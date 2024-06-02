@@ -1,20 +1,24 @@
-# HelloWorld
+# Alpine
 
-[![HelloWorld](http://dockeri.co/image/snowdreamtech/helloworld)](https://hub.docker.com/r/snowdreamtech/helloworld)
+[![Alpine](http://dockeri.co/image/snowdreamtech/alpine)](https://hub.docker.com/r/snowdreamtech/alpine)
 
-Docker Image packaging for HelloWorld. (amd64, arm32v6, arm32v7, arm64v8, i386, ppc64le,riscv64, s390x)
+Docker Image packaging for Alpine. (amd64, arm32v6, arm32v7, arm64v8, i386, ppc64le,riscv64, s390x)
 
 # Run
 
 ```bash
-docker run --rm snowdreamtech/helloworld:latest
+docker run --rm snowdreamtech/alpine:latest
+```
+
+```bash
+docker run -e TZ=Asia/Shanghai --rm snowdreamtech/alpine:latest
 ```
 
 # Development
 
 ```bash
 docker buildx create --use --name build --node build --driver-opt network=host
-docker buildx build -t snowdreamtech/helloworld --platform=linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/riscv64,linux/s390x . --push
+docker buildx build -t snowdreamtech/alpine --platform=linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/riscv64,linux/s390x . --push
 ```
 
 ## Reference

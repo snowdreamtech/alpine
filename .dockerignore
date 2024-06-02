@@ -1,5 +1,4 @@
 Dockerfile
 build.sh
-go.mod
 README.md
 .github

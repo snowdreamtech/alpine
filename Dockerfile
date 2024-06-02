@@ -1,12 +1,5 @@
-FROM golang:1.21-alpine3.20 AS builder
-ENV GO111MODULE auto
-RUN mkdir /app
-ADD . /app/
-WORKDIR /app
-RUN go build -o hello .
+FROM alpine:3.20.0
 
-FROM alpine
-RUN mkdir /app
-WORKDIR /app
-COPY --from=builder /app/hello .
-CMD ["./hello"]
+LABEL maintainer="snowdream <sn0wdr1am@qq.com>"
+
+RUN apk add --no-cache tzdata
