@@ -30,3 +30,14 @@ docker buildx build -t snowdreamtech/alpine --platform=linux/386,linux/amd64,lin
 1. [How to Rapidly Build Multi-Architecture Images with Buildx](https://www.docker.com/blog/how-to-rapidly-build-multi-architecture-images-with-buildx/)
 1. [Faster Multi-Platform Builds: Dockerfile Cross-Compilation Guide](https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/)
 1. [docker/buildx](https://github.com/docker/buildx)
+
+## Contact (备注：alpine)
+
+* Email: sn0wdr1am@qq.com
+* QQ: 3217680847
+* QQ群: 949022145
+* WeChat/微信群: sn0wdr1am
+
+## License
+
+MIT
