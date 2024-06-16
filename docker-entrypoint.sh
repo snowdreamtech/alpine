@@ -1,5 +1,5 @@
 #!/bin/sh
 set -e
 
-# wait
-wait
+# exec commands
+exec "$@"
