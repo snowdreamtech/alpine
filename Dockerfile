@@ -4,4 +4,8 @@ LABEL maintainer="snowdream <sn0wdr1am@qq.com>"
 
 RUN apk add --no-cache musl-locales \
     musl-locales-lang \
-    tzdata
+    tzdata \
+    openssl \
+    wget \
+    ca-certificates \                                                                                                                                                                                                      
+    && update-ca-certificates    
