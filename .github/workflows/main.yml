@@ -22,12 +22,6 @@ jobs:
             echo "BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
             echo "http_proxy=${http_proxy}" >> $GITHUB_ENV
             echo "no_proxy=${no_proxy}" >> $GITHUB_ENV
-        - 
-          name: Run GitHub Actions Version Updater
-          uses: saadmk11/github-actions-version-updater@v0.8.1
-          with:
-            # [Required] Access token with `workflow` scope.
-            token: ${{ secrets.WORKFLOW_SECRET }}
         -
           # Add support for more platforms with QEMU (optional)
           # https://github.com/docker/setup-qemu-action
