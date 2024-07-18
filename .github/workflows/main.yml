@@ -17,6 +17,11 @@ jobs:
           with:
             # [Required] Access token with `workflow` scope.
             token: ${{ secrets.WORKFLOW_SECRET }}
+        - name: Set env variables
+          run: |
+            echo "BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
+            echo "http_proxy=${http_proxy}" >> $GITHUB_ENV
+            echo "no_proxy=${no_proxy}" >> $GITHUB_ENV
         - 
           name: Run GitHub Actions Version Updater
           uses: saadmk11/github-actions-version-updater@v0.8.1
@@ -28,11 +33,6 @@ jobs:
           # https://github.com/docker/setup-qemu-action
           name: Set up QEMU
           uses: docker/setup-qemu-action@v3.1.0
-        - name: Set env variables
-          run: |
-            echo "BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
-            echo "http_proxy=${http_proxy}" >> $GITHUB_ENV
-            echo "no_proxy=${no_proxy}" >> $GITHUB_ENV
         -
           # https://github.com/docker/buildx/issues/136#issuecomment-550205439
           # docker buildx create --driver-opt env.http_proxy=$http_proxy --driver-opt env.https_proxy=$https_proxy --driver-opt '"env.no_proxy='$no_proxy'"'
