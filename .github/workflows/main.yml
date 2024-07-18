@@ -33,6 +33,7 @@ jobs:
             echo "BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
             echo "http_proxy=${http_proxy}" >> $GITHUB_ENV
             echo "no_proxy=${no_proxy}" >> $GITHUB_ENV
+            echo $GITHUB_ENV
         -
           name: Set up Docker Buildx
           uses: docker/setup-buildx-action@v3.4.0
