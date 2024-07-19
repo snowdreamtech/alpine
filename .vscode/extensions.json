@@ -12,6 +12,7 @@
         "ms-vscode.remote-explorer",
         "timonwong.shellcheck",
         "foxundermoon.shell-format",
-        "ms-ceintl.vscode-language-pack-zh-hans"
+        "ms-ceintl.vscode-language-pack-zh-hans",
+        "github.vscode-github-actions"
     ]
 }
