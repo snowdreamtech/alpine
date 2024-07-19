@@ -11,6 +11,7 @@
         "ms-vscode-remote.remote-ssh-edit",
         "ms-vscode.remote-explorer",
         "timonwong.shellcheck",
-        "foxundermoon.shell-format"
+        "foxundermoon.shell-format",
+        "ms-ceintl.vscode-language-pack-zh-hans"
     ]
 }
