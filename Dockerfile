@@ -1,4 +1,4 @@
-FROM alpine:3.20.0
+FROM alpine:3.20.1
 
 LABEL maintainer="snowdream <sn0wdr1am@qq.com>"
 
@@ -9,6 +9,6 @@ RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/a
     musl-locales-lang \
     tzdata \
     openssl \
-    wget \
+    wget \  
     ca-certificates \                                                                                                                                                                                                      
     && update-ca-certificates    
