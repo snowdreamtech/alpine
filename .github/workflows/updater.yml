@@ -5,8 +5,6 @@ on:
   push:
     branches:
       - entrypoint  
-    tags:
-      - '*'
   schedule:
     # Automatically run on every Day
     - cron:  '0 0 * * *'
