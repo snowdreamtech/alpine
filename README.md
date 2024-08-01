@@ -4,14 +4,63 @@
 
 Docker Image packaging for Alpine. (amd64, arm32v6, arm32v7, arm64v8, i386, ppc64le,riscv64, s390x)
 
-# Run
+# Usage
+
+To help you get started creating a container from this image you can either use docker-compose or the docker cli.
+
+## Docker Cli
+
+### Simple
 
 ```bash
-docker run --rm snowdreamtech/alpine:latest
+docker run -d \
+  --name=alpine \
+  -e TZ=Asia/Shanghai \
+  --restart unless-stopped \
+  snowdreamtech/alpine:latest
 ```
 
+### Advance
+
 ```bash
-docker run -e TZ=Asia/Shanghai --rm snowdreamtech/alpine:latest
+docker run -d \
+  --name=alpine \
+  -e TZ=Asia/Shanghai \
+  -v /path/to/data:/path/to/data \
+  --restart unless-stopped \
+  snowdreamtech/alpine:latest
+```
+
+## Docker Compose
+
+### Simple
+
+```bash
+version: "3"
+
+services:
+  alpine:
+    image: snowdreamtech/alpine:latest
+    container_name: alpine
+    environment:
+      - TZ=Asia/Shanghai
+    restart: unless-stopped
+```
+
+### Advance
+
+```bash
+version: "3"
+
+services:
+  alpine:
+    image: snowdreamtech/alpine:latest
+    container_name: alpine
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - /path/to/data:/path/to/data
+    restart: unless-stopped
 ```
 
 # Development
