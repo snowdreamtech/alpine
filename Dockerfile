@@ -16,7 +16,7 @@ RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/a
     ca-certificates \                                                                                                                                                                                                      
     && update-ca-certificates    
 
-# ENTRYPOINT [ "sleep","infinity" ]
-# ENTRYPOINT [ "tail", "-f", "/dev/null" ]
-# CMD [ "sleep","infinity" ]
-# CMD [ "tail", "-f", "/dev/null" ]
+# ENTRYPOINT [ "sh", "-c", "trap : TERM INT; tail -f /dev/null & wait" ]
+# ENTRYPOINT [ "sh", "-c", "trap : TERM INT; sleep infinity & wait" ]
+# CMD [ "sh", "-c", "trap : TERM INT; tail -f /dev/null & wait" ]
+# CMD [ "sh", "-c", "trap : TERM INT; sleep infinity & wait" ]
