@@ -2,4 +2,12 @@
 set -e
 
 # exec commands
-exec "$@"
+if [ -n "$*" ]; then
+    sh -c "$*"
+fi
+
+# keep the docker container running
+if [ "${KEEPALIVE}" -eq 1 ]; then
+    tail -f /dev/null
+    # sleep infinity
+fi
