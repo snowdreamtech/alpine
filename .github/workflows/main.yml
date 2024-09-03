@@ -9,7 +9,7 @@ on:
   workflow_dispatch:
 jobs:
     buildx:
-      runs-on: 4H16G
+      runs-on: 1H1G
       steps:
         -
           name: Checkout
