@@ -69,11 +69,11 @@ jobs:
             push: true
             tags: |
               snowdreamtech/alpine:latest
-              snowdreamtech/alpine:3.20.2
+              snowdreamtech/alpine:3.20.3
               snowdreamtech/alpine:3.20
               snowdreamtech/alpine:3
               ghcr.io/snowdreamtech/alpine:latest
-              ghcr.io/snowdreamtech/alpine:3.20.2
+              ghcr.io/snowdreamtech/alpine:3.20.3
               ghcr.io/snowdreamtech/alpine:3.20
               ghcr.io/snowdreamtech/alpine:3
              
