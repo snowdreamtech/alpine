@@ -1,7 +1,17 @@
 FROM alpine:3.20.3
 
-LABEL maintainer="snowdream <sn0wdr1am@qq.com>"
-
+# OCI annotations to image
+LABEL org.opencontainers.image.authors="Snowdream Tech" \
+      org.opencontainers.image.title="Alpine Base Image" \
+      org.opencontainers.image.description="Docker Images for Alpine. (i386,amd64,arm32v5,arm32v7,arm64,mips64le,ppc64le,s390x)" \
+      org.opencontainers.image.documentation="https://hub.docker.com/r/snowdreamtech/alpine" \
+      org.opencontainers.image.base.name="snowdreamtech/alpine:latest" \
+      org.opencontainers.image.licenses="MIT" \
+      org.opencontainers.image.source="https://github.com/snowdreamtech/alpine" \
+      org.opencontainers.image.vendor="Snowdream Tech" \
+      org.opencontainers.image.version="12.7" \
+      org.opencontainers.image.url="https://github.com/snowdreamtech/alpine"
+      
 # keep the docker container running
 ENV KEEPALIVE=0
 
