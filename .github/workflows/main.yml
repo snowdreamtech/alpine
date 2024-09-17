@@ -55,7 +55,30 @@ jobs:
           with:
             registry: ghcr.io
             username: ${{ github.repository_owner }}
-            password: ${{ secrets.GITHUB_TOKEN }}          
+            password: ${{ secrets.GITHUB_TOKEN }}       
+        - 
+          name: Docker meta
+          id: meta
+          uses: docker/metadata-action@v5
+          with:
+            # list of Docker images to use as base name for tags
+            images: |
+              snowdreamtech/alpine
+              ghcr.io/snowdreamtech/alpine            
+            flavor: |
+              latest=auto
+              prefix=
+              suffix=ab
+            # generate Docker tags based on the following events/attributes
+            tags: |
+              type=schedule
+              type=ref,event=branch
+              type=pep440,pattern={{version}}
+              type=pep440,pattern={{major}}.{{minor}}
+              type=pep440,pattern={{major}}
+              type=sha  
+          env:
+            DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index                         
         -
           name: Build and push
           uses: docker/build-push-action@v6.7.0
@@ -66,14 +89,18 @@ jobs:
               https_proxy=${{ env.http_proxy }}
               env.no_proxy=${{ env.no_proxy }}
             platforms: linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/riscv64,linux/s390x
-            push: false
-            tags: |
-              snowdreamtech/alpine:latest
-              snowdreamtech/alpine:3.20.3
-              snowdreamtech/alpine:3.20
-              snowdreamtech/alpine:3
-              ghcr.io/snowdreamtech/alpine:latest
-              ghcr.io/snowdreamtech/alpine:3.20.3
-              ghcr.io/snowdreamtech/alpine:3.20
-              ghcr.io/snowdreamtech/alpine:3
+            # push: false
+            push: ${{ github.event_name != 'pull_request' }}
+            tags: ${{ steps.meta.outputs.tags }}
+            labels: ${{ steps.meta.outputs.labels }}
+            annotations: ${{ steps.meta.outputs.annotations }}
+            # tags: |
+            #   snowdreamtech/alpine:latest
+            #   snowdreamtech/alpine:3.20.3
+            #   snowdreamtech/alpine:3.20
+            #   snowdreamtech/alpine:3
+            #   ghcr.io/snowdreamtech/alpine:latest
+            #   ghcr.io/snowdreamtech/alpine:3.20.3
+            #   ghcr.io/snowdreamtech/alpine:3.20
+            #   ghcr.io/snowdreamtech/alpine:3
              
