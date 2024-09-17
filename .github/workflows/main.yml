@@ -69,7 +69,6 @@ jobs:
               latest=auto
             # generate Docker tags based on the following events/attributes
             tags: |
-              type=ref,event=branch
               type=pep440,pattern={{version}}
               type=pep440,pattern={{major}}.{{minor}}
               type=pep440,pattern={{major}}
@@ -96,13 +95,4 @@ jobs:
             tags: ${{ steps.meta.outputs.tags }}
             labels: ${{ steps.meta.outputs.labels }}
             annotations: ${{ steps.meta.outputs.annotations }}
-            # tags: |
-            #   snowdreamtech/alpine:latest
-            #   snowdreamtech/alpine:3.20.3
-            #   snowdreamtech/alpine:3.20
-            #   snowdreamtech/alpine:3
-            #   ghcr.io/snowdreamtech/alpine:latest
-            #   ghcr.io/snowdreamtech/alpine:3.20.3
-            #   ghcr.io/snowdreamtech/alpine:3.20
-            #   ghcr.io/snowdreamtech/alpine:3
              
