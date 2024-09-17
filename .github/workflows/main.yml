@@ -69,6 +69,7 @@ jobs:
               latest=auto
             # generate Docker tags based on the following events/attributes
             tags: |
+              type=edge
               type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'dev') }}
               type=pep440,pattern={{version}}
               type=pep440,pattern={{major}}.{{minor}}
