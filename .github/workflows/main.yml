@@ -13,6 +13,11 @@ on:
 jobs:
     buildx:
       runs-on: 1H1G
+      strategy:
+        matrix:
+          suffix:
+            - debian
+            - bookworm
       steps:
         -
           name: Checkout
@@ -67,19 +72,14 @@ jobs:
               ghcr.io/snowdreamtech/alpine            
             flavor: |
               latest=auto
-            # generate Docker tags based on the following events/attributes
+              suffix=${{ matrix.suffix }},onlatest=false
             tags: |
               type=edge,branch=dev
               type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'dev') }}
+              type=raw,value=dev,enable=${{ github.ref == format('refs/heads/{0}', 'dev') }}
               type=pep440,pattern={{version}}
               type=pep440,pattern={{major}}.{{minor}}
               type=pep440,pattern={{major}}
-              type=pep440,pattern={{version}}-a
-              type=pep440,pattern={{major}}.{{minor}}-a
-              type=pep440,pattern={{major}}-a
-              type=pep440,pattern={{version}}-b
-              type=pep440,pattern={{major}}.{{minor}}-b
-              type=pep440,pattern={{major}}-b
           env:
             DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index                         
         -
