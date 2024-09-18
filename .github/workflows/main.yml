@@ -79,7 +79,7 @@ jobs:
               type=raw,enable=${{ github.ref == format('refs/heads/{0}', 'dev') }},priority=200,prefix=,suffix=,value=dev
               type=pep440,enable=true,priority=900,prefix=,suffix=-${{ matrix.suffix }},pattern={{version}}
               type=pep440,enable=true,priority=900,prefix=,suffix=-${{ matrix.suffix }},pattern={{major}}.{{minor}}
-              type=pep440,enable=true,priority=900,prefix=,suffix-${{ matrix.suffix }},pattern={{major}}
+              type=pep440,enable=true,priority=900,prefix=,suffix=-${{ matrix.suffix }},pattern={{major}}
               type=pep440,enable=true,priority=900,prefix=,suffix=,pattern={{version}}
               type=pep440,enable=true,priority=900,prefix=,suffix=,pattern={{major}}.{{minor}}
               type=pep440,enable=true,priority=900,prefix=,suffix=,pattern={{major}}
