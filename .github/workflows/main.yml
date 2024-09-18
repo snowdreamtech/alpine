@@ -16,6 +16,7 @@ jobs:
       strategy:
         matrix:
           suffix:
+            - 
             - debian
             - bookworm
       steps:
@@ -74,12 +75,12 @@ jobs:
               latest=auto
               suffix=${{ matrix.suffix }},onlatest=false
             tags: |
-              type=edge,branch=dev
-              type=raw,value=latest,enable=${{ github.ref == format('refs/heads/{0}', 'dev') }}
-              type=raw,value=dev,enable=${{ github.ref == format('refs/heads/{0}', 'dev') }}
-              type=pep440,pattern={{version}}
-              type=pep440,pattern={{major}}.{{minor}}
-              type=pep440,pattern={{major}}
+              type=edge,enable=true,priority=700,prefix=,suffix=,branch=dev
+              type=raw,enable=${{ github.ref == format('refs/heads/{0}', 'dev') }},priority=200,prefix=,suffix=,value=latest
+              type=raw,enable=${{ github.ref == format('refs/heads/{0}', 'dev') }},priority=200,prefix=,suffix=,value=dev
+              type=pep440,enable=true,priority=900,prefix=,suffix=,pattern={{version}}
+              type=pep440,enable=true,priority=900,prefix=,suffix=,pattern={{major}}.{{minor}}
+              type=pep440,enable=true,priority=900,prefix=,suffix=,pattern={{major}}
           env:
             DOCKER_METADATA_ANNOTATIONS_LEVELS: manifest,index                         
         -
