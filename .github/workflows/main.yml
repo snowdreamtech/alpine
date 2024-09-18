@@ -77,9 +77,9 @@ jobs:
               type=edge,enable=true,priority=700,prefix=,suffix=,branch=dev
               type=raw,enable=${{ github.ref == format('refs/heads/{0}', 'dev') }},priority=200,prefix=,suffix=,value=latest
               type=raw,enable=${{ github.ref == format('refs/heads/{0}', 'dev') }},priority=200,prefix=,suffix=,value=dev
-              type=pep440,enable=true,priority=900,prefix=,suffix=,pattern={{version}}-${{ matrix.suffix }}
-              type=pep440,enable=true,priority=900,prefix=,suffix=,pattern={{major}}.{{minor}}-${{ matrix.suffix }}
-              type=pep440,enable=true,priority=900,prefix=,suffix=,pattern={{major}}-${{ matrix.suffix }}
+              type=pep440,enable=true,priority=900,prefix=,suffix=-${{ matrix.suffix }},pattern={{version}}
+              type=pep440,enable=true,priority=900,prefix=,suffix=-${{ matrix.suffix }},pattern={{major}}.{{minor}}
+              type=pep440,enable=true,priority=900,prefix=,suffix-${{ matrix.suffix }},pattern={{major}}
               type=pep440,enable=true,priority=900,prefix=,suffix=,pattern={{version}}
               type=pep440,enable=true,priority=900,prefix=,suffix=,pattern={{major}}.{{minor}}
               type=pep440,enable=true,priority=900,prefix=,suffix=,pattern={{major}}
