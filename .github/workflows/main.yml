@@ -13,12 +13,6 @@ on:
 jobs:
     buildx:
       runs-on: 1H1G
-      strategy:
-        matrix:
-          suffix:
-            - 
-            - debian
-            - bookworm
       steps:
         -
           name: Checkout
@@ -71,15 +65,17 @@ jobs:
             images: |
               snowdreamtech/alpine
               ghcr.io/snowdreamtech/alpine            
-            flavor: |
-              latest=false
             tags: |
               type=edge,enable=true,priority=700,prefix=,suffix=,branch=dev
-              type=raw,enable=${{ github.ref == format('refs/heads/{0}', 'dev') }},priority=200,prefix=,suffix=,value=latest
+              type=raw,enable=${{ github.ref == format('refs/heads/{0}', 'main') }},priority=200,prefix=,suffix=,value=latest
+              type=raw,enable=${{ github.ref == format('refs/heads/{0}', 'master') }},priority=200,prefix=,suffix=,value=latest
               type=raw,enable=${{ github.ref == format('refs/heads/{0}', 'dev') }},priority=200,prefix=,suffix=,value=dev
-              type=pep440,enable=true,priority=900,prefix=,suffix=-${{ matrix.suffix }},pattern={{version}}
-              type=pep440,enable=true,priority=900,prefix=,suffix=-${{ matrix.suffix }},pattern={{major}}.{{minor}}
-              type=pep440,enable=true,priority=900,prefix=,suffix=-${{ matrix.suffix }},pattern={{major}}
+              type=pep440,enable=true,priority=900,prefix=,suffix=-debian,pattern={{version}}
+              type=pep440,enable=true,priority=900,prefix=,suffix=-debian,pattern={{major}}.{{minor}}
+              type=pep440,enable=true,priority=900,prefix=,suffix=-debian,pattern={{major}}
+              type=pep440,enable=true,priority=900,prefix=,suffix=-bookworm,pattern={{version}}
+              type=pep440,enable=true,priority=900,prefix=,suffix=-bookworm,pattern={{major}}.{{minor}}
+              type=pep440,enable=true,priority=900,prefix=,suffix=-bookworm,pattern={{major}}
               type=pep440,enable=true,priority=900,prefix=,suffix=,pattern={{version}}
               type=pep440,enable=true,priority=900,prefix=,suffix=,pattern={{major}}.{{minor}}
               type=pep440,enable=true,priority=900,prefix=,suffix=,pattern={{major}}
