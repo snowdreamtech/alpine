@@ -26,6 +26,7 @@ RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/a
     tzdata \
     openssl \
     wget \
+    curl \
     ca-certificates \                                                                                                                                                                                                      
     && update-ca-certificates
 
