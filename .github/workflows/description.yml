@@ -1,4 +1,5 @@
-name: Update Container Description
+name: GitHub Actions Description Updater
+
 on:
   push:
     branches:
