@@ -49,7 +49,7 @@ on:
 
 jobs:
   buildx:
-    runs-on: 1H1G
+    runs-on: 2H4G
     steps:
       - name: Checkout
         uses: actions/checkout@v4.2.2
