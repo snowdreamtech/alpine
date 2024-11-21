@@ -34,6 +34,7 @@ RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/a
 
 RUN apk add --no-cache \
     alpine-conf \
+    expect \
     fastfetch \
     xauth \
     openssh \
