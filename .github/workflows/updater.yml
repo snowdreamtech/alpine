@@ -16,8 +16,6 @@ on:
       - "feature/**"
       - "fix/**"
       - "pr/**"
-    tags:
-      - "*"
   pull_request:
     branches:
       - "main"
