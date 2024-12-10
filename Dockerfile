@@ -17,8 +17,10 @@ ENV KEEPALIVE=1 \
     # Ensure the container exec commands handle range of utf8 characters based of
     # default locales in base image (https://github.com/docker-library/docs/tree/master/debian#locales)
     LANG=C.UTF-8 \
-    SSH_ROOT_PASSWORD=
-
+    SSH_ROOT_PASSWORD= \
+    KEYBOARD_LAYOUT=us \
+    KEYBOARD_VARIANT=us 
+    
 RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/apk/repositories \
     && echo "@community https://dl-cdn.alpinelinux.org/alpine/edge/community" | tee -a /etc/apk/repositories \
     && echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" | tee -a /etc/apk/repositories \
@@ -64,6 +66,6 @@ COPY motd.sh /etc/periodic/15min/
 
 EXPOSE 22
 
-COPY docker-entrypoint.sh /usr/local/bin/
+COPY docker-entrypoint.sh setup-*.exp /usr/local/bin/
 
 ENTRYPOINT ["docker-entrypoint.sh"]

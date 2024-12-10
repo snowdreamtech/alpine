@@ -1,6 +1,10 @@
 #!/bin/sh
 set -e
 
+# setup-keymap
+setup-keymap.exp >/dev/null 2>&1
+
+
 # ssh-keygen -A
 if [ ! -f "/etc/ssh/ssh_host_rsa_key" ]; then
   ssh-keygen -A >/dev/null 2>&1
