@@ -38,6 +38,11 @@ RUN apk add --no-cache \
     fastfetch \
     xauth \
     xhost \
+    xinit \ 
+    xclock \
+    xeyes \
+    xcalc \
+    xterm \
     openssh \
     && sed -i "s/#PermitRootLogin.*/PermitRootLogin yes/g" /etc/ssh/sshd_config \ 
     && sed -i "s/^#PasswordAuthentication/PasswordAuthentication/g" /etc/ssh/sshd_config \ 
@@ -63,6 +68,8 @@ RUN apk add --no-cache \
 
 RUN apk add --no-cache \
     sudo \
+    xvfb \
+    x11vnc \
     bash \
     bash-doc \
     bash-completion \
