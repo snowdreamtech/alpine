@@ -20,7 +20,7 @@ ENV KEEPALIVE=1 \
     SSH_ROOT_PASSWORD= \
     KEYBOARD_LAYOUT=us \
     KEYBOARD_VARIANT=us 
-    
+
 RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/apk/repositories \
     && echo "@community https://dl-cdn.alpinelinux.org/alpine/edge/community" | tee -a /etc/apk/repositories \
     && echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" | tee -a /etc/apk/repositories \
@@ -32,7 +32,6 @@ RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/a
     curl \
     ca-certificates \                                                                                                                                                                                                      
     && update-ca-certificates
-
 
 RUN apk add --no-cache \
     alpine-conf \
@@ -61,6 +60,15 @@ RUN apk add --no-cache \
     && sed -i -E "s/#?X11UseLocalhost.*/X11UseLocalhost yes/g" /etc/ssh/sshd_config \
     && sed -i -E "s/#?PermitTTY.*/PermitTTY yes/g" /etc/ssh/sshd_config \
     && sed -i -E "s/#?PrintMotd.*/PrintMotd yes/g" /etc/ssh/sshd_config 
+
+RUN apk add --no-cache \
+    sudo \
+    bash \
+    bash-doc \
+    bash-completion 
+
+RUN setup-xorg-base || true
+
 
 COPY motd.sh /etc/periodic/15min/
 
