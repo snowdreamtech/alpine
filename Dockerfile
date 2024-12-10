@@ -21,6 +21,7 @@ ENV KEEPALIVE=1 \
     KEYBOARD_LAYOUT=us \
     KEYBOARD_VARIANT=us 
 
+# Basic
 RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/apk/repositories \
     && echo "@community https://dl-cdn.alpinelinux.org/alpine/edge/community" | tee -a /etc/apk/repositories \
     && echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" | tee -a /etc/apk/repositories \
@@ -33,6 +34,7 @@ RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/a
     ca-certificates \                                                                                                                                                                                                      
     && update-ca-certificates
 
+# OpenSSH
 RUN apk add --no-cache \
     alpine-conf \
     expect \
@@ -66,8 +68,51 @@ RUN apk add --no-cache \
     bash \
     bash-doc \
     bash-completion \
-    vim 
+    vim \ 
+    gvim \
+    ln -sf /usr/bin/vim /usr/bin/vi
 
+# Fonts
+RUN apk add --no-cache \
+    font-arabic-misc \
+    font-awesome \
+    font-cronyx-cyrillic \
+    font-dejavu \
+    font-inconsolata \
+    font-ipa \
+    font-isas-misc \
+    font-jis-misc \
+    font-misc-cyrillic \
+    font-mutt-misc \
+    font-noto \
+    font-noto-arabic \
+    font-noto-armenian \
+    font-noto-cherokee \
+    font-noto-cjk \
+    font-noto-devanagari \
+    font-noto-ethiopic \
+    font-noto-extra \
+    font-noto-georgian \
+    font-noto-hebrew \
+    font-noto-lao \
+    font-noto-malayalam \
+    font-noto-tamil \
+    font-noto-thaana \
+    font-noto-thai \
+    font-noto-tibetan \
+    font-screen-cyrillic \
+    font-sony-misc \
+    font-terminus \
+    font-vollkorn \
+    font-winitzki-cyrillic \
+    font-wqy-zenhei \
+    fontconfig \
+    freetype \
+    && mkfontscale \
+    && mkfontdir \
+    && fc-cache
+
+# setup-xorg-base 
 RUN setup-xorg-base || true
 
 COPY vimrc.local /etc/vim/
