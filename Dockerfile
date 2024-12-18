@@ -23,6 +23,7 @@ RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/a
     && echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" | tee -a /etc/apk/repositories \
     && apk add --no-cache \
     doas \
+    sudo \
     musl-locales \
     musl-locales-lang \
     tzdata \
