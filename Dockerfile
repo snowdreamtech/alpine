@@ -16,7 +16,10 @@ LABEL org.opencontainers.image.authors="Snowdream Tech" \
 ENV KEEPALIVE=0 \
     # Ensure the container exec commands handle range of utf8 characters based of
     # default locales in base image (https://github.com/docker-library/docs/tree/master/debian#locales)
-    LANG=C.UTF-8 
+    LANG=C.UTF-8 \
+    GID=1000 \
+    UID=1000  \
+    USER= 
 
 RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/apk/repositories \
     && echo "@community https://dl-cdn.alpinelinux.org/alpine/edge/community" | tee -a /etc/apk/repositories \
@@ -24,6 +27,7 @@ RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/a
     && apk add --no-cache \
     doas \
     sudo \
+    busybox-suid \
     musl-locales \
     musl-locales-lang \
     tzdata \
@@ -32,6 +36,12 @@ RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/a
     curl \
     ca-certificates \                                                                                                                                                                                                      
     && update-ca-certificates
+
+RUN if [ "${USER}" != "" ]; then \
+    addgroup -g ${GID} ${USER}; \
+    adduser -h /home/${USER} -u ${UID} -g ${USER} -G ${USER} -s /bin/sh -D ${USER}; \
+    sed -i "/%sudo/c ${USER} ALL=(ALL:ALL) NOPASSWD:ALL" /etc/sudoers; \
+    fi
 
 COPY docker-entrypoint.sh /usr/local/bin/
 
