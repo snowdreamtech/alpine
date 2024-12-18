@@ -21,7 +21,9 @@ ENV KEEPALIVE=0 \
 RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/apk/repositories \
     && echo "@community https://dl-cdn.alpinelinux.org/alpine/edge/community" | tee -a /etc/apk/repositories \
     && echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" | tee -a /etc/apk/repositories \
-    && apk add --no-cache musl-locales \
+    && apk add --no-cache \
+    doas \
+    musl-locales \
     musl-locales-lang \
     tzdata \
     openssl \
