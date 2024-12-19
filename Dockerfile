@@ -16,8 +16,9 @@ LABEL org.opencontainers.image.authors="Snowdream Tech" \
 ENV KEEPALIVE=0 \
     # Ensure the container exec commands handle range of utf8 characters based of
     # default locales in base image (https://github.com/docker-library/docs/tree/master/debian#locales)
-    LANG=C.UTF-8 \
-    GID=1000 \
+    LANG=C.UTF-8
+
+ARG GID=1000 \
     UID=1000  \
     USER= 
 
