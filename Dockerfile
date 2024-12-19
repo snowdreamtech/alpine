@@ -20,7 +20,8 @@ ENV KEEPALIVE=0 \
 
 ARG GID=1000 \
     UID=1000  \
-    USER= 
+    USER=root \
+    WORKDIR=/root
 
 RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/apk/repositories \
     && echo "@community https://dl-cdn.alpinelinux.org/alpine/edge/community" | tee -a /etc/apk/repositories \
@@ -38,11 +39,18 @@ RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/a
     ca-certificates \                                                                                                                                                                                                      
     && update-ca-certificates
 
-RUN if [ "${USER}" != "" ]; then \
+# Create a user with UID and GID
+RUN if [ "${USER}" != "root" ]; then \
     addgroup -g ${GID} ${USER}; \
     adduser -h /home/${USER} -u ${UID} -g ${USER} -G ${USER} -s /bin/sh -D ${USER}; \
-    sed -i "/%sudo/c ${USER} ALL=(ALL:ALL) NOPASSWD:ALL" /etc/sudoers; \
+    # sed -i "/%sudo/c ${USER} ALL=(ALL:ALL) NOPASSWD:ALL" /etc/sudoers; \
     fi
+
+# Switch to the user
+USER ${USER}
+
+# Set the workdir
+WORKDIR ${WORKDIR}
 
 COPY docker-entrypoint.sh /usr/local/bin/
 
