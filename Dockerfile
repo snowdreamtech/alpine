@@ -14,6 +14,9 @@ LABEL org.opencontainers.image.authors="Snowdream Tech" \
 
 # keep the docker container running
 ENV KEEPALIVE=0 \
+    # The cap_net_bind_service capability in Linux allows a process to bind a socket to Internet domain privileged ports, 
+    # which are port numbers less than 1024. 
+    CAP_NET_BIND_SERVICE=0 \
     # Ensure the container exec commands handle range of utf8 characters based of
     # default locales in base image (https://github.com/docker-library/docs/tree/master/debian#locales)
     LANG=C.UTF-8
@@ -44,6 +47,12 @@ RUN if [ "${USER}" != "root" ]; then \
     addgroup -g ${GID} ${USER}; \
     adduser -h /home/${USER} -u ${UID} -g ${USER} -G ${USER} -s /bin/sh -D ${USER}; \
     # sed -i "/%sudo/c ${USER} ALL=(ALL:ALL) NOPASSWD:ALL" /etc/sudoers; \
+    fi
+
+# Enable CAP_NET_BIND_SERVICE
+RUN if [ "${USER}" != "root" ] && [ "${CAP_NET_BIND_SERVICE}" -eq 1 ]; then \
+    apk add --no-cache libcap; \
+    # setcap 'cap_net_bind_service=+ep' `which nginx`; \
     fi
 
 # Switch to the user
