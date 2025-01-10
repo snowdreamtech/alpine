@@ -11,6 +11,12 @@ LABEL org.opencontainers.image.authors="Snowdream Tech" \
     org.opencontainers.image.vendor="Snowdream Tech" \
     org.opencontainers.image.version="3.21.0" \
     org.opencontainers.image.url="https://github.com/snowdreamtech/alpine"
+    
+# Switch to the user
+USER root
+
+# Set the workdir
+WORKDIR /root
 
 # keep the docker container running
 ENV KEEPALIVE=0 \
