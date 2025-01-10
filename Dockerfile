@@ -96,10 +96,12 @@ RUN apk add --no-cache \
     sudo \
     bash \
     bash-doc \
-    bash-completion 
+    bash-completion \
+    vim 
 
 RUN setup-xorg-base || true
 
+COPY vimrc.local /etc/vim/
 
 COPY motd.sh /etc/periodic/15min/
 
