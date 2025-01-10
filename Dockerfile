@@ -94,7 +94,7 @@ RUN apk add --no-cache \
     bash-completion \
     vim \ 
     gvim \
-    ln -sf /usr/bin/vim /usr/bin/vi
+    && ln -sf /usr/bin/vim /usr/bin/vi
 
 # Fonts
 RUN apk add --no-cache \
