@@ -92,6 +92,7 @@ RUN apk add --no-cache \
     bash \
     bash-doc \
     bash-completion \
+    shadow \
     vim \ 
     gvim \
     && ln -sf /usr/bin/vim /usr/bin/vi
