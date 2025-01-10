@@ -64,6 +64,7 @@ RUN if [ "${USER}" != "root" ] && [ "${CAP_NET_BIND_SERVICE}" -eq 1 ]; then \
 
 RUN apk add --no-cache \
     alpine-conf \
+    expect \
     fastfetch \
     xauth \
     openssh \
