@@ -64,6 +64,7 @@ RUN apk add --no-cache \
     expect \
     fastfetch \
     xauth \
+    xhost \
     openssh \
     && sed -i "s/#PermitRootLogin.*/PermitRootLogin yes/g" /etc/ssh/sshd_config \ 
     && sed -i "s/^#PasswordAuthentication/PasswordAuthentication/g" /etc/ssh/sshd_config \ 
