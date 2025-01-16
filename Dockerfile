@@ -26,7 +26,9 @@ ENV KEEPALIVE=0 \
     # Ensure the container exec commands handle range of utf8 characters based of
     # default locales in base image (https://github.com/docker-library/docs/tree/master/debian#locales)
     LANG=C.UTF-8 \
-    SSH_ROOT_PASSWORD=
+    SSH_ROOT_PASSWORD= \
+    KEYBOARD_LAYOUT=us \
+    KEYBOARD_VARIANT=us 
 
 ARG GID=1000 \
     UID=1000  \
@@ -100,6 +102,6 @@ WORKDIR ${WORKDIR}
 
 EXPOSE 22
 
-COPY docker-entrypoint.sh /usr/local/bin/
+COPY docker-entrypoint.sh setup-*.exp /usr/local/bin/
 
 ENTRYPOINT ["docker-entrypoint.sh"]

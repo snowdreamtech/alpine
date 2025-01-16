@@ -1,0 +1,12 @@
+#!/usr/bin/expect
+
+set timeout -1
+
+spawn setup-keymap
+
+expect "Select keyboard layout"
+send -- "$env(KEYBOARD_LAYOUT)\r"
+expect "Select variant"
+send -- "$env(KEYBOARD_VARIANT)\r"
+
+expect eof
