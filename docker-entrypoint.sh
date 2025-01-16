@@ -56,8 +56,8 @@ x11vnc -storepasswd "$VNC_ROOT_PASSWORD" /etc/x11vnc.pass >/dev/null 2>&1 &
 # nohup x11vnc -listen 0.0.0.0  -auth guess -unixpw --rfbport "$VNC_PORT" -display "$DISPLAY" -bg -wait 20 -loop -forever -shared > /dev/null 2>&1 &
 x11vnc -listen 0.0.0.0 -rfbauth /etc/x11vnc.pass -rfbport "$VNC_PORT" -display "$DISPLAY" -wait 20 -loop -forever -shared >/dev/null 2>&1 &
 
-# start gnome 
-gnome-session --session=gnome > /dev/null 2>&1 &
+# start gnome
+gnome-session --session=gnome >/dev/null 2>&1 &
 
 # exec commands
 if [ -n "$*" ]; then
