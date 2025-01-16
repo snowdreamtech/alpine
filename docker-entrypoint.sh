@@ -57,7 +57,7 @@ x11vnc -storepasswd "$VNC_ROOT_PASSWORD" /etc/x11vnc.pass >/dev/null 2>&1 &
 x11vnc -listen 0.0.0.0 -rfbauth /etc/x11vnc.pass -rfbport "$VNC_PORT" -display "$DISPLAY" -wait 20 -loop -forever -shared >/dev/null 2>&1 &
 
 # start xfce
-startxfce4 > /dev/null 2>&1 &
+startxfce4 >/dev/null 2>&1 &
 
 # exec commands
 if [ -n "$*" ]; then
