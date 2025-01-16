@@ -16,10 +16,11 @@ crond >/dev/null 2>&1
 /etc/periodic/15min/motd.sh >/dev/null 2>&1
 
 # openssl rand -base64 33
-if [ -z "${SSH_ROOT_PASSWORD}" ]; then {
+if [ -z "${SSH_ROOT_PASSWORD}" ]; then
+  {
     SSH_ROOT_PASSWORD=$(openssl rand -base64 33)
     echo "Generate random ssh root password: ${SSH_ROOT_PASSWORD}"
-}
+  }
 fi
 
 # change the password for root
@@ -34,7 +35,7 @@ if [ ! -d "/root/.ssh" ]; then
 fi
 
 # start sshd
-/usr/sbin/sshd -D > /dev/null 2>&1 &
+/usr/sbin/sshd -D >/dev/null 2>&1 &
 
 # start Xvfb
 # nohup /usr/bin/Xvfb "$DISPLAY" -screen 0 "$RESOLUTION" -ac +extension GLX +render -noreset > /dev/null 2>&1 &
@@ -43,16 +44,17 @@ fi
 # start x11vnc
 
 # openssl rand -base64 33
-if [ -z "${VNC_ROOT_PASSWORD}" ]; then {
+if [ -z "${VNC_ROOT_PASSWORD}" ]; then
+  {
     VNC_ROOT_PASSWORD=$(openssl rand -base64 33)
     echo "Generate random vnc root password: ${VNC_ROOT_PASSWORD}"
-}
+  }
 fi
 
-x11vnc -storepasswd "$VNC_ROOT_PASSWORD" /etc/x11vnc.pass > /dev/null 2>&1 &
+x11vnc -storepasswd "$VNC_ROOT_PASSWORD" /etc/x11vnc.pass >/dev/null 2>&1 &
 
 # nohup x11vnc -listen 0.0.0.0  -auth guess -unixpw --rfbport "$VNC_PORT" -display "$DISPLAY" -bg -wait 20 -loop -forever -shared > /dev/null 2>&1 &
-x11vnc  -listen 0.0.0.0 -rfbauth /etc/x11vnc.pass -rfbport "$VNC_PORT" -display "$DISPLAY" -wait 20 -loop -forever -shared > /dev/null 2>&1 &
+x11vnc -listen 0.0.0.0 -rfbauth /etc/x11vnc.pass -rfbport "$VNC_PORT" -display "$DISPLAY" -wait 20 -loop -forever -shared >/dev/null 2>&1 &
 
 # exec commands
 if [ -n "$*" ]; then
