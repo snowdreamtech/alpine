@@ -152,6 +152,9 @@ RUN apk add --no-cache \
 # setup-xorg-base 
 RUN setup-xorg-base || true
 
+# setup-desktop plasma 
+RUN setup-desktop plasma || true
+
 COPY vimrc.local /etc/vim/
 
 COPY motd.sh /etc/periodic/15min/
