@@ -1,6 +1,6 @@
 # Alpine
 
-[![Alpine](http://dockeri.co/image/snowdreamtech/alpine)](https://hub.docker.com/r/snowdreamtech/alpine)
+[![dockeri.co](https://dockerico.blankenship.io/image/snowdreamtech/alpine)](https://hub.docker.com/r/snowdreamtech/alpine)
 
 Docker Image packaging for Alpine. (amd64, arm32v6, arm32v7, arm64v8, i386, ppc64le,riscv64, s390x)
 
