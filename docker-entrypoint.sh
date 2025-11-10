@@ -1,9 +1,21 @@
 #!/bin/sh
 set -e
 
+# set umask
+if [ -z "${UMASK}" ]; then
+  UMASK=022
+fi
+umask "${UMASK}"
+
+# set workdir
+if [ -z "${WORKDIR}" ]; then
+  WORKDIR="/root"
+fi
+cd "${WORKDIR}"
+
 # exec commands
 if [ -n "$*" ]; then
-  sh -c "$*"
+  su-exec "${PUID}:${PGID}" ""$*""
 fi
 
 # keep the docker container running

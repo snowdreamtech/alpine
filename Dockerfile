@@ -25,10 +25,10 @@ ENV KEEPALIVE=0 \
     CAP_NET_BIND_SERVICE=0 \
     # Ensure the container exec commands handle range of utf8 characters based of
     # default locales in base image (https://github.com/docker-library/docs/tree/master/debian#locales)
-    LANG=C.UTF-8
-
-ARG GID=1000 \
-    UID=1000  \
+    LANG=C.UTF-8\
+    UMASK=022 \
+    PGID=0 \
+    PUID=0  \
     USER=root \
     WORKDIR=/root
 
@@ -46,13 +46,14 @@ RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/a
     wget \
     curl \
     git \
+    su-exec \ 
     ca-certificates \                                                                                                                                                                                                      
     && update-ca-certificates
 
-# Create a user with UID and GID
+# Create a user with PUID and PGID
 RUN if [ "${USER}" != "root" ]; then \
-    addgroup -g ${GID} ${USER}; \
-    adduser -h /home/${USER} -u ${UID} -g ${USER} -G ${USER} -s /bin/sh -D ${USER}; \
+    addgroup -g ${PGID} ${USER}; \
+    adduser -h /home/${USER} -u ${PUID} -g ${USER} -G ${USER} -s /bin/sh -D ${USER}; \
     # sed -i "/%sudo/c ${USER} ALL=(ALL:ALL) NOPASSWD:ALL" /etc/sudoers; \
     fi
 
