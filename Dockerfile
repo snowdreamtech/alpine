@@ -19,7 +19,7 @@ USER root
 WORKDIR /root
 
 # keep the docker container running
-ENV KEEPALIVE=0 \
+ARG KEEPALIVE=0 \
     # The cap_net_bind_service capability in Linux allows a process to bind a socket to Internet domain privileged ports, 
     # which are port numbers less than 1024. 
     CAP_NET_BIND_SERVICE=0 \
@@ -32,6 +32,21 @@ ENV KEEPALIVE=0 \
     PUID=0  \
     USER=root \
     WORKDIR=/root 
+
+# keep the docker container running
+ENV KEEPALIVE=${KEEPALIVE} \
+    # The cap_net_bind_service capability in Linux allows a process to bind a socket to Internet domain privileged ports, 
+    # which are port numbers less than 1024. 
+    CAP_NET_BIND_SERVICE=${CAP_NET_BIND_SERVICE} \
+    # Ensure the container exec commands handle range of utf8 characters based of
+    # default locales in base image (https://github.com/docker-library/docs/tree/master/debian#locales)
+    LANG=${LANG} \
+    UMASK=${UMASK} \
+    DEBUG=${DEBUG} \
+    PGID=${PGID} \
+    PUID=${PUID}  \
+    USER=${USER} \
+    WORKDIR=${WORKDIR} 
 
 RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/apk/repositories \
     && echo "@community https://dl-cdn.alpinelinux.org/alpine/edge/community" | tee -a /etc/apk/repositories \
