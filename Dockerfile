@@ -11,7 +11,7 @@ LABEL org.opencontainers.image.authors="Snowdream Tech" \
     org.opencontainers.image.vendor="Snowdream Tech" \
     org.opencontainers.image.version="3.22.0" \
     org.opencontainers.image.url="https://github.com/snowdreamtech/alpine"
-    
+
 # Switch to the user
 USER root
 
@@ -27,10 +27,11 @@ ENV KEEPALIVE=0 \
     # default locales in base image (https://github.com/docker-library/docs/tree/master/debian#locales)
     LANG=C.UTF-8\
     UMASK=022 \
+    DEBUG=false \
     PGID=0 \
     PUID=0  \
     USER=root \
-    WORKDIR=/root
+    WORKDIR=/root 
 
 RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/apk/repositories \
     && echo "@community https://dl-cdn.alpinelinux.org/alpine/edge/community" | tee -a /etc/apk/repositories \
@@ -46,29 +47,16 @@ RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/a
     wget \
     curl \
     git \
+    libcap \
     su-exec \ 
     ca-certificates \                                                                                                                                                                                                      
     && update-ca-certificates
 
-# Create a user with PUID and PGID
-RUN if [ "${USER}" != "root" ]; then \
-    addgroup -g ${PGID} ${USER}; \
-    adduser -h /home/${USER} -u ${PUID} -g ${USER} -G ${USER} -s /bin/sh -D ${USER}; \
-    # sed -i "/%sudo/c ${USER} ALL=(ALL:ALL) NOPASSWD:ALL" /etc/sudoers; \
-    fi
+COPY entrypoint.d /usr/local/bin/entrypoint.d
 
-# Enable CAP_NET_BIND_SERVICE
-RUN if [ "${USER}" != "root" ] && [ "${CAP_NET_BIND_SERVICE}" -eq 1 ]; then \
-    apk add --no-cache libcap; \
-    # setcap 'cap_net_bind_service=+ep' `which nginx`; \
-    fi
+COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
 
-# Switch to the user
-USER ${USER}
-
-# Set the workdir
-WORKDIR ${WORKDIR}
-
-COPY docker-entrypoint.sh /usr/local/bin/
+RUN chmod +x /usr/local/bin/docker-entrypoint.sh \
+    && chmod +x /usr/local/bin/entrypoint.d/*
 
 ENTRYPOINT ["docker-entrypoint.sh"]

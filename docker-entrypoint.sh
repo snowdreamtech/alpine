@@ -1,28 +1,16 @@
 #!/bin/sh
 set -e
 
-# set umask
-if [ -z "${UMASK}" ]; then
-  UMASK=022
-fi
-umask "${UMASK}"
+if [ "$DEBUG" = "true" ]; then echo "→ [ENTRYPOINT] Executing all scripts in /usr/local/bin/entrypoint.d"; fi    
 
-# set workdir
-if [ -z "${WORKDIR}" ]; then
-  WORKDIR="/root"
-fi
-cd "${WORKDIR}"
+for script in /usr/local/bin/entrypoint.d/*; do
+  if [ -x "$script" ]; then
+    if [ "$DEBUG" = "true" ]; then echo "→ Running $script"; fi    
+    "$script" "$*"
+  else
+    if [ "$DEBUG" = "true" ]; then echo "⚠️ Skipping $script (not executable)"; fi    
+  fi
+done
 
-# exec commands
-if [ -n "$*" ]; then
-  su-exec "${PUID}:${PGID}" ""$*""
-fi
 
-# keep the docker container running
-# https://github.com/docker/compose/issues/1926#issuecomment-422351028
-if [ "${KEEPALIVE}" -eq 1 ]; then
-  trap : TERM INT
-  tail -f /dev/null &
-  wait
-  # sleep infinity & wait
-fi
+if [ "$DEBUG" = "true" ]; then echo "→ [ENTRYPOINT] Done."; fi    
