@@ -67,6 +67,18 @@ RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/a
     ca-certificates \                                                                                                                                                                                                      
     && update-ca-certificates
 
+# Create a user with PUID and PGID
+RUN if [ "${USER}" != "root" ]; then \
+    addgroup -g ${PGID} ${USER}; \
+    adduser -h /home/${USER} -u ${PUID} -g ${USER} -G ${USER} -s /bin/sh -D ${USER}; \
+    # sed -i "/%sudo/c ${USER} ALL=(ALL:ALL) NOPASSWD:ALL" /etc/sudoers; \
+    fi
+
+# Enable CAP_NET_BIND_SERVICE
+# RUN if [ "${USER}" != "root" ] && [ "${CAP_NET_BIND_SERVICE}" -eq 1 ]; then \
+    # setcap 'cap_net_bind_service=+ep' `which nginx`; \
+    # fi
+
 COPY entrypoint.d /usr/local/bin/entrypoint.d
 
 COPY docker-entrypoint.sh /usr/local/bin/docker-entrypoint.sh
