@@ -8,8 +8,8 @@ fi
 cd "${WORKDIR}"
 
 # exec commands
-if [ -n "$*" ]; then
-  su-exec "${PUID}:${PGID}" ""$*""
+if [ $# -gt 0 ]; then
+  su-exec "${PUID}:${PGID}" "$@"
 fi
 
 # keep the docker container running
