@@ -1,6 +1,9 @@
 # Alpine
 
-[![dockeri.co](https://dockerico.blankenship.io/image/snowdreamtech/alpine)](https://hub.docker.com/r/snowdreamtech/alpine)
+![Docker Image Version](https://img.shields.io/docker/v/snowdreamtech/alpine)
+![Docker Image Size](https://img.shields.io/docker/image-size/snowdreamtech/alpine/latest)
+![Docker Pulls](https://img.shields.io/docker/pulls/snowdreamtech/alpine)
+![Docker Stars](https://img.shields.io/docker/stars/snowdreamtech/alpine)
 
 Docker Image packaging for Alpine. (amd64, arm32v6, arm32v7, arm64v8, i386, ppc64le,riscv64, s390x)
 
