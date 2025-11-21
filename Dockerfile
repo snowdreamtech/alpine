@@ -51,6 +51,7 @@ ENV KEEPALIVE=${KEEPALIVE} \
 RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/apk/repositories \
     && echo "@community https://dl-cdn.alpinelinux.org/alpine/edge/community" | tee -a /etc/apk/repositories \
     && echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" | tee -a /etc/apk/repositories \
+    && apk update \
     && apk add --no-cache \
     doas \
     sudo \
