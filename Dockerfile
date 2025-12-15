@@ -1,4 +1,4 @@
-FROM alpine:3.19.7
+FROM alpine:3.19.8
 
 # OCI annotations to image
 LABEL org.opencontainers.image.authors="Snowdream Tech" \
@@ -9,7 +9,7 @@ LABEL org.opencontainers.image.authors="Snowdream Tech" \
     org.opencontainers.image.licenses="MIT" \
     org.opencontainers.image.source="https://github.com/snowdreamtech/alpine" \
     org.opencontainers.image.vendor="Snowdream Tech" \
-    org.opencontainers.image.version="3.19.7" \
+    org.opencontainers.image.version="3.19.8" \
     org.opencontainers.image.url="https://github.com/snowdreamtech/alpine"
 
 # Switch to the user
