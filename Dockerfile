@@ -53,16 +53,34 @@ RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/a
     && echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" | tee -a /etc/apk/repositories \
     && apk update \
     && apk add --no-cache \
+    lsb-release \
     doas \
     sudo \
+    procps-ng \
+    vim \
+    zip \
+    unzip \
+    bzip2 \ 
+    xz \
+    file \
+    gzip \
+    jq \
     busybox-suid \
     musl-locales \
     musl-locales-lang \
     tzdata \
     openssl \
+    gnupg \
+    sysstat \
     wget \
     curl \
     git \
+    bind-tools \
+    netcat-openbsd \
+    traceroute \
+    iputils \
+    net-tools \
+    lsof \
     libcap \
     su-exec \ 
     ca-certificates \                                                                                                                                                                                                      
