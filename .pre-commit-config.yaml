@@ -13,6 +13,8 @@
 #
 # Run manually against all files:
 #   pre-commit run --all-files
+fail_fast: true
+default_stages: [pre-commit, pre-merge-commit]
 exclude: '^(\.git|node_modules|\.venv|venv|env|vendor|dist|build|out|target|\.next|\.nuxt|\.output|__pycache__|\.specify)/'
 
 repos:
