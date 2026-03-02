@@ -160,6 +160,23 @@ repos:
         types_or: [json, yaml]
         files: '(?i)(openapi|swagger|asyncapi).*\.(json|yaml|yml)$'
         pass_filenames: true
+        description: "Linter for OpenAPI/Swagger/AsyncAPI specifications."
+
+      - id: sort-package-json
+        name: sort-package-json
+        entry: npx sort-package-json
+        language: system
+        files: ^package\.json$
+        pass_filenames: true
+        description: "Automatically sort package.json fields to maintain consistency."
+
+      - id: dotenv-linter
+        name: dotenv-linter
+        entry: bash -c "curl -fLsS https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin && ~/.local/bin/dotenv-linter \"\$@\"" --
+        language: system
+        files: '(\.env|\.env\.example|\.env\.sample)$'
+        pass_filenames: true
+        description: "Linter for .env files to check for consistency and security."
 
       # ── Git Commit Message Flow ──────────────────────────────────────────────
       - id: commitlint
