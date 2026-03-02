@@ -85,5 +85,5 @@ You **MUST** consider the user input before proceeding (if not empty).
 
      ```bash
      pip3 install pre-commit
-     pre-commit install
+     pre-commit install --hook-type pre-commit --hook-type commit-msg
      ```
