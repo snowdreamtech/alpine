@@ -51,6 +51,20 @@ repos:
         stages: [pre-commit, pre-merge-commit]
         description: "Intercept files that still contain git merge conflict markers."
 
+      - id: check-executables-have-shebangs
+        name: check executables have shebangs
+        entry: python3 -c 'import sys, os; [sys.exit(1) for f in sys.argv[1:] if os.access(f, os.X_OK) and not open(f, "rb").read(2) == b"#!" and not os.path.isdir(f)]'
+        language: system
+        types: [text]
+        description: "Verify that executable files have a proper shebang (!#) line."
+
+      - id: check-shebang-scripts-are-executable
+        name: check shebang scripts are executable
+        entry: python3 -c 'import sys, os; [sys.exit(1) for f in sys.argv[1:] if open(f, "rb").read(2) == b"#!" and not os.access(f, os.X_OK)]'
+        language: system
+        types: [text]
+        description: "Ensure that files starting with a shebang are marked as executable."
+
       # ── Secret Scanning ────────────────────────────────────────────────────
       - id: gitleaks
         name: gitleaks
@@ -151,6 +165,14 @@ repos:
         language: system
         entry: hadolint
         files: Dockerfile
+        description: "Linter for Dockerfiles to ensure best practices."
+
+      - id: actionlint
+        name: actionlint
+        language: system
+        entry: actionlint
+        files: ^\.github/workflows/.*\.yml$
+        description: "Linter for GitHub Actions workflow files."
 
       # ── API Contracts & Specifications ───────────────────────────────────────
       - id: spectral
