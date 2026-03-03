@@ -12,10 +12,10 @@ Before submitting any changes, you must set up your local development environmen
 
 1. **Install `pre-commit`**: We rely heavily on `pre-commit` to catch linting, formatting, and security issues _before_ they are committed.
 
-    ```bash
-    pip install pre-commit
-    pre-commit install --install-hooks
-    ```
+   ```bash
+   pip install pre-commit
+   pre-commit install --install-hooks
+   ```
 
 2. **Verify Setup**: Run `pre-commit run --all-files` to ensure all linters pass locally.
 
