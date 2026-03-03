@@ -92,9 +92,11 @@ else ifeq ($(OS_NAME),Linux)
 		echo "$(BLUE)Detected APT. Installing tools...$(RESET)"; \
 		sudo apt-get update && sudo apt-get install -y \
 			shellcheck hadolint shfmt gitleaks python3-ruff clang-format; \
+		$(PIP) install actionlint-py; \
 	elif command -v dnf >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected DNF. Installing tools...$(RESET)"; \
 		sudo dnf install -y shellcheck hadolint shfmt gitleaks ruff clang-format; \
+		$(PIP) install actionlint-py; \
 	elif command -v apk >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected APK. Installing tools...$(RESET)"; \
 		sudo apk add shellcheck actionlint hadolint shfmt gitleaks py3-ruff; \
@@ -113,7 +115,7 @@ else ifeq ($(OS_NAME),Windows)
 		Write-Host "Error: No supported package manager found (Scoop/Winget/Choco)." -ForegroundColor Red; exit 1; \
 	}
 endif
-	@$(PIP) install pre-commit yamllint actionlint-py
+	@$(PIP) install pre-commit yamllint
 	@$(NPM) install -g markdownlint-cli2 prettier editorconfig-checker eslint \
 		@stoplight/spectral-cli @commitlint/cli @commitlint/config-conventional \
 		stylelint stylelint-config-standard @taplo/cli
