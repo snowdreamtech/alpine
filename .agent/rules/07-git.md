@@ -22,8 +22,8 @@
   | `revert`   | Reverts a previous commit          | `revert: feat(auth): add OAuth2 login`      |
 
 - Commit messages **MUST** be in **English only** (no Chinese characters or punctuation allowed). The **header** (the entire first line: `<type>(<scope>): <description>`) must be concise (**max 120 characters**), written in the imperative mood ("add", not "added"), and **MUST NOT** end with a period (full stop).
-- **Detail Offloading**: If you need to provide more context or detailed information beyond the 120-character limit, **MUST** put it in the **body** section after a blank line. The subject line should remain a high-level summary. The body and footer lines also have a **max 120 characters** per line limit.
-- While the traditional Git limit is 72, we strictly follow an extended `@commitlint/config-conventional` limit of **120 characters** for the header, body, and footer lines.
+- **Detail Offloading**: If you need to provide more context or detailed information beyond the 120-character limit, **MUST** put it in the **body** section after a blank line. The subject line should remain a high-level summary. The body and footer lines **do not have a strict line-length limit** in order to accommodate AI-generated messages, URLs, or error stack traces.
+- While the traditional Git limit is 72, we strictly follow an extended `@commitlint/config-conventional` limit of **120 characters** for the header, but disable line length limits for the body and footer.
 
   ```
   feat(auth): add OAuth2 login with Google provider
@@ -52,7 +52,7 @@
 
 If your commit fails CI or local hooks, check for these common violations:
 
-- **header-max-length**: First line must be **≤ 120 characters**. If it exceeds this, move extra details to the **body**. (This 120 character limit also applies to the subject, body lines, and footer lines).
+- **header-max-length**: First line must be **≤ 120 characters**. If it exceeds this, move extra details to the **body**. (The 120 character limit applies strictly to the header; body and footer have no rigid length limits to allow for long URLs).
 - **subject-case**: Description after `<type>(<scope>):` must be **all lowercase** (except acronyms). Never start with a Capital letter.
 - **subject-full-stop**: The subject line **must not** end with a period (`.`).
 - **subject-empty**: The description part is required.

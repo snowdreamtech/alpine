@@ -3,8 +3,8 @@ module.exports = {
   rules: {
     "header-max-length": [2, "always", 120],
     "subject-max-length": [2, "always", 120],
-    "body-max-line-length": [2, "always", 120],
-    "footer-max-line-length": [2, "always", 120],
+    "body-max-line-length": [0, "always"],
+    "footer-max-line-length": [0, "always"],
     // Custom rule: Disallow Chinese characters in commit messages
     "no-chinese": [2, "always"],
   },
