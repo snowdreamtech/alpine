@@ -53,7 +53,7 @@ jobs:
           fi
 
       - name: Install Gitleaks
-        shell: bash
+        shell: sh
         env:
           GITHUB_PROXY: ${{ secrets.GITHUB_PROXY || vars.GH_PROXY || 'https://gh-proxy.sn0wdr1am.com/' }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -102,7 +102,7 @@ jobs:
           echo "$PWD/gitleaks-bin" >> "$GITHUB_PATH"
 
       - name: Run Gitleaks
-        shell: bash
+        shell: sh
         run: gitleaks detect --source . --verbose --gitleaks-ignore-path .gitleaksignore
 
       - name: Set env variables
@@ -284,7 +284,7 @@ jobs:
         env:
           GITHUB_PROXY: ${{ secrets.GITHUB_PROXY || vars.GH_PROXY || 'https://gh-proxy.sn0wdr1am.com/' }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
+        shell: sh
         run: |
           mkdir -p ~/.local/bin
 
@@ -492,7 +492,7 @@ jobs:
       # Shell Scripts linting (excluding dependencies, running native binary)
       - name: Run ShellCheck
         run: |
-          find . -type f -name "*.sh" -not -path "*/\.venv/*" -not -path "*/venv/*" -not -path "*/env/*" -not -path "*/node_modules/*" -not -path "*/vendor/*" -not -path "*/dist/*" -not -path "*/build/*" -not -path "*/out/*" -not -path "*/target/*" -not -path "*/\.next/*" -not -path "*/\.nuxt/*" -not -path "*/\.output/*" -not -path "*/__pycache__/*" -not -path "*/\.git/*" -not -path "*/\.specify/*" -exec bash -c 'shellcheck "$@"' _ {} +
+          find . -type f -name "*.sh" -not -path "*/\.venv/*" -not -path "*/venv/*" -not -path "*/env/*" -not -path "*/node_modules/*" -not -path "*/vendor/*" -not -path "*/dist/*" -not -path "*/build/*" -not -path "*/out/*" -not -path "*/target/*" -not -path "*/\.next/*" -not -path "*/\.nuxt/*" -not -path "*/\.output/*" -not -path "*/__pycache__/*" -not -path "*/\.git/*" -not -path "*/\.specify/*" -exec sh -c 'shellcheck "$@"' _ {} +
 
       # Shell Scripts formatting (shfmt)
       - name: Run shfmt
@@ -528,7 +528,7 @@ jobs:
         env:
           GITHUB_PROXY: ${{ secrets.GITHUB_PROXY || vars.GH_PROXY || 'https://gh-proxy.sn0wdr1am.com/' }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
+        shell: sh
         run: |
           # Detect OS
           OS="$(uname -s)"
@@ -621,7 +621,7 @@ jobs:
         env:
           GITHUB_PROXY: ${{ secrets.GITHUB_PROXY || vars.GH_PROXY || 'https://gh-proxy.sn0wdr1am.com/' }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: bash
+        shell: sh
         run: |
           # Detect OS
           OS="$(uname -s)"

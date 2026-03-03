@@ -46,7 +46,7 @@ repos:
 
       - id: check-merge-conflict
         name: check for merge conflicts
-        entry: bash -c "! grep -qE '^(<<<<<<<|=======|>>>>>>>)' \"\$@\"" --
+        entry: sh -c "! grep -qE '^(<<<<<<<|=======|>>>>>>>)' \"\$@\"" --
         language: system
         stages: [pre-commit, pre-merge-commit]
         description: "Intercept files that still contain git merge conflict markers."
@@ -194,7 +194,7 @@ repos:
 
       - id: dotenv-linter
         name: dotenv-linter
-        entry: bash -c "curl -fLsS https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin && ~/.local/bin/dotenv-linter \"\$@\"" --
+        entry: sh -c "curl -fLsS https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin && ~/.local/bin/dotenv-linter \"\$@\"" --
         language: system
         files: '(\.env|\.env\.example|\.env\.sample)$'
         pass_filenames: true
