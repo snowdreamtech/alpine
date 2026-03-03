@@ -281,9 +281,53 @@ jobs:
       - name: Install GolangCI-Lint
         env:
           GITHUB_PROXY: ${{ secrets.GITHUB_PROXY || vars.GH_PROXY || 'https://gh-proxy.sn0wdr1am.com/' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: bash
         run: |
           mkdir -p ~/.local/bin
-          curl -sSfL "${GITHUB_PROXY}https://github.com/golangci/golangci-lint/releases/download/v2.10.1/golangci-lint-2.10.1-linux-amd64.tar.gz" | tar -xz -C ~/.local/bin --strip-components=1 golangci-lint-2.10.1-linux-amd64/golangci-lint
+
+          # Detect OS
+          OS="$(uname -s)"
+          case "${OS}" in
+              Linux*)     PLATFORM=linux;;
+              Darwin*)    PLATFORM=darwin;;
+              CYGWIN*|MINGW*|MSYS*) PLATFORM=windows;;
+              *)          echo "Unsupported OS: ${OS}" && exit 1;;
+          esac
+
+          # Detect Arch
+          ARCH="$(uname -m)"
+          case "${ARCH}" in
+              x86_64|amd64) ARCH=amd64;;
+              aarch64|arm64) ARCH=arm64;;
+              *)             echo "Unsupported architecture: ${ARCH}" && exit 1;;
+          esac
+
+          echo "Detected Platform: ${PLATFORM}, Arch: ${ARCH}"
+
+          # Fetch latest version from GitHub API with token to avoid rate limits
+          LATEST_VERSION=$(curl -sSf -H "Authorization: Bearer ${GITHUB_TOKEN}" https://api.github.com/repos/golangci/golangci-lint/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+          if [ -z "$LATEST_VERSION" ]; then
+            echo "Failed to fetch the latest version of golangci-lint."
+            exit 1
+          fi
+          echo "Latest GolangCI-Lint version is: ${LATEST_VERSION}"
+
+          # Strip the 'v' prefix for the folder name extraction
+          VERSION_NUM="${LATEST_VERSION#v}"
+
+          if [ "$PLATFORM" = "windows" ]; then
+            FILE_EXT="zip"
+            DOWNLOAD_URL="${GITHUB_PROXY}https://github.com/golangci/golangci-lint/releases/download/${LATEST_VERSION}/golangci-lint-${VERSION_NUM}-${PLATFORM}-${ARCH}.${FILE_EXT}"
+            curl -sSfL "$DOWNLOAD_URL" -o golangci-lint.zip
+            unzip -q -j golangci-lint.zip "golangci-lint-${VERSION_NUM}-${PLATFORM}-${ARCH}/golangci-lint.exe" -d ~/.local/bin
+            rm golangci-lint.zip
+          else
+            FILE_EXT="tar.gz"
+            DOWNLOAD_URL="${GITHUB_PROXY}https://github.com/golangci/golangci-lint/releases/download/${LATEST_VERSION}/golangci-lint-${VERSION_NUM}-${PLATFORM}-${ARCH}.${FILE_EXT}"
+            curl -sSfL "$DOWNLOAD_URL" | tar -xz -C ~/.local/bin --strip-components=1 "golangci-lint-${VERSION_NUM}-${PLATFORM}-${ARCH}/golangci-lint"
+          fi
+
           echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Run golangci-lint
