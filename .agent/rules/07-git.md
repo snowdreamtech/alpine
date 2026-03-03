@@ -19,10 +19,11 @@
   | `ci`       | CI/CD pipeline changes             | `ci: add matrix for Node 22`                |
   | `perf`     | Performance optimization           | `perf(cache): use Redis pipelining`         |
   | `build`    | Build system changes               | `build: switch to esbuild`                  |
+  | `revert`   | Reverts a previous commit          | `revert: feat(auth): add OAuth2 login`      |
 
-- Commit messages **MUST** be in **English**. The **header** (the entire first line: `<type>(<scope>): <description>`) must be concise (**max 100 characters**), written in the imperative mood ("add", not "added"), and **MUST NOT** end with a period (full stop).
-- **Detail Offloading**: If you need to provide more context or detailed information beyond the 100-character limit, **MUST** put it in the **body** section after a blank line. The subject line should remain a high-level summary.
-- While the traditional Git limit is 72, we strictly follow the `@commitlint/config-conventional` limit of **100 characters** for the header.
+- Commit messages **MUST** be in **English only** (no Chinese characters or punctuation allowed). The **header** (the entire first line: `<type>(<scope>): <description>`) must be concise (**max 120 characters**), written in the imperative mood ("add", not "added"), and **MUST NOT** end with a period (full stop).
+- **Detail Offloading**: If you need to provide more context or detailed information beyond the 120-character limit, **MUST** put it in the **body** section after a blank line. The subject line should remain a high-level summary. The body and footer lines also have a **max 120 characters** per line limit.
+- While the traditional Git limit is 72, we strictly follow an extended `@commitlint/config-conventional` limit of **120 characters** for the header, body, and footer lines.
 
   ```
   feat(auth): add OAuth2 login with Google provider
@@ -51,11 +52,12 @@
 
 If your commit fails CI or local hooks, check for these common violations:
 
-- **header-max-length**: First line must be **≤ 100 characters**. If it exceeds this, move extra details to the **body**.
+- **header-max-length**: First line must be **≤ 120 characters**. If it exceeds this, move extra details to the **body**. (This 120 character limit also applies to the subject, body lines, and footer lines).
 - **subject-case**: Description after `<type>(<scope>):` must be **all lowercase** (except acronyms). Never start with a Capital letter.
 - **subject-full-stop**: The subject line **must not** end with a period (`.`).
 - **subject-empty**: The description part is required.
 - **type-enum**: Only use allowed types (see table above).
+- **no-chinese**: Commit message must be in English only (no Chinese characters or punctuation allowed).
 - **Infinitive Mood**: Use `feat: add` instead of `feat: added` or `feat: adding`.
 
 **Quick Fix for Last Commit:**

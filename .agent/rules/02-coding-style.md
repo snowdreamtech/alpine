@@ -20,8 +20,9 @@
   | `ci`       | CI configuration changes                    |
   | `perf`     | Performance improvement                     |
   | `build`    | Build system or external dependency changes |
+  | `revert`   | Reverts a previous commit                   |
 
-- Commit messages MUST be in **English**. The **header** (the entire first line) must be written in the imperative mood ("add" not "added") and kept **≤ 120 characters**. It **MUST NOT** end with a period (full stop). Use the body for detailed explanations.
+- Commit messages MUST be in **English only** (no Chinese characters or punctuation allowed). The **header** (the entire first line) must be written in the imperative mood ("add" not "added") and kept **≤ 120 characters**. It **MUST NOT** end with a period (full stop). The same **120 character length limit** per line applies to the subject, body, and footer. Use the body for detailed explanations.
 - Body (optional): explain **why** the change was made, not what it does — the diff shows what. Separate body from subject with a blank line:
 
   ```
