@@ -20,6 +20,9 @@ endif
 PRUNE_DIRS := .git node_modules .venv venv env vendor dist build out target \
 	.next .nuxt .output __pycache__ .specify
 
+FIND_EXCLUDES := $(foreach dir,$(PRUNE_DIRS),-not -path "*/$(dir)/*" -not -path "*/$(dir)")
+RUFF_EXCLUDES := $(foreach dir,$(PRUNE_DIRS),--exclude $(dir))
+
 # =============================================================================
 # Tool Variables (can be overridden: make setup PYTHON=python3.11)
 # =============================================================================
@@ -165,11 +168,11 @@ format:
 	@echo "$(BOLD)Formatting code...$(RESET)"
 	@if command -v ruff >/dev/null 2>&1; then \
 		echo "$(BLUE)Running ruff format...$(RESET)"; \
-		ruff format .; \
+		ruff format $(RUFF_EXCLUDES) .; \
 	fi
 	@if command -v shfmt >/dev/null 2>&1; then \
 		echo "$(BLUE)Running shfmt...$(RESET)"; \
-		shfmt -w -i 2 .; \
+		find . -type f -name "*.sh" $(FIND_EXCLUDES) -exec shfmt -w -i 2 {} +; \
 	fi
 	@if command -v prettier >/dev/null 2>&1; then \
 		echo "$(BLUE)Running prettier...$(RESET)"; \
@@ -177,7 +180,7 @@ format:
 	fi
 	@if command -v gofmt >/dev/null 2>&1 && [ -f go.mod ]; then \
 		echo "$(BLUE)Running gofmt...$(RESET)"; \
-		gofmt -w .; \
+		find . -type f -name "*.go" $(FIND_EXCLUDES) -exec gofmt -w {} +; \
 	fi
 	@echo "$(GREEN)Formatting complete!$(RESET)"
 
@@ -223,17 +226,13 @@ check:
 		echo "$(BLUE)Checking for secrets with gitleaks...$(RESET)"; \
 		gitleaks detect --source . --no-git; \
 	fi
-	@if command -v ruff >/dev/null 2>&1 && ([ -f pyproject.toml ] || find . -name "*.py" -not -path "./.git/*" | grep -q .); then \
+	@if command -v ruff >/dev/null 2>&1 && ([ -f pyproject.toml ] || find . -type f -name "*.py" $(FIND_EXCLUDES) | grep -q .); then \
 		echo "$(BLUE)Checking Python code with ruff...$(RESET)"; \
-		ruff check .; \
+		ruff check $(RUFF_EXCLUDES) .; \
 	fi
 	@if command -v shellcheck >/dev/null 2>&1; then \
 		echo "$(BLUE)Checking shell scripts with shellcheck...$(RESET)"; \
-		find . -name "*.sh" \
-			-not -path "./.git/*" \
-			-not -path "./node_modules/*" \
-			-not -path "./.venv/*" \
-			-not -path "./vendor/*" \
+		find . -type f -name "*.sh" $(FIND_EXCLUDES) \
 			-exec shellcheck {} +; \
 	fi
 	@if [ -f go.mod ] && command -v govulncheck >/dev/null 2>&1; then \
