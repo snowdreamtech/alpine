@@ -10,22 +10,24 @@ We welcome contributions of all kinds, including bug fixes, new AI agent rules, 
 
 Before submitting any changes, you must set up your local development environment to ensure your code matches our strict project standards:
 
-1.  **Install `pre-commit`**: We rely heavily on `pre-commit` to catch linting, formatting, and security issues _before_ they are committed.
+1. **Install `pre-commit`**: We rely heavily on `pre-commit` to catch linting, formatting, and security issues _before_ they are committed.
+
     ```bash
     pip install pre-commit
     pre-commit install --install-hooks
     ```
-2.  **Verify Setup**: Run `pre-commit run --all-files` to ensure all linters pass locally.
+
+2. **Verify Setup**: Run `pre-commit run --all-files` to ensure all linters pass locally.
 
 ### 2. General Workflow
 
-1.  **Fork** the repository on GitHub.
-2.  **Clone** your fork locally.
-3.  **Branch** from `main` to a descriptively named branch (e.g., `feat/add-new-ai-rule`, `fix/ci-memory-leak`).
-4.  **Develop** your feature or fix.
-5.  **Commit** your changes following our [Conventional Commits](https://www.conventionalcommits.org/) standards. Your message should look like `feat(rule): add support for new Claude tool`.
-6.  **Push** to your fork.
-7.  **Submit a Pull Request (PR)** against our `main` branch.
+1. **Fork** the repository on GitHub.
+2. **Clone** your fork locally.
+3. **Branch** from `main` to a descriptively named branch (e.g., `feat/add-new-ai-rule`, `fix/ci-memory-leak`).
+4. **Develop** your feature or fix.
+5. **Commit** your changes following our [Conventional Commits](https://www.conventionalcommits.org/) standards. Your message should look like `feat(rule): add support for new Claude tool`.
+6. **Push** to your fork.
+7. **Submit a Pull Request (PR)** against our `main` branch.
 
 ### 3. Developer Certificate of Origin (DCO)
 
