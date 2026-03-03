@@ -75,10 +75,10 @@ You **MUST** consider the user input before proceeding (if not empty).
        | tar -xz -C ~/.local/bin gitleaks
 
      # dotenv-linter
-     curl -fLsS https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin
+     curl -fLsS "${GITHUB_PROXY}https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh" | sh -s -- -b ~/.local/bin
 
      # golangci-lint
-     curl -fLsS https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b ~/.local/bin
+     curl -fLsS "${GITHUB_PROXY}https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh" | sh -s -- -b ~/.local/bin
      ```
 
      Ensure `~/.local/bin` is in your `PATH`:

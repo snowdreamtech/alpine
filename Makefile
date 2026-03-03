@@ -32,6 +32,7 @@ NODE       ?= node
 NPM        ?= npm
 PRE_COMMIT ?= pre-commit
 GORELEASER ?= goreleaser
+GITHUB_PROXY ?= https://gh-proxy.sn0wdr1am.com/
 
 # =============================================================================
 # Color Output (disable with: make NO_COLOR=1 <target>)
@@ -94,9 +95,9 @@ ifeq ($(OS_NAME),Darwin)
 		echo "$(BLUE)Detected MacPorts. Installing tools...$(RESET)"; \
 		sudo port install shellcheck actionlint hadolint shfmt gitleaks ruff clang-18; \
 		sudo port select --set clang mp-clang-18; \
-		curl -fLsS https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin; \
-		curl -fLsS https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b ~/.local/bin; \
-		curl -fLsS https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash -s -- latest ~/.local/bin; \
+		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin; \
+		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b ~/.local/bin; \
+		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash -s -- latest ~/.local/bin; \
 	else \
 		echo "$(RED)Error: Neither Homebrew nor MacPorts found. Please install one first.$(RESET)"; exit 1; \
 	fi
@@ -106,25 +107,25 @@ else ifeq ($(OS_NAME),Linux)
 		sudo apt-get update && sudo apt-get install -y \
 			shellcheck hadolint shfmt gitleaks python3-ruff clang-format ktlint; \
 		$(PIP) install actionlint-py; \
-		curl -fLsS https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin; \
-		curl -fLsS https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b ~/.local/bin; \
-		curl -fLsS https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash; \
-		curl -fLsS https://github.com/stackrox/kube-linter/releases/latest/download/kube-linter-linux.tar.gz | tar -xz -C ~/.local/bin kube-linter; \
+		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin; \
+		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b ~/.local/bin; \
+		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash; \
+		curl -fLsS $(GITHUB_PROXY)https://github.com/stackrox/kube-linter/releases/latest/download/kube-linter-linux.tar.gz | tar -xz -C ~/.local/bin kube-linter; \
 		GO_CHECKMAKE_URL=$$(curl -sSf https://api.github.com/repos/checkmake/checkmake/releases/latest | grep 'browser_download_url.*linux.*amd64' | head -1 | cut -d'"' -f4); \
-		curl -fLsS "$$GO_CHECKMAKE_URL" -o ~/.local/bin/checkmake && chmod +x ~/.local/bin/checkmake; \
+		curl -fLsS "$(GITHUB_PROXY)$$GO_CHECKMAKE_URL" -o ~/.local/bin/checkmake && chmod +x ~/.local/bin/checkmake; \
 	elif command -v dnf >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected DNF. Installing tools...$(RESET)"; \
 		sudo dnf install -y shellcheck hadolint shfmt gitleaks ruff clang-format ktlint; \
 		$(PIP) install actionlint-py; \
-		curl -fLsS https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin; \
-		curl -fLsS https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b ~/.local/bin; \
-		curl -fLsS https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash; \
-		curl -fLsS https://github.com/stackrox/kube-linter/releases/latest/download/kube-linter-linux.tar.gz | tar -xz -C ~/.local/bin kube-linter; \
+		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin; \
+		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b ~/.local/bin; \
+		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash; \
+		curl -fLsS $(GITHUB_PROXY)https://github.com/stackrox/kube-linter/releases/latest/download/kube-linter-linux.tar.gz | tar -xz -C ~/.local/bin kube-linter; \
 	elif command -v apk >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected APK. Installing tools...$(RESET)"; \
 		sudo apk add shellcheck actionlint hadolint shfmt gitleaks py3-ruff ktlint; \
-		curl -fLsS https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin; \
-		curl -fLsS https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b ~/.local/bin; \
+		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin; \
+		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b ~/.local/bin; \
 	else \
 		echo "$(RED)Error: Unsupported Linux package manager.$(RESET)"; exit 1; \
 	fi
@@ -136,7 +137,7 @@ else ifeq ($(OS_NAME),Windows)
 	} elseif (Get-Command choco -ErrorAction SilentlyContinue) { \
 		choco install shellcheck actionlint hadolint shfmt gitleaks llvm \
 			golangci-lint tflint ktlint --yes; \
-		Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh' -OutFile install.sh; sh install.sh -b "$$env:LOCALAPPDATA\Microsoft\WinGet\Packages"; Remove-Item install.sh; \
+		Invoke-WebRequest -Uri '$(GITHUB_PROXY)https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh' -OutFile install.sh; sh install.sh -b "$$env:LOCALAPPDATA\Microsoft\WinGet\Packages"; Remove-Item install.sh; \
 	} elseif (Get-Command winget -ErrorAction SilentlyContinue) { \
 		winget install --id koalaman.shellcheck rhysd.actionlint hadolint.hadolint mvdan.sh \
 			GolangCI.golangci-lint terraform-linters.tflint --silent; \
