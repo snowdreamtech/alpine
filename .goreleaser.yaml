@@ -9,9 +9,31 @@
 
 version: 2
 
+archives:
+  - format: tar.gz
+    # This name template makes the OS and Arch compatible with uname and includes the version.
+    name_template: >-
+      {{ .ProjectName }}_{{ .Version }}_
+      {{- title .Os }}_
+      {{- if eq .Arch "amd64" }}x86_64
+      {{- else if eq .Arch "386" }}i386
+      {{- else }}{{ .Arch }}{{ end }}
+      {{- if .Arm }}v{{ .Arm }}{{ end }}
+    # Wraps the files inside a top-level directory within the archive to prevent tarbombing (Best Practice)
+    wrap_in_directory: true
+    # Use zip for windows archives
+    format_overrides:
+      - goos: windows
+        format: zip
+    # Include all relevant standard documentation arrays using Globs
+    files:
+      - src: "LICENSE*"
+      - src: "README*"
+      - src: "CHANGELOG*"
+
 source:
   enabled: true
-  name_template: "{{ .ProjectName }}_{{ .Version }}_source"
+  name_template: "{{ .ProjectName }}-{{ .Version }}-source"
 
 changelog:
   sort: asc
