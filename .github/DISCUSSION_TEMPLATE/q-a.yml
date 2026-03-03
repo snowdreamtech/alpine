@@ -1,0 +1,17 @@
+---
+title: '[Q&A] '
+labels: ['question']
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for taking the time to ask a question!
+        Please read the project rules and check previous discussions or issues before asking.
+  - type: textarea
+    id: question
+    attributes:
+      label: Your Question
+      description: What would you like to know or discuss?
+      placeholder: I am wondering how to...
+    validations:
+      required: true
