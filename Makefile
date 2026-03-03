@@ -55,9 +55,11 @@ endif
 # =============================================================================
 # Targets
 # =============================================================================
-.PHONY: help setup install lint format test build check clean
+.PHONY: all help setup install lint format test build check clean
 
 # Default target: display help
+all: help
+
 help:
 	@echo "$(BOLD)Snowdream Tech AI IDE Template$(RESET)"
 	@echo "$(BLUE)Detected OS: $(OS_NAME)$(RESET)"
@@ -86,12 +88,15 @@ setup:
 ifeq ($(OS_NAME),Darwin)
 	@if command -v brew >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected Homebrew. Installing tools...$(RESET)"; \
-		brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format dotenv-linter; \
+		brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format \
+			dotenv-linter golangci-lint checkmake tflint kube-linter ktlint; \
 	elif command -v port >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected MacPorts. Installing tools...$(RESET)"; \
 		sudo port install shellcheck actionlint hadolint shfmt gitleaks ruff clang-18; \
 		sudo port select --set clang mp-clang-18; \
 		curl -fLsS https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin; \
+		curl -fLsS https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b ~/.local/bin; \
+		curl -fLsS https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash -s -- latest ~/.local/bin; \
 	else \
 		echo "$(RED)Error: Neither Homebrew nor MacPorts found. Please install one first.$(RESET)"; exit 1; \
 	fi
@@ -99,37 +104,50 @@ else ifeq ($(OS_NAME),Linux)
 	@if command -v apt-get >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected APT. Installing tools...$(RESET)"; \
 		sudo apt-get update && sudo apt-get install -y \
-			shellcheck hadolint shfmt gitleaks python3-ruff clang-format; \
+			shellcheck hadolint shfmt gitleaks python3-ruff clang-format ktlint; \
 		$(PIP) install actionlint-py; \
 		curl -fLsS https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin; \
+		curl -fLsS https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b ~/.local/bin; \
+		curl -fLsS https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash; \
+		curl -fLsS https://github.com/stackrox/kube-linter/releases/latest/download/kube-linter-linux.tar.gz | tar -xz -C ~/.local/bin kube-linter; \
+		GO_CHECKMAKE_URL=$$(curl -sSf https://api.github.com/repos/checkmake/checkmake/releases/latest | grep 'browser_download_url.*linux.*amd64' | head -1 | cut -d'"' -f4); \
+		curl -fLsS "$$GO_CHECKMAKE_URL" -o ~/.local/bin/checkmake && chmod +x ~/.local/bin/checkmake; \
 	elif command -v dnf >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected DNF. Installing tools...$(RESET)"; \
-		sudo dnf install -y shellcheck hadolint shfmt gitleaks ruff clang-format; \
+		sudo dnf install -y shellcheck hadolint shfmt gitleaks ruff clang-format ktlint; \
 		$(PIP) install actionlint-py; \
 		curl -fLsS https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin; \
+		curl -fLsS https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b ~/.local/bin; \
+		curl -fLsS https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash; \
+		curl -fLsS https://github.com/stackrox/kube-linter/releases/latest/download/kube-linter-linux.tar.gz | tar -xz -C ~/.local/bin kube-linter; \
 	elif command -v apk >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected APK. Installing tools...$(RESET)"; \
-		sudo apk add shellcheck actionlint hadolint shfmt gitleaks py3-ruff; \
+		sudo apk add shellcheck actionlint hadolint shfmt gitleaks py3-ruff ktlint; \
 		curl -fLsS https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin; \
+		curl -fLsS https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b ~/.local/bin; \
 	else \
 		echo "$(RED)Error: Unsupported Linux package manager.$(RESET)"; exit 1; \
 	fi
 else ifeq ($(OS_NAME),Windows)
 	@Write-Host "Installing system tools for Windows..." -ForegroundColor Blue
 	@if (Get-Command scoop -ErrorAction SilentlyContinue) { \
-		scoop install shellcheck actionlint hadolint shfmt gitleaks llvm; \
-	} elseif (Get-Command winget -ErrorAction SilentlyContinue) { \
-		winget install --id koalaman.shellcheck rhysd.actionlint hadolint.hadolint mvdan.sh --silent; \
+		scoop install shellcheck actionlint hadolint shfmt gitleaks llvm \
+			golangci-lint tflint kube-linter checkmake ktlint dotenv-linter; \
 	} elseif (Get-Command choco -ErrorAction SilentlyContinue) { \
-		choco install shellcheck actionlint hadolint shfmt gitleaks llvm; \
+		choco install shellcheck actionlint hadolint shfmt gitleaks llvm \
+			golangci-lint tflint ktlint --yes; \
+		Invoke-WebRequest -Uri 'https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh' -OutFile install.sh; sh install.sh -b "$$env:LOCALAPPDATA\Microsoft\WinGet\Packages"; Remove-Item install.sh; \
+	} elseif (Get-Command winget -ErrorAction SilentlyContinue) { \
+		winget install --id koalaman.shellcheck rhysd.actionlint hadolint.hadolint mvdan.sh \
+			GolangCI.golangci-lint terraform-linters.tflint --silent; \
 	} else { \
-		Write-Host "Error: No supported package manager found (Scoop/Winget/Choco)." -ForegroundColor Red; exit 1; \
+		Write-Host "Error: No supported package manager found (Scoop/Choco/Winget)." -ForegroundColor Red; exit 1; \
 	}
 endif
-	@$(PIP) install pre-commit yamllint
+	@$(PIP) install pre-commit yamllint sqlfluff
 	@$(NPM) install -g markdownlint-cli2 prettier editorconfig-checker eslint \
 		@stoplight/spectral-cli @commitlint/cli @commitlint/config-conventional \
-		stylelint stylelint-config-standard @taplo/cli
+		stylelint stylelint-config-standard @taplo/cli sort-package-json
 	@$(PRE_COMMIT) install \
 		--hook-type pre-commit \
 		--hook-type pre-merge-commit \

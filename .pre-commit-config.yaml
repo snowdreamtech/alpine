@@ -2,10 +2,13 @@
 # Pre-commit hook configuration (local mode).
 # Uses system-installed tools directly — no network downloads required.
 #
-# Required tools (install once):
-#   brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format dotenv-linter
-#   pip3 install yamllint
-#   npm install -g markdownlint-cli2 prettier editorconfig-checker eslint @stoplight/spectral-cli @commitlint/cli @commitlint/config-conventional stylelint @taplo/cli
+# Required tools (install once via: make setup):
+#   brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format \
+#                dotenv-linter golangci-lint tflint kube-linter ktlint
+#   pip3 install yamllint sqlfluff
+#   npm install -g markdownlint-cli2 prettier editorconfig-checker eslint \
+#               @stoplight/spectral-cli @commitlint/cli @commitlint/config-conventional \
+#               stylelint stylelint-config-standard @taplo/cli sort-package-json
 #
 # Setup (one-time per machine):
 #   pip3 install pre-commit
@@ -46,7 +49,7 @@ repos:
 
       - id: check-merge-conflict
         name: check for merge conflicts
-        entry: sh -c "! grep -qE '^(<<<<<<<|=======|>>>>>>>)' \"\$@\"" --
+        entry: sh -c "! grep -qE '^(<<<<<<<|=======|>>>>>>>)' \"$@\"" --
         language: system
         stages: [pre-commit, pre-merge-commit]
         description: "Intercept files that still contain git merge conflict markers."
@@ -118,7 +121,7 @@ repos:
         entry: editorconfig-checker
         args:
           - -exclude
-          - '(\.(venv|git|github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|specify|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml|tabnine|supermaven|vibe|void|zed)/.*)|((node_modules|venv|env|dist|build|out|target|vendor|__pycache__|\.specify)/.*)|(\.aider\.conf\.yml)'
+          - '(\.(venv|git|github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|specify|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml|tabnine|supermaven|vibe|void|zed)/.*)|((node_modules|venv|env|dist|build|out|target|vendor|__pycache__|\.specify)/.*|(\.aider\.conf\.yml))'
 
       # ── Linting & Quality ──────────────────────────────────────────────────
       - id: eslint
@@ -173,6 +176,117 @@ repos:
         entry: actionlint
         files: ^\.github/workflows/.*\.yml$
         description: "Linter for GitHub Actions workflow files."
+
+      # ── Go ─────────────────────────────────────────────────────────────────
+      - id: golangci-lint
+        name: golangci-lint
+        language: system
+        entry: golangci-lint run
+        types: [go]
+        pass_filenames: false
+        description: "Fast Go linter aggregator. Runs incrementally on changed files."
+
+      # ── SQL ────────────────────────────────────────────────────────────────
+      - id: sqlfluff
+        name: sqlfluff lint
+        language: system
+        entry: sqlfluff lint
+        args: [--dialect, postgres]
+        types_or: [sql]
+        description: "SQL linter. Dialect defaults to postgres; override via .sqlfluff config."
+
+      # ── Terraform / OpenTofu ───────────────────────────────────────────────
+      - id: tflint
+        name: tflint
+        language: system
+        entry: tflint
+        files: \.tf$
+        pass_filenames: false
+        description: "Linter for Terraform files. Requires tflint installed locally."
+
+      # ── Kubernetes ────────────────────────────────────────────────────────
+      - id: kube-linter
+        name: kube-linter
+        language: system
+        entry: kube-linter lint
+        files: '\.(yaml|yml)$'
+        pass_filenames: true
+        description: "Linter for Kubernetes manifests. Only runs when kube-linter is installed."
+
+      # ── Kotlin ────────────────────────────────────────────────────────────
+      - id: ktlint
+        name: ktlint
+        language: system
+        entry: ktlint
+        types_or: [kotlin]
+        description: "Kotlin linter and formatter. Requires ktlint installed locally."
+
+      # ── Java ──────────────────────────────────────────────────────────────
+      - id: google-java-format
+        name: google-java-format
+        language: system
+        entry: google-java-format --set-exit-if-changed --dry-run
+        types: [java]
+        description: "Java formatter (dry-run check). Requires google-java-format installed locally."
+
+      # ── Ruby ──────────────────────────────────────────────────────────────
+      - id: rubocop
+        name: rubocop
+        language: system
+        entry: rubocop
+        types: [ruby]
+        description: "Ruby linter and formatter. Requires rubocop gem installed."
+
+      # ── PHP ───────────────────────────────────────────────────────────────
+      - id: php-cs-fixer
+        name: php-cs-fixer
+        language: system
+        entry: php-cs-fixer fix --dry-run
+        types: [php]
+        description: "PHP code style checker (dry-run). Requires php-cs-fixer installed."
+
+      # ── Dart / Flutter ────────────────────────────────────────────────────
+      - id: dart-format
+        name: dart format
+        language: system
+        entry: dart format --output=none --set-exit-if-changed
+        types_or: [dart]
+        description: "Dart formatter check. Requires dart SDK installed."
+
+      # ── Swift (macOS only) ────────────────────────────────────────────────
+      - id: swiftformat
+        name: swiftformat
+        language: system
+        entry: swiftformat --lint
+        types: [swift]
+        description: "Swift formatter check. Requires swiftformat installed (macOS only)."
+
+      - id: swiftlint
+        name: swiftlint
+        language: system
+        entry: swiftlint lint --strict
+        types: [swift]
+        pass_filenames: false
+        description: "Swift linter. Requires swiftlint installed (macOS only)."
+
+      # ── C# / .NET ─────────────────────────────────────────────────────────
+      - id: dotnet-format
+        name: dotnet format
+        language: system
+        entry: dotnet format --verify-no-changes
+        files: '\.(cs|vb|fs)$'
+        pass_filenames: false
+        description: "C# formatter check. Requires .NET SDK installed."
+
+      # ── PowerShell ────────────────────────────────────────────────────────
+      - id: psscriptanalyzer
+        name: PSScriptAnalyzer
+        language: system
+        entry: >-
+          pwsh -NoProfile -Command
+          "Set-StrictMode -Version Latest; $r = Invoke-ScriptAnalyzer -Path $args[0] -Severity Error,Warning; if ($r) { $r | Format-Table -AutoSize; exit 1 }"
+        types: [powershell]
+        description: "PowerShell script analyzer. Requires pwsh and PSScriptAnalyzer module."
 
       # ── API Contracts & Specifications ───────────────────────────────────────
       - id: spectral
