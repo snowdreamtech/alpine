@@ -77,12 +77,13 @@ help:
 setup:
 	@echo "$(BOLD)Installing system tools for $(OS_NAME)...$(RESET)"
 ifeq ($(OS_NAME),Darwin)
-	@if command -v port >/dev/null 2>&1; then \
-		echo "$(BLUE)Detected MacPorts. Installing tools...$(RESET)"; \
-		sudo port install shellcheck actionlint hadolint shfmt gitleaks ruff clang-18; \
-	elif command -v brew >/dev/null 2>&1; then \
+	@if command -v brew >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected Homebrew. Installing tools...$(RESET)"; \
 		brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format; \
+	elif command -v port >/dev/null 2>&1; then \
+		echo "$(BLUE)Detected MacPorts. Installing tools...$(RESET)"; \
+		sudo port install shellcheck actionlint hadolint shfmt gitleaks ruff clang-18; \
+		sudo port select --set clang mp-clang-18; \
 	else \
 		echo "$(RED)Error: Neither Homebrew nor MacPorts found. Please install one first.$(RESET)"; exit 1; \
 	fi
@@ -103,17 +104,19 @@ else ifeq ($(OS_NAME),Linux)
 else ifeq ($(OS_NAME),Windows)
 	@Write-Host "Installing system tools for Windows..." -ForegroundColor Blue
 	@if (Get-Command scoop -ErrorAction SilentlyContinue) { \
-		scoop install shellcheck actionlint hadolint shfmt gitleaks; \
+		scoop install shellcheck actionlint hadolint shfmt gitleaks llvm; \
+	} elseif (Get-Command winget -ErrorAction SilentlyContinue) { \
+		winget install --id koalaman.shellcheck rhysd.actionlint hadolint.hadolint mvdan.sh --silent; \
 	} elseif (Get-Command choco -ErrorAction SilentlyContinue) { \
-		choco install shellcheck actionlint hadolint shfmt gitleaks; \
+		choco install shellcheck actionlint hadolint shfmt gitleaks llvm; \
 	} else { \
-		Write-Host "Error: Neither Scoop nor Chocolatey found. Please install one first." -ForegroundColor Red; exit 1; \
+		Write-Host "Error: No supported package manager found (Scoop/Winget/Choco)." -ForegroundColor Red; exit 1; \
 	}
 endif
 	@$(PIP) install pre-commit yamllint actionlint-py
 	@$(NPM) install -g markdownlint-cli2 prettier editorconfig-checker eslint \
 		@stoplight/spectral-cli @commitlint/cli @commitlint/config-conventional \
-		stylelint @taplo/cli
+		stylelint stylelint-config-standard @taplo/cli
 	@$(PRE_COMMIT) install \
 		--hook-type pre-commit \
 		--hook-type pre-merge-commit \
