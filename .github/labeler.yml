@@ -1,0 +1,33 @@
+---
+# These labels are configured to match the conventional commits and codebase structure.
+
+"AI Rules 🤖":
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".agent/rules/*"
+          - ".github/instructions/*"
+          - "prompts/*"
+          - ".*rules"
+
+"CI/CD ⚙️":
+  - changed-files:
+      - any-glob-to-any-file:
+          - ".github/workflows/*"
+          - ".github/dependabot.yml"
+          - ".pre-commit-config.yaml"
+          - ".goreleaser.yaml"
+
+"Documentation 📝":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "*.md"
+          - "LICENSE"
+          - ".github/ISSUE_TEMPLATE/*"
+
+"Dependencies 📦":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "package.json"
+          - "requirements.txt"
+          - "go.mod"
+          - "Cargo.toml"
