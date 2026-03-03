@@ -17,12 +17,8 @@
     ".nuxt",
     "__pycache__",
     ".specify",
-    ".*/prompts/**/*.md",
+    // Ignore symlinked AI IDE command/prompt files in all hidden directories
     ".*/commands/**/*.md",
-    ".*/agents/**/*.md",
-    ".*/rules/rules.md",
-    ".*/rules/project_rules.md",
-    ".*/**/*.agent.md",
-    ".*/**/*.prompt.md"
+    ".*/prompts/**/*.md"
   ]
 }
