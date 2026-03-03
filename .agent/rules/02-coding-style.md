@@ -149,8 +149,8 @@
 - **Goal: Absolute Synchronization & Strategic Placement (极致同步与战略分层)**
   - Every linting tool MUST strictly and consistently ignore standard dependency/build folders: `node_modules`, `.venv`, `venv`, `env`, `vendor`, `dist`, `build`, `out`, `target`, `.next`, `.nuxt`, `.output`, `__pycache__`, `.specify`.
   - **Shift-Left (Local/Pre-commit)**: Reserved for **lightweight, language-level, and high-frequency** checks.
-    - _Examples_: Language linters (ESLint, Ruff, golangci-lint, sqlfluff, ktlint), formatters (Prettier, shfmt, google-java-format dry-run), infrastructure (tflint, kube-linter) and critical local security (Gitleaks).
+    - _Examples_: Language linters (ESLint, Ruff, golangci-lint, sqlfluff, ktlint, checkmake), formatters (Prettier, shfmt, google-java-format dry-run), infrastructure (tflint, kube-linter) and critical local security (Gitleaks).
     - _Constraint_: MUST remain fast (seconds) and incrementally triggered by file extensions to maintain developer velocity.
   - **Shift-Right (GitHub Actions Only)**: Reserved for **heavy, high-latency, cross-file, and deep-audit** tools.
-    - _Examples_: Vulnerability scanners (Trivy), full-repo security analysis (Semgrep), Makefile multi-target rule checkers (checkmake), and remote link checkers (Lychee).
+    - _Examples_: Vulnerability scanners (Trivy), full-repo security analysis (Semgrep), and remote link checkers (Lychee).
     - _Constraint_: These are the final authoritative gates for repository purity and deep security, but MUST NOT block local commit flows.

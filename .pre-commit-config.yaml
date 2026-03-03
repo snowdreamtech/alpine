@@ -4,7 +4,7 @@
 #
 # Required tools (install once via: make setup):
 #   brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format \
-#                dotenv-linter golangci-lint tflint kube-linter ktlint
+#                dotenv-linter golangci-lint checkmake tflint kube-linter ktlint
 #   pip3 install yamllint sqlfluff
 #   npm install -g markdownlint-cli2 prettier editorconfig-checker eslint \
 #               @stoplight/spectral-cli @commitlint/cli @commitlint/config-conventional \
@@ -185,6 +185,14 @@ repos:
         types: [go]
         pass_filenames: false
         description: "Fast Go linter aggregator. Runs incrementally on changed files."
+
+      # ── Makefile ──────────────────────────────────────────────────────────
+      - id: checkmake
+        name: checkmake
+        language: system
+        entry: checkmake --config .checkmake.ini
+        files: ^Makefile$
+        description: "Linter for Makefiles to enforce best practices."
 
       # ── SQL ────────────────────────────────────────────────────────────────
       - id: sqlfluff

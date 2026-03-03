@@ -36,10 +36,10 @@ You **MUST** consider the user input before proceeding (if not empty).
 
      ```bash
      # macOS — Homebrew (preferred)
-     brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format dotenv-linter golangci-lint tflint kube-linter ktlint
+     brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format dotenv-linter golangci-lint checkmake tflint kube-linter ktlint
 
      # Windows (Scoop)
-     scoop install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format llvm golangci-lint tflint kube-linter ktlint dotenv-linter
+     scoop install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format llvm golangci-lint checkmake tflint kube-linter ktlint dotenv-linter
 
      # Windows (Winget)
      winget install koalaman.shellcheck rhysd.actionlint hadolint.hadolint mvdan.sh GolangCI.golangci-lint terraform-linters.tflint
