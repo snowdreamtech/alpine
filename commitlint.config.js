@@ -8,21 +8,7 @@ module.exports = {
     "type-enum": [
       2,
       "always",
-      [
-        "feat",
-        "fix",
-        "docs",
-        "style",
-        "refactor",
-        "perf",
-        "test",
-        "build",
-        "ci",
-        "chore",
-        "revert",
-        "deps",
-        "security",
-      ],
+      ["feat", "fix", "docs", "style", "refactor", "perf", "test", "build", "ci", "chore", "revert"],
     ],
     // Custom rule: Disallow Chinese characters in commit messages
     "no-chinese": [2, "always"],
