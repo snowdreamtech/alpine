@@ -31,6 +31,23 @@ archives:
       - src: "README*"
       - src: "CHANGELOG*"
 
+snapshot:
+  version_template: SNAPSHOT-{{ .Commit }}
+
+checksum:
+  disable: false
+  name_template: "{{ .ProjectName }}-{{ .Version }}-checksums.txt"
+
+release:
+  skip_upload: false
+  github:
+    owner: snowdreamtech
+    name: template
+  header: |
+    **Snowdream Tech AI IDE Template** is an enterprise-grade, foundational template designed for multi-AI IDE collaboration.
+
+    This repository serves as a **Single Source of Truth** for AI agent rules, workflows, and project configurations, supporting over 50 different AI-assisted IDEs with massive multi-language support.
+
 source:
   enabled: true
   name_template: "{{ .ProjectName }}-{{ .Version }}-source"
