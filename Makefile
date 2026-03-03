@@ -79,7 +79,7 @@ setup:
 ifeq ($(OS_NAME),Darwin)
 	@if command -v port >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected MacPorts. Installing tools...$(RESET)"; \
-		sudo port install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format-18; \
+		sudo port install shellcheck actionlint hadolint shfmt gitleaks ruff clang-18; \
 	elif command -v brew >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected Homebrew. Installing tools...$(RESET)"; \
 		brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format; \
@@ -89,27 +89,28 @@ ifeq ($(OS_NAME),Darwin)
 else ifeq ($(OS_NAME),Linux)
 	@if command -v apt-get >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected APT. Installing tools...$(RESET)"; \
-		sudo apt-get update && sudo apt-get install -y shellcheck hadolint shfmt python3-ruff clang-format; \
+		sudo apt-get update && sudo apt-get install -y \
+			shellcheck hadolint shfmt gitleaks python3-ruff clang-format; \
 	elif command -v dnf >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected DNF. Installing tools...$(RESET)"; \
-		sudo dnf install -y shellcheck hadolint shfmt ruff clang-format; \
+		sudo dnf install -y shellcheck hadolint shfmt gitleaks ruff clang-format; \
 	elif command -v apk >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected APK. Installing tools...$(RESET)"; \
-		sudo apk add shellcheck hadolint shfmt ruff clang-format; \
+		sudo apk add shellcheck actionlint hadolint shfmt gitleaks py3-ruff; \
 	else \
 		echo "$(RED)Error: Unsupported Linux package manager.$(RESET)"; exit 1; \
 	fi
 else ifeq ($(OS_NAME),Windows)
 	@Write-Host "Installing system tools for Windows..." -ForegroundColor Blue
 	@if (Get-Command scoop -ErrorAction SilentlyContinue) { \
-		scoop install shellcheck actionlint hadolint shfmt gitleaks ruff; \
+		scoop install shellcheck actionlint hadolint shfmt gitleaks; \
 	} elseif (Get-Command choco -ErrorAction SilentlyContinue) { \
 		choco install shellcheck actionlint hadolint shfmt gitleaks; \
 	} else { \
 		Write-Host "Error: Neither Scoop nor Chocolatey found. Please install one first." -ForegroundColor Red; exit 1; \
 	}
 endif
-	@$(PIP) install pre-commit yamllint
+	@$(PIP) install pre-commit yamllint actionlint-py
 	@$(NPM) install -g markdownlint-cli2 prettier editorconfig-checker eslint \
 		@stoplight/spectral-cli @commitlint/cli @commitlint/config-conventional \
 		stylelint @taplo/cli
