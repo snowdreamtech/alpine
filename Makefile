@@ -79,7 +79,7 @@ setup:
 ifeq ($(OS_NAME),Darwin)
 	@if command -v port >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected MacPorts. Installing tools...$(RESET)"; \
-		sudo port install shellcheck github-actionlint hadolint shfmt gitleaks ruff clang-format-18; \
+		sudo port install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format-18; \
 	elif command -v brew >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected Homebrew. Installing tools...$(RESET)"; \
 		brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format; \
