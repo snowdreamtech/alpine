@@ -16,6 +16,10 @@ else
 	MKDIR := mkdir -p
 endif
 
+# Directories to exclude from search operations (mirrors CI ignore list)
+PRUNE_DIRS := .git node_modules .venv venv env vendor dist build out target \
+	.next .nuxt .output __pycache__ .specify
+
 # =============================================================================
 # Tool Variables (can be overridden: make setup PYTHON=python3.11)
 # =============================================================================
@@ -146,8 +150,13 @@ install:
 	@echo "$(GREEN)Dependencies installed!$(RESET)"
 
 # Run all pre-commit hooks
+# First pass: let hooks auto-fix files (whitespace, formatting, etc.)
+# Second pass: verify no issues remain after fixes
 lint:
 	@echo "$(BOLD)Running pre-commit hooks on all files...$(RESET)"
+	@echo "$(BLUE)Pass 1/2: Applying auto-fixes...$(RESET)"
+	@$(PRE_COMMIT) run --all-files || true
+	@echo "$(BLUE)Pass 2/2: Verifying all checks pass...$(RESET)"
 	@$(PRE_COMMIT) run --all-files
 	@echo "$(GREEN)Lint complete!$(RESET)"
 
@@ -220,7 +229,12 @@ check:
 	fi
 	@if command -v shellcheck >/dev/null 2>&1; then \
 		echo "$(BLUE)Checking shell scripts with shellcheck...$(RESET)"; \
-		find . -name "*.sh" -not -path "./.git/*" -exec shellcheck {} +; \
+		find . -name "*.sh" \
+			-not -path "./.git/*" \
+			-not -path "./node_modules/*" \
+			-not -path "./.venv/*" \
+			-not -path "./vendor/*" \
+			-exec shellcheck {} +; \
 	fi
 	@if [ -f go.mod ] && command -v govulncheck >/dev/null 2>&1; then \
 		echo "$(BLUE)Checking Go vulnerabilities with govulncheck...$(RESET)"; \
