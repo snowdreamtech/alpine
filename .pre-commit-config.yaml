@@ -3,7 +3,7 @@
 # Uses system-installed tools directly — no network downloads required.
 #
 # Required tools (install once):
-#   brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format
+#   brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format dotenv-linter
 #   pip3 install yamllint
 #   npm install -g markdownlint-cli2 prettier editorconfig-checker eslint @stoplight/spectral-cli @commitlint/cli @commitlint/config-conventional stylelint @taplo/cli
 #
@@ -194,11 +194,11 @@ repos:
 
       - id: dotenv-linter
         name: dotenv-linter
-        entry: sh -c "curl -fLsS https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin && ~/.local/bin/dotenv-linter \"\$@\"" --
+        entry: dotenv-linter
         language: system
         files: '(\.env|\.env\.example|\.env\.sample)$'
         pass_filenames: true
-        description: "Linter for .env files to check for consistency and security."
+        description: "Linter for .env files to check for consistency and security. Requires dotenv-linter installed locally (see Makefile setup target)."
 
       # ── Git Commit Message Flow ──────────────────────────────────────────────
       - id: commitlint

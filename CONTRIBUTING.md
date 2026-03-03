@@ -14,7 +14,7 @@ Before submitting any changes, you must set up your local development environmen
 
    ```bash
    pip install pre-commit
-   pre-commit install --install-hooks
+   pre-commit install --hook-type pre-commit --hook-type pre-merge-commit --hook-type commit-msg
    ```
 
 2. **Verify Setup**: Run `pre-commit run --all-files` to ensure all linters pass locally.

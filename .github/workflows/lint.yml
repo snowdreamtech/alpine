@@ -609,11 +609,55 @@ jobs:
           sarif_file: "trivy-results.sarif"
 
       # Dockerfile linting
+      - name: Install hadolint
+        env:
+          GITHUB_PROXY: ${{ secrets.GITHUB_PROXY || vars.GH_PROXY || 'https://gh-proxy.sn0wdr1am.com/' }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        shell: sh
+        run: |
+          # Detect OS
+          OS="$(uname -s)"
+          case "${OS}" in
+              Linux*)     PLATFORM=Linux;;
+              Darwin*)    PLATFORM=Darwin;;
+              CYGWIN*|MINGW*|MSYS*) PLATFORM=Windows;;
+              *)          echo "Unsupported OS: ${OS}" && exit 1;;
+          esac
+
+          # Detect Arch
+          ARCH="$(uname -m)"
+          case "${ARCH}" in
+              x86_64|amd64) ARCH=x86_64;;
+              aarch64|arm64) ARCH=arm64;;
+              *)             echo "Unsupported architecture: ${ARCH}" && exit 1;;
+          esac
+
+          echo "Detected Platform: ${PLATFORM}, Arch: ${ARCH}"
+
+          LATEST_VERSION=$(curl -sSf -H "Authorization: Bearer ${GITHUB_TOKEN}" https://api.github.com/repos/hadolint/hadolint/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+          if [ -z "$LATEST_VERSION" ]; then
+            echo "Failed to fetch the latest version of hadolint. Using fallback."
+            LATEST_VERSION="v2.12.0"
+          fi
+          echo "Latest hadolint version is: ${LATEST_VERSION}"
+
+          mkdir -p ~/.local/bin
+          if [ "$PLATFORM" = "Windows" ]; then
+            DOWNLOAD_URL="${GITHUB_PROXY}https://github.com/hadolint/hadolint/releases/download/${LATEST_VERSION}/hadolint-Windows-${ARCH}.exe"
+            curl -sSfL "$DOWNLOAD_URL" -o ~/.local/bin/hadolint.exe
+          else
+            DOWNLOAD_URL="${GITHUB_PROXY}https://github.com/hadolint/hadolint/releases/download/${LATEST_VERSION}/hadolint-${PLATFORM}-${ARCH}"
+            curl -sSfL "$DOWNLOAD_URL" -o ~/.local/bin/hadolint
+            chmod +x ~/.local/bin/hadolint
+          fi
+
+          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
+
       - name: Run hadolint
         run: |
           find . -type f -name "*Dockerfile*" -not -path "*/\.venv/*" -not -path "*/venv/*" -not -path "*/env/*" -not -path "*/node_modules/*" -not -path "*/vendor/*" -not -path "*/dist/*" -not -path "*/build/*" -not -path "*/out/*" -not -path "*/target/*" -not -path "*/\.next/*" -not -path "*/\.nuxt/*" -not -path "*/\.output/*" -not -path "*/__pycache__/*" -not -path "*/\.git/*" -not -path "*/\.specify/*" -print0 | while IFS= read -r -d '' file; do
             echo "Linting $file"
-            docker run --rm -i hadolint/hadolint hadolint - < "$file"
+            hadolint "$file"
           done
 
       # Makefile linting

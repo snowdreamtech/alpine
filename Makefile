@@ -86,11 +86,12 @@ setup:
 ifeq ($(OS_NAME),Darwin)
 	@if command -v brew >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected Homebrew. Installing tools...$(RESET)"; \
-		brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format; \
+		brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format dotenv-linter; \
 	elif command -v port >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected MacPorts. Installing tools...$(RESET)"; \
 		sudo port install shellcheck actionlint hadolint shfmt gitleaks ruff clang-18; \
 		sudo port select --set clang mp-clang-18; \
+		curl -fLsS https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin; \
 	else \
 		echo "$(RED)Error: Neither Homebrew nor MacPorts found. Please install one first.$(RESET)"; exit 1; \
 	fi
@@ -100,13 +101,16 @@ else ifeq ($(OS_NAME),Linux)
 		sudo apt-get update && sudo apt-get install -y \
 			shellcheck hadolint shfmt gitleaks python3-ruff clang-format; \
 		$(PIP) install actionlint-py; \
+		curl -fLsS https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin; \
 	elif command -v dnf >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected DNF. Installing tools...$(RESET)"; \
 		sudo dnf install -y shellcheck hadolint shfmt gitleaks ruff clang-format; \
 		$(PIP) install actionlint-py; \
+		curl -fLsS https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin; \
 	elif command -v apk >/dev/null 2>&1; then \
 		echo "$(BLUE)Detected APK. Installing tools...$(RESET)"; \
 		sudo apk add shellcheck actionlint hadolint shfmt gitleaks py3-ruff; \
+		curl -fLsS https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin; \
 	else \
 		echo "$(RED)Error: Unsupported Linux package manager.$(RESET)"; exit 1; \
 	fi
