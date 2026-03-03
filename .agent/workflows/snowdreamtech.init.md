@@ -20,8 +20,8 @@ You **MUST** consider the user input before proceeding (if not empty).
      **Cross-platform (pip3 + npm — works on macOS / Linux / Windows):**
 
      ```bash
-     pip3 install yamllint
-     npm install -g markdownlint-cli2 prettier editorconfig-checker eslint @stoplight/spectral-cli @commitlint/cli @commitlint/config-conventional stylelint stylelint-config-standard @taplo/cli
+     pip3 install yamllint sqlfluff
+     npm install -g markdownlint-cli2 prettier editorconfig-checker eslint @stoplight/spectral-cli @commitlint/cli @commitlint/config-conventional stylelint stylelint-config-standard @taplo/cli sort-package-json
      ```
 
      **Other Backend Ecosystems (.NET / Ruby / PHP):**
@@ -36,13 +36,13 @@ You **MUST** consider the user input before proceeding (if not empty).
 
      ```bash
      # macOS — Homebrew (preferred)
-     brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format
+     brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format dotenv-linter golangci-lint tflint kube-linter ktlint
 
      # Windows (Scoop)
-     scoop install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format
+     scoop install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format llvm golangci-lint tflint kube-linter ktlint dotenv-linter
 
      # Windows (Winget)
-     winget install koalaman.shellcheck rhysd.actionlint hadolint.hadolint shfmt
+     winget install koalaman.shellcheck rhysd.actionlint hadolint.hadolint mvdan.sh GolangCI.golangci-lint terraform-linters.tflint
      ```
 
      **Binary downloads (actionlint / hadolint / gitleaks — macOS & Linux fallback):**
@@ -73,6 +73,12 @@ You **MUST** consider the user input before proceeding (if not empty).
      curl -fL --retry 3 \
        "${GITHUB_PROXY}https://github.com/gitleaks/gitleaks/releases/download/${GITLEAKS_VER}/gitleaks_${GITLEAKS_VER#v}_${GL}_${GA}.tar.gz" \
        | tar -xz -C ~/.local/bin gitleaks
+
+     # dotenv-linter
+     curl -fLsS https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin
+
+     # golangci-lint
+     curl -fLsS https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b ~/.local/bin
      ```
 
      Ensure `~/.local/bin` is in your `PATH`:

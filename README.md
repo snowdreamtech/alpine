@@ -38,9 +38,9 @@ project-root/
 1. **Clone the template**.
 2. **Initialize the Environment**:
    Trigger the initialization workflow by typing `@[/snowdreamtech.init]` in your AI agent chat. This will:
-   - Install linguistically specific linters/formatters.
-   - Configure platform-specific binary tools (e.g., MacPorts/Homebrew).
-   - Activate `pre-commit` hooks.
+   - Install linguistically specific linters/formatters (e.g., `golangci-lint`, `sqlfluff`, `ktlint`, `kube-linter`, `tflint`).
+   - Configure platform-specific binary tools (e.g., MacPorts/Homebrew/Scoop/Winget/APT).
+   - Activate `pre-commit` hooks for lightning-fast localized Shift-Left quality gates.
 3. **Read the Rules**:
    Before coding, ensure both you and your AI assistant has read the core principles at `.agent/rules/01-general.md`.
 
