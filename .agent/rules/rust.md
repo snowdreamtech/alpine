@@ -23,7 +23,21 @@
   rust-version = "1.70"   # MSRV
   ```
 
-- Use **`cargo`** for all standard operations. Commit `Cargo.lock` for **binary projects** for reproducibility. Libraries should check in `Cargo.lock` to CI but not distribute it.
+- Use **`cargo`** for all standard operations. Commit `Cargo.lock` for **binary projects** for reproducibility. Libraries should check in `Cargo.lock` to CI but not distribute it. **Strict Version Pinning (MANDATORY)**: All dependencies in `Cargo.toml` MUST use **exact version numbers**. Never use range operators (`^`, `~`, `>=`, `*`, `<`).
+
+  ```toml
+  # ❌ WRONG — version ranges are non-deterministic
+  [dependencies]
+  tokio = { version = "^1.0", features = ["full"] }
+  serde = ">=1.0"
+
+  # ✅ CORRECT — exact, auditable, reproducible
+  [dependencies]
+  tokio = { version = "1.36.0", features = ["full"] }
+  serde = { version = "1.0.197", features = ["derive"] }
+  ```
+
+  `Cargo.lock` pins transitive dependencies — always commit it for binaries.
 
 ### Formatting & Linting
 
