@@ -149,17 +149,28 @@
 
 ## 6. CI Security & Supply Chain
 
-- Pin ALL CI action versions to a specific **commit SHA** — not a mutable tag like `v4` which could be changed without notice:
+- **Strict Action Version Pinning (MANDATORY)**: All GitHub Actions references MUST use **exact version tags** (e.g., `v4.2.2`). Never use mutable major version tags (`@v4`, `@v2`) — they can be silently overwritten by the action author, breaking reproducibility and enabling supply-chain attacks. Always use the **latest available exact version**.
 
   ```yaml
-  # ❌ Mutable tag — can be silently overwritten
+  # ❌ WRONG — mutable major tag, non-deterministic
   - uses: actions/checkout@v4
+  - uses: actions/setup-node@v4
+  - uses: pnpm/action-setup@v4
 
-  # ✅ Pinned SHA — immutable, auditable
-  - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+  # ✅ CORRECT — exact version, auditable, reproducible
+  - uses: actions/checkout@v6.0.2
+  - uses: actions/setup-node@v6.3.0
+  - uses: pnpm/action-setup@v4.2.0
   ```
 
-  Use tools like `renovate` (with `pinDigests: true`) or `pin-github-action` CLI to automate SHA pinning.
+  **Gold standard (security-critical workflows)**: Pin to the immutable commit SHA rather than a tag:
+
+  ```yaml
+  # ✅ GOLD STANDARD — SHA is truly immutable, tag is additional context
+  - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v6.0.2
+  ```
+
+  Use `dependabot` (with `version-updates` for GitHub Actions) or `Renovate` (with `pinDigests: true`) to automatically track and update pinned versions and SHAs.
 
 - Use **OIDC (OpenID Connect)** for short-lived cloud credentials in CI instead of long-lived static secrets:
 
