@@ -7,7 +7,25 @@
   - `dependencies`: Runtime requirements only.
   - `devDependencies`: Build tools, linters, test frameworks.
   - `peerDependencies`: When creating plugins or shared libraries.
-- **Strict Versioning**: Use fixed versions or carats (`^`) cautiously. Prefer exact versions for critical infrastructure.
+- **Strict Version Pinning (MANDATORY)**: All dependencies in `package.json` MUST use **exact version numbers**. Never use range operators (`^`, `~`, `>=`, `*`, `latest`). Unpinned versions introduce non-reproducible builds and undiscovered breaking changes.
+
+  ```jsonc
+  // ❌ WRONG — version ranges are non-deterministic
+  "dependencies": {
+    "express": "^4.18.0",
+    "lodash": "~4.17.0",
+    "axios": ">=1.0.0"
+  }
+
+  // ✅ CORRECT — exact, auditable, reproducible
+  "dependencies": {
+    "express": "4.18.2",
+    "lodash": "4.17.21",
+    "axios": "1.6.7"
+  }
+  ```
+
+  Always commit `package-lock.json` to version control. Use `npm ci` (not `npm install`) in CI pipelines for deterministic installs.
 - **Scripts**: All repeatable actions MUST be defined in `npm scripts` within `package.json`.
 
 ## 2. Environment Setup
