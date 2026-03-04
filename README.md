@@ -78,17 +78,35 @@ This project provides a pre-configured **DevContainer** for a consistent, enterp
 
 ### How to use
 
+#### Local Development (本地开发)
+
 1. Open the project in VS Code.
-2. If you have the "Dev Containers" extension installed, you will be prompted to "Reopen in Container".
-3. Alternatively, use the Command Palette (`F1`) and select `Dev Containers: Reopen in Container`.
+2. Ensure Docker Desktop is running.
+3. If you have the "Dev Containers" extension installed, you will be prompted to "Reopen in Container".
+4. Alternatively, use the Command Palette (`F1`) and select `Dev Containers: Reopen in Container`.
+
+#### Remote Development (远程 SSH 开发)
+
+1. Connect to your remote server via `Remote - SSH` extension.
+2. Open this project folder on the remote server.
+3. Use the Command Palette (`F1`) and select `Dev Containers: Reopen in Container`. VS Code will build and run the container on the **remote server's Docker engine**.
 
 ### Configuration
 
-To switch to **Docker Compose** mode:
+#### Switch to Docker Compose (切换混合模式)
+
+To enable **PostgreSQL** and **Redis**:
 
 1. Open `.devcontainer/devcontainer.json`.
-2. Follow the comments to swap the `build` section with the `dockerComposeFile` section.
+2. Follow the internal comments to swap the `build` section with the `dockerComposeFile` section.
 3. Rebuild the container.
+
+#### Custom Base Image (自定义镜像)
+
+If you need to use a private or enterprise image:
+
+1. Modify the `FROM` instruction in `.devcontainer/Dockerfile`.
+2. Ensure your image has a `vscode` user or adjust the `remoteUser` setting in `devcontainer.json`.
 
 ## 📄 License
 
