@@ -2,6 +2,28 @@
 
 > Objective: Unify commit history, branching, PR workflows, and review standards to improve traceability and collaboration efficiency.
 
+## 0. Atomic Commit Discipline (MANDATORY)
+
+> **Strictly enforced when implementing multiple suggestions or changes in sequence.**
+
+- **One commit = one logical change.** Each commit must address a **single, well-defined topic** (e.g., one feature, one bug fix, one refactor, one config change). Never batch unrelated changes into a single commit.
+- **Implement → Commit → Next.** When executing multiple suggestions or tasks in sequence:
+  1. Implement the first item completely.
+  2. Commit it immediately with a precise commit message.
+  3. Only then proceed to the next item.
+- **No bulk commits.** Do NOT accumulate multiple changes across files and then commit them all at once. This breaks auditability and makes `git bisect`, `git revert`, and code review harder.
+- **Applies regardless of user selection.** Whether the user has selected one suggestion from a list or confirmed all of them, always commit after each individual change — not after all of them together.
+
+```bash
+# ✅ CORRECT: atomic, auditable
+git commit -m "feat(auth): add OAuth2 login"
+# ... implement next item ...
+git commit -m "feat(auth): add logout endpoint"
+
+# ❌ WRONG: batch commit, hard to audit
+git commit -m "feat(auth): add OAuth2 login and logout and token refresh"
+```
+
 ## 1. Commit Messages
 
 - Use **Conventional Commits** format (strictly following `@commitlint/config-conventional`): `<type>(<scope>): <description>` (e.g., `feat(auth): add OAuth2 login`). Never write vague commit messages like "fix bug", "update code", or "WIP".
