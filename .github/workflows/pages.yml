@@ -35,6 +35,21 @@ jobs:
       - name: Detect package manager
         id: detect-pm
         run: |
+          lock_count=0
+          [ -f "pnpm-lock.yaml" ] && lock_count=$((lock_count + 1))
+          [ -f "yarn.lock" ]      && lock_count=$((lock_count + 1))
+          [ -f "bun.lockb" ]      && lock_count=$((lock_count + 1))
+          [ -f "package-lock.json" ] && lock_count=$((lock_count + 1))
+
+          if [ "$lock_count" -gt 1 ]; then
+            echo "::error::Multiple lock files detected. Remove all but one:"
+            [ -f "pnpm-lock.yaml" ]   && echo "::error::  - pnpm-lock.yaml"
+            [ -f "yarn.lock" ]        && echo "::error::  - yarn.lock"
+            [ -f "bun.lockb" ]        && echo "::error::  - bun.lockb"
+            [ -f "package-lock.json" ] && echo "::error::  - package-lock.json"
+            exit 1
+          fi
+
           if [ -f "pnpm-lock.yaml" ]; then
             {
               echo "manager=pnpm"
