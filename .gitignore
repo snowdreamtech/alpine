@@ -1284,3 +1284,7 @@ skills/
 shellcheck-*/
 actionlint
 sc.tar.gz
+
+# VitePress
+docs/.vitepress/dist
+docs/.vitepress/cache
