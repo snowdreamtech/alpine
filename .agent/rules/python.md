@@ -14,7 +14,8 @@
   echo "3.12.3" > .python-version
   ```
 
-- Use **`uv lock`** or **`poetry.lock`** for reproducible installs. Always commit the lock file to version control.
+- **Strict Version Pinning (MANDATORY)**: All dependencies in `pyproject.toml` MUST use **exact version numbers**. Never use range operators (`>=`, `~=`, `^`, `*`). Unpinned versions introduce non-reproducible builds and supply-chain risk.
+- Use **`uv lock`** or **`poetry.lock`** for reproducible installs. Always commit the lock file to version control. Use `uv sync --frozen` or `pip install --require-hashes` in CI to guarantee deterministic installs.
 - Commit `pyproject.toml` with fully configured tool settings (ruff, mypy, pytest, coverage):
 
   ```toml
@@ -22,9 +23,16 @@
   name = "myproject"
   version = "1.0.0"
   requires-python = ">=3.12"
+  # ❌ WRONG — version ranges are non-deterministic
+  # dependencies = [
+  #   "fastapi>=0.115",
+  #   "sqlalchemy>=2.0",
+  # ]
+
+  # ✅ CORRECT — exact, auditable, reproducible
   dependencies = [
-    "fastapi>=0.115",
-    "sqlalchemy>=2.0",
+    "fastapi==0.115.2",
+    "sqlalchemy==2.0.35",
   ]
 
   [project.optional-dependencies]
