@@ -1,8 +1,21 @@
 {
   "name": "Snowdream Tech Template",
-  "dockerComposeFile": "docker-compose.yaml",
-  "service": "app",
-  "workspaceFolder": "/workspace",
+  // --- DEV ENVIRONMENT CONFIGURATION ---
+  // You can choose between two development modes:
+  // 1. [DEFAULT] SINGLE CONTAINER: Use a basic Dockerfile for a lightweight environment.
+  // 2. MULTI-CONTAINER: Use Docker Compose to include databases (PostgreSQL, Redis).
+  // --- MODE 1: SINGLE CONTAINER (Dockerfile) ---
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  // --- MODE 2: MULTI-CONTAINER (Docker Compose) ---
+  // To enable this mode:
+  // 1. Comment out the "build" section above.
+  // 2. Uncomment the three lines below.
+  // "dockerComposeFile": "docker-compose.yaml",
+  // "service": "app",
+  // "workspaceFolder": "/workspace",
   "customizations": {
     "vscode": {
       "settings": {
@@ -69,7 +82,7 @@
         "terminal.integrated.gpuAcceleration": "on",
         "terminal.integrated.scrollback": 10000,
         "terminal.integrated.defaultProfile.linux": "bash",
-        "terminal.integrated.enableMultiLinePasteWarning": false,
+        "terminal.integrated.enableMultiLinePasteWarning": "never",
         "files.insertFinalNewline": true,
         "files.trimTrailingWhitespace": true,
         "explorer.confirmDragAndDrop": false,

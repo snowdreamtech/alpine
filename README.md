@@ -69,6 +69,27 @@ To augment AI behavior, **do not** modify individual IDE configuration directori
 1. Add or modify markdown files inside `.agent/rules/`.
 2. The existing symlink topology will automatically apply your new rules to all 50+ AI environments.
 
+## 🐳 DevContainer
+
+This project provides a pre-configured **DevContainer** for a consistent, enterprise-grade development experience. It supports two modes:
+
+- **Single Container (Default)**: Lightweight environment with all 20+ CI tools and 40+ VS Code extensions pre-installed.
+- **Docker Compose (Optional)**: Includes additional services like **PostgreSQL** and **Redis**.
+
+### How to use
+
+1. Open the project in VS Code.
+2. If you have the "Dev Containers" extension installed, you will be prompted to "Reopen in Container".
+3. Alternatively, use the Command Palette (`F1`) and select `Dev Containers: Reopen in Container`.
+
+### Configuration
+
+To switch to **Docker Compose** mode:
+
+1. Open `.devcontainer/devcontainer.json`.
+2. Follow the comments to swap the `build` section with the `dockerComposeFile` section.
+3. Rebuild the container.
+
 ## 📄 License
 
 This project is licensed under the **MIT License**.
