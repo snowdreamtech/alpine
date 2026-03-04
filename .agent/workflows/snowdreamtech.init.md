@@ -49,26 +49,27 @@ You **MUST** consider the user input before proceeding (if not empty).
 
      > `GITHUB_PROXY` is set to `https://gh-proxy.sn0wdr1am.com/` by default to ensure reliable downloads in restricted network environments.
 
-     ```bash
+     ```sh
      GITHUB_PROXY="${GITHUB_PROXY:-https://gh-proxy.sn0wdr1am.com/}"
 
-     # actionlint
-     ACTIONLINT_VER="v1.7.11"
+     # actionlint (latest version, dynamically fetched)
+     ACTIONLINT_VER=$(curl -sSf https://api.github.com/repos/rhysd/actionlint/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
      OS=$(uname -s | tr '[:upper:]' '[:lower:]'); ARCH=$(uname -m)
      curl -fL --retry 3 \
        "${GITHUB_PROXY}https://github.com/rhysd/actionlint/releases/download/${ACTIONLINT_VER}/actionlint_${ACTIONLINT_VER#v}_${OS}_${ARCH}.tar.gz" \
        | tar -xz -C ~/.local/bin actionlint
 
-     # hadolint
-     HADOLINT_VER="v2.12.0"
+     # hadolint (latest version, dynamically fetched)
+     HADOLINT_VER=$(curl -sSf https://api.github.com/repos/hadolint/hadolint/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
      ARCH=$(uname -m); if [ "$ARCH" = "arm64" ]; then HA="arm64"; else HA="x86_64"; fi
      curl -fL --retry 3 \
        "${GITHUB_PROXY}https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VER}/hadolint-$(uname -s)-${HA}" \
        -o ~/.local/bin/hadolint && chmod +x ~/.local/bin/hadolint
 
-     # gitleaks
-     GITLEAKS_VER="v8.21.2"
-     OS=$(uname -s | tr '[:upper:]' '[:lower:]'); ARCH=$(uname -m); if [ "$ARCH" = "x86_64" ] || [ "$ARCH" = "amd64" ]; then GA="x64"; elif [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then GA="arm64"; elif [ "$ARCH" = "i386" ] || [ "$ARCH" = "i686" ]; then GA="x32"; else GA=$ARCH; fi
+     # gitleaks (latest version, dynamically fetched)
+     GITLEAKS_VER=$(curl -sSf https://api.github.com/repos/gitleaks/gitleaks/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
+     OS=$(uname -s | tr '[:upper:]' '[:lower:]'); ARCH=$(uname -m)
+     if [ "$ARCH" = "x86_64" ] || [ "$ARCH" = "amd64" ]; then GA="x64"; elif [ "$ARCH" = "aarch64" ] || [ "$ARCH" = "arm64" ]; then GA="arm64"; else GA=$ARCH; fi
      if [ "$OS" = "darwin" ]; then GL="darwin"; else GL="linux"; fi
      curl -fL --retry 3 \
        "${GITHUB_PROXY}https://github.com/gitleaks/gitleaks/releases/download/${GITLEAKS_VER}/gitleaks_${GITLEAKS_VER#v}_${GL}_${GA}.tar.gz" \
