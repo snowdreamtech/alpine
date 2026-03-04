@@ -1,79 +1,37 @@
-# Rule System Overview
+# Rules Overview
 
-The rule system is the foundation of this template — it defines how AI assistants should think and act within your project.
+The `.agent/rules/` directory is the **single source of truth** for all development standards in this repository. Every AI IDE (Cursor, Windsurf, Claude, Copilot, etc.) reads from the same rule files, ensuring consistent behavior across all AI coding assistants.
 
-## Architecture
+## Rule Files
 
-```text
-.agent/rules/               ← Single Source of Truth
-├── Core Rules (01–11)      ← Always loaded
-└── Language Rules          ← Loaded on demand
-    ├── go.md
-    ├── python.md
-    ├── typescript.md
-    ├── react.md
-    └── 70+ more...
-```
+| File                                       | Scope                                        |
+| ------------------------------------------ | -------------------------------------------- |
+| [01 · General](./01-general)               | Language, communication, core principles     |
+| [02 · Coding Style](./02-coding-style)     | Commit messages, naming, formatting          |
+| [03 · Architecture](./03-architecture)     | Project structure, cross-platform design     |
+| [04 · Security](./04-security)             | Secrets, auth, input validation              |
+| [05 · Dependencies](./05-dependencies)     | Version pinning, lock files, auditing        |
+| [06 · CI & Testing](./06-ci-testing)       | Pipelines, quality gates, test strategy      |
+| [07 · Git](./07-git)                       | Branch strategy, PR workflow, atomic commits |
+| [08 · Dev Env](./08-dev-env)               | Local setup, DevContainer, tooling           |
+| [09 · AI Interaction](./09-ai-interaction) | AI agent behavior and boundaries             |
+| [10 · UI/UX](./10-ui-ux)                   | Frontend, accessibility, i18n                |
+| [11 · Deployment](./11-deployment)         | Docker, IaC, release pipelines               |
 
-## Two-Phase Rule Loading
+## How Rules Work
 
-Every AI assistant that reads this template's rules follows a two-phase loading protocol:
+Rules are loaded automatically by each AI IDE via their respective config files:
 
-### Phase 1: Core Rules (Mandatory)
+- **Cursor** → `.cursor/rules/` (symlinks to `.agent/rules/`)
+- **Windsurf** → `.windsurfrules`
+- **Claude / Gemini** → `CLAUDE.md` / `GEMINI.md` (redirect to `.agent/rules/`)
+- **GitHub Copilot** → `.github/copilot-instructions.md`
+- **Continue** → `.continue/config.json`
 
-All 11 core rules are read in numerical order at the start of every session:
-
-| #   | File                   | Covers                                                                  |
-| --- | ---------------------- | ----------------------------------------------------------------------- |
-| 01  | `01-general.md`        | Language, communication, idempotency, cross-platform, network, security |
-| 02  | `02-coding-style.md`   | Commit messages, code quality, error handling, naming                   |
-| 03  | `03-architecture.md`   | Project structure, AI IDE integration, design principles                |
-| 04  | `04-security.md`       | Credentials, access control, encryption, scanning                       |
-| 05  | `05-dependencies.md`   | Locking, integrity, auditing, release process                           |
-| 06  | `06-ci-testing.md`     | Test types, CI pipeline, quality gates                                  |
-| 07  | `07-git.md`            | Atomic commits, branching, pull requests, code review                   |
-| 08  | `08-dev-env.md`        | DevContainer, scripts, pre-commit hooks                                 |
-| 09  | `09-ai-interaction.md` | Safety, code generation, communication, atomic commits                  |
-| 10  | `10-ui-ux.md`          | Styling, accessibility, performance, i18n                               |
-| 11  | `11-deployment.md`     | Containerization, secrets, IaC, observability                           |
-
-### Phase 2: Language & Framework Rules (Dynamic)
-
-The AI inspects the project's files (`go.mod`, `package.json`, `pyproject.toml`, etc.) and loads the relevant language-specific rules:
-
-**Languages:** JavaScript, TypeScript, Python, Go, Rust, Java, Kotlin, C#, Swift, PHP, Ruby, Scala, Elixir, Lua, R, C, C++, Shell/Bash, HTML, CSS, SQL, GraphQL
-
-**Frameworks:** React, Next.js, Vue, Nuxt, Angular, Svelte, Express, NestJS, FastAPI, Django, Flask, Spring, Gin, Echo, Fiber, Flutter, and 40+ more
-
-**Infrastructure:** Docker, Kubernetes, Terraform, Ansible, GitHub Actions, PostgreSQL, MongoDB, Redis, Elasticsearch, and more
-
-## Editing Rules
-
-::: warning
-**Never modify individual IDE configuration directories directly.** Always edit `.agent/rules/` only.
-:::
-
-To add or modify a rule:
+## Adding or Modifying Rules
 
 1. Edit the relevant file in `.agent/rules/`
-2. All 50+ AI IDE directories will automatically use the updated rule on the next session — they all point back to this directory.
+2. All AI IDEs will pick up the change automatically on next session
+3. Commit with `docs(rules): <description>`
 
-## Key Rules Highlighted
-
-### Atomic Commits (07-git.md)
-
-Every commit must address a **single logical change**. When implementing multiple changes:
-
-1. Implement one change completely
-2. Commit it immediately
-3. Proceed to the next
-
-### AI Interaction Safety (09-ai-interaction.md)
-
-- No blind refactoring — AI must not change code outside the requested scope
-- Explicit confirmation required for destructive operations
-- Atomic commits are non-negotiable when executing multiple tasks
-
-### Cross-Platform Compatibility (01-general.md)
-
-All scripts and configurations must work on **Linux**, **macOS**, and **Windows** without hardcoded paths.
+> **Single Source of Truth**: Never edit IDE-specific rule files directly. Always update `.agent/rules/` and let the symlinks/redirects propagate the change.
