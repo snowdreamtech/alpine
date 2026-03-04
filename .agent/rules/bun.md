@@ -16,6 +16,22 @@
   bun install --frozen-lockfile
   ```
 
+- **Strict Version Pinning (MANDATORY)**: All dependencies in `package.json` MUST use **exact version numbers**. Never use range operators (`^`, `~`, `>=`, `*`, `latest`).
+
+  ```jsonc
+  // ❌ WRONG — version ranges are non-deterministic
+  "dependencies": {
+    "elysia": "^1.0.0",
+    "drizzle-orm": "~0.30.0"
+  }
+
+  // ✅ CORRECT — exact, auditable, reproducible
+  "dependencies": {
+    "elysia": "1.0.27",
+    "drizzle-orm": "0.30.10"
+  }
+  ```
+
 - Use **`bunx`** (Bun's `npx` equivalent) sparingly and only for one-off commands. For repeated linting/formatting in this project, prefer direct execution after `make setup` for maximum performance.
 
   ```bash
