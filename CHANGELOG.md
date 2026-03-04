@@ -40,4 +40,4 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - N/A
 
-[Unreleased]: https://github.com/snowdreamtech/template/compare/HEAD...HEAD
+[Unreleased]: https://github.com/snowdreamtech/template/commits/main/
