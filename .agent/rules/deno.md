@@ -47,17 +47,22 @@
 
 ### Import Maps (deno.json)
 
-- Pin all dependency versions in **import maps** via `deno.json`:
+- Pin all dependency versions in **import maps** via `deno.json`. **Strict Version Pinning (MANDATORY)**: All imports MUST use **exact version numbers**. Never use range specifiers (`^`, `~`, `>=`).
 
   ```jsonc
   // deno.json
+  // ❌ WRONG — version ranges are non-deterministic
+  // "@std/http": "jsr:@std/http@^1.0.0"
+  // "hono": "npm:hono@^4.0.0"
+
+  // ✅ CORRECT — exact, auditable, reproducible
   {
     "imports": {
-      "@std/http": "jsr:@std/http@^1.0.0",
-      "@std/path": "jsr:@std/path@^1.0.0",
-      "@std/assert": "jsr:@std/assert@^1.0.0",
-      "hono": "npm:hono@^4.0.0",
-      "zod": "npm:zod@^3.22.0",
+      "@std/http": "jsr:@std/http@1.0.4",
+      "@std/path": "jsr:@std/path@1.0.6",
+      "@std/assert": "jsr:@std/assert@1.0.6",
+      "hono": "npm:hono@4.4.0",
+      "zod": "npm:zod@3.22.4",
     },
     "tasks": {
       "dev": "deno run --allow-net --allow-env --watch main.ts",
