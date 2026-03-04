@@ -56,7 +56,7 @@ endif
 # =============================================================================
 # Targets
 # =============================================================================
-.PHONY: all help setup install lint format test build check clean
+.PHONY: all help init setup install lint format test build check clean
 
 # Default target: display help
 all: help
@@ -69,6 +69,7 @@ help:
 	@echo "  make $(YELLOW)<target>$(RESET) [VARIABLE=value ...]"
 	@echo ""
 	@echo "$(BOLD)Targets:$(RESET)"
+	@echo "  $(GREEN)init$(RESET)     Hydrate project from template (rename placeholders)"
 	@echo "  $(GREEN)setup$(RESET)    Install system-level development tools"
 	@echo "  $(GREEN)install$(RESET)  Install project-level dependencies (pip, npm)"
 	@echo "  $(GREEN)lint$(RESET)     Run all pre-commit hooks on all files"
@@ -82,6 +83,10 @@ help:
 	@echo "$(BOLD)Overridable Variables:$(RESET)"
 	@echo "  PYTHON=$(PYTHON)  PIP=$(PIP)  NODE=$(NODE)  NPM=$(NPM)"
 	@echo "  NO_COLOR=1    Disable colored output"
+
+# Hydrate project from template
+init:
+	@bash scripts/init-project.sh
 
 # Install system-level development tools based on OS and package manager
 setup:
