@@ -184,5 +184,6 @@
     }
   },
   "remoteUser": "vscode",
-  "postCreateCommand": "make setup || true"
+  "postCreateCommand": "make setup || true",
+  "postAttachCommand": "git fetch --tags & (command -v pre-commit >/dev/null && pre-commit --version) &"
 }

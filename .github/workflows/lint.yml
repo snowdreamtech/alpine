@@ -21,6 +21,7 @@ name: GitHub Actions Lint
       - "fix/**"
       - "pr/**"
   workflow_dispatch:
+  workflow_call:
 
 permissions:
   contents: write
