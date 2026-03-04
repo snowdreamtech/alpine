@@ -34,15 +34,70 @@ body:
       description: A clear and concise description of what you expected to happen.
     validations:
       required: true
-  - type: textarea
-    id: environment
+  - type: dropdown
+    id: os
     attributes:
-      label: Environment
-      description: What OS, IDE, and Agent are you using?
-      placeholder: |
-        - OS: [e.g. macOS 14.2]
-        - IDE: [e.g. VS Code, Cursor]
-        - Agent/Extension: [e.g. Cline, Mely]
+      label: Operating System
+      options:
+        - macOS
+        - Linux (Ubuntu/Debian)
+        - Linux (RedHat/Fedora)
+        - Linux (Alpine)
+        - Windows 11
+        - Windows 10
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: ide
+    attributes:
+      label: AI IDE / Editor
+      description: Which AI-powered IDE or editor are you using?
+      multiple: true
+      options:
+        - VS Code + Copilot
+        - Cursor
+        - Windsurf
+        - Trae
+        - PearAI
+        - Void
+        - Other VS Code Fork
+        - JetBrains AI
+        - Neovim + AI Plugin
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: agent
+    attributes:
+      label: AI Agent / Extension
+      description: Which AI agent or extension are you using?
+      multiple: true
+      options:
+        - Gemini (Antigravity)
+        - Claude (claude.ai)
+        - Cline
+        - Roo Code
+        - GitHub Copilot Chat
+        - Amazon Q Developer
+        - Cursor Agent
+        - Windsurf Cascade
+        - Codex CLI
+        - Aider
+        - Devin
+        - OpenHands
+        - Augment Code
+        - Continue
+        - Kiro
+        - Other
+    validations:
+      required: false
+  - type: input
+    id: rule-file
+    attributes:
+      label: Affected Rule / Workflow File (if applicable)
+      description: Which `.agent/rules/` or `.agent/workflows/` file is involved?
+      placeholder: "e.g. .agent/rules/shell.md or .agent/workflows/speckit.implement.md"
     validations:
       required: false
   - type: checkboxes

@@ -1,6 +1,6 @@
 ---
-name: 🚀🚀 Feature Request
-description: Suggest an idea, enhancement, or new AI rule for this template
+name: 🚀 Feature Request
+description: Suggest an idea, enhancement, or new rule for this template
 labels: ["enhancement"]
 body:
   - type: markdown
@@ -8,27 +8,72 @@ body:
       value: |
         Thanks for taking the time to suggest an improvement!
         Be sure to search [existing issues](https://github.com/snowdreamtech/template/issues) before opening a new one.
+  - type: dropdown
+    id: category
+    attributes:
+      label: Category
+      description: What area does this feature request apply to?
+      options:
+        - New Rule File (.agent/rules/)
+        - Existing Rule Improvement
+        - New Workflow (.agent/workflows/)
+        - Existing Workflow Improvement
+        - CI/CD & GitHub Actions
+        - Pre-commit Hooks & Linting
+        - Documentation (VitePress)
+        - Project Template Files
+        - Cross-platform Compatibility
+        - AI IDE Support (new IDE)
+        - Other
+    validations:
+      required: true
   - type: textarea
     id: problem
     attributes:
-      label: Is your feature request related to a problem? Please describe.
-      description: A clear and concise description of what the problem is.
+      label: Problem Description
+      description: What problem does this solve? What's missing or frustrating?
       placeholder: I'm always frustrated when [...]
     validations:
       required: false
   - type: textarea
     id: solution
     attributes:
-      label: Describe the solution you'd like
-      description: A clear and concise description of what you want to happen.
+      label: Proposed Solution
+      description: A clear description of what you'd like to see added or changed.
       placeholder: I would like this template to include a rule that [...]
     validations:
       required: true
   - type: textarea
     id: alternatives
     attributes:
-      label: Describe alternatives you've considered
-      description: A clear and concise description of any alternative solutions or features you've considered.
+      label: Alternatives Considered
+      description: Any alternative solutions or workarounds you've considered.
+    validations:
+      required: false
+  - type: dropdown
+    id: ide
+    attributes:
+      label: AI IDE / Agent Context (if applicable)
+      description: Is this request specific to a particular IDE or agent?
+      multiple: true
+      options:
+        - All IDEs (Universal)
+        - Gemini (Antigravity)
+        - Claude / CLAUDE.md
+        - Cursor / .cursor
+        - Windsurf / .windsurf
+        - GitHub Copilot
+        - Amazon Q / .amazonq
+        - Cline / .cline
+        - Roo Code / .roo
+        - Codex / .codex
+        - Aider / .aider
+        - Devin / .devin
+        - OpenHands / .openhands
+        - Continue / .continue
+        - Kiro / .kiro
+        - JetBrains AI / .junie
+        - Other
     validations:
       required: false
   - type: checkboxes
