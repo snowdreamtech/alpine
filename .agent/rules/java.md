@@ -13,8 +13,20 @@
   - `lowercase.dotted`: package names (e.g., `com.example.users.service`)
   - Never abbreviate names except for universally understood short forms (`id`, `url`, `dto`, `ctx`)
 - Run **SpotBugs** and **PMD** in CI for static analysis beyond style. Use **SonarQube/SonarCloud** for ongoing code quality tracking: code smells, duplications, and security hotspots.
-- Pin the JDK version via a committed toolchain config. Specify the target bytecode with `--release 21` (Maven) or `java.toolchain.languageVersion = JavaLanguageVersion.of(21)` (Gradle). Use the Gradle/Maven wrapper so the JDK version is self-documented and reproducible.
-- Build dependency specifications: use BOM (Bill of Materials) for dependency version management. In Spring Boot projects, extend `spring-boot-dependencies` BOM. Never use ranges (`[1.0,)`) — pin exact versions.
+- **Strict Version Pinning (MANDATORY)**: All dependencies in `pom.xml` or `build.gradle` MUST use **exact version numbers**. Never use dynamic versions, ranges, or wildcards (`[1.0,)`, `+`, `latest`, `SNAPSHOT` in production). Use BOM (Bill of Materials) for dependency alignment in Spring Boot projects.
+
+  ```kotlin
+  // build.gradle.kts
+  // ❌ WRONG — dynamic/ranged versions are non-deterministic
+  implementation("com.example:library:latest.release")
+  implementation("org.springframework.boot:spring-boot-starter-web:3.+")
+
+  // ✅ CORRECT — exact, auditable, reproducible
+  implementation("org.springframework.boot:spring-boot-starter-web:3.2.5")
+  implementation("com.google.guava:guava:33.0.0-jre")
+  ```
+
+  Pin the JDK version via a committed toolchain config. Specify the target bytecode with `--release 21` (Maven) or `java.toolchain.languageVersion = JavaLanguageVersion.of(21)` (Gradle). Use the Gradle/Maven wrapper so the JDK version is self-documented and reproducible.
 
 ## 2. Language Features (Java 21+)
 
