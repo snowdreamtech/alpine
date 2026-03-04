@@ -48,8 +48,8 @@
         "uriFormat": "%s",
         "action": "debugWithChrome"
       }
-    }
-        {
+    },
+    {
       "name": "Edge: Debug React/Vue App",
       "type": "msedge",
       "request": "launch",

@@ -49,8 +49,8 @@
       "command": "make sync-rules",
       "group": "none",
       "problemMatcher": []
-    }
-        {
+    },
+    {
       "label": "🌐 web: dev server",
       "type": "shell",
       "command": "npm run dev",
