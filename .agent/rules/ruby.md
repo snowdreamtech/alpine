@@ -210,11 +210,23 @@
 - Pin the **Ruby version** in `.ruby-version` (rbenv/rvm/mise) and `Gemfile`:
 
   ```ruby
-  # Gemfile
-  ruby "~> 3.3"
+  # Gemfile — pin to exact Ruby version
+  ruby "3.3.4"  # ✅ exact, not "~> 3.3" (range)
   ```
 
-- Use **Bundler** for all dependency management. Pin `Gemfile.lock` to the repository — this is the lockfile for reproducible installs.
+- **Strict Version Pinning (MANDATORY)**: All gems in `Gemfile` MUST use **exact version numbers**. Never use range operators (`~>`, `>=`, `!=`). Commit `Gemfile.lock` to version control — this is the lockfile for reproducible installs.
+
+  ```ruby
+  # ❌ WRONG — version ranges are non-deterministic
+  gem "rails", "~> 7.1"
+  gem "sidekiq", ">= 7.0"
+
+  # ✅ CORRECT — exact, auditable, reproducible
+  gem "rails", "7.1.3"
+  gem "sidekiq", "7.2.4"
+  ```
+
+  Use `bundle install` (reads `Gemfile.lock`) rather than `bundle update` in CI to guarantee deterministic installs.
 - Audit gems before adding them: check maintenance status, download count, license, and security history. Prefer gems with active maintenance and a clear security disclosure policy.
 
 ### Tooling
