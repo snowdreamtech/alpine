@@ -5,7 +5,7 @@
 # For more information, see:
 # https://github.com/actions/stale
 
-name: ✨ Mark Stale Issues and PRs
+name: Mark Stale Issues and PRs
 
 "on":
   schedule:
