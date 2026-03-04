@@ -13,6 +13,24 @@
 ansible.log
 ansible-galaxy.log
 
+# Sensitive Vault password files
+.vault_pass
+vault_pass.txt
+.ansible_vault_password
+
+# Ansible collected Facts cache output
+facts/
+fact_cache/
+
+# Ansible Navigator related artifacts
+ansible-navigator.log
+*-artifact*.json
+
+# Externally imported Collections and Roles (if you don't intend to hardcode them in the repository)
+# collections/ansible_collections/
+# roles/*
+# !roles/requirements.yml
+
 ### Linter Test Binaries / Artefacts ###
 actionlint
 shellcheck-*
