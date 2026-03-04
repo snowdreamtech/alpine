@@ -4,43 +4,52 @@
 
 ## 1. Safety Flags & Script Header
 
-### Mandatory Header
+### POSIX Shell as Default (MANDATORY)
 
-- Always begin non-trivial scripts with **`set -euo pipefail`**:
+**Unless explicitly specified**, ALL shell scripts in this project MUST be written as **POSIX-compliant shell scripts** (`#!/bin/sh`). Do NOT default to Bash. Rationale:
 
-  ```bash
-  #!/usr/bin/env bash
-  # Description: What this script does
-  # Usage:       ./script.sh [options]
+- Ensures compatibility with minimal environments (Alpine Linux, BusyBox, base Docker images, embedded CI).
+- Prevents silent failures when `bash` is not installed.
+- Enforces a higher portability standard that benefits all environments.
 
-  set -euo pipefail
-  IFS=$'\n\t'   # safer word splitting — only newline and tab, not space
-  ```
+When Bash-specific features are genuinely required, the script MUST:
 
-  - `-e` (`errexit`): Exit immediately when any command returns a non-zero exit code
-  - `-u` (`nounset`): Treat unset variables as errors — prevents silent bugs from typos
-  - `-o pipefail`: Propagate errors through pipelines (`cmd1 | cmd2` fails if `cmd1` fails, even if `cmd2` succeeds)
-  - `IFS=$'\n\t'`: Prevent word-splitting on spaces in `for` loops and command substitution
+1. Use `#!/usr/bin/env bash` (NOT `#!/bin/bash`).
+2. Include a comment explaining WHY Bash is required (`# Requires Bash: uses associative arrays`).
+3. Explicitly document the Bash version requirement.
 
-### Strict POSIX Considerations for CI & Embedded Scripts
+### POSIX Header Template
 
-- **WARNING**: `set -o pipefail` is a **Bashism** (and supported by Zsh/Ksh). It is **NOT** recognized by strict POSIX shells like `dash` or `busybox sh` (the default `/bin/sh` on lightweight distributions like Alpine Linux and Crux).
-- When writing highly portable scripts intended for `/bin/sh` or extreme cross-platform minimal environments, **MUST NOT** use `set -o pipefail`, as it will cause the script to instantly crash with an "Illegal option" error before anything runs.
-- **Fallback**: For strict POSIX shell scripts, use `set -eu` instead:
+```sh
+#!/bin/sh
+# Description: What this script does
+# Usage:       ./script.sh [options]
 
-  ```sh
-  #!/bin/sh
-  set -eu
-  # Do not use pipefail. Handle pipeline errors manually if necessary.
-  ```
+set -eu
+# Note: set -o pipefail is a Bashism. Not supported in POSIX sh.
+# Handle pipeline errors manually when needed.
+```
 
-- **Embedded Shells & Pre-commit Hooks**: When embedding shell commands inside config files (e.g., `.pre-commit-config.yaml`, `Makefiles`), avoid hardcoding `bash -c`. Instead, use standard POSIX `sh -c` to guarantee execution on minimal development environments and strictly contained CI bounds that may lack `bash`.
+### Bash Header Template (Only When Required)
+
+```bash
+#!/usr/bin/env bash
+# Description: What this script does
+# Requires Bash: <reason>
+
+set -euo pipefail
+IFS=$'\n\t'
+```
 
 ### Shebang Selection
 
-- **`#!/usr/bin/env bash`** — for Bash scripts (uses the user's `bash`, better for cross-machine compatibility)
-- **`#!/bin/sh`** — ONLY when strict POSIX portability is required (Alpine containers, embedded systems, minimal CI)
-- **Never use `#!/bin/bash`** on macOS — it invokes the system-bundled Bash 3.x which is outdated (due to GPL3 licensing)
+- **`#!/bin/sh`** — **DEFAULT**. Use for all scripts unless Bash features are explicitly required.
+- **`#!/usr/bin/env bash`** — Only when Bash-specific features are required (with justification comment).
+- **NEVER use `#!/bin/bash`** — Invokes the outdated system Bash 3.x on macOS.
+
+### Embedded Shells & Pre-commit Hooks
+
+- When embedding shell commands inside config files (e.g., `.pre-commit-config.yaml`, `Makefiles`), use `sh -c` not `bash -c`.
 
 ### Trap & Cleanup
 
@@ -261,30 +270,66 @@
   - `127` — command not found
   - `128+n` — fatal error signal `n` (e.g., `130` = Ctrl+C, `137` = SIGKILL)
 
-### CI & Tooling
+## 6. Cross-Platform Delegation Pattern
 
-- Lint all shell scripts with **ShellCheck** in CI — catches common mistakes, portability issues, and quoting bugs:
+For any automation script that must support Windows users, follow the **Single Source of Truth (SSoT) delegation** pattern. All logic lives in `.sh`; wrappers do nothing except forward execution:
 
-  ```bash
-  # CI step
-  find . -name "*.sh" -not -path "*/node_modules/*" -exec shellcheck --severity=warning {} +
-  ```
+```
+script.bat   →   script.ps1   →   script.sh
+(CMD entry)      (PS entry)       (POSIX logic, SSoT)
+```
 
-  Document any necessary `# shellcheck disable=SC2034` exclusions with a reason.
-- Format with **shfmt** for consistent, automated formatting:
+### Template: `script.sh` (Primary Logic)
 
-  ```bash
-  shfmt -i 2 -ci -bn -w **/*.sh   # 2-space indent, indent case blocks, binary ops on newlines
-  ```
+```sh
+#!/bin/sh
+# Description: Your script description
+set -eu
+# ... all logic here ...
+```
 
-- For complex scripts requiring real testing, use **BATS** (Bash Automated Testing System):
+### Template: `script.ps1` (PowerShell Wrapper)
 
-  ```bash
-  @test "install_dependency fails on empty package name" {
-    run install_dependency ""
-    [ "$status" -eq 1 ]
-    [[ "$output" == *"Package name required"* ]]
-  }
-  ```
+```powershell
+# PowerShell wrapper — delegates to script.sh
+if (Get-Command 'sh' -ErrorAction SilentlyContinue) {
+    sh "$PSScriptRoot/script.sh"
+} else {
+    Write-Host "Error: 'sh' not found. Install Git for Windows." -ForegroundColor Red
+    exit 1
+}
+```
 
-- **Know when to stop writing shell**. When a script exceeds ~200 lines, consider replacing it with Python (`argparse`, `subprocess`, `pathlib`) or Go for better testability, error handling, and cross-platform compatibility.
+### Template: `script.bat` (CMD Wrapper)
+
+```bat
+@echo off
+REM CMD wrapper — delegates to script.ps1
+powershell -ExecutionPolicy Bypass -File "%~dp0script.bat".ps1
+```
+
+> **Rule**: Wrappers MUST NOT contain any logic. Copy-pasting the `.sh` logic into `.ps1` is a violation of this rule.
+
+## 7. Linting Requirements (All Script Types)
+
+ALL scripts MUST pass their respective linters before being committed. This is enforced by pre-commit hooks and CI.
+
+| Script Type | Linter | Required Flags |
+|-------------|--------|----------------|
+| `.sh` (POSIX) | `shellcheck` | `--shell=sh` |
+| `.sh` (Bash) | `shellcheck` | `--shell=bash` |
+| `.ps1` | `PSScriptAnalyzer` | `Invoke-ScriptAnalyzer -Path .` |
+| `.bat` | manual review | Keep minimal — delegate only |
+
+```bash
+# CI step — lint all shell scripts
+find . -name "*.sh" -not -path "*/node_modules/*" \
+  -exec shellcheck --shell=sh --severity=warning {} +
+
+# CI step — lint all PowerShell scripts (on Windows runner)
+Get-ChildItem -Recurse -Filter "*.ps1" | ForEach-Object {
+    Invoke-ScriptAnalyzer -Path $_.FullName -Severity Warning
+}
+```
+
+Document any necessary `# shellcheck disable=SC2034` exclusions with a reason. Suppressing linter warnings without justification is not permitted.
