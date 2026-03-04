@@ -28,7 +28,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
 
@@ -67,17 +67,17 @@ jobs:
 
       - name: Setup pnpm
         if: steps.detect-pm.outputs.manager == 'pnpm'
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v4.2.0
         with:
           version: latest
 
       - name: Setup Bun
         if: steps.detect-pm.outputs.manager == 'bun'
-        uses: oven-sh/setup-bun@v2
+        uses: oven-sh/setup-bun@v2.1.2
 
       - name: Setup Node.js
         if: steps.detect-pm.outputs.manager != 'bun'
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6.3.0
         with:
           node-version: 22
           cache: ${{ steps.detect-pm.outputs.cache }}
@@ -89,7 +89,7 @@ jobs:
         run: ${{ steps.detect-pm.outputs.build }}
 
       - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
+        uses: actions/upload-pages-artifact@v4.0.0
         with:
           path: docs/.vitepress/dist
 
@@ -103,4 +103,4 @@ jobs:
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v4
+        uses: actions/deploy-pages@v4.0.5
