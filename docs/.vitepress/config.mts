@@ -11,7 +11,7 @@ export default defineConfig({
   head: [['link', { rel: 'icon', href: '/template/favicon.ico' }]],
 
   themeConfig: {
-    logo: '/logo.svg',
+    logo: '/logo.png',
 
     nav: [
       { text: 'Guide', link: '/guide/introduction' },
