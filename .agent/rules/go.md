@@ -36,6 +36,19 @@
 ### Modules
 
 - Use Go modules (`go.mod`). Commit both `go.mod` and `go.sum` — the sum file is a security control, not just a cache. Run `go mod tidy` before every commit to keep them clean and remove unused dependencies.
+- **Strict Version Pinning (MANDATORY)**: All dependencies in `go.mod` MUST use **exact version tags** (e.g., `v1.2.3`). Never use pseudo-versions manually or leave dependencies without a pinned tag. The `go.sum` file provides cryptographic integrity verification — always commit it.
+
+  ```
+  // ❌ WRONG — pseudo-version or unpinned
+  require github.com/some/lib v0.0.0-20231015123456-abcdef123456
+
+  // ✅ CORRECT — exact tagged release
+  require (
+    github.com/gin-gonic/gin v1.10.0
+    github.com/stretchr/testify v1.9.0
+  )
+  ```
+
 - Pin Go version in `go.mod` and in CI tooling. Use the latest stable release. Set `GONOSUMCHECK` for private modules.
 - Manage tooling dependencies (linters, code generators) via `tools.go`:
 
