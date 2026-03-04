@@ -111,7 +111,7 @@
   ```
 
 - Scripts MUST use explicit exit codes (`0` = success, non-zero = failure). Always `set -euo pipefail` (bash) to prevent silent failures.
-- Use cross-platform compatible tooling (`npx`, `python`, Node.js scripts) when the project targets Windows contributors.
+- Use cross-platform compatible tooling (`python`, Node.js scripts, or direct binaries via `make setup`) when the project targets Windows contributors. Avoid `npx` startup overhead.
 
 ## 4. Pre-commit Hooks
 

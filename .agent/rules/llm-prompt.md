@@ -153,7 +153,7 @@
 - Run regression tests against the golden dataset whenever the **prompt, model version, or parameters** change:
 
   ```bash
-  npx promptfoo eval --config prompts/summarize/eval-config.yaml
+  promptfoo eval --config prompts/summarize/eval-config.yaml
   ```
 
 - Use systematic **A/B testing** before deploying prompt changes to production. Run challenger vs. champion on 10% of production traffic, measure quality metrics for ≥ 48h, then promote if metrics improve.

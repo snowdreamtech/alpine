@@ -215,10 +215,10 @@ src/
   });
   ```
 
-- Use **Playwright** for E2E tests. Generate tests with `npx playwright codegen` and run with `npx playwright test` in CI:
+- Use **Playwright** for E2E tests. Generate tests with `playwright codegen` and run with `playwright test` in CI:
 
   ```bash
-  npx playwright test --project=chromium --reporter=html
+  playwright test --project=chromium --reporter=html
   ```
 
 - Run `svelte-check --tsconfig ./tsconfig.json` in CI to catch Svelte-specific TypeScript errors and warnings in `.svelte` files.
@@ -226,10 +226,8 @@ src/
 
 ### Tooling & CI
 
-- Lint with **`eslint-plugin-svelte`** + TypeScript ESLint. Format with **`prettier-plugin-svelte`**. Run both in CI:
-
   ```bash
-  npx eslint . && npx prettier --check .
+  eslint . && prettier --check .
   ```
 
 - Configure TypeScript with `"strict": true` and `"checkJs": true` in `tsconfig.json`. Use typed `$props()` interfaces for all components.

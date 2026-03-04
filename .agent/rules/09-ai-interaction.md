@@ -36,21 +36,20 @@
 
 - **Mandatory Auto-fix Routine**: The AI MUST actively act as the first line of defense for the "Triple Guarantee" code quality mechanism. After creating or modifying any file, the AI MUST proactively run the appropriate linting and formatting tools to auto-fix the codebase before handing it back to the user or generating a commit.
   - **Source of Truth:** ALWAYS reference `.pre-commit-config.yaml` and `.github/workflows/lint.yml` for the current tool stack and their exact command arguments.
-  - **JS/TS/Vue/React**: Run `npx eslint --fix <file>` and `npx prettier --write <file>`
-  - **CSS/SCSS/LESS**: Run `npx stylelint --fix <file>` and `npx prettier --write <file>`
-  - **TOML**: Run `npx @taplo/cli format <file>`
+  - **JS/TS/Vue/React**: Run `eslint --fix <file>` and `prettier --write <file>`
+  - **CSS/SCSS/LESS**: Run `stylelint --fix <file>` and `prettier --write <file>`
+  - **TOML**: Run `taplo format <file>`
   - **Go**: Run `gofmt -w <file>`
   - **Python**: Run `ruff check --fix <file>` and `ruff format <file>`
   - **Obj-C/C++**: Run `clang-format -i <file>`
   - **Documentation**: Provide clear comments for complex logic, and use tools like `markdownlint-cli2` to ensure Markdown consistency.
-
   - **SAST/SCA/Heavy Audits**: Local execution of `semgrep`, `trivy`, `lychee`, `golangci-lint`, `ansible-lint`, and `cargo clippy` is **DISABLED** to maintain performance. These are strictly reserved for CI.
   - **Git Flow**: The system enforces Conventional Commits via `commitlint` locally and Semantic Pull Request titles remotely. ALWAYS ensure your commit messages and PR titles follow the `<type>(<scope>): <subject>` format exactly.
-  - **Markdown files**: Run `npx markdownlint-cli2 --fix <file>` and `npx prettier --write <file>`
-  - **YAML/JSON files**: Run `npx prettier --write <file>` and `yamllint <file>`
+  - **Markdown files**: Run `markdownlint-cli2 --fix <file>` and `prettier --write <file>`
+  - **YAML/JSON files**: Run `prettier --write <file>` and `yamllint <file>`
   - **Shell scripts**: Run `shfmt -w -s -l <file>` (formatting) and `shellcheck <file>` (logic).
   - **Dockerfile**: Run `hadolint <file>`.
-  - **API Contracts**: Run `npx @stoplight/spectral-cli lint <file>` on OpenAPI/Swagger specs.
+  - **API Contracts**: Run `spectral lint <file>` on OpenAPI/Swagger specs.
   - _Never leave formatting or linting errors for the user, the Git Commit hook, or the CI pipeline to catch. Nip all errors in the bud._
 
 - **Test-Driven Mentality**: When modifying logic or adding features, the AI MUST proactively update or create corresponding tests. Do not output untested code as final without a clear warning:
@@ -115,13 +114,10 @@
 ### Knowledge & Research
 
 - **Read Before Writing**: AI MUST read relevant project documentation, architecture files, and existing code patterns before generating new implementations. Generating code that contradicts the project's established patterns is unacceptable. Always check:
-
-  ```
   1. Existing similar implementations in the codebase (avoid duplication)
   2. Project conventions (naming, file structure, error handling patterns)
   3. Relevant architecture documents or ADRs
   4. Any related tests that document expected behavior
-  ```
 
 - **Artifact Usage**: Utilize designated memory or "brain" directories (if configured) to store and retrieve long-running task context, architectural decisions, checklists, and completed vs pending work. Reference prior decisions rather than re-inventing them.
 - **Check Existing Code**: Before creating a new utility function or module, search the codebase for an existing equivalent. Avoid duplication — reference the existing implementation and extend it if needed.
@@ -146,5 +142,5 @@
   terraform validate && terraform plan   # IaC validation
   kubectl --dry-run=client apply -f manifest.yaml  # Kubernetes dry-run
   docker build --no-cache -t test-image .          # Docker build validation
-  npx tsc --noEmit                                 # TypeScript type check
+  tsc --noEmit                                 # TypeScript type check
   ```

@@ -216,7 +216,7 @@
   "no-debugger": "error",
   ```
 
-- Run ESLint in CI: `npx eslint . --max-warnings 0`. Treat warnings as errors in CI.
+- Run ESLint in CI: `eslint . --max-warnings 0`. Treat warnings as errors in CI.
 
 ### Formatting
 

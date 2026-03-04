@@ -6,7 +6,9 @@
 
 - **Path Handling**: Always use `path.join()` or equivalent cross-platform path functions. Never hard-code `/` or `\` separators.
 - **Line Endings**: Configure `.gitattributes` to normalize line endings (`* text=auto`). This prevents CRLF/LF conflicts across platforms.
-- **Shell Scripts**: When shell scripts are necessary, provide both `.sh` (Unix/POSIX) and `.ps1` or `.cmd` (Windows) variants, or use cross-platform runners (e.g., `npx`, `python`, `node`).
+- **Shell Scripts**: When shell scripts are necessary, provide both `.sh` (Unix/POSIX) and `.ps1` or `.cmd` (Windows) variants, or use cross-platform runners (e.g., `python`, `node`).
+  - **Preferred Method**: Use direct execution of pre-installed binaries (via `make setup`).
+  - **Local Path**: For project-specific tools, use `npm run <command>` which safely includes `node_modules/.bin` in the path without `npx` overhead.
 - **Environment Variables**: Use `.env` files with a `.env.example` template. Never commit actual `.env` files. Support `HTTP_PROXY`/`HTTPS_PROXY`/`NO_PROXY` for network operations.
 - **OS Detection**: Detect the operating system at runtime for conditional logic. Use `process.platform` (Node.js), `sys.platform` (Python), `runtime.GOOS` (Go), or `std::env::consts::OS` (Rust). Never hard-code OS-specific command paths.
 

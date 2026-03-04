@@ -47,9 +47,9 @@ jobs:
         run: |
           npm install -g @commitlint/cli @commitlint/config-conventional
           if [ "${{ github.event_name }}" == "pull_request" ]; then
-            npx commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+            commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
           else
-            npx commitlint --last --verbose
+            commitlint --last --verbose
           fi
 
       - name: Install Gitleaks
@@ -195,7 +195,7 @@ jobs:
 
       # Run Markdown linting (exclusions are handled by .markdownlintignore)
       - name: Run markdownlint
-        run: npx markdownlint-cli2 "**/*.md"
+        run: markdownlint-cli2 "**/*.md"
 
       # Core Ansible Linting phase
       - name: Run ansible-lint
@@ -236,10 +236,10 @@ jobs:
 
       # JSON, YAML, Vue, JS, TS, & React formatting linting
       - name: Run Prettier
-        run: npx prettier --check "**/*.{json,yml,yaml,vue,js,jsx,ts,tsx}"
+        run: prettier --check "**/*.{json,yml,yaml,vue,js,jsx,ts,tsx}"
 
       - name: Run editorconfig-checker
-        run: npx editorconfig-checker -exclude "(\.(venv|git|github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|specify|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml|tabnine|supermaven|vibe|void|zed)/.*)|((node_modules|venv|env|dist|build|out|target|vendor|__pycache__|\.specify)/.*)|(\.aider\.conf\.yml)"
+        run: editorconfig-checker -exclude "(\.(venv|git|github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|specify|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml|tabnine|supermaven|vibe|void|zed)/.*)|((node_modules|venv|env|dist|build|out|target|vendor|__pycache__|\.specify)/.*)|(\.aider\.conf\.yml)"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -256,7 +256,7 @@ jobs:
         run: |
           if [ -f "eslint.config.js" ] || [ -f "eslint.config.mjs" ] || [ -f ".eslintrc.js" ] || [ -f ".eslintrc.json" ]; then
             echo "ESLint config found, running ESLint..."
-            npx eslint "."
+            eslint "."
           else
             echo "No ESLint configuration found, skipping ESLint."
           fi
@@ -265,7 +265,7 @@ jobs:
       - name: Run Stylelint
         run: |
           if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.css' -o -name '*.scss' -o -name '*.less' \) -print -quit)" ]; then
-            npx stylelint "**/*.{css,scss,less}"
+            stylelint "**/*.{css,scss,less}"
           else
             echo "No CSS/SCSS/LESS files found, skipping Stylelint."
           fi

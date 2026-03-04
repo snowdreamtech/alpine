@@ -268,10 +268,10 @@ Validate before every commit:
 
 ```bash
 # Lint Markdown with markdownlint-cli2
-npx markdownlint-cli2 "docs/**/*.md" "*.md"
+markdownlint-cli2 "docs/**/*.md" "*.md"
 
 # Fix auto-fixable issues
-npx markdownlint-cli2 --fix "docs/**/*.md" "*.md"
+markdownlint-cli2 --fix "docs/**/*.md" "*.md"
 ```
 
 ## 8. Documentation Quality Checklist
@@ -307,7 +307,7 @@ Before merging any PR that affects documentation, verify all applicable items:
 ### Markdown quality
 
 - [ ] All code blocks have language identifiers
-- [ ] No broken links (validate with `npx markdown-link-check`)
+- [ ] No broken links (validate with `markdown-link-check`)
 - [ ] Markdownlint passes with zero errors
 - [ ] File ends with a single newline
 

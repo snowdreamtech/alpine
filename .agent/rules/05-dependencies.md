@@ -181,7 +181,7 @@
 
   ```bash
   # Node.js
-  npx license-checker --summary --production --json > licenses.json
+  license-checker --summary --production --json > licenses.json
 
   # Python
   pip-licenses --format=json --output-file=licenses.json

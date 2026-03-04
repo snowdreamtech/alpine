@@ -16,7 +16,7 @@
   bun install --frozen-lockfile
   ```
 
-- Use **`bunx`** (Bun's `npx` equivalent) to execute package binaries without global installation:
+- Use **`bunx`** (Bun's `npx` equivalent) sparingly and only for one-off commands. For repeated linting/formatting in this project, prefer direct execution after `make setup` for maximum performance.
 
   ```bash
   bunx prisma generate

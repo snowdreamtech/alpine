@@ -33,7 +33,7 @@
 - Avoid hard-coding system-specific paths or commands. Adapt dynamically:
   - Use `path.join()` (Node.js), `os.path.join()` / `pathlib.Path` (Python), `filepath.Join()` (Go).
   - Detect OS at runtime: `process.platform`, `sys.platform`, `runtime.GOOS`.
-- When shell scripts are required, provide both `.sh` (Unix/POSIX) and `.ps1` (Windows PowerShell) variants, or use a cross-platform runner (`npx`, `python`, `node`).
+- When shell scripts are required, provide both `.sh` (Unix/POSIX) and `.ps1` (Windows PowerShell) variants, or use a cross-platform runner (`python`, `node`). Avoiding `npx` is preferred for performance.
 - Normalize line endings: configure `.gitattributes` with `* text=auto` to prevent CRLF/LF conflicts across platforms:
 
   ```gitattributes
