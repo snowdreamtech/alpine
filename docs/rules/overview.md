@@ -6,17 +6,17 @@ The `.agent/rules/` directory is the **single source of truth** for all developm
 
 | File                                       | Scope                                        |
 | ------------------------------------------ | -------------------------------------------- |
-| [01 · General](./01-general)               | Language, communication, core principles     |
-| [02 · Coding Style](./02-coding-style)     | Commit messages, naming, formatting          |
-| [03 · Architecture](./03-architecture)     | Project structure, cross-platform design     |
-| [04 · Security](./04-security)             | Secrets, auth, input validation              |
-| [05 · Dependencies](./05-dependencies)     | Version pinning, lock files, auditing        |
-| [06 · CI & Testing](./06-ci-testing)       | Pipelines, quality gates, test strategy      |
-| [07 · Git](./07-git)                       | Branch strategy, PR workflow, atomic commits |
-| [08 · Dev Env](./08-dev-env)               | Local setup, DevContainer, tooling           |
-| [09 · AI Interaction](./09-ai-interaction) | AI agent behavior and boundaries             |
-| [10 · UI/UX](./10-ui-ux)                   | Frontend, accessibility, i18n                |
-| [11 · Deployment](./11-deployment)         | Docker, IaC, release pipelines               |
+| [01 · General](./01-general.md)               | Language, communication, core principles     |
+| [02 · Coding Style](./02-coding-style.md)     | Commit messages, naming, formatting          |
+| [03 · Architecture](./03-architecture.md)     | Project structure, cross-platform design     |
+| [04 · Security](./04-security.md)             | Secrets, auth, input validation              |
+| [05 · Dependencies](./05-dependencies.md)     | Version pinning, lock files, auditing        |
+| [06 · CI & Testing](./06-ci-testing.md)       | Pipelines, quality gates, test strategy      |
+| [07 · Git](./07-git.md)                       | Branch strategy, PR workflow, atomic commits |
+| [08 · Dev Env](./08-dev-env.md)               | Local setup, DevContainer, tooling           |
+| [09 · AI Interaction](./09-ai-interaction.md) | AI agent behavior and boundaries             |
+| [10 · UI/UX](./10-ui-ux.md)                   | Frontend, accessibility, i18n                |
+| [11 · Deployment](./11-deployment.md)         | Docker, IaC, release pipelines               |
 
 ## How Rules Work
 

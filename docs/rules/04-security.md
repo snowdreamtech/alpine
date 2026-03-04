@@ -42,7 +42,7 @@ gitleaks detect --source . --report-format json --exit-code 1
   - Python: `pip-audit` or `safety check`
   - Go: `govulncheck ./...`
   - Rust: `cargo audit`
-- Pin all dependencies to exact versions (see [05 · Dependencies](./05-dependencies))
+- Pin all dependencies to exact versions (see [05 · Dependencies](./05-dependencies.md))
 - Configure Dependabot for automated security update PRs
 
 ## CI/CD Security

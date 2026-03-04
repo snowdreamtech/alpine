@@ -20,7 +20,7 @@ AI assistants operating in this repository MUST:
 
 AI assistants should:
 
-- Work within the established architecture (see [03 · Architecture](./03-architecture))
+- Work within the established architecture (see [03 · Architecture](./03-architecture.md))
 - Follow all rules in `.agent/rules/` without exception
 - Prefer the simplest correct solution over clever over-engineering
 - Propose changes file by file, in atomic commits
@@ -37,8 +37,8 @@ All AI-generated code must:
 
 - Pass the full pre-commit hook suite (`pre-commit run --all-files`)
 - Include appropriate tests
-- Follow the naming and style conventions in [02 · Coding Style](./02-coding-style)
-- Use exact version pins for any new dependencies (see [05 · Dependencies](./05-dependencies))
+- Follow the naming and style conventions in [02 · Coding Style](./02-coding-style.md)
+- Use exact version pins for any new dependencies (see [05 · Dependencies](./05-dependencies.md))
 
 ## Communication Style
 
