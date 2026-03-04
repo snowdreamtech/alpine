@@ -59,6 +59,8 @@ find . -type f \
   ! -path "./node_modules/*" \
   ! -path "./.venv/*" \
   ! -path "./scripts/init-project.sh" \
+  ! -path "./scripts/init-project.ps1" \
+  ! -path "./scripts/init-project.bat" \
   -exec perl -pi -e "s/$OLD_ORG|$OLD_USER/$GITHUB_ORG/g" {} +
 
 # 4. Update LICENSE
