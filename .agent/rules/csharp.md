@@ -30,6 +30,19 @@
   </PropertyGroup>
   ```
 
+- **Strict Version Pinning (MANDATORY)**: All NuGet packages in `.csproj` MUST use **exact version numbers**. Never use floating versions (`*`, `1.*`) or open-ended ranges.
+
+  ```xml
+  <!-- ❌ WRONG — floating version, non-deterministic -->
+  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.*" />
+
+  <!-- ✅ CORRECT — exact, auditable, reproducible -->
+  <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.4" />
+  <PackageReference Include="Serilog.AspNetCore" Version="8.0.1" />
+  ```
+
+  Use a `Directory.Packages.props` (Central Package Management) to pin all versions in one file across the entire solution.
+
 ### Naming & Style
 
 - Follow **Microsoft C# Coding Conventions**. Enforce with an `.editorconfig` committed to the repository:
