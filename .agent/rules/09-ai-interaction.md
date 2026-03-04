@@ -63,6 +63,13 @@
   ```
 
 - **Incremental Changes**: Prefer small, incremental, and reviewable changes over massive code dumps. Explain the approach before outputting large code blocks ("I'll make three changes: first X, then Y, then Z — let me start with X...").
+- **Atomic Commits Are Non-Negotiable**: When executing multiple tasks, suggestions, or changes in sequence, the AI MUST commit after each individual change — never batch them:
+  1. **Implement** one change completely.
+  2. **Commit** it immediately with a precise Conventional Commit message.
+  3. **Proceed** to the next item.
+
+  This applies even if the user has selected multiple suggestions at once or confirmed all items together. Every commit must represent one logical, auditable unit of work. Violating this rule makes `git bisect`, `git revert`, and code review significantly harder.
+
 - **Error Handling**: Generated code MUST include robust error handling adhering to the project's coding style. Never silently swallow errors:
 
   ```typescript
