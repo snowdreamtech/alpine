@@ -86,7 +86,7 @@ help:
 
 # Hydrate project from template
 init:
-	@bash scripts/init-project.sh
+	@sh scripts/init-project.sh
 
 # Install system-level development tools based on OS and package manager
 setup:
