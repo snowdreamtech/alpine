@@ -186,6 +186,10 @@ lint:
 	@$(PRE_COMMIT) run --all-files
 	@echo "$(GREEN)Lint complete!$(RESET)"
 
+sync-rules: ## Synchronize AI IDE rules from .agent/rules/
+	@chmod +x scripts/sync-rules.sh
+	@scripts/sync-rules.sh
+
 # Auto-format code
 format:
 	@echo "$(BOLD)Formatting code...$(RESET)"

@@ -16,6 +16,6 @@
     ".specify",
     // Ignore symlinked AI IDE command/prompt files in all hidden directories
     ".*/commands/**/*.md",
-    ".*/prompts/**/*.md"
-  ]
+    ".*/prompts/**/*.md",
+  ],
 }

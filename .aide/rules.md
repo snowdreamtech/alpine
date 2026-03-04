@@ -1,4 +1,4 @@
-# 🚨 CRITICAL AI INSTRUCTION: Cline 🚨
+# 🚨 CRITICAL AI INSTRUCTION: Aide 🚨
 
 > [!IMPORTANT]
 > This project uses a Unified Rule System (Single Source of Truth).
@@ -7,6 +7,7 @@
 **Source**: `.agent/rules/`
 
 ## 📜 Execution Order
+
  - .agent/rules/01-general.md
  - .agent/rules/02-coding-style.md
  - .agent/rules/03-architecture.md
