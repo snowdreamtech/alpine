@@ -1,8 +1,6 @@
-# --- 基础镜像配置 (Base Image Configuration) ---
-# [默认选项] 微软官方开发环境基础镜像，已针对 VS Code 优化
-# [Default] Microsoft's official devcontainer base image, optimized for VS Code
-# 如果您需要使用公司内部私有镜像，请修改下方的 FROM 指令。
-# If you need to use a custom/internal image, replace the FROM line below.
+# --- Base Image Configuration ---
+# [Recommended] Microsoft's official devcontainer base image, optimized for VS Code.
+# If you need to use a custom or internal enterprise image, replace the FROM line below.
 # hadolint ignore=DL3026
 FROM mcr.microsoft.com/devcontainers/base:ubuntu-22.04
 
