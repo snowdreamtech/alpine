@@ -1,54 +1,68 @@
 {
-    "version": "2.0.0",
-    "tasks": [
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "🛠️ setup: Install system tools",
+      "type": "shell",
+      "command": "make setup",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "🫐 install: Install dependencies",
+      "type": "shell",
+      "command": "make install",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "🔍 lint: Run all checks",
+      "type": "shell",
+      "command": "make lint",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "presentation": {
+        "reveal": "always",
+        "panel": "new"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "🧪 test: Run test suite",
+      "type": "shell",
+      "command": "make test",
+      "group": "test",
+      "problemMatcher": []
+    },
+    {
+      "label": "📦 build: Build project",
+      "type": "shell",
+      "command": "make build",
+      "group": "build",
+      "problemMatcher": []
+    },
+    {
+      "label": "🔄 sync-rules: Update IDE rules",
+      "type": "shell",
+      "command": "make sync-rules",
+      "group": "none",
+      "problemMatcher": []
+    }
         {
-            "label": "🛠️ setup: Install system tools",
-            "type": "shell",
-            "command": "make setup",
-            "group": "build",
-            "problemMatcher": []
-        },
-        {
-            "label": "🫐 install: Install dependencies",
-            "type": "shell",
-            "command": "make install",
-            "group": "build",
-            "problemMatcher": []
-        },
-        {
-            "label": "🔍 lint: Run all checks",
-            "type": "shell",
-            "command": "make lint",
-            "group": {
-                "kind": "build",
-                "isDefault": true
-            },
-            "presentation": {
-                "reveal": "always",
-                "panel": "new"
-            },
-            "problemMatcher": []
-        },
-        {
-            "label": "🧪 test: Run test suite",
-            "type": "shell",
-            "command": "make test",
-            "group": "test",
-            "problemMatcher": []
-        },
-        {
-            "label": "📦 build: Build project",
-            "type": "shell",
-            "command": "make build",
-            "group": "build",
-            "problemMatcher": []
-        },
-        {
-            "label": "🔄 sync-rules: Update IDE rules",
-            "type": "shell",
-            "command": "make sync-rules",
-            "group": "none",
-            "problemMatcher": []
-        }
-    ]
+      "label": "🌐 web: dev server",
+      "type": "shell",
+      "command": "npm run dev",
+      "group": "none",
+      "problemMatcher": []
+    },
+    {
+      "label": "🏗️ web: build",
+      "type": "shell",
+      "command": "npm run build",
+      "group": "build",
+      "problemMatcher": []
+    }
+  ]
 }
