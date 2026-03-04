@@ -99,7 +99,7 @@ repos:
       - id: taplo
         name: taplo
         language: system
-        entry: npx @taplo/cli format
+        entry: taplo format
         types: [toml]
 
       - id: ruff-format
@@ -127,14 +127,14 @@ repos:
       - id: eslint
         name: eslint
         language: system
-        entry: npx eslint
+        entry: eslint
         args: [--fix]
         types_or: [javascript, ts, tsx, jsx, vue]
 
       - id: stylelint
         name: stylelint
         language: system
-        entry: npx stylelint --fix
+        entry: stylelint --fix
         types_or: [css, scss, less]
 
       - id: ruff
@@ -308,7 +308,7 @@ repos:
 
       - id: sort-package-json
         name: sort-package-json
-        entry: npx sort-package-json
+        entry: sort-package-json
         language: system
         files: ^package\.json$
         pass_filenames: true

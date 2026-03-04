@@ -195,7 +195,7 @@ jobs:
 
       # Run Markdown linting (exclusions are handled by .markdownlintignore)
       - name: Run markdownlint
-        run: npx markdownlint-cli2
+        run: npx markdownlint-cli2 "**/*.md"
 
       # Core Ansible Linting phase
       - name: Run ansible-lint
