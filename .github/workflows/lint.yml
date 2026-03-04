@@ -143,7 +143,7 @@ jobs:
           node-version: "20"
 
       - name: Install Node.js Linters
-        run: npm install -g markdownlint-cli2 prettier editorconfig-checker eslint @stoplight/spectral-cli @taplo/cli
+        run: npm install -g markdownlint-cli2 prettier editorconfig-checker eslint stylelint @stoplight/spectral-cli @taplo/cli sort-package-json
 
       - name: Install ShellCheck Binary
         env:
