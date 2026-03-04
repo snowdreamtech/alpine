@@ -86,7 +86,11 @@ help:
 
 # Hydrate project from template
 init:
+ifeq ($(OS_NAME),Windows)
+	@powershell -ExecutionPolicy Bypass -File scripts/init-project.ps1
+else
 	@sh scripts/init-project.sh
+endif
 
 # Install system-level development tools based on OS and package manager
 setup:
