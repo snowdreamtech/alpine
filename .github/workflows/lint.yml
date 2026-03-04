@@ -493,7 +493,7 @@ jobs:
       # Shell Scripts linting (excluding dependencies, running native binary)
       - name: Run ShellCheck
         run: |
-          find . -type f -name "*.sh" -not -path "*/\.venv/*" -not -path "*/venv/*" -not -path "*/env/*" -not -path "*/node_modules/*" -not -path "*/vendor/*" -not -path "*/dist/*" -not -path "*/build/*" -not -path "*/out/*" -not -path "*/target/*" -not -path "*/\.next/*" -not -path "*/\.nuxt/*" -not -path "*/\.output/*" -not -path "*/__pycache__/*" -not -path "*/\.git/*" -not -path "*/\.specify/*" -exec sh -c 'shellcheck "$@"' _ {} +
+          find . -type f -name "*.sh" -not -path "*/\.venv/*" -not -path "*/venv/*" -not -path "*/env/*" -not -path "*/node_modules/*" -not -path "*/vendor/*" -not -path "*/dist/*" -not -path "*/build/*" -not -path "*/out/*" -not -path "*/target/*" -not -path "*/\.next/*" -not -path "*/\.nuxt/*" -not -path "*/\.output/*" -not -path "*/__pycache__/*" -not -path "*/\.git/*" -not -path "*/\.specify/*" -exec sh -c 'shellcheck --shell=sh "$@"' _ {} +
 
       # Shell Scripts formatting (shfmt)
       - name: Run shfmt
