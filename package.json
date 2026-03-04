@@ -1,0 +1,14 @@
+{
+  "name": "snowdreamtech-template-docs",
+  "version": "1.0.0",
+  "private": true,
+  "description": "VitePress documentation site for Snowdream Tech AI IDE Template",
+  "scripts": {
+    "docs:build": "vitepress build docs",
+    "docs:dev": "vitepress dev docs",
+    "docs:preview": "vitepress preview docs"
+  },
+  "devDependencies": {
+    "vitepress": "^1.6.3"
+  }
+}
