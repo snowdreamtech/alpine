@@ -70,4 +70,4 @@ if [[ $REINIT_GIT == [yY] ]]; then
 fi
 
 echo -e "\n${GREEN}🚀 Project Hydration Complete!${NC}"
-echo -e "Next steps: Run 'make setup' and 'make sync-rules'."
+echo -e "Next steps: Run 'make setup'."
