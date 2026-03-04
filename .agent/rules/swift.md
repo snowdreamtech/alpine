@@ -171,7 +171,20 @@
 
 ### Dependencies
 
-- Use **Swift Package Manager (SPM)** exclusively for dependency management in new projects. Avoid CocoaPods or Carthage unless a specific library requires them.
+- Use **Swift Package Manager (SPM)** exclusively for dependency management in new projects. Avoid CocoaPods or Carthage unless a specific library requires them. **Strict Version Pinning (MANDATORY)**: All packages in `Package.swift` MUST use **exact version numbers** (`.exact("x.y.z")`). Never use `.upToNextMajor`, `.upToNextMinor`, or range-based requirements.
+
+  ```swift
+  // ❌ WRONG — version ranges are non-deterministic
+  .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
+  .package(url: "https://github.com/vapor/vapor", .upToNextMajor(from: "4.0.0")),
+
+  // ✅ CORRECT — exact, auditable, reproducible
+  .package(url: "https://github.com/apple/swift-argument-parser", exact: "1.3.0"),
+  .package(url: "https://github.com/vapor/vapor", exact: "4.102.0"),
+  ```
+
+  Always commit `Package.resolved` — it is the lockfile for SPM and guarantees all developers use the same resolved versions.
+
 - Define dependencies as protocols and inject implementations. Never access singletons directly in testable code:
 
   ```swift

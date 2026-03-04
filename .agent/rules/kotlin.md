@@ -217,6 +217,20 @@
 
 ### Tooling
 
+- **Strict Version Pinning (MANDATORY)**: All dependencies in `build.gradle.kts` MUST use **exact version numbers**. Never use dynamic versions, wildcards, or range selectors (`+`, `latest`, `[1.0,)`).
+
+  ```kotlin
+  // ❌ WRONG — non-deterministic
+  implementation("io.ktor:ktor-server-core:2.+")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:latest.release")
+
+  // ✅ CORRECT — exact, auditable, reproducible
+  implementation("io.ktor:ktor-server-core:2.3.12")
+  implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.8.0")
+  ```
+
+  Use version catalogs (`libs.versions.toml`) to centralize all pins. Always commit `gradle/libs.versions.toml` and the `gradle.lockfile`.
+
 - Lint with **Detekt** (configurable static analysis for Kotlin) committed as `detekt.yml`:
 
   ```bash
