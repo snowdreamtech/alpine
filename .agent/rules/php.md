@@ -23,7 +23,23 @@
   php-cs-fixer fix src/                       # local auto-fix
   ```
 
-- Use **Composer** for dependency management. Commit `composer.lock`. Build for production:
+- Use **Composer** for dependency management. Commit `composer.lock`. **Strict Version Pinning (MANDATORY)**: All packages in `composer.json` MUST use **exact version numbers**. Never use range operators (`^`, `~`, `>=`, `*`).
+
+  ```jsonc
+  // ❌ WRONG — version ranges are non-deterministic
+  "require": {
+    "laravel/framework": "^11.0",
+    "guzzlehttp/guzzle": "~7.8"
+  }
+
+  // ✅ CORRECT — exact, auditable, reproducible
+  "require": {
+    "laravel/framework": "11.13.0",
+    "guzzlehttp/guzzle": "7.8.1"
+  }
+  ```
+
+  Use `composer install` (not `composer update`) in CI for deterministic installs from `composer.lock`. Build for production:
 
   ```bash
   composer install --no-dev --optimize-autoloader --classmap-authoritative
