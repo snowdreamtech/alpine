@@ -1,42 +1,176 @@
 {
-    "name": "Snowdream Tech Template",
-    "build": {
-        "dockerfile": "Dockerfile",
-        "context": ".."
-    },
-    "customizations": {
-        "vscode": {
-            "settings": {
-                "editor.formatOnSave": true,
-                "editor.defaultFormatter": "esbenp.prettier-vscode",
-                "python.formatting.provider": "none",
-                "python.linting.enabled": true,
-                "python.linting.ruffEnabled": true,
-                "go.lintTool": "golangci-lint",
-                "go.formatTool": "gofmt",
-                "editor.codeActionsOnSave": {
-                    "source.fixAll": "explicit",
-                    "source.organizeImports": "explicit"
-                }
-            },
-            "extensions": [
-                "charliermarsh.ruff",
-                "dbaeumer.vscode-eslint",
-                "esbenp.prettier-vscode",
-                "ms-python.python",
-                "golang.go",
-                "streetsidesoftware.code-spell-checker",
-                "davidanson.vscode-markdownlint",
-                "timonwong.shellcheck",
-                "editorconfig.editorconfig",
-                "irongeek.vscode-env",
-                "hashicorp.terraform",
-                "ms-kubernetes-tools.vscode-kubernetes-tools",
-                "aliariff.vscode-ktlint",
-                "zxh0.checkmake"
-            ]
-        }
-    },
-    "remoteUser": "vscode",
-    "postCreateCommand": "make setup || true"
+  "name": "Snowdream Tech Template",
+  "build": {
+    "dockerfile": "Dockerfile",
+    "context": ".."
+  },
+  "customizations": {
+    "vscode": {
+      "settings": {
+        // --- Workbench Settings ---
+        "vsicons.dontShowNewVersionMessage": true,
+        "workbench.layoutControl.enabled": false,
+        "workbench.startupEditor": "none",
+        "workbench.colorTheme": "Solarized Dark",
+        "workbench.iconTheme": "vscode-icons",
+        // --- SpecKit AI & Terminal ---
+        "chat.promptFilesRecommendations": {
+          "speckit.constitution": true,
+          "speckit.specify": true,
+          "speckit.plan": true,
+          "speckit.tasks": true,
+          "speckit.implement": true
+        },
+        "chat.tools.terminal.autoApprove": {
+          ".specify/scripts/bash/": true,
+          ".specify/scripts/powershell/": true
+        },
+        // --- Editor Behavior ---
+        "editor.minimap.enabled": false,
+        "files.autoSave": "afterDelay",
+        "files.autoSaveDelay": 1000,
+        "editor.formatOnSave": true,
+        "editor.cursorSmoothCaretAnimation": "on",
+        "editor.cursorBlinking": "smooth",
+        "editor.linkedEditing": true,
+        "editor.tabCompletion": "on",
+        "editor.suggest.showWords": false,
+        "editor.bracketPairColorization.enabled": true,
+        "editor.guides.bracketPairs": "active",
+        "editor.guides.bracketPairsHorizontal": "active",
+        "editor.stickyScroll.enabled": true,
+        "editor.autoClosingBrackets": "always",
+        "editor.autoClosingQuotes": "always",
+        "window.title": "${dirty}${activeEditorShort}${separator}${rootName}",
+        // --- UI & Performance ---
+        "explorer.compactFolders": false,
+        "explorer.fileNesting.enabled": true,
+        "explorer.fileNesting.expand": false,
+        "explorer.fileNesting.patterns": {
+          "tsconfig.json": "tsconfig.*.json, env.d.ts",
+          "vite.config.*": "jsconfig*, tsconfig*, vitest.config.*, index.html",
+          "vue.config.*": "jsconfig*, tsconfig*, .eslintrc*, .prettierrc*, .babelrc*, package.json, package-lock.json",
+          "package.json": "package-lock.json, pnpm*, .yarnrc*, yarn*, .npmrc",
+          "go.mod": "go.sum",
+          "gemfile": "gemfile.lock",
+          "composer.json": "composer.lock",
+          "cargo.toml": "cargo.lock",
+          "mix.exs": "mix.lock",
+          "pubspec.yaml": "pubspec.lock",
+          "*.ts": "${capture}.js, ${capture}.d.ts, ${capture}.js.map",
+          "*.js": "${capture}.js.map, ${capture}.min.js, ${capture}.d.ts",
+          "*.jsx": "${capture}.js",
+          "*.tsx": "${capture}.ts",
+          "*.vue": "${capture}.js, ${capture}.ts, ${capture}.css, ${capture}.scss, ${capture}.less"
+        },
+        "workbench.tree.indent": 16,
+        "workbench.editor.enablePreview": false,
+        "workbench.list.smoothScrolling": true,
+        "editor.suggestSelection": "recentlyUsed",
+        "terminal.integrated.gpuAcceleration": "on",
+        "terminal.integrated.scrollback": 10000,
+        "terminal.integrated.defaultProfile.linux": "bash",
+        "terminal.integrated.enableMultiLinePasteWarning": false,
+        "files.insertFinalNewline": true,
+        "files.trimTrailingWhitespace": true,
+        "explorer.confirmDragAndDrop": false,
+        "explorer.confirmDelete": false,
+        // --- Search & Language Specific ---
+        "search.exclude": {
+          "**/node_modules": true,
+          "**/dist": true,
+          "**/build": true,
+          "**/.git": true,
+          "**/.pytest_cache": true,
+          "**/__pycache__": true
+        },
+        "search.smartCase": true,
+        "[markdown]": {
+          "editor.wordWrap": "on",
+          "editor.quickSuggestions": {
+            "comments": "off",
+            "strings": "off",
+            "other": "off"
+          }
+        },
+        "[json]": {
+          "editor.defaultFormatter": "vscode.json-language-features"
+        },
+        "[jsonc]": {
+          "editor.defaultFormatter": "vscode.json-language-features"
+        },
+        "[dockerfile]": {
+          "editor.defaultFormatter": "ms-azuretools.vscode-docker"
+        },
+        "[yaml]": {
+          "editor.tabSize": 2,
+          "editor.autoIndent": "advanced"
+        },
+        "[shellscript]": {
+          "editor.defaultFormatter": "foxundermoon.shell-format",
+          "shellcheck.run": "onSave"
+        },
+        "[python]": {
+          "editor.defaultFormatter": "charliermarsh.ruff",
+          "editor.formatOnSave": true
+        },
+        "[go]": {
+          "editor.defaultFormatter": "golang.go",
+          "editor.formatOnSave": true
+        },
+        // --- Core Automation ---
+        "editor.codeActionsOnSave": {
+          "source.fixAll": "explicit",
+          "source.organizeImports": "explicit"
+        },
+        "git.autofetch": true,
+        "git.confirmSync": false,
+        "git.enableSmartCommit": true
+      },
+      "extensions": [
+        "ms-ceintl.vscode-language-pack-zh-hans",
+        "file-icons.file-icons",
+        "vscode-icons-team.vscode-icons",
+        "github.github-vscode-theme",
+        "pkief.material-icon-theme",
+        "mhutchie.git-graph",
+        "wdhongtw.gpg-indicator",
+        "ms-vscode-remote.remote-ssh",
+        "ms-azuretools.vscode-docker",
+        "github.vscode-github-actions",
+        "esbenp.prettier-vscode",
+        "ms-python.python",
+        "charliermarsh.ruff",
+        "golang.go",
+        "Vue.volar",
+        "dsznajder.es7-react-js-snippets",
+        "dbaeumer.vscode-eslint",
+        "ecmel.vscode-html-css",
+        "redhat.ansible",
+        "streetsidesoftware.code-spell-checker",
+        "wayou.vscode-todo-highlight",
+        "aaron-bond.better-comments",
+        "redhat.vscode-xml",
+        "ms-vscode.cpptools",
+        "vscjava.vscode-java-pack",
+        "usernamehw.errorlens",
+        "EditorConfig.EditorConfig",
+        "redhat.vscode-yaml",
+        "be5invis.toml",
+        "iceyer.toml-formatter",
+        "davidanson.vscode-markdownlint",
+        "timonwong.shellcheck",
+        "foxundermoon.shell-format",
+        "ultram4rine.vscode-choosealicense",
+        "minherz.copyright-inserter",
+        "irongeek.vscode-env",
+        "hashicorp.terraform",
+        "ms-kubernetes-tools.vscode-kubernetes-tools",
+        "aliariff.vscode-ktlint",
+        "zxh0.checkmake"
+      ]
+    }
+  },
+  "remoteUser": "vscode",
+  "postCreateCommand": "make setup || true"
 }
