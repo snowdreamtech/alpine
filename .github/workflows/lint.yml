@@ -1,5 +1,5 @@
 ---
-name: GitHub Actions Lint
+name: Lint
 
 "on":
   push:
