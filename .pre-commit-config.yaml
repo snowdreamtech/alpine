@@ -329,4 +329,5 @@ repos:
         name: commitlint
         language: system
         entry: commitlint --edit
+        always_run: true
         stages: [commit-msg, manual]
