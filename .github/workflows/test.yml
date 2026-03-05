@@ -1,0 +1,57 @@
+---
+name: Test
+
+"on":
+  push:
+    branches:
+      - "main"
+      - "dev"
+      - "feat/**"
+      - "branch/**"
+      - "feature/**"
+      - "fix/**"
+      - "pr/**"
+  pull_request:
+    branches:
+      - "main"
+      - "dev"
+      - "feat/**"
+      - "branch/**"
+      - "feature/**"
+      - "fix/**"
+      - "pr/**"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pull-requests: read
+
+jobs:
+  test:
+    name: Run Automated Tests
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # npm install uses pnpm, package manager defined in package.json
+      - name: Install Node Dependencies
+        run: npm i -g pnpm && pnpm install
+
+      - name: Setup PowerShell
+        shell: sh
+        run: |
+          # PowerShell is pre-installed on ubuntu-latest runners.
+          # The package.json script automatically installs Pester.
+          pwsh --version
+
+      - name: Run Test Matrix (Shell & PowerShell)
+        run: make test
