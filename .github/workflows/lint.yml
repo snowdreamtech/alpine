@@ -141,7 +141,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6.2.0
         with:
-          node-version: "20"
+          node-version: "24"
 
       - name: Install Node.js Linters
         run: npm install -g markdownlint-cli2 prettier editorconfig-checker eslint stylelint @stoplight/spectral-cli @taplo/cli sort-package-json
