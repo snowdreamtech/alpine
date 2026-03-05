@@ -2,6 +2,7 @@ export default [
   {
     ignores: [
       ".git/**",
+      ".ansible/**",
       "node_modules/**",
       ".venv/**",
       "venv/**",

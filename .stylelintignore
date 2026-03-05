@@ -16,3 +16,4 @@ target/
 .output/
 __pycache__/
 .specify/
+.ansible/

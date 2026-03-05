@@ -3,6 +3,7 @@ line-length = 120
 # Standard exclusion list for Ruff
 
 extend-exclude = [
+  ".ansible",
   ".git",
   "node_modules",
   ".venv",

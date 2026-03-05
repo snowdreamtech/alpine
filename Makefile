@@ -17,7 +17,7 @@ else
 endif
 
 # Directories to exclude from search operations (mirrors CI ignore list)
-PRUNE_DIRS := .git node_modules .venv venv env vendor dist build out target \
+PRUNE_DIRS := .git .ansible node_modules .venv venv env vendor dist build out target \
 	.next .nuxt .output __pycache__ .specify
 
 FIND_EXCLUDES := $(foreach dir,$(PRUNE_DIRS),-not -path "*/$(dir)/*" -not -path "*/$(dir)")
