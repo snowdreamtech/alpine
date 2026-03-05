@@ -33,7 +33,7 @@ New-Item -ItemType Directory -Path $paths.FEATURE_DIR -Force | Out-Null
 $template = Join-Path $paths.REPO_ROOT ".specify\templates\plan-template.md"
 if (Test-Path $template) {
     Copy-Item $template $paths.IMPL_PLAN -Force
-    Write-Host "Copied plan template to $($paths.IMPL_PLAN)"
+    Write-Output "Copied plan template to $($paths.IMPL_PLAN)"
 } else {
     Write-Warning "Plan template not found at $template"
     New-Item -ItemType File -Path $paths.IMPL_PLAN -Force | Out-Null

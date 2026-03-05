@@ -112,15 +112,15 @@ function Test-FeatureBranch {
 
 function Write-CheckFile {
     param([string]$Path, [string]$Label)
-    if (Test-Path $Path) { Write-Host "  $([char]0x2713) $Label" }
-    else                  { Write-Host "  $([char]0x2717) $Label" }
+    if (Test-Path $Path) { Write-Output "  $([char]0x2713) $Label" }
+    else                  { Write-Output "  $([char]0x2717) $Label" }
 }
 
 function Write-CheckDir {
     param([string]$Path, [string]$Label)
     if ((Test-Path $Path) -and (Get-ChildItem $Path -ErrorAction SilentlyContinue)) {
-        Write-Host "  $([char]0x2713) $Label"
+        Write-Output "  $([char]0x2713) $Label"
     } else {
-        Write-Host "  $([char]0x2717) $Label"
+        Write-Output "  $([char]0x2717) $Label"
     }
 }

@@ -29,10 +29,10 @@ $NewPlan  = $paths.IMPL_PLAN
 #------------------------------------------------------
 # Logging
 #------------------------------------------------------
-function Write-Info    { param([string]$m) Write-Host "INFO: $m" }
-function Write-Success { param([string]$m) Write-Host "$([char]0x2713) $m" }
-function Write-Err     { param([string]$m) Write-Host "ERROR: $m" -ForegroundColor Red }
-function Write-Warn    { param([string]$m) Write-Host "WARNING: $m" -ForegroundColor Yellow }
+function Write-Info    { param([string]$m) Write-Output "INFO: $m" }
+function Write-Success { param([string]$m) Write-Output "$([char]0x2713) $m" }
+function Write-Err     { param([string]$m) Write-Output "ERROR: $m"  }
+function Write-Warn    { param([string]$m) Write-Output "WARNING: $m" -ForegroundColor Yellow }
 
 #------------------------------------------------------
 # Validation
@@ -229,10 +229,10 @@ if ($AgentType) {
     }
 }
 
-Write-Host ""
+Write-Output ""
 Write-Info "Summary of changes:"
-if ($NewLang)      { Write-Host "  - Added language: $NewLang" }
-if ($NewFramework) { Write-Host "  - Added framework: $NewFramework" }
-if ($NewDb -and $NewDb -ne "N/A") { Write-Host "  - Added database: $NewDb" }
-Write-Host ""
+if ($NewLang)      { Write-Output "  - Added language: $NewLang" }
+if ($NewFramework) { Write-Output "  - Added framework: $NewFramework" }
+if ($NewDb -and $NewDb -ne "N/A") { Write-Output "  - Added database: $NewDb" }
+Write-Output ""
 Write-Success "Agent context update completed successfully"
