@@ -295,7 +295,7 @@ set -eu
 if (Get-Command 'sh' -ErrorAction SilentlyContinue) {
     sh "$PSScriptRoot/script.sh"
 } else {
-    Write-Host "Error: 'sh' not found. Install Git for Windows." -ForegroundColor Red
+    Write-Output "Error: 'sh' not found. Install Git for Windows."
     exit 1
 }
 ```
@@ -320,6 +320,9 @@ ALL scripts MUST pass their respective linters before being committed. This is e
 | `.sh` (Bash) | `shellcheck` | `--shell=bash` |
 | `.ps1` | `PSScriptAnalyzer` | `Invoke-ScriptAnalyzer -Path .` |
 | `.bat` | manual review | Keep minimal — delegate only |
+
+> **PowerShell Linting Note (`PSAvoidUsingWriteHost`)**:
+> Never use `Write-Host` for output in `.ps1` scripts, as it cannot be suppressed, captured, or redirected in older PS versions and breaks CI pipelines. Always use `Write-Output` (or `Write-Warning`/`Write-Error` where semantically appropriate) instead.
 
 ```bash
 # CI step — lint all shell scripts
