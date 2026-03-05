@@ -10,7 +10,11 @@ permissions:
   contents: write
 
 jobs:
+  lint:
+    uses: ./.github/workflows/lint.yml
+
   goreleaser:
+    needs: [lint]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
