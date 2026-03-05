@@ -41,6 +41,7 @@ project-root/
    - Install linguistically specific linters/formatters (e.g., `golangci-lint`, `checkmake`, `sqlfluff`, `ktlint`, `kube-linter`, `tflint`).
    - Configure platform-specific binary tools (e.g., MacPorts/Homebrew/Scoop/Winget/APT).
    - Activate `pre-commit` hooks for lightning-fast localized Shift-Left quality gates.
+   - Install project-level dependencies via `make install`.
 3. **Read the Rules**:
    Before coding, ensure both you and your AI assistant has read the core principles at `.agent/rules/01-general.md`.
 

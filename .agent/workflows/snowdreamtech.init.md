@@ -96,3 +96,10 @@ You **MUST** consider the user input before proceeding (if not empty).
      pip3 install pre-commit
      pre-commit install --hook-type pre-commit --hook-type pre-merge-commit --hook-type commit-msg
      ```
+
+   - **Install Project Dependencies**:
+     Finally, install project-specific node and python packages (e.g., `bats`, `commitizen`):
+
+     ```bash
+     make install
+     ```

@@ -17,7 +17,7 @@ Before submitting any changes, you must set up your local development environmen
    pre-commit install --hook-type pre-commit --hook-type pre-merge-commit --hook-type commit-msg
    ```
 
-2. **Verify Setup**: Run `pre-commit run --all-files` to ensure all linters pass locally.
+2. **Verify Setup**: Run `make setup` and `make install` to ensure all system and project dependencies are available, then run `make lint` to verify.
 
 ### 2. General Workflow
 
