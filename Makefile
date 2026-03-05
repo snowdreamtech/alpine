@@ -29,8 +29,12 @@ RUFF_EXCLUDES := $(foreach dir,$(PRUNE_DIRS),--exclude $(dir))
 PYTHON     ?= python3
 PIP        ?= pip3
 NODE       ?= node
-NPM        ?= pnpm
-PNPM       := $(shell command -v pnpm 2> /dev/null)
+NPM_DETECTOR := $(shell \
+	if command -v pnpm >/dev/null 2>&1; then echo "pnpm"; \
+	elif command -v yarn >/dev/null 2>&1; then echo "yarn"; \
+	elif command -v bun >/dev/null 2>&1; then echo "bun"; \
+	else echo "npm"; fi)
+NPM        ?= $(NPM_DETECTOR)
 PRE_COMMIT ?= pre-commit
 GORELEASER ?= goreleaser
 GITHUB_PROXY ?= https://gh-proxy.sn0wdr1am.com/
