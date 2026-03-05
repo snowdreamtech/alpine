@@ -29,6 +29,7 @@ repos:
         entry: sed -i '' -E 's/[[:space:]]*$//'
         language: system
         types: [text]
+        exclude: '\.(bat|cmd|ps1)$'
         stages: [pre-commit, pre-merge-commit]
         description: "Automatically remove trailing whitespace at the end of lines."
 
@@ -37,6 +38,7 @@ repos:
         entry: python3 -c 'import sys; f=sys.argv[1]; c=open(f,"rb").read(); open(f,"wb").write(c.rstrip()+b"\n") if c and not c.endswith(b"\n") else None'
         language: system
         types: [text]
+        exclude: '\.(bat|cmd|ps1)$'
         stages: [pre-commit, pre-merge-commit]
         description: "Ensure that files end with a single newline character."
 
