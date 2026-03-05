@@ -26,3 +26,4 @@ poetry.lock
 composer.lock
 Cargo.lock
 go.sum
+.ansible/
