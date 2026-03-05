@@ -1,7 +1,6 @@
 Describe "Init-Project PowerShell Wrapper" {
-    BeforeAll {
-        $ScriptPath = Join-Path $PSScriptRoot "..\scripts\init-project.ps1"
-    }
+    $ScriptPath = Join-Path $PSScriptRoot "..\scripts\init-project.ps1"
+
 
     It "Should invoke the underlying POSIX shell script if 'sh' is available" {
         # 'sh' is expected to be available in the test environment (macOS/Linux/WSL/Git Bash).
