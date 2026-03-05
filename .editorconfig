@@ -31,8 +31,14 @@ max_line_length = off
 indent_size = unset
 indent_style = unset
 
-# Shell and Windows Scripts
-[*.{sh,zsh,bash,ps1}]
+# Shell Scripts (Unix)
+[*.{sh,zsh,bash}]
 indent_style = space
 indent_size = 2
 end_of_line = lf
+
+# Windows Scripts (PowerShell & CMD)
+[*.{ps1,bat,cmd}]
+indent_style = space
+indent_size = 2
+end_of_line = crlf
