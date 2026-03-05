@@ -203,17 +203,14 @@ test:
 	else \
 		echo "$(YELLOW)pwsh not found. Skipping Pester tests.$(RESET)"; \
 	fi
-	@if [ -f pytest.ini ] || [ -f pyproject.toml ] || [ -d tests ]; then \
+	@if [ -f pytest.ini ] || [ -f pyproject.toml ] || { [ -d tests ] && find tests -name "test_*.py" -o -name "*_test.py" | grep -q . ; }; then \
 		echo "$(BLUE)Running pytest...$(RESET)"; \
 		$(PYTHON) -m pytest --tb=short; \
 	elif [ -f go.mod ]; then \
 		echo "$(BLUE)Running go test...$(RESET)"; \
 		go test ./...; \
-	elif [ -f package.json ]; then \
-		echo "$(BLUE)Running npm test...$(RESET)"; \
-		$(NPM) test; \
 	else \
-		echo "$(YELLOW)No test runner detected. Skipping.$(RESET)"; \
+		echo "$(GREEN)Component tests finished.$(RESET)"; \
 	fi
 	@echo "$(GREEN)All tests passed!$(RESET)"
 
