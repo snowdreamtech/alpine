@@ -216,9 +216,17 @@ format:
 	fi
 	@echo "$(GREEN)Formatting complete!$(RESET)"
 
-# Run tests
+# Run test suite
 test:
 	@echo "$(BOLD)Running tests...$(RESET)"
+	@echo "$(BLUE)Running bats (Shell)...$(RESET)"
+	$(NPM) run test:shell
+	@if command -v pwsh >/dev/null 2>&1; then \
+		echo "$(BLUE)Running Pester (PowerShell)...$(RESET)"; \
+		$(NPM) run test:ps; \
+	else \
+		echo "$(YELLOW)pwsh not found. Skipping Pester tests.$(RESET)"; \
+	fi
 	@if [ -f pytest.ini ] || [ -f pyproject.toml ] || [ -d tests ]; then \
 		echo "$(BLUE)Running pytest...$(RESET)"; \
 		$(PYTHON) -m pytest --tb=short; \

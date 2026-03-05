@@ -18,6 +18,7 @@ ignore: |
   .git/
   **/*.md
   .specify/
+  pnpm-lock.yaml
 
 rules:
   # Line-length is intentionally disabled. Modern wide screens and YAML's

@@ -7,6 +7,7 @@
     "docs:build": "vitepress build docs",
     "docs:dev": "vitepress dev docs",
     "docs:preview": "vitepress preview docs",
+    "test:ps": "pwsh -Command \"if (!(Get-Module -ListAvailable Pester)) { Install-Module -Name Pester -Force -SkipPublisherCheck -Scope CurrentUser }; Invoke-Pester tests/\"",
     "test:shell": "bats tests/"
   },
   "devDependencies": {
