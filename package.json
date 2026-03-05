@@ -6,9 +6,13 @@
   "scripts": {
     "docs:build": "vitepress build docs",
     "docs:dev": "vitepress dev docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:preview": "vitepress preview docs",
+    "test:shell": "bats tests/"
   },
   "devDependencies": {
+    "bats": "^1.13.0",
+    "bats-assert": "^2.2.4",
+    "bats-support": "^0.3.0",
     "vitepress": "1.6.3"
   },
   "packageManager": "pnpm@10.28.0"

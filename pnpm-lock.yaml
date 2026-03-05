@@ -1,4 +1,3 @@
----
 lockfileVersion: "9.0"
 
 settings:
@@ -8,6 +7,15 @@ settings:
 importers:
   .:
     devDependencies:
+      bats:
+        specifier: ^1.13.0
+        version: 1.13.0
+      bats-assert:
+        specifier: ^2.2.4
+        version: 2.2.4(bats-support@0.3.0(bats@1.13.0))(bats@1.13.0)
+      bats-support:
+        specifier: ^0.3.0
+        version: 0.3.0(bats@1.13.0)
       vitepress:
         specifier: 1.6.3
         version: 1.6.3(@algolia/client-search@5.49.1)(postcss@8.5.8)(search-insights@2.17.3)
@@ -674,6 +682,24 @@ packages:
     resolution:
       { integrity: sha512-X3Pp2aRQhg4xUC6PQtkubn5NpRKuUPQ9FPDQlx36SmpFwwH2N0/tw4c+NXV3nw3PsgeUs+BuWGP0gjz3TvENLQ== }
     engines: { node: ">= 14.0.0" }
+
+  bats-assert@2.2.4:
+    resolution:
+      { integrity: sha512-EcaY4Z+Tbz1c7pnC1SrVSq0epr7tLwFpz6qt7KUW9K8uSw8V12DTfH9d2HxZWvBEATaCuMsZ7KoZMFiSQPRoXw== }
+    peerDependencies:
+      bats: 0.4 || ^1
+      bats-support: ^0.3
+
+  bats-support@0.3.0:
+    resolution:
+      { integrity: sha512-z+2WzXbI4OZgLnynydqH8GpI3+DcOtepO66PlK47SfEzTkiuV9hxn9eIQX+uLVFbt2Oqoc7Ky3TJ/N83lqD+cg== }
+    peerDependencies:
+      bats: 0.4 || ^1
+
+  bats@1.13.0:
+    resolution:
+      { integrity: sha512-giSYKGTOcPZyJDbfbTtzAedLcNWdjCLbXYU3/MwPnjyvDXzu6Dgw8d2M+8jHhZXSmsCMSQqCp+YBsJ603UO4vQ== }
+    hasBin: true
 
   birpc@2.9.0:
     resolution:
@@ -1468,6 +1494,17 @@ snapshots:
       "@algolia/requester-browser-xhr": 5.49.1
       "@algolia/requester-fetch": 5.49.1
       "@algolia/requester-node-http": 5.49.1
+
+  bats-assert@2.2.4(bats-support@0.3.0(bats@1.13.0))(bats@1.13.0):
+    dependencies:
+      bats: 1.13.0
+      bats-support: 0.3.0(bats@1.13.0)
+
+  bats-support@0.3.0(bats@1.13.0):
+    dependencies:
+      bats: 1.13.0
+
+  bats@1.13.0: {}
 
   birpc@2.9.0: {}
 
