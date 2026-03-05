@@ -26,6 +26,7 @@
   ```
 
 - Document the reason and guard mechanism for every non-idempotent operation.
+- **No Temporary Files in Git**: All temporary files created during debugging, testing, or development (e.g., `test.txt`, `tmp.json`, empty debug scripts) MUST NEVER be committed to version control. They must be deleted immediately after testing or placed in a `.gitignore`'d directory (e.g., `.tmp/`). AI agents must proactively revert any such accidental commits before merging.
 
 ## 3. Cross-Platform Compatibility
 
