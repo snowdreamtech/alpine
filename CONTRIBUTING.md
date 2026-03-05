@@ -25,7 +25,8 @@ Before submitting any changes, you must set up your local development environmen
 2. **Clone** your fork locally.
 3. **Branch** from `main` to a descriptively named branch (e.g., `feat/add-new-ai-rule`, `fix/ci-memory-leak`).
 4. **Develop** your feature or fix.
-5. **Commit** your changes following our [Conventional Commits](https://www.conventionalcommits.org/) standards. Your message should look like `feat(rule): add support for new Claude tool`.
+5. **Commit** your changes following our [Conventional Commits](https://www.conventionalcommits.org/) standards. We highly recommend using our interactive Commitizen CLI to automatically assemble your commit message format.
+   Simply run `make commit` (or `npm run commit`) to launch the interactive prompt.
 6. **Push** to your fork.
 7. **Submit a Pull Request (PR)** against our `main` branch.
 
@@ -38,6 +39,8 @@ You can easily sign off your commits by using the `-s` or `--signoff` flag:
 ```bash
 git commit -s -m "fix(script): resolve posix portability issue"
 ```
+
+> **Tip:** If you use `make commit`, you can add the signoff flag by configuring your system git globally: `git config --global commit.gpgsign true` or `git config --global format.signOff true`.
 
 ### 4. Code & Architecture Standards
 

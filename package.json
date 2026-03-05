@@ -4,16 +4,24 @@
   "private": true,
   "description": "VitePress documentation site for Snowdream Tech AI IDE Template",
   "scripts": {
+    "commit": "cz",
     "docs:build": "vitepress build docs",
     "docs:dev": "vitepress dev docs",
     "docs:preview": "vitepress preview docs",
     "test:ps": "pwsh -Command \"if (!(Get-Module -ListAvailable Pester)) { Install-Module -Name Pester -Force -SkipPublisherCheck -Scope CurrentUser }; Invoke-Pester tests/\"",
     "test:shell": "bats tests/"
   },
+  "config": {
+    "commitizen": {
+      "path": "./node_modules/cz-conventional-changelog"
+    }
+  },
   "devDependencies": {
     "bats": "^1.13.0",
     "bats-assert": "^2.2.4",
     "bats-support": "^0.3.0",
+    "commitizen": "^4.3.1",
+    "cz-conventional-changelog": "^3.3.0",
     "vitepress": "1.6.3"
   },
   "packageManager": "pnpm@10.28.0"

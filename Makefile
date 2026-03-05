@@ -56,7 +56,7 @@ endif
 # =============================================================================
 # Targets
 # =============================================================================
-.PHONY: all help init setup install lint format test build check clean
+.PHONY: all help init setup install lint format test build check clean commit
 
 # Default target: display help
 all: help
@@ -77,6 +77,7 @@ help:
 	@echo "  $(GREEN)test$(RESET)     Run test suite"
 	@echo "  $(GREEN)build$(RESET)    Build project artifacts"
 	@echo "  $(GREEN)check$(RESET)    Run security and dependency audit checks"
+	@echo "  $(GREEN)commit$(RESET)   Start the interactive Commitizen CLI to create a structured commit"
 	@echo "  $(GREEN)clean$(RESET)    Remove temporary and generated files"
 	@echo "  $(GREEN)help$(RESET)     Show this help message"
 	@echo ""
@@ -184,6 +185,37 @@ install:
 	fi
 	@echo "$(GREEN)Dependencies installed!$(RESET)"
 
+# Run test suite
+test:
+	@echo "$(BOLD)Running tests...$(RESET)"
+	@echo "$(BLUE)Running bats (Shell)...$(RESET)"
+	$(NPM) run test:shell
+	@if command -v pwsh >/dev/null 2>&1; then \
+		echo "$(BLUE)Running Pester (PowerShell)...$(RESET)"; \
+		$(NPM) run test:ps; \
+	else \
+		echo "$(YELLOW)pwsh not found. Skipping Pester tests.$(RESET)"; \
+	fi
+	@if [ -f pytest.ini ] || [ -f pyproject.toml ] || [ -d tests ]; then \
+		echo "$(BLUE)Running pytest...$(RESET)"; \
+		$(PYTHON) -m pytest --tb=short; \
+	elif [ -f go.mod ]; then \
+		echo "$(BLUE)Running go test...$(RESET)"; \
+		go test ./...; \
+	elif [ -f package.json ]; then \
+		echo "$(BLUE)Running npm test...$(RESET)"; \
+		$(NPM) test; \
+	else \
+		echo "$(YELLOW)No test runner detected. Skipping.$(RESET)"; \
+	fi
+	@echo "$(GREEN)All tests passed!$(RESET)"
+
+# Launch interactive commit CLI
+commit:
+	@echo "$(BOLD)Starting interactive Commitizen CLI...$(RESET)"
+	$(NPM) run commit
+
+# Build project artifacts
 # Run all pre-commit hooks
 # First pass: let hooks auto-fix files (whitespace, formatting, etc.)
 # Second pass: verify no issues remain after fixes
