@@ -13,8 +13,10 @@ You **MUST** consider the user input before proceeding (if not empty).
 ## Outline
 
 1. **Initialize Environment**
-   - Ensure the development environment supports the following tools and languages: `nodejs`, `python`.
-   - Ensure the IDE installs recommended extensions and plugins based on the project configuration files.
+   > **💡 Tip: DevContainer Available!**
+   > This project provides a fully-configured `.devcontainer` configuration. If you use VS Code or GitHub Codespaces, you can simply open this project in a container to completely skip the environment setup below. Node.js, Python, Go, PowerShell, and all necessary linters will be pre-installed automatically.
+
+   - Ensure the development environment supports the core ecosystems needed for linting: `nodejs` (for eslint/prettier/commitlint), `python` (for ruff/yamllint/sqlfluff).
    - Install linting tools required by `.pre-commit-config.yaml` and `.github/workflows/lint.yml`.
 
      **Cross-platform (pip3 + npm — works on macOS / Linux / Windows):**
