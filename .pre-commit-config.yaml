@@ -75,6 +75,7 @@ repos:
         name: gitleaks
         language: system
         entry: gitleaks protect --verbose --redact --staged --gitleaks-ignore-path .gitleaksignore
+        always_run: true
         pass_filenames: false
 
       # ── Formatting ─────────────────────────────────────────────────────────
@@ -185,6 +186,7 @@ repos:
         language: system
         entry: golangci-lint run
         types: [go]
+        always_run: true
         pass_filenames: false
         description: "Fast Go linter aggregator. Runs incrementally on changed files."
 
@@ -211,6 +213,7 @@ repos:
         language: system
         entry: tflint
         files: \.tf$
+        always_run: true
         pass_filenames: false
         description: "Linter for Terraform files. Requires tflint installed locally."
 
@@ -276,6 +279,7 @@ repos:
         language: system
         entry: swiftlint lint --strict
         types: [swift]
+        always_run: true
         pass_filenames: false
         description: "Swift linter. Requires swiftlint installed (macOS only)."
 
@@ -285,6 +289,7 @@ repos:
         language: system
         entry: dotnet format --verify-no-changes
         files: '\.(cs|vb|fs)$'
+        always_run: true
         pass_filenames: false
         description: "C# formatter check. Requires .NET SDK installed."
 
