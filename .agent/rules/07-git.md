@@ -13,6 +13,7 @@
   3. Only then proceed to the next item.
 - **No bulk commits.** Do NOT accumulate multiple changes across files and then commit them all at once. This breaks auditability and makes `git bisect`, `git revert`, and code review harder.
 - **Applies regardless of user selection.** Whether the user has selected one suggestion from a list or confirmed all of them, always commit after each individual change — not after all of them together.
+- **NEVER use `--no-verify`**. Bypassing pre-commit hooks or commit-msg hooks is strictly prohibited. If a hook fails, you MUST fix the underlying code or configuration instead of using the bypass flag.
 
 ```bash
 # ✅ CORRECT: atomic, auditable

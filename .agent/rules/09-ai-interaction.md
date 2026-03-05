@@ -45,6 +45,8 @@
   - **Documentation**: Provide clear comments for complex logic, and use tools like `markdownlint-cli2` to ensure Markdown consistency.
   - **SAST/SCA/Heavy Audits**: Local execution of `semgrep`, `trivy`, `lychee`, `golangci-lint`, `ansible-lint`, and `cargo clippy` is **DISABLED** to maintain performance. These are strictly reserved for CI.
   - **Git Flow**: The system enforces Conventional Commits via `commitlint` locally and Semantic Pull Request titles remotely. ALWAYS ensure your commit messages and PR titles follow the `<type>(<scope>): <subject>` format exactly.
+  - **No Bypass**: AI agents MUST NEVER use the `--no-verify` flag when committing. If a linting or formatting hook fails, the agent MUST resolve the issue in the code rather than bypassing the quality gate.
+  - **Exact Versioning**: AI agents MUST always use exact version numbers (e.g., `1.2.3` instead of `^1.2.3` or `@v4`) in `package.json`, `requirements.txt`, and GitHub Actions to ensure deterministic builds.
   - **Markdown files**: Run `markdownlint-cli2 --fix <file>` and `prettier --write <file>`
   - **YAML/JSON files**: Run `prettier --write <file>` and `yamllint <file>`
   - **Shell scripts**: Run `shfmt -w -s -l <file>` (formatting) and `shellcheck <file>` (logic).
