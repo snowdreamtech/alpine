@@ -292,7 +292,7 @@ repos:
         language: system
         entry: >-
           pwsh -NoProfile -Command
-          "Set-StrictMode -Version Latest; $r = Invoke-ScriptAnalyzer -Path $args[0] -Severity Error,Warning; if ($r) { $r | Format-Table -AutoSize; exit 1 }"
+          "& { param([string[]]$paths) if (!(Get-Command Invoke-ScriptAnalyzer -ErrorAction SilentlyContinue)) { Write-Host 'PSScriptAnalyzer missing, skipping.'; exit 0 }; $r = Invoke-ScriptAnalyzer -Path $paths -Severity Error,Warning; if ($r) { $r | Format-Table -AutoSize; exit 1 } }" -args
         types: [powershell]
         description: "PowerShell script analyzer. Requires pwsh and PSScriptAnalyzer module."
 
