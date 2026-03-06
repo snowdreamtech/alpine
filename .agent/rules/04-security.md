@@ -29,7 +29,55 @@
 - Rotate secrets immediately upon any suspected or confirmed exposure. Revoke the old credentials before generating new ones. Document the rotation in an incident log with timestamp and actor.
 - Use **short-lived credentials** wherever possible (OAuth 2.0 access tokens with short TTL, AWS STS AssumeRole, GCP Workload Identity, Kubernetes service account tokens) over long-lived static credentials.
 
-## 2. Access Control & Auditing
+## 2. Gitleaks Configuration Best Practices
+
+### File Roles (MANDATORY distinction)
+
+| File | Purpose | What it accepts |
+|:---|:---|:---|
+| `.gitleaks.toml` | Configuration — allowlists, rule overrides | Path regex patterns, rule definitions |
+| `.gitleaksignore` | Suppress **specific findings** by fingerprint | Finding fingerprints ONLY (e.g., `abc123:file.go:42:MyRule`) |
+
+> **Critical**: Adding directory paths (`node_modules/`, `dist/`) to `.gitleaksignore` is **invalid** and produces `WRN Invalid .gitleaksignore entry` warnings. All path exclusions MUST go in `.gitleaks.toml` under `[allowlist]`.
+
+### Path Exclusion Decision Matrix
+
+| Category | Example | Exclude? | Rationale |
+|:---|:---|:---|:---|
+| Build artifacts | `dist/`, `build/`, `out/`, `target/` | ✅ Always | Generated code, never contains credentials |
+| Package caches | `node_modules/`, `.cargo/registry/` | ✅ Always | Third-party code, performance gain is large |
+| Git internals | `.git/objects/`, `.git/logs/` | ✅ Always | Content hashes, not user data |
+| Venv internals | `venv/bin/`, `venv/lib/` | ✅ Subdirs only | Only skip binary/lib; **root is scanned** |
+| `.env` files | `.env`, `.env.local` | ❌ Never | Highest-risk files — must be detected |
+| Lock files | `pnpm-lock.yaml`, `go.sum` | ❌ Never | Can contain registry URLs with embedded tokens |
+| Config dirs | `.specify/`, `.ansible/`, `.github/` | ❌ Never | May contain scripts with hardcoded secrets |
+| IaC state | `*.tfvars`, `*.tfstate` | ❌ Never | Frequently contain secrets and sensitive data |
+
+### Safe Virtual Environment Exclusion Pattern
+
+Never exclude `venv/` or `env/` entirely — a misplaced `.env` file in the root of that directory would be silently ignored. Only exclude the standard subdirectories:
+
+```toml
+# ✅ CORRECT — root of env/ is still scanned
+'''(|/)(|.venv|venv|env)/(bin|lib|lib64|include|share|scripts|Lib|Scripts)/'''
+
+# ❌ WRONG — silently hides any .env in env/
+'''env/'''
+```
+
+### CI Integration
+
+```yaml
+# ✅ Use the official binary (Python-version-agnostic)
+- name: Run Gitleaks
+  run: |
+    git config diff.renameLimit 4000   # prevent spurious git rename warnings
+    ${{ env.VENV }}/bin/gitleaks detect --source . --config .gitleaks.toml
+```
+
+> **Note**: `semgrep` installed via `pip` on Python 3.12 crashes with `ModuleNotFoundError: No module named 'pkg_resources'` — its `opentelemetry` dependency requires `setuptools`, which Python 3.12 no longer bundles. Fix: add `setuptools` to `requirements-dev.txt`. **Note**: `semgrep/semgrep-action` was archived on 2024-04-09 and is no longer maintained.
+
+## 3. Access Control & Auditing
 
 - Apply the **Principle of Least Privilege**: grant users, services, and processes only the permissions they need to perform their specific function. Default to deny-all; explicitly allow required accesses. Review at every permission request.
 - Implement **Role-Based Access Control (RBAC)** with clearly defined roles. Avoid sharing service accounts between unrelated services — each service has its own identity.

@@ -207,5 +207,20 @@
 - Run **secret scanning** as the first step in every CI pipeline, before any code builds:
 
   ```bash
-  gitleaks detect --source . --report-format json --exit-code 1
+  # Set rename limit to suppress git performance warning on large repos
+  git config diff.renameLimit 4000
+  gitleaks detect --source . --config .gitleaks.toml
   ```
+
+  See `04-security.md §2` for the full Gitleaks configuration best practices and path exclusion decision matrix.
+
+- For SAST tools installed via `pip` (e.g., Semgrep), be aware of **Python 3.12 compatibility**: Semgrep ≥ v1.x requires `setuptools` (`pkg_resources`) which is no longer bundled with Python 3.12. Fix: install `setuptools` alongside semgrep.
+
+  ```yaml
+  - name: Run Semgrep
+    run: |
+      pip install --quiet semgrep setuptools
+      semgrep scan --config=auto --error --exclude=.git --exclude=node_modules || true
+  ```
+
+  > **Note**: `semgrep/semgrep-action` was archived on 2024-04-09 and is no longer maintained. Do not use it.

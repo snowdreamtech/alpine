@@ -308,29 +308,26 @@ jobs:
         run: ${{ env.VENV }}/bin/actionlint
 
       - name: Run Semgrep
-        uses: semgrep/semgrep-action@v1
-        with:
-          # publishToken: ${{ secrets.SEMGREP_APP_TOKEN }}
-          # publishDeployment: ${{ secrets.SEMGREP_DEPLOYMENT_ID }}
-          config: >-
-            p/default
-          exclude: >
-            .git
-            node_modules
-            .venv
-            venv
-            env
-            vendor
-            dist
-            build
-            out
-            target
-            .next
-            .nuxt
-            .output
-            .specify
-            __pycache__
-        continue-on-error: true
+        run: |
+          pip install --quiet semgrep setuptools
+          semgrep scan \
+            --config=auto \
+            --error \
+            --exclude=.git \
+            --exclude=node_modules \
+            --exclude=.venv \
+            --exclude=venv \
+            --exclude=env \
+            --exclude=vendor \
+            --exclude=dist \
+            --exclude=build \
+            --exclude=out \
+            --exclude=target \
+            --exclude=.next \
+            --exclude=.nuxt \
+            --exclude=.output \
+            --exclude=__pycache__ \
+            --exclude=.specify || true
 
       - name: Run Trivy Vulnerability Scanner
         uses: aquasecurity/trivy-action@0.34.2
