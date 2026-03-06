@@ -1,7 +1,7 @@
 #!/bin/sh
 # scripts/archive-changelog.sh - Automate major-version changelog archiving
 # This script moves entries of previous major versions from CHANGELOG.md to archival files.
-# Strictly POSIX-compliant.
+# Features: POSIX compliant, Atomic Operations, Deduplication.
 
 set -e
 
@@ -23,22 +23,22 @@ fi
 # Temp files
 TMP_HEADER=$(mktemp)
 TMP_ARCHIVE_PREFIX=$(mktemp -d)
+NEW_CHANGELOG=$(mktemp)
 
 # 1. Extract the header (everything up to the first version header)
 FIRST_H2_LINE=$(grep -n "^## \[" "$CHANGELOG" | head -n1 | cut -d: -f1)
 if [ -z "$FIRST_H2_LINE" ]; then
   # No version headers found yet
-  rm -rf "$TMP_HEADER" "$TMP_ARCHIVE_PREFIX"
+  rm -f "$TMP_HEADER" "$NEW_CHANGELOG"
+  rm -rf "$TMP_ARCHIVE_PREFIX"
   exit 0
 fi
 
-# head -n $((FIRST_H2_LINE - 1)) is POSIX-compliant
 head -n "$((FIRST_H2_LINE - 1))" "$CHANGELOG" >"$TMP_HEADER"
 
-# 2. Process all versions using a more portable awk approach (Avoid match() and other non-POSIX)
+# 2. Process all versions using a portable awk approach
 tail -n +"$FIRST_H2_LINE" "$CHANGELOG" | awk -v major="$CURRENT_MAJOR" -v prefix="$TMP_ARCHIVE_PREFIX" '
   /^## \[/ {
-    # Extract major version manually using split
     line = $0;
     sub(/^## \[/, "", line);
     split(line, parts, ".");
@@ -61,14 +61,13 @@ tail -n +"$FIRST_H2_LINE" "$CHANGELOG" | awk -v major="$CURRENT_MAJOR" -v prefix
   }
 '
 
-# 3. Rebuild CHANGELOG.md
-cat "$TMP_HEADER" >"$CHANGELOG"
+# 3. Preparation for rebuild (Atomic)
+cat "$TMP_HEADER" >"$NEW_CHANGELOG"
 if [ -f "$TMP_ARCHIVE_PREFIX/current.md" ]; then
-  cat "$TMP_ARCHIVE_PREFIX/current.md" >>"$CHANGELOG"
+  cat "$TMP_ARCHIVE_PREFIX/current.md" >>"$NEW_CHANGELOG"
 fi
 
-# 4. Handle archives
-# Use for loop with patterns to avoid ls | grep
+# 4. Handle archives with deduplication
 for arch_file in "$TMP_ARCHIVE_PREFIX"/v*.md; do
   [ -e "$arch_file" ] || continue
 
@@ -76,34 +75,57 @@ for arch_file in "$TMP_ARCHIVE_PREFIX"/v*.md; do
   v_num=$(echo "$v_tag" | sed 's/^v//')
   FINAL_ARCH_FILE="CHANGELOG-v$v_num.md"
 
-  # Prepend newest entries to archive if it already exists
   if [ -f "$FINAL_ARCH_FILE" ]; then
-    tmp_file=$(mktemp)
-    cat "$arch_file" >"$tmp_file"
-    printf "\n" >>"$tmp_file"
-    # Portable sed: Skip first two lines (header) of existing archive
-    sed '1,2d' "$FINAL_ARCH_FILE" >>"$tmp_file"
-    mv "$tmp_file" "$FINAL_ARCH_FILE"
+    # Deduplication: only prepend blocks not already in the archive
+    # Use awk to filter out existing version headers
+    FILTERED_CONTENT=$(mktemp)
+    awk -v arch="$FINAL_ARCH_FILE" '
+      BEGIN {
+        while ((getline line < arch) > 0) {
+          if (line ~ /^## \[/) { headers[line] = 1; }
+        }
+        close(arch);
+      }
+      /^## \[/ {
+        if (headers[$0]) { skip = 1; }
+        else { skip = 0; }
+      }
+      { if (!skip) print; }
+    ' "$arch_file" >"$FILTERED_CONTENT"
+
+    if [ -s "$FILTERED_CONTENT" ]; then
+      tmp_arch=$(mktemp)
+      cat "$FILTERED_CONTENT" >"$tmp_arch"
+      printf "\n" >>"$tmp_arch"
+      # Skip first two lines (header) of existing archive
+      sed '1,2d' "$FINAL_ARCH_FILE" >>"$tmp_arch"
+      mv "$tmp_arch" "$FINAL_ARCH_FILE"
+    fi
+    rm -f "$FILTERED_CONTENT"
   else
+    # New archive file
     printf "# Changelog Archive v%s\n\n" "$v_num" >"$FINAL_ARCH_FILE"
     cat "$arch_file" >>"$FINAL_ARCH_FILE"
   fi
 
-  # Add/Update History section link
-  if ! grep -q "^## History" "$CHANGELOG"; then
-    printf "\n## History\n\n" >>"$CHANGELOG"
+  # Add/Update History section link in the NEW_CHANGELOG
+  if ! grep -q "^## History" "$NEW_CHANGELOG"; then
+    printf "\n## History\n\n" >>"$NEW_CHANGELOG"
   fi
 
   LINK="- [v$v_num.x.x Archive](./$FINAL_ARCH_FILE)"
-  if ! grep -Fq -- "$LINK" "$CHANGELOG"; then
-    # POSIX-compliant sed insertion using a temp file
+  if ! grep -Fq -- "$LINK" "$NEW_CHANGELOG"; then
     tmp_cl=$(mktemp)
     sed "/^## History/a\\
 $LINK
-" "$CHANGELOG" >"$tmp_cl"
-    mv "$tmp_cl" "$CHANGELOG"
+" "$NEW_CHANGELOG" >"$tmp_cl"
+    mv "$tmp_cl" "$NEW_CHANGELOG"
   fi
 done
 
+# 5. Final Swap (Atomic)
+mv "$NEW_CHANGELOG" "$CHANGELOG"
+
 # Cleanup
-rm -rf "$TMP_HEADER" "$TMP_ARCHIVE_PREFIX"
+rm -f "$TMP_HEADER"
+rm -rf "$TMP_ARCHIVE_PREFIX"
