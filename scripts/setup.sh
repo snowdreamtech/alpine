@@ -51,7 +51,32 @@ esac
 log() { printf "%b%s%b\n" "${BLUE}" "$1" "${NC}"; }
 info() { printf "%b%s%b\n" "${GREEN}" "$1" "${NC}"; }
 warn() { printf "%b%s%b\n" "${YELLOW}" "$1" "${NC}"; }
-error() { printf "%b%s%b\n" "${RED}" "$1" "${NC}"; }
+error() {
+  printf "%b%s%b\n" "${RED}" "$1" "${NC}" >&2
+  exit 1
+}
+
+# Robust download helper with proxy fallback
+download_url() {
+  _URL="$1"
+  _OUT="$2"
+  _DESC="$3"
+
+  if curl --retry 3 -fsSL "${_URL}" -o "${_OUT}"; then
+    return 0
+  fi
+
+  # Fallback if proxy failed (522, etc.)
+  if [ -n "${GITHUB_PROXY}" ] && echo "${_URL}" | grep -q "^${GITHUB_PROXY}"; then
+    _FALLBACK_URL="${_URL#"$GITHUB_PROXY"}"
+    warn "Proxy download failed for ${_DESC}, retrying directly from ${_FALLBACK_URL}..."
+    if curl --retry 3 -fsSL "${_FALLBACK_URL}" -o "${_OUT}"; then
+      return 0
+    fi
+  fi
+
+  return 1
+}
 
 setup_node() {
   log "── Setting up Node.js & pnpm ──"
@@ -88,7 +113,7 @@ install_gitleaks() {
   # zip for windows? No, gitleaks provides .tar.gz even for windows.
   _URL="${GITHUB_PROXY}https://github.com/gitleaks/gitleaks/releases/download/${GITLEAKS_VERSION}/${_TAR}"
   _TMP=$(mktemp -d)
-  if curl --retry 3 -fsSL "${_URL}" -o "${_TMP}/gitleaks.tar.gz"; then
+  if download_url "${_URL}" "${_TMP}/gitleaks.tar.gz" "gitleaks"; then
     tar -xzf "${_TMP}/gitleaks.tar.gz" -C "${_TMP}" gitleaks
     mv "${_TMP}/gitleaks" "${_BIN}"
     chmod +x "${_BIN}"
@@ -108,7 +133,7 @@ install_hadolint() {
     _SUFFIX="Darwin-x86_64"
   elif [ "${_OS_TAG}" = "windows" ]; then _SUFFIX="Windows-x86_64.exe"; fi
   _URL="${GITHUB_PROXY}https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-${_SUFFIX}"
-  if curl --retry 3 -fsSL "${_URL}" -o "${_BIN}"; then
+  if download_url "${_URL}" "${_BIN}" "hadolint"; then
     chmod +x "${_BIN}"
     info "hadolint installed."
   else
@@ -120,10 +145,16 @@ install_go_lint() {
   _BIN="${VENV}/bin/golangci-lint"
   if [ -x "${_BIN}" ]; then return 0; fi
   log "── Installing golangci-lint ${GOLANGCI_VERSION} ──"
-  # Official install script via curl
-  export BINDIR="${VENV}/bin"
-  curl -sSfL "${GITHUB_PROXY}https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh" | bash -s -- "${GOLANGCI_VERSION}"
-  info "golangci-lint installed."
+  _URL="${GITHUB_PROXY}https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh"
+  _TMP=$(mktemp -d)
+  if download_url "${_URL}" "${_TMP}/install_go.sh" "golangci-lint-installer"; then
+    export BINDIR="${VENV}/bin"
+    bash "${_TMP}/install_go.sh" "${GOLANGCI_VERSION}"
+    rm -rf "${_TMP}"
+    info "golangci-lint installed."
+  else
+    error "Failed to download golangci-lint installer."
+  fi
 }
 
 install_checkmake() {
@@ -138,7 +169,7 @@ install_checkmake() {
   _FILE="checkmake-${CHECKMAKE_VERSION}.${_OS_S}.${_ARCH_S}${_EXE}"
   _URL="${GITHUB_PROXY}https://github.com/checkmake/checkmake/releases/download/${CHECKMAKE_VERSION}/${_FILE}"
 
-  if curl --retry 3 -fsSL "${_URL}" -o "${_BIN}"; then
+  if download_url "${_URL}" "${_BIN}" "checkmake"; then
     chmod +x "${_BIN}"
     info "checkmake installed."
   else
@@ -157,12 +188,21 @@ install_iac_lint() {
       [ "${_ARCH_N}" = "x64" ] && _TAR="tflint_darwin_amd64.zip"
       _URL="${GITHUB_PROXY}https://github.com/terraform-linters/tflint/releases/download/${TFLINT_VERSION}/${_TAR}"
       _TMP=$(mktemp -d)
-      curl -fsSL "${_URL}" -o "${_TMP}/tflint.zip"
-      unzip -q "${_TMP}/tflint.zip" -d "${_TMP}"
-      mv "${_TMP}/tflint" "${VENV}/bin/tflint"
-      rm -rf "${_TMP}"
+      if download_url "${_URL}" "${_TMP}/tflint.zip" "tflint"; then
+        unzip -q "${_TMP}/tflint.zip" -d "${_TMP}"
+        mv "${_TMP}/tflint" "${VENV}/bin/tflint"
+        rm -rf "${_TMP}"
+      else
+        error "Failed to download tflint."
+      fi
     else
-      curl -sSfL "${_URL}" | TFLINT_INSTALL_PATH="${VENV}/bin" bash
+      _TMP=$(mktemp -d)
+      if download_url "${_URL}" "${_TMP}/install_tflint.sh" "tflint-installer"; then
+        TFLINT_INSTALL_PATH="${VENV}/bin" bash "${_TMP}/install_tflint.sh"
+        rm -rf "${_TMP}"
+      else
+        error "Failed to download tflint installer."
+      fi
     fi
   fi
   # Kube-Linter
@@ -170,8 +210,11 @@ install_iac_lint() {
     _SUFFIX="linux"
     [ "${OS}" = "darwin" ] && _SUFFIX="darwin"
     _URL="${GITHUB_PROXY}https://github.com/stackrox/kube-linter/releases/download/${KUBE_LINTER_VERSION}/kube-linter-$_SUFFIX"
-    curl -fsSL "${_URL}" -o "${VENV}/bin/kube-linter"
-    chmod +x "${VENV}/bin/kube-linter"
+    if download_url "${_URL}" "${VENV}/bin/kube-linter" "kube-linter"; then
+      chmod +x "${VENV}/bin/kube-linter"
+    else
+      error "Failed to download kube-linter."
+    fi
   fi
   info "IaC tools installed."
 }

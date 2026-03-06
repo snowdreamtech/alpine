@@ -40,16 +40,34 @@ if (Test-Path requirements-dev.txt) {
 # 3. System Tools Setup (Project-Local)
 Write-Host "`n[3/4] Ensuring system tools are installed locally..." -ForegroundColor Yellow
 
+function Download-Asset {
+    param([string]$Url, [string]$OutFile, [string]$Desc)
+
+    Write-Host "Downloading $Desc from $Url..."
+    try {
+        Invoke-WebRequest -Uri $Url -OutFile $OutFile -UseBasicParsing -ErrorAction Stop
+    }
+    catch {
+        if ($GITHUB_PROXY -and $Url.StartsWith($GITHUB_PROXY)) {
+            $FallbackUrl = $Url.Replace($GITHUB_PROXY, "")
+            Write-Host "Proxy failed, retrying without proxy: $FallbackUrl" -ForegroundColor Yellow
+            Invoke-WebRequest -Uri $FallbackUrl -OutFile $OutFile -UseBasicParsing
+        }
+        else {
+            throw $_
+        }
+    }
+}
+
 function Install-Checkmake {
     $BIN = "$VENV_BIN\checkmake.exe"
     if (Test-Path $BIN) { return }
 
-    Write-Host "Installing checkmake $CHECKMAKE_VERSION..."
     $ARCH = if ($env:PROCESSOR_ARCHITECTURE -eq "AMD64") { "amd64" } else { "arm64" }
     $FILE = "checkmake-$CHECKMAKE_VERSION.windows.$ARCH.exe"
     $URL = "${GITHUB_PROXY}https://github.com/checkmake/checkmake/releases/download/$CHECKMAKE_VERSION/$FILE"
 
-    Invoke-WebRequest -Uri $URL -OutFile $BIN -UseBasicParsing
+    Download-Asset -Url $URL -OutFile $BIN -Desc "checkmake"
     Write-Host "checkmake installed." -ForegroundColor Green
 }
 
