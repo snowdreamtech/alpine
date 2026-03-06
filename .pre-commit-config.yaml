@@ -186,10 +186,10 @@ repos:
       - id: sqlfluff
         name: sqlfluff lint
         language: system
-        entry: sqlfluff lint
+        entry: .venv/bin/sqlfluff lint
         args: [--dialect, postgres]
         types_or: [sql]
-        description: "SQL linter. Dialect defaults to postgres; override via .sqlfluff config."
+        description: "SQL linter. Installed via requirements-dev.txt."
 
       # ── Terraform / OpenTofu ───────────────────────────────────────────────
       # NOTE: tflint is heavy (requires plugin init) — run full scans in CI only.

@@ -58,11 +58,10 @@ jobs:
 
       - name: Run Commitlint Check
         run: |
-          npm install -g @commitlint/cli @commitlint/config-conventional
           if [ "${{ github.event_name }}" == "pull_request" ]; then
-            commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+            pnpm exec commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
           else
-            commitlint --last --verbose
+            pnpm exec commitlint --last --verbose
           fi
 
       - name: Setup pnpm
@@ -94,7 +93,12 @@ jobs:
           } >> "$GITHUB_ENV"
 
       - name: Run Gitleaks
-        run: pnpm exec gitleaks detect --source . --verbose --gitleaks-ignore-path .gitleaksignore || true
+        run: |
+          if command -v gitleaks > /dev/null 2>&1; then
+            gitleaks detect --source . --verbose --gitleaks-ignore-path .gitleaksignore || true
+          else
+            echo "gitleaks not found on system, skipping."
+          fi
 
       - name: Run markdownlint
         run: pnpm exec markdownlint-cli2 "**/*.md"
@@ -326,10 +330,15 @@ jobs:
 
       - name: Run hadolint
         run: |
-          find . -type f -name "*Dockerfile*" -not -path "*/${{ env.VENV }}/*" -not -path "*/node_modules/*" -print0 | while IFS= read -r -d '' file; do
-            echo "Linting $file"
-            ${{ env.VENV }}/bin/hadolint "$file" || hadolint "$file"
-          done
+          # Install hadolint binary if not available
+          if ! command -v hadolint > /dev/null 2>&1; then
+            HADOLINT_VERSION="v2.12.0"
+            curl -sSL "${{ vars.GH_PROXY }}https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64" \
+              -o /usr/local/bin/hadolint
+            chmod +x /usr/local/bin/hadolint
+          fi
+          find . -type f -name "*Dockerfile*" -not -path "*/${{ env.VENV }}/*" -not -path "*/node_modules/*" -print0 | \
+            xargs -0 -I{} hadolint {}
 
       - name: Run checkmake
         run: |
