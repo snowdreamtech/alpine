@@ -8,4 +8,3 @@ actionlint-py==1.7.11.24
 shfmt-py==3.12.0.2
 clang-format==19.1.7
 dotenv-linter==0.7.0
-semgrep==1.107.0
