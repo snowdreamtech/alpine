@@ -78,9 +78,9 @@ jobs:
         with:
           python-version: "3.12"
 
-      - name: Run Environment Setup
+      - name: Run Foundational Environment Setup
         run: |
-          sh scripts/setup.sh
+          sh scripts/setup.sh node python gitleaks
         env:
           VENV: ${{ env.VENV }}
 
@@ -168,8 +168,8 @@ jobs:
       - name: Run golangci-lint
         run: |
           if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.go' -print -quit)" ]; then
-            # Requires system installation or downloaded in setup.sh
-            golangci-lint run || true
+            sh scripts/setup.sh go
+            ${{ env.VENV }}/bin/golangci-lint run
           else
             echo "No Go files found, skipping golangci-lint."
           fi
@@ -257,12 +257,22 @@ jobs:
 
       - name: Run Kube-Linter and TFLint
         run: |
-          if command -v kube-linter &> /dev/null; then
-            (find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.yaml' -o -name '*.yml' \) -print0 | xargs -0 kube-linter lint) || true
+          # Detect K8s
+          if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.yaml' -o -name '*.yml' \) -print -quit)" ]; then
+            K8S_FILES=true
           fi
-          if command -v tflint &> /dev/null; then
-            if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.tf' -print -quit)" ]; then
-              tflint --init && tflint
+          # Detect TF
+          if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.tf' -print -quit)" ]; then
+            TF_FILES=true
+          fi
+
+          if [ "$K8S_FILES" = true ] || [ "$TF_FILES" = true ]; then
+            sh scripts/setup.sh iac
+            if [ "$K8S_FILES" = true ]; then
+              (find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.yaml' -o -name '*.yml' \) -print0 | xargs -0 ${{ env.VENV }}/bin/kube-linter lint) || true
+            fi
+            if [ "$TF_FILES" = true ]; then
+              ${{ env.VENV }}/bin/tflint --init && ${{ env.VENV }}/bin/tflint
             fi
           fi
 
@@ -326,15 +336,13 @@ jobs:
 
       - name: Run hadolint
         run: |
-          # Install hadolint binary if not available
-          if ! command -v hadolint > /dev/null 2>&1; then
-            HADOLINT_VERSION="v2.12.0"
-            curl -sSL "${{ vars.GH_PROXY }}https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-Linux-x86_64" \
-              -o /usr/local/bin/hadolint
-            chmod +x /usr/local/bin/hadolint
+          if [ -n "$(find . -type f -name "*Dockerfile*" -not -path "*/${{ env.VENV }}/*" -not -path "*/node_modules/*" -print -quit)" ]; then
+            sh scripts/setup.sh hadolint
+            find . -type f -name "*Dockerfile*" -not -path "*/${{ env.VENV }}/*" -not -path "*/node_modules/*" -print0 | \
+              xargs -0 -I{} ${{ env.VENV }}/bin/hadolint {}
+          else
+            echo "No Dockerfiles found, skipping hadolint."
           fi
-          find . -type f -name "*Dockerfile*" -not -path "*/${{ env.VENV }}/*" -not -path "*/node_modules/*" -print0 | \
-            xargs -0 -I{} hadolint {}
 
       - name: Run checkmake
         run: |
