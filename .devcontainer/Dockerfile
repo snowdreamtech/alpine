@@ -14,10 +14,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     curl git make python3 python3-pip python3-venv nodejs npm golang-go \
     shellcheck hadolint shfmt gitleaks ruff clang-format openjdk-17-jre-headless unzip \
     && apt-get clean && rm -rf /var/lib/apt/lists/* \
-    && npm install -g \
-    markdownlint-cli2 prettier editorconfig-checker eslint \
-    @stoplight/spectral-cli @commitlint/cli @commitlint/config-conventional \
-    stylelint stylelint-config-standard @taplo/cli sort-package-json \
+    && corepack enable \
     && pip3 install --no-cache-dir \
     pre-commit yamllint sqlfluff actionlint-py ansible-lint \
     && curl -fLsS https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b /usr/local/bin \
