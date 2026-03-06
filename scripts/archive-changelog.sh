@@ -1,16 +1,36 @@
 #!/bin/sh
 # scripts/archive-changelog.sh - Automate major-version changelog archiving
 # This script moves entries of previous major versions from CHANGELOG.md to archival files.
-# Features: POSIX compliant, Atomic Operations, Deduplication.
+# Features: POSIX compliant, Atomic Operations, Deduplication, Safety Traps, History Sorting.
 
 set -e
 
 CHANGELOG="CHANGELOG.md"
 PACKAGE_JSON="package.json"
+DRY_RUN=0
+
+# Argument parsing
+for arg in "$@"; do
+  if [ "$arg" = "--dry-run" ]; then
+    DRY_RUN=1
+    echo "Running in DRY-RUN mode. No changes will be applied."
+  fi
+done
 
 if [ ! -f "$CHANGELOG" ] || [ ! -f "$PACKAGE_JSON" ]; then
   exit 0
 fi
+
+# Cleanup on exit
+TMP_HEADER=$(mktemp)
+TMP_ARCHIVE_PREFIX=$(mktemp -d)
+NEW_CHANGELOG=$(mktemp)
+
+cleanup() {
+  rm -f "$TMP_HEADER" "$NEW_CHANGELOG"
+  rm -rf "$TMP_ARCHIVE_PREFIX"
+}
+trap cleanup EXIT INT TERM
 
 # Get current major version from package.json
 if command -v jq >/dev/null 2>&1; then
@@ -20,17 +40,10 @@ else
   CURRENT_MAJOR=$(grep '"version":' "$PACKAGE_JSON" | head -n 1 | sed 's/.*"//;s/\..*//')
 fi
 
-# Temp files
-TMP_HEADER=$(mktemp)
-TMP_ARCHIVE_PREFIX=$(mktemp -d)
-NEW_CHANGELOG=$(mktemp)
-
 # 1. Extract the header (everything up to the first version header)
 FIRST_H2_LINE=$(grep -n "^## \[" "$CHANGELOG" | head -n1 | cut -d: -f1)
 if [ -z "$FIRST_H2_LINE" ]; then
   # No version headers found yet
-  rm -f "$TMP_HEADER" "$NEW_CHANGELOG"
-  rm -rf "$TMP_ARCHIVE_PREFIX"
   exit 0
 fi
 
@@ -76,8 +89,7 @@ for arch_file in "$TMP_ARCHIVE_PREFIX"/v*.md; do
   FINAL_ARCH_FILE="CHANGELOG-v$v_num.md"
 
   if [ -f "$FINAL_ARCH_FILE" ]; then
-    # Deduplication: only prepend blocks not already in the archive
-    # Use awk to filter out existing version headers
+    # Deduplication
     FILTERED_CONTENT=$(mktemp)
     awk -v arch="$FINAL_ARCH_FILE" '
       BEGIN {
@@ -94,38 +106,60 @@ for arch_file in "$TMP_ARCHIVE_PREFIX"/v*.md; do
     ' "$arch_file" >"$FILTERED_CONTENT"
 
     if [ -s "$FILTERED_CONTENT" ]; then
-      tmp_arch=$(mktemp)
-      cat "$FILTERED_CONTENT" >"$tmp_arch"
-      printf "\n" >>"$tmp_arch"
-      # Skip first two lines (header) of existing archive
-      sed '1,2d' "$FINAL_ARCH_FILE" >>"$tmp_arch"
-      mv "$tmp_arch" "$FINAL_ARCH_FILE"
+      if [ "$DRY_RUN" -eq 1 ]; then
+        echo "DRY-RUN: Would prepend new entries to $FINAL_ARCH_FILE"
+      else
+        tmp_arch=$(mktemp)
+        cat "$FILTERED_CONTENT" >"$tmp_arch"
+        printf "\n" >>"$tmp_arch"
+        sed '1,2d' "$FINAL_ARCH_FILE" >>"$tmp_arch"
+        mv "$tmp_arch" "$FINAL_ARCH_FILE"
+      fi
     fi
     rm -f "$FILTERED_CONTENT"
   else
-    # New archive file
-    printf "# Changelog Archive v%s\n\n" "$v_num" >"$FINAL_ARCH_FILE"
-    cat "$arch_file" >>"$FINAL_ARCH_FILE"
-  fi
-
-  # Add/Update History section link in the NEW_CHANGELOG
-  if ! grep -q "^## History" "$NEW_CHANGELOG"; then
-    printf "\n## History\n\n" >>"$NEW_CHANGELOG"
-  fi
-
-  LINK="- [v$v_num.x.x Archive](./$FINAL_ARCH_FILE)"
-  if ! grep -Fq -- "$LINK" "$NEW_CHANGELOG"; then
-    tmp_cl=$(mktemp)
-    sed "/^## History/a\\
-$LINK
-" "$NEW_CHANGELOG" >"$tmp_cl"
-    mv "$tmp_cl" "$NEW_CHANGELOG"
+    if [ "$DRY_RUN" -eq 1 ]; then
+      echo "DRY-RUN: Would create $FINAL_ARCH_FILE"
+    else
+      printf "# Changelog Archive v%s\n\n" "$v_num" >"$FINAL_ARCH_FILE"
+      cat "$arch_file" >>"$FINAL_ARCH_FILE"
+    fi
   fi
 done
 
-# 5. Final Swap (Atomic)
-mv "$NEW_CHANGELOG" "$CHANGELOG"
+# 5. Rebuild History section in NEW_CHANGELOG (Sorted)
+# Collect all archive files (existing and newly created/planned)
+HISTORY_LINKS_TMP=$(mktemp)
+# Check filesystem for existing archives
+for f in CHANGELOG-v*.md; do
+  [ -e "$f" ] || continue
+  v_num=$(echo "$f" | sed 's/^CHANGELOG-v//;s/\.md$//')
+  printf "%s|%s\n" "$v_num" "- [v$v_num.x.x Archive](./$f)" >>"$HISTORY_LINKS_TMP"
+done
 
-# Cleanup
-rm -f "$TMP_HEADER"
-rm -rf "$TMP_ARCHIVE_PREFIX"
+# Merge with newly planned archives from TMP_ARCHIVE_PREFIX
+for f in "$TMP_ARCHIVE_PREFIX"/v*.md; do
+  [ -e "$f" ] || continue
+  v_num=$(echo "$f" | sed 's|^.*/v||;s/.md$//')
+  link="- [v$v_num.x.x Archive](./CHANGELOG-v$v_num.md)"
+  # Avoid duplicates in the link list
+  if ! grep -qF "$link" "$HISTORY_LINKS_TMP"; then
+    printf "%s|%s\n" "$v_num" "$link" >>"$HISTORY_LINKS_TMP"
+  fi
+done
+
+if [ -s "$HISTORY_LINKS_TMP" ]; then
+  printf "\n## History\n\n" >>"$NEW_CHANGELOG"
+  # Sort versions descending (-n for numeric, -r for reverse)
+  sort -t'|' -k1,1nr "$HISTORY_LINKS_TMP" | cut -d'|' -f2 >>"$NEW_CHANGELOG"
+fi
+rm -f "$HISTORY_LINKS_TMP"
+
+# 6. Final Swap (Atomic)
+if [ "$DRY_RUN" -eq 1 ]; then
+  echo "DRY-RUN: Would update $CHANGELOG with the following History section:"
+  grep -A 100 "^## History" "$NEW_CHANGELOG" || true
+else
+  mv "$NEW_CHANGELOG" "$CHANGELOG"
+  echo "Archiving complete!"
+fi
