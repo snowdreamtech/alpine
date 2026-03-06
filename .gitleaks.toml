@@ -1,19 +1,62 @@
 # .gitleaks.toml
-# Gitleaks configuration file with path exclusions
+# Gitleaks scan exclusion configuration.
+#
+# Design goals:
+#   1. SCAN: All project source, configuration, and script files.
+#   2. SKIP: Pure build artifacts, package caches, and binary-heavy directories
+#            that never contain credentials and slow down the scan significantly.
+#   3. SAFE: For virtual environments (env/, venv/, .venv/), only skip the
+#            standard subdirectories (bin/, lib/, etc.). The root of env/ is
+#            still scanned, so a misplaced .env file is caught.
+#
+# NOTE: All patterns are Go regex and are matched against the full file path.
 
 [allowlist]
-description = "Global allowlist for build artifacts and environments"
+description = "Skip build artifacts and package caches; scan all project source."
 paths = [
-  '''\.git/''',
+  # ── Git Internal Objects (never contains user secrets, just object hashes) ──
+  '''\.git/objects/''',
+  '''\.git/logs/''',
+  '''\.git/refs/''',
+  '''\.git/packed-refs''',
+
+  # ── Package Manager Caches (third-party code, not project-authored) ────────
+  # KEEP pnpm-lock.yaml, yarn.lock, etc. in scope — they are text files
+  # committed to the repo and occasionally contain URLs with embedded tokens.
   '''node_modules/''',
-  '''(\.venv|venv|env)/(bin|lib|include|share|scripts|Lib|Scripts)/''',
-  '''vendor/''',
-  '''dist/''',
-  '''build/''',
-  '''out/''',
-  '''target/''',
-  '''\.next/''',
-  '''\.nuxt/''',
-  '''\.output/''',
+
+  # ── Python Virtual Environments ────────────────────────────────────────────
+  # Only skip standard venv subdirectories (binary/library files).
+  # The root of env/ or venv/ IS scanned, so a misplaced .env file is caught.
+  '''(\.venv|venv|env)/(bin|lib|lib64|include|share|scripts|Lib|Scripts|pyvenv\.cfg)/''',
+
+  # ── Go / Rust / Java / PHP Dependency Cache ────────────────────────────────
+  # Only skip the vendor directory for dependency caches.
+  # vendor/ typically contains third-party source, not project secrets.
+  '''(^|/)vendor/''',
+
+  # ── Frontend Framework Build Output ────────────────────────────────────────
+  # These are generated, minified, and binary-heavy. No secrets should live here.
+  '''(^|/)dist/''',
+  '''(^|/)build/''',
+  '''(^|/)out/''',
+  '''(^|/)target/''',
+  '''(^|/)\.next/''',
+  '''(^|/)\.nuxt/''',
+  '''(^|/)\.output/''',
+
+  # ── Python Bytecode Cache ──────────────────────────────────────────────────
   '''__pycache__/''',
+  '''.*\.pyc$''',
+
+  # ── Test Coverage & Temporary Reports ─────────────────────────────────────
+  # Coverage reports are generated, contain no secrets.
+  '''(^|/)coverage/''',
+  '''(^|/)\.pytest_cache/''',
+  '''(^|/)\.tmp/''',
+  '''(^|/)tmp/''',
+
+  # ── IDE and OS Artifacts ───────────────────────────────────────────────────
+  # These are editor-local and contain no credentials.
+  '''\.(DS_Store|Thumbs\.db)$''',
 ]
