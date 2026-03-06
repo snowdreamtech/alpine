@@ -3,6 +3,10 @@
 
 $VENV = if ($env:VENV) { $env:VENV } else { ".venv" }
 $PYTHON = if ($env:PYTHON) { $env:PYTHON } else { "python" }
+$GITHUB_PROXY = if ($env:GITHUB_PROXY) { $env:GITHUB_PROXY } else { "https://gh-proxy.sn0wdr1am.com/" }
+
+# Tool Versions
+$CHECKMAKE_VERSION = "v0.3.2"
 
 Write-Host "🚀 Initializing Snowdream Tech AI IDE Template for Windows..." -ForegroundColor Blue
 
@@ -35,7 +39,23 @@ if (Test-Path requirements-dev.txt) {
 
 # 3. System Tools Setup (Project-Local)
 Write-Host "`n[3/4] Ensuring system tools are installed locally..." -ForegroundColor Yellow
-Write-Host "All tools (shellcheck, hadolint, gitleaks, etc.) are now installed via npm/pip into $VENV or node_modules."
+
+function Install-Checkmake {
+    $BIN = "$VENV_BIN\checkmake.exe"
+    if (Test-Path $BIN) { return }
+
+    Write-Host "Installing checkmake $CHECKMAKE_VERSION..."
+    $ARCH = if ($env:PROCESSOR_ARCHITECTURE -eq "AMD64") { "amd64" } else { "arm64" }
+    $FILE = "checkmake-$CHECKMAKE_VERSION.windows.$ARCH.exe"
+    $URL = "${GITHUB_PROXY}https://github.com/checkmake/checkmake/releases/download/$CHECKMAKE_VERSION/$FILE"
+
+    Invoke-WebRequest -Uri $URL -OutFile $BIN -UseBasicParsing
+    Write-Host "checkmake installed." -ForegroundColor Green
+}
+
+Install-Checkmake
+
+Write-Host "All tools (checkmake, shellcheck, hadolint, gitleaks, etc.) are now installed into $VENV_BIN or node_modules."
 Write-Host "This ensures version consistency across all environments."
 
 # 4. Pre-commit Hooks Setup

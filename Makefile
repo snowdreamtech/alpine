@@ -30,12 +30,7 @@ PYTHON     ?= python3
 VENV       ?= .venv
 PIP        ?= $(VENV)/bin/pip3
 NODE       ?= node
-NPM_DETECTOR := $(shell \
-	if command -v pnpm >/dev/null 2>&1; then echo "pnpm"; \
-	elif command -v yarn >/dev/null 2>&1; then echo "yarn"; \
-	elif command -v bun >/dev/null 2>&1; then echo "bun"; \
-	else echo "npm"; fi)
-NPM        ?= $(NPM_DETECTOR)
+NPM        ?= pnpm
 PRE_COMMIT ?= $(VENV)/bin/pre-commit
 GORELEASER ?= goreleaser
 GITHUB_PROXY ?= https://gh-proxy.sn0wdr1am.com/
@@ -110,7 +105,10 @@ endif
 	@echo "$(GREEN)Setup complete!$(RESET)"
 
 # Install project-level dependencies
-install: setup
+install:
+	@echo "$(BLUE)Installing project-level dependencies...$(RESET)"
+	@$(NPM) install
+	@$(VENV)/bin/pip install -r requirements-dev.txt
 	@echo "$(GREEN)Dependencies installed!$(RESET)"
 
 # Run test suite
@@ -121,8 +119,6 @@ test:
 	@if command -v pwsh >/dev/null 2>&1; then \
 		echo "$(BLUE)Running Pester (PowerShell)...$(RESET)"; \
 		$(NPM) run test:ps; \
-	else \
-		echo "$(YELLOW)pwsh not found. Skipping Pester tests.$(RESET)"; \
 	fi
 	@if [ -f pytest.ini ] || [ -f pyproject.toml ] || { [ -d tests ] && find tests -name "test_*.py" -o -name "*_test.py" | grep -q . ; }; then \
 		echo "$(BLUE)Running pytest...$(RESET)"; \
@@ -139,45 +135,6 @@ test:
 commit:
 	@echo "$(BOLD)Starting interactive Commitizen CLI...$(RESET)"
 	$(NPM) run commit
-
-# Build project artifacts
-# Run all pre-commit hooks
-# First pass: let hooks auto-fix files (whitespace, formatting, etc.)
-# Second pass: verify no issues remain after fixes
-lint:
-	@echo "$(BOLD)Running pre-commit hooks on all files...$(RESET)"
-	@echo "$(BLUE)Pass 1/2: Applying auto-fixes...$(RESET)"
-	@$(PRE_COMMIT) run --all-files || true
-	@echo "$(BLUE)Pass 2/2: Verifying all checks pass...$(RESET)"
-	@$(PRE_COMMIT) run --all-files
-	@echo "$(GREEN)Lint complete!$(RESET)"
-
-# Auto-format code
-format:
-	@echo "$(BOLD)Formatting code...$(RESET)"
-	@if [ -x $(VENV)/bin/ruff ]; then \
-		echo "$(BLUE)Running ruff format...$(RESET)"; \
-		$(VENV)/bin/ruff format $(RUFF_EXCLUDES) .; \
-	fi
-	@if [ -x $(VENV)/bin/shfmt ]; then \
-		echo "$(BLUE)Running shfmt...$(RESET)"; \
-		find . -type f -name "*.sh" $(FIND_EXCLUDES) -exec $(VENV)/bin/shfmt -w -i 2 {} +; \
-	elif command -v shfmt >/dev/null 2>&1; then \
-		echo "$(BLUE)Running system shfmt...$(RESET)"; \
-		find . -type f -name "*.sh" $(FIND_EXCLUDES) -exec shfmt -w -i 2 {} +; \
-	fi
-	@echo "$(BLUE)Running prettier...$(RESET)"
-	@$(NPM) exec prettier --write .
-	@if command -v gofmt >/dev/null 2>&1 && [ -f go.mod ]; then \
-		echo "$(BLUE)Running gofmt...$(RESET)"; \
-		find . -type f -name "*.go" $(FIND_EXCLUDES) -exec gofmt -w {} +; \
-	fi
-	@if [ -x $(VENV)/bin/clang-format ]; then \
-		echo "$(BLUE)Running clang-format...$(RESET)"; \
-		find . -type f \( -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.m" -o -name "*.mm" \) $(FIND_EXCLUDES) -exec $(VENV)/bin/clang-format -i {} +; \
-	fi
-	@echo "$(GREEN)Formatting complete!$(RESET)"
-
 
 # Build project artifacts
 build:
@@ -198,50 +155,74 @@ build:
 		echo "$(YELLOW)No build system detected. Skipping.$(RESET)"; \
 	fi
 
+# Run all pre-commit hooks
+lint:
+	@echo "$(BOLD)Running pre-commit hooks on all files...$(RESET)"
+	@echo "$(BLUE)Pass 1/2: Applying auto-fixes...$(RESET)"
+	@$(PRE_COMMIT) run --all-files || true
+	@echo "$(BLUE)Pass 2/2: Verifying all checks pass...$(RESET)"
+	@$(PRE_COMMIT) run --all-files
+	@echo "$(GREEN)Lint complete!$(RESET)"
+
+# Auto-format code
+format:
+	@echo "$(BOLD)Formatting code...$(RESET)"
+	@echo "$(BLUE)Running ruff format...$(RESET)"
+	$(VENV)/bin/ruff format $(RUFF_EXCLUDES) .
+	@echo "$(BLUE)Running shfmt...$(RESET)"
+	find . -type f -name "*.sh" $(FIND_EXCLUDES) -exec $(VENV)/bin/shfmt -w -i 2 {} +
+	@echo "$(BLUE)Running prettier...$(RESET)"
+	@$(NPM) exec prettier --write .
+	@if [ -f go.mod ]; then \
+		echo "$(BLUE)Running gofmt...$(RESET)"; \
+		find . -type f -name "*.go" $(FIND_EXCLUDES) -exec gofmt -w {} +; \
+	fi
+	@echo "$(BLUE)Running clang-format...$(RESET)"
+	find . -type f \( -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.m" -o -name "*.mm" \) $(FIND_EXCLUDES) -exec $(VENV)/bin/clang-format -i {} +
+	@echo "$(GREEN)Formatting complete!$(RESET)"
+
 # Security and dependency audit
 check:
 	@echo "$(BOLD)Running security and dependency checks...$(RESET)"
 	@echo "$(BLUE)Checking for secrets with gitleaks...$(RESET)"
-	@$(NPM) exec gitleaks detect --source . --no-git || true
-	@if [ -x $(VENV)/bin/ruff ] && ([ -f pyproject.toml ] || find . -type f -name "*.py" $(FIND_EXCLUDES) | grep -q .); then \
-		echo "$(BLUE)Checking Python code with ruff...$(RESET)"; \
-		$(VENV)/bin/ruff check $(RUFF_EXCLUDES) .; \
-	fi
-	@if [ -x $(VENV)/bin/yamllint ]; then \
-		echo "$(BLUE)Checking YAML with yamllint...$(RESET)"; \
+	$(VENV)/bin/gitleaks detect --source . --no-git || true
+	@if find . -type f \( -name "*.yaml" -o -name "*.yml" \) $(FIND_EXCLUDES) | grep -q . ; then \
+		echo "$(BLUE)Checking YAML files with yamllint...$(RESET)"; \
 		find . -type f \( -name "*.yaml" -o -name "*.yml" \) $(FIND_EXCLUDES) -print0 | xargs -0 $(VENV)/bin/yamllint; \
 	fi
-	@if [ -x $(VENV)/bin/sqlfluff ]; then \
-		echo "$(BLUE)Checking SQL with sqlfluff...$(RESET)"; \
-		find . -type f -name "*.sql" $(FIND_EXCLUDES) -exec $(VENV)/bin/sqlfluff lint {} --dialect postgres +; \
+	@if find . -type f -name "*.sql" $(FIND_EXCLUDES) | grep -q . ; then \
+		echo "$(BLUE)Checking SQL files with sqlfluff...$(RESET)"; \
+		find . -type f -name "*.sql" $(FIND_EXCLUDES) -exec $(VENV)/bin/sqlfluff lint --dialect postgres {} +; \
 	fi
-	@if [ -x $(VENV)/bin/ansible-lint ]; then \
-		echo "$(BLUE)Checking Ansible with ansible-lint...$(RESET)"; \
-		$(VENV)/bin/ansible-lint -v; \
-	fi
-	@if [ -x $(VENV)/bin/shellcheck ]; then \
+	@echo "$(BLUE)Checking Ansible with ansible-lint...$(RESET)"
+	$(VENV)/bin/ansible-lint -v
+	@if find . -type f -name "*.sh" $(FIND_EXCLUDES) | grep -q . ; then \
 		echo "$(BLUE)Checking shell scripts with shellcheck...$(RESET)"; \
 		find . -type f -name "*.sh" $(FIND_EXCLUDES) -exec $(VENV)/bin/shellcheck {} +; \
 	fi
-	@if [ -x $(VENV)/bin/hadolint ]; then \
+	@if find . -type f -name "*Dockerfile*" $(FIND_EXCLUDES) | grep -q . ; then \
 		echo "$(BLUE)Checking Dockerfiles with hadolint...$(RESET)"; \
 		find . -type f -name "*Dockerfile*" $(FIND_EXCLUDES) -exec $(VENV)/bin/hadolint {} +; \
 	fi
-	@if [ -x $(VENV)/bin/actionlint ]; then \
-		echo "$(BLUE)Checking GitHub Actions with actionlint...$(RESET)"; \
-		$(VENV)/bin/actionlint; \
-	fi
-	@if [ -x $(VENV)/bin/dotenv-linter ]; then \
+	@echo "$(BLUE)Checking GitHub Actions with actionlint...$(RESET)"
+	$(VENV)/bin/actionlint
+	@if find . -type f -name ".env*" $(FIND_EXCLUDES) | grep -q . ; then \
 		echo "$(BLUE)Checking .env files with dotenv-linter...$(RESET)"; \
-		$(VENV)/bin/dotenv-linter .env; \
+		find . -type f -name ".env*" $(FIND_EXCLUDES) -exec $(VENV)/bin/dotenv-linter {} +; \
 	fi
 	@echo "$(BLUE)Checking Kotlin with ktlint...$(RESET)"
-	@$(NPM) exec ktlint || true
-	@echo "$(BLUE)Checking API contracts with spectral...$(RESET)"
-	@find . -type f \( -iname "*openapi*" -o -iname "*swagger*" -o -iname "*asyncapi*" \) $(FIND_EXCLUDES) -exec $(NPM) exec spectral lint {} + || true
+	$(NPM) exec ktlint || true
+	@if find . -type f \( -iname "*openapi*" -o -iname "*swagger*" -o -iname "*asyncapi*" \) $(FIND_EXCLUDES) | grep -q . ; then \
+		echo "$(BLUE)Checking API contracts with spectral...$(RESET)"; \
+		find . -type f \( -iname "*openapi*" -o -iname "*swagger*" -o -iname "*asyncapi*" \) $(FIND_EXCLUDES) -exec $(NPM) exec spectral lint {} + || true; \
+	fi
 	@echo "$(BLUE)Checking TOML with taplo...$(RESET)"
-	@$(NPM) exec taplo format --check || true
-	@if [ -f go.mod ] && command -v govulncheck >/dev/null 2>&1; then \
+	$(NPM) exec taplo format --check || true
+	@if find . -type f -name 'Makefile' $(FIND_EXCLUDES) | grep -q . ; then \
+		echo "$(BLUE)Checking Makefiles with checkmake...$(RESET)"; \
+		find . -type f -name 'Makefile' $(FIND_EXCLUDES) -exec $(VENV)/bin/checkmake --config .checkmake.ini {} +; \
+	fi
+	@if [ -f go.mod ]; then \
 		echo "$(BLUE)Checking Go vulnerabilities with govulncheck...$(RESET)"; \
 		govulncheck ./...; \
 	fi

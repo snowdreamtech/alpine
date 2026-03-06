@@ -15,6 +15,7 @@ GITHUB_PROXY=${GITHUB_PROXY:-https://gh-proxy.sn0wdr1am.com/}
 GITLEAKS_VERSION=${GITLEAKS_VERSION:-v8.26.0}
 HADOLINT_VERSION=${HADOLINT_VERSION:-v2.12.0}
 GOLANGCI_VERSION=${GOLANGCI_VERSION:-v1.64.6}
+CHECKMAKE_VERSION=${CHECKMAKE_VERSION:-v0.3.2}
 TFLINT_VERSION=${TFLINT_VERSION:-v0.55.1}
 KUBE_LINTER_VERSION=${KUBE_LINTER_VERSION:-v0.7.2}
 
@@ -33,9 +34,15 @@ x86_64) _ARCH_N="x64" ;;
 aarch64 | arm64) _ARCH_N="arm64" ;;
 *) _ARCH_N="x64" ;;
 esac
+
+_EXE=""
 case "${OS}" in
 darwin) _OS_TAG="darwin" ;;
 linux) _OS_TAG="linux" ;;
+msys* | mingw*)
+  _OS_TAG="windows"
+  _EXE=".exe"
+  ;;
 *) _OS_TAG="linux" ;;
 esac
 
@@ -72,10 +79,13 @@ setup_python() {
 }
 
 install_gitleaks() {
-  _BIN="${VENV}/bin/gitleaks"
+  _BIN="${VENV}/bin/gitleaks${_EXE}"
   if [ -x "${_BIN}" ]; then return 0; fi
   log "── Installing gitleaks ${GITLEAKS_VERSION} ──"
-  _TAR="gitleaks_${GITLEAKS_VERSION#v}_${_OS_TAG}_${_ARCH_N}.tar.gz"
+  _TAR_TAG="${_OS_TAG}"
+  [ "${_OS_TAG}" = "windows" ] && _TAR_TAG="windows" # redundant but explicit
+  _TAR="gitleaks_${GITLEAKS_VERSION#v}_${_TAR_TAG}_${_ARCH_N}.tar.gz"
+  # zip for windows? No, gitleaks provides .tar.gz even for windows.
   _URL="${GITHUB_PROXY}https://github.com/gitleaks/gitleaks/releases/download/${GITLEAKS_VERSION}/${_TAR}"
   _TMP=$(mktemp -d)
   if curl --retry 3 -fsSL "${_URL}" -o "${_TMP}/gitleaks.tar.gz"; then
@@ -90,11 +100,13 @@ install_gitleaks() {
 }
 
 install_hadolint() {
-  _BIN="${VENV}/bin/hadolint"
+  _BIN="${VENV}/bin/hadolint${_EXE}"
   if [ -x "${_BIN}" ]; then return 0; fi
   log "── Installing hadolint ${HADOLINT_VERSION} ──"
   _SUFFIX="Linux-x86_64"
-  if [ "${OS}" = "darwin" ]; then _SUFFIX="Darwin-x86_64"; fi
+  if [ "${OS}" = "darwin" ]; then
+    _SUFFIX="Darwin-x86_64"
+  elif [ "${_OS_TAG}" = "windows" ]; then _SUFFIX="Windows-x86_64.exe"; fi
   _URL="${GITHUB_PROXY}https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-${_SUFFIX}"
   if curl --retry 3 -fsSL "${_URL}" -o "${_BIN}"; then
     chmod +x "${_BIN}"
@@ -112,6 +124,26 @@ install_go_lint() {
   export BINDIR="${VENV}/bin"
   curl -sSfL "${GITHUB_PROXY}https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh" | bash -s -- "${GOLANGCI_VERSION}"
   info "golangci-lint installed."
+}
+
+install_checkmake() {
+  _BIN="${VENV}/bin/checkmake${_EXE}"
+  if [ -x "${_BIN}" ]; then return 0; fi
+  log "── Installing checkmake ${CHECKMAKE_VERSION} ──"
+  _OS_S="${_OS_TAG}"
+  _ARCH_S="amd64"
+  [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _ARCH_S="arm64"
+
+  # Asset name: checkmake-v0.3.2.darwin.arm64 (direct binary)
+  _FILE="checkmake-${CHECKMAKE_VERSION}.${_OS_S}.${_ARCH_S}${_EXE}"
+  _URL="${GITHUB_PROXY}https://github.com/checkmake/checkmake/releases/download/${CHECKMAKE_VERSION}/${_FILE}"
+
+  if curl --retry 3 -fsSL "${_URL}" -o "${_BIN}"; then
+    chmod +x "${_BIN}"
+    info "checkmake installed."
+  else
+    error "Failed to download checkmake from ${_URL}"
+  fi
 }
 
 install_iac_lint() {
@@ -157,7 +189,7 @@ setup_hooks() {
 # ── Main Execution ───────────────────────────────────────────────────────────
 
 if [ $# -eq 0 ]; then
-  modules="node python gitleaks hooks"
+  modules="node python gitleaks checkmake hooks"
 else
   modules="$*"
 fi
@@ -167,6 +199,7 @@ for module in $modules; do
   node) setup_node ;;
   python) setup_python ;;
   gitleaks) install_gitleaks ;;
+  checkmake) install_checkmake ;;
   hadolint) install_hadolint ;;
   go) install_go_lint ;;
   iac) install_iac_lint ;;
@@ -175,6 +208,7 @@ for module in $modules; do
     setup_node
     setup_python
     install_gitleaks
+    install_checkmake
     install_hadolint
     install_go_lint
     install_iac_lint
