@@ -9,12 +9,32 @@ CHANGELOG="CHANGELOG.md"
 PACKAGE_JSON="package.json"
 DRY_RUN=0
 
+# Help message
+show_help() {
+  cat <<EOF
+Usage: $0 [OPTIONS]
+
+Automates the movement of older major version entries from $CHANGELOG
+to archival files (e.g., CHANGELOG-v1.md) and maintains a history section.
+
+Options:
+  --dry-run    Preview changes without modifying files.
+  --help       Show this help message.
+EOF
+}
+
 # Argument parsing
 for arg in "$@"; do
-  if [ "$arg" = "--dry-run" ]; then
+  case "$arg" in
+  --dry-run)
     DRY_RUN=1
     echo "Running in DRY-RUN mode. No changes will be applied."
-  fi
+    ;;
+  --help)
+    show_help
+    exit 0
+    ;;
+  esac
 done
 
 if [ ! -f "$CHANGELOG" ] || [ ! -f "$PACKAGE_JSON" ]; then
@@ -36,7 +56,6 @@ trap cleanup EXIT INT TERM
 if command -v jq >/dev/null 2>&1; then
   CURRENT_MAJOR=$(jq -r '.version | split(".")[0]' "$PACKAGE_JSON")
 else
-  # Portable extraction using grep/sed (BRE only)
   CURRENT_MAJOR=$(grep '"version":' "$PACKAGE_JSON" | head -n 1 | sed 's/.*"//;s/\..*//')
 fi
 
@@ -60,12 +79,14 @@ fi
 head -n "$((FIRST_H2_LINE - 1))" "$CHANGELOG" >"$TMP_HEADER"
 
 # 2. Process all versions using a portable awk approach
+# Includes protection to skip existing History section
 echo "Scanning $CHANGELOG for older major versions..."
 tail -n +"$FIRST_H2_LINE" "$CHANGELOG" | awk -v major="$CURRENT_MAJOR" -v prefix="$TMP_ARCHIVE_PREFIX" '
+  /^## History/ { skip_history = 1; next; }
   /^## \[/ {
+    skip_history = 0;
     line = $0;
     sub(/^## \[/, "", line);
-    # Normalize version (remove leading v, extract major)
     sub(/^v/, "", line);
     split(line, parts, ".");
     v_major = parts[1];
@@ -81,6 +102,7 @@ tail -n +"$FIRST_H2_LINE" "$CHANGELOG" | awk -v major="$CURRENT_MAJOR" -v prefix
     }
   }
   {
+    if (skip_history) next;
     if (output == "") output = "current";
     target = prefix "/" output ".md";
     print >> target;
@@ -102,7 +124,6 @@ for arch_file in "$TMP_ARCHIVE_PREFIX"/v*.md; do
   FINAL_ARCH_FILE="CHANGELOG-v$v_num.md"
 
   if [ -f "$FINAL_ARCH_FILE" ]; then
-    # Deduplication
     FILTERED_CONTENT=$(mktemp)
     awk -v arch="$FINAL_ARCH_FILE" '
       BEGIN {
@@ -145,26 +166,23 @@ done
 # 5. Rebuild History section in NEW_CHANGELOG (Sorted)
 echo "Rebuilding History section..."
 HISTORY_LINKS_TMP=$(mktemp)
-# Check filesystem for existing archives
 for f in CHANGELOG-v*.md; do
   [ -e "$f" ] || continue
   v_num=$(echo "$f" | sed 's/^CHANGELOG-v//;s/\.md$//')
   printf "%s|%s\n" "$v_num" "- [v$v_num.x.x Archive](./$f)" >>"$HISTORY_LINKS_TMP"
 done
 
-# Merge with newly planned archives from TMP_ARCHIVE_PREFIX
 for f in "$TMP_ARCHIVE_PREFIX"/v*.md; do
   [ -e "$f" ] || continue
   v_num=$(echo "$f" | sed 's|^.*/v||;s/.md$//')
   link="- [v$v_num.x.x Archive](./CHANGELOG-v$v_num.md)"
-  # Avoid duplicates in the link list
-  if ! grep -qF -- "$link" "$HISTORY_LINKS_TMP"; then
+  if ! grep -qF -- "$link" "$HISTORY_LINKS_TMP" 2>/dev/null; then
     printf "%s|%s\n" "$v_num" "$link" >>"$HISTORY_LINKS_TMP"
   fi
 done
 
 if [ -s "$HISTORY_LINKS_TMP" ]; then
-  printf "\n## History\n\n" >>"$NEW_CHANGELOG"
+  printf "\n## History\n" >>"$NEW_CHANGELOG"
   sort -t'|' -k1,1nr "$HISTORY_LINKS_TMP" | cut -d'|' -f2 >>"$NEW_CHANGELOG"
 fi
 rm -f "$HISTORY_LINKS_TMP"
