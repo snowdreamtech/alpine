@@ -310,8 +310,8 @@ jobs:
       - name: Run Semgrep
         uses: semgrep/semgrep-action@v1
         with:
-          publishToken: ${{ secrets.SEMGREP_APP_TOKEN }}
-          publishDeployment: ${{ secrets.SEMGREP_DEPLOYMENT_ID }}
+          # publishToken: ${{ secrets.SEMGREP_APP_TOKEN }}
+          # publishDeployment: ${{ secrets.SEMGREP_DEPLOYMENT_ID }}
           config: >-
             p/default
           exclude: >
