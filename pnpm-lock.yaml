@@ -13,6 +13,9 @@ importers:
       "@commitlint/config-conventional":
         specifier: 19.7.1
         version: 19.7.1
+      "@naturalcycles/ktlint":
+        specifier: 1.5.0
+        version: 1.5.0
       "@stoplight/spectral-cli":
         specifier: 6.11.1
         version: 6.11.1
@@ -34,12 +37,18 @@ importers:
       cz-conventional-changelog:
         specifier: 3.3.0
         version: 3.3.0(@types/node@25.3.3)(typescript@5.9.3)
+      dockerfile-utils:
+        specifier: 0.16.3
+        version: 0.16.3
       editorconfig-checker:
         specifier: 6.0.0
         version: 6.0.0
       eslint:
         specifier: 9.21.0
         version: 9.21.0(jiti@2.6.1)
+      gitleaks:
+        specifier: 1.0.0
+        version: 1.0.0
       markdownlint-cli2:
         specifier: 0.21.0
         version: 0.21.0
@@ -631,6 +640,12 @@ packages:
   "@keyv/serialize@1.1.1":
     resolution:
       { integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA== }
+
+  "@naturalcycles/ktlint@1.5.0":
+    resolution:
+      { integrity: sha512-tJI8Q0XeXkUd0iSDXY7V9MpHlrc8eZL4Zt6xQMCQ699fzfsYen+SIqNqQHzei3QwfFAnM6J0Q7KOoMMy7tcfRw== }
+    engines: { node: ">=14.15.0" }
+    hasBin: true
 
   "@nodelib/fs.scandir@2.1.5":
     resolution:
@@ -1708,6 +1723,15 @@ packages:
       { integrity: sha512-WkrWp9GR4KXfKGYzOLmTuGVi1UWFfws377n9cc55/tb6DuqyF6pcQ5AbiHEshaDpY9v6oaSr2XCDidGmMwdzIA== }
     engines: { node: ">=8" }
 
+  dockerfile-ast@0.7.1:
+    resolution:
+      { integrity: sha512-oX/A4I0EhSkGqrFv0YuvPkBUSYp1XiY8O8zAKc8Djglx8ocz+JfOr8gP0ryRMC2myqvDLagmnZaU9ot1vG2ijw== }
+
+  dockerfile-utils@0.16.3:
+    resolution:
+      { integrity: sha512-BslaqRR6PzCnhu+toDbkVAjq0B0CEgrCltk+enJ/xwCmvAHB1QqpO9QhXVIzMg/iSuD4tzS0Ex9n4Ik5ffI7pA== }
+    hasBin: true
+
   dot-prop@5.3.0:
     resolution:
       { integrity: sha512-QM8q3zDe58hqUqjraQOmzZ1LIH9SWQJTlEKCH4kJ2oQvLZk7RbQXvtDM2XEq3fwkV9CCvvH4LA0AV+ogFsBM2Q== }
@@ -2075,6 +2099,10 @@ packages:
       { integrity: sha512-ICsMM1Wk8xSGMowkOmPrzo2Fgmfo4bMHLNX6ytHjajRJUqvHOw/TFapQ+QG75c3X/tTDDhOSRPGC52dDbNM8FQ== }
     engines: { node: ">=16" }
     hasBin: true
+
+  gitleaks@1.0.0:
+    resolution:
+      { integrity: sha512-mTtKkWCAeHnTiBmRzjKnot8D8zX/JVDuRffuvSCr+z93vuBXygeifGZ7lXOB8Hjxto+DikSoF0XXfxntd1BZSQ== }
 
   glob-parent@5.1.2:
     resolution:
@@ -3739,6 +3767,14 @@ packages:
       postcss:
         optional: true
 
+  vscode-languageserver-textdocument@1.0.12:
+    resolution:
+      { integrity: sha512-cxWNPesCnQCcMPeenjKKsOCKQZ/L6Tv19DTRIGuLWe32lyzWhihGVJ/rcckZXJxfdKCFvRLS3fpBIsV/ZGX4zA== }
+
+  vscode-languageserver-types@3.17.5:
+    resolution:
+      { integrity: sha512-Ld1VelNuX9pdF39h2Hgaeb5hEZM2Z3jUrrMgWQAu82jMtZp7p3vJT3BzToKtZI7NgQssZje5o0zryOrhQvzQAg== }
+
   vue@3.5.29:
     resolution:
       { integrity: sha512-BZqN4Ze6mDQVNAni0IHeMJ5mwr8VAJ3MQC9FmprRhcBYENw+wOAAjRj8jfmN6FLl0j96OXbR+CjWhmAmM+QGnA== }
@@ -4332,6 +4368,8 @@ snapshots:
       keyv: 5.6.0
 
   "@keyv/serialize@1.1.1": {}
+
+  "@naturalcycles/ktlint@1.5.0": {}
 
   "@nodelib/fs.scandir@2.1.5":
     dependencies:
@@ -5323,6 +5361,17 @@ snapshots:
     dependencies:
       path-type: 4.0.0
 
+  dockerfile-ast@0.7.1:
+    dependencies:
+      vscode-languageserver-textdocument: 1.0.12
+      vscode-languageserver-types: 3.17.5
+
+  dockerfile-utils@0.16.3:
+    dependencies:
+      dockerfile-ast: 0.7.1
+      vscode-languageserver-textdocument: 1.0.12
+      vscode-languageserver-types: 3.17.5
+
   dot-prop@5.3.0:
     dependencies:
       is-obj: 2.0.0
@@ -5727,6 +5776,8 @@ snapshots:
       dargs: 8.1.0
       meow: 12.1.1
       split2: 4.2.0
+
+  gitleaks@1.0.0: {}
 
   glob-parent@5.1.2:
     dependencies:
@@ -7238,6 +7289,10 @@ snapshots:
       - terser
       - typescript
       - universal-cookie
+
+  vscode-languageserver-textdocument@1.0.12: {}
+
+  vscode-languageserver-types@3.17.5: {}
 
   vue@3.5.29(typescript@5.9.3):
     dependencies:

@@ -160,12 +160,12 @@ repos:
         entry: .venv/bin/shellcheck
         types: [shell]
 
-      - id: hadolint
-        name: hadolint
+      - id: dockerfile-utils
+        name: dockerfile-utils lint
         language: system
-        entry: hadolint
+        entry: pnpm exec dockerfile-utils lint
         files: Dockerfile
-        description: "Linter for Dockerfiles. Requires hadolint installed via brew or manually."
+        description: "Lightweight Dockerfile linter via pnpm. Full hadolint scan runs in CI."
 
       - id: actionlint
         name: actionlint
