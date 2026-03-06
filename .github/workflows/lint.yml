@@ -56,14 +56,6 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
 
-      - name: Run Commitlint Check
-        run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            pnpm exec commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
-          else
-            pnpm exec commitlint --last --verbose
-          fi
-
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.2.0
 
@@ -77,6 +69,14 @@ jobs:
         uses: actions/setup-python@v6.2.0
         with:
           python-version: "3.12"
+
+      - name: Run Commitlint Check
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            pnpm exec commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+          else
+            pnpm exec commitlint --last --verbose
+          fi
 
       - name: Run Foundational Environment Setup
         run: |
