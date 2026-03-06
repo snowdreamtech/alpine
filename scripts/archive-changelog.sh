@@ -143,7 +143,7 @@ for f in "$TMP_ARCHIVE_PREFIX"/v*.md; do
   v_num=$(echo "$f" | sed 's|^.*/v||;s/.md$//')
   link="- [v$v_num.x.x Archive](./CHANGELOG-v$v_num.md)"
   # Avoid duplicates in the link list
-  if ! grep -qF "$link" "$HISTORY_LINKS_TMP"; then
+  if ! grep -qF -- "$link" "$HISTORY_LINKS_TMP"; then
     printf "%s|%s\n" "$v_num" "$link" >>"$HISTORY_LINKS_TMP"
   fi
 done
