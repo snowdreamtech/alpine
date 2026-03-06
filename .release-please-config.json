@@ -36,11 +36,6 @@
       "hidden": false
     },
     {
-      "type": "deps",
-      "section": "📦 Dependency Updates",
-      "hidden": false
-    },
-    {
       "type": "chore",
       "section": "♻️ Miscellaneous Chores",
       "hidden": false

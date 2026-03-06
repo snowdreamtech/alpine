@@ -79,9 +79,6 @@ changelog:
     - title: "🛠 Refactoring"
       regexp: "^.*(?i)refactor[(\\w)]*:+.*$"
       order: 400
-    - title: "📦 Dependency Updates"
-      regexp: "^.*(?i)(chore|feat|fix)\\(deps\\):+.*$"
-      order: 500
     - title: "🛡️ Security Updates"
       regexp: "^.*(?i)(sec|security)[(\\w)]*:+.*$"
       order: 600
