@@ -5,6 +5,7 @@
 # Required tools (install once via: make setup):
 #   brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format \
 #                dotenv-linter golangci-lint checkmake tflint kube-linter ktlint
+#   corepack enable
 #   pip3 install yamllint sqlfluff
 #   npm install (project local via pnpm)
 #
