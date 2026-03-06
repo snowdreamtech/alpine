@@ -26,6 +26,7 @@
   "devDependencies": {
     "@commitlint/cli": "19.7.1",
     "@commitlint/config-conventional": "19.7.1",
+    "@naturalcycles/ktlint": "1.5.0",
     "@stoplight/spectral-cli": "6.11.1",
     "@taplo/cli": "0.7.0",
     "bats": "1.13.0",
@@ -35,6 +36,7 @@
     "cz-conventional-changelog": "3.3.0",
     "editorconfig-checker": "6.0.0",
     "eslint": "9.21.0",
+    "gitleaks": "8.24.0",
     "markdownlint-cli2": "0.21.0",
     "prettier": "3.5.2",
     "sort-package-json": "2.14.0",

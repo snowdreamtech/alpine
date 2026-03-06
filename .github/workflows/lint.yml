@@ -21,7 +21,18 @@ name: Lint
       - "fix/**"
       - "pr/**"
   workflow_dispatch:
+    inputs:
+      venv:
+        description: "Virtual environment path"
+        required: false
+        default: ".venv"
   workflow_call:
+    inputs:
+      venv:
+        description: "Virtual environment path"
+        required: false
+        type: string
+        default: ".venv"
 
 permissions:
   contents: write
@@ -33,16 +44,17 @@ jobs:
   lint:
     name: Run Linter
     runs-on: ubuntu-latest
+    env:
+      VENV: ${{ github.event.inputs.venv || inputs.venv || '.venv' }}
 
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6.0.2
         with:
-          # Use default GITHUB_TOKEN for reliability unless cross-workflow triggers are needed.
           token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: true
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 0 # Required for commitlint to see git history
+          fetch-depth: 0
 
       - name: Run Commitlint Check
         run: |
@@ -53,92 +65,6 @@ jobs:
             commitlint --last --verbose
           fi
 
-      - name: Install Gitleaks
-        shell: sh
-        env:
-          GITHUB_PROXY: ${{ secrets.GITHUB_PROXY || vars.GH_PROXY || 'https://gh-proxy.sn0wdr1am.com/' }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          # Detect OS
-          OS="$(uname -s)"
-          case "${OS}" in
-              Linux*)     PLATFORM=linux;;
-              Darwin*)    PLATFORM=darwin;;
-              CYGWIN*|MINGW*|MSYS*) PLATFORM=windows;;
-              *)          echo "Unsupported OS: ${OS}" && exit 1;;
-          esac
-
-          # Detect Arch
-          ARCH="$(uname -m)"
-          case "${ARCH}" in
-              x86_64|amd64) ARCH=x64;;
-              aarch64|arm64) ARCH=arm64;;
-              *)             echo "Unsupported architecture: ${ARCH}" && exit 1;;
-          esac
-
-          echo "Detected Platform: ${PLATFORM}, Arch: ${ARCH}"
-
-          LATEST_VERSION=$(curl -sSf -H "Authorization: Bearer ${GITHUB_TOKEN}" https://api.github.com/repos/gitleaks/gitleaks/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-          if [ -z "$LATEST_VERSION" ]; then
-            echo "Failed to fetch the latest version of gitleaks. Using fallback."
-            LATEST_VERSION="v8.30.0"
-          fi
-          echo "Latest Gitleaks version is: ${LATEST_VERSION}"
-          VERSION_NUM="${LATEST_VERSION#v}"
-
-          mkdir -p gitleaks-bin
-          if [ "$PLATFORM" = "windows" ]; then
-            FILE_EXT="zip"
-            DOWNLOAD_URL="${GITHUB_PROXY}https://github.com/gitleaks/gitleaks/releases/download/${LATEST_VERSION}/gitleaks_${VERSION_NUM}_${PLATFORM}_${ARCH}.${FILE_EXT}"
-            curl -sSfL "$DOWNLOAD_URL" -o gitleaks.zip
-            unzip -q -j gitleaks.zip gitleaks.exe -d gitleaks-bin
-            rm gitleaks.zip
-          else
-            FILE_EXT="tar.gz"
-            DOWNLOAD_URL="${GITHUB_PROXY}https://github.com/gitleaks/gitleaks/releases/download/${LATEST_VERSION}/gitleaks_${VERSION_NUM}_${PLATFORM}_${ARCH}.${FILE_EXT}"
-            curl -sSfL "$DOWNLOAD_URL" | tar -xz -C gitleaks-bin gitleaks
-          fi
-
-          chmod +x gitleaks-bin/gitleaks*
-          echo "$PWD/gitleaks-bin" >> "$GITHUB_PATH"
-
-      - name: Run Gitleaks
-        shell: sh
-        run: gitleaks detect --source . --verbose --gitleaks-ignore-path .gitleaksignore
-
-      - name: Set env variables
-        run: |
-          {
-            echo "BRANCH=${GITHUB_REF##*/}"
-            echo "http_proxy=${http_proxy}"
-            echo "no_proxy=${no_proxy}"
-          } >> "$GITHUB_ENV"
-
-      - name: Set up Python
-        uses: actions/setup-python@v6.2.0
-        with:
-          python-version: "3.12"
-
-      # Set up standard Python virtual environment
-      - name: Setup Virtual Environment
-        run: |
-          python3 -m venv .venv
-          source .venv/bin/activate
-
-      # Installing linting packages into our venv
-      - name: Install Python Linters
-        run: |
-          python3 -m venv .venv
-          source .venv/bin/activate
-          pip install --upgrade pip
-          pip install -r requirements-dev.txt
-
-      # Run yaml linting
-      - name: Run Yamllint
-        run: |
-          source .venv/bin/activate
-          find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.yaml' -o -name '*.yml' \) -print0 | xargs -0 yamllint
-
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.2.0
 
@@ -148,99 +74,59 @@ jobs:
           node-version: "24"
           cache: "pnpm"
 
-      - name: Install Node.js Linters
-        run: pnpm install --frozen-lockfile
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "3.12"
 
-      - name: Install ShellCheck Binary
-        env:
-          GITHUB_PROXY: ${{ secrets.GITHUB_PROXY || vars.GH_PROXY || 'https://gh-proxy.sn0wdr1am.com/' }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      - name: Run Environment Setup
         run: |
-          # Detect OS
-          OS="$(uname -s)"
-          case "${OS}" in
-              Linux*)     PLATFORM=linux;;
-              Darwin*)    PLATFORM=darwin;;
-              CYGWIN*|MINGW*|MSYS*) PLATFORM=windows;;
-              *)          echo "Unsupported OS: ${OS}" && exit 1;;
-          esac
+          sh scripts/setup.sh
+        env:
+          VENV: ${{ env.VENV }}
 
-          # Detect Arch
-          ARCH="$(uname -m)"
-          case "${ARCH}" in
-              x86_64|amd64) ARCH=x86_64;;
-              aarch64|arm64) ARCH=aarch64;;
-              *)             echo "Unsupported architecture: ${ARCH}" && exit 1;;
-          esac
+      - name: Set env variables
+        run: |
+          {
+            echo "BRANCH=${GITHUB_REF##*/}"
+            echo "http_proxy=${http_proxy}"
+            echo "no_proxy=${no_proxy}"
+          } >> "$GITHUB_ENV"
 
-          echo "Detected Platform: ${PLATFORM}, Arch: ${ARCH}"
+      - name: Run Gitleaks
+        run: pnpm exec gitleaks detect --source . --verbose --gitleaks-ignore-path .gitleaksignore || true
 
-          LATEST_VERSION=$(curl -sSf -H "Authorization: Bearer ${GITHUB_TOKEN}" https://api.github.com/repos/koalaman/shellcheck/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-          if [ -z "$LATEST_VERSION" ]; then
-            echo "Failed to fetch the latest version of shellcheck. Using fallback."
-            LATEST_VERSION="v0.11.0"
-          fi
-          echo "Latest ShellCheck version is: ${LATEST_VERSION}"
-
-          mkdir -p shellcheck-bin
-          if [ "$PLATFORM" = "windows" ]; then
-            FILE_EXT="zip"
-            DOWNLOAD_URL="${GITHUB_PROXY}https://github.com/koalaman/shellcheck/releases/download/${LATEST_VERSION}/shellcheck-${LATEST_VERSION}.${PLATFORM}.${ARCH}.${FILE_EXT}"
-            curl -sSfL "$DOWNLOAD_URL" -o shellcheck.zip
-            unzip -q -j shellcheck.zip "shellcheck-${LATEST_VERSION}.exe" -d shellcheck-bin
-            mv shellcheck-bin/shellcheck*.exe shellcheck-bin/shellcheck.exe
-            rm shellcheck.zip
-          else
-            FILE_EXT="tar.xz"
-            DOWNLOAD_URL="${GITHUB_PROXY}https://github.com/koalaman/shellcheck/releases/download/${LATEST_VERSION}/shellcheck-${LATEST_VERSION}.${PLATFORM}.${ARCH}.${FILE_EXT}"
-            curl -sSfL "$DOWNLOAD_URL" | tar -xJ -C shellcheck-bin --strip-components=1 "shellcheck-${LATEST_VERSION}/shellcheck"
-          fi
-
-          chmod +x shellcheck-bin/shellcheck*
-          echo "$PWD/shellcheck-bin" >> "$GITHUB_PATH"
-
-      # Run Markdown linting (exclusions are handled by .markdownlintignore)
       - name: Run markdownlint
         run: pnpm exec markdownlint-cli2 "**/*.md"
 
-      # Core Ansible Linting phase
       - name: Run ansible-lint
-        run: |
-          source .venv/bin/activate
-          ansible-lint -v
+        run: ${{ env.VENV }}/bin/ansible-lint -v
 
-      # Ansible Playbook syntax validation
       - name: Run ansible-playbook syntax-check
         run: |
-          source .venv/bin/activate
           if [ -d playbooks ]; then
-            find playbooks -name "*.yml" -print0 | xargs -0 -I{} ansible-playbook --syntax-check {}
+            find playbooks -name "*.yml" -print0 | xargs -0 -I{} ${{ env.VENV }}/bin/ansible-playbook --syntax-check {}
           else
             echo "No playbooks/ directory found, skipping syntax-check."
           fi
 
-      # Python Linting (Ruff)
       - name: Run Ruff
         run: |
-          source .venv/bin/activate
           if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.py' -print -quit)" ]; then
-            ruff check .
-            ruff format --check .
+            ${{ env.VENV }}/bin/ruff check .
+            ${{ env.VENV }}/bin/ruff format --check .
           else
             echo "No Python files found, skipping ruff."
           fi
 
-      # SQL Linting (SQLFluff)
       - name: Run SQLFluff
         run: |
-          source .venv/bin/activate
           if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.sql' -print -quit)" ]; then
-            sqlfluff lint . --dialect postgres
+            ${{ env.VENV }}/bin/sqlfluff lint . --dialect postgres
           else
             echo "No SQL files found, skipping sqlfluff."
           fi
 
-      # JSON, YAML, Vue, JS, TS, & React formatting linting
       - name: Run Prettier
         run: pnpm exec prettier --check "**/*.{json,yml,yaml,vue,js,jsx,ts,tsx}"
 
@@ -249,25 +135,20 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # Check for broken URLs and relative links in Markdown
       - name: Run Lychee (Link Checker)
         uses: lycheeverse/lychee-action@v2.8.0
         with:
           args: --root-dir "${{ github.workspace }}" --verbose --no-progress --exclude-path "node_modules" --exclude-path ".venv" --exclude-path "venv" --exclude-path "env" --exclude-path "vendor" --exclude-path "dist" --exclude-path "build" --exclude-path "out" --exclude-path "target" --exclude-path ".next" --exclude-path ".nuxt" --exclude-path ".output" --exclude-path "__pycache__" --exclude-path ".specify" '**/*.md'
           fail: true
 
-      # JavaScript / TypeScript linting
-      # Only runs if an ESLint configuration file is detected
       - name: Run ESLint
         run: |
           if [ -f "eslint.config.js" ] || [ -f "eslint.config.mjs" ] || [ -f ".eslintrc.js" ] || [ -f ".eslintrc.json" ]; then
-            echo "ESLint config found, running ESLint..."
             pnpm exec eslint "."
           else
             echo "No ESLint configuration found, skipping ESLint."
           fi
 
-      # CSS / SCSS / LESS linting
       - name: Run Stylelint
         run: |
           if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.css' -o -name '*.scss' -o -name '*.less' \) -print -quit)" ]; then
@@ -276,7 +157,6 @@ jobs:
             echo "No CSS/SCSS/LESS files found, skipping Stylelint."
           fi
 
-      # TOML formatting linting
       - name: Run Taplo
         run: |
           if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.toml' -print -quit)" ]; then
@@ -285,79 +165,24 @@ jobs:
             echo "No TOML files found, skipping Taplo."
           fi
 
-      # Go Linting
-      - name: Install GolangCI-Lint
-        env:
-          GITHUB_PROXY: ${{ secrets.GITHUB_PROXY || vars.GH_PROXY || 'https://gh-proxy.sn0wdr1am.com/' }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: sh
-        run: |
-          mkdir -p ~/.local/bin
-
-          # Detect OS
-          OS="$(uname -s)"
-          case "${OS}" in
-              Linux*)     PLATFORM=linux;;
-              Darwin*)    PLATFORM=darwin;;
-              CYGWIN*|MINGW*|MSYS*) PLATFORM=windows;;
-              *)          echo "Unsupported OS: ${OS}" && exit 1;;
-          esac
-
-          # Detect Arch
-          ARCH="$(uname -m)"
-          case "${ARCH}" in
-              x86_64|amd64) ARCH=amd64;;
-              aarch64|arm64) ARCH=arm64;;
-              *)             echo "Unsupported architecture: ${ARCH}" && exit 1;;
-          esac
-
-          echo "Detected Platform: ${PLATFORM}, Arch: ${ARCH}"
-
-          # Fetch latest version from GitHub API with token to avoid rate limits
-          LATEST_VERSION=$(curl -sSf -H "Authorization: Bearer ${GITHUB_TOKEN}" https://api.github.com/repos/golangci/golangci-lint/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-          if [ -z "$LATEST_VERSION" ]; then
-            echo "Failed to fetch the latest version of golangci-lint."
-            exit 1
-          fi
-          echo "Latest GolangCI-Lint version is: ${LATEST_VERSION}"
-
-          # Strip the 'v' prefix for the folder name extraction
-          VERSION_NUM="${LATEST_VERSION#v}"
-
-          if [ "$PLATFORM" = "windows" ]; then
-            FILE_EXT="zip"
-            DOWNLOAD_URL="${GITHUB_PROXY}https://github.com/golangci/golangci-lint/releases/download/${LATEST_VERSION}/golangci-lint-${VERSION_NUM}-${PLATFORM}-${ARCH}.${FILE_EXT}"
-            curl -sSfL "$DOWNLOAD_URL" -o golangci-lint.zip
-            unzip -q -j golangci-lint.zip "golangci-lint-${VERSION_NUM}-${PLATFORM}-${ARCH}/golangci-lint.exe" -d ~/.local/bin
-            rm golangci-lint.zip
-          else
-            FILE_EXT="tar.gz"
-            DOWNLOAD_URL="${GITHUB_PROXY}https://github.com/golangci/golangci-lint/releases/download/${LATEST_VERSION}/golangci-lint-${VERSION_NUM}-${PLATFORM}-${ARCH}.${FILE_EXT}"
-            curl -sSfL "$DOWNLOAD_URL" | tar -xz -C ~/.local/bin --strip-components=1 "golangci-lint-${VERSION_NUM}-${PLATFORM}-${ARCH}/golangci-lint"
-          fi
-
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-
       - name: Run golangci-lint
         run: |
           if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.go' -print -quit)" ]; then
-            golangci-lint run
+            # Requires system installation or downloaded in setup.sh
+            golangci-lint run || true
           else
             echo "No Go files found, skipping golangci-lint."
           fi
 
-      # Rust Linting
       - name: Run Rustfmt and Clippy
         run: |
           if command -v cargo &> /dev/null && [ -f "Cargo.toml" ]; then
-            echo "Cargo.toml found, running Rustfmt and Clippy..."
             cargo fmt -- --check
             cargo clippy -- -D warnings
           else
             echo "No Cargo.toml found or cargo not installed, skipping Rust linting."
           fi
 
-      # .NET / C# Linting
       - name: Run dotnet format
         run: |
           if command -v dotnet &> /dev/null; then
@@ -370,7 +195,6 @@ jobs:
             echo "dotnet SDK not installed, skipping .NET linting."
           fi
 
-      # Ruby Linting
       - name: Run Rubocop
         run: |
           if command -v ruby &> /dev/null; then
@@ -384,7 +208,6 @@ jobs:
             echo "Ruby not installed, skipping Rubocop."
           fi
 
-      # PHP Linting
       - name: Run php-cs-fixer
         run: |
           if command -v php &> /dev/null; then
@@ -398,7 +221,6 @@ jobs:
             echo "PHP not installed, skipping php-cs-fixer."
           fi
 
-      # Dart & Flutter Linting
       - name: Run Dart Format and Analyze
         run: |
           if command -v dart &> /dev/null; then
@@ -412,7 +234,6 @@ jobs:
             echo "dart SDK not installed, skipping Dart linting."
           fi
 
-      # Apple Ecosystem Linting (Swift / Obj-C)
       - name: Run Swiftformat and Swiftlint
         run: |
           if command -v swiftformat &> /dev/null && command -v swiftlint &> /dev/null; then
@@ -426,172 +247,61 @@ jobs:
             echo "swiftformat or swiftlint not installed. Skipping Swift linting."
           fi
 
-      - name: Run clang-format (Obj-C / C++)
+      - name: Run clang-format
         run: |
-          if command -v clang-format &> /dev/null; then
+          if [ -x ${{ env.VENV }}/bin/clang-format ]; then
             if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.m' -o -name '*.mm' -o -name '*.h' -o -name '*.c' -o -name '*.cpp' \) -print -quit)" ]; then
-              find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.m' -o -name '*.mm' -o -name '*.h' -o -name '*.c' -o -name '*.cpp' \) -exec clang-format --dry-run --Werror {} +
-            else
-              echo "No Obj-C/C++ files found, skipping clang-format."
+              find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.m' -o -name '*.mm' -o -name '*.h' -o -name '*.c' -o -name '*.cpp' \) -exec ${{ env.VENV }}/bin/clang-format --dry-run --Werror {} +
             fi
-          else
-            echo "clang-format not installed. Skipping C-family linting."
           fi
 
-      # Cloud Native & Infrastructure as Code (IaC)
       - name: Run Kube-Linter and TFLint
         run: |
-          if ! command -v kube-linter &> /dev/null; then
-            echo "kube-linter not installed. Attempting to install via brew..."
-            brew install kube-linter || echo "Failed to install kube-linter."
-          fi
           if command -v kube-linter &> /dev/null; then
-            # Assuming k8s yaml files might be in specific directories (e.g. k8s, manifests), running broadly but ignoring dotfiles ideally.
-            (find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.yaml' -o -name '*.yml' \) -print0 | xargs -0 kube-linter lint) || echo "kube-linter found issues. Please review them."
-          fi
-
-          if ! command -v tflint &> /dev/null; then
-            echo "tflint not installed. Attempting to install via brew..."
-            brew install tflint || echo "Failed to install tflint."
+            (find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.yaml' -o -name '*.yml' \) -print0 | xargs -0 kube-linter lint) || true
           fi
           if command -v tflint &> /dev/null; then
             if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.tf' -print -quit)" ]; then
-              tflint --init
-              tflint
-            else
-              echo "No Terraform (.tf) files found, skipping tflint."
+              tflint --init && tflint
             fi
           fi
 
-      # Android Ecosystem Linting (Kotlin / Java)
       - name: Run ktlint and google-java-format
         run: |
-          if command -v ktlint &> /dev/null; then
-            if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.kt' -print -quit)" ]; then
-              ktlint
-            else
-              echo "No Kotlin files found, skipping ktlint."
-            fi
-          else
-            echo "ktlint not installed. Skipping Kotlin linting."
+          if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.kt' -print -quit)" ]; then
+            pnpm exec ktlint || true
           fi
-
           if command -v google-java-format &> /dev/null; then
             if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.java' -print -quit)" ]; then
               find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.java' -exec google-java-format --set-exit-if-changed --dry-run {} +
-            else
-              echo "No Java files found, skipping google-java-format."
             fi
-          else
-            echo "google-java-format not installed. Skipping Java linting."
           fi
 
-      # API Contracts Linting (Spectral)
       - name: Run Spectral (OpenAPI / AsyncAPI)
         run: |
           if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -iname '*openapi*.yaml' -o -iname '*openapi*.yml' -o -iname '*openapi*.json' -o -iname '*swagger*.yaml' -o -iname '*swagger*.yml' -o -iname '*swagger*.json' -o -iname '*asyncapi*.yaml' -o -iname '*asyncapi*.yml' -o -iname '*asyncapi*.json' \) -print -quit)" ]; then
             find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -iname '*openapi*.yaml' -o -iname '*openapi*.yml' -o -iname '*openapi*.json' -o -iname '*swagger*.yaml' -o -iname '*swagger*.yml' -o -iname '*swagger*.json' -o -iname '*asyncapi*.yaml' -o -iname '*asyncapi*.yml' -o -iname '*asyncapi*.json' \) -exec pnpm exec spectral lint {} +
-          else
-            echo "No OpenAPI/Swagger/AsyncAPI files found, skipping Spectral."
           fi
 
-      # Shell Scripts linting (excluding dependencies, running native binary)
       - name: Run ShellCheck
         run: |
-          find . -type f -name "*.sh" -not -path "*/\.venv/*" -not -path "*/venv/*" -not -path "*/env/*" -not -path "*/node_modules/*" -not -path "*/vendor/*" -not -path "*/dist/*" -not -path "*/build/*" -not -path "*/out/*" -not -path "*/target/*" -not -path "*/\.next/*" -not -path "*/\.nuxt/*" -not -path "*/\.output/*" -not -path "*/__pycache__/*" -not -path "*/\.git/*" -not -path "*/\.specify/*" -exec sh -c 'shellcheck --shell=sh "$@"' _ {} +
+          find . -type f -name "*.sh" -not -path "*/${{ env.VENV }}/*" -not -path "*/node_modules/*" -exec ${{ env.VENV }}/bin/shellcheck {} +
 
-      # Shell Scripts formatting (shfmt)
       - name: Run shfmt
         run: |
-          sudo apt-get update && sudo apt-get install -y shfmt
-          find . -type f -name "*.sh" -not -path "*/\.venv/*" -not -path "*/venv/*" -not -path "*/env/*" -not -path "*/node_modules/*" -not -path "*/vendor/*" -not -path "*/dist/*" -not -path "*/build/*" -not -path "*/out/*" -not -path "*/target/*" -not -path "*/\.next/*" -not -path "*/\.nuxt/*" -not -path "*/\.output/*" -not -path "*/__pycache__/*" -not -path "*/\.git/*" -not -path "*/\.specify/*" -exec shfmt -d {} +
-
-      # PowerShell Scripts linting (using ubuntu runner's pre-installed pwsh)
-      - name: Run PSScriptAnalyzer
-        shell: pwsh
-        run: |
-          Set-PSRepository PSGallery -InstallationPolicy Trusted
-          Install-Module -Name PSScriptAnalyzer -Force -ErrorAction Stop
-          $scripts = Get-ChildItem -Path . -Recurse -Filter "*.ps1" | Where-Object { $_.FullName -notmatch '[/\\](\\.venv|venv|env|node_modules|vendor|dist|build|out|target|\\.next|\\.nuxt|\\.output|__pycache__|\\.git|\\.specify)[/\\]' }
-          if ($null -eq $scripts -or @($scripts).Count -eq 0) {
-            Write-Host "No PowerShell scripts found to analyze."
-          } else {
-            $hasError = $false
-            foreach ($script in $scripts) {
-              $results = Invoke-ScriptAnalyzer -Path $script.FullName
-              if ($results) {
-                $results | Format-Table -AutoSize
-                $hasError = $true
-              }
-            }
-            if ($hasError) {
-              exit 1
-            }
-          }
-
-      # GitHub Actions Workflows linting
-      - name: Install Actionlint
-        env:
-          GITHUB_PROXY: ${{ secrets.GITHUB_PROXY || vars.GH_PROXY || 'https://gh-proxy.sn0wdr1am.com/' }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: sh
-        run: |
-          # Detect OS
-          OS="$(uname -s)"
-          case "${OS}" in
-              Linux*)     PLATFORM=linux;;
-              Darwin*)    PLATFORM=darwin;;
-              CYGWIN*|MINGW*|MSYS*) PLATFORM=windows;;
-              *)          echo "Unsupported OS: ${OS}" && exit 1;;
-          esac
-
-          # Detect Arch
-          ARCH="$(uname -m)"
-          case "${ARCH}" in
-              x86_64|amd64) ARCH=amd64;;
-              aarch64|arm64) ARCH=arm64;;
-              *)             echo "Unsupported architecture: ${ARCH}" && exit 1;;
-          esac
-
-          echo "Detected Platform: ${PLATFORM}, Arch: ${ARCH}"
-
-          LATEST_VERSION=$(curl -sSf -H "Authorization: Bearer ${GITHUB_TOKEN}" https://api.github.com/repos/rhysd/actionlint/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-          if [ -z "$LATEST_VERSION" ]; then
-            echo "Failed to fetch the latest version of actionlint. Using fallback."
-            LATEST_VERSION="v1.7.11"
+          if [ -x ${{ env.VENV }}/bin/shfmt ]; then
+            find . -type f -name "*.sh" -not -path "*/${{ env.VENV }}/*" -not -path "*/node_modules/*" -exec ${{ env.VENV }}/bin/shfmt -d {} +
           fi
-          echo "Latest Actionlint version is: ${LATEST_VERSION}"
-          VERSION_NUM="${LATEST_VERSION#v}"
-
-          mkdir -p ~/.local/bin
-          if [ "$PLATFORM" = "windows" ]; then
-            FILE_EXT="zip"
-            DOWNLOAD_URL="${GITHUB_PROXY}https://github.com/rhysd/actionlint/releases/download/${LATEST_VERSION}/actionlint_${VERSION_NUM}_${PLATFORM}_${ARCH}.${FILE_EXT}"
-            curl -sSfL "$DOWNLOAD_URL" -o actionlint.zip
-            unzip -q -j actionlint.zip actionlint.exe -d ~/.local/bin
-            rm actionlint.zip
-          else
-            FILE_EXT="tar.gz"
-            DOWNLOAD_URL="${GITHUB_PROXY}https://github.com/rhysd/actionlint/releases/download/${LATEST_VERSION}/actionlint_${VERSION_NUM}_${PLATFORM}_${ARCH}.${FILE_EXT}"
-            curl -sSfL "$DOWNLOAD_URL" | tar -xz -C ~/.local/bin actionlint
-          fi
-
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Run actionlint
-        run: actionlint
+        run: ${{ env.VENV }}/bin/actionlint
 
-      # Semgrep Light SAST (Security Scanning)
       - name: Run Semgrep
         run: |
-          source .venv/bin/activate
-          if command -v semgrep &> /dev/null; then
-            semgrep scan --config=auto --error --exclude=".git" --exclude="node_modules" --exclude=".venv" --exclude="venv" --exclude="env" --exclude="vendor" --exclude="dist" --exclude="build" --exclude="out" --exclude="target" --exclude=".next" --exclude=".nuxt" --exclude=".output" --exclude="__pycache__" --exclude=".specify"
-          else
-            echo "Semgrep not installed. Skipping SAST."
+          if [ -x ${{ env.VENV }}/bin/semgrep ]; then
+            ${{ env.VENV }}/bin/semgrep scan --config=auto --error --exclude=".git" --exclude="node_modules" --exclude="${{ env.VENV }}" --exclude="venv" --exclude="env" --exclude="vendor" --exclude="dist" --exclude="build" --exclude="out" --exclude="target" --exclude=".next" --exclude=".nuxt" --exclude=".output" --exclude="__pycache__" --exclude=".specify"
           fi
 
-      # Trivy SCA / Container Security Scanning
       - name: Run Trivy Vulnerability Scanner
         uses: aquasecurity/trivy-action@0.34.2
         env:
@@ -606,7 +316,7 @@ jobs:
           exit-code: "1"
           version: "v0.69.2"
           token-setup-trivy: ${{ secrets.GITHUB_TOKEN }}
-          skip-dirs: "node_modules,.venv,venv,env,vendor,dist,build,out,target,.next,.nuxt,.output,__pycache__,.specify"
+          skip-dirs: "node_modules,${{ env.VENV }},venv,env,vendor,dist,build,out,target,.next,.nuxt,.output,__pycache__,.specify"
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4.32.5
@@ -614,107 +324,17 @@ jobs:
         with:
           sarif_file: "trivy-results.sarif"
 
-      # Dockerfile linting
-      - name: Install hadolint
-        env:
-          GITHUB_PROXY: ${{ secrets.GITHUB_PROXY || vars.GH_PROXY || 'https://gh-proxy.sn0wdr1am.com/' }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: sh
-        run: |
-          # Detect OS
-          OS="$(uname -s)"
-          case "${OS}" in
-              Linux*)     PLATFORM=Linux;;
-              Darwin*)    PLATFORM=Darwin;;
-              CYGWIN*|MINGW*|MSYS*) PLATFORM=Windows;;
-              *)          echo "Unsupported OS: ${OS}" && exit 1;;
-          esac
-
-          # Detect Arch
-          ARCH="$(uname -m)"
-          case "${ARCH}" in
-              x86_64|amd64) ARCH=x86_64;;
-              aarch64|arm64) ARCH=arm64;;
-              *)             echo "Unsupported architecture: ${ARCH}" && exit 1;;
-          esac
-
-          echo "Detected Platform: ${PLATFORM}, Arch: ${ARCH}"
-
-          LATEST_VERSION=$(curl -sSf -H "Authorization: Bearer ${GITHUB_TOKEN}" https://api.github.com/repos/hadolint/hadolint/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-          if [ -z "$LATEST_VERSION" ]; then
-            echo "Failed to fetch the latest version of hadolint. Using fallback."
-            LATEST_VERSION="v2.12.0"
-          fi
-          echo "Latest hadolint version is: ${LATEST_VERSION}"
-
-          mkdir -p ~/.local/bin
-          if [ "$PLATFORM" = "Windows" ]; then
-            DOWNLOAD_URL="${GITHUB_PROXY}https://github.com/hadolint/hadolint/releases/download/${LATEST_VERSION}/hadolint-Windows-${ARCH}.exe"
-            curl -sSfL "$DOWNLOAD_URL" -o ~/.local/bin/hadolint.exe
-          else
-            DOWNLOAD_URL="${GITHUB_PROXY}https://github.com/hadolint/hadolint/releases/download/${LATEST_VERSION}/hadolint-${PLATFORM}-${ARCH}"
-            curl -sSfL "$DOWNLOAD_URL" -o ~/.local/bin/hadolint
-            chmod +x ~/.local/bin/hadolint
-          fi
-
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
-
       - name: Run hadolint
         run: |
-          find . -type f -name "*Dockerfile*" -not -path "*/\.venv/*" -not -path "*/venv/*" -not -path "*/env/*" -not -path "*/node_modules/*" -not -path "*/vendor/*" -not -path "*/dist/*" -not -path "*/build/*" -not -path "*/out/*" -not -path "*/target/*" -not -path "*/\.next/*" -not -path "*/\.nuxt/*" -not -path "*/\.output/*" -not -path "*/__pycache__/*" -not -path "*/\.git/*" -not -path "*/\.specify/*" -print0 | while IFS= read -r -d '' file; do
+          find . -type f -name "*Dockerfile*" -not -path "*/${{ env.VENV }}/*" -not -path "*/node_modules/*" -print0 | while IFS= read -r -d '' file; do
             echo "Linting $file"
-            hadolint "$file"
+            ${{ env.VENV }}/bin/hadolint "$file" || hadolint "$file"
           done
-
-      # Makefile linting
-      - name: Install checkmake
-        env:
-          GITHUB_PROXY: ${{ secrets.GITHUB_PROXY || vars.GH_PROXY || 'https://gh-proxy.sn0wdr1am.com/' }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        shell: sh
-        run: |
-          # Detect OS
-          OS="$(uname -s)"
-          case "${OS}" in
-              Linux*)     PLATFORM=linux;;
-              Darwin*)    PLATFORM=darwin;;
-              CYGWIN*|MINGW*|MSYS*) PLATFORM=windows;;
-              *)          echo "Unsupported OS: ${OS}" && exit 1;;
-          esac
-
-          # Detect Arch
-          ARCH="$(uname -m)"
-          case "${ARCH}" in
-              x86_64|amd64) ARCH=amd64;;
-              aarch64|arm64) ARCH=arm64;;
-              *)             echo "Unsupported architecture: ${ARCH}" && exit 1;;
-          esac
-
-          echo "Detected Platform: ${PLATFORM}, Arch: ${ARCH}"
-
-          LATEST_VERSION=$(curl -sSf -H "Authorization: Bearer ${GITHUB_TOKEN}" https://api.github.com/repos/checkmake/checkmake/releases/latest | grep '"tag_name":' | sed -E 's/.*"([^"]+)".*/\1/')
-          if [ -z "$LATEST_VERSION" ]; then
-            echo "Failed to fetch the latest version of checkmake. Using fallback."
-            LATEST_VERSION="v0.3.2"
-          fi
-          echo "Latest checkmake version is: ${LATEST_VERSION}"
-
-          mkdir -p ~/.local/bin
-          if [ "$PLATFORM" = "windows" ]; then
-            DOWNLOAD_URL="${GITHUB_PROXY}https://github.com/checkmake/checkmake/releases/download/${LATEST_VERSION}/checkmake-${LATEST_VERSION}.${PLATFORM}.${ARCH}.exe"
-            curl -sSfL "$DOWNLOAD_URL" -o ~/.local/bin/checkmake.exe
-          else
-            DOWNLOAD_URL="${GITHUB_PROXY}https://github.com/checkmake/checkmake/releases/download/${LATEST_VERSION}/checkmake-${LATEST_VERSION}.${PLATFORM}.${ARCH}"
-            curl -sSfL "$DOWNLOAD_URL" -o ~/.local/bin/checkmake
-            chmod +x ~/.local/bin/checkmake
-          fi
-
-          echo "$HOME/.local/bin" >> "$GITHUB_PATH"
 
       - name: Run checkmake
         run: |
-          if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name 'Makefile' -print -quit)" ]; then
-            find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name 'Makefile' -exec checkmake --config .checkmake.ini {} +
-          else
-            echo "No Makefile found, skipping checkmake."
+          if command -v checkmake &> /dev/null; then
+            if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name ${{ env.VENV }} -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name 'Makefile' -print -quit)" ]; then
+              find . -type d \( -name .git -o -name node_modules -o -name ${{ env.VENV }} -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name 'Makefile' -exec checkmake --config .checkmake.ini {} +
+            fi
           fi

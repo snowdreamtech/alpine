@@ -99,97 +99,18 @@ else
 	@sh scripts/init-project.sh
 endif
 
-# Install system-level development tools based on OS and package manager
 setup:
-	@echo "$(BOLD)Installing system tools for $(OS_NAME)...$(RESET)"
-ifeq ($(OS_NAME),Darwin)
-	@if command -v brew >/dev/null 2>&1; then \
-		echo "$(BLUE)Detected Homebrew. Installing tools...$(RESET)"; \
-		brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format \
-			dotenv-linter golangci-lint checkmake tflint kube-linter ktlint; \
-	elif command -v port >/dev/null 2>&1; then \
-		echo "$(BLUE)Detected MacPorts. Installing tools...$(RESET)"; \
-		sudo port install shellcheck actionlint hadolint shfmt gitleaks ruff clang-18; \
-		sudo port select --set clang mp-clang-18; \
-		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin; \
-		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b ~/.local/bin; \
-		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/rhysd/actionlint/main/scripts/download-actionlint.bash | bash -s -- latest ~/.local/bin; \
-	else \
-		echo "$(RED)Error: Neither Homebrew nor MacPorts found. Please install one first.$(RESET)"; exit 1; \
-	fi
-else ifeq ($(OS_NAME),Linux)
-	@if command -v apt-get >/dev/null 2>&1; then \
-		echo "$(BLUE)Detected APT. Installing tools...$(RESET)"; \
-		sudo apt-get update && sudo apt-get install -y \
-			shellcheck hadolint shfmt gitleaks python3-ruff clang-format ktlint; \
-		$(PIP) install actionlint-py; \
-		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin; \
-		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b ~/.local/bin; \
-		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash; \
-		curl -fLsS $(GITHUB_PROXY)https://github.com/stackrox/kube-linter/releases/latest/download/kube-linter-linux.tar.gz | tar -xz -C ~/.local/bin kube-linter; \
-		GO_CHECKMAKE_URL=$$(curl -sSf https://api.github.com/repos/checkmake/checkmake/releases/latest | grep 'browser_download_url.*linux.*amd64' | head -1 | cut -d'"' -f4); \
-		curl -fLsS "$(GITHUB_PROXY)$$GO_CHECKMAKE_URL" -o ~/.local/bin/checkmake && chmod +x ~/.local/bin/checkmake; \
-	elif command -v dnf >/dev/null 2>&1; then \
-		echo "$(BLUE)Detected DNF. Installing tools...$(RESET)"; \
-		sudo dnf install -y shellcheck hadolint shfmt gitleaks ruff clang-format ktlint; \
-		$(PIP) install actionlint-py; \
-		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin; \
-		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b ~/.local/bin; \
-		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash; \
-		curl -fLsS $(GITHUB_PROXY)https://github.com/stackrox/kube-linter/releases/latest/download/kube-linter-linux.tar.gz | tar -xz -C ~/.local/bin kube-linter; \
-	elif command -v apk >/dev/null 2>&1; then \
-		echo "$(BLUE)Detected APK. Installing tools...$(RESET)"; \
-		sudo apk add shellcheck actionlint hadolint shfmt gitleaks py3-ruff ktlint; \
-		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b ~/.local/bin; \
-		curl -fLsS $(GITHUB_PROXY)https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b ~/.local/bin; \
-	else \
-		echo "$(RED)Error: Unsupported Linux package manager.$(RESET)"; exit 1; \
-	fi
-else ifeq ($(OS_NAME),Windows)
-	@Write-Host "Installing system tools for Windows..." -ForegroundColor Blue
-	@if (Get-Command scoop -ErrorAction SilentlyContinue) { \
-		scoop install shellcheck actionlint hadolint shfmt gitleaks llvm \
-			golangci-lint tflint kube-linter checkmake ktlint dotenv-linter; \
-	} elseif (Get-Command choco -ErrorAction SilentlyContinue) { \
-		choco install shellcheck actionlint hadolint shfmt gitleaks llvm \
-			golangci-lint tflint ktlint --yes; \
-		Invoke-WebRequest -Uri '$(GITHUB_PROXY)https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh' -OutFile install.sh; sh install.sh -b "$$env:LOCALAPPDATA\Microsoft\WinGet\Packages"; Remove-Item install.sh; \
-	} elseif (Get-Command winget -ErrorAction SilentlyContinue) { \
-		winget install --id koalaman.shellcheck rhysd.actionlint hadolint.hadolint mvdan.sh \
-			GolangCI.golangci-lint terraform-linters.tflint --silent; \
-	} else { \
-		Write-Host "Error: No supported package manager found (Scoop/Choco/Winget)." -ForegroundColor Red; exit 1; \
-	}
+ifeq ($(OS_NAME),Windows)
+	@powershell -ExecutionPolicy Bypass -File scripts/setup.ps1
+else
+	@sh scripts/setup.sh
 endif
-	@if [ ! -d $(VENV) ]; then \
-		echo "$(BLUE)Creating virtual environment in $(VENV)...$(RESET)"; \
-		$(PYTHON) -m venv $(VENV); \
-	fi
-	@$(VENV)/bin/pip install --upgrade pip
-	@$(VENV)/bin/pip install -r requirements-dev.txt
-	@echo "$(BLUE)Installing system tools for $(OS_NAME)...$(RESET)"
 	@echo "$(BLUE)Installing project-level dependencies...$(RESET)"
 	@$(MAKE) install
 	@echo "$(GREEN)Setup complete!$(RESET)"
 
 # Install project-level dependencies
-install:
-	@echo "$(BOLD)Installing project dependencies...$(RESET)"
-	@if [ -f requirements.txt ]; then \
-		echo "$(BLUE)Installing Python dependencies...$(RESET)"; \
-		$(VENV)/bin/pip install -r requirements.txt; \
-	fi
-	@if [ -f requirements-dev.txt ]; then \
-		$(VENV)/bin/pip install -r requirements-dev.txt; \
-	fi
-	@if [ -f package.json ]; then \
-		echo "$(BLUE)Installing Node.js dependencies...$(RESET)"; \
-		$(NPM) install; \
-	fi
-	@if [ -f go.mod ]; then \
-		echo "$(BLUE)Downloading Go modules...$(RESET)"; \
-		go mod download; \
-	fi
+install: setup
 	@echo "$(GREEN)Dependencies installed!$(RESET)"
 
 # Run test suite
@@ -238,17 +159,22 @@ format:
 		echo "$(BLUE)Running ruff format...$(RESET)"; \
 		$(VENV)/bin/ruff format $(RUFF_EXCLUDES) .; \
 	fi
-	@if command -v shfmt >/dev/null 2>&1; then \
+	@if [ -x $(VENV)/bin/shfmt ]; then \
 		echo "$(BLUE)Running shfmt...$(RESET)"; \
+		find . -type f -name "*.sh" $(FIND_EXCLUDES) -exec $(VENV)/bin/shfmt -w -i 2 {} +; \
+	elif command -v shfmt >/dev/null 2>&1; then \
+		echo "$(BLUE)Running system shfmt...$(RESET)"; \
 		find . -type f -name "*.sh" $(FIND_EXCLUDES) -exec shfmt -w -i 2 {} +; \
 	fi
-	@if command -v prettier >/dev/null 2>&1; then \
-		echo "$(BLUE)Running prettier...$(RESET)"; \
-		prettier --write .; \
-	fi
+	@echo "$(BLUE)Running prettier...$(RESET)"
+	@$(NPM) exec prettier --write .
 	@if command -v gofmt >/dev/null 2>&1 && [ -f go.mod ]; then \
 		echo "$(BLUE)Running gofmt...$(RESET)"; \
 		find . -type f -name "*.go" $(FIND_EXCLUDES) -exec gofmt -w {} +; \
+	fi
+	@if [ -x $(VENV)/bin/clang-format ]; then \
+		echo "$(BLUE)Running clang-format...$(RESET)"; \
+		find . -type f \( -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.m" -o -name "*.mm" \) $(FIND_EXCLUDES) -exec $(VENV)/bin/clang-format -i {} +; \
 	fi
 	@echo "$(GREEN)Formatting complete!$(RESET)"
 
@@ -275,24 +201,51 @@ build:
 # Security and dependency audit
 check:
 	@echo "$(BOLD)Running security and dependency checks...$(RESET)"
-	@if command -v gitleaks >/dev/null 2>&1; then \
-		echo "$(BLUE)Checking for secrets with gitleaks...$(RESET)"; \
-		gitleaks detect --source . --no-git; \
-	fi
+	@echo "$(BLUE)Checking for secrets with gitleaks...$(RESET)"
+	@$(NPM) exec gitleaks detect --source . --no-git || true
 	@if [ -x $(VENV)/bin/ruff ] && ([ -f pyproject.toml ] || find . -type f -name "*.py" $(FIND_EXCLUDES) | grep -q .); then \
 		echo "$(BLUE)Checking Python code with ruff...$(RESET)"; \
 		$(VENV)/bin/ruff check $(RUFF_EXCLUDES) .; \
 	fi
-	@if command -v shellcheck >/dev/null 2>&1; then \
-		echo "$(BLUE)Checking shell scripts with shellcheck...$(RESET)"; \
-		find . -type f -name "*.sh" $(FIND_EXCLUDES) \
-			-exec shellcheck {} +; \
+	@if [ -x $(VENV)/bin/yamllint ]; then \
+		echo "$(BLUE)Checking YAML with yamllint...$(RESET)"; \
+		find . -type f \( -name "*.yaml" -o -name "*.yml" \) $(FIND_EXCLUDES) -print0 | xargs -0 $(VENV)/bin/yamllint; \
 	fi
+	@if [ -x $(VENV)/bin/sqlfluff ]; then \
+		echo "$(BLUE)Checking SQL with sqlfluff...$(RESET)"; \
+		find . -type f -name "*.sql" $(FIND_EXCLUDES) -exec $(VENV)/bin/sqlfluff lint {} --dialect postgres +; \
+	fi
+	@if [ -x $(VENV)/bin/ansible-lint ]; then \
+		echo "$(BLUE)Checking Ansible with ansible-lint...$(RESET)"; \
+		$(VENV)/bin/ansible-lint -v; \
+	fi
+	@if [ -x $(VENV)/bin/shellcheck ]; then \
+		echo "$(BLUE)Checking shell scripts with shellcheck...$(RESET)"; \
+		find . -type f -name "*.sh" $(FIND_EXCLUDES) -exec $(VENV)/bin/shellcheck {} +; \
+	fi
+	@if [ -x $(VENV)/bin/hadolint ]; then \
+		echo "$(BLUE)Checking Dockerfiles with hadolint...$(RESET)"; \
+		find . -type f -name "*Dockerfile*" $(FIND_EXCLUDES) -exec $(VENV)/bin/hadolint {} +; \
+	fi
+	@if [ -x $(VENV)/bin/actionlint ]; then \
+		echo "$(BLUE)Checking GitHub Actions with actionlint...$(RESET)"; \
+		$(VENV)/bin/actionlint; \
+	fi
+	@if [ -x $(VENV)/bin/dotenv-linter ]; then \
+		echo "$(BLUE)Checking .env files with dotenv-linter...$(RESET)"; \
+		$(VENV)/bin/dotenv-linter .env; \
+	fi
+	@echo "$(BLUE)Checking Kotlin with ktlint...$(RESET)"
+	@$(NPM) exec ktlint || true
+	@echo "$(BLUE)Checking API contracts with spectral...$(RESET)"
+	@find . -type f \( -iname "*openapi*" -o -iname "*swagger*" -o -iname "*asyncapi*" \) $(FIND_EXCLUDES) -exec $(NPM) exec spectral lint {} + || true
+	@echo "$(BLUE)Checking TOML with taplo...$(RESET)"
+	@$(NPM) exec taplo format --check || true
 	@if [ -f go.mod ] && command -v govulncheck >/dev/null 2>&1; then \
 		echo "$(BLUE)Checking Go vulnerabilities with govulncheck...$(RESET)"; \
 		govulncheck ./...; \
 	fi
-	@echo "$(GREEN)Security check complete!$(RESET)"
+	@echo "$(GREEN)Security and Lint check complete!$(RESET)"
 
 # Clean up temporary and generated files
 clean:

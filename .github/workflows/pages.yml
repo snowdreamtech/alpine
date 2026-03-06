@@ -8,11 +8,13 @@ name: Deploy Docs to GitHub Pages
     paths:
       - "docs/**"
       - "package.json"
-      - "package-lock.json"
       - "pnpm-lock.yaml"
-      - "yarn.lock"
-      - "bun.lockb"
   workflow_dispatch:
+    inputs:
+      venv:
+        description: "Virtual environment path"
+        required: false
+        default: ".venv"
 
 permissions:
   contents: read
@@ -26,73 +28,37 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      VENV: ${{ github.event.inputs.venv || '.venv' }}
+
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2
         with:
           fetch-depth: 0
 
-      - name: Detect package manager
-        id: detect-pm
-        # Priority: pnpm → yarn → npm → bun
-        run: |
-          if [ -f "pnpm-lock.yaml" ]; then
-            {
-              echo "manager=pnpm"
-              echo "install=pnpm install --frozen-lockfile"
-              echo "build=pnpm docs:build"
-              echo "cache=pnpm"
-            } >> "$GITHUB_OUTPUT"
-          elif [ -f "yarn.lock" ]; then
-            {
-              echo "manager=yarn"
-              echo "install=yarn install --frozen-lockfile"
-              echo "build=yarn docs:build"
-              echo "cache=yarn"
-            } >> "$GITHUB_OUTPUT"
-          elif [ -f "package-lock.json" ]; then
-            {
-              echo "manager=npm"
-              echo "install=npm ci"
-              echo "build=npm run docs:build"
-              echo "cache=npm"
-            } >> "$GITHUB_OUTPUT"
-          elif [ -f "bun.lockb" ]; then
-            {
-              echo "manager=bun"
-              echo "install=bun install --frozen-lockfile"
-              echo "build=bun run docs:build"
-              echo "cache=npm"
-            } >> "$GITHUB_OUTPUT"
-          else
-            {
-              echo "manager=npm"
-              echo "install=npm ci"
-              echo "build=npm run docs:build"
-              echo "cache=npm"
-            } >> "$GITHUB_OUTPUT"
-          fi
-
       - name: Setup pnpm
-        if: steps.detect-pm.outputs.manager == 'pnpm'
         uses: pnpm/action-setup@v4.2.0
 
-      - name: Setup Node.js
-        if: steps.detect-pm.outputs.manager != 'bun'
-        uses: actions/setup-node@v6.3.0
+      - name: Set up Node.js
+        uses: actions/setup-node@v6.2.0
         with:
-          node-version: 22
-          cache: ${{ steps.detect-pm.outputs.cache }}
+          node-version: "24"
+          cache: "pnpm"
 
-      - name: Setup Bun
-        if: steps.detect-pm.outputs.manager == 'bun'
-        uses: oven-sh/setup-bun@v2.1.2
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "3.12"
 
-      - name: Install dependencies
-        run: ${{ steps.detect-pm.outputs.install }}
+      - name: Run Environment Setup
+        run: |
+          sh scripts/setup.sh
+        env:
+          VENV: ${{ env.VENV }}
 
       - name: Build VitePress site
-        run: ${{ steps.detect-pm.outputs.build }}
+        run: pnpm docs:build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4.0.0

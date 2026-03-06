@@ -36,14 +36,21 @@ project-root/
 ## 🚀 Getting Started
 
 1. **Clone the template**.
-2. **Initialize the Environment**:
-   Trigger the initialization workflow by typing `@[/snowdreamtech.init]` in your AI agent chat. This will:
-   - Enable zero-config Node.js environment via `corepack enable`.
-   - Install all project-local linters/formatters (e.g., `markdownlint-cli2`, `prettier`, `eslint`, `stylelint`).
-   - Configure platform-specific binary tools (e.g., `shellcheck`, `actionlint`, `hadolint`, `gitleaks`).
-   - Activate `pre-commit` hooks for lightning-fast localized Shift-Left quality gates.
-   - Install project-level dependencies via `make install` (Requires `make` to be installed on your system).
-3. **Read the Rules**:
+2. **Bootstrap and Setup Environment**:
+   Run the cross-platform setup script to configure your local environment:
+   - **macOS / Linux**: `sh scripts/setup.sh`
+   - **Windows (PowerShell)**: `.\scripts\setup.ps1`
+   - **Windows (CMD)**: `scripts\setup.bat`
+3. **Project Hydration**:
+   Re-brand the template for your new project:
+
+   ```bash
+   make init
+   ```
+
+4. **Initialize AI Workflows**:
+   Trigger the initialization by typing `@[/snowdreamtech.init]` in your AI agent chat. This will configure `corepack`, install local linters/formatters, and activate `pre-commit` hooks.
+5. **Read the Rules**:
    Before coding, ensure both you and your AI assistant has read the core principles at `.agent/rules/01-general.md`.
 
 ## 🛠️ SpecKit Collaboration Workflows

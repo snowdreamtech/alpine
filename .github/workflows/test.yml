@@ -21,6 +21,11 @@ name: Test
       - "fix/**"
       - "pr/**"
   workflow_dispatch:
+    inputs:
+      venv:
+        description: "Virtual environment path"
+        required: false
+        default: ".venv"
 
 permissions:
   contents: read
@@ -30,6 +35,8 @@ jobs:
   test:
     name: Run Automated Tests
     runs-on: ubuntu-latest
+    env:
+      VENV: ${{ github.event.inputs.venv || '.venv' }}
 
     steps:
       - name: Checkout Code
@@ -40,21 +47,30 @@ jobs:
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.2.0
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4.2.0
+      - name: Set up Node.js
+        uses: actions/setup-node@v6.2.0
         with:
-          node-version: 20
-          cache: pnpm
+          node-version: "24"
+          cache: "pnpm"
 
-      - name: Install Node Dependencies
-        run: pnpm install
+      - name: Set up Python
+        uses: actions/setup-python@v6.2.0
+        with:
+          python-version: "3.12"
+
+      - name: Run Environment Setup
+        run: |
+          sh scripts/setup.sh
+        env:
+          VENV: ${{ env.VENV }}
 
       - name: Setup PowerShell
         shell: sh
         run: |
           # PowerShell is pre-installed on ubuntu-latest runners.
-          # The package.json script automatically installs Pester.
           pwsh --version
 
-      - name: Run Test Matrix (Shell & PowerShell)
+      - name: Run Test Matrix (Shell & PowerShell & Python & Go)
         run: make test
+        env:
+          VENV: ${{ env.VENV }}
