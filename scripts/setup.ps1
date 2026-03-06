@@ -14,7 +14,7 @@ $SetupScript = Join-Path $PSScriptRoot "setup.sh"
 $SetupScriptPosix = $SetupScript -replace '\\', '/'
 
 # Function to execute and exit
-function Execute-WithShell([string]$ShellPath, [string]$ShellName) {
+function Invoke-WithShell([string]$ShellPath, [string]$ShellName) {
     Write-Information "[PS1] Using $ShellName at $ShellPath" -InformationAction Continue
 
     # We use -c to run the script and properly pass arguments
@@ -42,19 +42,19 @@ function Execute-WithShell([string]$ShellPath, [string]$ShellName) {
 # 1. Try Git Bash (most common for Windows devs)
 $GitBash = "C:\Program Files\Git\bin\bash.exe"
 if (Test-Path $GitBash) {
-    Execute-WithShell $GitBash "Git Bash"
+    Invoke-WithShell $GitBash "Git Bash"
 }
 
 # 2. Try looking for bash in PATH
 $BashInPath = (Get-Command bash -ErrorAction SilentlyContinue).Source
 if ($BashInPath) {
-    Execute-WithShell $BashInPath "bash (from PATH)"
+    Invoke-WithShell $BashInPath "bash (from PATH)"
 }
 
 # 3. Try looking for sh in PATH
 $ShInPath = (Get-Command sh -ErrorAction SilentlyContinue).Source
 if ($ShInPath) {
-    Execute-WithShell $ShInPath "sh (from PATH)"
+    Invoke-WithShell $ShInPath "sh (from PATH)"
 }
 
 # 4. Try WSL (Windows Subsystem for Linux)
