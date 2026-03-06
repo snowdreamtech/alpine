@@ -57,7 +57,7 @@ endif
 # =============================================================================
 # Targets
 # =============================================================================
-.PHONY: all help init setup install lint format test build check clean commit
+.PHONY: all help init setup install lint format test build clean commit
 
 # Default target: display help
 all: help
@@ -77,7 +77,6 @@ help:
 	@echo "  $(GREEN)format$(RESET)   Auto-format code (ruff, prettier, shfmt, etc.)"
 	@echo "  $(GREEN)test$(RESET)     Run test suite"
 	@echo "  $(GREEN)build$(RESET)    Build project artifacts"
-	@echo "  $(GREEN)check$(RESET)    Run security and dependency audit checks"
 	@echo "  $(GREEN)commit$(RESET)   Start the interactive Commitizen CLI to create a structured commit"
 	@echo "  $(GREEN)clean$(RESET)    Remove temporary and generated files"
 	@echo "  $(GREEN)help$(RESET)     Show this help message"
@@ -180,53 +179,6 @@ format:
 	@echo "$(BLUE)Running clang-format...$(RESET)"
 	find . -type f \( -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.m" -o -name "*.mm" \) $(FIND_EXCLUDES) -exec $(VENV)/bin/clang-format -i {} +
 	@echo "$(GREEN)Formatting complete!$(RESET)"
-
-# Security and dependency audit
-check:
-	@echo "$(BOLD)Running security and dependency checks...$(RESET)"
-	@echo "$(BLUE)Checking for secrets with gitleaks...$(RESET)"
-	$(VENV)/bin/gitleaks detect --source . --no-git || true
-	@if find . -type f \( -name "*.yaml" -o -name "*.yml" \) $(FIND_EXCLUDES) | grep -q . ; then \
-		echo "$(BLUE)Checking YAML files with yamllint...$(RESET)"; \
-		find . -type f \( -name "*.yaml" -o -name "*.yml" \) $(FIND_EXCLUDES) -print0 | xargs -0 $(VENV)/bin/yamllint; \
-	fi
-	@if find . -type f -name "*.sql" $(FIND_EXCLUDES) | grep -q . ; then \
-		echo "$(BLUE)Checking SQL files with sqlfluff...$(RESET)"; \
-		find . -type f -name "*.sql" $(FIND_EXCLUDES) -exec $(VENV)/bin/sqlfluff lint --dialect postgres {} +; \
-	fi
-	@echo "$(BLUE)Checking Ansible with ansible-lint...$(RESET)"
-	$(VENV)/bin/ansible-lint -v
-	@if find . -type f -name "*.sh" $(FIND_EXCLUDES) | grep -q . ; then \
-		echo "$(BLUE)Checking shell scripts with shellcheck...$(RESET)"; \
-		find . -type f -name "*.sh" $(FIND_EXCLUDES) -exec $(VENV)/bin/shellcheck {} +; \
-	fi
-	@if find . -type f -name "*Dockerfile*" $(FIND_EXCLUDES) | grep -q . ; then \
-		echo "$(BLUE)Checking Dockerfiles with hadolint...$(RESET)"; \
-		find . -type f -name "*Dockerfile*" $(FIND_EXCLUDES) -exec $(VENV)/bin/hadolint {} +; \
-	fi
-	@echo "$(BLUE)Checking GitHub Actions with actionlint...$(RESET)"
-	$(VENV)/bin/actionlint
-	@if find . -type f -name ".env*" $(FIND_EXCLUDES) | grep -q . ; then \
-		echo "$(BLUE)Checking .env files with dotenv-linter...$(RESET)"; \
-		find . -type f -name ".env*" $(FIND_EXCLUDES) -exec $(VENV)/bin/dotenv-linter {} +; \
-	fi
-	@echo "$(BLUE)Checking Kotlin with ktlint...$(RESET)"
-	$(NPM) exec ktlint || true
-	@if find . -type f \( -iname "*openapi*" -o -iname "*swagger*" -o -iname "*asyncapi*" \) $(FIND_EXCLUDES) | grep -q . ; then \
-		echo "$(BLUE)Checking API contracts with spectral...$(RESET)"; \
-		find . -type f \( -iname "*openapi*" -o -iname "*swagger*" -o -iname "*asyncapi*" \) $(FIND_EXCLUDES) -exec $(NPM) exec spectral lint {} + || true; \
-	fi
-	@echo "$(BLUE)Checking TOML with taplo...$(RESET)"
-	$(NPM) exec taplo format --check || true
-	@if find . -type f -name 'Makefile' $(FIND_EXCLUDES) | grep -q . ; then \
-		echo "$(BLUE)Checking Makefiles with checkmake...$(RESET)"; \
-		find . -type f -name 'Makefile' $(FIND_EXCLUDES) -exec $(VENV)/bin/checkmake --config .checkmake.ini {} +; \
-	fi
-	@if [ -f go.mod ]; then \
-		echo "$(BLUE)Checking Go vulnerabilities with govulncheck...$(RESET)"; \
-		govulncheck ./...; \
-	fi
-	@echo "$(GREEN)Security and Lint check complete!$(RESET)"
 
 # Clean up temporary and generated files
 clean:

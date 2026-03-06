@@ -199,17 +199,21 @@ install_checkmake() {
 install_iac_lint() {
   log "── Installing IaC tools (tflint, kube-linter) ──"
   # TFLint
-  if [ ! -x "${VENV}/bin/tflint" ]; then
+  if [ ! -x "${VENV}/bin/tflint${_EXE}" ]; then
     _URL="${GITHUB_PROXY}https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh"
-    if [ "${OS}" = "darwin" ]; then
-      # Manual download for darwin as script uses sudo/usr/local
-      _TAR="tflint_darwin_arm64.zip" # approximation
-      [ "${_ARCH_N}" = "x64" ] && _TAR="tflint_darwin_amd64.zip"
+    if [ "${OS}" = "darwin" ] || [ "${_OS_TAG}" = "windows" ]; then
+      # Manual download for darwin and windows to bypass linux-only bash script
+      _TAR_OS="${_OS_TAG}"
+      _TAR_ARCH="amd64"
+      [ "${_ARCH_N}" = "arm64" ] && _TAR_ARCH="arm64"
+
+      _TAR="tflint_${_TAR_OS}_${_TAR_ARCH}.zip"
       _URL="${GITHUB_PROXY}https://github.com/terraform-linters/tflint/releases/download/${TFLINT_VERSION}/${_TAR}"
       _TMP=$(mktemp -d)
       if download_url "${_URL}" "${_TMP}/tflint.zip" "tflint"; then
         unzip -q "${_TMP}/tflint.zip" -d "${_TMP}"
-        mv "${_TMP}/tflint" "${VENV}/bin/tflint"
+        mv "${_TMP}/tflint${_EXE}" "${VENV}/bin/tflint${_EXE}"
+        chmod +x "${VENV}/bin/tflint${_EXE}"
         rm -rf "${_TMP}"
       else
         error "Failed to download tflint."
@@ -225,12 +229,14 @@ install_iac_lint() {
     fi
   fi
   # Kube-Linter
-  if [ ! -x "${VENV}/bin/kube-linter" ]; then
+  if [ ! -x "${VENV}/bin/kube-linter${_EXE}" ]; then
     _SUFFIX="linux"
     [ "${OS}" = "darwin" ] && _SUFFIX="darwin"
+    [ "${_OS_TAG}" = "windows" ] && _SUFFIX="windows.exe"
+
     _URL="${GITHUB_PROXY}https://github.com/stackrox/kube-linter/releases/download/${KUBE_LINTER_VERSION}/kube-linter-$_SUFFIX"
-    if download_url "${_URL}" "${VENV}/bin/kube-linter" "kube-linter"; then
-      chmod +x "${VENV}/bin/kube-linter"
+    if download_url "${_URL}" "${VENV}/bin/kube-linter${_EXE}" "kube-linter"; then
+      chmod +x "${VENV}/bin/kube-linter${_EXE}"
     else
       error "Failed to download kube-linter."
     fi

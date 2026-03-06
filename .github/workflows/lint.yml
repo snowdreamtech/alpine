@@ -162,6 +162,14 @@ jobs:
             echo "No ESLint configuration found, skipping ESLint."
           fi
 
+      - name: Run sort-package-json
+        run: |
+          if [ -f "package.json" ]; then
+            pnpm exec sort-package-json --check "package.json"
+          else
+            echo "No package.json found, skipping sort-package-json."
+          fi
+
       - name: Run Stylelint
         run: |
           if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.css' -o -name '*.scss' -o -name '*.less' \) -print -quit)" ]; then
@@ -185,6 +193,16 @@ jobs:
             ${{ env.VENV }}/bin/golangci-lint run
           else
             echo "No Go files found, skipping golangci-lint."
+          fi
+
+      - name: Run govulncheck
+        run: |
+          if [ -f "go.mod" ]; then
+            # install govulncheck globally in the runner since it's a go tool
+            go install golang.org/x/vuln/cmd/govulncheck@latest
+            govulncheck ./...
+          else
+            echo "No go.mod found, skipping govulncheck."
           fi
 
       - name: Run Rustfmt and Clippy
