@@ -18,6 +18,8 @@ GOLANGCI_VERSION=${GOLANGCI_VERSION:-v1.64.6}
 CHECKMAKE_VERSION=${CHECKMAKE_VERSION:-v0.3.2}
 TFLINT_VERSION=${TFLINT_VERSION:-v0.55.1}
 KUBE_LINTER_VERSION=${KUBE_LINTER_VERSION:-v0.7.2}
+JAVA_FORMAT_VERSION=${JAVA_FORMAT_VERSION:-1.34.1}
+PHP_CS_FIXER_VERSION=${PHP_CS_FIXER_VERSION:-v3.94.2}
 
 # Colors
 BLUE='\033[0;34m'
@@ -264,10 +266,80 @@ setup_powershell() {
   fi
 }
 
+install_java_lint() {
+  _JAR="${VENV}/bin/google-java-format.jar"
+  _BIN="${VENV}/bin/google-java-format"
+  if [ -f "${_JAR}" ]; then return 0; fi
+  log "── Installing google-java-format ${JAVA_FORMAT_VERSION} ──"
+  _URL="${GITHUB_PROXY}https://github.com/google/google-java-format/releases/download/v${JAVA_FORMAT_VERSION}/google-java-format-${JAVA_FORMAT_VERSION}-all-deps.jar"
+  if download_url "${_URL}" "${_JAR}" "google-java-format"; then
+    printf "#!/bin/sh\njava -jar \"%s\" \"\$@\"\n" "${_JAR}" >"${_BIN}"
+    chmod +x "${_BIN}"
+    info "google-java-format installed."
+  else
+    error "Failed to download google-java-format."
+  fi
+}
+
+install_ruby_lint() {
+  log "── Setting up Rubocop ──"
+  if command -v gem >/dev/null 2>&1; then
+    _RUBY_VER=$(ruby -e 'print RUBY_VERSION')
+    _RUBY_MAJOR=$(echo "$_RUBY_VER" | cut -d. -f1)
+    _RUBY_MINOR=$(echo "$_RUBY_VER" | cut -d. -f2)
+
+    if [ "$_RUBY_MAJOR" -lt 2 ] || { [ "$_RUBY_MAJOR" -eq 2 ] && [ "$_RUBY_MINOR" -lt 7 ]; }; then
+      warn "Warning: Ruby version $_RUBY_VER is too old (< 2.7.0). Attempting to install Rubocop v0.93.1 which is compatible with older Ruby."
+      gem install rubocop -v 0.93.1 --user-install --no-document --quiet || warn "Failed to install Rubocop. Please upgrade Ruby."
+    else
+      gem install rubocop --user-install --no-document --quiet || warn "Failed to install Rubocop."
+    fi
+    info "Rubocop setup finished."
+  else
+    warn "Warning: gem not found. Skipping Rubocop setup."
+  fi
+}
+
+install_php_lint() {
+  _BIN="${VENV}/bin/php-cs-fixer"
+  if [ -x "${_BIN}" ]; then return 0; fi
+  log "── Installing php-cs-fixer ${PHP_CS_FIXER_VERSION} ──"
+  _URL="${GITHUB_PROXY}https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/releases/download/${PHP_CS_FIXER_VERSION}/php-cs-fixer.phar"
+  if download_url "${_URL}" "${_BIN}" "php-cs-fixer"; then
+    chmod +x "${_BIN}"
+    info "php-cs-fixer installed."
+  else
+    error "Failed to download php-cs-fixer."
+  fi
+}
+
+setup_dart() {
+  log "── Checking Dart SDK ──"
+  command -v dart >/dev/null 2>&1 || warn "Warning: dart SDK not found."
+}
+
+setup_swift() {
+  if [ "${OS}" = "darwin" ]; then
+    log "── Setting up Swift Linters (macOS) ──"
+    if command -v brew >/dev/null 2>&1; then
+      brew list swiftformat >/dev/null 2>&1 || brew install swiftformat
+      brew list swiftlint >/dev/null 2>&1 || brew install swiftlint
+      info "Swift linters ensured."
+    else
+      warn "Warning: brew not found. Cannot install Swift linters."
+    fi
+  fi
+}
+
+setup_dotnet() {
+  log "── Checking .NET SDK ──"
+  command -v dotnet >/dev/null 2>&1 || warn "Warning: .NET SDK not found."
+}
+
 # ── Main Execution ───────────────────────────────────────────────────────────
 
 if [ $# -eq 0 ]; then
-  modules="node python gitleaks checkmake powershell hooks"
+  modules="node python gitleaks checkmake powershell java ruby php dart swift dotnet hooks"
 else
   modules="$*"
 fi
@@ -282,6 +354,12 @@ for module in $modules; do
   go) install_go_lint ;;
   iac) install_iac_lint ;;
   powershell) setup_powershell ;;
+  java) install_java_lint ;;
+  ruby) install_ruby_lint ;;
+  php) install_php_lint ;;
+  dart) setup_dart ;;
+  swift) setup_swift ;;
+  dotnet) setup_dotnet ;;
   hooks) setup_hooks ;;
   all)
     setup_node
@@ -292,6 +370,12 @@ for module in $modules; do
     install_go_lint
     install_iac_lint
     setup_powershell
+    install_java_lint
+    install_ruby_lint
+    install_php_lint
+    setup_dart
+    setup_swift
+    setup_dotnet
     setup_hooks
     ;;
   *) error "Unknown module: $module" ;;
