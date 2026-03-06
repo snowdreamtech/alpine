@@ -126,13 +126,15 @@ jobs:
           source .venv/bin/activate
 
       # Installing linting packages into our venv
-      - name: Install Linters
+      - name: Install Python Linters
         run: |
+          python3 -m venv .venv
           source .venv/bin/activate
-          pip install yamllint ansible-core ansible-lint ruff sqlfluff semgrep
+          pip install --upgrade pip
+          pip install -r requirements-dev.txt
 
       # Run yaml linting
-      - name: Run yamllint
+      - name: Run Yamllint
         run: |
           source .venv/bin/activate
           find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.yaml' -o -name '*.yml' \) -print0 | xargs -0 yamllint

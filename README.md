@@ -42,7 +42,7 @@ project-root/
    - Install all project-local linters/formatters (e.g., `markdownlint-cli2`, `prettier`, `eslint`, `stylelint`).
    - Configure platform-specific binary tools (e.g., `shellcheck`, `actionlint`, `hadolint`, `gitleaks`).
    - Activate `pre-commit` hooks for lightning-fast localized Shift-Left quality gates.
-   - Install project-level dependencies via `make install`.
+   - Install project-level dependencies via `make install` (Requires `make` to be installed on your system).
 3. **Read the Rules**:
    Before coding, ensure both you and your AI assistant has read the core principles at `.agent/rules/01-general.md`.
 

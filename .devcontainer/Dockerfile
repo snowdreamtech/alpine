@@ -15,8 +15,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     shellcheck hadolint shfmt gitleaks ruff clang-format openjdk-17-jre-headless unzip \
     && apt-get clean && rm -rf /var/lib/apt/lists/* \
     && corepack enable \
-    && pip3 install --no-cache-dir \
-    pre-commit yamllint sqlfluff actionlint-py ansible-lint \
+    && make setup \
     && curl -fLsS https://raw.githubusercontent.com/dotenv-linter/dotenv-linter/master/install.sh | sh -s -- -b /usr/local/bin \
     && curl -fLsS https://raw.githubusercontent.com/golangci/golangci-lint/HEAD/install.sh | sh -s -- -b /usr/local/bin \
     && curl -fLsS https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh | bash \

@@ -12,19 +12,21 @@ You **MUST** consider the user input before proceeding (if not empty).
 
 ## Outline
 
-1. **Initialize Environment**
+1. **Install Prerequisites**
+   Ensure you have `make` installed:
+   - **macOS**: `xcode-select --install` or `brew install make`
+   - **Windows**: `scoop install make` or `choco install make`
+   - **Linux**: `sudo apt install make` or `sudo dnf install make`
+
+2. **Initialize Environment**
    > **💡 Tip: DevContainer Available!**
    > This project provides a fully-configured `.devcontainer` configuration. If you use VS Code or GitHub Codespaces, you can simply open this project in a container to completely skip the environment setup below. Node.js, Python, Go, PowerShell, and all necessary linters will be pre-installed automatically.
 
-      **Cross-platform (pip3 + pnpm — works on macOS / Linux / Windows):**
-
-      > **💡 Zero Configuration Environment (Node.js 16.9+):**
-      > This project uses Node.js `corepack` to manage `pnpm`. New developers only need to run `corepack enable` once, and the correct version of `pnpm` defined in `package.json` will be automatically used.
-
       ```bash
       corepack enable
-      pip3 install yamllint sqlfluff
-      pnpm install
+      make setup                       # Default VENV=.venv
+      # or for ansible subproject:
+      # make VENV=.ansible/.venv setup
       ```
 
      **Other Backend Ecosystems (.NET / Ruby / PHP):**
@@ -94,7 +96,7 @@ You **MUST** consider the user input before proceeding (if not empty).
    - Install and activate `pre-commit` hooks to enforce code quality checks before every commit:
 
      ```bash
-     pip3 install pre-commit
+     # pre-commit is installed as part of `make setup`
      pre-commit install --hook-type pre-commit --hook-type pre-merge-commit --hook-type commit-msg
      ```
 

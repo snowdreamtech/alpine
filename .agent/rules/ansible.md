@@ -4,7 +4,9 @@
 
 ## 1. Idempotency
 
-- All tasks MUST be **idempotent** — running a playbook multiple times must produce the same end state without errors.
+- **Virtual Environments**: All development MUST occur within a project-local virtual environment (`.venv` by default). Global `pip install` is PROHIBITED.
+- **Tool Localization**: Linters (`ruff`) and other development tools MUST be installed via `requirements-dev.txt` into the virtual environment. Use `make setup` to initialize the environment.
+- **Configurable VENV**: The virtual environment path SHOULD be configurable via the `VENV` variable in the `Makefile` to support subprojects or specific deployment needs (e.g., `make VENV=.custom_venv setup`).
 - Use Ansible **modules** (e.g., `ansible.builtin.file`, `ansible.builtin.template`, `ansible.builtin.systemd`) instead of raw `shell` or `command` tasks whenever an appropriate module exists. Module names MUST be **fully qualified** (`ansible.builtin.*`, `community.general.*`, etc.) — never use short-form names (e.g., `copy`, `template`) to avoid ambiguity with collection shadowing.
 - When `shell` or `command` tasks are unavoidable, MUST explicitly set `changed_when: false` for read-only/info-gathering commands. If the task tracks real state changes, define a precise `changed_when` condition — do not blindly set `false`.
 - `failed_when` is REQUIRED only when the default non-zero exit code check is insufficient (e.g., success/failure depends on stdout patterns).

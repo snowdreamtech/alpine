@@ -6,7 +6,7 @@
 #   brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format \
 #                dotenv-linter golangci-lint checkmake tflint kube-linter ktlint
 #   corepack enable
-#   pip3 install yamllint sqlfluff
+#   make VENV=... setup  # Default VENV=.venv
 #   npm install (project local via pnpm)
 #
 # Setup (one-time per machine):

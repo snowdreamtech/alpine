@@ -5,6 +5,7 @@ Get up and running in under 5 minutes.
 ## Prerequisites
 
 - **Git** — for cloning the repository
+- **Make** — for running project tasks (`brew install make` or `scoop install make`)
 - **Docker Desktop** — for DevContainer support (recommended)
 - **VS Code** with the [Dev Containers](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers) extension
 

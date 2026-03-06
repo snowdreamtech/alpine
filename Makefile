@@ -27,7 +27,8 @@ RUFF_EXCLUDES := $(foreach dir,$(PRUNE_DIRS),--exclude $(dir))
 # Tool Variables (can be overridden: make setup PYTHON=python3.11)
 # =============================================================================
 PYTHON     ?= python3
-PIP        ?= pip3
+VENV       ?= .venv
+PIP        ?= $(VENV)/bin/pip3
 NODE       ?= node
 NPM_DETECTOR := $(shell \
 	if command -v pnpm >/dev/null 2>&1; then echo "pnpm"; \
@@ -35,7 +36,7 @@ NPM_DETECTOR := $(shell \
 	elif command -v bun >/dev/null 2>&1; then echo "bun"; \
 	else echo "npm"; fi)
 NPM        ?= $(NPM_DETECTOR)
-PRE_COMMIT ?= pre-commit
+PRE_COMMIT ?= $(VENV)/bin/pre-commit
 GORELEASER ?= goreleaser
 GITHUB_PROXY ?= https://gh-proxy.sn0wdr1am.com/
 
@@ -160,12 +161,13 @@ else ifeq ($(OS_NAME),Windows)
 		Write-Host "Error: No supported package manager found (Scoop/Choco/Winget)." -ForegroundColor Red; exit 1; \
 	}
 endif
-	@$(PIP) install pre-commit yamllint sqlfluff
-	@$(NPM) install
-	@$(PRE_COMMIT) install \
-		--hook-type pre-commit \
-		--hook-type pre-merge-commit \
-		--hook-type commit-msg
+	@if [ ! -d $(VENV) ]; then \
+		echo "$(BLUE)Creating virtual environment in $(VENV)...$(RESET)"; \
+		$(PYTHON) -m venv $(VENV); \
+	fi
+	@$(VENV)/bin/pip install --upgrade pip
+	@$(VENV)/bin/pip install -r requirements-dev.txt
+	@echo "$(BLUE)Installing system tools for $(OS_NAME)...$(RESET)"
 	@echo "$(BLUE)Installing project-level dependencies...$(RESET)"
 	@$(MAKE) install
 	@echo "$(GREEN)Setup complete!$(RESET)"
@@ -175,10 +177,10 @@ install:
 	@echo "$(BOLD)Installing project dependencies...$(RESET)"
 	@if [ -f requirements.txt ]; then \
 		echo "$(BLUE)Installing Python dependencies...$(RESET)"; \
-		$(PIP) install -r requirements.txt; \
+		$(VENV)/bin/pip install -r requirements.txt; \
 	fi
 	@if [ -f requirements-dev.txt ]; then \
-		$(PIP) install -r requirements-dev.txt; \
+		$(VENV)/bin/pip install -r requirements-dev.txt; \
 	fi
 	@if [ -f package.json ]; then \
 		echo "$(BLUE)Installing Node.js dependencies...$(RESET)"; \
@@ -203,7 +205,7 @@ test:
 	fi
 	@if [ -f pytest.ini ] || [ -f pyproject.toml ] || { [ -d tests ] && find tests -name "test_*.py" -o -name "*_test.py" | grep -q . ; }; then \
 		echo "$(BLUE)Running pytest...$(RESET)"; \
-		$(PYTHON) -m pytest --tb=short; \
+		$(VENV)/bin/python3 -m pytest --tb=short; \
 	elif [ -f go.mod ]; then \
 		echo "$(BLUE)Running go test...$(RESET)"; \
 		go test ./...; \
@@ -232,9 +234,9 @@ lint:
 # Auto-format code
 format:
 	@echo "$(BOLD)Formatting code...$(RESET)"
-	@if command -v ruff >/dev/null 2>&1; then \
+	@if [ -x $(VENV)/bin/ruff ]; then \
 		echo "$(BLUE)Running ruff format...$(RESET)"; \
-		ruff format $(RUFF_EXCLUDES) .; \
+		$(VENV)/bin/ruff format $(RUFF_EXCLUDES) .; \
 	fi
 	@if command -v shfmt >/dev/null 2>&1; then \
 		echo "$(BLUE)Running shfmt...$(RESET)"; \
@@ -265,7 +267,7 @@ build:
 		$(NPM) run build; \
 	elif [ -f pyproject.toml ]; then \
 		echo "$(BLUE)Running python build...$(RESET)"; \
-		$(PYTHON) -m build; \
+		$(VENV)/bin/python3 -m build; \
 	else \
 		echo "$(YELLOW)No build system detected. Skipping.$(RESET)"; \
 	fi
@@ -277,9 +279,9 @@ check:
 		echo "$(BLUE)Checking for secrets with gitleaks...$(RESET)"; \
 		gitleaks detect --source . --no-git; \
 	fi
-	@if command -v ruff >/dev/null 2>&1 && ([ -f pyproject.toml ] || find . -type f -name "*.py" $(FIND_EXCLUDES) | grep -q .); then \
+	@if [ -x $(VENV)/bin/ruff ] && ([ -f pyproject.toml ] || find . -type f -name "*.py" $(FIND_EXCLUDES) | grep -q .); then \
 		echo "$(BLUE)Checking Python code with ruff...$(RESET)"; \
-		ruff check $(RUFF_EXCLUDES) .; \
+		$(VENV)/bin/ruff check $(RUFF_EXCLUDES) .; \
 	fi
 	@if command -v shellcheck >/dev/null 2>&1; then \
 		echo "$(BLUE)Checking shell scripts with shellcheck...$(RESET)"; \
