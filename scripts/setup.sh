@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 # scripts/setup.sh - Modularized Project Setup Script
 # This script is designed for both local development and CI/CD JIT installation.
 # usage: sh scripts/setup.sh [module1] [module2] ...
@@ -110,7 +110,7 @@ install_go_lint() {
   log "── Installing golangci-lint ${GOLANGCI_VERSION} ──"
   # Official install script via curl
   export BINDIR="${VENV}/bin"
-  curl -sSfL "${GITHUB_PROXY}https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh" | sh -s -- "${GOLANGCI_VERSION}"
+  curl -sSfL "${GITHUB_PROXY}https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh" | bash -s -- "${GOLANGCI_VERSION}"
   info "golangci-lint installed."
 }
 
@@ -130,7 +130,7 @@ install_iac_lint() {
       mv "${_TMP}/tflint" "${VENV}/bin/tflint"
       rm -rf "${_TMP}"
     else
-      curl -sSfL "${_URL}" | TFLINT_INSTALL_PATH="${VENV}/bin" sh
+      curl -sSfL "${_URL}" | TFLINT_INSTALL_PATH="${VENV}/bin" bash
     fi
   fi
   # Kube-Linter
