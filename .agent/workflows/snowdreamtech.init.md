@@ -18,7 +18,11 @@ You **MUST** consider the user input before proceeding (if not empty).
 
       **Cross-platform (pip3 + pnpm — works on macOS / Linux / Windows):**
 
+      > **💡 Zero Configuration Environment (Node.js 16.9+):**
+      > This project uses Node.js `corepack` to manage `pnpm`. New developers only need to run `corepack enable` once, and the correct version of `pnpm` defined in `package.json` will be automatically used.
+
       ```bash
+      corepack enable
       pip3 install yamllint sqlfluff
       pnpm install
       ```
