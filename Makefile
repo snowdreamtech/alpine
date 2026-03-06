@@ -103,6 +103,16 @@ endif
 	@$(MAKE) install
 	@echo "$(GREEN)Setup complete!$(RESET)"
 
+# Archive major version changelogs
+archive-changelog:
+	@echo "$(BLUE)Archiving previous major version changelogs...$(RESET)"
+ifeq ($(OS_NAME),Windows)
+	@scripts/archive-changelog.bat
+else
+	@sh scripts/archive-changelog.sh
+endif
+	@echo "$(GREEN)Archiving complete!$(RESET)"
+
 # Install project-level dependencies
 install:
 	@echo "$(BLUE)Installing project-level dependencies...$(RESET)"

@@ -1,6 +1,7 @@
 #!/bin/sh
 # scripts/archive-changelog.sh - Automate major-version changelog archiving
 # This script moves entries of previous major versions from CHANGELOG.md to archival files.
+# Strictly POSIX-compliant.
 
 set -e
 
@@ -15,8 +16,8 @@ fi
 if command -v jq >/dev/null 2>&1; then
   CURRENT_MAJOR=$(jq -r '.version | split(".")[0]' "$PACKAGE_JSON")
 else
-  # Portable extraction using grep/sed
-  CURRENT_MAJOR=$(grep '"version":' "$PACKAGE_JSON" | head -n 1 | sed -E 's/.*"([0-9]+)\..*/\1/')
+  # Portable extraction using grep/sed (BRE only)
+  CURRENT_MAJOR=$(grep '"version":' "$PACKAGE_JSON" | head -n 1 | sed 's/.*"//;s/\..*//')
 fi
 
 # Temp files
@@ -31,15 +32,16 @@ if [ -z "$FIRST_H2_LINE" ]; then
   exit 0
 fi
 
+# head -n $((FIRST_H2_LINE - 1)) is POSIX-compliant
 head -n "$((FIRST_H2_LINE - 1))" "$CHANGELOG" >"$TMP_HEADER"
 
-# 2. Process all versions using a more portable awk approach
+# 2. Process all versions using a more portable awk approach (Avoid match() and other non-POSIX)
 tail -n +"$FIRST_H2_LINE" "$CHANGELOG" | awk -v major="$CURRENT_MAJOR" -v prefix="$TMP_ARCHIVE_PREFIX" '
   /^## \[/ {
-    # Extract major version manually for portability (BSD awk compatibility)
-    header = $0;
-    sub(/^## \[/, "", header);
-    split(header, parts, ".");
+    # Extract major version manually using split
+    line = $0;
+    sub(/^## \[/, "", line);
+    split(line, parts, ".");
     v_major = parts[1];
 
     if ($0 ~ /Unreleased/) {
@@ -54,7 +56,8 @@ tail -n +"$FIRST_H2_LINE" "$CHANGELOG" | awk -v major="$CURRENT_MAJOR" -v prefix
   }
   {
     if (output == "") output = "current";
-    print >> (prefix "/" output ".md");
+    target = prefix "/" output ".md";
+    print >> target;
   }
 '
 
@@ -65,22 +68,24 @@ if [ -f "$TMP_ARCHIVE_PREFIX/current.md" ]; then
 fi
 
 # 4. Handle archives
-# Use for loop to avoid ls | grep (ls -f lists all files including hidden, but prefix is clean)
+# Use for loop with patterns to avoid ls | grep
 for arch_file in "$TMP_ARCHIVE_PREFIX"/v*.md; do
   [ -e "$arch_file" ] || continue
 
-  V_NUM=$(basename "$arch_file" .md | sed 's/^v//')
-  FINAL_ARCH_FILE="CHANGELOG-v$V_NUM.md"
+  v_tag=$(basename "$arch_file" .md)
+  v_num=$(echo "$v_tag" | sed 's/^v//')
+  FINAL_ARCH_FILE="CHANGELOG-v$v_num.md"
 
   # Prepend newest entries to archive if it already exists
   if [ -f "$FINAL_ARCH_FILE" ]; then
-    cat "$arch_file" >"${FINAL_ARCH_FILE}.tmp"
-    printf "\n" >>"${FINAL_ARCH_FILE}.tmp"
-    # Skip header in existing file if it exists
-    sed '1,2d' "$FINAL_ARCH_FILE" >>"${FINAL_ARCH_FILE}.tmp"
-    mv "${FINAL_ARCH_FILE}.tmp" "$FINAL_ARCH_FILE"
+    tmp_file=$(mktemp)
+    cat "$arch_file" >"$tmp_file"
+    printf "\n" >>"$tmp_file"
+    # Portable sed: Skip first two lines (header) of existing archive
+    sed '1,2d' "$FINAL_ARCH_FILE" >>"$tmp_file"
+    mv "$tmp_file" "$FINAL_ARCH_FILE"
   else
-    printf "# Changelog Archive v%s\n\n" "$V_NUM" >"$FINAL_ARCH_FILE"
+    printf "# Changelog Archive v%s\n\n" "$v_num" >"$FINAL_ARCH_FILE"
     cat "$arch_file" >>"$FINAL_ARCH_FILE"
   fi
 
@@ -89,12 +94,14 @@ for arch_file in "$TMP_ARCHIVE_PREFIX"/v*.md; do
     printf "\n## History\n\n" >>"$CHANGELOG"
   fi
 
-  LINK="- [v$V_NUM.x.x Archive](./$FINAL_ARCH_FILE)"
+  LINK="- [v$v_num.x.x Archive](./$FINAL_ARCH_FILE)"
   if ! grep -Fq -- "$LINK" "$CHANGELOG"; then
-    # Portable sed insertion
-    sed -i.bak "/^## History/a \\
+    # POSIX-compliant sed insertion using a temp file
+    tmp_cl=$(mktemp)
+    sed "/^## History/a\\
 $LINK
-" "$CHANGELOG" && rm "${CHANGELOG}.bak"
+" "$CHANGELOG" >"$tmp_cl"
+    mv "$tmp_cl" "$CHANGELOG"
   fi
 done
 
