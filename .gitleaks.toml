@@ -18,13 +18,4 @@ paths = [
   '''\.nuxt/''',
   '''\.output/''',
   '''__pycache__/''',
-  '''\.specify/''',
-  '''\.ansible/''',
-  '''package-lock\.json''',
-  '''pnpm-lock\.yaml''',
-  '''yarn\.lock''',
-  '''poetry\.lock''',
-  '''composer\.lock''',
-  '''Cargo\.lock''',
-  '''go\.sum''',
 ]
