@@ -16,15 +16,12 @@ You **MUST** consider the user input before proceeding (if not empty).
    > **💡 Tip: DevContainer Available!**
    > This project provides a fully-configured `.devcontainer` configuration. If you use VS Code or GitHub Codespaces, you can simply open this project in a container to completely skip the environment setup below. Node.js, Python, Go, PowerShell, and all necessary linters will be pre-installed automatically.
 
-   - Ensure the development environment supports the core ecosystems needed for linting: `nodejs` (for eslint/prettier/commitlint), `python` (for ruff/yamllint/sqlfluff).
-   - Install linting tools required by `.pre-commit-config.yaml` and `.github/workflows/lint.yml`.
+      **Cross-platform (pip3 + pnpm — works on macOS / Linux / Windows):**
 
-     **Cross-platform (pip3 + npm — works on macOS / Linux / Windows):**
-
-     ```bash
-     pip3 install yamllint sqlfluff
-     npm install -g markdownlint-cli2 prettier editorconfig-checker eslint @stoplight/spectral-cli @commitlint/cli @commitlint/config-conventional stylelint stylelint-config-standard @taplo/cli sort-package-json
-     ```
+      ```bash
+      pip3 install yamllint sqlfluff
+      pnpm install
+      ```
 
      **Other Backend Ecosystems (.NET / Ruby / PHP):**
      _Note: `.NET` formatters are built-in (`dotnet format`)._

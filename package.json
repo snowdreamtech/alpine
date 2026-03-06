@@ -8,6 +8,13 @@
     "docs:build": "vitepress build docs",
     "docs:dev": "vitepress dev docs",
     "docs:preview": "vitepress preview docs",
+    "lint:eslint": "eslint \".\"",
+    "lint:fix": "prettier --write . && eslint \".\" --fix && stylelint \"**/*.{css,scss,less}\" --fix && markdownlint-cli2 \"**/*.md\" --fix",
+    "lint:markdown": "markdownlint-cli2 \"**/*.md\"",
+    "lint:prettier": "prettier --check \"**/*.{json,yml,yaml,vue,js,jsx,ts,tsx}\"",
+    "lint:spectral": "spectral lint \"**/*.{json,yml,yaml}\"",
+    "lint:stylelint": "stylelint \"**/*.{css,scss,less}\"",
+    "lint:taplo": "taplo format --check",
     "test:ps": "pwsh -Command \"if (!(Get-Module -ListAvailable Pester)) { Install-Module -Name Pester -Force -SkipPublisherCheck -Scope CurrentUser }; Invoke-Pester tests/\"",
     "test:shell": "bats tests/"
   },
@@ -17,11 +24,22 @@
     }
   },
   "devDependencies": {
+    "@commitlint/cli": "19.7.1",
+    "@commitlint/config-conventional": "19.7.1",
+    "@stoplight/spectral-cli": "6.11.1",
+    "@taplo/cli": "0.7.0",
     "bats": "1.13.0",
     "bats-assert": "2.2.4",
     "bats-support": "0.3.0",
     "commitizen": "4.3.1",
     "cz-conventional-changelog": "3.3.0",
+    "editorconfig-checker": "6.0.0",
+    "eslint": "9.21.0",
+    "markdownlint-cli2": "0.21.0",
+    "prettier": "3.5.2",
+    "sort-package-json": "2.14.0",
+    "stylelint": "16.15.0",
+    "stylelint-config-standard": "37.0.0",
     "vitepress": "1.6.3"
   },
   "packageManager": "pnpm@10.28.0"

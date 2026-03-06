@@ -142,9 +142,10 @@ jobs:
         uses: actions/setup-node@v6.2.0
         with:
           node-version: "24"
+          cache: "pnpm"
 
       - name: Install Node.js Linters
-        run: npm install -g markdownlint-cli2 prettier editorconfig-checker eslint stylelint @stoplight/spectral-cli @taplo/cli sort-package-json
+        run: pnpm install --frozen-lockfile
 
       - name: Install ShellCheck Binary
         env:
@@ -196,7 +197,7 @@ jobs:
 
       # Run Markdown linting (exclusions are handled by .markdownlintignore)
       - name: Run markdownlint
-        run: markdownlint-cli2 "**/*.md"
+        run: pnpm exec markdownlint-cli2 "**/*.md"
 
       # Core Ansible Linting phase
       - name: Run ansible-lint
@@ -237,10 +238,10 @@ jobs:
 
       # JSON, YAML, Vue, JS, TS, & React formatting linting
       - name: Run Prettier
-        run: prettier --check "**/*.{json,yml,yaml,vue,js,jsx,ts,tsx}"
+        run: pnpm exec prettier --check "**/*.{json,yml,yaml,vue,js,jsx,ts,tsx}"
 
       - name: Run editorconfig-checker
-        run: editorconfig-checker -exclude "(\.(venv|git|github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|specify|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml|tabnine|supermaven|vibe|void|zed)/.*)|((node_modules|venv|env|dist|build|out|target|vendor|__pycache__|\.specify)/.*)|(\.aider\.conf\.yml)"
+        run: pnpm exec editorconfig-checker -exclude "(\.(venv|git|github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|specify|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml|tabnine|supermaven|vibe|void|zed)/.*)|((node_modules|venv|env|dist|build|out|target|vendor|__pycache__|\.specify)/.*)|(\.aider\.conf\.yml)"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -257,7 +258,7 @@ jobs:
         run: |
           if [ -f "eslint.config.js" ] || [ -f "eslint.config.mjs" ] || [ -f ".eslintrc.js" ] || [ -f ".eslintrc.json" ]; then
             echo "ESLint config found, running ESLint..."
-            eslint "."
+            pnpm exec eslint "."
           else
             echo "No ESLint configuration found, skipping ESLint."
           fi
@@ -266,7 +267,7 @@ jobs:
       - name: Run Stylelint
         run: |
           if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.css' -o -name '*.scss' -o -name '*.less' \) -print -quit)" ]; then
-            stylelint "**/*.{css,scss,less}"
+            pnpm exec stylelint "**/*.{css,scss,less}"
           else
             echo "No CSS/SCSS/LESS files found, skipping Stylelint."
           fi
@@ -275,7 +276,7 @@ jobs:
       - name: Run Taplo
         run: |
           if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.toml' -print -quit)" ]; then
-            taplo format --check
+            pnpm exec taplo format --check
           else
             echo "No TOML files found, skipping Taplo."
           fi
@@ -485,7 +486,7 @@ jobs:
       - name: Run Spectral (OpenAPI / AsyncAPI)
         run: |
           if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -iname '*openapi*.yaml' -o -iname '*openapi*.yml' -o -iname '*openapi*.json' -o -iname '*swagger*.yaml' -o -iname '*swagger*.yml' -o -iname '*swagger*.json' -o -iname '*asyncapi*.yaml' -o -iname '*asyncapi*.yml' -o -iname '*asyncapi*.json' \) -print -quit)" ]; then
-            find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -iname '*openapi*.yaml' -o -iname '*openapi*.yml' -o -iname '*openapi*.json' -o -iname '*swagger*.yaml' -o -iname '*swagger*.yml' -o -iname '*swagger*.json' -o -iname '*asyncapi*.yaml' -o -iname '*asyncapi*.yml' -o -iname '*asyncapi*.json' \) -exec spectral lint {} +
+            find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -iname '*openapi*.yaml' -o -iname '*openapi*.yml' -o -iname '*openapi*.json' -o -iname '*swagger*.yaml' -o -iname '*swagger*.yml' -o -iname '*swagger*.json' -o -iname '*asyncapi*.yaml' -o -iname '*asyncapi*.yml' -o -iname '*asyncapi*.json' \) -exec pnpm exec spectral lint {} +
           else
             echo "No OpenAPI/Swagger/AsyncAPI files found, skipping Spectral."
           fi

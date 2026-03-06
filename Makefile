@@ -161,9 +161,7 @@ else ifeq ($(OS_NAME),Windows)
 	}
 endif
 	@$(PIP) install pre-commit yamllint sqlfluff
-	@$(NPM) install -g markdownlint-cli2 prettier editorconfig-checker eslint \
-		@stoplight/spectral-cli @commitlint/cli @commitlint/config-conventional \
-		stylelint stylelint-config-standard @taplo/cli sort-package-json
+	@$(NPM) install
 	@$(PRE_COMMIT) install \
 		--hook-type pre-commit \
 		--hook-type pre-merge-commit \

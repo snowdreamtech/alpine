@@ -6,9 +6,7 @@
 #   brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format \
 #                dotenv-linter golangci-lint checkmake tflint kube-linter ktlint
 #   pip3 install yamllint sqlfluff
-#   npm install -g markdownlint-cli2 prettier editorconfig-checker eslint \
-#               @stoplight/spectral-cli @commitlint/cli @commitlint/config-conventional \
-#               stylelint stylelint-config-standard @taplo/cli sort-package-json
+#   npm install (project local via pnpm)
 #
 # Setup (one-time per machine):
 #   pip3 install pre-commit
@@ -82,7 +80,7 @@ repos:
       - id: prettier
         name: prettier
         language: system
-        entry: prettier
+        entry: pnpm exec prettier
         args: [--write]
         types_or: [json, yaml, vue, javascript, jsx, ts, tsx]
 
@@ -102,7 +100,7 @@ repos:
       - id: taplo
         name: taplo
         language: system
-        entry: taplo format
+        entry: pnpm exec taplo format
         types: [toml]
 
       - id: ruff-format
@@ -121,7 +119,7 @@ repos:
       - id: editorconfig-checker
         name: editorconfig-checker
         language: system
-        entry: editorconfig-checker
+        entry: pnpm exec editorconfig-checker
         args:
           - -exclude
           - '(\.(venv|git|github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|specify|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml|tabnine|supermaven|vibe|void|zed)/.*)|((node_modules|venv|env|dist|build|out|target|vendor|__pycache__|\.specify)/.*|(\.aider\.conf\.yml))'
@@ -130,14 +128,14 @@ repos:
       - id: eslint
         name: eslint
         language: system
-        entry: eslint
+        entry: pnpm exec eslint
         args: [--fix]
         types_or: [javascript, ts, tsx, jsx, vue]
 
       - id: stylelint
         name: stylelint
         language: system
-        entry: stylelint --fix
+        entry: pnpm exec stylelint --fix
         types_or: [css, scss, less]
 
       - id: ruff
@@ -156,7 +154,7 @@ repos:
       - id: markdownlint-cli2
         name: markdownlint-cli2
         language: system
-        entry: markdownlint-cli2
+        entry: pnpm exec markdownlint-cli2
         args: [--fix]
         types: [markdown]
 
@@ -303,7 +301,7 @@ repos:
       - id: spectral
         name: spectral
         language: system
-        entry: spectral lint
+        entry: pnpm exec spectral lint
         types_or: [json, yaml]
         files: '(?i)(openapi|swagger|asyncapi).*\.(json|yaml|yml)$'
         pass_filenames: true
@@ -311,7 +309,7 @@ repos:
 
       - id: sort-package-json
         name: sort-package-json
-        entry: sort-package-json
+        entry: pnpm exec sort-package-json
         language: system
         files: ^package\.json$
         pass_filenames: true
@@ -329,6 +327,6 @@ repos:
       - id: commitlint
         name: commitlint
         language: system
-        entry: commitlint --edit
+        entry: pnpm exec commitlint --edit
         always_run: true
         stages: [commit-msg, manual]
