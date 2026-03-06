@@ -80,7 +80,7 @@ jobs:
 
       - name: Run Foundational Environment Setup
         run: |
-          bash scripts/setup.sh node python gitleaks
+          sh scripts/setup.sh node python gitleaks
         env:
           VENV: ${{ env.VENV }}
 
@@ -168,7 +168,7 @@ jobs:
       - name: Run golangci-lint
         run: |
           if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.go' -print -quit)" ]; then
-            bash scripts/setup.sh go
+            sh scripts/setup.sh go
             ${{ env.VENV }}/bin/golangci-lint run
           else
             echo "No Go files found, skipping golangci-lint."
@@ -267,7 +267,7 @@ jobs:
           fi
 
           if [ "$K8S_FILES" = true ] || [ "$TF_FILES" = true ]; then
-            bash scripts/setup.sh iac
+            sh scripts/setup.sh iac
             if [ "$K8S_FILES" = true ]; then
               (find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.yaml' -o -name '*.yml' \) -print0 | xargs -0 ${{ env.VENV }}/bin/kube-linter lint) || true
             fi
@@ -337,7 +337,7 @@ jobs:
       - name: Run hadolint
         run: |
           if [ -n "$(find . -type f -name "*Dockerfile*" -not -path "*/${{ env.VENV }}/*" -not -path "*/node_modules/*" -print -quit)" ]; then
-            bash scripts/setup.sh hadolint
+            sh scripts/setup.sh hadolint
             find . -type f -name "*Dockerfile*" -not -path "*/${{ env.VENV }}/*" -not -path "*/node_modules/*" -print0 | \
               xargs -0 -I{} ${{ env.VENV }}/bin/hadolint {}
           else

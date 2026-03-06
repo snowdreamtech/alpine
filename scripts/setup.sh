@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/bin/sh
 # scripts/setup.sh - Modularized Project Setup Script
 # This script is designed for both local development and CI/CD JIT installation.
 # usage: sh scripts/setup.sh [module1] [module2] ...
