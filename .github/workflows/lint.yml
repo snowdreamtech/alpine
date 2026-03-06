@@ -56,6 +56,14 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
 
+      - name: Set env variables
+        run: |
+          {
+            echo "BRANCH=${GITHUB_REF##*/}"
+            echo "http_proxy=${http_proxy}"
+            echo "no_proxy=${no_proxy}"
+          } >> "$GITHUB_ENV"
+
       - name: Setup pnpm
         uses: pnpm/action-setup@v4.2.0
 
@@ -83,14 +91,6 @@ jobs:
           sh scripts/setup.sh node python gitleaks
         env:
           VENV: ${{ env.VENV }}
-
-      - name: Set env variables
-        run: |
-          {
-            echo "BRANCH=${GITHUB_REF##*/}"
-            echo "http_proxy=${http_proxy}"
-            echo "no_proxy=${no_proxy}"
-          } >> "$GITHUB_ENV"
 
       - name: Run Gitleaks
         run: |
