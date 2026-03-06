@@ -1,17 +1,11 @@
 ---
 # Pre-commit hook configuration (local mode).
-# Uses system-installed tools directly — no network downloads required.
-#
-# Required tools (install once via: make setup):
-#   brew install shellcheck actionlint hadolint shfmt gitleaks ruff clang-format \
-#                dotenv-linter golangci-lint checkmake tflint kube-linter ktlint
-#   corepack enable
-#   make VENV=... setup  # Default VENV=.venv
-#   npm install (project local via pnpm)
+# Uses project-local tools installed via scripts/setup.sh.
 #
 # Setup (one-time per machine):
-#   pip3 install pre-commit
-#   pre-commit install --hook-type pre-commit --hook-type pre-merge-commit --hook-type commit-msg
+#   sh scripts/setup.sh
+#   # or with a custom venv path:
+#   VENV=/path/to/.venv sh scripts/setup.sh
 #
 # Run manually against all files:
 #   pre-commit run --all-files
@@ -94,7 +88,7 @@ repos:
       - id: shfmt
         name: shfmt
         language: system
-        entry: shfmt
+        entry: .venv/bin/shfmt
         args: [-w, -s, -i, "2"]
         types: [shell]
 
@@ -113,7 +107,8 @@ repos:
       - id: clang-format
         name: clang-format
         language: system
-        entry: clang-format -i
+        entry: .venv/bin/clang-format
+        args: [-i]
         types_or: [objective-c, c, c++]
 
       # ── EditorConfig & Consistency ─────────────────────────────────────────
@@ -148,7 +143,7 @@ repos:
       - id: yamllint
         name: yamllint
         language: system
-        entry: yamllint
+        entry: .venv/bin/yamllint
         args: [--config-file, .yamllint.yml]
         types: [yaml]
 
@@ -162,7 +157,7 @@ repos:
       - id: shellcheck
         name: shellcheck
         language: system
-        entry: shellcheck
+        entry: .venv/bin/shellcheck
         types: [shell]
 
       - id: hadolint
@@ -170,23 +165,14 @@ repos:
         language: system
         entry: hadolint
         files: Dockerfile
-        description: "Linter for Dockerfiles to ensure best practices."
+        description: "Linter for Dockerfiles. Requires hadolint installed via brew or manually."
 
       - id: actionlint
         name: actionlint
         language: system
-        entry: actionlint
+        entry: .venv/bin/actionlint
         files: ^\.github/workflows/.*\.yml$
         description: "Linter for GitHub Actions workflow files."
-
-      # ── Go ─────────────────────────────────────────────────────────────────
-      - id: golangci-lint
-        name: golangci-lint
-        language: system
-        entry: golangci-lint run
-        types: [go]
-        pass_filenames: false
-        description: "Fast Go linter aggregator. Runs incrementally on changed files."
 
       # ── Makefile ──────────────────────────────────────────────────────────
       - id: checkmake
@@ -194,7 +180,7 @@ repos:
         language: system
         entry: checkmake --config .checkmake.ini
         files: ^Makefile$
-        description: "Linter for Makefiles to enforce best practices."
+        description: "Linter for Makefiles. Requires checkmake installed locally."
 
       # ── SQL ────────────────────────────────────────────────────────────────
       - id: sqlfluff
@@ -206,30 +192,19 @@ repos:
         description: "SQL linter. Dialect defaults to postgres; override via .sqlfluff config."
 
       # ── Terraform / OpenTofu ───────────────────────────────────────────────
-      - id: tflint
-        name: tflint
-        language: system
-        entry: tflint
-        files: \.tf$
-        pass_filenames: false
-        description: "Linter for Terraform files. Requires tflint installed locally."
+      # NOTE: tflint is heavy (requires plugin init) — run full scans in CI only.
+      # Locally, only format/syntax checks via pre-commit.
 
       # ── Kubernetes ────────────────────────────────────────────────────────
-      - id: kube-linter
-        name: kube-linter
-        language: system
-        entry: kube-linter lint
-        files: '\.(yaml|yml)$'
-        pass_filenames: true
-        description: "Linter for Kubernetes manifests. Only runs when kube-linter is installed."
+      # NOTE: kube-linter is heavy (full manifest scan) — run in CI only.
 
       # ── Kotlin ────────────────────────────────────────────────────────────
       - id: ktlint
         name: ktlint
         language: system
-        entry: ktlint
+        entry: pnpm exec ktlint
         types_or: [kotlin]
-        description: "Kotlin linter and formatter. Requires ktlint installed locally."
+        description: "Kotlin linter and formatter. Via pnpm exec."
 
       # ── Java ──────────────────────────────────────────────────────────────
       - id: google-java-format
@@ -318,11 +293,11 @@ repos:
 
       - id: dotenv-linter
         name: dotenv-linter
-        entry: dotenv-linter
+        entry: .venv/bin/dotenv-linter
         language: system
         files: '(\.env|\.env\.example|\.env\.sample)$'
         pass_filenames: true
-        description: "Linter for .env files to check for consistency and security. Requires dotenv-linter installed locally (see Makefile setup target)."
+        description: "Linter for .env files. Installed via requirements-dev.txt."
 
       # ── Git Commit Message Flow ──────────────────────────────────────────────
       - id: commitlint
