@@ -345,7 +345,7 @@ jobs:
           }
           $psFiles = Get-ChildItem -Path . -Recurse -Include *.ps1,*.psm1,*.psd1 -Exclude .git,node_modules,.venv,venv,env,vendor,dist,build,out,target,.next,.nuxt,.output,__pycache__,.specify
           if ($psFiles.Count -gt 0) {
-            $results = Invoke-ScriptAnalyzer -Path $psFiles.FullName -Severity Error,Warning
+            $results = $psFiles.FullName | Invoke-ScriptAnalyzer -Severity Error,Warning
             if ($results) {
               $results | Format-Table -AutoSize
               exit 1

@@ -254,10 +254,20 @@ setup_hooks() {
   fi
 }
 
+setup_powershell() {
+  log "── Setting up PowerShell Linter ──"
+  if command -v pwsh >/dev/null 2>&1; then
+    pwsh -NoProfile -Command "if (!(Get-Module -ListAvailable PSScriptAnalyzer)) { Install-Module -Name PSScriptAnalyzer -Force -SkipPublisherCheck -Scope CurrentUser }"
+    info "PSScriptAnalyzer installed."
+  else
+    warn "Warning: pwsh not found. Skipping PowerShell linter setup."
+  fi
+}
+
 # ── Main Execution ───────────────────────────────────────────────────────────
 
 if [ $# -eq 0 ]; then
-  modules="node python gitleaks checkmake hooks"
+  modules="node python gitleaks checkmake powershell hooks"
 else
   modules="$*"
 fi
@@ -271,6 +281,7 @@ for module in $modules; do
   hadolint) install_hadolint ;;
   go) install_go_lint ;;
   iac) install_iac_lint ;;
+  powershell) setup_powershell ;;
   hooks) setup_hooks ;;
   all)
     setup_node
@@ -280,6 +291,7 @@ for module in $modules; do
     install_hadolint
     install_go_lint
     install_iac_lint
+    setup_powershell
     setup_hooks
     ;;
   *) error "Unknown module: $module" ;;
