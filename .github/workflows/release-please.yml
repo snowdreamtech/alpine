@@ -22,5 +22,3 @@ jobs:
         with:
           # Using the manifest approach allows managing multiple components or a single monorepo seamlessly
           release-type: simple
-          # Generate the changelog at the root of the repo
-          changelog-path: CHANGELOG.md
