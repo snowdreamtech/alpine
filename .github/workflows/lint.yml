@@ -78,6 +78,12 @@ jobs:
         with:
           python-version: "3.12"
 
+      - name: Run Foundational Environment Setup
+        run: |
+          sh scripts/setup.sh node python gitleaks
+        env:
+          VENV: ${{ env.VENV }}
+
       - name: Run Commitlint Check
         run: |
           if [ "${{ github.event_name }}" == "pull_request" ]; then
@@ -85,12 +91,6 @@ jobs:
           else
             pnpm exec commitlint --last --verbose
           fi
-
-      - name: Run Foundational Environment Setup
-        run: |
-          sh scripts/setup.sh node python gitleaks
-        env:
-          VENV: ${{ env.VENV }}
 
       - name: Run Gitleaks
         run: |
