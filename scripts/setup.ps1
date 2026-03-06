@@ -2,8 +2,11 @@
 # This script initializes the development environment by delegating to setup.sh
 # using a compatible shell (Git Bash, WSL, MSYS2, or standalone bash).
 
-Write-Host "🚀 Initializing Snowdream Tech AI IDE Template for Windows..." -ForegroundColor Blue
-Write-Host "[PS1] Finding a compatible POSIX shell to execute setup.sh..." -ForegroundColor Gray
+[CmdletBinding()]
+param()
+
+Write-Information "🚀 Initializing Snowdream Tech AI IDE Template for Windows..." -InformationAction Continue
+Write-Information "[PS1] Finding a compatible POSIX shell to execute setup.sh..." -InformationAction Continue
 
 $ArgsString = $args -join " "
 $SetupScript = Join-Path $PSScriptRoot "setup.sh"
@@ -12,7 +15,7 @@ $SetupScriptPosix = $SetupScript -replace '\\', '/'
 
 # Function to execute and exit
 function Execute-WithShell([string]$ShellPath, [string]$ShellName) {
-    Write-Host "[PS1] Using $ShellName at $ShellPath" -ForegroundColor Green
+    Write-Information "[PS1] Using $ShellName at $ShellPath" -InformationAction Continue
 
     # We use -c to run the script and properly pass arguments
     $Command = "`"$SetupScriptPosix`" $ArgsString"
@@ -27,9 +30,10 @@ function Execute-WithShell([string]$ShellPath, [string]$ShellName) {
     $Process.WaitForExit()
 
     if ($Process.ExitCode -eq 0) {
-        Write-Host "`n✨ Setup completed successfully via $ShellName!" -ForegroundColor Green
-    } else {
-        Write-Host "`n❌ Setup failed with exit code $($Process.ExitCode)." -ForegroundColor Red
+        Write-Information "`n✨ Setup completed successfully via $ShellName!" -InformationAction Continue
+    }
+    else {
+        Write-Information "`n❌ Setup failed with exit code $($Process.ExitCode)." -InformationAction Continue
     }
 
     exit $Process.ExitCode
@@ -56,7 +60,7 @@ if ($ShInPath) {
 # 4. Try WSL (Windows Subsystem for Linux)
 $WslPath = "$env:WINDIR\System32\wsl.exe"
 if (Test-Path $WslPath) {
-    Write-Host "[PS1] Using WSL (Windows Subsystem for Linux)" -ForegroundColor Green
+    Write-Information "[PS1] Using WSL (Windows Subsystem for Linux)" -InformationAction Continue
 
     # Convert Windows path to WSL path (e.g., C:\ -> /mnt/c/)
     $Drive = $SetupScript.Substring(0, 1).ToLower()
@@ -72,9 +76,10 @@ if (Test-Path $WslPath) {
     $Process.WaitForExit()
 
     if ($Process.ExitCode -eq 0) {
-        Write-Host "`n✨ Setup completed successfully via WSL!" -ForegroundColor Green
-    } else {
-        Write-Host "`n❌ Setup failed with exit code $($Process.ExitCode)." -ForegroundColor Red
+        Write-Information "`n✨ Setup completed successfully via WSL!" -InformationAction Continue
+    }
+    else {
+        Write-Information "`n❌ Setup failed with exit code $($Process.ExitCode)." -InformationAction Continue
     }
     exit $Process.ExitCode
 }
