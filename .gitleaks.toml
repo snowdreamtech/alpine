@@ -1,0 +1,30 @@
+# .gitleaks.toml
+# Gitleaks configuration file with path exclusions
+
+[allowlist]
+description = "Global allowlist for build artifacts and environments"
+paths = [
+  '''\.git/''',
+  '''node_modules/''',
+  '''\.venv/''',
+  '''venv/''',
+  '''env/''',
+  '''vendor/''',
+  '''dist/''',
+  '''build/''',
+  '''out/''',
+  '''target/''',
+  '''\.next/''',
+  '''\.nuxt/''',
+  '''\.output/''',
+  '''__pycache__/''',
+  '''\.specify/''',
+  '''\.ansible/''',
+  '''package-lock\.json''',
+  '''pnpm-lock\.yaml''',
+  '''yarn\.lock''',
+  '''poetry\.lock''',
+  '''composer\.lock''',
+  '''Cargo\.lock''',
+  '''go\.sum''',
+]

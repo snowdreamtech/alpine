@@ -94,7 +94,7 @@ jobs:
 
       - name: Run Gitleaks
         run: |
-          ${{ env.VENV }}/bin/gitleaks detect --source . --verbose --gitleaks-ignore-path .gitleaksignore || true
+          ${{ env.VENV }}/bin/gitleaks detect --source . --verbose --config .gitleaks.toml || true
 
       - name: Run markdownlint
         run: |
