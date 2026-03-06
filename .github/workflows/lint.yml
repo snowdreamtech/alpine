@@ -132,14 +132,14 @@ jobs:
         run: pnpm exec prettier --check "**/*.{json,yml,yaml,vue,js,jsx,ts,tsx}"
 
       - name: Run editorconfig-checker
-        run: pnpm exec editorconfig-checker -exclude "(\.(venv|git|github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|specify|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml|tabnine|supermaven|vibe|void|zed)/.*)|((node_modules|venv|env|dist|build|out|target|vendor|__pycache__|\.specify)/.*)|(\.aider\.conf\.yml)"
+        run: pnpm exec editorconfig-checker -exclude '^(\.git|node_modules|\.venv|venv|env|vendor|dist|build|out|target|\.next|\.nuxt|\.output|__pycache__|\.specify)/'
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Run Lychee (Link Checker)
         uses: lycheeverse/lychee-action@v2.8.0
         with:
-          args: --root-dir "${{ github.workspace }}" --verbose --no-progress --exclude-path "node_modules" --exclude-path ".venv" --exclude-path "venv" --exclude-path "env" --exclude-path "vendor" --exclude-path "dist" --exclude-path "build" --exclude-path "out" --exclude-path "target" --exclude-path ".next" --exclude-path ".nuxt" --exclude-path ".output" --exclude-path "__pycache__" --exclude-path ".specify" '**/*.md'
+          args: --root-dir "${{ github.workspace }}" --verbose --no-progress --exclude-path ".git" --exclude-path "node_modules" --exclude-path ".venv" --exclude-path "venv" --exclude-path "env" --exclude-path "vendor" --exclude-path "dist" --exclude-path "build" --exclude-path "out" --exclude-path "target" --exclude-path ".next" --exclude-path ".nuxt" --exclude-path ".output" --exclude-path "__pycache__" --exclude-path ".specify" '**/*.md'
           fail: true
 
       - name: Run ESLint
@@ -310,7 +310,7 @@ jobs:
       - name: Run Semgrep
         run: |
           if [ -x ${{ env.VENV }}/bin/semgrep ]; then
-            ${{ env.VENV }}/bin/semgrep scan --config=auto --error --exclude=".git" --exclude="node_modules" --exclude="${{ env.VENV }}" --exclude="venv" --exclude="env" --exclude="vendor" --exclude="dist" --exclude="build" --exclude="out" --exclude="target" --exclude=".next" --exclude=".nuxt" --exclude=".output" --exclude="__pycache__" --exclude=".specify"
+            ${{ env.VENV }}/bin/semgrep scan --config=auto --error --exclude=".git" --exclude="node_modules" --exclude=".venv" --exclude="venv" --exclude="env" --exclude="vendor" --exclude="dist" --exclude="build" --exclude="out" --exclude="target" --exclude=".next" --exclude=".nuxt" --exclude=".output" --exclude="__pycache__" --exclude=".specify"
           fi
 
       - name: Run Trivy Vulnerability Scanner
@@ -327,7 +327,7 @@ jobs:
           exit-code: "1"
           version: "v0.69.2"
           token-setup-trivy: ${{ secrets.GITHUB_TOKEN }}
-          skip-dirs: "node_modules,${{ env.VENV }},venv,env,vendor,dist,build,out,target,.next,.nuxt,.output,__pycache__,.specify"
+          skip-dirs: ".git,node_modules,.venv,venv,env,vendor,dist,build,out,target,.next,.nuxt,.output,__pycache__,.specify"
 
       - name: Upload Trivy scan results to GitHub Security tab
         uses: github/codeql-action/upload-sarif@v4.32.5
