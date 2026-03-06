@@ -144,6 +144,9 @@ jobs:
           node-version: "24"
           cache: "pnpm"
 
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.2.0
+
       - name: Install Node.js Linters
         run: pnpm install --frozen-lockfile
 

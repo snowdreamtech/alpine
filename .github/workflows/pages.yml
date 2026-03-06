@@ -76,8 +76,6 @@ jobs:
       - name: Setup pnpm
         if: steps.detect-pm.outputs.manager == 'pnpm'
         uses: pnpm/action-setup@v4.2.0
-        with:
-          version: latest
 
       - name: Setup Bun
         if: steps.detect-pm.outputs.manager == 'bun'

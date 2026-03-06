@@ -42,9 +42,11 @@ jobs:
         with:
           node-version: 20
 
-      # npm install uses pnpm, package manager defined in package.json
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.2.0
+
       - name: Install Node Dependencies
-        run: npm i -g pnpm && pnpm install
+        run: pnpm install
 
       - name: Setup PowerShell
         shell: sh
