@@ -39,7 +39,7 @@ _EXE=""
 case "${OS}" in
 darwin) _OS_TAG="darwin" ;;
 linux) _OS_TAG="linux" ;;
-msys* | mingw*)
+msys* | mingw* | cygwin*)
   _OS_TAG="windows"
   _EXE=".exe"
   ;;
@@ -108,18 +108,37 @@ install_gitleaks() {
   if [ -x "${_BIN}" ]; then return 0; fi
   log "── Installing gitleaks ${GITLEAKS_VERSION} ──"
   _TAR_TAG="${_OS_TAG}"
-  [ "${_OS_TAG}" = "windows" ] && _TAR_TAG="windows" # redundant but explicit
-  _TAR="gitleaks_${GITLEAKS_VERSION#v}_${_TAR_TAG}_${_ARCH_N}.tar.gz"
-  # zip for windows? No, gitleaks provides .tar.gz even for windows.
-  _URL="${GITHUB_PROXY}https://github.com/gitleaks/gitleaks/releases/download/${GITLEAKS_VERSION}/${_TAR}"
+  [ "${_OS_TAG}" = "windows" ] && _TAR_TAG="windows"
   _TMP=$(mktemp -d)
-  if download_url "${_URL}" "${_TMP}/gitleaks.tar.gz" "gitleaks"; then
-    tar -xzf "${_TMP}/gitleaks.tar.gz" -C "${_TMP}" gitleaks
-    mv "${_TMP}/gitleaks" "${_BIN}"
-    chmod +x "${_BIN}"
-    info "gitleaks installed."
+
+  if [ "${_OS_TAG}" = "windows" ]; then
+    _ARCH_W="x64"
+    [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _ARCH_W="arm64" # approximations based on known variants
+    # actually gitleaks uses x64, x32, armv6, armv7. Assuming x64 for typical Windows setups.
+    _ARCH_W="x64"
+    _TAR="gitleaks_${GITLEAKS_VERSION#v}_${_TAR_TAG}_${_ARCH_W}.zip"
+    _URL="${GITHUB_PROXY}https://github.com/gitleaks/gitleaks/releases/download/${GITLEAKS_VERSION}/${_TAR}"
+
+    if download_url "${_URL}" "${_TMP}/gitleaks.zip" "gitleaks"; then
+      unzip -q "${_TMP}/gitleaks.zip" -d "${_TMP}"
+      mv "${_TMP}/gitleaks.exe" "${_BIN}"
+      chmod +x "${_BIN}"
+      info "gitleaks installed."
+    else
+      error "Failed to download gitleaks."
+    fi
   else
-    error "Failed to download gitleaks."
+    _TAR="gitleaks_${GITLEAKS_VERSION#v}_${_TAR_TAG}_${_ARCH_N}.tar.gz"
+    _URL="${GITHUB_PROXY}https://github.com/gitleaks/gitleaks/releases/download/${GITLEAKS_VERSION}/${_TAR}"
+
+    if download_url "${_URL}" "${_TMP}/gitleaks.tar.gz" "gitleaks"; then
+      tar -xzf "${_TMP}/gitleaks.tar.gz" -C "${_TMP}" gitleaks
+      mv "${_TMP}/gitleaks" "${_BIN}"
+      chmod +x "${_BIN}"
+      info "gitleaks installed."
+    else
+      error "Failed to download gitleaks."
+    fi
   fi
   rm -rf "${_TMP}"
 }

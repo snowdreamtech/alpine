@@ -1,6 +1,7 @@
 @echo off
-:: scripts/setup.bat - CMD wrapper for setup.ps1
-:: This provides a familiar entry point for Windows developers.
+REM scripts\setup.cmd - Project Setup Script for Windows (CMD Wrapper)
+REM This script delegates to setup.ps1, which in turn delegates to setup.sh.
 
-echo 🚀 Launching PowerShell setup script...
-powershell -ExecutionPolicy Bypass -File "%~dp0setup.ps1"
+echo [CMD] Delegating setup to PowerShell...
+powershell.exe -ExecutionPolicy Bypass -NoProfile -File "%~dp0setup.ps1" %*
+exit /b %ERRORLEVEL%

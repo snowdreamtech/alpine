@@ -142,6 +142,18 @@ jobs:
           args: --root-dir "${{ github.workspace }}" --verbose --no-progress --exclude-path ".git" --exclude-path "node_modules" --exclude-path ".venv" --exclude-path "venv" --exclude-path "env" --exclude-path "vendor" --exclude-path "dist" --exclude-path "build" --exclude-path "out" --exclude-path "target" --exclude-path ".next" --exclude-path ".nuxt" --exclude-path ".output" --exclude-path "__pycache__" --exclude-path ".specify" '**/*.md'
           fail: true
 
+      - name: Run yamllint
+        run: |
+          if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.yaml' -o -name '*.yml' \) -print -quit)" ]; then
+            find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.yaml' -o -name '*.yml' \) -print0 | xargs -0 ${{ env.VENV }}/bin/yamllint --config-file .yamllint.yml
+          fi
+
+      - name: Run dotenv-linter
+        run: |
+          if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '.env' -o -name '.env.example' -o -name '.env.sample' \) -print -quit)" ]; then
+            find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '.env' -o -name '.env.example' -o -name '.env.sample' \) -exec ${{ env.VENV }}/bin/dotenv-linter {} +
+          fi
+
       - name: Run ESLint
         run: |
           if [ -f "eslint.config.js" ] || [ -f "eslint.config.mjs" ] || [ -f ".eslintrc.js" ] || [ -f ".eslintrc.json" ]; then
@@ -306,6 +318,21 @@ jobs:
 
       - name: Run actionlint
         run: ${{ env.VENV }}/bin/actionlint
+
+      - name: Run PSScriptAnalyzer
+        shell: pwsh
+        run: |
+          if (-not (Get-Module -ListAvailable PSScriptAnalyzer)) {
+            Install-Module -Name PSScriptAnalyzer -Force -SkipPublisherCheck -Scope CurrentUser
+          }
+          $psFiles = Get-ChildItem -Path . -Recurse -Include *.ps1,*.psm1,*.psd1 -Exclude .git,node_modules,.venv,venv,env,vendor,dist,build,out,target,.next,.nuxt,.output,__pycache__,.specify
+          if ($psFiles.Count -gt 0) {
+            $results = Invoke-ScriptAnalyzer -Path $psFiles.FullName -Severity Error,Warning
+            if ($results) {
+              $results | Format-Table -AutoSize
+              exit 1
+            }
+          }
 
       - name: Run Semgrep
         run: |
