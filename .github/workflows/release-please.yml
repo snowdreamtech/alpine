@@ -29,3 +29,4 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           # Using the manifest approach allows managing multiple components or a single monorepo seamlessly
           release-type: simple
+          config-file: .release-please-config.json

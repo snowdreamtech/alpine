@@ -2,39 +2,48 @@
   "changelog-sections": [
     {
       "type": "feat",
-      "section": "🚀 Features"
+      "section": "🚀 Features",
+      "hidden": false
     },
     {
       "type": "fix",
-      "section": "🐛 Bug Fixes"
+      "section": "🐛 Bug Fixes",
+      "hidden": false
     },
     {
       "type": "perf",
-      "section": "⚡️ Performance Improvements"
+      "section": "⚡️ Performance Improvements",
+      "hidden": false
     },
     {
       "type": "refactor",
-      "section": "🛠 Refactoring"
+      "section": "🛠 Refactoring",
+      "hidden": false
     },
     {
       "type": "sec",
-      "section": "🛡️ Security Updates"
+      "section": "🛡️ Security Updates",
+      "hidden": false
     },
     {
       "type": "security",
-      "section": "🛡️ Security Updates"
+      "section": "🛡️ Security Updates",
+      "hidden": false
     },
     {
       "type": "docs",
-      "section": "📖 Documentation"
+      "section": "📖 Documentation",
+      "hidden": false
     },
     {
       "type": "deps",
-      "section": "📦 Dependency Updates"
+      "section": "📦 Dependency Updates",
+      "hidden": false
     },
     {
       "type": "chore",
-      "section": "♻️ Miscellaneous Chores"
+      "section": "♻️ Miscellaneous Chores",
+      "hidden": false
     }
   ]
 }

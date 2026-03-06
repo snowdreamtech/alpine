@@ -58,11 +58,9 @@ changelog:
   filters:
     exclude:
       - "(?i)^test"
-      - "(?i)^chore"
       - "(?i)^ci"
       - "(?i)^build"
       - "(?i)^style"
-      - "(?i)^docs"
       - "(?i)^revert"
       - "^Merge pull request"
       - "^Merge remote-tracking branch"
