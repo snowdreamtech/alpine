@@ -45,7 +45,8 @@ Open your project in any supported AI IDE and run the init workflow:
 
 This triggers the AI agent to:
 
-- Install all language-specific linters and formatters
+- Enable zero-config Node.js environment via `corepack enable`
+- Install all project-local linters and formatters via `pnpm install`
 - Configure platform-specific tools (Homebrew / APT / Scoop)
 - Activate pre-commit hooks
 

@@ -38,8 +38,9 @@ project-root/
 1. **Clone the template**.
 2. **Initialize the Environment**:
    Trigger the initialization workflow by typing `@[/snowdreamtech.init]` in your AI agent chat. This will:
-   - Install linguistically specific linters/formatters (e.g., `golangci-lint`, `checkmake`, `sqlfluff`, `ktlint`, `kube-linter`, `tflint`).
-   - Configure platform-specific binary tools (e.g., MacPorts/Homebrew/Scoop/Winget/APT).
+   - Enable zero-config Node.js environment via `corepack enable`.
+   - Install all project-local linters/formatters (e.g., `markdownlint-cli2`, `prettier`, `eslint`, `stylelint`).
+   - Configure platform-specific binary tools (e.g., `shellcheck`, `actionlint`, `hadolint`, `gitleaks`).
    - Activate `pre-commit` hooks for lightning-fast localized Shift-Left quality gates.
    - Install project-level dependencies via `make install`.
 3. **Read the Rules**:

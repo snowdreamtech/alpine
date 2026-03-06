@@ -14,14 +14,18 @@ Invoke with `/snowdreamtech.init` in any AI IDE.
 
 ## What It Does
 
-1. **Installs global tools** required by the development workflow:
-   - `commitlint` — commit message validation
-   - `markdownlint-cli2` — Markdown linting
-   - `prettier` — code formatting
-   - `sort-package-json` — `package.json` sorting
-   - `stylelint` — CSS/SCSS linting
+1. **Installs tools** required by the development workflow:
+
+   - `corepack enable` — enables zero-config `pnpm`
+   - `pnpm install` — installs all project-local linters/formatters:
+     - `commitlint`
+     - `markdownlint-cli2`
+     - `prettier`
+     - `sort-package-json`
+     - `stylelint`
 
 2. **Sets up pre-commit hooks**:
+
    - Installs `pre-commit` Python package
    - Runs `pre-commit install` for commit hooks
    - Runs `pre-commit install --hook-type commit-msg` for commit message hooks
@@ -39,9 +43,11 @@ make setup
 ## Manual Steps (if needed)
 
 ```bash
-# Install Node.js tools
-npm install -g commitlint @commitlint/cli @commitlint/config-conventional \
-  markdownlint-cli2 prettier sort-package-json stylelint
+# Enable Zero-Config pnpm
+corepack enable
+
+# Install all project tools
+pnpm install
 
 # Install pre-commit
 pip install pre-commit
@@ -60,8 +66,8 @@ After initialization, verify everything works:
 pre-commit run --all-files
 
 # Test commit message validation
-echo "feat: test" | commitlint
+echo "feat: test" | pnpm exec commitlint
 
 # Test formatting
-prettier --check .
+pnpm exec prettier --check .
 ```
