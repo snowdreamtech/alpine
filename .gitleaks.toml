@@ -6,9 +6,7 @@ description = "Global allowlist for build artifacts and environments"
 paths = [
   '''\.git/''',
   '''node_modules/''',
-  '''\.venv/''',
-  '''venv/''',
-  '''env/''',
+  '''(\.venv|venv|env)/(bin|lib|include|share|scripts|Lib|Scripts)/''',
   '''vendor/''',
   '''dist/''',
   '''build/''',
