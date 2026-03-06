@@ -77,16 +77,16 @@ jobs:
         if: steps.detect-pm.outputs.manager == 'pnpm'
         uses: pnpm/action-setup@v4.2.0
 
-      - name: Setup Bun
-        if: steps.detect-pm.outputs.manager == 'bun'
-        uses: oven-sh/setup-bun@v2.1.2
-
       - name: Setup Node.js
         if: steps.detect-pm.outputs.manager != 'bun'
         uses: actions/setup-node@v6.3.0
         with:
           node-version: 22
           cache: ${{ steps.detect-pm.outputs.cache }}
+
+      - name: Setup Bun
+        if: steps.detect-pm.outputs.manager == 'bun'
+        uses: oven-sh/setup-bun@v2.1.2
 
       - name: Install dependencies
         run: ${{ steps.detect-pm.outputs.install }}

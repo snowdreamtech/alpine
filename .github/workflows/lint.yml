@@ -137,15 +137,14 @@ jobs:
           source .venv/bin/activate
           find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.yaml' -o -name '*.yml' \) -print0 | xargs -0 yamllint
 
-      # Setup Node.js for Markdown linting & JS-based tools
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4.2.0
+
       - name: Set up Node.js
         uses: actions/setup-node@v6.2.0
         with:
           node-version: "24"
           cache: "pnpm"
-
-      - name: Setup pnpm
-        uses: pnpm/action-setup@v4.2.0
 
       - name: Install Node.js Linters
         run: pnpm install --frozen-lockfile
