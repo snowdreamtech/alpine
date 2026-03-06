@@ -78,7 +78,7 @@ changelog:
     - title: "⚡️ Performance Improvements"
       regexp: "^.*(?i)perf[(\\w)]*:+.*$"
       order: 300
-    - title: "🛠  Refactoring"
+    - title: "🛠 Refactoring"
       regexp: "^.*(?i)refactor[(\\w)]*:+.*$"
       order: 400
     - title: "📦 Dependency Updates"
@@ -90,5 +90,5 @@ changelog:
     - title: "📖 Documentation"
       regexp: "^.*(?i)docs[(\\w)]*:+.*$"
       order: 700
-    - title: "♻️ Other Work"
+    - title: "♻️ Miscellaneous Chores"
       order: 9999

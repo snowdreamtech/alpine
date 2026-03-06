@@ -1,0 +1,40 @@
+{
+  "changelog-sections": [
+    {
+      "type": "feat",
+      "section": "🚀 Features"
+    },
+    {
+      "type": "fix",
+      "section": "🐛 Bug Fixes"
+    },
+    {
+      "type": "perf",
+      "section": "⚡️ Performance Improvements"
+    },
+    {
+      "type": "refactor",
+      "section": "🛠 Refactoring"
+    },
+    {
+      "type": "sec",
+      "section": "🛡️ Security Updates"
+    },
+    {
+      "type": "security",
+      "section": "🛡️ Security Updates"
+    },
+    {
+      "type": "docs",
+      "section": "📖 Documentation"
+    },
+    {
+      "type": "deps",
+      "section": "📦 Dependency Updates"
+    },
+    {
+      "type": "chore",
+      "section": "♻️ Miscellaneous Chores"
+    }
+  ]
+}
