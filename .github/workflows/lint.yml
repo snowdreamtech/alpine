@@ -94,11 +94,7 @@ jobs:
 
       - name: Run Gitleaks
         run: |
-          if command -v gitleaks > /dev/null 2>&1; then
-            gitleaks detect --source . --verbose --gitleaks-ignore-path .gitleaksignore || true
-          else
-            echo "gitleaks not found on system, skipping."
-          fi
+          ${{ env.VENV }}/bin/gitleaks detect --source . --verbose --gitleaks-ignore-path .gitleaksignore || true
 
       - name: Run markdownlint
         run: pnpm exec markdownlint-cli2 "**/*.md"

@@ -45,10 +45,43 @@ if [ -f requirements-dev.txt ]; then
   "$VENV/bin/pip" install -r requirements-dev.txt
 fi
 
-# 3. System Tools Setup (Project-Local)
-printf "\n%b[3/4] Ensuring system tools are installed locally...%b\n" "${YELLOW}" "${NC}"
-printf "All tools (shellcheck, hadolint, gitleaks, etc.) are now installed via npm/pip into %s or node_modules.\n" "${VENV}"
-printf "This ensures version consistency across all environments.\n"
+# 3. System Tools Setup (Project-Local Binary Installation)
+printf "\n%b[3/4] Installing system tools locally...%b\n" "${YELLOW}" "${NC}"
+
+# ── gitleaks (secret scanner) ───────────────────────────────────────────────
+GITLEAKS_VERSION="${GITLEAKS_VERSION:-v8.26.0}"
+GITLEAKS_BIN="${VENV}/bin/gitleaks"
+GITHUB_PROXY="${GITHUB_PROXY:-https://gh-proxy.sn0wdr1am.com/}"
+
+if [ ! -x "${GITLEAKS_BIN}" ]; then
+  printf 'Installing gitleaks %s into %s/bin/...\n' "${GITLEAKS_VERSION}" "${VENV}"
+  _OS=$(uname -s | tr '[:upper:]' '[:lower:]')
+  _ARCH=$(uname -m)
+  case "${_ARCH}" in
+  x86_64) _ARCH="x64" ;;
+  aarch64 | arm64) _ARCH="arm64" ;;
+  *) _ARCH="x64" ;;
+  esac
+  case "${_OS}" in
+  darwin) _OS_TAG="darwin" ;;
+  linux) _OS_TAG="linux" ;;
+  *) _OS_TAG="linux" ;;
+  esac
+  _TARBALL="gitleaks_${GITLEAKS_VERSION#v}_${_OS_TAG}_${_ARCH}.tar.gz"
+  _URL="${GITHUB_PROXY}https://github.com/gitleaks/gitleaks/releases/download/${GITLEAKS_VERSION}/${_TARBALL}"
+  _TMP=$(mktemp -d)
+  if curl --retry 3 --retry-delay 2 -fsSL "${_URL}" -o "${_TMP}/gitleaks.tar.gz"; then
+    tar -xzf "${_TMP}/gitleaks.tar.gz" -C "${_TMP}" gitleaks
+    mv "${_TMP}/gitleaks" "${GITLEAKS_BIN}"
+    chmod +x "${GITLEAKS_BIN}"
+    printf "%bgitleaks %s installed at %s%b\n" "${GREEN}" "${GITLEAKS_VERSION}" "${GITLEAKS_BIN}" "${NC}"
+  else
+    printf "%bWarning: failed to download gitleaks. Install manually.%b\n" "${RED}" "${NC}"
+  fi
+  rm -rf "${_TMP}"
+else
+  printf 'gitleaks already installed at %s (skip).\n' "${GITLEAKS_BIN}"
+fi
 
 # 4. Pre-commit Hooks Setup
 printf "\n%b[4/4] Activating pre-commit hooks...%b\n" "${YELLOW}" "${NC}"

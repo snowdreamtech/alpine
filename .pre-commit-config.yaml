@@ -67,7 +67,7 @@ repos:
       - id: gitleaks
         name: gitleaks
         language: system
-        entry: gitleaks protect --verbose --redact --staged --gitleaks-ignore-path .gitleaksignore
+        entry: .venv/bin/gitleaks protect --verbose --redact --staged --gitleaks-ignore-path .gitleaksignore
         always_run: true
         pass_filenames: false
 
