@@ -3,6 +3,7 @@
 # This script is designed for both local development and CI/CD JIT installation.
 # usage: sh scripts/setup.sh [module1] [module2] ...
 # modules: node, python, gitleaks, hadolint, go, iac, hooks, all (default)
+# Features: POSIX compliant, Execution Guard, CI Job Summary, Professional UX.
 
 set -e
 
@@ -28,6 +29,66 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
+# 1. Execution Context Guard
+if [ ! -f "Makefile" ] || [ ! -d ".git" ]; then
+  printf "%bError: This script must be run from the project root (where Makefile and .git reside).%b\n" "${RED}" "${NC}" >&2
+  exit 1
+fi
+
+# 2. Help Message
+show_help() {
+  cat <<EOF
+Usage: $0 [OPTIONS] [MODULES]
+
+Modularized Project Setup Script for local development and CI/CD environments.
+
+Options:
+  --help             Show this help message.
+
+Modules (default: all):
+  node               Setup Node.js & pnpm
+  python             Setup Python Virtual Environment & dependencies
+  gitleaks           Install Gitleaks (secrets scanning)
+  hadolint           Install Hadolint (Docker linting)
+  go                 Install golangci-lint
+  checkmake          Install checkmake (Makefile linting)
+  iac                Install IaC tools (tflint, kube-linter)
+  powershell         Setup PSScriptAnalyzer
+  java               Install google-java-format
+  ruby               Setup Rubocop
+  php                Install php-cs-fixer
+  dart               Check Dart SDK
+  swift              Install Swift linters (macOS)
+  dotnet             Check .NET SDK
+  hooks              Activate Pre-commit Hooks
+  all                Run all of the above
+
+Environment Variables:
+  VENV               Virtualenv directory (default: .venv)
+  PYTHON             Python executable (default: python3)
+  GITHUB_PROXY       Github proxy URL for asset downloads
+
+EOF
+}
+
+# ── Functions ────────────────────────────────────────────────────────────────
+
+log() { printf "%b%s%b\n" "${BLUE}" "$1" "${NC}"; }
+info() { printf "%b%s%b\n" "${GREEN}" "$1" "${NC}"; }
+warn() { printf "%b%s%b\n" "${YELLOW}" "$1" "${NC}"; }
+error() {
+  printf "%b%s%b\n" "${RED}" "$1" "${NC}" >&2
+  exit 1
+}
+
+# CI Summary helper
+TMP_SUMMARY=$(mktemp)
+log_summary() {
+  _MOD="$1"
+  _STAT="$2"
+  printf "| %s | %s |\n" "$_MOD" "$_STAT" >>"$TMP_SUMMARY"
+}
+
 # OS/Arch Detection
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 ARCH=$(uname -m)
@@ -47,16 +108,6 @@ msys* | mingw* | cygwin*)
   ;;
 *) _OS_TAG="linux" ;;
 esac
-
-# ── Functions ────────────────────────────────────────────────────────────────
-
-log() { printf "%b%s%b\n" "${BLUE}" "$1" "${NC}"; }
-info() { printf "%b%s%b\n" "${GREEN}" "$1" "${NC}"; }
-warn() { printf "%b%s%b\n" "${YELLOW}" "$1" "${NC}"; }
-error() {
-  printf "%b%s%b\n" "${RED}" "$1" "${NC}" >&2
-  exit 1
-}
 
 # Robust download helper with proxy fallback
 download_url() {
@@ -90,6 +141,9 @@ setup_node() {
   if [ -f package.json ]; then
     pnpm install
     info "Node.js dependencies installed."
+    log_summary "Node.js" "✅ Installed"
+  else
+    log_summary "Node.js" "⏭️ Skipped (no package.json)"
   fi
 }
 
@@ -102,12 +156,18 @@ setup_python() {
   if [ -f requirements-dev.txt ]; then
     "$VENV/bin/pip" install -r requirements-dev.txt
     info "Python dev dependencies installed in ${VENV}."
+    log_summary "Python" "✅ Installed"
+  else
+    log_summary "Python" "⏭️ Skipped (no requirements-dev.txt)"
   fi
 }
 
 install_gitleaks() {
   _BIN="${VENV}/bin/gitleaks${_EXE}"
-  if [ -x "${_BIN}" ]; then return 0; fi
+  if [ -x "${_BIN}" ]; then
+    log_summary "Gitleaks" "✅ Already exists"
+    return 0
+  fi
   log "── Installing gitleaks ${GITLEAKS_VERSION} ──"
   _TAR_TAG="${_OS_TAG}"
   [ "${_OS_TAG}" = "windows" ] && _TAR_TAG="windows"
@@ -115,8 +175,7 @@ install_gitleaks() {
 
   if [ "${_OS_TAG}" = "windows" ]; then
     _ARCH_W="x64"
-    [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _ARCH_W="arm64" # approximations based on known variants
-    # actually gitleaks uses x64, x32, armv6, armv7. Assuming x64 for typical Windows setups.
+    [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _ARCH_W="arm64"
     _ARCH_W="x64"
     _TAR="gitleaks_${GITLEAKS_VERSION#v}_${_TAR_TAG}_${_ARCH_W}.zip"
     _URL="${GITHUB_PROXY}https://github.com/gitleaks/gitleaks/releases/download/${GITLEAKS_VERSION}/${_TAR}"
@@ -126,7 +185,9 @@ install_gitleaks() {
       mv "${_TMP}/gitleaks.exe" "${_BIN}"
       chmod +x "${_BIN}"
       info "gitleaks installed."
+      log_summary "Gitleaks" "✅ Installed"
     else
+      log_summary "Gitleaks" "❌ Failed"
       error "Failed to download gitleaks."
     fi
   else
@@ -138,7 +199,9 @@ install_gitleaks() {
       mv "${_TMP}/gitleaks" "${_BIN}"
       chmod +x "${_BIN}"
       info "gitleaks installed."
+      log_summary "Gitleaks" "✅ Installed"
     else
+      log_summary "Gitleaks" "❌ Failed"
       error "Failed to download gitleaks."
     fi
   fi
@@ -147,7 +210,10 @@ install_gitleaks() {
 
 install_hadolint() {
   _BIN="${VENV}/bin/hadolint${_EXE}"
-  if [ -x "${_BIN}" ]; then return 0; fi
+  if [ -x "${_BIN}" ]; then
+    log_summary "Hadolint" "✅ Already exists"
+    return 0
+  fi
   log "── Installing hadolint ${HADOLINT_VERSION} ──"
   _SUFFIX="Linux-x86_64"
   if [ "${OS}" = "darwin" ]; then
@@ -157,14 +223,19 @@ install_hadolint() {
   if download_url "${_URL}" "${_BIN}" "hadolint"; then
     chmod +x "${_BIN}"
     info "hadolint installed."
+    log_summary "Hadolint" "✅ Installed"
   else
+    log_summary "Hadolint" "❌ Failed"
     error "Failed to download hadolint."
   fi
 }
 
 install_go_lint() {
   _BIN="${VENV}/bin/golangci-lint"
-  if [ -x "${_BIN}" ]; then return 0; fi
+  if [ -x "${_BIN}" ]; then
+    log_summary "Go Lint" "✅ Already exists"
+    return 0
+  fi
   log "── Installing golangci-lint ${GOLANGCI_VERSION} ──"
   _URL="${GITHUB_PROXY}https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh"
   _TMP=$(mktemp -d)
@@ -173,27 +244,33 @@ install_go_lint() {
     bash "${_TMP}/install_go.sh" "${GOLANGCI_VERSION}"
     rm -rf "${_TMP}"
     info "golangci-lint installed."
+    log_summary "Go Lint" "✅ Installed"
   else
+    log_summary "Go Lint" "❌ Failed"
     error "Failed to download golangci-lint installer."
   fi
 }
 
 install_checkmake() {
   _BIN="${VENV}/bin/checkmake${_EXE}"
-  if [ -x "${_BIN}" ]; then return 0; fi
+  if [ -x "${_BIN}" ]; then
+    log_summary "Checkmake" "✅ Already exists"
+    return 0
+  fi
   log "── Installing checkmake ${CHECKMAKE_VERSION} ──"
   _OS_S="${_OS_TAG}"
   _ARCH_S="amd64"
   [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _ARCH_S="arm64"
 
-  # Asset name: checkmake-v0.3.2.darwin.arm64 (direct binary)
   _FILE="checkmake-${CHECKMAKE_VERSION}.${_OS_S}.${_ARCH_S}${_EXE}"
   _URL="${GITHUB_PROXY}https://github.com/checkmake/checkmake/releases/download/${CHECKMAKE_VERSION}/${_FILE}"
 
   if download_url "${_URL}" "${_BIN}" "checkmake"; then
     chmod +x "${_BIN}"
     info "checkmake installed."
+    log_summary "Checkmake" "✅ Installed"
   else
+    log_summary "Checkmake" "❌ Failed"
     error "Failed to download checkmake from ${_URL}"
   fi
 }
@@ -204,7 +281,6 @@ install_iac_lint() {
   if [ ! -x "${VENV}/bin/tflint${_EXE}" ]; then
     _URL="${GITHUB_PROXY}https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh"
     if [ "${OS}" = "darwin" ] || [ "${_OS_TAG}" = "windows" ]; then
-      # Manual download for darwin and windows to bypass linux-only bash script
       _TAR_OS="${_OS_TAG}"
       _TAR_ARCH="amd64"
       [ "${_ARCH_N}" = "arm64" ] && _TAR_ARCH="arm64"
@@ -217,7 +293,9 @@ install_iac_lint() {
         mv "${_TMP}/tflint${_EXE}" "${VENV}/bin/tflint${_EXE}"
         chmod +x "${VENV}/bin/tflint${_EXE}"
         rm -rf "${_TMP}"
+        log_summary "TFLint" "✅ Installed"
       else
+        log_summary "TFLint" "❌ Failed"
         error "Failed to download tflint."
       fi
     else
@@ -225,10 +303,14 @@ install_iac_lint() {
       if download_url "${_URL}" "${_TMP}/install_tflint.sh" "tflint-installer"; then
         TFLINT_INSTALL_PATH="${VENV}/bin" bash "${_TMP}/install_tflint.sh"
         rm -rf "${_TMP}"
+        log_summary "TFLint" "✅ Installed"
       else
+        log_summary "TFLint" "❌ Failed"
         error "Failed to download tflint installer."
       fi
     fi
+  else
+    log_summary "TFLint" "✅ Already exists"
   fi
   # Kube-Linter
   if [ ! -x "${VENV}/bin/kube-linter${_EXE}" ]; then
@@ -239,9 +321,13 @@ install_iac_lint() {
     _URL="${GITHUB_PROXY}https://github.com/stackrox/kube-linter/releases/download/${KUBE_LINTER_VERSION}/kube-linter-$_SUFFIX"
     if download_url "${_URL}" "${VENV}/bin/kube-linter${_EXE}" "kube-linter"; then
       chmod +x "${VENV}/bin/kube-linter${_EXE}"
+      log_summary "Kube-Linter" "✅ Installed"
     else
+      log_summary "Kube-Linter" "❌ Failed"
       error "Failed to download kube-linter."
     fi
+  else
+    log_summary "Kube-Linter" "✅ Already exists"
   fi
   info "IaC tools installed."
 }
@@ -251,8 +337,10 @@ setup_hooks() {
   if [ -x "$VENV/bin/pre-commit" ]; then
     "$VENV/bin/pre-commit" install --hook-type pre-commit --hook-type pre-merge-commit --hook-type commit-msg
     info "Pre-commit hooks activated."
+    log_summary "Hooks" "✅ Activated"
   else
     warn "Warning: pre-commit not found. Run python module first."
+    log_summary "Hooks" "❌ Failed (missing pre-commit)"
   fi
 }
 
@@ -261,22 +349,29 @@ setup_powershell() {
   if command -v pwsh >/dev/null 2>&1; then
     pwsh -NoProfile -Command "if (!(Get-Module -ListAvailable PSScriptAnalyzer)) { Install-Module -Name PSScriptAnalyzer -Force -SkipPublisherCheck -Scope CurrentUser }"
     info "PSScriptAnalyzer installed."
+    log_summary "PowerShell" "✅ Installed"
   else
     warn "Warning: pwsh not found. Skipping PowerShell linter setup."
+    log_summary "PowerShell" "⏭️ Skipped (no pwsh)"
   fi
 }
 
 install_java_lint() {
   _JAR="${VENV}/bin/google-java-format.jar"
   _BIN="${VENV}/bin/google-java-format"
-  if [ -f "${_JAR}" ]; then return 0; fi
+  if [ -f "${_JAR}" ]; then
+    log_summary "Java Lint" "✅ Already exists"
+    return 0
+  fi
   log "── Installing google-java-format ${JAVA_FORMAT_VERSION} ──"
   _URL="${GITHUB_PROXY}https://github.com/google/google-java-format/releases/download/v${JAVA_FORMAT_VERSION}/google-java-format-${JAVA_FORMAT_VERSION}-all-deps.jar"
   if download_url "${_URL}" "${_JAR}" "google-java-format"; then
     printf "#!/bin/sh\njava -jar \"%s\" \"\$@\"\n" "${_JAR}" >"${_BIN}"
     chmod +x "${_BIN}"
     info "google-java-format installed."
+    log_summary "Java Lint" "✅ Installed"
   else
+    log_summary "Java Lint" "❌ Failed"
     error "Failed to download google-java-format."
   fi
 }
@@ -289,33 +384,45 @@ install_ruby_lint() {
     _RUBY_MINOR=$(echo "$_RUBY_VER" | cut -d. -f2)
 
     if [ "$_RUBY_MAJOR" -lt 2 ] || { [ "$_RUBY_MAJOR" -eq 2 ] && [ "$_RUBY_MINOR" -lt 7 ]; }; then
-      warn "Warning: Ruby version $_RUBY_VER is too old (< 2.7.0). Attempting to install Rubocop v0.93.1 which is compatible with older Ruby."
-      gem install rubocop -v 0.93.1 --user-install --no-document --quiet || warn "Failed to install Rubocop. Please upgrade Ruby."
+      warn "Warning: Ruby version $_RUBY_VER is too old (< 2.7.0). Attempting to install Rubocop v0.93.1."
+      gem install rubocop -v 0.93.1 --user-install --no-document --quiet || warn "Failed to install Rubocop."
     else
       gem install rubocop --user-install --no-document --quiet || warn "Failed to install Rubocop."
     fi
     info "Rubocop setup finished."
+    log_summary "Rubocop" "✅ Installed"
   else
     warn "Warning: gem not found. Skipping Rubocop setup."
+    log_summary "Rubocop" "⏭️ Skipped (no gem)"
   fi
 }
 
 install_php_lint() {
   _BIN="${VENV}/bin/php-cs-fixer"
-  if [ -x "${_BIN}" ]; then return 0; fi
+  if [ -x "${_BIN}" ]; then
+    log_summary "PHP Lint" "✅ Already exists"
+    return 0
+  fi
   log "── Installing php-cs-fixer ${PHP_CS_FIXER_VERSION} ──"
   _URL="${GITHUB_PROXY}https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/releases/download/${PHP_CS_FIXER_VERSION}/php-cs-fixer.phar"
   if download_url "${_URL}" "${_BIN}" "php-cs-fixer"; then
     chmod +x "${_BIN}"
     info "php-cs-fixer installed."
+    log_summary "PHP Lint" "✅ Installed"
   else
+    log_summary "PHP Lint" "❌ Failed"
     error "Failed to download php-cs-fixer."
   fi
 }
 
 setup_dart() {
   log "── Checking Dart SDK ──"
-  command -v dart >/dev/null 2>&1 || warn "Warning: dart SDK not found."
+  if command -v dart >/dev/null 2>&1; then
+    log_summary "Dart" "✅ Available"
+  else
+    warn "Warning: dart SDK not found."
+    log_summary "Dart" "⏭️ Not found"
+  fi
 }
 
 setup_swift() {
@@ -325,24 +432,49 @@ setup_swift() {
       brew list swiftformat >/dev/null 2>&1 || brew install swiftformat
       brew list swiftlint >/dev/null 2>&1 || brew install swiftlint
       info "Swift linters ensured."
+      log_summary "Swift" "✅ Installed via brew"
     else
       warn "Warning: brew not found. Cannot install Swift linters."
+      log_summary "Swift" "❌ Failed (no brew)"
     fi
+  else
+    log_summary "Swift" "⏭️ Skipped (non-macOS)"
   fi
 }
 
 setup_dotnet() {
   log "── Checking .NET SDK ──"
-  command -v dotnet >/dev/null 2>&1 || warn "Warning: .NET SDK not found."
+  if command -v dotnet >/dev/null 2>&1; then
+    log_summary ".NET" "✅ Available"
+  else
+    warn "Warning: .NET SDK not found."
+    log_summary ".NET" "⏭️ Not found"
+  fi
 }
 
 # ── Main Execution ───────────────────────────────────────────────────────────
 
-if [ $# -eq 0 ]; then
+# Argument parsing for flags
+RAW_ARGS=""
+for arg in "$@"; do
+  case "$arg" in
+  --help)
+    show_help
+    exit 0
+    ;;
+  *) RAW_ARGS="${RAW_ARGS} ${arg}" ;;
+  esac
+done
+
+if [ -z "$(echo "${RAW_ARGS}" | tr -d ' ')" ]; then
   modules="node python gitleaks checkmake powershell java ruby php dart swift dotnet hooks"
 else
-  modules="$*"
+  modules="${RAW_ARGS}"
 fi
+
+printf "### Setup Execution Summary\n\n" >"$TMP_SUMMARY"
+printf "| Module | Status |\n" >>"$TMP_SUMMARY"
+printf "| :--- | :--- |\n" >>"$TMP_SUMMARY"
 
 for module in $modules; do
   case $module in
@@ -381,5 +513,11 @@ for module in $modules; do
   *) error "Unknown module: $module" ;;
   esac
 done
+
+# Write summary to CI if available
+if [ -n "$GITHUB_STEP_SUMMARY" ]; then
+  cat "$TMP_SUMMARY" >>"$GITHUB_STEP_SUMMARY"
+fi
+rm -f "$TMP_SUMMARY"
 
 info "\n✨ Setup step $modules complete!"
