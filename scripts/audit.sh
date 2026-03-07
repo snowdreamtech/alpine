@@ -36,21 +36,33 @@ log_info "🛡️  Starting Security Auditor...\n"
 # 3. Secrets Scanning
 if command -v gitleaks >/dev/null 2>&1; then
   log_info "── Scanning for Secrets (gitleaks) ──"
-  gitleaks detect --source . --verbose
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_success "DRY-RUN: Would run gitleaks detect [gitleaks detect --source .]"
+  else
+    gitleaks detect --source . --verbose
+  fi
 fi
 
 # 4. Dependency Audits
 if [ -f "$PACKAGE_JSON" ]; then
   log_info "\n── Auditing Node.js dependencies ($NPM) ──"
   if command -v "$NPM" >/dev/null 2>&1; then
-    "$NPM" audit
+    if [ "$DRY_RUN" -eq 1 ]; then
+      log_success "DRY-RUN: Would run $NPM audit [$NPM audit]"
+    else
+      "$NPM" audit
+    fi
   fi
 fi
 
 if [ -f "$REQUIREMENTS_TXT" ] || [ -f "requirements.txt" ] || [ -f "$PYPROJECT_TOML" ]; then
   log_info "\n── Auditing Python dependencies (pip-audit) ──"
   if command -v pip-audit >/dev/null 2>&1; then
-    pip-audit
+    if [ "$DRY_RUN" -eq 1 ]; then
+      log_success "DRY-RUN: Would run pip-audit [pip-audit]"
+    else
+      pip-audit
+    fi
   else
     log_warn "Warning: pip-audit not found. Skipping python audit."
   fi

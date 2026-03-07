@@ -14,7 +14,7 @@ setup() {
   # Create a dummy project structure
   cd "$TEMP_DIR" || exit
   touch Makefile LICENSE
-  mkdir .git
+  git init -q
 
   # Create targets to clean
   mkdir -p build dist .venv node_modules docs/.vitepress/dist

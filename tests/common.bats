@@ -39,7 +39,7 @@ teardown() {
 @test "common.sh: guard_project_root passes in project root (with Makefile and .git)" {
   cd "$TEMP_DIR" || exit
   touch Makefile
-  mkdir .git
+  git init -q
   run sh test_script.sh guard
   assert_success
 }

@@ -15,7 +15,7 @@ setup() {
   cd "$TEMP_DIR" || exit
   touch Makefile package.json README.md
   mkdir -p .agent/rules && touch .agent/rules/01-general.md
-  mkdir .git
+  git init -q
 }
 
 teardown() {
