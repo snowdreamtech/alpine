@@ -2,15 +2,33 @@
 # scripts/archive-changelog.sh - Automate major-version changelog archiving
 # This script moves entries of previous major versions from CHANGELOG.md to archival files.
 # Features: POSIX compliant, Atomic Operations, Deduplication, Safety Traps,
-#           History Sorting, Universal Versioning, Subdirectory Support, Concurrency Lock.
+#           History Sorting, Universal Versioning, Subdirectory Support, Concurrency Lock,
+#           Smart Directory Discovery, ANSI Colored Output.
 
 set -e
 
 CHANGELOG="CHANGELOG.md"
 PACKAGE_JSON="package.json"
 DRY_RUN=0
-ARCHIVE_DIR="${ARCHIVE_DIR:-.}"
 LOCK_DIR="$CHANGELOG.lock"
+
+# ANSI Colors
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+NC='\033[0m' # No Color
+
+# Smart Directory Discovery
+if [ -z "$ARCHIVE_DIR" ]; then
+  if [ -d "docs/changelogs" ]; then
+    ARCHIVE_DIR="docs/changelogs"
+  elif [ -d "changelogs" ]; then
+    ARCHIVE_DIR="changelogs"
+  else
+    ARCHIVE_DIR="."
+  fi
+fi
 
 # Help message
 show_help() {
@@ -25,8 +43,9 @@ Options:
   --help       Show this help message.
 
 Environment Variables:
-  ARCHIVE_DIR  Directory to store archive files (default: .).
-                Example: ARCHIVE_DIR=docs/changelogs $0
+  ARCHIVE_DIR  Directory to store archive files (default: auto-detected or .).
+                Auto-detection order: docs/changelogs/ -> changelogs/ -> ./
+                Example: ARCHIVE_DIR=custom/path $0
 EOF
 }
 
@@ -35,7 +54,7 @@ for arg in "$@"; do
   case "$arg" in
   --dry-run)
     DRY_RUN=1
-    echo "Running in DRY-RUN mode. No changes will be applied."
+    printf "%bRunning in DRY-RUN mode. No changes will be applied.%b\n" "$YELLOW" "$NC"
     ;;
   --help)
     show_help
@@ -51,7 +70,7 @@ fi
 # Concurrency Lock (Atomic mkdir is standard POSIX lock)
 if [ "$DRY_RUN" -eq 0 ]; then
   if ! mkdir "$LOCK_DIR" 2>/dev/null; then
-    echo "Error: Another archival process seems to be running (lock exists: $LOCK_DIR)." >&2
+    printf "%bError: Another archival process seems to be running (lock exists: %s).%b\n" "$RED" "$LOCK_DIR" "$NC" >&2
     exit 1
   fi
 fi
@@ -91,24 +110,24 @@ fi
 # Input Validation
 case "$CURRENT_MAJOR" in
 '' | *[!0-9]*)
-  echo "Error: Could not determine a valid numeric major version (Found: '$CURRENT_MAJOR')" >&2
+  printf "%bError: Could not determine a valid numeric major version (Found: '%s')%b\n" "$RED" "$CURRENT_MAJOR" "$NC" >&2
   exit 1
   ;;
 esac
 
-echo "Targeting major version: $CURRENT_MAJOR"
+printf "%bTargeting major version: %s%b\n" "$BLUE" "$CURRENT_MAJOR" "$NC"
 
 # 1. Extract the header (everything up to the first version header)
 FIRST_H2_LINE=$(grep -n "^## \[" "$CHANGELOG" | head -n1 | cut -d: -f1)
 if [ -z "$FIRST_H2_LINE" ]; then
-  echo "No version headers found in $CHANGELOG. Nothing to archive."
+  printf "%bNo version headers found in %s. Nothing to archive.%b\n" "$YELLOW" "$CHANGELOG" "$NC"
   exit 0
 fi
 
 head -n "$((FIRST_H2_LINE - 1))" "$CHANGELOG" >"$TMP_HEADER"
 
 # 2. Process all versions using a portable awk approach
-echo "Scanning $CHANGELOG for older major versions..."
+printf "%bScanning %s for older major versions...%b\n" "$BLUE" "$CHANGELOG" "$NC"
 tail -n +"$FIRST_H2_LINE" "$CHANGELOG" | awk -v major="$CURRENT_MAJOR" -v prefix="$TMP_ARCHIVE_PREFIX" '
   /^## History/ { skip_history = 1; next; }
   /^## \[/ {
@@ -169,9 +188,9 @@ for arch_file in "$TMP_ARCHIVE_PREFIX"/v*.md; do
 
     if [ -s "$FILTERED_CONTENT" ]; then
       if [ "$DRY_RUN" -eq 1 ]; then
-        echo "DRY-RUN: Would prepend new entries to $FINAL_ARCH_FILE"
+        printf "%bDRY-RUN: Would prepend new entries to %s%b\n" "$YELLOW" "$FINAL_ARCH_FILE" "$NC"
       else
-        echo "Updating archive: $FINAL_ARCH_FILE"
+        printf "%bUpdating archive: %s%b\n" "$BLUE" "$FINAL_ARCH_FILE" "$NC"
         tmp_arch=$(mktemp)
         cat "$FILTERED_CONTENT" >"$tmp_arch"
         printf "\n" >>"$tmp_arch"
@@ -182,9 +201,9 @@ for arch_file in "$TMP_ARCHIVE_PREFIX"/v*.md; do
     rm -f "$FILTERED_CONTENT"
   else
     if [ "$DRY_RUN" -eq 1 ]; then
-      echo "DRY-RUN: Would create $FINAL_ARCH_FILE"
+      printf "%bDRY-RUN: Would create %s%b\n" "$YELLOW" "$FINAL_ARCH_FILE" "$NC"
     else
-      echo "Creating new archive: $FINAL_ARCH_FILE"
+      printf "%bCreating new archive: %s%b\n" "$GREEN" "$FINAL_ARCH_FILE" "$NC"
       mkdir -p "$ARCHIVE_DIR"
       printf "# Changelog Archive v%s\n\n" "$v_num" >"$FINAL_ARCH_FILE"
       cat "$arch_file" >>"$FINAL_ARCH_FILE"
@@ -193,7 +212,7 @@ for arch_file in "$TMP_ARCHIVE_PREFIX"/v*.md; do
 done
 
 # 5. Rebuild History section in NEW_CHANGELOG (Sorted)
-echo "Rebuilding History section (Archive Directory: $ARCHIVE_DIR)..."
+printf "%bRebuilding History section (Archive Directory: %s)...%b\n" "$BLUE" "$ARCHIVE_DIR" "$NC"
 HISTORY_LINKS_TMP=$(mktemp)
 # Check filesystem for existing archives in ARCHIVE_DIR
 for f in "$ARCHIVE_DIR"/CHANGELOG-v*.md; do
@@ -223,9 +242,9 @@ rm -f "$HISTORY_LINKS_TMP"
 
 # 6. Final Swap (Atomic)
 if [ "$DRY_RUN" -eq 1 ]; then
-  echo "DRY-RUN: History section preview:"
+  printf "%bDRY-RUN: History section preview:%b\n" "$YELLOW" "$NC"
   grep -A 100 "^## History" "$NEW_CHANGELOG" || true
 else
   mv "$NEW_CHANGELOG" "$CHANGELOG"
-  echo "Successfully updated $CHANGELOG"
+  printf "%bSuccessfully updated %s%b\n" "$GREEN" "$CHANGELOG" "$NC"
 fi
