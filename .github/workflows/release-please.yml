@@ -13,12 +13,12 @@ permissions:
   security-events: write
 
 jobs:
-  lint:
-    uses: ./.github/workflows/lint.yml
+  verify:
+    uses: ./.github/workflows/verify.yml
     secrets: inherit
 
   release-please:
-    needs: [lint]
+    needs: [verify]
     runs-on: ubuntu-latest
     steps:
       - uses: googleapis/release-please-action@v4.4.0
