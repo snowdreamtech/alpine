@@ -57,7 +57,7 @@ endif
 # =============================================================================
 # Targets
 # =============================================================================
-.PHONY: all help init setup install lint format test build clean commit
+.PHONY: all help init setup install lint format test build clean commit verify release env
 
 # Default target: display help
 all: help
@@ -166,4 +166,28 @@ ifeq ($(OS_NAME),Windows)
 	@scripts/cleanup.bat
 else
 	@sh scripts/cleanup.sh
+endif
+
+# Full project verification
+verify:
+ifeq ($(OS_NAME),Windows)
+	@scripts/verify.bat
+else
+	@sh scripts/verify.sh
+endif
+
+# Release manager
+release:
+ifeq ($(OS_NAME),Windows)
+	@scripts/release.bat
+else
+	@sh scripts/release.sh
+endif
+
+# Environment manager
+env:
+ifeq ($(OS_NAME),Windows)
+	@scripts/env.bat
+else
+	@sh scripts/env.sh
 endif
