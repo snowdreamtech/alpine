@@ -170,4 +170,18 @@
 - Use **locale-aware APIs** (`Intl.DateTimeFormat`, `Intl.NumberFormat`, `Intl.RelativeTimeFormat`) for dates, numbers, and currencies. Never manually format locale-sensitive values.
 - Design layouts using **logical CSS properties** (`margin-inline-start`, `padding-block-end`) instead of physical properties (`margin-left`, `padding-bottom`) to enable RTL language support without rewrites.
 - Maintain a **design system** or component library as a single source of truth for visual design decisions. Design tokens MUST be versioned and breaking changes managed like a public API — with a changelog and migration guide.
-- Run automated **visual regression tests** (Chromatic, Percy, Playwright screenshot comparisons) for critical UI components in CI to catch unintended visual changes.
+
+## 6. CLI UX & Terminal Interface
+
+### Professional Terminal Aesthetics
+
+- Provide **immediate visual feedback** for long-running scripts (progress bars, status indicators).
+- Use **ANSI standard colors** to distinguish output types and enhance scanability:
+  - **Blue**: Progress info, scanning, and informational status.
+  - **Green**: Success, completion, and resource creation.
+  - **Yellow**: Warnings, dry-run (preview) mode, and non-blocking issues.
+  - **Red**: Fatal errors and critical failures.
+- Implement **Smart Discovery**: Command-line tools should attempt to auto-detect common project directories (e.g., `docs/changelogs/`, `bin/`, `dist/`) to minimize required manual configuration.
+- Support **Non-Destructive Previews**: Every tool that modifies files on a large scale MUST implement a `--dry-run` flag.
+- Ensure **Concurrency Safety**: Use standard POSIX locking mechanisms (like `mkdir` based locks) to prevent corruption during simultaneous local and CI executions.
+- Provide a standard **Help Interface** (`--help`) for all scripts to ensure discoverability and correct usage.
