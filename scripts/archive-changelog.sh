@@ -1,13 +1,16 @@
 #!/bin/sh
 # scripts/archive-changelog.sh - Automate major-version changelog archiving
 # This script moves entries of previous major versions from CHANGELOG.md to archival files.
-# Features: POSIX compliant, Atomic Operations, Deduplication, Safety Traps, History Sorting.
+# Features: POSIX compliant, Atomic Operations, Deduplication, Safety Traps,
+#           History Sorting, Universal Versioning, Subdirectory Support, Concurrency Lock.
 
 set -e
 
 CHANGELOG="CHANGELOG.md"
 PACKAGE_JSON="package.json"
 DRY_RUN=0
+ARCHIVE_DIR="${ARCHIVE_DIR:-.}"
+LOCK_DIR="$CHANGELOG.lock"
 
 # Help message
 show_help() {
@@ -15,11 +18,15 @@ show_help() {
 Usage: $0 [OPTIONS]
 
 Automates the movement of older major version entries from $CHANGELOG
-to archival files (e.g., CHANGELOG-v1.md) and maintains a history section.
+to archival files and maintains a history section.
 
 Options:
   --dry-run    Preview changes without modifying files.
   --help       Show this help message.
+
+Environment Variables:
+  ARCHIVE_DIR  Directory to store archive files (default: .).
+                Example: ARCHIVE_DIR=docs/changelogs $0
 EOF
 }
 
@@ -37,8 +44,16 @@ for arg in "$@"; do
   esac
 done
 
-if [ ! -f "$CHANGELOG" ] || [ ! -f "$PACKAGE_JSON" ]; then
+if [ ! -f "$CHANGELOG" ]; then
   exit 0
+fi
+
+# Concurrency Lock (Atomic mkdir is standard POSIX lock)
+if [ "$DRY_RUN" -eq 0 ]; then
+  if ! mkdir "$LOCK_DIR" 2>/dev/null; then
+    echo "Error: Another archival process seems to be running (lock exists: $LOCK_DIR)." >&2
+    exit 1
+  fi
 fi
 
 # Cleanup on exit
@@ -49,20 +64,34 @@ NEW_CHANGELOG=$(mktemp)
 cleanup() {
   rm -f "$TMP_HEADER" "$NEW_CHANGELOG"
   rm -rf "$TMP_ARCHIVE_PREFIX"
+  [ "$DRY_RUN" -eq 0 ] && rmdir "$LOCK_DIR" 2>/dev/null || true
 }
 trap cleanup EXIT INT TERM
 
-# Get current major version from package.json
-if command -v jq >/dev/null 2>&1; then
-  CURRENT_MAJOR=$(jq -r '.version | split(".")[0]' "$PACKAGE_JSON")
-else
-  CURRENT_MAJOR=$(grep '"version":' "$PACKAGE_JSON" | head -n 1 | sed 's/.*"//;s/\..*//')
+# Get current major version (Universal Source)
+CURRENT_MAJOR=""
+if [ -f "$PACKAGE_JSON" ]; then
+  if command -v jq >/dev/null 2>&1; then
+    CURRENT_MAJOR=$(jq -r '.version | split(".")[0]' "$PACKAGE_JSON" 2>/dev/null || true)
+  else
+    CURRENT_MAJOR=$(grep '"version":' "$PACKAGE_JSON" | head -n 1 | sed 's/.*"//;s/\..*//' || true)
+  fi
+fi
+
+# Fallback to Git tags if package.json version is missing or invalid
+if [ -z "$CURRENT_MAJOR" ] || [ "$CURRENT_MAJOR" = "null" ]; then
+  if command -v git >/dev/null 2>&1 && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+    GIT_TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
+    if [ -n "$GIT_TAG" ]; then
+      CURRENT_MAJOR=$(echo "$GIT_TAG" | sed 's/^v//;s/\..*//')
+    fi
+  fi
 fi
 
 # Input Validation
 case "$CURRENT_MAJOR" in
 '' | *[!0-9]*)
-  echo "Error: Could not determine a valid numeric major version from $PACKAGE_JSON (Found: '$CURRENT_MAJOR')" >&2
+  echo "Error: Could not determine a valid numeric major version (Found: '$CURRENT_MAJOR')" >&2
   exit 1
   ;;
 esac
@@ -79,7 +108,6 @@ fi
 head -n "$((FIRST_H2_LINE - 1))" "$CHANGELOG" >"$TMP_HEADER"
 
 # 2. Process all versions using a portable awk approach
-# Includes protection to skip existing History section
 echo "Scanning $CHANGELOG for older major versions..."
 tail -n +"$FIRST_H2_LINE" "$CHANGELOG" | awk -v major="$CURRENT_MAJOR" -v prefix="$TMP_ARCHIVE_PREFIX" '
   /^## History/ { skip_history = 1; next; }
@@ -121,7 +149,7 @@ for arch_file in "$TMP_ARCHIVE_PREFIX"/v*.md; do
 
   v_tag=$(basename "$arch_file" .md)
   v_num=$(echo "$v_tag" | sed 's/^v//')
-  FINAL_ARCH_FILE="CHANGELOG-v$v_num.md"
+  FINAL_ARCH_FILE="$ARCHIVE_DIR/CHANGELOG-v$v_num.md"
 
   if [ -f "$FINAL_ARCH_FILE" ]; then
     FILTERED_CONTENT=$(mktemp)
@@ -157,6 +185,7 @@ for arch_file in "$TMP_ARCHIVE_PREFIX"/v*.md; do
       echo "DRY-RUN: Would create $FINAL_ARCH_FILE"
     else
       echo "Creating new archive: $FINAL_ARCH_FILE"
+      mkdir -p "$ARCHIVE_DIR"
       printf "# Changelog Archive v%s\n\n" "$v_num" >"$FINAL_ARCH_FILE"
       cat "$arch_file" >>"$FINAL_ARCH_FILE"
     fi
@@ -164,18 +193,23 @@ for arch_file in "$TMP_ARCHIVE_PREFIX"/v*.md; do
 done
 
 # 5. Rebuild History section in NEW_CHANGELOG (Sorted)
-echo "Rebuilding History section..."
+echo "Rebuilding History section (Archive Directory: $ARCHIVE_DIR)..."
 HISTORY_LINKS_TMP=$(mktemp)
-for f in CHANGELOG-v*.md; do
+# Check filesystem for existing archives in ARCHIVE_DIR
+for f in "$ARCHIVE_DIR"/CHANGELOG-v*.md; do
   [ -e "$f" ] || continue
-  v_num=$(echo "$f" | sed 's/^CHANGELOG-v//;s/\.md$//')
+  file_name=$(basename "$f")
+  v_num=$(echo "$file_name" | sed 's/^CHANGELOG-v//;s/\.md$//')
   printf "%s|%s\n" "$v_num" "- [v$v_num.x.x Archive](./$f)" >>"$HISTORY_LINKS_TMP"
 done
 
+# Merge with newly planned archives from TMP_ARCHIVE_PREFIX
 for f in "$TMP_ARCHIVE_PREFIX"/v*.md; do
   [ -e "$f" ] || continue
   v_num=$(echo "$f" | sed 's|^.*/v||;s/.md$//')
-  link="- [v$v_num.x.x Archive](./CHANGELOG-v$v_num.md)"
+  link="- [v$v_num.x.x Archive](./$ARCHIVE_DIR/CHANGELOG-v$v_num.md)"
+  # Normalize link paths (remove repeated ./)
+  link=$(echo "$link" | sed 's|\./\./|\./|g')
   if ! grep -qF -- "$link" "$HISTORY_LINKS_TMP" 2>/dev/null; then
     printf "%s|%s\n" "$v_num" "$link" >>"$HISTORY_LINKS_TMP"
   fi
