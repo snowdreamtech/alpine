@@ -13,9 +13,10 @@ setup() {
   echo "This is template by snowdreamtech (snowdream)" >"$TEMP_DIR/README.md"
   echo "Copyright (c) 2023-present SnowdreamTech Inc." >"$TEMP_DIR/LICENSE"
 
-  # Copy the script to test workspace
-  mkdir -p "$TEMP_DIR/scripts"
+  # Copy the script and common library to test workspace
+  mkdir -p "$TEMP_DIR/scripts/lib"
   cp "$BATS_TEST_DIRNAME/../scripts/init-project.sh" "$TEMP_DIR/scripts/"
+  cp "$BATS_TEST_DIRNAME/../scripts/lib/common.sh" "$TEMP_DIR/scripts/lib/"
   chmod +x "$TEMP_DIR/scripts/init-project.sh"
 }
 
