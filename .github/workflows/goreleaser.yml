@@ -12,12 +12,12 @@ permissions:
   security-events: write
 
 jobs:
-  lint:
-    uses: ./.github/workflows/lint.yml
+  verify:
+    uses: ./.github/workflows/verify.yml
     secrets: inherit
 
   goreleaser:
-    needs: [lint]
+    needs: [verify]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
