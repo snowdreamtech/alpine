@@ -4,19 +4,13 @@
   "private": true,
   "description": "VitePress documentation site for Snowdream Tech AI IDE Template",
   "scripts": {
-    "commit": "cz",
-    "docs:build": "vitepress build docs",
-    "docs:dev": "vitepress dev docs",
-    "docs:preview": "vitepress preview docs",
-    "lint:eslint": "eslint \".\"",
-    "lint:fix": "prettier --write . && eslint \".\" --fix && stylelint \"**/*.{css,scss,less}\" --fix && markdownlint-cli2 \"**/*.md\" --fix",
-    "lint:markdown": "markdownlint-cli2 \"**/*.md\"",
-    "lint:prettier": "prettier --check \"**/*.{json,yml,yaml,vue,js,jsx,ts,tsx}\"",
-    "lint:spectral": "spectral lint \"**/*.{json,yml,yaml}\"",
-    "lint:stylelint": "stylelint \"**/*.{css,scss,less}\"",
-    "lint:taplo": "taplo format --check",
-    "test:ps": "pwsh -Command \"if (!(Get-Module -ListAvailable Pester)) { Install-Module -Name Pester -Force -SkipPublisherCheck -Scope CurrentUser }; Invoke-Pester tests/\"",
-    "test:shell": "bats tests/"
+    "commit": "sh scripts/commit.sh",
+    "docs:build": "sh scripts/docs.sh build",
+    "docs:dev": "sh scripts/docs.sh dev",
+    "docs:preview": "sh scripts/docs.sh preview",
+    "format": "sh scripts/format.sh",
+    "lint": "sh scripts/lint.sh",
+    "test": "sh scripts/test.sh"
   },
   "config": {
     "commitizen": {

@@ -122,94 +122,48 @@ install:
 
 # Run test suite
 test:
-	@echo "$(BOLD)Running tests...$(RESET)"
-	@echo "$(BLUE)Running bats (Shell)...$(RESET)"
-	$(NPM) run test:shell
-	@if command -v pwsh >/dev/null 2>&1; then \
-		echo "$(BLUE)Running Pester (PowerShell)...$(RESET)"; \
-		$(NPM) run test:ps; \
-	fi
-	@if [ -f pytest.ini ] || [ -f pyproject.toml ] || { [ -d tests ] && find tests -name "test_*.py" -o -name "*_test.py" | grep -q . ; }; then \
-		echo "$(BLUE)Running pytest...$(RESET)"; \
-		$(VENV)/bin/python3 -m pytest --tb=short; \
-	elif [ -f go.mod ]; then \
-		echo "$(BLUE)Running go test...$(RESET)"; \
-		go test ./...; \
-	else \
-		echo "$(GREEN)Component tests finished.$(RESET)"; \
-	fi
-	@echo "$(GREEN)All tests passed!$(RESET)"
+ifeq ($(OS_NAME),Windows)
+	@scripts/test.bat
+else
+	@sh scripts/test.sh
+endif
 
 # Launch interactive commit CLI
 commit:
-	@echo "$(BOLD)Starting interactive Commitizen CLI...$(RESET)"
-	$(NPM) run commit
+ifeq ($(OS_NAME),Windows)
+	@scripts/commit.bat
+else
+	@sh scripts/commit.sh
+endif
 
 # Build project artifacts
 build:
-	@echo "$(BOLD)Building project...$(RESET)"
-	@if [ -f .goreleaser.yaml ] || [ -f .goreleaser.yml ]; then \
-		echo "$(BLUE)Running goreleaser (snapshot)...$(RESET)"; \
-		$(GORELEASER) build --snapshot --clean; \
-	elif [ -f go.mod ]; then \
-		echo "$(BLUE)Running go build...$(RESET)"; \
-		go build ./...; \
-	elif [ -f package.json ]; then \
-		echo "$(BLUE)Running npm build...$(RESET)"; \
-		$(NPM) run build; \
-	elif [ -f pyproject.toml ]; then \
-		echo "$(BLUE)Running python build...$(RESET)"; \
-		$(VENV)/bin/python3 -m build; \
-	else \
-		echo "$(YELLOW)No build system detected. Skipping.$(RESET)"; \
-	fi
+ifeq ($(OS_NAME),Windows)
+	@scripts/build.bat
+else
+	@sh scripts/build.sh
+endif
 
 # Run all pre-commit hooks
 lint:
-	@echo "$(BOLD)Running pre-commit hooks on all files...$(RESET)"
-	@echo "$(BLUE)Pass 1/2: Applying auto-fixes...$(RESET)"
-	@$(PRE_COMMIT) run --all-files || true
-	@echo "$(BLUE)Pass 2/2: Verifying all checks pass...$(RESET)"
-	@$(PRE_COMMIT) run --all-files
-	@echo "$(GREEN)Lint complete!$(RESET)"
+ifeq ($(OS_NAME),Windows)
+	@scripts/lint.bat
+else
+	@sh scripts/lint.sh
+endif
 
 # Auto-format code
 format:
-	@echo "$(BOLD)Formatting code...$(RESET)"
-	@echo "$(BLUE)Running ruff format...$(RESET)"
-	$(VENV)/bin/ruff format $(RUFF_EXCLUDES) .
-	@echo "$(BLUE)Running shfmt...$(RESET)"
-	find . -type f -name "*.sh" $(FIND_EXCLUDES) -exec $(VENV)/bin/shfmt -w -i 2 {} +
-	@echo "$(BLUE)Running prettier...$(RESET)"
-	@$(NPM) exec prettier --write .
-	@if [ -f go.mod ]; then \
-		echo "$(BLUE)Running gofmt...$(RESET)"; \
-		find . -type f -name "*.go" $(FIND_EXCLUDES) -exec gofmt -w {} +; \
-	fi
-	@echo "$(BLUE)Running clang-format...$(RESET)"
-	find . -type f \( -name "*.c" -o -name "*.cpp" -o -name "*.h" -o -name "*.m" -o -name "*.mm" \) $(FIND_EXCLUDES) -exec $(VENV)/bin/clang-format -i {} +
-	@echo "$(GREEN)Formatting complete!$(RESET)"
+ifeq ($(OS_NAME),Windows)
+	@scripts/format.bat
+else
+	@sh scripts/format.sh
+endif
 
 # Clean up temporary and generated files
 clean:
-	@echo "$(BOLD)Cleaning up for $(OS_NAME)...$(RESET)"
 ifeq ($(OS_NAME),Windows)
-	@foreach ($d in @(".pytest_cache",".ruff_cache",".mypy_cache",".coverage","dist","build")) { \
-		if (Test-Path $$d) { $(RM) $$d } \
-	}
-	@Get-ChildItem -Path . -Filter "__pycache__" -Recurse | ForEach-Object { $(RM) $$_.FullName }
-	@Get-ChildItem -Path . -Filter "*.pyc" -Recurse | ForEach-Object { $(RM) $$_.FullName }
-	@Get-ChildItem -Path . -Filter "*.egg-info" -Recurse | ForEach-Object { $(RM) $$_.FullName }
+	@scripts/cleanup.bat
 else
-	@$(RM) \
-		.pytest_cache .ruff_cache .mypy_cache .coverage \
-		dist/ build/ *.egg-info \
-		coverage.xml .coverage.*
-	@find . \
-		-not -path "./.git/*" \
-		\( -type d -name "__pycache__" \
-		-o -type f -name "*.pyc" \
-		-o -type f -name "*.pyo" \) \
-		-exec $(RM) {} + 2>/dev/null || true
+	@sh scripts/cleanup.sh
 endif
-	@echo "$(GREEN)Clean complete!$(RESET)"
