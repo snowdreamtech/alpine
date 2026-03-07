@@ -39,6 +39,9 @@ help:
 	@echo "  verify   Run full project verification (env, lint, test)"
 	@echo "  release  Standardized release manager (versioning & tagging)"
 	@echo "  env      Environment configuration manager (.env)"
+	@echo "  update   Update global/project tools and hooks"
+	@echo "  audit    Run security audit and vulnerability scans"
+	@echo "  bench    Run performance benchmarks"
 	@echo "  clean    Remove temporary and generated files"
 	@echo "  help     Show this help message"
 
