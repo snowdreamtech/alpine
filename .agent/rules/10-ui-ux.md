@@ -185,3 +185,8 @@
 - Support **Non-Destructive Previews**: Every tool that modifies files on a large scale MUST implement a `--dry-run` flag.
 - Ensure **Concurrency Safety**: Use standard POSIX locking mechanisms (like `mkdir` based locks) to prevent corruption during simultaneous local and CI executions.
 - Provide a standard **Help Interface** (`--help`) for all scripts to ensure discoverability and correct usage.
+- **CI Integration (Rich Reporting)**: Tools running in GitHub Actions SHOULD leverage `GITHUB_STEP_SUMMARY` to provide rich Markdown reports (e.g., summary tables of changed files) directly in the CI dashboard.
+- **Support Multiple Verbosity Levels**:
+  - `--quiet` / `-q`: Silent mode, suppressing all output except critical errors.
+  - Default: Standard progress and status information with ANSI colors.
+  - `--verbose` / `-v`: Detailed debugging information, useful for troubleshooting complex operations.
