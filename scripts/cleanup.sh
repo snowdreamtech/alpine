@@ -1,0 +1,132 @@
+#!/bin/sh
+# scripts/cleanup.sh - Deep Project Cleanup Script
+# Removes temporary files, build artifacts, and caches across all supported stacks.
+# Features: POSIX compliant, Execution Guard, Dry-run support, Professional UX.
+
+set -e
+
+# Colors
+BLUE='\033[0;34m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+RED='\033[0;31m'
+NC='\033[0m'
+
+VERBOSE=1 # 0: quiet, 1: normal, 2: verbose
+DRY_RUN=0
+
+# Logging functions
+log_info() {
+  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$BLUE" "$1" "$NC"; fi
+}
+log_success() {
+  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$GREEN" "$1" "$NC"; fi
+}
+log_warn() {
+  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$YELLOW" "$1" "$NC"; fi
+}
+log_error() {
+  printf "%b%s%b\n" "$RED" "$1" "$NC" >&2
+}
+log_debug() {
+  if [ "$VERBOSE" -ge 2 ]; then printf "[DEBUG] %s\n" "$1"; fi
+}
+
+# 1. Execution Context Guard
+if [ ! -f "Makefile" ] || [ ! -d ".git" ]; then
+  log_error "Error: This script must be run from the project root."
+  exit 1
+fi
+
+# Help message
+show_help() {
+  cat <<EOF
+Usage: $0 [OPTIONS]
+
+Removes temporary files, build artifacts, and caches across all supported stacks.
+
+Options:
+  --dry-run        Preview files to be deleted without removing them.
+  -q, --quiet      Only show errors.
+  -v, --verbose    Enable verbose/debug output.
+  -h, --help       Show this help message.
+
+EOF
+}
+
+# Argument parsing
+for arg in "$@"; do
+  case "$arg" in
+  --dry-run)
+    DRY_RUN=1
+    log_warn "Running in DRY-RUN mode. No files will be removed."
+    ;;
+  -q | --quiet) VERBOSE=0 ;;
+  -v | --verbose) VERBOSE=2 ;;
+  -h | --help)
+    show_help
+    exit 0
+    ;;
+  esac
+done
+
+log_info "🧹 Starting deep project cleanup...\n"
+
+clean_item() {
+  _PATH="$1"
+  _DESC="$2"
+
+  if [ -e "$_PATH" ]; then
+    if [ "$DRY_RUN" -eq 1 ]; then
+      log_success "DRY-RUN: Would remove $_DESC ($_PATH)"
+    else
+      log_info "Removing $_DESC ($_PATH)..."
+      rm -rf "$_PATH"
+    fi
+  else
+    log_debug "Skipping $_DESC ($_PATH) - Not found."
+  fi
+}
+
+# 2. General Artifacts
+clean_item "dist" "Build distribution"
+clean_item "build" "Build artifacts"
+clean_item "out" "Output directory"
+clean_item ".coverage" "Coverage report"
+clean_item "coverage.xml" "Coverage XML"
+
+# 3. Language Specific Caches
+log_info "\n📦 Cleaning language-specific caches..."
+
+# Python
+clean_item ".pytest_cache" "Pytest cache"
+clean_item ".ruff_cache" "Ruff cache"
+clean_item ".mypy_cache" "Mypy cache"
+
+# Finding and removing __pycache__ and .pyc files
+if [ "$DRY_RUN" -eq 1 ]; then
+  log_success "DRY-RUN: Would search and remove all __pycache__ and *.pyc files."
+else
+  find . -type d -name "__pycache__" -not -path "*/.*" -exec rm -rf {} + 2>/dev/null || true
+  find . -type f -name "*.pyc" -not -path "*/.*" -exec rm -f {} + 2>/dev/null || true
+fi
+
+# Node.js
+# We don't remove node_modules by default, only build output
+clean_item ".next" "Next.js build"
+clean_item ".nuxt" "Nuxt.js build"
+clean_item ".output" "Vite/Nitro output"
+
+# Rust / Go / Java
+clean_item "target" "Cargo/Maven/Gradle target"
+clean_item "bin" "Go/Java binary output"
+
+# 4. OS Specific Caches
+if [ "$DRY_RUN" -eq 1 ]; then
+  log_success "DRY-RUN: Would remove .DS_Store and Thumbs.db files."
+else
+  find . -type f -name ".DS_Store" -not -path "*/.*" -exec rm -f {} + 2>/dev/null || true
+  find . -type f -name "Thumbs.db" -not -path "*/.*" -exec rm -f {} + 2>/dev/null || true
+fi
+
+log_success "\n✨ Cleanup complete!"
