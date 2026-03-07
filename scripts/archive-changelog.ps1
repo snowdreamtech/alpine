@@ -1,33 +1,13 @@
-<#
-.SYNOPSIS
-    Automates major-version changelog archiving by calling the POSIX shell script.
-.DESCRIPTION
-    Ensures a POSIX shell is available and executes scripts/archive-changelog.sh.
-#>
+# PowerShell wrapper for archive-changelog.sh
+# Ensures that the POSIX shell script remains the single source of truth (SSoT).
 
-$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
-$BaseDir = Split-Path -Parent $ScriptDir
-$ShellScript = Join-Path $ScriptDir "archive-changelog.sh"
+$ArgsString = $args -join " "
 
-# Check for common POSIX shells
-$Shell = "sh"
-if (-not (Get-Command $Shell -ErrorAction SilentlyContinue)) {
-    $Shell = "bash"
-    if (-not (Get-Command $Shell -ErrorAction SilentlyContinue)) {
-        Write-Error "Error: POSIX shell (sh or bash) not found."
-        exit 1
-    }
-}
-
-# Invoke the shell script
-Push-Location $BaseDir
-try {
-    & $Shell "scripts/archive-changelog.sh"
-}
-finally {
-    Pop-Location
-}
-
-if ($LASTEXITCODE -ne 0) {
-    exit $LASTEXITCODE
+if (Get-Command 'sh' -ErrorAction SilentlyContinue) {
+    sh "$PSScriptRoot/archive-changelog.sh" $ArgsString
+} elseif (Get-Command 'bash' -ErrorAction SilentlyContinue) {
+    bash "$PSScriptRoot/archive-changelog.sh" $ArgsString
+} else {
+    Write-Output "Error: 'sh' or 'bash' not found. Please install Git for Windows or ensure a POSIX shell is in your PATH."
+    exit 1
 }

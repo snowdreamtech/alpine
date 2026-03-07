@@ -1,15 +1,6 @@
 @echo off
 REM scripts/archive-changelog.bat - Entry point for Windows
-REM Follows the cmd -> powershell -> shell pattern.
+REM Delegates to archive-changelog.ps1 to maintain Single Source of Truth.
 
-setlocal
-set SCRIPT_DIR=%~dp0
-set PS_SCRIPT=%SCRIPT_DIR%archive-changelog.ps1
-
-powershell -NoProfile -ExecutionPolicy Bypass -File "%PS_SCRIPT%"
-
-if %ERRORLEVEL% neq 0 (
-    exit /b %ERRORLEVEL%
-)
-
-endlocal
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0archive-changelog.ps1" %*
+exit /b %ERRORLEVEL%

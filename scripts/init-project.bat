@@ -1,4 +1,6 @@
 @echo off
-REM CMD wrapper for init-project.ps1
+REM scripts/init-project.bat - Entry point for Windows
+REM Delegates to init-project.ps1 to maintain Single Source of Truth.
 
-powershell -ExecutionPolicy Bypass -File "%~dp0init-project.ps1"
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0init-project.ps1" %*
+exit /b %ERRORLEVEL%

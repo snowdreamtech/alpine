@@ -1,9 +1,15 @@
 # PowerShell wrapper for init-project.sh
-# This ensures that the POSIX shell script is the single source of truth.
+# Ensures that the POSIX shell script remains the single source of truth (SSoT).
 
-if (Get-Command "sh" -ErrorAction SilentlyContinue) {
-    sh "$PSScriptRoot/init-project.sh"
-} else {
-    Write-Output "Error: 'sh' (POSIX Shell) not found. Please install Git for Windows or ensure 'sh' is in your PATH."
+$ArgsString = $args -join " "
+
+if (Get-Command 'sh' -ErrorAction SilentlyContinue) {
+    sh "$PSScriptRoot/init-project.sh" $ArgsString
+}
+elseif (Get-Command 'bash' -ErrorAction SilentlyContinue) {
+    bash "$PSScriptRoot/init-project.sh" $ArgsString
+}
+else {
+    Write-Output "Error: 'sh' or 'bash' not found. Please install Git for Windows or ensure a POSIX shell is in your PATH."
     exit 1
 }
