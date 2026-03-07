@@ -50,16 +50,13 @@ run_python_bench() {
     if [ -x "$VENV/bin/pytest" ]; then
       "$VENV/bin/pytest" --benchmark-only
     else
-      log_warn "Warning: pytest-benchmark not found. Skipping."
+      log_warn "pytest-benchmark not found. Skipping."
     fi
   fi
 }
 
 run_node_bench() {
-  if [ -f "$PACKAGE_JSON" ] && grep -q '"bench":' "$PACKAGE_JSON"; then
-    log_info "── Testing Node.js Benchmarks ($NPM bench) ──"
-    "$NPM" run bench
-  fi
+  run_npm_script "bench"
 }
 
 case "$SUITE" in

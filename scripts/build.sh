@@ -60,12 +60,7 @@ elif [ -f "go.mod" ]; then
 fi
 
 # 3. Node.js build
-if [ -f "package.json" ]; then
-  if grep -q '"build":' package.json; then
-    NPM=${NPM:-pnpm}
-    run_build "$NPM run build" "Node.js build ($NPM)"
-  fi
-fi
+run_npm_script "build"
 
 # 4. Python build
 if [ -f "pyproject.toml" ]; then

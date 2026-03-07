@@ -39,11 +39,16 @@ log_info "📦 Installing Project Dependencies...\n"
 
 # 2. Node.js dependencies
 if [ -f "$PACKAGE_JSON" ]; then
-  log_info "── Installing Node.js dependencies ($NPM) ──"
-  if command -v "$NPM" >/dev/null 2>&1; then
-    "$NPM" install
+  if [ "$IN_INSTALL_SCRIPT" = "1" ]; then
+    log_debug "Skipping recursive pnpm install call."
   else
-    log_warn "Warning: $NPM not found. Skipping Node.js dependencies."
+    log_info "── Installing Node.js dependencies ($NPM) ──"
+    if command -v "$NPM" >/dev/null 2>&1; then
+      export IN_INSTALL_SCRIPT=1
+      "$NPM" install
+    else
+      log_warn "Warning: $NPM not found. Skipping Node.js dependencies."
+    fi
   fi
 fi
 

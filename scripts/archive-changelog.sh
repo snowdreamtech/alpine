@@ -13,8 +13,9 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
 # 1. Execution Context Guard: Ensure we are in the project root
-if [ ! -f "$CHANGELOG" ] || [ ! -d ".git" ]; then
-  log_error "Error: This script must be run from the project root (where $CHANGELOG and .git reside)."
+guard_project_root
+if [ ! -f "$CHANGELOG" ]; then
+  log_error "Error: $CHANGELOG not found in project root."
   exit 1
 fi
 

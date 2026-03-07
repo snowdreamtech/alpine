@@ -69,13 +69,7 @@ error() {
   exit 1
 }
 
-# CI Summary helper
-TMP_SUMMARY=$(mktemp)
-log_summary() {
-  _MOD="$1"
-  _STAT="$2"
-  printf "| %s | %s |\n" "$_MOD" "$_STAT" >>"$TMP_SUMMARY"
-}
+# ── Functions ────────────────────────────────────────────────────────────────
 
 # OS/Arch Detection
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
@@ -96,32 +90,11 @@ msys* | mingw* | cygwin*)
   ;;
 *) _OS_TAG="linux" ;;
 esac
-
-# Robust download helper with proxy fallback
-download_url() {
-  _URL="$1"
-  _OUT="$2"
-  _DESC="$3"
-
-  if [ "$DRY_RUN" -eq 1 ]; then
-    log_debug "DRY-RUN: Would download $_URL to $_OUT"
-    return 0
-  fi
-
-  if curl --retry 3 -fsSL "${_URL}" -o "${_OUT}"; then
-    return 0
-  fi
-
-  # Fallback if proxy failed (522, etc.)
-  if [ -n "${GITHUB_PROXY}" ] && echo "${_URL}" | grep -q "^${GITHUB_PROXY}"; then
-    _FALLBACK_URL="${_URL#"$GITHUB_PROXY"}"
-    warn "Proxy download failed for ${_DESC}, retrying directly from ${_FALLBACK_URL}..."
-    if curl --retry 3 -fsSL "${_FALLBACK_URL}" -o "${_OUT}"; then
-      return 0
-    fi
-  fi
-
-  return 1
+TMP_SUMMARY=$(mktemp)
+log_summary() {
+  _MOD="$1"
+  _STAT="$2"
+  printf "| %s | %s |\n" "$_MOD" "$_STAT" >>"$TMP_SUMMARY"
 }
 
 setup_node() {
@@ -188,7 +161,6 @@ install_gitleaks() {
   if [ "${_OS_TAG}" = "windows" ]; then
     _ARCH_W="x64"
     [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _ARCH_W="arm64"
-    _ARCH_W="x64"
     _TAR="gitleaks_${GITLEAKS_VERSION#v}_${_TAR_TAG}_${_ARCH_W}.zip"
     _URL="${GITHUB_PROXY}https://github.com/gitleaks/gitleaks/releases/download/${GITLEAKS_VERSION}/${_TAR}"
 
@@ -226,18 +198,14 @@ install_hadolint() {
     log_summary "Hadolint" "✅ Already exists"
     return 0
   fi
-  log_info "── Installing hadolint ${HADOLINT_VERSION} ──"
-
-  if [ "$DRY_RUN" -eq 1 ]; then
-    log_info "DRY-RUN: Would install hadolint to $_BIN"
-    log_summary "Hadolint" "⚖️ Previewed"
-    return 0
-  fi
 
   _SUFFIX="Linux-x86_64"
   if [ "${OS}" = "darwin" ]; then
     _SUFFIX="Darwin-x86_64"
-  elif [ "${_OS_TAG}" = "windows" ]; then _SUFFIX="Windows-x86_64.exe"; fi
+  elif [ "${_OS_TAG}" = "windows" ]; then
+    _SUFFIX="Windows-x86_64.exe"
+  fi
+
   _URL="${GITHUB_PROXY}https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-${_SUFFIX}"
   if download_url "${_URL}" "${_BIN}" "hadolint"; then
     chmod +x "${_BIN}"
@@ -255,19 +223,12 @@ install_go_lint() {
     log_summary "Go Lint" "✅ Already exists"
     return 0
   fi
-  log_info "── Installing golangci-lint ${GOLANGCI_VERSION} ──"
-
-  if [ "$DRY_RUN" -eq 1 ]; then
-    log_info "DRY-RUN: Would install golangci-lint to ${VENV}/bin"
-    log_summary "Go Lint" "⚖️ Previewed"
-    return 0
-  fi
 
   _URL="${GITHUB_PROXY}https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh"
   _TMP=$(mktemp -d)
   if download_url "${_URL}" "${_TMP}/install_go.sh" "golangci-lint-installer"; then
     export BINDIR="${VENV}/bin"
-    bash "${_TMP}/install_go.sh" "${GOLANGCI_VERSION}"
+    sh "${_TMP}/install_go.sh" "${GOLANGCI_VERSION}"
     rm -rf "${_TMP}"
     info "golangci-lint installed."
     log_summary "Go Lint" "✅ Installed"
@@ -281,13 +242,6 @@ install_checkmake() {
   _BIN="${VENV}/bin/checkmake${_EXE}"
   if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
     log_summary "Checkmake" "✅ Already exists"
-    return 0
-  fi
-  log_info "── Installing checkmake ${CHECKMAKE_VERSION} ──"
-
-  if [ "$DRY_RUN" -eq 1 ]; then
-    log_info "DRY-RUN: Would install checkmake to $_BIN"
-    log_summary "Checkmake" "⚖️ Previewed"
     return 0
   fi
 
@@ -310,12 +264,6 @@ install_checkmake() {
 
 install_iac_lint() {
   log_info "── Installing IaC tools (tflint, kube-linter) ──"
-
-  if [ "$DRY_RUN" -eq 1 ]; then
-    log_info "DRY-RUN: Would install tflint and kube-linter."
-    log_summary "IaC Tools" "⚖️ Previewed"
-    return 0
-  fi
 
   # TFLint
   if [ ! -x "${VENV}/bin/tflint${_EXE}" ]; then
@@ -341,7 +289,7 @@ install_iac_lint() {
     else
       _TMP=$(mktemp -d)
       if download_url "${_URL}" "${_TMP}/install_tflint.sh" "tflint-installer"; then
-        TFLINT_INSTALL_PATH="${VENV}/bin" bash "${_TMP}/install_tflint.sh"
+        TFLINT_INSTALL_PATH="${VENV}/bin" sh "${_TMP}/install_tflint.sh"
         rm -rf "${_TMP}"
         log_summary "TFLint" "✅ Installed"
       else
@@ -417,13 +365,6 @@ install_java_lint() {
     log_summary "Java Lint" "✅ Already exists"
     return 0
   fi
-  log_info "── Installing google-java-format ${JAVA_FORMAT_VERSION} ──"
-
-  if [ "$DRY_RUN" -eq 1 ]; then
-    log_info "DRY-RUN: Would install google-java-format to $_BIN"
-    log_summary "Java Lint" "⚖️ Previewed"
-    return 0
-  fi
 
   _URL="${GITHUB_PROXY}https://github.com/google/google-java-format/releases/download/v${JAVA_FORMAT_VERSION}/google-java-format-${JAVA_FORMAT_VERSION}-all-deps.jar"
   if download_url "${_URL}" "${_JAR}" "google-java-format"; then
@@ -469,13 +410,6 @@ install_php_lint() {
   _BIN="${VENV}/bin/php-cs-fixer"
   if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
     log_summary "PHP Lint" "✅ Already exists"
-    return 0
-  fi
-  log_info "── Installing php-cs-fixer ${PHP_CS_FIXER_VERSION} ──"
-
-  if [ "$DRY_RUN" -eq 1 ]; then
-    log_info "DRY-RUN: Would install php-cs-fixer to $_BIN"
-    log_summary "PHP Lint" "⚖️ Previewed"
     return 0
   fi
 

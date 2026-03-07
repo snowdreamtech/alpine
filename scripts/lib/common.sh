@@ -30,6 +30,7 @@ LOCK_DIR=".archival_lock"
 DOCS_DIR="docs"
 # shellcheck disable=SC2034
 ARCHIVE_DIR="${ARCHIVE_DIR:-.}"
+GITHUB_PROXY="${GITHUB_PROXY:-https://gh-proxy.sn0wdr1am.com/}"
 
 # Logging functions
 log_info() {
@@ -50,14 +51,99 @@ log_debug() {
 
 # Execution context guard
 guard_project_root() {
-  if [ ! -f "Makefile" ] || [ ! -d ".git" ]; then
+  if [ ! -f "Makefile" ] && [ ! -f "package.json" ]; then
     log_error "Error: This script must be run from the project root."
     exit 1
   fi
 }
 
-# Export functions for subshells if needed
-# Note: POSIX sh doesn't support export -f
+# Enhanced download helper with retry and proxy fallback
+download_url() {
+  _URL="$1"
+  _OUT="$2"
+  _DESC="$3"
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_debug "DRY-RUN: Would download $_URL to $_OUT"
+    return 0
+  fi
+
+  # Ensure output directory exists
+  _DIR=$(dirname "$_OUT")
+  mkdir -p "$_DIR"
+
+  log_info "Downloading $_DESC..."
+  # curl with retry flags as per rules
+  if curl --retry 5 --retry-delay 2 --retry-connrefused --fail \
+    --connect-timeout 10 --max-time 60 \
+    -fsSL "${_URL}" -o "${_OUT}"; then
+    return 0
+  fi
+
+  # Fallback if proxy failed and it was a proxied URL
+  if [ -n "${GITHUB_PROXY}" ] && echo "${_URL}" | grep -q "^${GITHUB_PROXY}"; then
+    _FALLBACK_URL="${_URL#"$GITHUB_PROXY"}"
+    log_warn "Proxy download failed for ${_DESC}, retrying directly from ${_FALLBACK_URL}..."
+    if curl --retry 5 --retry-delay 2 --retry-connrefused --fail \
+      --connect-timeout 10 --max-time 60 \
+      -fsSL "${_FALLBACK_URL}" -o "${_OUT}"; then
+      return 0
+    fi
+  fi
+
+  log_error "Failed to download $_DESC from $_URL"
+  return 1
+}
+
+# Checksum verification helper
+verify_checksum() {
+  _FILE="$1"
+  _EXPECTED_SHA="$2"
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_debug "DRY-RUN: Would verify checksum for $_FILE"
+    return 0
+  fi
+
+  log_info "Verifying checksum for $(basename "$_FILE")..."
+  if command -v sha256sum >/dev/null 2>&1; then
+    _ACTUAL_SHA=$(sha256sum "$_FILE" | awk '{print $1}')
+  elif command -v shasum >/dev/null 2>&1; then
+    _ACTUAL_SHA=$(shasum -a 256 "$_FILE" | awk '{print $1}')
+  else
+    log_warn "sha256sum/shasum not found. Skipping checksum verification."
+    return 0
+  fi
+
+  if [ "$_ACTUAL_SHA" != "$_EXPECTED_SHA" ]; then
+    log_error "Checksum mismatch for $_FILE!"
+    log_error "Expected: $_EXPECTED_SHA"
+    log_error "Actual:   $_ACTUAL_SHA"
+    return 1
+  fi
+
+  log_success "Checksum verified."
+  return 0
+}
+
+# Helper to run npm/pnpm scripts without infinite recursion
+run_npm_script() {
+  _SCRIPT_NAME="$1"
+  _CURRENT_SCRIPT=$(basename "$0")
+
+  if [ -f "$PACKAGE_JSON" ]; then
+    _CMD=$(grep "\"$_SCRIPT_NAME\":" "$PACKAGE_JSON" | sed "s/.*\"$_SCRIPT_NAME\":[[:space:]]*\"//;s/\".*//" || true)
+    if [ -n "$_CMD" ]; then
+      # Avoid infinite loop if the command points back to this script
+      if echo "$_CMD" | grep -q "$_CURRENT_SCRIPT"; then
+        log_debug "npm script '$_SCRIPT_NAME' is a self-reference to '$_CURRENT_SCRIPT'. Skipping."
+        return 0
+      fi
+      log_info "── Running Node.js script: $NPM $_SCRIPT_NAME ──"
+      "$NPM" run "$_SCRIPT_NAME"
+    fi
+  fi
+}
 
 # Standard argument parsing for DRY_RUN and VERBOSE
 parse_common_args() {
