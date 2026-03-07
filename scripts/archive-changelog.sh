@@ -3,7 +3,8 @@
 # This script moves entries of previous major versions from CHANGELOG.md to archival files.
 # Features: POSIX compliant, Atomic Operations, Deduplication, Safety Traps,
 #           History Sorting, Universal Versioning, Subdirectory Support, Concurrency Lock,
-#           Smart Directory Discovery, ANSI Colored Output, Verbosity Control.
+#           Smart Directory Discovery, ANSI Colored Output, Verbosity Control,
+#           GitHub Actions Job Summary.
 
 set -e
 
@@ -97,10 +98,12 @@ fi
 TMP_HEADER=$(mktemp)
 TMP_ARCHIVE_PREFIX=$(mktemp -d)
 NEW_CHANGELOG=$(mktemp)
+# For Job Summary
+TMP_SUMMARY=$(mktemp)
 
 cleanup() {
   log_debug "Cleaning up temporary files..."
-  rm -f "$TMP_HEADER" "$NEW_CHANGELOG"
+  rm -f "$TMP_HEADER" "$NEW_CHANGELOG" "$TMP_SUMMARY"
   rm -rf "$TMP_ARCHIVE_PREFIX"
   [ "$DRY_RUN" -eq 0 ] && rmdir "$LOCK_DIR" 2>/dev/null || true
 }
@@ -186,6 +189,11 @@ if [ -f "$TMP_ARCHIVE_PREFIX/current.md" ]; then
 fi
 
 # 4. Handle archives with deduplication
+printf "### Archival Execution Summary\n\n" >"$TMP_SUMMARY"
+printf "| Major Version | Action | Destination |\n" >>"$TMP_SUMMARY"
+printf "| :--- | :--- | :--- |\n" >>"$TMP_SUMMARY"
+ARCHIVE_COUNT=0
+
 for arch_file in "$TMP_ARCHIVE_PREFIX"/v*.md; do
   [ -e "$arch_file" ] || continue
 
@@ -213,6 +221,7 @@ for arch_file in "$TMP_ARCHIVE_PREFIX"/v*.md; do
     if [ -s "$FILTERED_CONTENT" ]; then
       if [ "$DRY_RUN" -eq 1 ]; then
         log_warn "DRY-RUN: Would prepend new entries to $FINAL_ARCH_FILE"
+        printf "| v%s | Prepend (Dry Run) | %s |\n" "$v_num" "$FINAL_ARCH_FILE" >>"$TMP_SUMMARY"
       else
         log_info "Updating archive: $FINAL_ARCH_FILE"
         tmp_arch=$(mktemp)
@@ -220,20 +229,31 @@ for arch_file in "$TMP_ARCHIVE_PREFIX"/v*.md; do
         printf "\n" >>"$tmp_arch"
         sed '1,2d' "$FINAL_ARCH_FILE" >>"$tmp_arch"
         mv "$tmp_arch" "$FINAL_ARCH_FILE"
+        printf "| v%s | Updated | %s |\n" "$v_num" "$FINAL_ARCH_FILE" >>"$TMP_SUMMARY"
       fi
+      ARCHIVE_COUNT=$((ARCHIVE_COUNT + 1))
+    else
+      log_debug "No new entries for v$v_num, skipping."
     fi
     rm -f "$FILTERED_CONTENT"
   else
     if [ "$DRY_RUN" -eq 1 ]; then
       log_warn "DRY-RUN: Would create $FINAL_ARCH_FILE"
+      printf "| v%s | Create (Dry Run) | %s |\n" "$v_num" "$FINAL_ARCH_FILE" >>"$TMP_SUMMARY"
     else
       log_success "Creating new archive: $FINAL_ARCH_FILE"
       mkdir -p "$ARCHIVE_DIR"
       printf "# Changelog Archive v%s\n\n" "$v_num" >"$FINAL_ARCH_FILE"
       cat "$arch_file" >>"$FINAL_ARCH_FILE"
+      printf "| v%s | Created | %s |\n" "$v_num" "$FINAL_ARCH_FILE" >>"$TMP_SUMMARY"
     fi
+    ARCHIVE_COUNT=$((ARCHIVE_COUNT + 1))
   fi
 done
+
+if [ "$ARCHIVE_COUNT" -eq 0 ]; then
+  printf "| N/A | No changes required | %s is up to date |\n" "$CHANGELOG" >>"$TMP_SUMMARY"
+fi
 
 # 5. Rebuild History section in NEW_CHANGELOG (Sorted)
 log_info "Rebuilding History section (Archive Directory: $ARCHIVE_DIR)..."
@@ -273,4 +293,10 @@ if [ "$DRY_RUN" -eq 1 ]; then
 else
   mv "$NEW_CHANGELOG" "$CHANGELOG"
   log_success "Successfully updated $CHANGELOG"
+fi
+
+# 7. Write to GITHUB_STEP_SUMMARY if available
+if [ -n "$GITHUB_STEP_SUMMARY" ]; then
+  log_debug "Writing to GITHUB_STEP_SUMMARY..."
+  cat "$TMP_SUMMARY" >>"$GITHUB_STEP_SUMMARY"
 fi
