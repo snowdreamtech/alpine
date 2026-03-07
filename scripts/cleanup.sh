@@ -65,6 +65,7 @@ log_info "\n📦 Cleaning language-specific caches..."
 clean_item ".pytest_cache" "Pytest cache"
 clean_item ".ruff_cache" "Ruff cache"
 clean_item ".mypy_cache" "Mypy cache"
+clean_item ".venv" "Python virtual environment"
 
 # Finding and removing __pycache__ and .pyc files
 if [ "$DRY_RUN" -eq 1 ]; then
