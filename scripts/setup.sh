@@ -199,6 +199,13 @@ install_hadolint() {
     return 0
   fi
 
+  log_info "── Installing hadolint ${HADOLINT_VERSION} ──"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_info "DRY-RUN: Would install hadolint to $_BIN"
+    log_summary "Hadolint" "⚖️ Previewed"
+    return 0
+  fi
+
   _SUFFIX="Linux-x86_64"
   if [ "${OS}" = "darwin" ]; then
     _SUFFIX="Darwin-x86_64"
@@ -224,6 +231,13 @@ install_go_lint() {
     return 0
   fi
 
+  log_info "── Installing golangci-lint ${GOLANGCI_VERSION} ──"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_info "DRY-RUN: Would install golangci-lint to $_BIN"
+    log_summary "Go Lint" "⚖️ Previewed"
+    return 0
+  fi
+
   _URL="${GITHUB_PROXY}https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh"
   _TMP=$(mktemp -d)
   if download_url "${_URL}" "${_TMP}/install_go.sh" "golangci-lint-installer"; then
@@ -242,6 +256,13 @@ install_checkmake() {
   _BIN="${VENV}/bin/checkmake${_EXE}"
   if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
     log_summary "Checkmake" "✅ Already exists"
+    return 0
+  fi
+
+  log_info "── Installing checkmake ${CHECKMAKE_VERSION} ──"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_info "DRY-RUN: Would install checkmake to $_BIN"
+    log_summary "Checkmake" "⚖️ Previewed"
     return 0
   fi
 
@@ -264,6 +285,13 @@ install_checkmake() {
 
 install_iac_lint() {
   log_info "── Installing IaC tools (tflint, kube-linter) ──"
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_info "DRY-RUN: Would install tflint and kube-linter to ${VENV}/bin"
+    log_summary "TFLint" "⚖️ Previewed"
+    log_summary "Kube-Linter" "⚖️ Previewed"
+    return 0
+  fi
 
   # TFLint
   if [ ! -x "${VENV}/bin/tflint${_EXE}" ]; then
@@ -366,6 +394,13 @@ install_java_lint() {
     return 0
   fi
 
+  log_info "── Installing google-java-format ${JAVA_FORMAT_VERSION} ──"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_info "DRY-RUN: Would install google-java-format to $_BIN"
+    log_summary "Java Lint" "⚖️ Previewed"
+    return 0
+  fi
+
   _URL="${GITHUB_PROXY}https://github.com/google/google-java-format/releases/download/v${JAVA_FORMAT_VERSION}/google-java-format-${JAVA_FORMAT_VERSION}-all-deps.jar"
   if download_url "${_URL}" "${_JAR}" "google-java-format"; then
     printf "#!/bin/sh\njava -jar \"%s\" \"\$@\"\n" "${_JAR}" >"${_BIN}"
@@ -410,6 +445,13 @@ install_php_lint() {
   _BIN="${VENV}/bin/php-cs-fixer"
   if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
     log_summary "PHP Lint" "✅ Already exists"
+    return 0
+  fi
+
+  log_info "── Installing php-cs-fixer ${PHP_CS_FIXER_VERSION} ──"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_info "DRY-RUN: Would install php-cs-fixer to $_BIN"
+    log_summary "PHP Lint" "⚖️ Previewed"
     return 0
   fi
 
