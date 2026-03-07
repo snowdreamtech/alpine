@@ -8,38 +8,9 @@
 
 set -e
 
-CHANGELOG="CHANGELOG.md"
-PACKAGE_JSON="package.json"
-CARGO_TOML="Cargo.toml"
-PYPROJECT_TOML="pyproject.toml"
-VERSION_FILE="VERSION"
-DRY_RUN=0
-VERBOSE=1 # 0: quiet, 1: normal, 2: verbose
-LOCK_DIR="$CHANGELOG.lock"
-
-# ANSI Colors
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-BLUE='\033[0;34m'
-NC='\033[0m' # No Color
-
-# Logging functions - Robustness fix for set -e
-log_info() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$BLUE" "$1" "$NC"; fi
-}
-log_success() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$GREEN" "$1" "$NC"; fi
-}
-log_warn() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$YELLOW" "$1" "$NC"; fi
-}
-log_error() {
-  printf "%b%s%b\n" "$RED" "$1" "$NC" >&2
-}
-log_debug() {
-  if [ "$VERBOSE" -ge 2 ]; then printf "[DEBUG] %s\n" "$1"; fi
-}
+# ── Common Library ───────────────────────────────────────────────────────────
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+. "$SCRIPT_DIR/lib/common.sh"
 
 # 1. Execution Context Guard: Ensure we are in the project root
 if [ ! -f "$CHANGELOG" ] || [ ! -d ".git" ]; then
@@ -80,24 +51,7 @@ EOF
 }
 
 # Argument parsing
-for arg in "$@"; do
-  case "$arg" in
-  --dry-run)
-    DRY_RUN=1
-    log_warn "Running in DRY-RUN mode. No changes will be applied."
-    ;;
-  -q | --quiet)
-    VERBOSE=0
-    ;;
-  -v | --verbose)
-    VERBOSE=2
-    ;;
-  -h | --help)
-    show_help
-    exit 0
-    ;;
-  esac
-done
+parse_common_args "$@"
 
 # Concurrency Lock (Atomic mkdir is standard POSIX lock)
 if [ "$DRY_RUN" -eq 0 ]; then

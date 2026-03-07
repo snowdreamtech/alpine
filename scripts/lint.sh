@@ -5,37 +5,12 @@
 
 set -e
 
-# Colors
-BLUE='\033[0;34m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m'
-
-VERBOSE=1 # 0: quiet, 1: normal, 2: verbose
-
-# Logging functions
-log_info() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$BLUE" "$1" "$NC"; fi
-}
-log_success() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$GREEN" "$1" "$NC"; fi
-}
-log_warn() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$YELLOW" "$1" "$NC"; fi
-}
-log_error() {
-  printf "%b%s%b\n" "$RED" "$1" "$NC" >&2
-}
-log_debug() {
-  if [ "$VERBOSE" -ge 2 ]; then printf "[DEBUG] %s\n" "$1"; fi
-}
+# ── Common Library ───────────────────────────────────────────────────────────
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+. "$SCRIPT_DIR/lib/common.sh"
 
 # 1. Execution Context Guard
-if [ ! -f "Makefile" ] || [ ! -d ".git" ]; then
-  log_error "Error: This script must be run from the project root."
-  exit 1
-fi
+guard_project_root
 
 # Help message
 show_help() {
@@ -55,17 +30,12 @@ EOF
 
 # Argument parsing
 FIX=""
-for arg in "$@"; do
-  case "$arg" in
+for _arg in "$@"; do
+  case "$_arg" in
   --fix) FIX="--fix" ;;
-  -q | --quiet) VERBOSE=0 ;;
-  -v | --verbose) VERBOSE=2 ;;
-  -h | --help)
-    show_help
-    exit 0
-    ;;
   esac
 done
+parse_common_args "$@"
 
 log_info "🔍 Starting Unified Project Linter...\n"
 

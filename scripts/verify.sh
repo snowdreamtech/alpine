@@ -5,34 +5,12 @@
 
 set -e
 
-# Colors
-BLUE='\033[0;34m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m'
-
-VERBOSE=1 # 0: quiet, 1: normal, 2: verbose
-
-# Logging functions
-log_info() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$BLUE" "$1" "$NC"; fi
-}
-log_success() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$GREEN" "$1" "$NC"; fi
-}
-log_warn() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$YELLOW" "$1" "$NC"; fi
-}
-log_error() {
-  printf "%b%s%b\n" "$RED" "$1" "$NC" >&2
-}
+# ── Common Library ───────────────────────────────────────────────────────────
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+. "$SCRIPT_DIR/lib/common.sh"
 
 # 1. Execution Context Guard
-if [ ! -f "Makefile" ] || [ ! -d ".git" ]; then
-  log_error "Error: This script must be run from the project root."
-  exit 1
-fi
+guard_project_root
 
 # Help message
 show_help() {
@@ -52,22 +30,13 @@ EOF
 
 # Argument parsing
 SUB_ARGS=""
-for arg in "$@"; do
-  case "$arg" in
-  -q | --quiet)
-    VERBOSE=0
-    SUB_ARGS="--quiet"
-    ;;
-  -v | --verbose)
-    VERBOSE=2
-    SUB_ARGS="--verbose"
-    ;;
-  -h | --help)
-    show_help
-    exit 0
-    ;;
+for _arg in "$@"; do
+  case "$_arg" in
+  -q | --quiet) SUB_ARGS="--quiet" ;;
+  -v | --verbose) SUB_ARGS="--verbose" ;;
   esac
 done
+parse_common_args "$@"
 
 log_info "🚀 Starting Full Project Verification...\n"
 

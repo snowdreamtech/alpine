@@ -8,36 +8,16 @@
 
 set -e
 
-# ── Configuration ────────────────────────────────────────────────────────────
-VENV=${VENV:-.venv}
-PYTHON=${PYTHON:-python3}
-GITHUB_PROXY=${GITHUB_PROXY:-https://gh-proxy.sn0wdr1am.com/}
-
-# Tool Versions
-GITLEAKS_VERSION=${GITLEAKS_VERSION:-v8.26.0}
-HADOLINT_VERSION=${HADOLINT_VERSION:-v2.12.0}
-GOLANGCI_VERSION=${GOLANGCI_VERSION:-v1.64.6}
-CHECKMAKE_VERSION=${CHECKMAKE_VERSION:-v0.3.2}
-TFLINT_VERSION=${TFLINT_VERSION:-v0.55.1}
-KUBE_LINTER_VERSION=${KUBE_LINTER_VERSION:-v0.7.2}
-JAVA_FORMAT_VERSION=${JAVA_FORMAT_VERSION:-1.34.1}
-PHP_CS_FIXER_VERSION=${PHP_CS_FIXER_VERSION:-v3.94.2}
-
-# Colors
-BLUE='\033[0;34m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m'
-
-DRY_RUN=0
-VERBOSE=1 # 0: quiet, 1: normal, 2: verbose
+# ── Common Library ───────────────────────────────────────────────────────────
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+. "$SCRIPT_DIR/lib/common.sh"
 
 # 1. Execution Context Guard
-if [ ! -f "Makefile" ] || [ ! -d ".git" ]; then
-  printf "%bError: This script must be run from the project root (where Makefile and .git reside).%b\n" "${RED}" "${NC}" >&2
-  exit 1
-fi
+guard_project_root
+
+# ── Configuration ────────────────────────────────────────────────────────────
+VENV=${VENV:-.venv}
+# ... (rest of configuration)
 
 # 2. Help Message
 show_help() {
@@ -80,23 +60,7 @@ EOF
 
 # ── Functions ────────────────────────────────────────────────────────────────
 
-log_info() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "${BLUE}" "$1" "${NC}"; fi
-}
-log_success() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "${GREEN}" "$1" "${NC}"; fi
-}
-log_warn() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "${YELLOW}" "$1" "${NC}"; fi
-}
-log_error() {
-  printf "%b%s%b\n" "${RED}" "$1" "${NC}" >&2
-}
-log_debug() {
-  if [ "$VERBOSE" -ge 2 ]; then printf "[DEBUG] %s\n" "$1"; fi
-}
-
-# Backward compatibility (some modules might still use log/info/warn/error internally)
+# Backward compatibility (some modules might still use log internally)
 log() { log_info "$1"; }
 info() { log_success "$1"; }
 warn() { log_warn "$1"; }
