@@ -4,13 +4,16 @@
   "private": true,
   "description": "VitePress documentation site for Snowdream Tech AI IDE Template",
   "scripts": {
+    "audit": "sh scripts/audit.sh",
+    "bench": "sh scripts/bench.sh",
     "commit": "sh scripts/commit.sh",
     "docs:build": "sh scripts/docs.sh build",
     "docs:dev": "sh scripts/docs.sh dev",
     "docs:preview": "sh scripts/docs.sh preview",
     "format": "sh scripts/format.sh",
     "lint": "sh scripts/lint.sh",
-    "test": "sh scripts/test.sh"
+    "test": "sh scripts/test.sh",
+    "update": "sh scripts/update.sh"
   },
   "config": {
     "commitizen": {

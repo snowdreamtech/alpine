@@ -15,7 +15,7 @@ endif
 # =============================================================================
 # Targets
 # =============================================================================
-.PHONY: all help init setup install lint format test build clean commit verify release env
+.PHONY: all help init setup install lint format test build clean commit verify release env update audit bench
 
 # Default target: display help
 all: help
@@ -118,6 +118,27 @@ ifeq ($(OS_NAME),Windows)
 	@scripts/env.bat
 else
 	@sh scripts/env.sh
+endif
+
+update:
+ifeq ($(OS_NAME),Windows)
+	@scripts/update.bat
+else
+	@sh scripts/update.sh
+endif
+
+audit:
+ifeq ($(OS_NAME),Windows)
+	@scripts/audit.bat
+else
+	@sh scripts/audit.sh
+endif
+
+bench:
+ifeq ($(OS_NAME),Windows)
+	@scripts/bench.bat
+else
+	@sh scripts/bench.sh
 endif
 
 clean:
