@@ -4,7 +4,7 @@
 # Features: POSIX compliant, Atomic Operations, Deduplication, Safety Traps,
 #           History Sorting, Universal Versioning, Subdirectory Support, Concurrency Lock,
 #           Smart Directory Discovery, ANSI Colored Output, Verbosity Control,
-#           GitHub Actions Job Summary.
+#           GitHub Actions Job Summary, Execution Context Guard.
 
 set -e
 
@@ -27,6 +27,12 @@ log_success() { [ "$VERBOSE" -ge 1 ] && printf "%b%s%b\n" "$GREEN" "$1" "$NC"; }
 log_warn() { [ "$VERBOSE" -ge 1 ] && printf "%b%s%b\n" "$YELLOW" "$1" "$NC"; }
 log_error() { printf "%b%s%b\n" "$RED" "$1" "$NC" >&2; }
 log_debug() { [ "$VERBOSE" -ge 2 ] && printf "[DEBUG] %s\n" "$1"; }
+
+# 1. Execution Context Guard: Ensure we are in the project root
+if [ ! -f "$CHANGELOG" ] || [ ! -d ".git" ]; then
+  log_error "Error: This script must be run from the project root (where $CHANGELOG and .git reside)."
+  exit 1
+fi
 
 # Smart Directory Discovery
 if [ -z "$ARCHIVE_DIR" ]; then
@@ -79,11 +85,6 @@ for arg in "$@"; do
     ;;
   esac
 done
-
-if [ ! -f "$CHANGELOG" ]; then
-  log_debug "$CHANGELOG not found, skipping."
-  exit 0
-fi
 
 # Concurrency Lock (Atomic mkdir is standard POSIX lock)
 if [ "$DRY_RUN" -eq 0 ]; then
