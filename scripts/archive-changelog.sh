@@ -4,12 +4,15 @@
 # Features: POSIX compliant, Atomic Operations, Deduplication, Safety Traps,
 #           History Sorting, Universal Versioning, Subdirectory Support, Concurrency Lock,
 #           Smart Directory Discovery, ANSI Colored Output, Verbosity Control,
-#           GitHub Actions Job Summary, Execution Context Guard.
+#           GitHub Actions Job Summary, Execution Context Guard, Multi-Language Versioning.
 
 set -e
 
 CHANGELOG="CHANGELOG.md"
 PACKAGE_JSON="package.json"
+CARGO_TOML="Cargo.toml"
+PYPROJECT_TOML="pyproject.toml"
+VERSION_FILE="VERSION"
 DRY_RUN=0
 VERBOSE=1 # 0: quiet, 1: normal, 2: verbose
 LOCK_DIR="$CHANGELOG.lock"
@@ -112,22 +115,49 @@ trap cleanup EXIT INT TERM
 
 # Get current major version (Universal Source)
 CURRENT_MAJOR=""
+
+# Helper function to extract major version from a semantic version string
+get_major() { echo "$1" | sed 's/^v//;s/\..*//'; }
+
+# 1. Check package.json (Node.js)
 if [ -f "$PACKAGE_JSON" ]; then
   log_debug "Checking $PACKAGE_JSON for version..."
   if command -v jq >/dev/null 2>&1; then
-    CURRENT_MAJOR=$(jq -r '.version | split(".")[0]' "$PACKAGE_JSON" 2>/dev/null || true)
+    raw_v=$(jq -r '.version' "$PACKAGE_JSON" 2>/dev/null || true)
   else
-    CURRENT_MAJOR=$(grep '"version":' "$PACKAGE_JSON" | head -n 1 | sed 's/.*"//;s/\..*//' || true)
+    raw_v=$(grep '"version":' "$PACKAGE_JSON" | head -n 1 | sed 's/.*"//;s/".*//' || true)
   fi
+  [ -n "$raw_v" ] && [ "$raw_v" != "null" ] && CURRENT_MAJOR=$(get_major "$raw_v")
 fi
 
-# Fallback to Git tags if package.json version is missing or invalid
+# 2. Check Cargo.toml (Rust)
+if [ -z "$CURRENT_MAJOR" ] && [ -f "$CARGO_TOML" ]; then
+  log_debug "Checking $CARGO_TOML for version..."
+  raw_v=$(grep '^version =' "$CARGO_TOML" | head -n 1 | sed -e 's/.*"\(.*\)"/\1/' -e "s/.*'\(.*\)'/\1/" || true)
+  [ -n "$raw_v" ] && CURRENT_MAJOR=$(get_major "$raw_v")
+fi
+
+# 3. Check pyproject.toml (Python)
+if [ -z "$CURRENT_MAJOR" ] && [ -f "$PYPROJECT_TOML" ]; then
+  log_debug "Checking $PYPROJECT_TOML for version..."
+  raw_v=$(grep '^version =' "$PYPROJECT_TOML" | head -n 1 | sed -e 's/.*"\(.*\)"/\1/' -e "s/.*'\(.*\)'/\1/" || true)
+  [ -n "$raw_v" ] && CURRENT_MAJOR=$(get_major "$raw_v")
+fi
+
+# 4. Check VERSION file (Generic)
+if [ -z "$CURRENT_MAJOR" ] && [ -f "$VERSION_FILE" ]; then
+  log_debug "Checking $VERSION_FILE for version..."
+  raw_v=$(cat "$VERSION_FILE" | head -n 1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' || true)
+  [ -n "$raw_v" ] && CURRENT_MAJOR=$(get_major "$raw_v")
+fi
+
+# 5. Fallback to Git tags if all files fail
 if [ -z "$CURRENT_MAJOR" ] || [ "$CURRENT_MAJOR" = "null" ]; then
   if command -v git >/dev/null 2>&1 && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
     log_debug "Falling back to Git tags for version..."
     GIT_TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
     if [ -n "$GIT_TAG" ]; then
-      CURRENT_MAJOR=$(echo "$GIT_TAG" | sed 's/^v//;s/\..*//')
+      CURRENT_MAJOR=$(get_major "$GIT_TAG")
     fi
   fi
 fi
