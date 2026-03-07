@@ -336,3 +336,48 @@ Get-ChildItem -Recurse -Filter "*.ps1" | ForEach-Object {
 ```
 
 Document any necessary `# shellcheck disable=SC2034` exclusions with a reason. Suppressing linter warnings without justification is not permitted.
+
+## 8. High-Performance & Robustness Patterns
+
+### Atomic File Updates (Build-then-Swap)
+
+When a script needs to modify a file, avoid direct append/redirection to the source. Use a temporary file to ensure atomicity.
+
+```sh
+# POSIX-compliant atomic update
+tmp_file=$(mktemp)
+# 1. Process/Build
+cat header.txt > "$tmp_file"
+sed 's/foo/bar/g' source.txt >> "$tmp_file"
+# 2. Atomic Swap
+mv "$tmp_file" source.txt
+```
+
+### Universal Versioning Detection
+
+Standardize version detection across different ecosystems to ensure a zero-config experience.
+
+```sh
+# Helper to extract version from various manifests
+get_project_version() {
+  if [ -f "package.json" ]; then
+    grep '"version":' package.json | head -n 1 | sed 's/.*"version":[[:space:]]*"//;s/".*//'
+  elif [ -f "Cargo.toml" ]; then
+    grep '^version =' Cargo.toml | head -n 1 | sed -e 's/.*"\(.*\)"/\1/' -e "s/.*'\(.*\)'/\1/"
+  elif [ -f "VERSION" ]; then
+    cat VERSION | head -n 1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+  fi
+}
+```
+
+### Execution Context Guard
+
+Prevent scripts from running in unintentional directories.
+
+```sh
+# Verify project root
+if [ ! -f "CHANGELOG.md" ] || [ ! -d ".git" ]; then
+  printf "ERROR: This script must be run from the project root.\n" >&2
+  exit 1
+fi
+```

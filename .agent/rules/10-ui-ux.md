@@ -181,9 +181,15 @@
   - **Green**: Success, completion, and resource creation.
   - **Yellow**: Warnings, dry-run (preview) mode, and non-blocking issues.
   - **Red**: Fatal errors and critical failures.
+- **Cross-Platform Compatibility**: Scripts MUST be **POSIX-compliant** (`#!/bin/sh`) to ensure execution across minimal environments (Alpine, BusyBox, etc.) and prevent system-specific edge cases.
+- **Atomic Operations (File Integrity)**: Scripts that modify critical files SHOULD use the **Build-then-Swap** pattern: generate a temporary file first, then use an atomic `mv` to swap it into place. This prevents data corruption if the process is interrupted.
+- **Deduplication Intelligence**: When appending or prepending to logs/archives, scripts MUST implement a check to prevent redundant entries, ensuring data remains clean and unique.
 - Implement **Smart Discovery**: Command-line tools should attempt to auto-detect common project directories (e.g., `docs/changelogs/`, `bin/`, `dist/`) to minimize required manual configuration.
+- **Universal Sensing (Context Awareness)**: CLI tools SHOULD automatically detect the project type and version by scanning for standard manifest files (e.g., `package.json`, `Cargo.toml`, `pyproject.toml`, `VERSION`) to provide a zero-config experience.
 - Support **Non-Destructive Previews**: Every tool that modifies files on a large scale MUST implement a `--dry-run` flag.
-- Ensure **Concurrency Safety**: Use standard POSIX locking mechanisms (like `mkdir` based locks) to prevent corruption during simultaneous local and CI executions.
+- **Defensive Programming**:
+  - **Execution Context Guard**: Scripts MUST verify they are running from the correct location (e.g., project root) before making changes.
+  - **Concurrency Safety**: Use standard POSIX locking mechanisms (like `mkdir` based locks) to prevent corruption during simultaneous local and CI executions.
 - Provide a standard **Help Interface** (`--help`) for all scripts to ensure discoverability and correct usage.
 - **CI Integration (Rich Reporting)**: Tools running in GitHub Actions SHOULD leverage `GITHUB_STEP_SUMMARY` to provide rich Markdown reports (e.g., summary tables of changed files) directly in the CI dashboard.
 - **Support Multiple Verbosity Levels**:
