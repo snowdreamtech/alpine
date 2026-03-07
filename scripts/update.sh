@@ -12,7 +12,6 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 guard_project_root
 
 # ── Configuration ────────────────────────────────────────────────────────────
-DRY_RUN=0
 
 # Help Message
 show_help() {
@@ -48,8 +47,8 @@ run_update() {
 }
 
 # 3. Core Package Managers
-if command -v pnpm >/dev/null 2>&1; then
-  run_update "pnpm self-update" "pnpm (self-update)"
+if command -v "$NPM" >/dev/null 2>&1; then
+  run_update "$NPM self-update" "$NPM (self-update)"
 fi
 
 if command -v brew >/dev/null 2>&1; then
@@ -57,7 +56,6 @@ if command -v brew >/dev/null 2>&1; then
 fi
 
 # 4. Git Hooks & Tooling
-VENV=${VENV:-.venv}
 if [ -x "$VENV/bin/pre-commit" ]; then
   run_update "$VENV/bin/pre-commit autoupdate" "pre-commit hooks"
 elif command -v pre-commit >/dev/null 2>&1; then

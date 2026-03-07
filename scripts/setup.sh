@@ -16,8 +16,8 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 guard_project_root
 
 # ── Configuration ────────────────────────────────────────────────────────────
-VENV=${VENV:-.venv}
-# ... (rest of configuration)
+# Global variables (VENV, PYTHON, etc.) are sourced from common.sh
+# Modules can be overridden by command line args
 
 # 2. Help Message
 show_help() {
@@ -544,6 +544,7 @@ for arg in "$@"; do
     VERBOSE=0
     ;;
   -v | --verbose)
+    # shellcheck disable=SC2034
     VERBOSE=2
     ;;
   --dry-run)

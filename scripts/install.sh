@@ -38,8 +38,7 @@ parse_common_args "$@"
 log_info "📦 Installing Project Dependencies...\n"
 
 # 2. Node.js dependencies
-if [ -f "package.json" ]; then
-  NPM=${NPM:-pnpm}
+if [ -f "$PACKAGE_JSON" ]; then
   log_info "── Installing Node.js dependencies ($NPM) ──"
   if command -v "$NPM" >/dev/null 2>&1; then
     "$NPM" install
@@ -49,11 +48,9 @@ if [ -f "package.json" ]; then
 fi
 
 # 3. Python dependencies
-if [ -f "requirements-dev.txt" ] || [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then
+if [ -f "$REQUIREMENTS_TXT" ] || [ -f "requirements.txt" ] || [ -f "$PYPROJECT_TOML" ]; then
   printf "\n"
   log_info "── Installing Python dependencies ──"
-  VENV=${VENV:-.venv}
-  PYTHON=${PYTHON:-python3}
 
   if [ ! -d "$VENV" ]; then
     log_info "Creating virtual environment in $VENV..."
@@ -69,8 +66,8 @@ if [ -f "requirements-dev.txt" ] || [ -f "requirements.txt" ] || [ -f "pyproject
     exit 1
   fi
 
-  if [ -f "requirements-dev.txt" ]; then
-    "$PIP" install -r requirements-dev.txt
+  if [ -f "$REQUIREMENTS_TXT" ]; then
+    "$PIP" install -r "$REQUIREMENTS_TXT"
   elif [ -f "requirements.txt" ]; then
     "$PIP" install -r requirements.txt
   fi
@@ -84,3 +81,13 @@ if [ -d ".git/hooks" ] && command -v pre-commit >/dev/null 2>&1; then
 fi
 
 log_success "\n✨ All dependencies installed successfully!"
+
+# 5. Onboarding Next Steps (Phase 14)
+if [ "$VERBOSE" -ge 1 ]; then
+  printf "\n🚀 %bNext Actions:%b\n" "${YELLOW}" "${NC}"
+  if [ ! -f ".git/hooks/pre-commit" ]; then
+    printf "  - Run %bmake setup%b to activate pre-commit hooks.\n" "${GREEN}" "${NC}"
+  fi
+  printf "  - Run %bmake init%b to hydrate your project (if first time).\n" "${GREEN}" "${NC}"
+  printf "  - Run %bmake verify%b to ensure environment health.\n" "${GREEN}" "${NC}"
+fi

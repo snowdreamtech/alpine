@@ -48,8 +48,7 @@ parse_common_args "$@"
 log_info "📖 Documentation Manager ($COMMAND)...\n"
 
 # 2. Check for dependencies
-NPM=${NPM:-pnpm}
-DOCS_DIR=${DOCS_DIR:-docs}
+# Variables (NPM, DOCS_DIR) are sourced from common.sh
 
 if [ ! -d "$DOCS_DIR" ]; then
   log_error "Error: Documentation directory '$DOCS_DIR' not found."

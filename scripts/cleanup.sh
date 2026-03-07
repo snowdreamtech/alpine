@@ -53,6 +53,8 @@ clean_item() {
 clean_item "dist" "Build distribution"
 clean_item "build" "Build artifacts"
 clean_item "out" "Output directory"
+clean_item "bin" "Binary output"
+clean_item "target" "Language target directory"
 clean_item ".coverage" "Coverage report"
 clean_item "coverage.xml" "Coverage XML"
 
@@ -79,8 +81,7 @@ clean_item ".nuxt" "Nuxt.js build"
 clean_item ".output" "Vite/Nitro output"
 
 # Rust / Go / Java
-clean_item "target" "Cargo/Maven/Gradle target"
-clean_item "bin" "Go/Java binary output"
+# Handled in General Artifacts (target, bin)
 
 # 4. OS Specific Caches
 if [ "$DRY_RUN" -eq 1 ]; then

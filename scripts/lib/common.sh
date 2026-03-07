@@ -13,6 +13,23 @@ NC=$(printf '\033[0m')
 # Default verbosity
 # shellcheck disable=SC2034
 VERBOSE=${VERBOSE:-1} # 0: quiet, 1: normal, 2: verbose
+DRY_RUN=${DRY_RUN:-0}
+
+# SSoT Constants (Paths and Files)
+CHANGELOG="CHANGELOG.md"
+PACKAGE_JSON="package.json"
+CARGO_TOML="Cargo.toml"
+PYPROJECT_TOML="pyproject.toml"
+VERSION_FILE="VERSION"
+REQUIREMENTS_TXT="requirements-dev.txt"
+VENV="${VENV:-.venv}"
+PYTHON="${PYTHON:-python3}"
+NPM="${NPM:-pnpm}"
+GORELEASER="${GORELEASER:-goreleaser}"
+LOCK_DIR=".archival_lock"
+DOCS_DIR="docs"
+# shellcheck disable=SC2034
+ARCHIVE_DIR="${ARCHIVE_DIR:-.}"
 
 # Logging functions
 log_info() {

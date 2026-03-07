@@ -64,7 +64,7 @@ check_version() {
 # 2. Tool Checks
 check_version "Node.js" "node" "20.0.0" "node -v"
 check_version "pnpm" "pnpm" "9.0.0" "pnpm -v"
-check_version "Python" "python3" "3.10.0" "python3 --version"
+check_version "Python" "$PYTHON" "3.10.0" "$PYTHON --version"
 check_version "Git" "git" "2.30.0" "git --version"
 
 if command -v go >/dev/null 2>&1; then
@@ -86,7 +86,7 @@ fi
 
 # 3. Project File Integrity
 log_info "\n📁 Checking Project Integrity..."
-for f in "Makefile" "package.json" "README.md" ".agent/rules/01-general.md"; do
+for f in "Makefile" "$PACKAGE_JSON" "README.md" ".agent/rules/01-general.md"; do
   if [ -f "$f" ]; then
     log_debug "Found $f"
   else

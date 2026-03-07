@@ -40,15 +40,14 @@ if command -v gitleaks >/dev/null 2>&1; then
 fi
 
 # 4. Dependency Audits
-if [ -f "package.json" ]; then
-  NPM=${NPM:-pnpm}
+if [ -f "$PACKAGE_JSON" ]; then
   log_info "\n── Auditing Node.js dependencies ($NPM) ──"
   if command -v "$NPM" >/dev/null 2>&1; then
     "$NPM" audit
   fi
 fi
 
-if [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then
+if [ -f "$REQUIREMENTS_TXT" ] || [ -f "requirements.txt" ] || [ -f "$PYPROJECT_TOML" ]; then
   log_info "\n── Auditing Python dependencies (pip-audit) ──"
   if command -v pip-audit >/dev/null 2>&1; then
     pip-audit

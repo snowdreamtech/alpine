@@ -47,7 +47,6 @@ log_info "⚡ Starting Performance Benchmarker...\n"
 run_python_bench() {
   if find . -maxdepth 2 -name "*benchmark*" | grep -q .; then
     log_info "── Testing Python Benchmarks (pytest-benchmark) ──"
-    VENV=${VENV:-.venv}
     if [ -x "$VENV/bin/pytest" ]; then
       "$VENV/bin/pytest" --benchmark-only
     else
@@ -57,9 +56,8 @@ run_python_bench() {
 }
 
 run_node_bench() {
-  if [ -f "package.json" ] && grep -q '"bench":' package.json; then
-    log_info "── Testing Node.js Benchmarks (pnpm bench) ──"
-    NPM=${NPM:-pnpm}
+  if [ -f "$PACKAGE_JSON" ] && grep -q '"bench":' "$PACKAGE_JSON"; then
+    log_info "── Testing Node.js Benchmarks ($NPM bench) ──"
     "$NPM" run bench
   fi
 }
