@@ -12,6 +12,7 @@ setup() {
   # Create dummy files to test replacements
   echo "This is template by snowdreamtech (snowdream)" >"$TEMP_DIR/README.md"
   echo "Copyright (c) 2023-present SnowdreamTech Inc." >"$TEMP_DIR/LICENSE"
+  mkdir -p "$TEMP_DIR/.git"
 
   # Copy the script and common library to test workspace
   mkdir -p "$TEMP_DIR/scripts/lib"
