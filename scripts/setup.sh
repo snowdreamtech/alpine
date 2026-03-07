@@ -1,9 +1,10 @@
 #!/bin/sh
 # scripts/setup.sh - Modularized Project Setup Script
 # This script is designed for both local development and CI/CD JIT installation.
-# usage: sh scripts/setup.sh [module1] [module2] ...
+# usage: sh scripts/setup.sh [OPTIONS] [module1] [module2] ...
 # modules: node, python, gitleaks, hadolint, go, iac, hooks, all (default)
-# Features: POSIX compliant, Execution Guard, CI Job Summary, Professional UX.
+# Features: POSIX compliant, Execution Guard, CI Job Summary, Professional UX,
+#           Verbosity Control, Dry-run support.
 
 set -e
 
@@ -29,6 +30,9 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
+DRY_RUN=0
+VERBOSE=1 # 0: quiet, 1: normal, 2: verbose
+
 # 1. Execution Context Guard
 if [ ! -f "Makefile" ] || [ ! -d ".git" ]; then
   printf "%bError: This script must be run from the project root (where Makefile and .git reside).%b\n" "${RED}" "${NC}" >&2
@@ -43,7 +47,10 @@ Usage: $0 [OPTIONS] [MODULES]
 Modularized Project Setup Script for local development and CI/CD environments.
 
 Options:
-  --help             Show this help message.
+  -q, --quiet        Suppress informational output.
+  -v, --verbose      Enable verbose/debug output.
+  --dry-run          Preview what will be installed without making changes.
+  -h, --help         Show this help message.
 
 Modules (default: all):
   node               Setup Node.js & pnpm
@@ -73,11 +80,28 @@ EOF
 
 # ── Functions ────────────────────────────────────────────────────────────────
 
-log() { printf "%b%s%b\n" "${BLUE}" "$1" "${NC}"; }
-info() { printf "%b%s%b\n" "${GREEN}" "$1" "${NC}"; }
-warn() { printf "%b%s%b\n" "${YELLOW}" "$1" "${NC}"; }
-error() {
+log_info() {
+  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "${BLUE}" "$1" "${NC}"; fi
+}
+log_success() {
+  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "${GREEN}" "$1" "${NC}"; fi
+}
+log_warn() {
+  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "${YELLOW}" "$1" "${NC}"; fi
+}
+log_error() {
   printf "%b%s%b\n" "${RED}" "$1" "${NC}" >&2
+}
+log_debug() {
+  if [ "$VERBOSE" -ge 2 ]; then printf "[DEBUG] %s\n" "$1"; fi
+}
+
+# Backward compatibility (some modules might still use log/info/warn/error internally)
+log() { log_info "$1"; }
+info() { log_success "$1"; }
+warn() { log_warn "$1"; }
+error() {
+  log_error "$1"
   exit 1
 }
 
@@ -115,6 +139,11 @@ download_url() {
   _OUT="$2"
   _DESC="$3"
 
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_debug "DRY-RUN: Would download $_URL to $_OUT"
+    return 0
+  fi
+
   if curl --retry 3 -fsSL "${_URL}" -o "${_OUT}"; then
     return 0
   fi
@@ -132,7 +161,13 @@ download_url() {
 }
 
 setup_node() {
-  log "── Setting up Node.js & pnpm ──"
+  log_info "── Setting up Node.js & pnpm ──"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_info "DRY-RUN: Would enable corepack and pnpm install."
+    log_summary "Node.js" "⚖️ Previewed"
+    return 0
+  fi
+
   if command -v corepack >/dev/null 2>&1; then
     corepack enable
   else
@@ -148,7 +183,13 @@ setup_node() {
 }
 
 setup_python() {
-  log "── Setting up Python Virtual Environment ──"
+  log_info "── Setting up Python Virtual Environment ──"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_info "DRY-RUN: Would create $VENV and install requirements."
+    log_summary "Python" "⚖️ Previewed"
+    return 0
+  fi
+
   if [ ! -d "$VENV" ]; then
     "$PYTHON" -m venv "$VENV"
   fi
@@ -164,11 +205,18 @@ setup_python() {
 
 install_gitleaks() {
   _BIN="${VENV}/bin/gitleaks${_EXE}"
-  if [ -x "${_BIN}" ]; then
+  if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
     log_summary "Gitleaks" "✅ Already exists"
     return 0
   fi
-  log "── Installing gitleaks ${GITLEAKS_VERSION} ──"
+  log_info "── Installing gitleaks ${GITLEAKS_VERSION} ──"
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_info "DRY-RUN: Would install gitleaks to $_BIN"
+    log_summary "Gitleaks" "⚖️ Previewed"
+    return 0
+  fi
+
   _TAR_TAG="${_OS_TAG}"
   [ "${_OS_TAG}" = "windows" ] && _TAR_TAG="windows"
   _TMP=$(mktemp -d)
@@ -210,11 +258,18 @@ install_gitleaks() {
 
 install_hadolint() {
   _BIN="${VENV}/bin/hadolint${_EXE}"
-  if [ -x "${_BIN}" ]; then
+  if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
     log_summary "Hadolint" "✅ Already exists"
     return 0
   fi
-  log "── Installing hadolint ${HADOLINT_VERSION} ──"
+  log_info "── Installing hadolint ${HADOLINT_VERSION} ──"
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_info "DRY-RUN: Would install hadolint to $_BIN"
+    log_summary "Hadolint" "⚖️ Previewed"
+    return 0
+  fi
+
   _SUFFIX="Linux-x86_64"
   if [ "${OS}" = "darwin" ]; then
     _SUFFIX="Darwin-x86_64"
@@ -232,11 +287,18 @@ install_hadolint() {
 
 install_go_lint() {
   _BIN="${VENV}/bin/golangci-lint"
-  if [ -x "${_BIN}" ]; then
+  if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
     log_summary "Go Lint" "✅ Already exists"
     return 0
   fi
-  log "── Installing golangci-lint ${GOLANGCI_VERSION} ──"
+  log_info "── Installing golangci-lint ${GOLANGCI_VERSION} ──"
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_info "DRY-RUN: Would install golangci-lint to ${VENV}/bin"
+    log_summary "Go Lint" "⚖️ Previewed"
+    return 0
+  fi
+
   _URL="${GITHUB_PROXY}https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh"
   _TMP=$(mktemp -d)
   if download_url "${_URL}" "${_TMP}/install_go.sh" "golangci-lint-installer"; then
@@ -253,11 +315,18 @@ install_go_lint() {
 
 install_checkmake() {
   _BIN="${VENV}/bin/checkmake${_EXE}"
-  if [ -x "${_BIN}" ]; then
+  if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
     log_summary "Checkmake" "✅ Already exists"
     return 0
   fi
-  log "── Installing checkmake ${CHECKMAKE_VERSION} ──"
+  log_info "── Installing checkmake ${CHECKMAKE_VERSION} ──"
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_info "DRY-RUN: Would install checkmake to $_BIN"
+    log_summary "Checkmake" "⚖️ Previewed"
+    return 0
+  fi
+
   _OS_S="${_OS_TAG}"
   _ARCH_S="amd64"
   [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _ARCH_S="arm64"
@@ -276,7 +345,14 @@ install_checkmake() {
 }
 
 install_iac_lint() {
-  log "── Installing IaC tools (tflint, kube-linter) ──"
+  log_info "── Installing IaC tools (tflint, kube-linter) ──"
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_info "DRY-RUN: Would install tflint and kube-linter."
+    log_summary "IaC Tools" "⚖️ Previewed"
+    return 0
+  fi
+
   # TFLint
   if [ ! -x "${VENV}/bin/tflint${_EXE}" ]; then
     _URL="${GITHUB_PROXY}https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh"
@@ -333,7 +409,14 @@ install_iac_lint() {
 }
 
 setup_hooks() {
-  log "── Activating Pre-commit Hooks ──"
+  log_info "── Activating Pre-commit Hooks ──"
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_info "DRY-RUN: Would activate pre-commit hooks."
+    log_summary "Hooks" "⚖️ Previewed"
+    return 0
+  fi
+
   if [ -x "$VENV/bin/pre-commit" ]; then
     "$VENV/bin/pre-commit" install --hook-type pre-commit --hook-type pre-merge-commit --hook-type commit-msg
     info "Pre-commit hooks activated."
@@ -345,7 +428,14 @@ setup_hooks() {
 }
 
 setup_powershell() {
-  log "── Setting up PowerShell Linter ──"
+  log_info "── Setting up PowerShell Linter ──"
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_info "DRY-RUN: Would install PSScriptAnalyzer."
+    log_summary "PowerShell" "⚖️ Previewed"
+    return 0
+  fi
+
   if command -v pwsh >/dev/null 2>&1; then
     pwsh -NoProfile -Command "if (!(Get-Module -ListAvailable PSScriptAnalyzer)) { Install-Module -Name PSScriptAnalyzer -Force -SkipPublisherCheck -Scope CurrentUser }"
     info "PSScriptAnalyzer installed."
@@ -359,11 +449,18 @@ setup_powershell() {
 install_java_lint() {
   _JAR="${VENV}/bin/google-java-format.jar"
   _BIN="${VENV}/bin/google-java-format"
-  if [ -f "${_JAR}" ]; then
+  if [ -f "${_JAR}" ] && [ "$DRY_RUN" -eq 0 ]; then
     log_summary "Java Lint" "✅ Already exists"
     return 0
   fi
-  log "── Installing google-java-format ${JAVA_FORMAT_VERSION} ──"
+  log_info "── Installing google-java-format ${JAVA_FORMAT_VERSION} ──"
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_info "DRY-RUN: Would install google-java-format to $_BIN"
+    log_summary "Java Lint" "⚖️ Previewed"
+    return 0
+  fi
+
   _URL="${GITHUB_PROXY}https://github.com/google/google-java-format/releases/download/v${JAVA_FORMAT_VERSION}/google-java-format-${JAVA_FORMAT_VERSION}-all-deps.jar"
   if download_url "${_URL}" "${_JAR}" "google-java-format"; then
     printf "#!/bin/sh\njava -jar \"%s\" \"\$@\"\n" "${_JAR}" >"${_BIN}"
@@ -377,7 +474,14 @@ install_java_lint() {
 }
 
 install_ruby_lint() {
-  log "── Setting up Rubocop ──"
+  log_info "── Setting up Rubocop ──"
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_info "DRY-RUN: Would install Rubocop via gem."
+    log_summary "Rubocop" "⚖️ Previewed"
+    return 0
+  fi
+
   if command -v gem >/dev/null 2>&1; then
     _RUBY_VER=$(ruby -e 'print RUBY_VERSION')
     _RUBY_MAJOR=$(echo "$_RUBY_VER" | cut -d. -f1)
@@ -399,11 +503,18 @@ install_ruby_lint() {
 
 install_php_lint() {
   _BIN="${VENV}/bin/php-cs-fixer"
-  if [ -x "${_BIN}" ]; then
+  if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
     log_summary "PHP Lint" "✅ Already exists"
     return 0
   fi
-  log "── Installing php-cs-fixer ${PHP_CS_FIXER_VERSION} ──"
+  log_info "── Installing php-cs-fixer ${PHP_CS_FIXER_VERSION} ──"
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_info "DRY-RUN: Would install php-cs-fixer to $_BIN"
+    log_summary "PHP Lint" "⚖️ Previewed"
+    return 0
+  fi
+
   _URL="${GITHUB_PROXY}https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/releases/download/${PHP_CS_FIXER_VERSION}/php-cs-fixer.phar"
   if download_url "${_URL}" "${_BIN}" "php-cs-fixer"; then
     chmod +x "${_BIN}"
@@ -416,7 +527,7 @@ install_php_lint() {
 }
 
 setup_dart() {
-  log "── Checking Dart SDK ──"
+  log_info "── Checking Dart SDK ──"
   if command -v dart >/dev/null 2>&1; then
     log_summary "Dart" "✅ Available"
   else
@@ -427,7 +538,14 @@ setup_dart() {
 
 setup_swift() {
   if [ "${OS}" = "darwin" ]; then
-    log "── Setting up Swift Linters (macOS) ──"
+    log_info "── Setting up Swift Linters (macOS) ──"
+
+    if [ "$DRY_RUN" -eq 1 ]; then
+      log_info "DRY-RUN: Would install swiftformat and swiftlint via brew."
+      log_summary "Swift" "⚖️ Previewed"
+      return 0
+    fi
+
     if command -v brew >/dev/null 2>&1; then
       brew list swiftformat >/dev/null 2>&1 || brew install swiftformat
       brew list swiftlint >/dev/null 2>&1 || brew install swiftlint
@@ -443,7 +561,7 @@ setup_swift() {
 }
 
 setup_dotnet() {
-  log "── Checking .NET SDK ──"
+  log_info "── Checking .NET SDK ──"
   if command -v dotnet >/dev/null 2>&1; then
     log_summary ".NET" "✅ Available"
   else
@@ -458,7 +576,17 @@ setup_dotnet() {
 RAW_ARGS=""
 for arg in "$@"; do
   case "$arg" in
-  --help)
+  -q | --quiet)
+    VERBOSE=0
+    ;;
+  -v | --verbose)
+    VERBOSE=2
+    ;;
+  --dry-run)
+    DRY_RUN=1
+    log_warn "Running in DRY-RUN mode. No changes will be applied."
+    ;;
+  -h | --help)
     show_help
     exit 0
     ;;

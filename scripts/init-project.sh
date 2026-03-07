@@ -12,11 +12,24 @@ YELLOW='\033[1;33m'
 RED='\033[0;31m'
 NC='\033[0m'
 
+VERBOSE=1 # 0: quiet, 1: normal, 2: verbose
+
 # Logging functions
-log_info() { printf "%b%s%b\n" "$BLUE" "$1" "$NC"; }
-log_success() { printf "%b%s%b\n" "$GREEN" "$1" "$NC"; }
-log_warn() { printf "%b%s%b\n" "$YELLOW" "$1" "$NC"; }
-log_error() { printf "%b%s%b\n" "$RED" "$1" "$NC" >&2; }
+log_info() {
+  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$BLUE" "$1" "$NC"; fi
+}
+log_success() {
+  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$GREEN" "$1" "$NC"; fi
+}
+log_warn() {
+  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$YELLOW" "$1" "$NC"; fi
+}
+log_error() {
+  printf "%b%s%b\n" "$RED" "$1" "$NC" >&2
+}
+log_debug() {
+  if [ "$VERBOSE" -ge 2 ]; then printf "[DEBUG] %s\n" "$1"; fi
+}
 
 # 1. Execution Context Guard
 if [ ! -f "LICENSE" ] || [ ! -d ".git" ]; then
@@ -32,8 +45,10 @@ Usage: $0 [OPTIONS]
 Re-brands the template for a new project by replacing placeholders.
 
 Options:
+  -q, --quiet      Suppress informational output.
+  -v, --verbose    Enable verbose/debug output.
   --dry-run        Preview changes without modifying files.
-  --help           Show this help message.
+  -h, --help       Show this help message.
 
 EOF
 }
@@ -41,21 +56,30 @@ EOF
 DRY_RUN=0
 for arg in "$@"; do
   case "$arg" in
+  -q | --quiet)
+    VERBOSE=0
+    ;;
+  -v | --verbose)
+    VERBOSE=2
+    ;;
   --dry-run)
     DRY_RUN=1
     log_warn "Running in DRY-RUN mode. No changes will be applied."
     ;;
-  --help)
+  -h | --help)
     show_help
     exit 0
     ;;
   esac
 done
 
-printf "%b💧 Project Hydration: Converting Template to Project...%b\n\n" "${BLUE}" "${NC}"
+if [ "$VERBOSE" -ge 1 ]; then
+  printf "%b💧 Project Hydration: Converting Template to Project...%b\n\n" "${BLUE}" "${NC}"
+fi
 
 # 2. Interactive Input
-# In dry-run or non-interactive mode, we might want defaults, but for hydration, we keep it interactive.
+# In non-interactive mode (QUIET), we might need an alternative,
+# but for hydration, we assume it's always interactive.
 printf "Enter Project Name (e.g., my-awesome-app): "
 read -r PROJECT_NAME
 printf "Enter Author Name (e.g., John Doe): "
@@ -69,10 +93,12 @@ OLD_ORG="snowdreamtech"
 OLD_USER="snowdream"
 
 # 3. Confirmation
-printf "\n%bConfiguration Summary:%b\n" "${YELLOW}" "${NC}"
-printf "  Project: %b%s%b\n" "${GREEN}" "$PROJECT_NAME" "${NC}"
-printf "  Author:  %b%s%b\n" "${GREEN}" "$AUTHOR_NAME" "${NC}"
-printf "  GitHub:  %b%s%b\n" "${GREEN}" "$GITHUB_ORG" "${NC}"
+if [ "$VERBOSE" -ge 1 ]; then
+  printf "\n%bConfiguration Summary:%b\n" "${YELLOW}" "${NC}"
+  printf "  Project: %b%s%b\n" "${GREEN}" "$PROJECT_NAME" "${NC}"
+  printf "  Author:  %b%s%b\n" "${GREEN}" "$AUTHOR_NAME" "${NC}"
+  printf "  GitHub:  %b%s%b\n" "${GREEN}" "$GITHUB_ORG" "${NC}"
+fi
 
 if [ "$DRY_RUN" -eq 0 ]; then
   printf "\nProceed with hydration? (y/N): "
@@ -89,7 +115,6 @@ fi
 # 4. Replace Placeholders
 log_info "\nStep 1: Replacing placeholders in files..."
 
-# Create a temporary file to track changes if in dry-run
 if [ "$DRY_RUN" -eq 1 ]; then
   log_warn "DRY-RUN: Would replace '$OLD_PROJECT' with '$PROJECT_NAME' and '$OLD_ORG/$OLD_USER' with '$GITHUB_ORG' in matching files."
 else
@@ -139,6 +164,6 @@ else
 fi
 
 log_success "\n🚀 Project Hydration Complete!"
-if [ "$DRY_RUN" -eq 0 ]; then
+if [ "$DRY_RUN" -eq 0 ] && [ "$VERBOSE" -ge 1 ]; then
   printf "Next steps: Run 'make setup'.\n"
 fi

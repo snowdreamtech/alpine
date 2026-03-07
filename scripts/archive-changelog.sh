@@ -70,7 +70,7 @@ Options:
   --dry-run        Preview changes without modifying files.
   -q, --quiet      Suppress all output except errors.
   -v, --verbose    Show detailed debug information.
-  --help           Show this help message.
+  -h, --help       Show this help message.
 
 Environment Variables:
   ARCHIVE_DIR      Directory to store archive files (default: auto-detected or .).
@@ -92,7 +92,7 @@ for arg in "$@"; do
   -v | --verbose)
     VERBOSE=2
     ;;
-  --help)
+  -h | --help)
     show_help
     exit 0
     ;;
