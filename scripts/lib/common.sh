@@ -3,12 +3,12 @@
 # Unified logging, colors, and utility functions.
 # shellcheck disable=SC2034
 
-# Colors
-BLUE='\033[0;34m'
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-RED='\033[0;31m'
-NC='\033[0m'
+# Colors (using printf to generate literal ESC characters for maximum compatibility)
+BLUE=$(printf '\033[0;34m')
+GREEN=$(printf '\033[0;32m')
+YELLOW=$(printf '\033[1;33m')
+RED=$(printf '\033[0;31m')
+NC=$(printf '\033[0m')
 
 # Default verbosity
 # shellcheck disable=SC2034
@@ -16,16 +16,16 @@ VERBOSE=${VERBOSE:-1} # 0: quiet, 1: normal, 2: verbose
 
 # Logging functions
 log_info() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$BLUE" "$1" "$NC"; fi
+  if [ "$VERBOSE" -ge 1 ]; then printf "%s%s%s\n" "$BLUE" "$1" "$NC"; fi
 }
 log_success() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$GREEN" "$1" "$NC"; fi
+  if [ "$VERBOSE" -ge 1 ]; then printf "%s%s%s\n" "$GREEN" "$1" "$NC"; fi
 }
 log_warn() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$YELLOW" "$1" "$NC"; fi
+  if [ "$VERBOSE" -ge 1 ]; then printf "%s%s%s\n" "$YELLOW" "$1" "$NC"; fi
 }
 log_error() {
-  printf "%b%s%b\n" "$RED" "$1" "$NC" >&2
+  printf "%s%s%s\n" "$RED" "$1" "$NC" >&2
 }
 log_debug() {
   if [ "$VERBOSE" -ge 2 ]; then printf "[DEBUG] %s\n" "$1"; fi

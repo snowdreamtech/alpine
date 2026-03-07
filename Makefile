@@ -8,8 +8,20 @@ ifeq ($(OS),Windows_NT)
 	OS_NAME := Windows
 	SHELL   := powershell.exe
 	.SHELLFLAGS := -NoProfile -Command
+	# Colors for Windows (PowerShell handles this differently, but for echo)
+	BLUE   :=
+	GREEN  :=
+	YELLOW :=
+	RED    :=
+	NC     :=
 else
 	OS_NAME := $(shell uname -s)
+	# Colors for POSIX (using shell printf for literal escapes)
+	BLUE   := $(shell printf '\033[0;34m')
+	GREEN  := $(shell printf '\033[0;32m')
+	YELLOW := $(shell printf '\033[1;33m')
+	RED    := $(shell printf '\033[0;31m')
+	NC     := $(shell printf '\033[0m')
 endif
 
 # =============================================================================
@@ -21,29 +33,27 @@ endif
 all: help
 
 help:
-	@echo "Snowdream Tech AI IDE Template"
-	@echo "Detected OS: $(OS_NAME)"
-	@echo ""
-	@echo "Usage:"
-	@echo "  make <target> [VARIABLE=value ...]"
-	@echo ""
-	@echo "Targets:"
-	@echo "  init     Hydrate project from template (rename placeholders)"
-	@echo "  setup    Install system-level development tools"
-	@echo "  install  Install project-level dependencies (pip, npm)"
-	@echo "  lint     Run standardized linter (pre-commit)"
-	@echo "  format   Auto-format code (ruff, prettier, shfmt, etc.)"
-	@echo "  test     Run unified test suite"
-	@echo "  build    Build project artifacts"
-	@echo "  commit   Start the interactive Commitizen CLI"
-	@echo "  verify   Run full project verification (env, lint, test)"
-	@echo "  release  Standardized release manager (versioning & tagging)"
-	@echo "  env      Environment configuration manager (.env)"
-	@echo "  update   Update global/project tools and hooks"
-	@echo "  audit    Run security audit and vulnerability scans"
-	@echo "  bench    Run performance benchmarks"
-	@echo "  clean    Remove temporary and generated files"
-	@echo "  help     Show this help message"
+	@printf "$(BLUE)Snowdream Tech AI IDE Template$(NC)\n"
+	@printf "Detected OS: $(GREEN)$(OS_NAME)$(NC)\n\n"
+	@printf "$(YELLOW)Usage:$(NC)\n"
+	@printf "  make <target> [VARIABLE=value ...]\n\n"
+	@printf "$(YELLOW)Targets:$(NC)\n"
+	@printf "  $(GREEN)init$(NC)     Hydrate project from template (rename placeholders)\n"
+	@echo "  $(GREEN)setup$(NC)    Install system-level development tools"
+	@echo "  $(GREEN)install$(NC)  Install project-level dependencies (pip, npm)"
+	@echo "  $(GREEN)lint$(NC)     Run standardized linter (pre-commit)"
+	@echo "  $(GREEN)format$(NC)   Auto-format code (ruff, prettier, shfmt, etc.)"
+	@echo "  $(GREEN)test$(NC)     Run unified test suite"
+	@echo "  $(GREEN)build$(NC)    Build project artifacts"
+	@echo "  $(GREEN)commit$(NC)   Start the interactive Commitizen CLI"
+	@echo "  $(GREEN)verify$(NC)   Run full project verification (env, lint, test)"
+	@echo "  $(GREEN)release$(NC)  Standardized release manager (versioning & tagging)"
+	@echo "  $(GREEN)env$(NC)      Environment configuration manager (.env)"
+	@echo "  $(GREEN)update$(NC)   Update global/project tools and hooks"
+	@echo "  $(GREEN)audit$(NC)    Run security audit and vulnerability scans"
+	@echo "  $(GREEN)bench$(NC)    Run performance benchmarks"
+	@echo "  $(GREEN)clean$(NC)    Remove temporary and generated files"
+	@echo "  $(GREEN)help$(NC)     Show this help message"
 
 # Lifecycle Targets
 init:
