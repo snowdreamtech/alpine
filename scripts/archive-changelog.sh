@@ -24,12 +24,22 @@ YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
-# Logging functions
-log_info() { [ "$VERBOSE" -ge 1 ] && printf "%b%s%b\n" "$BLUE" "$1" "$NC"; }
-log_success() { [ "$VERBOSE" -ge 1 ] && printf "%b%s%b\n" "$GREEN" "$1" "$NC"; }
-log_warn() { [ "$VERBOSE" -ge 1 ] && printf "%b%s%b\n" "$YELLOW" "$1" "$NC"; }
-log_error() { printf "%b%s%b\n" "$RED" "$1" "$NC" >&2; }
-log_debug() { [ "$VERBOSE" -ge 2 ] && printf "[DEBUG] %s\n" "$1"; }
+# Logging functions - Robustness fix for set -e
+log_info() {
+  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$BLUE" "$1" "$NC"; fi
+}
+log_success() {
+  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$GREEN" "$1" "$NC"; fi
+}
+log_warn() {
+  if [ "$VERBOSE" -ge 1 ]; then printf "%b%s%b\n" "$YELLOW" "$1" "$NC"; fi
+}
+log_error() {
+  printf "%b%s%b\n" "$RED" "$1" "$NC" >&2
+}
+log_debug() {
+  if [ "$VERBOSE" -ge 2 ]; then printf "[DEBUG] %s\n" "$1"; fi
+}
 
 # 1. Execution Context Guard: Ensure we are in the project root
 if [ ! -f "$CHANGELOG" ] || [ ! -d ".git" ]; then
@@ -125,30 +135,41 @@ if [ -f "$PACKAGE_JSON" ]; then
   if command -v jq >/dev/null 2>&1; then
     raw_v=$(jq -r '.version' "$PACKAGE_JSON" 2>/dev/null || true)
   else
-    raw_v=$(grep '"version":' "$PACKAGE_JSON" | head -n 1 | sed 's/.*"//;s/".*//' || true)
+    # Improved POSIX sed for package.json
+    raw_v=$(grep '"version":' "$PACKAGE_JSON" | head -n 1 | sed 's/.*"version":[[:space:]]*"//;s/".*//' || true)
   fi
-  [ -n "$raw_v" ] && [ "$raw_v" != "null" ] && CURRENT_MAJOR=$(get_major "$raw_v")
+  if [ -n "$raw_v" ] && [ "$raw_v" != "null" ]; then
+    CURRENT_MAJOR=$(get_major "$raw_v")
+  fi
 fi
 
 # 2. Check Cargo.toml (Rust)
 if [ -z "$CURRENT_MAJOR" ] && [ -f "$CARGO_TOML" ]; then
   log_debug "Checking $CARGO_TOML for version..."
+  # Improved POSIX sed for Cargo.toml
   raw_v=$(grep '^version =' "$CARGO_TOML" | head -n 1 | sed -e 's/.*"\(.*\)"/\1/' -e "s/.*'\(.*\)'/\1/" || true)
-  [ -n "$raw_v" ] && CURRENT_MAJOR=$(get_major "$raw_v")
+  if [ -n "$raw_v" ]; then
+    CURRENT_MAJOR=$(get_major "$raw_v")
+  fi
 fi
 
 # 3. Check pyproject.toml (Python)
 if [ -z "$CURRENT_MAJOR" ] && [ -f "$PYPROJECT_TOML" ]; then
   log_debug "Checking $PYPROJECT_TOML for version..."
+  # Improved POSIX sed for pyproject.toml
   raw_v=$(grep '^version =' "$PYPROJECT_TOML" | head -n 1 | sed -e 's/.*"\(.*\)"/\1/' -e "s/.*'\(.*\)'/\1/" || true)
-  [ -n "$raw_v" ] && CURRENT_MAJOR=$(get_major "$raw_v")
+  if [ -n "$raw_v" ]; then
+    CURRENT_MAJOR=$(get_major "$raw_v")
+  fi
 fi
 
 # 4. Check VERSION file (Generic)
 if [ -z "$CURRENT_MAJOR" ] && [ -f "$VERSION_FILE" ]; then
   log_debug "Checking $VERSION_FILE for version..."
   raw_v=$(cat "$VERSION_FILE" | head -n 1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' || true)
-  [ -n "$raw_v" ] && CURRENT_MAJOR=$(get_major "$raw_v")
+  if [ -n "$raw_v" ]; then
+    CURRENT_MAJOR=$(get_major "$raw_v")
+  fi
 fi
 
 # 5. Fallback to Git tags if all files fail
@@ -317,10 +338,8 @@ rm -f "$HISTORY_LINKS_TMP"
 
 # 6. Final Swap (Atomic)
 if [ "$DRY_RUN" -eq 1 ]; then
-  if [ "$VERBOSE" -ge 1 ]; then
-    log_warn "DRY-RUN: History section preview:"
-    grep -A 100 "^## History" "$NEW_CHANGELOG" || true
-  fi
+  log_warn "DRY-RUN: History section preview:"
+  grep -A 100 "^## History" "$NEW_CHANGELOG" || true
 else
   mv "$NEW_CHANGELOG" "$CHANGELOG"
   log_success "Successfully updated $CHANGELOG"
