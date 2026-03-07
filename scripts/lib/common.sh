@@ -16,19 +16,19 @@ VERBOSE=${VERBOSE:-1} # 0: quiet, 1: normal, 2: verbose
 
 # Logging functions
 log_info() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%s%s%s\n" "$BLUE" "$1" "$NC"; fi
+  if [ "$VERBOSE" -ge 1 ]; then printf "%s%b%s\n" "$BLUE" "$1" "$NC"; fi
 }
 log_success() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%s%s%s\n" "$GREEN" "$1" "$NC"; fi
+  if [ "$VERBOSE" -ge 1 ]; then printf "%s%b%s\n" "$GREEN" "$1" "$NC"; fi
 }
 log_warn() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%s%s%s\n" "$YELLOW" "$1" "$NC"; fi
+  if [ "$VERBOSE" -ge 1 ]; then printf "%s%b%s\n" "$YELLOW" "$1" "$NC"; fi
 }
 log_error() {
-  printf "%s%s%s\n" "$RED" "$1" "$NC" >&2
+  printf "%s%b%s\n" "$RED" "$1" "$NC" >&2
 }
 log_debug() {
-  if [ "$VERBOSE" -ge 2 ]; then printf "[DEBUG] %s\n" "$1"; fi
+  if [ "$VERBOSE" -ge 2 ]; then printf "[DEBUG] %b\n" "$1"; fi
 }
 
 # Execution context guard
