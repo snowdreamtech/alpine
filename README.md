@@ -53,17 +53,20 @@ project-root/
 5. **Read the Rules**:
    Before coding, ensure both you and your AI assistant has read the core principles at `.agent/rules/01-general.md`.
 
+## 🛠️ Full Automation Matrix
+
+This template features a professional-grade script library (18 tool suites) that ensures **Single Source of Truth (SSoT)** across macOS, Linux, and Windows. All tools are natively accessible via `make` or `pnpm/npm`.
+
+| Suite        | Goal                       | Commands                                |
+| :----------- | :------------------------- | :-------------------------------------- |
+| **Core**     | Onboarding & Project Setup | `init`, `setup`, `check-env`            |
+| **Quality**  | Reliability & Standards    | `test`, `lint`, `format`, `verify`      |
+| **Security** | Auditing & Compliance      | `audit`, `env`                          |
+| **Ops**      | Building & Releasing       | `build`, `release`, `archive-changelog` |
+| **Maint**    | Tooling & Cleanup          | `update`, `cleanup`                     |
+| **DX**       | Developer Productivity     | `install`, `docs`, `commit`, `bench`    |
+
 ## 🛠️ SpecKit Collaboration Workflows
-
-This template includes the **SpecKit** workflow suite to manage the full feature lifecycle:
-
-| Command              | Purpose                                                        |
-| :------------------- | :------------------------------------------------------------- |
-| `/speckit.specify`   | Create or update feature specification from natural language.  |
-| `/speckit.plan`      | Execute implementation planning and generate design artifacts. |
-| `/speckit.tasks`     | Generate actionable, dependency-ordered `tasks.md`.            |
-| `/speckit.implement` | Execute the implementation plan task by task.                  |
-| `/speckit.analyze`   | Perform cross-artifact consistency and quality analysis.       |
 
 ## 📐 AI Interaction Guidelines
 

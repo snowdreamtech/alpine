@@ -11,6 +11,10 @@
   - **Local Path**: For project-specific tools, use `npm run <command>` which safely includes `node_modules/.bin` in the path without `npx` overhead.
 - **Environment Variables**: Use `.env` files with a `.env.example` template. Never commit actual `.env` files. Support `HTTP_PROXY`/`HTTPS_PROXY`/`NO_PROXY` for network operations.
 - **OS Detection**: Detect the operating system at runtime for conditional logic. Use `process.platform` (Node.js), `sys.platform` (Python), `runtime.GOOS` (Go), or `std::env::consts::OS` (Rust). Never hard-code OS-specific command paths.
+- **Scripting Architecture (SSoT)**: All automation tools must follow a **Triple-Entry Unified Pattern**:
+  - **Core Logic**: POSIX-compliant Shell (`scripts/*.sh`) sourcing `lib/common.sh`.
+  - **Windows Delegation**: Thin PowerShell wrappers (`scripts/*.ps1`) and Batch files (`scripts/*.bat`) that delegate to the shell logic.
+  - **Unified Entry Points**: Every tool MUST be accessible via both `Makefile` and `package.json` for consistent developer experience.
 
 ## 2. Project Organization & Configuration
 

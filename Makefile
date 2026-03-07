@@ -27,7 +27,7 @@ endif
 # =============================================================================
 # Targets
 # =============================================================================
-.PHONY: all help init setup install lint format test build clean commit verify release env update audit bench
+.PHONY: all help init setup install lint format test build clean commit verify release env update audit bench docs archive-changelog check-env
 
 # Default target: display help
 all: help
@@ -49,6 +49,9 @@ help:
 	@echo "  $(GREEN)verify$(NC)   Run full project verification (env, lint, test)"
 	@echo "  $(GREEN)release$(NC)  Standardized release manager (versioning & tagging)"
 	@echo "  $(GREEN)env$(NC)      Environment configuration manager (.env)"
+	@echo "  $(GREEN)docs$(NC)     Documentation site manager (dev/build/preview)"
+	@echo "  $(GREEN)archive-changelog$(NC) Archive major-version changelog entries"
+	@echo "  $(GREEN)check-env$(NC) Onboarding environment health check"
 	@echo "  $(GREEN)update$(NC)   Update global/project tools and hooks"
 	@echo "  $(GREEN)audit$(NC)    Run security audit and vulnerability scans"
 	@echo "  $(GREEN)bench$(NC)    Run performance benchmarks"
@@ -152,6 +155,27 @@ ifeq ($(OS_NAME),Windows)
 	@scripts/bench.bat
 else
 	@sh scripts/bench.sh
+endif
+
+docs:
+ifeq ($(OS_NAME),Windows)
+	@scripts/docs.bat $(ARGS)
+else
+	@sh scripts/docs.sh $(ARGS)
+endif
+
+archive-changelog:
+ifeq ($(OS_NAME),Windows)
+	@scripts/archive-changelog.bat
+else
+	@sh scripts/archive-changelog.sh
+endif
+
+check-env:
+ifeq ($(OS_NAME),Windows)
+	@scripts/check-env.bat
+else
+	@sh scripts/check-env.sh
 endif
 
 clean:

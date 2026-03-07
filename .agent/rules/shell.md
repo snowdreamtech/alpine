@@ -18,17 +18,30 @@ When Bash-specific features are genuinely required, the script MUST:
 2. Include a comment explaining WHY Bash is required (`# Requires Bash: uses associative arrays`).
 3. Explicitly document the Bash version requirement.
 
-### POSIX Header Template
+### Global Library (MANDATORY)
+
+To ensure consistency in logging, colors, and argument parsing, ALL functional scripts MUST source the **`scripts/lib/common.sh`** library:
 
 ```sh
 #!/bin/sh
-# Description: What this script does
-# Usage:       ./script.sh [options]
+set -e
 
-set -eu
-# Note: set -o pipefail is a Bashism. Not supported in POSIX sh.
-# Handle pipeline errors manually when needed.
+# ── Common Library ───────────────────────────────────────────────────────────
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+. "$SCRIPT_DIR/lib/common.sh"
+
+# 1. Execution Context Guard: ensure run from root
+guard_project_root
+
+# 2. Argument Parsing (Standardizes --dry-run, -v, -h)
+parse_common_args "$@"
 ```
+
+By sourcing this library, your script automatically gains:
+
+- **`log_info`, `log_success`, `log_warn`, `log_error`**: Standardized colored output.
+- **`guard_project_root`**: Safety guard to prevent execution outside the project root.
+- **`parse_common_args`**: Unified logic for global flags.
 
 ### Bash Header Template (Only When Required)
 
