@@ -204,32 +204,19 @@
 
 ## 6. Onboarding Automation
 
-- Provide a **`scripts/setup.sh` (or `setup.ps1`)** that automates the full onboarding sequence: runtime installation, dependency install, `.env` copy, database creation/migration, and seed data loading:
+- Provide a **`scripts/setup.sh` (or `setup.ps1`)** that automates the full onboarding sequence: runtime installation, tool setup, and repository hydration. This project uses a modularized setup script based on a POSIX shell core:
 
   ```bash
-  #!/usr/bin/env bash
-  set -euo pipefail
+  #!/bin/sh
+  # scripts/setup.sh - Modularized Project Setup Script
+  . "scripts/lib/common.sh"
 
-  echo "🔧 Setting up development environment..."
-
-  # Verify required tools
-  command -v node >/dev/null || { echo "Error: node not found. Run: mise install"; exit 1; }
-  command -v docker >/dev/null || { echo "Error: docker not found."; exit 1; }
-
-  # Install dependencies
-  npm ci
-
-  # Configure environment
-  [ -f .env ] || cp .env.example .env
-  echo "⚠️  Please review and fill in .env before continuing."
-
-  # Start services and run migrations
-  docker compose up -d postgres redis
-  sleep 3   # wait for postgres to be ready
-  npm run db:migrate
-  npm run db:seed
-
-  echo "✅ Setup complete. Run: npm run dev"
+  # Standardized entry point supporting multiple modules
+  # sh scripts/setup.sh [module1] [module2] ...
+  install_python_deps
+  install_node_deps
+  install_iac_lint
+  ...
   ```
 
   Scripts MUST be idempotent — safe to run multiple times without causing errors or duplicate data.

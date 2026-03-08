@@ -18,6 +18,9 @@ When Bash-specific features are genuinely required, the script MUST:
 2. Include a comment explaining WHY Bash is required (`# Requires Bash: uses associative arrays`).
 3. Explicitly document the Bash version requirement.
 
+> [!WARNING]
+> **POSIX `sh` does NOT support `set -o pipefail`**. Using this in a `#!/bin/sh` script will cause it to crash on many Linux systems (e.g. Debian/Ubuntu). Always use standard pipes and check exit codes manually or use Bash if pipefail is critical.
+
 ### Global Library (MANDATORY)
 
 To ensure consistency in logging, colors, and argument parsing, ALL functional scripts MUST source the **`scripts/lib/common.sh`** library:
@@ -305,12 +308,8 @@ set -eu
 
 ```powershell
 # PowerShell wrapper — delegates to script.sh
-if (Get-Command 'sh' -ErrorAction SilentlyContinue) {
-    sh "$PSScriptRoot/script.sh"
-} else {
-    Write-Output "Error: 'sh' not found. Install Git for Windows."
-    exit 1
-}
+. "$PSScriptRoot/lib/common.ps1"
+Delegate-To-Shell "script.sh" ($args -join " ")
 ```
 
 ### Template: `script.bat` (CMD Wrapper)
@@ -318,7 +317,7 @@ if (Get-Command 'sh' -ErrorAction SilentlyContinue) {
 ```bat
 @echo off
 REM CMD wrapper — delegates to script.ps1
-powershell -ExecutionPolicy Bypass -File "%~dp0script.bat".ps1
+powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0script.ps1" %*
 ```
 
 > **Rule**: Wrappers MUST NOT contain any logic. Copy-pasting the `.sh` logic into `.ps1` is a violation of this rule.

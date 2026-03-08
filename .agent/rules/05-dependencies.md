@@ -56,13 +56,13 @@
 ## 2. Dependency Sources & Integrity
 
 - Prioritize **official registries** (npm, PyPI, crates.io, Maven Central, Go module proxy). For enterprise or air-gapped environments, use internal proxies with upstream mirroring (Nexus, Artifactory, Verdaccio).
-- When downloading external resources in scripts or CI, verify downloaded artifacts with **SHA-256 checksum** before use:
+- When downloading external resources in scripts or CI, verify downloaded artifacts with **SHA-256 checksum** before use. Prefer the project's standardized functions in `scripts/lib/common.sh`:
 
   ```bash
-  # Download with integrity check
-  curl -fsSL "https://example.com/tool-v1.2.3-linux-amd64.tar.gz" -o tool.tar.gz
-  echo "a3b8c4d... tool.tar.gz" | sha256sum --check   # fail if checksum mismatches
-  tar xzf tool.tar.gz
+  # Standardized download with integrity check (POSIX sh)
+  . "scripts/lib/common.sh"
+  download_url "$URL" "output.tar.gz" "my-tool"
+  verify_checksum "output.tar.gz" "$EXPECTED_SHA256"
   ```
 
 - Never introduce unreviewed prebuilt binaries, native extensions, or pre-compiled wheels without verified sources and documented justification.
