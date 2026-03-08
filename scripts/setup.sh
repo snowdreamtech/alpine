@@ -105,6 +105,19 @@ log_summary() {
   _STAT="${3:-⏭️ Skipped}"
   _VER="${4:--}"
   _DUR="${5:--}"
+
+  # Automatically demote to Warning if status is supposedly Active/Installed but version detection failed
+  case "$_STAT" in
+  ✅*)
+    if [ "$_VER" = "-" ] || [ -z "$_VER" ]; then
+      case "$_MOD" in
+      System | Shell | React | Vue | Tailwind | VitePress | Vite) ;; # These don't always have a single version command
+      *) _STAT="⚠️ Warning" ;;
+      esac
+    fi
+    ;;
+  esac
+
   printf "| %-12s | %-15s | %-20s | %-15s | %-6s |\n" "$_CAT" "$_MOD" "$_STAT" "$_VER" "${_DUR}s" >>"$TMP_SUMMARY"
 }
 
@@ -171,8 +184,7 @@ setup_python() {
     "$VENV/bin/pip" install -r requirements-dev.txt >/dev/null 2>&1
     _V=$(get_version "$VENV/bin/python")
     _D=$(($(date +%s) - _T0))
-    _PATH=$(sanitize_path "$VENV")
-    log_summary "Runtime" "Python" "✅ $(_PATH)" "$_V" "$_D"
+    log_summary "Runtime" "Python" "✅ Installed" "$_V" "$_D"
   else
     log_summary "Runtime" "Python" "⏭️ Skipped" "-" "0"
   fi
@@ -495,7 +507,7 @@ setup_swift() {
       _D=$(($(date +%s) - _T0))
       log_summary "Lint Tool" "Swift" "✅ Installed" "$(get_version swiftlint lint --version)" "$_D"
     else
-      log_summary "Lint Tool" "Swift" "❌ No brew" "-" "0"
+      log_summary "Lint Tool" "Swift" "❌ Failed" "-" "0"
     fi
   else
     log_summary "Lint Tool" "Swift" "⏭️ Skipped" "-" "0"
@@ -537,14 +549,28 @@ for arg in "$@"; do
 done
 
 if [ -z "$(echo "${RAW_ARGS}" | tr -d ' ')" ] || [ "${RAW_ARGS# *}" = "all" ]; then
-  modules="node python gitleaks checkmake powershell java ruby php dart swift dotnet hooks"
+  modules="node python gitleaks hadolint go checkmake iac powershell java ruby php dart swift dotnet hooks"
 else
   modules="${RAW_ARGS}"
 fi
 
-printf "### Setup Execution Summary\n\n" >"$TMP_SUMMARY"
-printf "| Category | Module | Status | Version | Time |\n" >>"$TMP_SUMMARY"
-printf "| :--- | :--- | :--- | :--- | :--- |\n" >>"$TMP_SUMMARY"
+{
+  printf "### Setup Execution Summary\n\n"
+  cat <<EOF
+> **Status Legend:**
+> ⚖️ **Previewed**: Running in \`--dry-run\` mode.
+> ✅ **Active/Detected/Available**: System/Shell active or Runtime detected.
+> ✅ **Installed**: Tool was missing and successfully installed.
+> ✅ **Exists**: Tool already exists in \`$VENV/bin\`.
+> ✅ **Activated**: Git Hooks successfully attached to \`.git/\`.
+> ⏭️ **Skipped/Missing**: Module skipped or required runtime not found.
+> ⚠️ **Warning**: Tool exists but version verification failed.
+> ❌ **Failed**: An error occurred during installation or setup.
+
+EOF
+  printf "| Category | Module | Status | Version | Time |\n"
+  printf "| :--- | :--- | :--- | :--- | :--- |\n"
+} >"$TMP_SUMMARY"
 
 for module in $modules; do
   case $module in
@@ -563,23 +589,6 @@ for module in $modules; do
   swift) setup_swift ;;
   dotnet) setup_dotnet ;;
   hooks) setup_hooks ;;
-  all)
-    setup_node
-    setup_python
-    install_gitleaks
-    install_checkmake
-    install_hadolint
-    install_go_lint
-    install_iac_lint
-    setup_powershell
-    install_java_lint
-    install_ruby_lint
-    install_php_lint
-    setup_dart
-    setup_swift
-    setup_dotnet
-    setup_hooks
-    ;;
   *) error "Unknown module: $module" ;;
   esac
 done
