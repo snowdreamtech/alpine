@@ -31,15 +31,34 @@ EOF
 # 2. Argument Parsing
 parse_common_args "$@"
 
-log_info "🛡️  Starting Security Auditor...\n"
+_START_TIME=$(date +%s)
+
+# Initialize Summary File if not already done
+if [ -z "$SETUP_SUMMARY_FILE" ]; then
+  SETUP_SUMMARY_FILE=$(mktemp)
+  export SETUP_SUMMARY_FILE
+  _IS_TOP_LEVEL=true
+
+  {
+    printf "### Security Audit Execution Summary\n\n"
+    printf "| Category | Module | Status | Version | Time |\n"
+    printf "| :--- | :--- | :--- | :--- | :--- |\n"
+  } >"$SETUP_SUMMARY_FILE"
+fi
 
 # 3. Secrets Scanning
 if command -v gitleaks >/dev/null 2>&1; then
+  _T0=$(date +%s)
   log_info "── Scanning for Secrets (gitleaks) ──"
   if [ "$DRY_RUN" -eq 1 ]; then
     log_success "DRY-RUN: Would run gitleaks detect"
+    log_summary "Security" "gitleaks" "⚖️ Previewed" "-" "0"
   else
-    gitleaks detect --source . --verbose
+    if gitleaks detect --source . --verbose; then
+      log_summary "Security" "gitleaks" "✅ Clean" "$(get_version gitleaks)" "$(($(date +%s) - _T0))"
+    else
+      log_summary "Security" "gitleaks" "❌ Leaks Found" "$(get_version gitleaks)" "$(($(date +%s) - _T0))"
+    fi
   fi
 fi
 
@@ -47,6 +66,7 @@ fi
 run_npm_script "audit"
 
 if [ -f "$REQUIREMENTS_TXT" ] || [ -f "requirements.txt" ] || [ -f "$PYPROJECT_TOML" ]; then
+  _T0=$(date +%s)
   log_info "\n── Auditing Python dependencies (pip-audit) ──"
   PIPAUDIT=""
   if [ -x "$VENV/bin/pip-audit" ]; then
@@ -58,12 +78,92 @@ if [ -f "$REQUIREMENTS_TXT" ] || [ -f "requirements.txt" ] || [ -f "$PYPROJECT_T
   if [ -n "$PIPAUDIT" ]; then
     if [ "$DRY_RUN" -eq 1 ]; then
       log_success "DRY-RUN: Would run $PIPAUDIT"
+      log_summary "Python" "pip-audit" "⚖️ Previewed" "-" "0"
     else
-      "$PIPAUDIT"
+      if "$PIPAUDIT"; then
+        log_summary "Python" "pip-audit" "✅ Secure" "$(get_version "$PIPAUDIT")" "$(($(date +%s) - _T0))"
+      else
+        log_summary "Python" "pip-audit" "❌ Vulnerable" "$(get_version "$PIPAUDIT")" "$(($(date +%s) - _T0))"
+      fi
     fi
   else
     log_warn "pip-audit not found. Run 'make setup' to install it."
+    log_summary "Python" "pip-audit" "⚠️ Missing" "-" "0"
   fi
 fi
 
-log_success "\n✨ Security audit finished."
+if [ -f "go.mod" ]; then
+  _T0=$(date +%s)
+  log_info "\n── Auditing Go dependencies (govulncheck) ──"
+  if command -v govulncheck >/dev/null 2>&1; then
+    if [ "$DRY_RUN" -eq 1 ]; then
+      log_success "DRY-RUN: Would run govulncheck"
+      log_summary "Go" "govulncheck" "⚖️ Previewed" "-" "0"
+    else
+      if govulncheck ./...; then
+        log_summary "Go" "govulncheck" "✅ Secure" "$(get_version govulncheck)" "$(($(date +%s) - _T0))"
+      else
+        log_summary "Go" "govulncheck" "❌ Vulnerable" "$(get_version govulncheck)" "$(($(date +%s) - _T0))"
+      fi
+    fi
+  else
+    log_warn "govulncheck not found. Skipping Go audit."
+    log_summary "Go" "govulncheck" "⚠️ Missing" "-" "0"
+  fi
+fi
+
+if [ -f "Cargo.toml" ]; then
+  _T0=$(date +%s)
+  log_info "\n── Auditing Rust dependencies (cargo audit) ──"
+  if command -v cargo >/dev/null 2>&1 && cargo audit --version >/dev/null 2>&1; then
+    if [ "$DRY_RUN" -eq 1 ]; then
+      log_success "DRY-RUN: Would run cargo audit"
+      log_summary "Rust" "cargo-audit" "⚖️ Previewed" "-" "0"
+    else
+      if cargo audit; then
+        log_summary "Rust" "cargo-audit" "✅ Secure" "$(get_version cargo-audit)" "$(($(date +%s) - _T0))"
+      else
+        log_summary "Rust" "cargo-audit" "❌ Vulnerable" "$(get_version cargo-audit)" "$(($(date +%s) - _T0))"
+      fi
+    fi
+  else
+    log_warn "cargo-audit not found. Skipping Rust audit."
+    log_summary "Rust" "cargo-audit" "⚠️ Missing" "-" "0"
+  fi
+fi
+
+if [ -f "Dockerfile" ] || [ -f "docker-compose.yml" ]; then
+  _T0=$(date +%s)
+  log_info "\n── Auditing Containers (trivy) ──"
+  if command -v trivy >/dev/null 2>&1; then
+    if [ "$DRY_RUN" -eq 1 ]; then
+      log_success "DRY-RUN: Would run trivy config"
+      log_summary "DevOps" "trivy" "⚖️ Previewed" "-" "0"
+    else
+      if trivy config .; then
+        log_summary "DevOps" "trivy" "✅ Secure" "$(get_version trivy)" "$(($(date +%s) - _T0))"
+      else
+        log_summary "DevOps" "trivy" "❌ Vulnerable" "$(get_version trivy)" "$(($(date +%s) - _T0))"
+      fi
+    fi
+  else
+    log_warn "trivy not found. Skipping container audit."
+    log_summary "DevOps" "trivy" "⚠️ Missing" "-" "0"
+  fi
+fi
+
+# ── Final Report ─────────────────────────────────────────────────────────────
+
+if [ "$_IS_TOP_LEVEL" = "true" ]; then
+  _TOTAL_DUR=$(($(date +%s) - _START_TIME))
+  printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR" >>"$SETUP_SUMMARY_FILE"
+
+  if [ -n "$GITHUB_STEP_SUMMARY" ]; then
+    cat "$SETUP_SUMMARY_FILE" >>"$GITHUB_STEP_SUMMARY"
+  else
+    printf "\n"
+    cat "$SETUP_SUMMARY_FILE"
+  fi
+  rm -f "$SETUP_SUMMARY_FILE"
+  log_success "\n✨ Security audit finished."
+fi
