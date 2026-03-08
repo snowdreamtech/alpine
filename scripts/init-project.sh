@@ -40,12 +40,21 @@ parse_common_args "$@"
 PROJECT_NAME=""
 AUTHOR_NAME=""
 GITHUB_ORG=""
+AUTO_CONFIRM=0
+
+# Check if we are running in a terminal
+if [ -t 0 ]; then
+  IS_TTY=1
+else
+  IS_TTY=0
+fi
 
 for _arg in "$@"; do
   case "$_arg" in
   --project=*) PROJECT_NAME="${_arg#*=}" ;;
   --author=*) AUTHOR_NAME="${_arg#*=}" ;;
   --github=*) GITHUB_ORG="${_arg#*=}" ;;
+  -y | --yes) AUTO_CONFIRM=1 ;;
   esac
 done
 
@@ -53,18 +62,35 @@ if [ "$VERBOSE" -ge 1 ]; then
   printf "%b💧 Project Hydration: Converting Template to Project...%b\n\n" "${BLUE}" "${NC}"
 fi
 
-# 2. Input Collection (Interactive fallback)
+# 2. Input Collection (Interactive fallback or validation)
 if [ -z "$PROJECT_NAME" ]; then
-  printf "Enter Project Name (e.g., my-awesome-app): "
-  read -r PROJECT_NAME
+  if [ "$IS_TTY" -eq 1 ] && [ "$AUTO_CONFIRM" -eq 0 ]; then
+    printf "Enter Project Name (e.g., my-awesome-app): "
+    read -r PROJECT_NAME
+  else
+    log_error "Error: --project is required in non-interactive mode."
+    exit 1
+  fi
 fi
+
 if [ -z "$AUTHOR_NAME" ]; then
-  printf "Enter Author Name (e.g., John Doe): "
-  read -r AUTHOR_NAME
+  if [ "$IS_TTY" -eq 1 ] && [ "$AUTO_CONFIRM" -eq 0 ]; then
+    printf "Enter Author Name (e.g., John Doe): "
+    read -r AUTHOR_NAME
+  else
+    log_error "Error: --author is required in non-interactive mode."
+    exit 1
+  fi
 fi
+
 if [ -z "$GITHUB_ORG" ]; then
-  printf "Enter GitHub Username/Org (e.g., myorg): "
-  read -r GITHUB_ORG
+  if [ "$IS_TTY" -eq 1 ] && [ "$AUTO_CONFIRM" -eq 0 ]; then
+    printf "Enter GitHub Username/Org (e.g., myorg): "
+    read -r GITHUB_ORG
+  else
+    log_error "Error: --github is required in non-interactive mode."
+    exit 1
+  fi
 fi
 
 # Default placeholders to replace
@@ -80,16 +106,20 @@ if [ "$VERBOSE" -ge 1 ]; then
   printf "  GitHub:  %b%s%b\n" "${GREEN}" "$GITHUB_ORG" "${NC}"
 fi
 
-if [ "$DRY_RUN" -eq 0 ] && [ "$VERBOSE" -ge 1 ]; then
-  printf "\nProceed with hydration? (y/N): "
-  read -r CONFIRM
-  case "$CONFIRM" in
-  [yY]*) ;;
-  *)
-    log_error "Aborted."
-    exit 1
-    ;;
-  esac
+if [ "$DRY_RUN" -eq 0 ] && [ "$VERBOSE" -ge 1 ] && [ "$AUTO_CONFIRM" -eq 0 ]; then
+  if [ "$IS_TTY" -eq 1 ]; then
+    printf "\nProceed with hydration? (y/N): "
+    read -r CONFIRM
+    case "$CONFIRM" in
+    [yY]*) ;;
+    *)
+      log_error "Aborted."
+      exit 1
+      ;;
+    esac
+  else
+    log_info "Non-interactive mode: Proceeding automatically..."
+  fi
 fi
 
 # 4. Replace Placeholders
