@@ -75,14 +75,14 @@ repos:
       - id: prettier
         name: prettier
         language: system
-        entry: pnpm exec prettier
+        entry: sh scripts/lib/lint-wrapper.sh prettier
         args: [--write]
         types_or: [json, yaml, vue, javascript, jsx, ts, tsx]
 
       - id: gofmt
         name: gofmt
         language: system
-        entry: gofmt -w
+        entry: sh scripts/lib/lint-wrapper.sh gofmt -w
         types: [go]
 
       - id: shfmt
@@ -95,7 +95,7 @@ repos:
       - id: taplo
         name: taplo
         language: system
-        entry: pnpm exec taplo format
+        entry: sh scripts/lib/lint-wrapper.sh taplo format
         types: [toml]
 
       - id: ruff-format
@@ -107,7 +107,7 @@ repos:
       - id: clang-format
         name: clang-format
         language: system
-        entry: .venv/bin/clang-format
+        entry: sh scripts/lib/lint-wrapper.sh clang-format
         args: [-i]
         types_or: [objective-c, c, c++]
 
@@ -115,7 +115,7 @@ repos:
       - id: editorconfig-checker
         name: editorconfig-checker
         language: system
-        entry: pnpm exec editorconfig-checker
+        entry: sh scripts/lib/lint-wrapper.sh editorconfig-checker
         args:
           - -exclude
           - '(\.(venv|git|github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|specify|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml|tabnine|supermaven|vibe|void|zed)/.*)|((node_modules|venv|env|dist|build|out|target|vendor|__pycache__|\.specify)/.*|(\.aider\.conf\.yml))'
@@ -124,14 +124,14 @@ repos:
       - id: eslint
         name: eslint
         language: system
-        entry: pnpm exec eslint
+        entry: sh scripts/lib/lint-wrapper.sh eslint
         args: [--fix]
         types_or: [javascript, ts, tsx, jsx, vue]
 
       - id: stylelint
         name: stylelint
         language: system
-        entry: pnpm exec stylelint --fix
+        entry: sh scripts/lib/lint-wrapper.sh stylelint --fix
         types_or: [css, scss, less]
 
       - id: ruff
@@ -150,7 +150,7 @@ repos:
       - id: markdownlint-cli2
         name: markdownlint-cli2
         language: system
-        entry: pnpm exec markdownlint-cli2
+        entry: sh scripts/lib/lint-wrapper.sh markdownlint-cli2
         args: [--fix]
         types: [markdown]
 
@@ -163,7 +163,7 @@ repos:
       - id: dockerfile-utils
         name: dockerfile-utils lint
         language: system
-        entry: pnpm exec dockerfile-utils lint
+        entry: sh scripts/lib/lint-wrapper.sh dockerfile-utils lint
         files: Dockerfile
         description: "Lightweight Dockerfile linter via pnpm. Full hadolint scan runs in CI."
 
@@ -202,7 +202,7 @@ repos:
       - id: ktlint
         name: ktlint
         language: system
-        entry: pnpm exec ktlint
+        entry: sh scripts/lib/lint-wrapper.sh ktlint
         types_or: [kotlin]
         description: "Kotlin linter and formatter. Via pnpm exec."
 
@@ -234,7 +234,7 @@ repos:
       - id: dart-format
         name: dart format
         language: system
-        entry: dart format --output=none --set-exit-if-changed
+        entry: sh scripts/lib/lint-wrapper.sh dart format --output=none --set-exit-if-changed
         types_or: [dart]
         description: "Dart formatter check. Requires dart SDK installed."
 
@@ -242,14 +242,14 @@ repos:
       - id: swiftformat
         name: swiftformat
         language: system
-        entry: swiftformat --lint
+        entry: sh scripts/lib/lint-wrapper.sh swiftformat --lint
         types: [swift]
         description: "Swift formatter check. Requires swiftformat installed (macOS only)."
 
       - id: swiftlint
         name: swiftlint
         language: system
-        entry: swiftlint lint --strict
+        entry: sh scripts/lib/lint-wrapper.sh swiftlint lint --strict
         types: [swift]
         pass_filenames: false
         description: "Swift linter. Requires swiftlint installed (macOS only)."
@@ -258,7 +258,7 @@ repos:
       - id: dotnet-format
         name: dotnet format
         language: system
-        entry: dotnet format --verify-no-changes
+        entry: sh scripts/lib/lint-wrapper.sh dotnet format --verify-no-changes
         files: '\.(cs|vb|fs)$'
         pass_filenames: false
         description: "C# formatter check. Requires .NET SDK installed."
@@ -277,7 +277,7 @@ repos:
       - id: spectral
         name: spectral
         language: system
-        entry: pnpm exec spectral lint
+        entry: sh scripts/lib/lint-wrapper.sh spectral lint
         types_or: [json, yaml]
         files: '(?i)(openapi|swagger|asyncapi).*\.(json|yaml|yml)$'
         pass_filenames: true
@@ -285,7 +285,7 @@ repos:
 
       - id: sort-package-json
         name: sort-package-json
-        entry: pnpm exec sort-package-json
+        entry: sh scripts/lib/lint-wrapper.sh sort-package-json
         language: system
         files: ^package\.json$
         pass_filenames: true
@@ -303,6 +303,6 @@ repos:
       - id: commitlint
         name: commitlint
         language: system
-        entry: pnpm exec commitlint --edit
+        entry: sh scripts/lib/lint-wrapper.sh commitlint --edit
         always_run: true
         stages: [commit-msg, manual]

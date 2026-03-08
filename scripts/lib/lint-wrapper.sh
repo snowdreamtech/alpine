@@ -7,11 +7,13 @@ LINTER="$1"
 shift
 
 # 1. Resolve Binary Path
-# Check .venv/bin (POSIX), .venv/Scripts (Windows), and PATH
+# Check .venv/bin (POSIX), .venv/Scripts (Windows), node_modules/.bin, and PATH
 VENV_BIN=".venv/bin/${LINTER}"
 VENV_SCRIPTS=".venv/Scripts/${LINTER}"
 VENV_EXE_BIN=".venv/bin/${LINTER}.exe"
 VENV_EXE_SCRIPTS=".venv/Scripts/${LINTER}.exe"
+NODE_BIN="node_modules/.bin/${LINTER}"
+NODE_CMD="node_modules/.bin/${LINTER}.cmd"
 
 RESOLVED_BIN=""
 
@@ -23,6 +25,10 @@ elif [ -x "$VENV_SCRIPTS" ]; then
   RESOLVED_BIN="$VENV_SCRIPTS"
 elif [ -x "$VENV_EXE_SCRIPTS" ]; then
   RESOLVED_BIN="$VENV_EXE_SCRIPTS"
+elif [ -x "$NODE_BIN" ]; then
+  RESOLVED_BIN="$NODE_BIN"
+elif [ -x "$NODE_CMD" ]; then
+  RESOLVED_BIN="$NODE_CMD"
 elif command -v "$LINTER" >/dev/null 2>&1; then
   RESOLVED_BIN="$LINTER"
 fi
@@ -48,7 +54,7 @@ php-cs-fixer) check_runtime php ;;
 rubocop) check_runtime gem ;;
 dart) check_runtime dart ;;
 gofmt) check_runtime go ;;
-eslint | prettier | stylelint | spectral | sort-package-json | markdownlint-cli2 | taplo)
+eslint | prettier | stylelint | spectral | sort-package-json | markdownlint-cli2 | taplo | dockerfile-utils | editorconfig-checker | commitlint)
   # These often run via 'pnpm exec', but check for node as the base runtime
   check_runtime node
   ;;

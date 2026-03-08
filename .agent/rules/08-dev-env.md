@@ -223,19 +223,11 @@
 
 - Track **onboarding time**: periodically measure how long it takes a new developer to go from `git clone` to a passing test run. The target is **≤ 15 minutes**. Failures to meet this SLA MUST be treated as developer experience bugs.
 
-- Automate dependency **health checks** using a `scripts/check-env.sh` that validates all required tools, versions, and services before any developer runs the project:
+- Automate dependency **health checks** using a `scripts/check-env.sh` script. This script MUST follow an **Intelligent Priority Health Check** strategy to balance strictness and robustness:
 
-  ```bash
-  #!/usr/bin/env bash
-  # Check minimum required tool versions
-  NODE_VERSION=$(node --version | sed 's/v//')
-  MIN_NODE="20.0.0"
+  | Priority Class | Tools / Runtimes | Health Check Behavior |
+  | :--- | :--- | :--- |
+  | **Lifeline (Critical)** | Node, Python, Git, Make | **Strict**: Exit with `1` (BROKEN) if missing or version too low. |
+  | **Enhanced (Optional)** | Go, PHP, Java, Rust, Docker | **Robust**: Print `⚠️ Warning` but exit with `0` (FUNCTIONAL). |
 
-  # Compare semver (simplified)
-  if [ "$(printf '%s\n' "$MIN_NODE" "$NODE_VERSION" | sort -V | head -n1)" != "$MIN_NODE" ]; then
-    echo "❌ node $NODE_VERSION < required $MIN_NODE. Run: mise install"
-    exit 1
-  fi
-
-  echo "✅ All environment checks passed"
-  ```
+  This ensures that a developer with a partially setup environment can still perform basic tasks (hydration, common linting) without being blocked by auxiliary language requirements.

@@ -415,4 +415,34 @@ if [ "$_IS_TOP_LEVEL" = "true" ]; then
   cat "$SHARED_SUMMARY_FILE"
   rm -f "$SHARED_SUMMARY_FILE"
 fi
+### Intelligent Priority Health Check Pattern
+
+To balance environmental strictness with robustness (especially in polyglot projects), use a class-based priority check.
+
+```sh
+# check_version standard: name, cmd, min_ver, ver_cmd, is_critical(0|1)
+check_version() {
+  _NAME="$1"; _CMD="$2"; _MIN_VER="$3"; _VER_CMD="$4"; _CRITICAL="${5:-0}"
+  if ! command -v "$_CMD" >/dev/null 2>&1; then
+    log_warn "❌ $_NAME: Not found."
+    HEALTHY=1
+    [ "$_CRITICAL" -eq 1 ] && CORE_HEALTHY=1
+    return 1
+  fi
+  # ... Version extraction and comparison logic ...
+  if [ "$_VERSION_TOO_LOW" = "true" ]; then
+    log_warn "⚠️  $_NAME: v$_CURRENT_VER (below v$_MIN_VER)"
+    HEALTHY=1
+    [ "$_CRITICAL" -eq 1 ] && CORE_HEALTHY=1
+  fi
+}
+
+# Usage: 1 = Critical (exit 1), 0 = Optional (exit 0)
+check_version "Node.js" "node" "20.0.0" "node -v" 1
+check_version "Go" "go" "1.21.0" "go version" 0
+
+if [ "$CORE_HEALTHY" -ne 0 ]; then
+  log_error "❌ Environment is BROKEN (Critical tools missing)."
+  exit 1
+fi
 ```

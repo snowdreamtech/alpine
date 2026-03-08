@@ -145,23 +145,26 @@ setup_node() {
   fi
 
   if [ -f package.json ]; then
-    pnpm install
+    _STAT="✅ Installed"
+    "$NPM" install >/dev/null 2>&1 || _STAT="❌ Failed"
     _V=$(get_version node)
     _D=$(($(date +%s) - _T0))
-    log_summary "Runtime" "Node.js" "✅ Installed" "$_V" "$_D"
+    log_summary "Runtime" "Node.js" "$_STAT" "$_V" "$_D"
 
-    # Detect Frameworks from package.json
-    if grep -q '"vitepress"' package.json; then
-      log_summary "Framework" "VitePress" "✅ Detected" "$(get_version pnpm "exec vitepress --version")" "0"
-    fi
-    if grep -q '"vue"' package.json; then
-      log_summary "Framework" "Vue" "✅ Detected" "-" "0"
-    fi
-    if grep -q '"react"' package.json; then
-      log_summary "Framework" "React" "✅ Detected" "-" "0"
-    fi
-    if grep -q '"tailwindcss"' package.json; then
-      log_summary "Framework" "Tailwind" "✅ Detected" "-" "0"
+    if [ "$_STAT" = "✅ Installed" ]; then
+      # Detect Frameworks from package.json
+      if grep -q '"vitepress"' package.json; then
+        log_summary "Framework" "VitePress" "✅ Detected" "$(get_version "$NPM" "exec vitepress --version")" "0"
+      fi
+      if grep -q '"vue"' package.json; then
+        log_summary "Framework" "Vue" "✅ Detected" "-" "0"
+      fi
+      if grep -q '"react"' package.json; then
+        log_summary "Framework" "React" "✅ Detected" "-" "0"
+      fi
+      if grep -q '"tailwindcss"' package.json; then
+        log_summary "Framework" "Tailwind" "✅ Detected" "-" "0"
+      fi
     fi
   else
     log_summary "Runtime" "Node.js" "⏭️ Skipped" "-" "0"
@@ -176,17 +179,24 @@ setup_python() {
     return 0
   fi
 
+  _STAT="✅ Installed"
   if [ ! -d "$VENV" ]; then
-    "$PYTHON" -m venv "$VENV"
+    "$PYTHON" -m venv "$VENV" || _STAT="❌ Failed"
   fi
-  "$VENV/bin/pip" install --upgrade pip >/dev/null 2>&1
-  if [ -f requirements-dev.txt ]; then
-    "$VENV/bin/pip" install -r requirements-dev.txt >/dev/null 2>&1
+
+  if [ "$_STAT" = "✅ Installed" ]; then
+    "$VENV/bin/pip" install --upgrade pip >/dev/null 2>&1 || _STAT="⚠️ Warning"
+    if [ -f requirements-dev.txt ]; then
+      "$VENV/bin/pip" install -r requirements-dev.txt >/dev/null 2>&1 || _STAT="❌ Failed"
+    fi
+  fi
+
+  if [ -d "$VENV" ]; then
     _V=$(get_version "$VENV/bin/python")
     _D=$(($(date +%s) - _T0))
-    log_summary "Runtime" "Python" "✅ Installed" "$_V" "$_D"
+    log_summary "Runtime" "Python" "$_STAT" "$_V" "$_D"
   else
-    log_summary "Runtime" "Python" "⏭️ Skipped" "-" "0"
+    log_summary "Runtime" "Python" "❌ Failed" "-" "0"
   fi
 }
 
@@ -256,14 +266,20 @@ install_hadolint() {
     return 0
   fi
 
-  _SUFFIX="Linux-x86_64"
-  [ "${OS}" = "darwin" ] && _SUFFIX="Darwin-x86_64"
-  [ "${_OS_TAG}" = "windows" ] && _SUFFIX="Windows-x86_64.exe"
+  _H_ARCH="x86_64"
+  [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _H_ARCH="arm64"
+
+  _H_OS="Linux"
+  [ "${OS}" = "darwin" ] && _H_OS="Darwin"
+  [ "${_OS_TAG}" = "windows" ] && _H_OS="Windows"
+
+  _SUFFIX="${_H_OS}-${_H_ARCH}"
+  [ "${_OS_TAG}" = "windows" ] && _SUFFIX="${_SUFFIX}.exe"
 
   _URL="${GITHUB_PROXY}https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-${_SUFFIX}"
   _STAT="✅ Installed"
   if download_url "${_URL}" "${_BIN}" "hadolint"; then
-    chmod +x "${_BIN}"
+    chmod +x "${_BIN}" 2>/dev/null || true
   else
     _STAT="❌ Failed"
   fi
@@ -395,12 +411,13 @@ setup_hooks() {
   fi
 
   if [ -x "$VENV/bin/pre-commit" ]; then
-    "$VENV/bin/pre-commit" install --hook-type pre-commit --hook-type pre-merge-commit --hook-type commit-msg >/dev/null 2>&1
+    _STAT="✅ Activated"
+    "$VENV/bin/pre-commit" install --hook-type pre-commit --hook-type pre-merge-commit --hook-type commit-msg >/dev/null 2>&1 || _STAT="❌ Failed"
     _V=$(get_version "$VENV/bin/pre-commit")
     _D=$(($(date +%s) - _T0))
-    log_summary "Other" "Hooks" "✅ Activated" "$_V" "$_D"
+    log_summary "Other" "Hooks" "$_STAT" "$_V" "$_D"
   else
-    log_summary "Other" "Hooks" "❌ Failed" "-" "0"
+    log_summary "Other" "Hooks" "❌ Failed (missing pre-commit)" "-" "0"
   fi
 }
 
@@ -413,13 +430,14 @@ setup_powershell() {
   fi
 
   if command -v pwsh >/dev/null 2>&1; then
-    pwsh -NoProfile -Command "if (!(Get-Module -ListAvailable PSScriptAnalyzer)) { Install-Module -Name PSScriptAnalyzer -Force -SkipPublisherCheck -Scope CurrentUser }" >/dev/null 2>&1
+    _STAT="✅ Installed"
+    pwsh -NoProfile -Command "if (!(Get-Module -ListAvailable PSScriptAnalyzer)) { Install-Module -Name PSScriptAnalyzer -Force -SkipPublisherCheck -Scope CurrentUser }" >/dev/null 2>&1 || _STAT="❌ Failed"
     # shellcheck disable=SC2016
     _V=$(pwsh -NoProfile -Command '(Get-Module PSScriptAnalyzer -ListAvailable).Version | Select-Object -First 1 | ForEach-Object { $_.ToString() }' 2>/dev/null || echo "installed")
     _D=$(($(date +%s) - _T0))
-    log_summary "Lint Tool" "PowerShell" "✅ Installed" "$_V" "$_D"
+    log_summary "Lint Tool" "PowerShell" "$_STAT" "$_V" "$_D"
   else
-    log_summary "Lint Tool" "PowerShell" "⏭️ Skipped" "-" "0"
+    log_summary "Lint Tool" "PowerShell" "⏭️ Skipped (pwsh missing)" "-" "0"
   fi
 }
 
@@ -459,12 +477,13 @@ install_ruby_lint() {
   fi
 
   if command -v gem >/dev/null 2>&1; then
-    gem install rubocop --user-install --no-document --quiet >/dev/null 2>&1 || true
+    _STAT="✅ Installed"
+    gem install rubocop --user-install --no-document --quiet >/dev/null 2>&1 || _STAT="❌ Failed"
     _V=$(get_version rubocop)
     _D=$(($(date +%s) - _T0))
-    log_summary "Lint Tool" "Rubocop" "✅ Installed" "$_V" "$_D"
+    log_summary "Lint Tool" "Rubocop" "$_STAT" "$_V" "$_D"
   else
-    log_summary "Lint Tool" "Rubocop" "⏭️ Skipped" "-" "0"
+    log_summary "Lint Tool" "Rubocop" "⏭️ Skipped (gem missing)" "-" "0"
   fi
 }
 
@@ -512,12 +531,13 @@ setup_swift() {
     fi
 
     if command -v brew >/dev/null 2>&1; then
-      brew list swiftformat >/dev/null 2>&1 || brew install swiftformat >/dev/null 2>&1
-      brew list swiftlint >/dev/null 2>&1 || brew install swiftlint >/dev/null 2>&1
+      _STAT="✅ Installed"
+      brew list swiftformat >/dev/null 2>&1 || brew install swiftformat >/dev/null 2>&1 || _STAT="⚠️ Partial"
+      brew list swiftlint >/dev/null 2>&1 || brew install swiftlint >/dev/null 2>&1 || _STAT="❌ Failed"
       _D=$(($(date +%s) - _T0))
-      log_summary "Lint Tool" "Swift" "✅ Installed" "$(get_version swiftlint lint --version)" "$_D"
+      log_summary "Lint Tool" "Swift" "$_STAT" "$(get_version swiftlint lint --version)" "$_D"
     else
-      log_summary "Lint Tool" "Swift" "❌ Failed" "-" "0"
+      log_summary "Lint Tool" "Swift" "⏭️ Skipped (brew missing)" "-" "0"
     fi
   else
     log_summary "Lint Tool" "Swift" "⏭️ Skipped" "-" "0"
