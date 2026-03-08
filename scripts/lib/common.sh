@@ -140,6 +140,32 @@ verify_checksum() {
   return 0
 }
 
+# Graceful runtime check helper
+# Usage: check_runtime "node" "LINTER_NAME"
+check_runtime() {
+  _RT="$1"
+  _TOOL="${2:-Tool}"
+  if ! command -v "$_RT" >/dev/null 2>&1; then
+    log_warn "⏭️  Required runtime '$_RT' for $_TOOL is missing. Skipping."
+    exit 0
+  fi
+}
+
+# Universal project version detector
+get_project_version() {
+  if [ -f "$PACKAGE_JSON" ]; then
+    grep '"version":' "$PACKAGE_JSON" | head -n 1 | sed 's/.*"version":[[:space:]]*"//;s/".*//'
+  elif [ -f "$CARGO_TOML" ]; then
+    grep '^version =' "$CARGO_TOML" | head -n 1 | sed -e 's/.*"\(.*\)"/\1/' -e "s/.*'\(.*\)'/\1/"
+  elif [ -f "$PYPROJECT_TOML" ]; then
+    grep '^version =' "$PYPROJECT_TOML" | head -n 1 | sed 's/.*"//;s/".*//'
+  elif [ -f "$VERSION_FILE" ]; then
+    cat "$VERSION_FILE" | head -n 1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+  else
+    echo "0.0.0"
+  fi
+}
+
 # Helper to run npm/pnpm scripts without infinite recursion
 run_npm_script() {
   _SCRIPT_NAME="$1"

@@ -15,6 +15,10 @@ VENV_EXE_SCRIPTS=".venv/Scripts/${LINTER}.exe"
 NODE_BIN="node_modules/.bin/${LINTER}"
 NODE_CMD="node_modules/.bin/${LINTER}.cmd"
 
+# Load common library for shared helpers (check_runtime, logging)
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+. "$SCRIPT_DIR/common.sh"
+
 RESOLVED_BIN=""
 
 if [ -x "$VENV_BIN" ]; then
@@ -35,36 +39,28 @@ fi
 
 # 2. Check Existence
 if [ -z "$RESOLVED_BIN" ]; then
-  echo "⚠️  ${LINTER} not found. Skipping linting for this module."
-  echo "💡 Run 'make setup' to install required tools."
+  log_warn "⚠️  ${LINTER} not found. Skipping linting for this module."
+  log_info "💡 Run 'make setup' to install required tools."
   exit 0
 fi
 
-# 3. Special Runtime Checks (Optional but recommended for robust skipping)
-check_runtime() {
-  if ! command -v "$1" >/dev/null 2>&1; then
-    echo "⏭️  Required runtime '$1' for ${LINTER} is missing. Skipping."
-    exit 0
-  fi
-}
-
+# 3. Special Runtime Checks
 case "$LINTER" in
-google-java-format | ktlint) check_runtime java ;;
-php-cs-fixer) check_runtime php ;;
-rubocop) check_runtime gem ;;
-dart) check_runtime dart ;;
-gofmt) check_runtime go ;;
+google-java-format | ktlint) check_runtime java "$LINTER" ;;
+php-cs-fixer) check_runtime php "$LINTER" ;;
+rubocop) check_runtime gem "$LINTER" ;;
+dart) check_runtime dart "$LINTER" ;;
+gofmt) check_runtime go "$LINTER" ;;
 eslint | prettier | stylelint | spectral | sort-package-json | markdownlint-cli2 | taplo | dockerfile-utils | editorconfig-checker | commitlint)
-  # These often run via 'pnpm exec', but check for node as the base runtime
-  check_runtime node
+  check_runtime node "$LINTER"
   ;;
 swiftformat | swiftlint)
   if [ "$(uname -s)" != "Darwin" ]; then
-    echo "⏭️  ${LINTER} is only supported on macOS. Skipping."
+    log_info "⏭️  ${LINTER} is only supported on macOS. Skipping."
     exit 0
   fi
   ;;
-dotnet) check_runtime dotnet ;;
+dotnet) check_runtime dotnet "$LINTER" ;;
 esac
 
 # 4. Execute Linter
