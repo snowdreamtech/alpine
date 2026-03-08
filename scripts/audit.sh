@@ -48,14 +48,21 @@ run_npm_script "audit"
 
 if [ -f "$REQUIREMENTS_TXT" ] || [ -f "requirements.txt" ] || [ -f "$PYPROJECT_TOML" ]; then
   log_info "\n── Auditing Python dependencies (pip-audit) ──"
-  if command -v pip-audit >/dev/null 2>&1; then
+  PIPAUDIT=""
+  if [ -x "$VENV/bin/pip-audit" ]; then
+    PIPAUDIT="$VENV/bin/pip-audit"
+  elif command -v pip-audit >/dev/null 2>&1; then
+    PIPAUDIT="pip-audit"
+  fi
+
+  if [ -n "$PIPAUDIT" ]; then
     if [ "$DRY_RUN" -eq 1 ]; then
-      log_success "DRY-RUN: Would run pip-audit"
+      log_success "DRY-RUN: Would run $PIPAUDIT"
     else
-      pip-audit
+      "$PIPAUDIT"
     fi
   else
-    log_warn "pip-audit not found. Skipping python audit."
+    log_warn "pip-audit not found. Run 'make setup' to install it."
   fi
 fi
 
