@@ -19,7 +19,7 @@ repos:
       # ── Git Hygiene (Local Mode) ───────────────────────────────────────────
       - id: trailing-whitespace
         name: trim trailing whitespace
-        entry: sed -i '' -E 's/[[:space:]]*$//'
+        entry: "python3 -c 'import sys, re; [(lambda f, c: open(f, \"w\").write(re.sub(r\"[ \\t]+(?=\\n|$)\", \"\", c)))(f, open(f).read()) for f in sys.argv[1:]]'"
         language: system
         types: [text]
         exclude: '\.(bat|cmd|ps1)$'
