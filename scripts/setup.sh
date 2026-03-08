@@ -552,24 +552,13 @@ done
 _START_TIME=$(date +%s)
 _IS_TOP_LEVEL=false
 
-# Helper to check if a component already exists in CI summary
-check_ci_summary() {
-  [ -n "$GITHUB_STEP_SUMMARY" ] && [ -f "$GITHUB_STEP_SUMMARY" ] && grep -qF "$1" "$GITHUB_STEP_SUMMARY"
-}
-
 if [ -z "$SETUP_SUMMARY_FILE" ]; then
   SETUP_SUMMARY_FILE=$(mktemp)
   export SETUP_SUMMARY_FILE
   _IS_TOP_LEVEL=true
 
-  # Check if we should print the main header and legend
-  # Use BOTH grep and GITHUB_ENV sentinel for maximum reliability across CI steps
-  _WANT_HEADER=true
-  if [ "$_SETUP_SUMMARY_HEADER_SENTINEL" = "true" ] || check_ci_summary "### Setup Execution Summary"; then
-    _WANT_HEADER=false
-  fi
-
-  if [ "$_WANT_HEADER" = "true" ]; then
+  # Initialize Summary (Only once per CI Job or first call)
+  if [ "$_SETUP_SUMMARY_INITIALIZED" != "true" ]; then
     {
       printf "### Setup Execution Summary\n\n"
       cat <<EOF
@@ -584,27 +573,29 @@ if [ -z "$SETUP_SUMMARY_FILE" ]; then
 > ❌ **Failed**: An error occurred during installation or setup.
 
 EOF
+      # Add Global Environment Detections immediately after the legend
+      log_summary "Environment" "System" "✅ Active" "${OS}/${ARCH}" "0"
+      log_summary "Environment" "Shell" "✅ Active" "$(basename "$SHELL")" "0"
+
+      # Detect Go/Rust even if not explicitly setup
+      if command -v go >/dev/null 2>&1; then
+        log_summary "Runtime" "Go" "✅ Detected" "$(get_version go)" "0"
+      fi
+      if command -v cargo >/dev/null 2>&1; then
+        log_summary "Runtime" "Rust" "✅ Detected" "$(get_version cargo)" "0"
+      fi
     } >"$SETUP_SUMMARY_FILE"
 
-    # Add global environment detections immediately after the legend (only once)
-    log_summary "Environment" "System" "✅ Active" "${OS}/${ARCH}" "0"
-    log_summary "Environment" "Shell" "✅ Active" "$(basename "$SHELL")" "0"
-
-    # Detect Go/Rust even if not explicitly setup
-    if command -v go >/dev/null 2>&1; then
-      log_summary "Runtime" "Go" "✅ Detected" "$(get_version go)" "0"
+    # Set master sentinel for subsequent steps in CI
+    if [ -n "$GITHUB_ENV" ]; then
+      echo "_SETUP_SUMMARY_INITIALIZED=true" >>"$GITHUB_ENV"
     fi
-    if command -v cargo >/dev/null 2>&1; then
-      log_summary "Runtime" "Rust" "✅ Detected" "$(get_version cargo)" "0"
-    fi
-
-    # Set sentinel for subsequent steps in CI
-    [ -n "$GITHUB_ENV" ] && echo "_SETUP_SUMMARY_HEADER_SENTINEL=true" >>"$GITHUB_ENV"
+    export _SETUP_SUMMARY_INITIALIZED=true
   else
     touch "$SETUP_SUMMARY_FILE"
   fi
 
-  # Add table header
+  # Always provide a table header for the current process invocation
   {
     printf "| Category | Module | Status | Version | Time |\n"
     printf "| :--- | :--- | :--- | :--- | :--- |\n"
@@ -639,13 +630,11 @@ for module in $modules; do
   esac
 done
 
-# ── Final Management ──
+# ── Final Output Management ──
 if [ "$_IS_TOP_LEVEL" = "true" ]; then
   _TOTAL_DUR=$(($(date +%s) - _START_TIME))
-
   printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR" >>"$SETUP_SUMMARY_FILE"
 
-  # Final Output
   if [ -n "$GITHUB_STEP_SUMMARY" ]; then
     cat "$SETUP_SUMMARY_FILE" >>"$GITHUB_STEP_SUMMARY"
   else
