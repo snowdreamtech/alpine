@@ -89,4 +89,8 @@ run_prettier
 printf "\n"
 run_ruff
 
+# Optional: run npm format if extra tools are defined in package.json
+# ensuring we don't loop back to this script.
+run_npm_script "format"
+
 log_success "\n✨ Formatting complete!"

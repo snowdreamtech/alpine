@@ -84,5 +84,10 @@ run_release() {
 run_verify
 printf "\n"
 run_release
+printf "\n"
+
+# Optional: run npm release if extra tools are defined in package.json
+# ensuring we don't loop back to this script.
+run_npm_script "release"
 
 log_success "\n✨ Release process completed successfully!"

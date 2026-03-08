@@ -21,6 +21,7 @@ Run a full project verification suite (env check, linting, and testing).
 Commonly used before committing or releasing.
 
 Options:
+  --dry-run        Preview verification steps without execution.
   -q, --quiet      Suppress verbose orchestration details.
   -v, --verbose    Enable verbose output for all sub-tools.
   -h, --help       Show this help message.
@@ -38,6 +39,11 @@ for _arg in "$@"; do
 done
 parse_common_args "$@"
 
+# Pass dry-run to sub-scripts
+if [ "$DRY_RUN" -eq 1 ]; then
+  SUB_ARGS="${SUB_ARGS} --dry-run"
+fi
+
 log_info "🚀 Starting Full Project Verification...\n"
 
 run_step() {
@@ -45,6 +51,7 @@ run_step() {
   _MSG="$2"
   log_info "── Step: $_MSG ──"
   if [ -f "$_SCRIPT" ]; then
+    # shellcheck disable=SC2086
     sh "$_SCRIPT" $SUB_ARGS || {
       log_error "\n❌ Verification FAILED at Step: $_MSG"
       exit 1
@@ -63,5 +70,8 @@ run_step "scripts/lint.sh" "Code Quality (Linting)"
 
 # 4. Testing
 run_step "scripts/test.sh" "Core Functionality (Testing)"
+
+# Optional: run npm verify if defined
+run_npm_script "verify"
 
 log_success "✨ All verification steps passed! Project is healthy."

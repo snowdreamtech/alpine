@@ -42,7 +42,8 @@ run_update() {
     log_info "DRY-RUN: Would run $_DESC [$_CMD]"
   else
     log_info "Updating $_DESC..."
-    eval "$_CMD"
+    # shellcheck disable=SC2086
+    eval $_CMD
   fi
 }
 
@@ -61,5 +62,8 @@ if [ -x "$VENV/bin/pre-commit" ]; then
 elif command -v pre-commit >/dev/null 2>&1; then
   run_update "pre-commit autoupdate" "pre-commit hooks"
 fi
+
+# Optional: run npm update if defined
+run_npm_script "update"
 
 log_success "\n✨ Update process finished."

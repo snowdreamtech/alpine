@@ -63,16 +63,28 @@ fi
 # 3. Execute VitePress via NPM
 case "$COMMAND" in
 dev)
-  log_info "Starting development server..."
-  "$NPM" exec vitepress dev "$DOCS_DIR"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_success "DRY-RUN: Would start VitePress dev server on $DOCS_DIR"
+  else
+    log_info "Starting development server..."
+    "$NPM" exec vitepress dev "$DOCS_DIR"
+  fi
   ;;
 build)
-  log_info "Building documentation site..."
-  "$NPM" exec vitepress build "$DOCS_DIR"
-  log_success "\n✨ Build complete! Artifacts are in $DOCS_DIR/.vitepress/dist"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_success "DRY-RUN: Would build VitePress site from $DOCS_DIR"
+  else
+    log_info "Building documentation site..."
+    "$NPM" exec vitepress build "$DOCS_DIR"
+    log_success "\n✨ Build complete! Artifacts are in $DOCS_DIR/.vitepress/dist"
+  fi
   ;;
 preview)
-  log_info "Previewing production build..."
-  "$NPM" exec vitepress preview "$DOCS_DIR"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_success "DRY-RUN: Would preview VitePress site in $DOCS_DIR"
+  else
+    log_info "Previewing production build..."
+    "$NPM" exec vitepress preview "$DOCS_DIR"
+  fi
   ;;
 esac
