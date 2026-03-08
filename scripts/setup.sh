@@ -585,6 +585,19 @@ if [ -z "$SETUP_SUMMARY_FILE" ]; then
 
 EOF
     } >"$SETUP_SUMMARY_FILE"
+
+    # Add global environment detections immediately after the legend (only once)
+    log_summary "Environment" "System" "✅ Active" "${OS}/${ARCH}" "0"
+    log_summary "Environment" "Shell" "✅ Active" "$(basename "$SHELL")" "0"
+
+    # Detect Go/Rust even if not explicitly setup
+    if command -v go >/dev/null 2>&1; then
+      log_summary "Runtime" "Go" "✅ Detected" "$(get_version go)" "0"
+    fi
+    if command -v cargo >/dev/null 2>&1; then
+      log_summary "Runtime" "Rust" "✅ Detected" "$(get_version cargo)" "0"
+    fi
+
     # Set sentinel for subsequent steps in CI
     [ -n "$GITHUB_ENV" ] && echo "_SETUP_SUMMARY_HEADER_SENTINEL=true" >>"$GITHUB_ENV"
   else
@@ -626,31 +639,9 @@ for module in $modules; do
   esac
 done
 
-# ── Global Detections (Environment & Other Runtimes) ──
-# Only run global detections at the top-level AND if they haven't been reported yet
+# ── Final Management ──
 if [ "$_IS_TOP_LEVEL" = "true" ]; then
   _TOTAL_DUR=$(($(date +%s) - _START_TIME))
-
-  # Check if global detections are needed
-  _WANT_GLOBAL=true
-  if [ "$_SETUP_SUMMARY_GLOBAL_SENTINEL" = "true" ] || check_ci_summary "| Environment  | System"; then
-    _WANT_GLOBAL=false
-  fi
-
-  if [ "$_WANT_GLOBAL" = "true" ]; then
-    log_summary "Environment" "System" "✅ Active" "${OS}/${ARCH}" "0"
-    log_summary "Environment" "Shell" "✅ Active" "$(basename "$SHELL")" "0"
-
-    # Detect Go/Rust even if not explicitly setup
-    if command -v go >/dev/null 2>&1; then
-      log_summary "Runtime" "Go" "✅ Detected" "$(get_version go)" "0"
-    fi
-    if command -v cargo >/dev/null 2>&1; then
-      log_summary "Runtime" "Rust" "✅ Detected" "$(get_version cargo)" "0"
-    fi
-    # Set sentinel for subsequent steps in CI
-    [ -n "$GITHUB_ENV" ] && echo "_SETUP_SUMMARY_GLOBAL_SENTINEL=true" >>"$GITHUB_ENV"
-  fi
 
   printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR" >>"$SETUP_SUMMARY_FILE"
 
