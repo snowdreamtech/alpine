@@ -49,7 +49,28 @@ run_update() {
 
 # 3. Core Package Managers
 if command -v "$NPM" >/dev/null 2>&1; then
-  run_update "$NPM self-update" "$NPM (self-update)"
+  if [ "$NPM" = "pnpm" ]; then
+    # Intelligent pnpm update: detects if managed by corepack
+    if command -v corepack >/dev/null 2>&1 && pnpm self-update --help 2>&1 | grep -q "corepack" >/dev/null 2>&1; then
+      # Note: corepack doesn't allow self-update, use corepack prepare
+      run_update "corepack prepare pnpm@latest --activate" "pnpm (via corepack)"
+    else
+      # Attempt self-update, fallback to corepack if it fails with the specific error
+      if [ "$DRY_RUN" -eq 1 ]; then
+        log_info "DRY-RUN: Would run pnpm self-update"
+      else
+        log_info "Updating pnpm (self-update)..."
+        if ! pnpm self-update 2>&1 | grep -q "ERR_PNPM_CANT_SELF_UPDATE_IN_COREPACK"; then
+          log_success "pnpm updated successfully."
+        else
+          log_warn "pnpm is managed by corepack. Switching to corepack update..."
+          run_update "corepack prepare pnpm@latest --activate" "pnpm (via corepack)"
+        fi
+      fi
+    fi
+  else
+    run_update "$NPM self-update" "$NPM (self-update)"
+  fi
 fi
 
 if command -v brew >/dev/null 2>&1; then
