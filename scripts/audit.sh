@@ -68,12 +68,12 @@ if [ -f "$PACKAGE_JSON" ]; then
   log_info "── Auditing Node.js dependencies ($NPM audit) ──"
   if [ "$DRY_RUN" -eq 1 ]; then
     log_success "DRY-RUN: Would run $NPM audit"
-    log_summary "Node.js" "pnpm-audit" "⚖️ Previewed" "-" "0"
+    log_summary "Node.js" "$NPM-audit" "⚖️ Previewed" "-" "0"
   else
     if "$NPM" audit >/dev/null 2>&1; then
-      log_summary "Node.js" "pnpm-audit" "✅ Secure" "$(get_version "$NPM")" "$(($(date +%s) - _T0))"
+      log_summary "Node.js" "$NPM-audit" "✅ Secure" "$(get_version "$NPM")" "$(($(date +%s) - _T0))"
     else
-      log_summary "Node.js" "pnpm-audit" "❌ Vulnerable" "$(get_version "$NPM")" "$(($(date +%s) - _T0))"
+      log_summary "Node.js" "$NPM-audit" "❌ Vulnerable" "$(get_version "$NPM")" "$(($(date +%s) - _T0))"
     fi
   fi
 fi
