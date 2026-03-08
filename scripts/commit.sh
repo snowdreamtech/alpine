@@ -52,6 +52,16 @@ if ! command -v "$NPM" >/dev/null 2>&1; then
 fi
 
 # 4. Launch Commitizen
+if [ "$DRY_RUN" -eq 1 ]; then
+  log_success "DRY-RUN: Would launch interactive Commitizen CLI."
+  if [ -f "package.json" ] && grep -q '"commit":' package.json; then
+    log_info "Command: $NPM run commit"
+  else
+    log_info "Command: $NPM exec cz"
+  fi
+  exit 0
+fi
+
 log_info "Launching interactive CLI..."
 if [ -f "package.json" ] && grep -q '"commit":' package.json; then
   "$NPM" run commit

@@ -71,8 +71,9 @@ clean_item ".venv" "Python virtual environment"
 if [ "$DRY_RUN" -eq 1 ]; then
   log_success "DRY-RUN: Would search and remove all __pycache__ and *.pyc files."
 else
-  find . -type d -name "__pycache__" -not -path "*/.*" -exec rm -rf {} + 2>/dev/null || true
-  find . -type f -name "*.pyc" -not -path "*/.*" -exec rm -f {} + 2>/dev/null || true
+  # Using POSIX compliant find
+  find . -type d -name "__pycache__" ! -path "*/.*" -exec rm -rf {} \; 2>/dev/null || true
+  find . -type f -name "*.pyc" ! -path "*/.*" -exec rm -f {} \; 2>/dev/null || true
 fi
 
 # Node.js
@@ -88,8 +89,9 @@ clean_item ".output" "Vite/Nitro output"
 if [ "$DRY_RUN" -eq 1 ]; then
   log_success "DRY-RUN: Would remove .DS_Store and Thumbs.db files."
 else
-  find . -type f -name ".DS_Store" -not -path "*/.*" -exec rm -f {} + 2>/dev/null || true
-  find . -type f -name "Thumbs.db" -not -path "*/.*" -exec rm -f {} + 2>/dev/null || true
+  # Using POSIX compliant find
+  find . -type f -name ".DS_Store" ! -path "*/.*" -exec rm -f {} \; 2>/dev/null || true
+  find . -type f -name "Thumbs.db" ! -path "*/.*" -exec rm -f {} \; 2>/dev/null || true
 fi
 
 log_success "\n✨ Cleanup complete!"

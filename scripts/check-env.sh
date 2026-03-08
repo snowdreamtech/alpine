@@ -43,14 +43,14 @@ check_version() {
   log_debug "Checking $_NAME (min: $_MIN_VER)..."
 
   if ! command -v "$_CMD" >/dev/null 2>&1; then
-    log_error "❌ $_NAME: Not found. Please install it."
+    log_warn "❌ $_NAME: Not found."
     HEALTHY=1
     return 1
   fi
 
   _CURRENT_VER=$($_VER_CMD | sed 's/[^0-9.]//g' | cut -d. -f1-3)
 
-  # Simple version comparison using sort -V (POSIX doesn't have sort -V, but we can use a helper)
+  # Simple version comparison using sort -n
   _LOWER_VER=$(printf "%s\n%s" "$_MIN_VER" "$_CURRENT_VER" | sort -n -t. -k1,1 -k2,2 -k3,3 | head -n1)
 
   if [ "$_LOWER_VER" = "$_MIN_VER" ] || [ "$_CURRENT_VER" = "$_MIN_VER" ]; then
@@ -69,6 +69,18 @@ check_version "Git" "git" "2.30.0" "git --version"
 
 if command -v go >/dev/null 2>&1; then
   check_version "Go" "go" "1.21.0" "go version"
+fi
+
+if command -v golangci-lint >/dev/null 2>&1; then
+  check_version "golangci-lint" "golangci-lint" "1.55.0" "golangci-lint --version"
+fi
+
+if command -v gitleaks >/dev/null 2>&1; then
+  log_success "✅ Gitleaks: Installed"
+fi
+
+if command -v hadolint >/dev/null 2>&1; then
+  log_success "✅ Hadolint: Installed"
 fi
 
 if command -v make >/dev/null 2>&1; then
