@@ -552,14 +552,25 @@ done
 _START_TIME=$(date +%s)
 _IS_TOP_LEVEL=false
 
+# Helper to check if header should be printed
+should_print_header() {
+  if [ -n "$GITHUB_STEP_SUMMARY" ] && [ -f "$GITHUB_STEP_SUMMARY" ]; then
+    if grep -q "### Setup Execution Summary" "$GITHUB_STEP_SUMMARY"; then
+      return 1 # Already exists in CI summary
+    fi
+  fi
+  return 0
+}
+
 if [ -z "$SETUP_SUMMARY_FILE" ]; then
   SETUP_SUMMARY_FILE=$(mktemp)
   export SETUP_SUMMARY_FILE
   _IS_TOP_LEVEL=true
 
-  {
-    printf "### Setup Execution Summary\n\n"
-    cat <<EOF
+  if should_print_header; then
+    {
+      printf "### Setup Execution Summary\n\n"
+      cat <<EOF
 > **Status Legend:**
 > ⚖️ **Previewed**: Running in \`--dry-run\` mode.
 > ✅ **Active/Detected/Available**: System/Shell active or Runtime detected.
@@ -571,9 +582,15 @@ if [ -z "$SETUP_SUMMARY_FILE" ]; then
 > ❌ **Failed**: An error occurred during installation or setup.
 
 EOF
+    } >"$SETUP_SUMMARY_FILE"
+  else
+    # Ensure file exists even if header is skipped
+    touch "$SETUP_SUMMARY_FILE"
+  fi
+  {
     printf "| Category | Module | Status | Version | Time |\n"
     printf "| :--- | :--- | :--- | :--- | :--- |\n"
-  } >"$SETUP_SUMMARY_FILE"
+  } >>"$SETUP_SUMMARY_FILE"
 fi
 
 # ── Module Selection ──
