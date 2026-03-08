@@ -44,7 +44,7 @@ teardown() {
   # setup.sh has many components
   assert_output --partial "Setting up Node.js & pnpm"
   assert_output --partial "Setting up Python Virtual Environment"
-  assert_output --partial "Activating Pre-commit Hooks"
+  assert_output --partial "Setting up Pre-commit Hooks"
 }
 
 @test "setup.sh: respects project root guard" {
