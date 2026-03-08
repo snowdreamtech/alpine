@@ -98,49 +98,6 @@ sanitize_path() {
   echo "$1" | sed "s|$HOME|~|g"
 }
 
-log_summary() {
-  _CAT="${1:-Other}"
-  _MOD="${2:-Unknown}"
-  _STAT="${3:-⏭️ Skipped}"
-  _VER="${4:--}"
-  _DUR="${5:--}"
-
-  # Automatically demote to Warning if status is supposedly Active/Installed but version detection failed
-  case "$_STAT" in
-  ✅*)
-    if [ "$_VER" = "-" ] || [ -z "$_VER" ]; then
-      case "$_MOD" in
-      System | Shell | React | Vue | Tailwind | VitePress | Vite) ;; # These don't always have a single version command
-      *) _STAT="⚠️ Warning" ;;
-      esac
-    fi
-    ;;
-  esac
-
-  printf "| %-12s | %-15s | %-20s | %-15s | %-6s |\n" "$_CAT" "$_MOD" "$_STAT" "$_VER" "${_DUR}s" >>"$SETUP_SUMMARY_FILE"
-}
-
-# Helper to get version safely
-get_version() {
-  _CMD="$1"
-  _ARG="${2:---version}"
-  if command -v "$_CMD" >/dev/null 2>&1; then
-    # Use centralized project version detector if it is a project file,
-    # otherwise use the generic version extraction.
-    case "$_CMD" in
-    node | python | go | cargo | dotnet | dart | pwsh)
-      "$_CMD" "$_ARG" 2>&1 | head -n 1 | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
-      ;;
-    *)
-      # For other binaries, try to get version from the output
-      "$_CMD" "$_ARG" 2>&1 | head -n 1 | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
-      ;;
-    esac
-  else
-    echo "-"
-  fi
-}
-
 setup_node() {
   _T0=$(date +%s)
   log_info "── Setting up Node.js & pnpm ──"
