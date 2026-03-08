@@ -90,9 +90,8 @@ msys* | mingw* | cygwin*)
   ;;
 *) _OS_TAG="linux" ;;
 esac
-# Execution timing and summary
+# Execution timing
 _START_TIME=$(date +%s)
-TMP_SUMMARY=$(mktemp)
 
 # Privacy-aware path sanitizer
 sanitize_path() {
@@ -118,7 +117,7 @@ log_summary() {
     ;;
   esac
 
-  printf "| %-12s | %-15s | %-20s | %-15s | %-6s |\n" "$_CAT" "$_MOD" "$_STAT" "$_VER" "${_DUR}s" >>"$TMP_SUMMARY"
+  printf "| %-12s | %-15s | %-20s | %-15s | %-6s |\n" "$_CAT" "$_MOD" "$_STAT" "$_VER" "${_DUR}s" >>"$SETUP_SUMMARY_FILE"
 }
 
 # Helper to get version safely
@@ -126,7 +125,8 @@ get_version() {
   _CMD="$1"
   _ARG="${2:---version}"
   if command -v "$_CMD" >/dev/null 2>&1; then
-    "$_CMD" "$_ARG" 2>&1 | head -n 1 | sed 's/[^0-9.]*\([0-9.]*\).*/\1/' | cut -c1-15
+    # Improved version extraction: find the first sequence starting with a digit
+    "$_CMD" "$_ARG" 2>&1 | head -n 1 | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
   else
     echo "-"
   fi
@@ -548,15 +548,18 @@ for arg in "$@"; do
   esac
 done
 
-if [ -z "$(echo "${RAW_ARGS}" | tr -d ' ')" ] || [ "${RAW_ARGS# *}" = "all" ]; then
-  modules="node python gitleaks hadolint go checkmake iac powershell java ruby php dart swift dotnet hooks"
-else
-  modules="${RAW_ARGS}"
-fi
+# ── Execution Timing & Summary Management ──
+_START_TIME=$(date +%s)
+_IS_TOP_LEVEL=false
 
-{
-  printf "### Setup Execution Summary\n\n"
-  cat <<EOF
+if [ -z "$SETUP_SUMMARY_FILE" ]; then
+  SETUP_SUMMARY_FILE=$(mktemp)
+  export SETUP_SUMMARY_FILE
+  _IS_TOP_LEVEL=true
+
+  {
+    printf "### Setup Execution Summary\n\n"
+    cat <<EOF
 > **Status Legend:**
 > ⚖️ **Previewed**: Running in \`--dry-run\` mode.
 > ✅ **Active/Detected/Available**: System/Shell active or Runtime detected.
@@ -568,9 +571,17 @@ fi
 > ❌ **Failed**: An error occurred during installation or setup.
 
 EOF
-  printf "| Category | Module | Status | Version | Time |\n"
-  printf "| :--- | :--- | :--- | :--- | :--- |\n"
-} >"$TMP_SUMMARY"
+    printf "| Category | Module | Status | Version | Time |\n"
+    printf "| :--- | :--- | :--- | :--- | :--- |\n"
+  } >"$SETUP_SUMMARY_FILE"
+fi
+
+# ── Module Selection ──
+if [ -z "$(echo "${RAW_ARGS}" | tr -d ' ')" ] || [ "${RAW_ARGS# *}" = "all" ]; then
+  modules="node python gitleaks hadolint go checkmake iac powershell java ruby php dart swift dotnet hooks"
+else
+  modules="${RAW_ARGS}"
+fi
 
 for module in $modules; do
   case $module in
@@ -594,27 +605,29 @@ for module in $modules; do
 done
 
 # ── Global Detections (Environment & Other Runtimes) ──
-_TOTAL_DUR=$(($(date +%s) - _START_TIME))
-log_summary "Environment" "System" "✅ Active" "${OS}/${ARCH}" "0"
-log_summary "Environment" "Shell" "✅ Active" "$(basename "$SHELL")" "0"
+# Only run global detections at the top-level or if specifically not in a sub-setup
+if [ "$_IS_TOP_LEVEL" = "true" ]; then
+  _TOTAL_DUR=$(($(date +%s) - _START_TIME))
+  log_summary "Environment" "System" "✅ Active" "${OS}/${ARCH}" "0"
+  log_summary "Environment" "Shell" "✅ Active" "$(basename "$SHELL")" "0"
 
-# Detect Go/Rust even if not explicitly setup
-if command -v go >/dev/null 2>&1; then
-  log_summary "Runtime" "Go" "✅ Detected" "$(get_version go)" "0"
+  # Detect Go/Rust even if not explicitly setup
+  if command -v go >/dev/null 2>&1; then
+    log_summary "Runtime" "Go" "✅ Detected" "$(get_version go)" "0"
+  fi
+  if command -v cargo >/dev/null 2>&1; then
+    log_summary "Runtime" "Rust" "✅ Detected" "$(get_version cargo)" "0"
+  fi
+
+  printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR" >>"$SETUP_SUMMARY_FILE"
+
+  # Final Output
+  if [ -n "$GITHUB_STEP_SUMMARY" ]; then
+    cat "$SETUP_SUMMARY_FILE" >>"$GITHUB_STEP_SUMMARY"
+  else
+    printf "\n"
+    cat "$SETUP_SUMMARY_FILE"
+  fi
+  rm -f "$SETUP_SUMMARY_FILE"
+  info "\n✨ Setup step $modules complete!"
 fi
-if command -v cargo >/dev/null 2>&1; then
-  log_summary "Runtime" "Rust" "✅ Detected" "$(get_version cargo)" "0"
-fi
-
-printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR" >>"$TMP_SUMMARY"
-
-# Write summary to CI if available, otherwise print to terminal
-if [ -n "$GITHUB_STEP_SUMMARY" ]; then
-  cat "$TMP_SUMMARY" >>"$GITHUB_STEP_SUMMARY"
-else
-  printf "\n"
-  cat "$TMP_SUMMARY"
-fi
-rm -f "$TMP_SUMMARY"
-
-info "\n✨ Setup step $modules complete!"
