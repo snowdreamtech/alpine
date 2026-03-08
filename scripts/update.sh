@@ -43,20 +43,28 @@ update_pnpm_global() {
       if [ "$DRY_RUN" -eq 1 ]; then
         log_summary "Manager" "pnpm" "⚖️ Previewed" "-" "0"
       else
-        corepack prepare pnpm@latest --activate >/dev/null 2>&1 || true
-        log_summary "Manager" "pnpm" "✅ Updated" "$(get_version pnpm)" "$(($(date +%s) - _T0))"
+        if corepack prepare pnpm@latest --activate >/dev/null 2>&1; then
+          log_summary "Manager" "pnpm" "✅ Updated" "$(get_version pnpm)" "$(($(date +%s) - _T0))"
+        else
+          log_summary "Manager" "pnpm" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+        fi
       fi
     else
       if [ "$DRY_RUN" -eq 1 ]; then
         log_summary "Manager" "pnpm" "⚖️ Previewed" "-" "0"
       else
         log_info "Updating pnpm (self-update)..."
-        if ! pnpm self-update 2>&1 | grep -q "ERR_PNPM_CANT_SELF_UPDATE_IN_COREPACK"; then
+        if _OUT=$(pnpm self-update 2>&1); then
           log_summary "Manager" "pnpm" "✅ Updated" "$(get_version pnpm)" "$(($(date +%s) - _T0))"
-        else
+        elif echo "$_OUT" | grep -q "ERR_PNPM_CANT_SELF_UPDATE_IN_COREPACK"; then
           log_warn "pnpm is managed by corepack. Switching to corepack update..."
-          corepack prepare pnpm@latest --activate >/dev/null 2>&1 || true
-          log_summary "Manager" "pnpm" "✅ Updated" "$(get_version pnpm)" "$(($(date +%s) - _T0))"
+          if corepack prepare pnpm@latest --activate >/dev/null 2>&1; then
+            log_summary "Manager" "pnpm" "✅ Updated" "$(get_version pnpm)" "$(($(date +%s) - _T0))"
+          else
+            log_summary "Manager" "pnpm" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+          fi
+        else
+          log_summary "Manager" "pnpm" "❌ Failed" "-" "$(($(date +%s) - _T0))"
         fi
       fi
     fi
@@ -66,12 +74,20 @@ update_pnpm_global() {
 update_pnpm_project() {
   _T0=$(date +%s)
   if [ -f "pnpm-lock.yaml" ]; then
-    log_info "Updating project dependencies (pnpm update)..."
-    if [ "$DRY_RUN" -eq 1 ]; then
-      log_summary "Project" "pnpm-deps" "⚖️ Previewed" "-" "0"
+    if command -v pnpm >/dev/null 2>&1; then
+      log_info "Updating project dependencies (pnpm update)..."
+      if [ "$DRY_RUN" -eq 1 ]; then
+        log_summary "Project" "pnpm-deps" "⚖️ Previewed" "-" "0"
+      else
+        if pnpm update >/dev/null 2>&1; then
+          log_summary "Project" "pnpm-deps" "✅ Updated" "-" "$(($(date +%s) - _T0))"
+        else
+          log_summary "Project" "pnpm-deps" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+        fi
+      fi
     else
-      pnpm update >/dev/null 2>&1 || true
-      log_summary "Project" "pnpm-deps" "✅ Updated" "-" "$(($(date +%s) - _T0))"
+      log_warn "pnpm-lock.yaml found but pnpm command is missing. Skipping."
+      log_summary "Project" "pnpm-deps" "⚠️ Missing" "-" "0"
     fi
   fi
 }
@@ -79,15 +95,21 @@ update_pnpm_project() {
 update_python_venv() {
   _T0=$(date +%s)
   if [ -d "$VENV" ]; then
-    log_info "Updating Python environment ($VENV)..."
-    if [ "$DRY_RUN" -eq 1 ]; then
-      log_summary "Project" "Python-Venv" "⚖️ Previewed" "-" "0"
-    else
-      "$VENV/bin/pip" install --upgrade pip >/dev/null 2>&1 || true
-      if [ -f "$REQUIREMENTS_TXT" ]; then
-        "$VENV/bin/pip" install -r "$REQUIREMENTS_TXT" --upgrade >/dev/null 2>&1 || true
+    if [ -x "$VENV/bin/pip" ]; then
+      log_info "Updating Python environment ($VENV)..."
+      if [ "$DRY_RUN" -eq 1 ]; then
+        log_summary "Project" "Python-Venv" "⚖️ Previewed" "-" "0"
+      else
+        _STAT="✅ Updated"
+        "$VENV/bin/pip" install --upgrade pip >/dev/null 2>&1 || _STAT="⚠️ Warning"
+        if [ -f "$REQUIREMENTS_TXT" ]; then
+          "$VENV/bin/pip" install -r "$REQUIREMENTS_TXT" --upgrade >/dev/null 2>&1 || _STAT="❌ Failed"
+        fi
+        log_summary "Project" "Python-Venv" "$_STAT" "$(get_version "$VENV/bin/pip")" "$(($(date +%s) - _T0))"
       fi
-      log_summary "Project" "Python-Venv" "✅ Updated" "$(get_version "$VENV/bin/pip")" "$(($(date +%s) - _T0))"
+    else
+      log_warn "Virtualenv directory $VENV exists but pip is missing/not executable. Skipping."
+      log_summary "Project" "Python-Venv" "⚠️ Missing" "-" "0"
     fi
   fi
 }
@@ -99,8 +121,11 @@ update_homebrew() {
     if [ "$DRY_RUN" -eq 1 ]; then
       log_summary "Manager" "Homebrew" "⚖️ Previewed" "-" "0"
     else
-      brew update >/dev/null 2>&1 || true
-      log_summary "Manager" "Homebrew" "✅ Updated" "-" "$(($(date +%s) - _T0))"
+      if brew update >/dev/null 2>&1; then
+        log_summary "Manager" "Homebrew" "✅ Updated" "-" "$(($(date +%s) - _T0))"
+      else
+        log_summary "Manager" "Homebrew" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+      fi
     fi
   fi
 }
@@ -113,8 +138,11 @@ update_ruby_gems() {
       if [ "$DRY_RUN" -eq 1 ]; then
         log_summary "Lint Tool" "Rubocop" "⚖️ Previewed" "-" "0"
       else
-        gem update rubocop --user-install --no-document --quiet >/dev/null 2>&1 || true
-        log_summary "Lint Tool" "Rubocop" "✅ Updated" "$(get_version rubocop)" "$(($(date +%s) - _T0))"
+        if gem update rubocop --user-install --no-document --quiet >/dev/null 2>&1; then
+          log_summary "Lint Tool" "Rubocop" "✅ Updated" "$(get_version rubocop)" "$(($(date +%s) - _T0))"
+        else
+          log_summary "Lint Tool" "Rubocop" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+        fi
       fi
     fi
   fi
@@ -132,8 +160,11 @@ update_pre_commit() {
     if [ "$DRY_RUN" -eq 1 ]; then
       log_summary "Other" "Hooks" "⚖️ Previewed" "-" "0"
     else
-      "$_BIN" autoupdate >/dev/null 2>&1 || true
-      log_summary "Other" "Hooks" "✅ Updated" "$(get_version "$_BIN")" "$(($(date +%s) - _T0))"
+      if "$_BIN" autoupdate >/dev/null 2>&1; then
+        log_summary "Other" "Hooks" "✅ Updated" "$(get_version "$_BIN")" "$(($(date +%s) - _T0))"
+      else
+        log_summary "Other" "Hooks" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+      fi
     fi
   fi
 }
@@ -141,13 +172,20 @@ update_pre_commit() {
 update_go_mod() {
   _T0=$(date +%s)
   if [ -f "go.mod" ]; then
-    log_info "Updating Go workspace (go get -u)..."
-    if [ "$DRY_RUN" -eq 1 ]; then
-      log_summary "Project" "Go-Mod" "⚖️ Previewed" "-" "0"
+    if command -v go >/dev/null 2>&1; then
+      log_info "Updating Go workspace (go get -u)..."
+      if [ "$DRY_RUN" -eq 1 ]; then
+        log_summary "Project" "Go-Mod" "⚖️ Previewed" "-" "0"
+      else
+        if go get -u ./... >/dev/null 2>&1 && go mod tidy >/dev/null 2>&1; then
+          log_summary "Project" "Go-Mod" "✅ Updated" "$(get_version go)" "$(($(date +%s) - _T0))"
+        else
+          log_summary "Project" "Go-Mod" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+        fi
+      fi
     else
-      go get -u ./... >/dev/null 2>&1 || true
-      go mod tidy >/dev/null 2>&1 || true
-      log_summary "Project" "Go-Mod" "✅ Updated" "$(get_version go)" "$(($(date +%s) - _T0))"
+      log_warn "go.mod found but go command is missing. Skipping."
+      log_summary "Project" "Go-Mod" "⚠️ Missing" "-" "0"
     fi
   fi
 }
@@ -155,12 +193,20 @@ update_go_mod() {
 update_cargo_deps() {
   _T0=$(date +%s)
   if [ -f "Cargo.toml" ]; then
-    log_info "Updating Rust dependencies (cargo update)..."
-    if [ "$DRY_RUN" -eq 1 ]; then
-      log_summary "Project" "Cargo-Deps" "⚖️ Previewed" "-" "0"
+    if command -v cargo >/dev/null 2>&1; then
+      log_info "Updating Rust dependencies (cargo update)..."
+      if [ "$DRY_RUN" -eq 1 ]; then
+        log_summary "Project" "Cargo-Deps" "⚖️ Previewed" "-" "0"
+      else
+        if cargo update >/dev/null 2>&1; then
+          log_summary "Project" "Cargo-Deps" "✅ Updated" "$(get_version cargo)" "$(($(date +%s) - _T0))"
+        else
+          log_summary "Project" "Cargo-Deps" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+        fi
+      fi
     else
-      cargo update >/dev/null 2>&1 || true
-      log_summary "Project" "Cargo-Deps" "✅ Updated" "$(get_version cargo)" "$(($(date +%s) - _T0))"
+      log_warn "Cargo.toml found but cargo command is missing. Skipping."
+      log_summary "Project" "Cargo-Deps" "⚠️ Missing" "-" "0"
     fi
   fi
 }
