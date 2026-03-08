@@ -16,3 +16,4 @@ __pycache__
 .specify
 .ansible-lint
 .ansible
+pnpm-lock.yaml
