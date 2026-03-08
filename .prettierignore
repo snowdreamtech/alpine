@@ -1,9 +1,10 @@
 # =============================================================================
 # .prettierignore for Snowdream Tech AI IDE Template
-# Best practices: Ignore machine-generated, binary, and AI-specific files.
+# Standards: https://prettier.io/docs/en/ignore.html
 # =============================================================================
 
-# ── AI IDE & Agents (Hidden Configs) ─────────────────────────────────────────
+# ── 1. AI IDE & Agent Ecosystems ─────────────────────────────────────────────
+# Prevents Prettier from interfering with AI-managed metadata and logs.
 .agents/
 .agent/
 .roo/
@@ -12,7 +13,9 @@
 .amazonq/
 .augment/
 .cursor/
+.cursorrules
 .windsurf/
+.traerules
 .pearai/
 .trae/
 .zed/
@@ -35,13 +38,14 @@
 .void/
 .zencoder
 
-# ── Git & Version Control ────────────────────────────────────────────────────
+# ── 2. Git & Tooling Meta-files ───────────────────────────────────────────────
 .git/
 .github/agents/
 .gitignore
 .gitattributes
+.gitconfig
 
-# ── Dependencies & Runtimes ──────────────────────────────────────────────────
+# ── 3. Dependencies & Runtimes ────────────────────────────────────────────────
 node_modules/
 .venv/
 venv/
@@ -49,7 +53,7 @@ env/
 vendor/
 __pycache__/
 
-# ── Lockfiles (Should not be formatted by Prettier) ───────────────────────────
+# ── 4. Lockfiles (Preserve machine formatting) ────────────────────────────────
 **/pnpm-lock.yaml
 pnpm-lock.yaml
 **/yarn.lock
@@ -65,7 +69,7 @@ composer.lock
 **/Gemfile.lock
 Gemfile.lock
 
-# ── Build & Output ───────────────────────────────────────────────────────────
+# ── 5. Build, Output & Temporary Artifacts ────────────────────────────────────
 dist/
 build/
 out/
@@ -77,18 +81,67 @@ target/
 .svelte-kit/
 docs/.vitepress/dist
 docs/.vitepress/cache
+.nyc_output/
+.coverage/
+coverage/
+junit.xml
+test-results/
 
-# ── OS & IDE Metadata ────────────────────────────────────────────────────────
+# ── 6. OS & IDE Metadata ──────────────────────────────────────────────────────
 .DS_Store
 Thumbs.db
+Desktop.ini
 .vscode/
 .idea/
+.history/
+*.code-workspace
+.metadata/
 
-# ── Miscellaneous ────────────────────────────────────────────────────────────
+# ── 7. Linter & Formatting Exclusions (Standard Practise) ─────────────────────
+# We avoid formatting "ignore" and "rc" files that tools handle themselves.
+.prettierignore
+.prettierrc
+.eslintignore
+.stylelintignore
+.sqlfluffignore
+.gitleaksignore
+.yamllint.yml
+.markdownlint-cli2.jsonc
+.checkmake.ini
+
+# ── 8. Media, Binary & Asset Files ────────────────────────────────────────────
+# Prettier skips these by default, but explicit exclusion is a best practice.
+**/*.svg
+**/*.ico
+**/*.png
+**/*.jpg
+**/*.jpeg
+**/*.gif
+**/*.webp
+**/*.avif
+**/*.pdf
+**/*.mp4
+**/*.webm
+**/*.mp3
+**/*.wav
+**/*.woff
+**/*.woff2
+**/*.ttf
+**/*.otf
+
+# ── 9. Minified & Machine-Generated Code ──────────────────────────────────────
+**/*.min.js
+**/*.min.css
+**/*.map
+**/*.bundle.js
+
+# ── 10. Miscellaneous ─────────────────────────────────────────────────────────
 .ansible-lint
 .ansible/
 *.log
 *.tmp
 *.temp
 *.bak
-*.origf
+*.orig
+CHANGELOG.md
+LICENSE
