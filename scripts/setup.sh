@@ -125,8 +125,17 @@ get_version() {
   _CMD="$1"
   _ARG="${2:---version}"
   if command -v "$_CMD" >/dev/null 2>&1; then
-    # Improved version extraction: find the first sequence starting with a digit
-    "$_CMD" "$_ARG" 2>&1 | head -n 1 | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
+    # Use centralized project version detector if it is a project file,
+    # otherwise use the generic version extraction.
+    case "$_CMD" in
+    node | python | go | cargo | dotnet | dart | pwsh)
+      "$_CMD" "$_ARG" 2>&1 | head -n 1 | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
+      ;;
+    *)
+      # For other binaries, try to get version from the output
+      "$_CMD" "$_ARG" 2>&1 | head -n 1 | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
+      ;;
+    esac
   else
     echo "-"
   fi
@@ -244,12 +253,12 @@ install_gitleaks() {
       _STAT="❌ Failed"
     fi
   fi
-  if [ "$_STAT" = "✅ Installed" ]; then
-    chmod +x "${_BIN}" 2>/dev/null || true
+  if "${_BIN}" --version >/dev/null 2>&1; then
+    _D=$(($(date +%s) - _T0))
+    log_summary "Lint Tool" "Gitleaks" "$_STAT" "$(get_version "$_BIN")" "$_D"
+  else
+    log_summary "Lint Tool" "Gitleaks" "❌ Failed" "-" "0"
   fi
-  rm -rf "${_TMP}"
-  _D=$(($(date +%s) - _T0))
-  log_summary "Lint Tool" "Gitleaks" "$_STAT" "$(get_version "$_BIN")" "$_D"
 }
 
 install_hadolint() {

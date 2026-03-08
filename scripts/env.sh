@@ -66,7 +66,8 @@ run_setup() {
 
 run_check() {
   if [ ! -f ".env.example" ]; then
-    log_error "Error: .env.example not found."
+    log_error "Error: .env.example not found in the project root."
+    log_info "💡 Ensure you are running this script from the workspace root."
     exit 1
   fi
   if [ ! -f ".env" ]; then
@@ -82,8 +83,8 @@ run_check() {
     \#* | '') continue ;;
     esac
 
-    # Extract key
-    KEY=$(echo "$line" | cut -d'=' -f1)
+    # Extract key (handle both KEY=VAL and KEY = VAL)
+    KEY=$(echo "$line" | cut -d'=' -f1 | sed 's/[[:space:]]*$//')
     if ! grep -q "^$KEY=" ".env" && ! grep -q "^$KEY =" ".env"; then
       log_warn "Missing key: $KEY"
       MISSING=$((MISSING + 1))
@@ -94,17 +95,53 @@ run_check() {
     log_success "All environment keys are present."
   else
     log_error "Validation failed: $MISSING keys missing from .env"
+    log_info "💡 Run 'scripts/env.sh sync' to add missing keys (interactive)."
     exit 1
   fi
+}
+
+run_sync() {
+  if [ ! -f ".env.example" ]; then
+    log_error "Error: .env.example not found."
+    exit 1
+  fi
+  if [ ! -f ".env" ]; then
+    log_info "Initializing .env from .env.example..."
+    cp ".env.example" ".env"
+  fi
+
+  log_info "Syncing missing keys from .env.example to .env..."
+  ADDED=0
+  while IFS= read -r line || [ -n "$line" ]; do
+    case "$line" in
+    \#* | '') continue ;;
+    esac
+
+    KEY=$(echo "$line" | cut -d'=' -f1 | sed 's/[[:space:]]*$//')
+    if ! grep -q "^$KEY=" ".env" && ! grep -q "^$KEY =" ".env"; then
+      if [ "$DRY_RUN" -eq 1 ]; then
+        log_info "DRY-RUN: Would add $KEY to .env"
+      else
+        printf "Missing key found: %b%s%b. Add to .env? (y/N): " "${YELLOW}" "$KEY" "${NC}"
+        read -r CONFIRM
+        case "$CONFIRM" in
+        [yY]*)
+          echo "$line" >>.env
+          log_success "Added $KEY"
+          ADDED=$((ADDED + 1))
+          ;;
+        *) log_info "Skipped $KEY" ;;
+        esac
+      fi
+    fi
+  done <".env.example"
+  log_success "Sync complete. $ADDED keys added."
 }
 
 case "$COMMAND" in
 setup) run_setup ;;
 check) run_check ;;
-sync)
-  log_info "Sync command placeholder. Please manually update .env for now."
-  run_check
-  ;;
+sync) run_sync ;;
 esac
 
 log_success "\n✨ Environment management task complete."
