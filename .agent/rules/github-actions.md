@@ -140,7 +140,6 @@
       - uses: actions/setup-node@cdca7365b2d0f64f794a2daf5be0b89ae6eb40b9 # v4.3.0
         with:
           node-version: ${{ inputs.node-version }}
-          cache: npm
       - run: npm ci
         shell: bash
   ```
@@ -177,22 +176,7 @@
 
 ## 4. Performance & Efficiency
 
-### Dependency Caching
-
-- Use **`actions/cache`** for all dependency managers. A missing cache causes unnecessary full installs on every run:
-
-  ```yaml
-  - uses: actions/cache@5a3ec84eff668545956fd18c39b1ba4a59d65f26 # v4.2.3
-    with:
-      path: |
-        ~/.npm
-        node_modules
-      key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-      restore-keys: |
-        ${{ runner.os }}-node-
-  ```
-
-  Use `hashFiles()` to key the cache on the lockfile — cache busts automatically when dependencies change.
+- **Conditional Caching**: While caching (`actions/cache`) improves performance, it MUST be omitted in general-purpose templates to prevent "dependency file not found" errors. Only implement caching when the project footprint is stable and dependency paths are explicitly known.
 
 ### Parallel Execution
 

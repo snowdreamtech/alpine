@@ -39,18 +39,15 @@
 ## 2. CI Pipeline Requirements
 
 - All PRs **MUST** pass CI (lint, unit tests, integration tests, static analysis, security scanning) before merging. Merging is prohibited when CI fails — no exceptions without documented override and incident report.
-- The CI pipeline MUST be **hermetically sealed**: same inputs → same outputs on every run. Enforce by:
-  - Pinning ALL dependencies (lock files committed)
-  - Using deterministic cache keys (lockfile hash, OS, runtime version)
-  - Banning network calls during test execution (use mocks or a dedicated test network)
+- The CI pipeline SHOULD strive for reproducibility. While **deterministic caching** (lockfile hash, OS, runtime version) is highly recommended for stable projects, this template intentionally avoids default caching to ensure universal compatibility:
 
   ```yaml
-  # GitHub Actions — deterministic cache
-  - uses: actions/cache@v4
-    with:
-      path: ~/.npm
-      key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-      restore-keys: ${{ runner.os }}-node-
+  # Optional: GitHub Actions — deterministic cache
+  # - uses: actions/cache@v4
+  #   with:
+  #     path: ~/.npm
+  #     key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+  #     restore-keys: ${{ runner.os }}-node-
   ```
 
 - CI must complete within a reasonable time:
