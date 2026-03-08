@@ -138,10 +138,18 @@ setup_node() {
     log_summary "Runtime" "Node.js" "✅ Installed" "$_V" "$_D"
 
     # Detect Frameworks from package.json
-    grep -q '"vitepress"' package.json && log_summary "Framework" "VitePress" "✅ Detected" "$(get_version pnpm "exec vitepress --version")" "0"
-    grep -q '"vue"' package.json && log_summary "Framework" "Vue" "✅ Detected" "-" "0"
-    grep -q '"react"' package.json && log_summary "Framework" "React" "✅ Detected" "-" "0"
-    grep -q '"tailwindcss"' package.json && log_summary "Framework" "Tailwind" "✅ Detected" "-" "0"
+    if grep -q '"vitepress"' package.json; then
+      log_summary "Framework" "VitePress" "✅ Detected" "$(get_version pnpm "exec vitepress --version")" "0"
+    fi
+    if grep -q '"vue"' package.json; then
+      log_summary "Framework" "Vue" "✅ Detected" "-" "0"
+    fi
+    if grep -q '"react"' package.json; then
+      log_summary "Framework" "React" "✅ Detected" "-" "0"
+    fi
+    if grep -q '"tailwindcss"' package.json; then
+      log_summary "Framework" "Tailwind" "✅ Detected" "-" "0"
+    fi
   else
     log_summary "Runtime" "Node.js" "⏭️ Skipped" "-" "0"
   fi
@@ -582,8 +590,12 @@ log_summary "Environment" "System" "✅ Active" "${OS}/${ARCH}" "0"
 log_summary "Environment" "Shell" "✅ Active" "$(basename "$SHELL")" "0"
 
 # Detect Go/Rust even if not explicitly setup
-command -v go >/dev/null 2>&1 && log_summary "Runtime" "Go" "✅ Detected" "$(get_version go)" "0"
-command -v cargo >/dev/null 2>&1 && log_summary "Runtime" "Rust" "✅ Detected" "$(get_version cargo)" "0"
+if command -v go >/dev/null 2>&1; then
+  log_summary "Runtime" "Go" "✅ Detected" "$(get_version go)" "0"
+fi
+if command -v cargo >/dev/null 2>&1; then
+  log_summary "Runtime" "Rust" "✅ Detected" "$(get_version cargo)" "0"
+fi
 
 printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR" >>"$TMP_SUMMARY"
 
