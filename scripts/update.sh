@@ -138,6 +138,33 @@ update_pre_commit() {
   fi
 }
 
+update_go_mod() {
+  _T0=$(date +%s)
+  if [ -f "go.mod" ]; then
+    log_info "Updating Go workspace (go get -u)..."
+    if [ "$DRY_RUN" -eq 1 ]; then
+      log_summary "Project" "Go-Mod" "⚖️ Previewed" "-" "0"
+    else
+      go get -u ./... >/dev/null 2>&1 || true
+      go mod tidy >/dev/null 2>&1 || true
+      log_summary "Project" "Go-Mod" "✅ Updated" "$(get_version go)" "$(($(date +%s) - _T0))"
+    fi
+  fi
+}
+
+update_cargo_deps() {
+  _T0=$(date +%s)
+  if [ -f "Cargo.toml" ]; then
+    log_info "Updating Rust dependencies (cargo update)..."
+    if [ "$DRY_RUN" -eq 1 ]; then
+      log_summary "Project" "Cargo-Deps" "⚖️ Previewed" "-" "0"
+    else
+      cargo update >/dev/null 2>&1 || true
+      log_summary "Project" "Cargo-Deps" "✅ Updated" "$(get_version cargo)" "$(($(date +%s) - _T0))"
+    fi
+  fi
+}
+
 # ── Main Execution ───────────────────────────────────────────────────────────
 
 _START_TIME=$(date +%s)
@@ -159,6 +186,8 @@ update_homebrew
 update_pnpm_global
 update_pnpm_project
 update_python_venv
+update_go_mod
+update_cargo_deps
 update_ruby_gems
 update_pre_commit
 

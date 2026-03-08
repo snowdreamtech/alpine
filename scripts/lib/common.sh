@@ -224,7 +224,7 @@ log_summary() {
   ✅*)
     if [ "$_VER" = "-" ] || [ -z "$_VER" ]; then
       case "$_MOD" in
-      System | Shell | React | Vue | Tailwind | VitePress | Vite | pnpm-deps | Python-Venv | Homebrew | Hooks) ;; # These don't always have a single version command
+      System | Shell | React | Vue | Tailwind | VitePress | Vite | pnpm-deps | Python-Venv | Homebrew | Hooks | Go-Mod | Cargo-Deps | Ruby-Gems) ;; # These don't always have a single version command
       *) _STAT="⚠️ Warning" ;;
       esac
     fi
