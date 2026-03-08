@@ -317,11 +317,20 @@ install_iac_lint() {
   fi
   # Kube-Linter
   if [ ! -x "${VENV}/bin/kube-linter${_EXE}" ]; then
-    _SUFFIX="linux"
-    [ "${OS}" = "darwin" ] && _SUFFIX="darwin"
-    [ "${_OS_TAG}" = "windows" ] && _SUFFIX="windows.exe"
+    _K_OS="linux"
+    [ "${OS}" = "darwin" ] && _K_OS="darwin"
+    [ "${_OS_TAG}" = "windows" ] && _K_OS="windows"
 
-    _URL="${GITHUB_PROXY}https://github.com/stackrox/kube-linter/releases/download/${KUBE_LINTER_VERSION}/kube-linter-$_SUFFIX"
+    _K_SUFFIX=""
+    if [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; then
+      _K_SUFFIX="_arm64"
+    fi
+
+    # v0.8.1 uses kube-linter-{os}{_arch}{.exe}
+    _FILE="kube-linter-${_K_OS}${_K_SUFFIX}"
+    [ "${_OS_TAG}" = "windows" ] && _FILE="${_FILE}.exe"
+
+    _URL="${GITHUB_PROXY}https://github.com/stackrox/kube-linter/releases/download/${KUBE_LINTER_VERSION}/${_FILE}"
     if download_url "${_URL}" "${VENV}/bin/kube-linter${_EXE}" "kube-linter"; then
       chmod +x "${VENV}/bin/kube-linter${_EXE}"
       log_summary "Kube-Linter" "✅ Installed"
