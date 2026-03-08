@@ -41,10 +41,13 @@ TFLINT_VERSION="${TFLINT_VERSION:-v0.61.0}"
 KUBE_LINTER_VERSION="${KUBE_LINTER_VERSION:-v0.8.1}"
 JAVA_FORMAT_VERSION="${JAVA_FORMAT_VERSION:-1.34.1}"
 PHP_CS_FIXER_VERSION="${PHP_CS_FIXER_VERSION:-v3.94.2}"
+OSV_SCANNER_VERSION="${OSV_SCANNER_VERSION:-v1.9.2}"
+TRIVY_VERSION="${TRIVY_VERSION:-v0.69.3}"
 
 # Export versions for sub-shells
 export GITLEAKS_VERSION HADOLINT_VERSION GOLANGCI_VERSION CHECKMAKE_VERSION
 export TFLINT_VERSION KUBE_LINTER_VERSION JAVA_FORMAT_VERSION PHP_CS_FIXER_VERSION
+export OSV_SCANNER_VERSION TRIVY_VERSION
 
 # Logging functions
 log_info() {
@@ -162,7 +165,12 @@ get_project_version() {
   elif [ -f "$VERSION_FILE" ]; then
     cat "$VERSION_FILE" | head -n 1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
   else
-    echo "0.0.0"
+    # Fallback to git tag if available
+    if command -v git >/dev/null 2>&1 && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
+      git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0"
+    else
+      echo "0.0.0"
+    fi
   fi
 }
 
@@ -243,6 +251,10 @@ get_version() {
     case "$_CMD" in
     node | python | go | cargo | dotnet | dart | pwsh)
       "$_CMD" "$_ARG" 2>&1 | head -n 1 | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
+      ;;
+    pip-audit)
+      # pip-audit version output: "pip-audit 2.8.0" or with warnings
+      "$_CMD" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
       ;;
     *)
       # For other binaries, try to get version from the output

@@ -47,6 +47,7 @@ Modules (default: all):
   dart               Check Dart SDK
   swift              Install Swift linters (macOS)
   dotnet             Check .NET SDK
+  security           Install security audit tools (osv-scanner, trivy, etc.)
   hooks              Activate Pre-commit Hooks
   all                Run all of the above
 
@@ -519,6 +520,112 @@ setup_dotnet() {
   fi
 }
 
+install_osv_scanner() {
+  _T0=$(date +%s)
+  _BIN="${VENV}/bin/osv-scanner${_EXE}"
+  if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
+    log_summary "Security Tool" "OSV-Scanner" "✅ Exists" "$(get_version "$_BIN")" "0"
+    return 0
+  fi
+
+  log_info "── Installing osv-scanner ──"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_summary "Security Tool" "OSV-Scanner" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  _O_OS="${_OS_TAG}"
+  _O_ARCH="amd64"
+  [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _O_ARCH="arm64"
+  # osv-scanner asset naming: osv-scanner_{os}_{arch}[.exe] (no version in filename)
+  _FILE="osv-scanner_${_O_OS}_${_O_ARCH}${_EXE}"
+  _URL="${GITHUB_PROXY}https://github.com/google/osv-scanner/releases/download/${OSV_SCANNER_VERSION}/${_FILE}"
+
+  _STAT="✅ Installed"
+  if download_url "${_URL}" "${_BIN}" "osv-scanner"; then
+    chmod +x "${_BIN}" 2>/dev/null || true
+  else
+    _STAT="❌ Failed"
+  fi
+  _D=$(($(date +%s) - _T0))
+  log_summary "Security Tool" "OSV-Scanner" "$_STAT" "$(get_version "$_BIN")" "$_D"
+}
+
+install_trivy() {
+  _T0=$(date +%s)
+  _BIN="${VENV}/bin/trivy${_EXE}"
+  if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
+    log_summary "Security Tool" "Trivy" "✅ Exists" "$(get_version "$_BIN")" "0"
+    return 0
+  fi
+
+  log_info "── Installing trivy ──"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_summary "Security Tool" "Trivy" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  _T_OS="Linux"
+  [ "${OS}" = "darwin" ] && _T_OS="macOS"
+  # trivy arch naming: ARM64 for arm64, 64bit for amd64
+  _T_ARCH="64bit"
+  { [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; } && _T_ARCH="ARM64"
+
+  if [ "${_OS_TAG}" = "windows" ]; then
+    _TAR="trivy_${TRIVY_VERSION#v}_windows-64bit.zip"
+  else
+    _TAR="trivy_${TRIVY_VERSION#v}_${_T_OS}-${_T_ARCH}.tar.gz"
+  fi
+
+  _URL="${GITHUB_PROXY}https://github.com/aquasecurity/trivy/releases/download/${TRIVY_VERSION}/${_TAR}"
+  _TMP=$(mktemp -d)
+  _STAT="✅ Installed"
+
+  if download_url "${_URL}" "${_TMP}/trivy_pkg" "trivy"; then
+    if [ "${_OS_TAG}" = "windows" ]; then
+      unzip -q "${_TMP}/trivy_pkg" -d "${_TMP}" || _STAT="❌ Failed"
+      mv "${_TMP}/trivy.exe" "${_BIN}" 2>/dev/null || _STAT="❌ Failed"
+    else
+      tar -xzf "${_TMP}/trivy_pkg" -C "${_TMP}" trivy || _STAT="❌ Failed"
+      mv "${_TMP}/trivy" "${_BIN}" 2>/dev/null || _STAT="❌ Failed"
+    fi
+    chmod +x "${_BIN}" 2>/dev/null || true
+  else
+    _STAT="❌ Failed"
+  fi
+  rm -rf "${_TMP}"
+  _D=$(($(date +%s) - _T0))
+  log_summary "Security Tool" "Trivy" "$_STAT" "$(get_version "$_BIN")" "$_D"
+}
+
+setup_security() {
+  log_info "── Setting up Security Audit Tools ──"
+  install_osv_scanner
+  install_trivy
+
+  # Install govulncheck if go exists
+  if command -v go >/dev/null 2>&1; then
+    _T0=$(date +%s)
+    log_info "Installing govulncheck..."
+    if go install golang.org/x/vuln/cmd/govulncheck@latest >/dev/null 2>&1; then
+      log_summary "Security Tool" "Govulncheck" "✅ Installed" "$(get_version govulncheck)" "$(($(date +%s) - _T0))"
+    else
+      log_summary "Security Tool" "Govulncheck" "❌ Failed" "-" "0"
+    fi
+  fi
+
+  # Install cargo-audit if cargo exists
+  if command -v cargo >/dev/null 2>&1; then
+    _T0=$(date +%s)
+    log_info "Installing cargo-audit..."
+    if cargo install cargo-audit >/dev/null 2>&1; then
+      log_summary "Security Tool" "Cargo-Audit" "✅ Installed" "$(get_version cargo-audit)" "$(($(date +%s) - _T0))"
+    else
+      log_summary "Security Tool" "Cargo-Audit" "❌ Failed" "-" "0"
+    fi
+  fi
+}
+
 # ── Main Execution ───────────────────────────────────────────────────────────
 
 # Argument parsing for flags
@@ -600,7 +707,7 @@ fi
 
 # ── Module Selection ──
 if [ -z "$(echo "${RAW_ARGS}" | tr -d ' ')" ] || [ "${RAW_ARGS# *}" = "all" ]; then
-  modules="node python gitleaks hadolint go checkmake iac powershell java ruby php dart swift dotnet hooks"
+  modules="node python gitleaks hadolint go checkmake iac powershell java ruby php dart swift dotnet security hooks"
 else
   modules="${RAW_ARGS}"
 fi
@@ -621,6 +728,7 @@ for module in $modules; do
   dart) setup_dart ;;
   swift) setup_swift ;;
   dotnet) setup_dotnet ;;
+  security) setup_security ;;
   hooks) setup_hooks ;;
   *) error "Unknown module: $module" ;;
   esac
