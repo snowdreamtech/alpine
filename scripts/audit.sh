@@ -63,7 +63,20 @@ if command -v gitleaks >/dev/null 2>&1; then
 fi
 
 # 4. Dependency Audits
-run_npm_script "audit"
+if [ -f "$PACKAGE_JSON" ]; then
+  _T0=$(date +%s)
+  log_info "── Auditing Node.js dependencies ($NPM audit) ──"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_success "DRY-RUN: Would run $NPM audit"
+    log_summary "Node.js" "pnpm-audit" "⚖️ Previewed" "-" "0"
+  else
+    if "$NPM" audit >/dev/null 2>&1; then
+      log_summary "Node.js" "pnpm-audit" "✅ Secure" "$(get_version "$NPM")" "$(($(date +%s) - _T0))"
+    else
+      log_summary "Node.js" "pnpm-audit" "❌ Vulnerable" "$(get_version "$NPM")" "$(($(date +%s) - _T0))"
+    fi
+  fi
+fi
 
 if [ -f "$REQUIREMENTS_TXT" ] || [ -f "requirements.txt" ] || [ -f "$PYPROJECT_TOML" ]; then
   _T0=$(date +%s)
