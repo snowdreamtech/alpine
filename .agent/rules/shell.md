@@ -309,7 +309,7 @@ set -eu
 ```powershell
 # PowerShell wrapper — delegates to script.sh
 . "$PSScriptRoot/lib/common.ps1"
-Delegate-To-Shell "script.sh" ($args -join " ")
+Invoke-ShellDelegation "script.sh" ($args -join " ")
 ```
 
 ### Template: `script.bat` (CMD Wrapper)

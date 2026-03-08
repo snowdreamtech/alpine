@@ -36,7 +36,7 @@
   - Detect OS at runtime: `process.platform`, `sys.platform`, `runtime.GOOS`.
 - **Cross-Platform Shell Delegation Pattern (MANDATORY)**: When shell scripts are required, provide **three** script variants following a strict delegation chain to ensure a Single Source of Truth (SSoT):
   1. **`script.sh`** — POSIX-compliant shell script containing **all primary logic**.
-  2. **`script.ps1`** — PowerShell wrapper that detects `sh` and delegates: `Delegate-To-Shell "script.sh" ($args -join " ")`.
+  2. **`script.ps1`** — PowerShell wrapper that detects `sh` and delegates: `Invoke-ShellDelegation "script.sh" ($args -join " ")`.
   3. **`script.bat`** — CMD wrapper that delegates to PowerShell: `powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0script.ps1" %*`.
 
   Wrappers MUST NOT duplicate logic. Their only purpose is to bridge the platform gap into the `.sh` script.

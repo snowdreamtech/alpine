@@ -1,6 +1,6 @@
 # scripts/lib/common.ps1 - Shared logic for PowerShell wrappers.
 
-function Delegate-To-Shell {
+function Invoke-ShellDelegation {
     param(
         [string]$ScriptName,
         [string]$Arguments

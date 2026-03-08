@@ -2,4 +2,4 @@
 # Ensures that the POSIX shell script remains the single source of truth (SSoT).
 
 . "$PSScriptRoot/lib/common.ps1"
-Delegate-To-Shell "setup.sh" ($args -join " ")
+Invoke-ShellDelegation "setup.sh" ($args -join " ")
