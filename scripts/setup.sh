@@ -327,8 +327,12 @@ install_iac_lint() {
     fi
 
     # v0.8.1 uses kube-linter-{os}{_arch}{.exe}
-    _FILE="kube-linter-${_K_OS}${_K_SUFFIX}"
-    [ "${_OS_TAG}" = "windows" ] && _FILE="${_FILE}.exe"
+    # BUT Windows assets are kube-linter.exe and kube-linter_arm64.exe (no 'windows' prefix)
+    if [ "${_OS_TAG}" = "windows" ]; then
+      _FILE="kube-linter${_K_SUFFIX}.exe"
+    else
+      _FILE="kube-linter-${_K_OS}${_K_SUFFIX}"
+    fi
 
     _URL="${GITHUB_PROXY}https://github.com/stackrox/kube-linter/releases/download/${KUBE_LINTER_VERSION}/${_FILE}"
     if download_url "${_URL}" "${VENV}/bin/kube-linter${_EXE}" "kube-linter"; then
@@ -336,7 +340,7 @@ install_iac_lint() {
       log_summary "Kube-Linter" "✅ Installed"
     else
       log_summary "Kube-Linter" "❌ Failed"
-      error "Failed to download kube-linter."
+      error "Failed to download kube-linter from ${_URL}"
     fi
   else
     log_summary "Kube-Linter" "✅ Already exists"
