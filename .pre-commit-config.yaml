@@ -67,7 +67,7 @@ repos:
       - id: gitleaks
         name: gitleaks
         language: system
-        entry: .venv/bin/gitleaks protect --verbose --redact --staged --config .gitleaks.toml
+        entry: sh scripts/lib/lint-wrapper.sh gitleaks protect --verbose --redact --staged --config .gitleaks.toml
         always_run: true
         pass_filenames: false
 
@@ -88,7 +88,7 @@ repos:
       - id: shfmt
         name: shfmt
         language: system
-        entry: .venv/bin/shfmt
+        entry: sh scripts/lib/lint-wrapper.sh shfmt
         args: [-w, -s, -i, "2"]
         types: [shell]
 
@@ -101,7 +101,7 @@ repos:
       - id: ruff-format
         name: ruff format
         language: system
-        entry: .venv/bin/ruff format
+        entry: sh scripts/lib/lint-wrapper.sh ruff format
         types_or: [python, pyi]
 
       - id: clang-format
@@ -137,13 +137,13 @@ repos:
       - id: ruff
         name: ruff check
         language: system
-        entry: .venv/bin/ruff check --fix
+        entry: sh scripts/lib/lint-wrapper.sh ruff check --fix
         types_or: [python, pyi]
 
       - id: yamllint
         name: yamllint
         language: system
-        entry: .venv/bin/yamllint
+        entry: sh scripts/lib/lint-wrapper.sh yamllint
         args: [--config-file, .yamllint.yml]
         types: [yaml]
 
@@ -157,7 +157,7 @@ repos:
       - id: shellcheck
         name: shellcheck
         language: system
-        entry: .venv/bin/shellcheck
+        entry: sh scripts/lib/lint-wrapper.sh shellcheck
         types: [shell]
 
       - id: dockerfile-utils
@@ -170,7 +170,7 @@ repos:
       - id: actionlint
         name: actionlint
         language: system
-        entry: .venv/bin/actionlint
+        entry: sh scripts/lib/lint-wrapper.sh actionlint
         files: ^\.github/workflows/.*\.yml$
         description: "Linter for GitHub Actions workflow files."
 
@@ -178,7 +178,7 @@ repos:
       - id: checkmake
         name: checkmake
         language: system
-        entry: .venv/bin/checkmake --config .checkmake.ini
+        entry: sh scripts/lib/lint-wrapper.sh checkmake --config .checkmake.ini
         files: ^Makefile$
         description: "Linter for Makefiles. Requires checkmake installed locally."
 
@@ -186,7 +186,7 @@ repos:
       - id: sqlfluff
         name: sqlfluff lint
         language: system
-        entry: .venv/bin/sqlfluff lint
+        entry: sh scripts/lib/lint-wrapper.sh sqlfluff lint
         args: [--dialect, postgres]
         types_or: [sql]
         description: "SQL linter. Installed via requirements-dev.txt."
@@ -210,7 +210,7 @@ repos:
       - id: google-java-format
         name: google-java-format
         language: system
-        entry: google-java-format --set-exit-if-changed --dry-run
+        entry: sh scripts/lib/lint-wrapper.sh google-java-format --set-exit-if-changed --dry-run
         types: [java]
         description: "Java formatter (dry-run check). Requires google-java-format installed locally."
 
@@ -218,7 +218,7 @@ repos:
       - id: rubocop
         name: rubocop
         language: system
-        entry: rubocop
+        entry: sh scripts/lib/lint-wrapper.sh rubocop
         types: [ruby]
         description: "Ruby linter and formatter. Requires rubocop gem installed."
 
@@ -226,7 +226,7 @@ repos:
       - id: php-cs-fixer
         name: php-cs-fixer
         language: system
-        entry: php-cs-fixer fix --dry-run
+        entry: sh scripts/lib/lint-wrapper.sh php-cs-fixer fix --dry-run
         types: [php]
         description: "PHP code style checker (dry-run). Requires php-cs-fixer installed."
 
@@ -293,7 +293,7 @@ repos:
 
       - id: dotenv-linter
         name: dotenv-linter
-        entry: .venv/bin/dotenv-linter
+        entry: sh scripts/lib/lint-wrapper.sh dotenv-linter
         language: system
         files: '(\.env|\.env\.example|\.env\.sample)$'
         pass_filenames: true

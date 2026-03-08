@@ -215,8 +215,10 @@ install_gitleaks() {
     _URL="${GITHUB_PROXY}https://github.com/gitleaks/gitleaks/releases/download/${GITLEAKS_VERSION}/${_TAR}"
 
     if download_url "${_URL}" "${_TMP}/gitleaks.zip" "gitleaks"; then
-      unzip -q "${_TMP}/gitleaks.zip" -d "${_TMP}"
-      mv "${_TMP}/gitleaks.exe" "${_BIN}"
+      unzip -q "${_TMP}/gitleaks.zip" -d "${_TMP}" || _STAT="❌ Failed"
+      if [ "$_STAT" = "✅ Installed" ]; then
+        mv "${_TMP}/gitleaks.exe" "${_BIN}" || _STAT="❌ Failed"
+      fi
     else
       _STAT="❌ Failed"
     fi
@@ -224,13 +226,17 @@ install_gitleaks() {
     _TAR="gitleaks_${GITLEAKS_VERSION#v}_${_TAR_TAG}_${_ARCH_N}.tar.gz"
     _URL="${GITHUB_PROXY}https://github.com/gitleaks/gitleaks/releases/download/${GITLEAKS_VERSION}/${_TAR}"
     if download_url "${_URL}" "${_TMP}/gitleaks.tar.gz" "gitleaks"; then
-      tar -xzf "${_TMP}/gitleaks.tar.gz" -C "${_TMP}" gitleaks
-      mv "${_TMP}/gitleaks" "${_BIN}"
+      tar -xzf "${_TMP}/gitleaks.tar.gz" -C "${_TMP}" gitleaks || _STAT="❌ Failed"
+      if [ "$_STAT" = "✅ Installed" ]; then
+        mv "${_TMP}/gitleaks" "${_BIN}" || _STAT="❌ Failed"
+      fi
     else
       _STAT="❌ Failed"
     fi
   fi
-  chmod +x "${_BIN}" 2>/dev/null
+  if [ "$_STAT" = "✅ Installed" ]; then
+    chmod +x "${_BIN}" 2>/dev/null || true
+  fi
   rm -rf "${_TMP}"
   _D=$(($(date +%s) - _T0))
   log_summary "Lint Tool" "Gitleaks" "$_STAT" "$(get_version "$_BIN")" "$_D"
@@ -315,7 +321,7 @@ install_checkmake() {
 
   _STAT="✅ Installed"
   if download_url "${_URL}" "${_BIN}" "checkmake"; then
-    chmod +x "${_BIN}"
+    chmod +x "${_BIN}" 2>/dev/null || true
   else
     _STAT="❌ Failed"
   fi
@@ -341,10 +347,14 @@ install_iac_lint() {
     _URL="${GITHUB_PROXY}https://github.com/terraform-linters/tflint/releases/download/${TFLINT_VERSION}/${_TAR}"
     _TMP=$(mktemp -d)
     if download_url "${_URL}" "${_TMP}/tflint.zip" "tflint"; then
-      unzip -q "${_TMP}/tflint.zip" -d "${_TMP}"
-      mv "${_TMP}/tflint${_EXE}" "${VENV}/bin/tflint${_EXE}"
-      chmod +x "${VENV}/bin/tflint${_EXE}"
-      log_summary "Lint Tool" "TFLint" "✅ Installed" "$(get_version "${VENV}/bin/tflint${_EXE}")" "$(($(date +%s) - _T0))"
+      unzip -q "${_TMP}/tflint.zip" -d "${_TMP}" || _T_STAT="failed"
+      if [ "$_T_STAT" != "failed" ]; then
+        mv "${_TMP}/tflint${_EXE}" "${VENV}/bin/tflint${_EXE}" || _T_STAT="failed"
+        chmod +x "${VENV}/bin/tflint${_EXE}" 2>/dev/null || true
+        log_summary "Lint Tool" "TFLint" "✅ Installed" "$(get_version "${VENV}/bin/tflint${_EXE}")" "$(($(date +%s) - _T0))"
+      else
+        log_summary "Lint Tool" "TFLint" "❌ Failed" "-" "0"
+      fi
     else
       log_summary "Lint Tool" "TFLint" "❌ Failed" "-" "0"
     fi
@@ -366,7 +376,7 @@ install_iac_lint() {
     fi
     _URL="${GITHUB_PROXY}https://github.com/stackrox/kube-linter/releases/download/${KUBE_LINTER_VERSION}/${_FILE}"
     if download_url "${_URL}" "${VENV}/bin/kube-linter${_EXE}" "kube-linter"; then
-      chmod +x "${VENV}/bin/kube-linter${_EXE}"
+      chmod +x "${VENV}/bin/kube-linter${_EXE}" 2>/dev/null || true
       log_summary "Lint Tool" "Kube-Linter" "✅ Installed" "$(get_version "${VENV}/bin/kube-linter${_EXE}" "version")" "$(($(date +%s) - _T0))"
     else
       log_summary "Lint Tool" "Kube-Linter" "❌ Failed" "-" "0"
@@ -431,8 +441,8 @@ install_java_lint() {
   _URL="${GITHUB_PROXY}https://github.com/google/google-java-format/releases/download/v${JAVA_FORMAT_VERSION}/google-java-format-${JAVA_FORMAT_VERSION}-all-deps.jar"
   _STAT="✅ Installed"
   if download_url "${_URL}" "${_JAR}" "google-java-format"; then
-    printf "#!/bin/sh\njava -jar \"%s\" \"\$@\"\n" "${_JAR}" >"${_BIN}"
-    chmod +x "${_BIN}"
+    printf "#!/bin/sh\njava -jar \"%s\" \"\$@\"\n" "${_JAR}" >"${_BIN}" || _STAT="❌ Failed"
+    chmod +x "${_BIN}" 2>/dev/null || true
   else
     _STAT="❌ Failed"
   fi
@@ -475,7 +485,7 @@ install_php_lint() {
   _URL="${GITHUB_PROXY}https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/releases/download/${PHP_CS_FIXER_VERSION}/php-cs-fixer.phar"
   _STAT="✅ Installed"
   if download_url "${_URL}" "${_BIN}" "php-cs-fixer"; then
-    chmod +x "${_BIN}"
+    chmod +x "${_BIN}" 2>/dev/null || true
   else
     _STAT="❌ Failed"
   fi
