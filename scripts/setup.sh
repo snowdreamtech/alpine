@@ -295,35 +295,22 @@ install_iac_lint() {
 
   # TFLint
   if [ ! -x "${VENV}/bin/tflint${_EXE}" ]; then
-    _URL="${GITHUB_PROXY}https://raw.githubusercontent.com/terraform-linters/tflint/master/install_linux.sh"
-    if [ "${OS}" = "darwin" ] || [ "${_OS_TAG}" = "windows" ]; then
-      _TAR_OS="${_OS_TAG}"
-      _TAR_ARCH="amd64"
-      [ "${_ARCH_N}" = "arm64" ] && _TAR_ARCH="arm64"
+    _TAR_OS="${_OS_TAG}"
+    _TAR_ARCH="amd64"
+    [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _TAR_ARCH="arm64"
 
-      _TAR="tflint_${_TAR_OS}_${_TAR_ARCH}.zip"
-      _URL="${GITHUB_PROXY}https://github.com/terraform-linters/tflint/releases/download/${TFLINT_VERSION}/${_TAR}"
-      _TMP=$(mktemp -d)
-      if download_url "${_URL}" "${_TMP}/tflint.zip" "tflint"; then
-        unzip -q "${_TMP}/tflint.zip" -d "${_TMP}"
-        mv "${_TMP}/tflint${_EXE}" "${VENV}/bin/tflint${_EXE}"
-        chmod +x "${VENV}/bin/tflint${_EXE}"
-        rm -rf "${_TMP}"
-        log_summary "TFLint" "✅ Installed"
-      else
-        log_summary "TFLint" "❌ Failed"
-        error "Failed to download tflint."
-      fi
+    _TAR="tflint_${_TAR_OS}_${_TAR_ARCH}.zip"
+    _URL="${GITHUB_PROXY}https://github.com/terraform-linters/tflint/releases/download/${TFLINT_VERSION}/${_TAR}"
+    _TMP=$(mktemp -d)
+    if download_url "${_URL}" "${_TMP}/tflint.zip" "tflint"; then
+      unzip -q "${_TMP}/tflint.zip" -d "${_TMP}"
+      mv "${_TMP}/tflint${_EXE}" "${VENV}/bin/tflint${_EXE}"
+      chmod +x "${VENV}/bin/tflint${_EXE}"
+      rm -rf "${_TMP}"
+      log_summary "TFLint" "✅ Installed"
     else
-      _TMP=$(mktemp -d)
-      if download_url "${_URL}" "${_TMP}/install_tflint.sh" "tflint-installer"; then
-        TFLINT_INSTALL_PATH="${VENV}/bin" sh "${_TMP}/install_tflint.sh"
-        rm -rf "${_TMP}"
-        log_summary "TFLint" "✅ Installed"
-      else
-        log_summary "TFLint" "❌ Failed"
-        error "Failed to download tflint installer."
-      fi
+      log_summary "TFLint" "❌ Failed"
+      error "Failed to download tflint."
     fi
   else
     log_summary "TFLint" "✅ Already exists"
