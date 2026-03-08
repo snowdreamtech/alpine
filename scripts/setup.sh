@@ -90,206 +90,225 @@ msys* | mingw* | cygwin*)
   ;;
 *) _OS_TAG="linux" ;;
 esac
+# Execution timing and summary
+_START_TIME=$(date +%s)
 TMP_SUMMARY=$(mktemp)
+
+# Privacy-aware path sanitizer
+sanitize_path() {
+  echo "$1" | sed "s|$HOME|~|g"
+}
+
 log_summary() {
-  _MOD="$1"
-  _STAT="$2"
-  printf "| %s | %s |\n" "$_MOD" "$_STAT" >>"$TMP_SUMMARY"
+  _CAT="${1:-Other}"
+  _MOD="${2:-Unknown}"
+  _STAT="${3:-⏭️ Skipped}"
+  _VER="${4:--}"
+  _DUR="${5:--}"
+  printf "| %-12s | %-15s | %-20s | %-15s | %-6s |\n" "$_CAT" "$_MOD" "$_STAT" "$_VER" "${_DUR}s" >>"$TMP_SUMMARY"
+}
+
+# Helper to get version safely
+get_version() {
+  _CMD="$1"
+  _ARG="${2:---version}"
+  if command -v "$_CMD" >/dev/null 2>&1; then
+    "$_CMD" "$_ARG" 2>&1 | head -n 1 | sed 's/[^0-9.]*\([0-9.]*\).*/\1/' | cut -c1-15
+  else
+    echo "-"
+  fi
 }
 
 setup_node() {
+  _T0=$(date +%s)
   log_info "── Setting up Node.js & pnpm ──"
   if [ "$DRY_RUN" -eq 1 ]; then
-    log_info "DRY-RUN: Would enable corepack and pnpm install."
-    log_summary "Node.js" "⚖️ Previewed"
+    log_summary "Runtime" "Node.js" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
   if command -v corepack >/dev/null 2>&1; then
     corepack enable
-  else
-    warn "Warning: corepack not found. Ensure Node.js 16.9+ is installed."
   fi
+
   if [ -f package.json ]; then
     pnpm install
-    info "Node.js dependencies installed."
-    log_summary "Node.js" "✅ Installed"
+    _V=$(get_version node)
+    _D=$(($(date +%s) - _T0))
+    log_summary "Runtime" "Node.js" "✅ Installed" "$_V" "$_D"
+
+    # Detect Frameworks from package.json
+    grep -q '"vitepress"' package.json && log_summary "Framework" "VitePress" "✅ Detected" "$(get_version pnpm "exec vitepress --version")" "0"
+    grep -q '"vue"' package.json && log_summary "Framework" "Vue" "✅ Detected" "-" "0"
+    grep -q '"react"' package.json && log_summary "Framework" "React" "✅ Detected" "-" "0"
+    grep -q '"tailwindcss"' package.json && log_summary "Framework" "Tailwind" "✅ Detected" "-" "0"
   else
-    log_summary "Node.js" "⏭️ Skipped (no package.json)"
+    log_summary "Runtime" "Node.js" "⏭️ Skipped" "-" "0"
   fi
 }
 
 setup_python() {
+  _T0=$(date +%s)
   log_info "── Setting up Python Virtual Environment ──"
   if [ "$DRY_RUN" -eq 1 ]; then
-    log_info "DRY-RUN: Would create $VENV and install requirements."
-    log_summary "Python" "⚖️ Previewed"
+    log_summary "Runtime" "Python" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
   if [ ! -d "$VENV" ]; then
     "$PYTHON" -m venv "$VENV"
   fi
-  "$VENV/bin/pip" install --upgrade pip
+  "$VENV/bin/pip" install --upgrade pip >/dev/null 2>&1
   if [ -f requirements-dev.txt ]; then
-    "$VENV/bin/pip" install -r requirements-dev.txt
-    info "Python dev dependencies installed in ${VENV}."
-    log_summary "Python" "✅ Installed"
+    "$VENV/bin/pip" install -r requirements-dev.txt >/dev/null 2>&1
+    _V=$(get_version "$VENV/bin/python")
+    _D=$(($(date +%s) - _T0))
+    _PATH=$(sanitize_path "$VENV")
+    log_summary "Runtime" "Python" "✅ $(_PATH)" "$_V" "$_D"
   else
-    log_summary "Python" "⏭️ Skipped (no requirements-dev.txt)"
+    log_summary "Runtime" "Python" "⏭️ Skipped" "-" "0"
   fi
 }
 
 install_gitleaks() {
+  _T0=$(date +%s)
   _BIN="${VENV}/bin/gitleaks${_EXE}"
   if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
-    log_summary "Gitleaks" "✅ Already exists"
+    log_summary "Lint Tool" "Gitleaks" "✅ Exists" "$(get_version "$_BIN")" "0"
     return 0
   fi
-  log_info "── Installing gitleaks ${GITLEAKS_VERSION} ──"
+  log_info "── Installing gitleaks ──"
 
   if [ "$DRY_RUN" -eq 1 ]; then
-    log_info "DRY-RUN: Would install gitleaks to $_BIN"
-    log_summary "Gitleaks" "⚖️ Previewed"
+    log_summary "Lint Tool" "Gitleaks" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
   _TAR_TAG="${_OS_TAG}"
-  [ "${_OS_TAG}" = "windows" ] && _TAR_TAG="windows"
   _TMP=$(mktemp -d)
+  _STAT="✅ Installed"
 
   if [ "${_OS_TAG}" = "windows" ]; then
     _ARCH_W="x64"
     [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _ARCH_W="arm64"
-    _TAR="gitleaks_${GITLEAKS_VERSION#v}_${_TAR_TAG}_${_ARCH_W}.zip"
+    _TAR="gitleaks_${GITLEAKS_VERSION#v}_windows_${_ARCH_W}.zip"
     _URL="${GITHUB_PROXY}https://github.com/gitleaks/gitleaks/releases/download/${GITLEAKS_VERSION}/${_TAR}"
 
     if download_url "${_URL}" "${_TMP}/gitleaks.zip" "gitleaks"; then
       unzip -q "${_TMP}/gitleaks.zip" -d "${_TMP}"
       mv "${_TMP}/gitleaks.exe" "${_BIN}"
-      chmod +x "${_BIN}"
-      info "gitleaks installed."
-      log_summary "Gitleaks" "✅ Installed"
     else
-      log_summary "Gitleaks" "❌ Failed"
-      error "Failed to download gitleaks."
+      _STAT="❌ Failed"
     fi
   else
     _TAR="gitleaks_${GITLEAKS_VERSION#v}_${_TAR_TAG}_${_ARCH_N}.tar.gz"
     _URL="${GITHUB_PROXY}https://github.com/gitleaks/gitleaks/releases/download/${GITLEAKS_VERSION}/${_TAR}"
-
     if download_url "${_URL}" "${_TMP}/gitleaks.tar.gz" "gitleaks"; then
       tar -xzf "${_TMP}/gitleaks.tar.gz" -C "${_TMP}" gitleaks
       mv "${_TMP}/gitleaks" "${_BIN}"
-      chmod +x "${_BIN}"
-      info "gitleaks installed."
-      log_summary "Gitleaks" "✅ Installed"
     else
-      log_summary "Gitleaks" "❌ Failed"
-      error "Failed to download gitleaks."
+      _STAT="❌ Failed"
     fi
   fi
+  chmod +x "${_BIN}" 2>/dev/null
   rm -rf "${_TMP}"
+  _D=$(($(date +%s) - _T0))
+  log_summary "Lint Tool" "Gitleaks" "$_STAT" "$(get_version "$_BIN")" "$_D"
 }
 
 install_hadolint() {
+  _T0=$(date +%s)
   _BIN="${VENV}/bin/hadolint${_EXE}"
   if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
-    log_summary "Hadolint" "✅ Already exists"
+    log_summary "Lint Tool" "Hadolint" "✅ Exists" "$(get_version "$_BIN")" "0"
     return 0
   fi
 
-  log_info "── Installing hadolint ${HADOLINT_VERSION} ──"
+  log_info "── Installing hadolint ──"
   if [ "$DRY_RUN" -eq 1 ]; then
-    log_info "DRY-RUN: Would install hadolint to $_BIN"
-    log_summary "Hadolint" "⚖️ Previewed"
+    log_summary "Lint Tool" "Hadolint" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
   _SUFFIX="Linux-x86_64"
-  if [ "${OS}" = "darwin" ]; then
-    _SUFFIX="Darwin-x86_64"
-  elif [ "${_OS_TAG}" = "windows" ]; then
-    _SUFFIX="Windows-x86_64.exe"
-  fi
+  [ "${OS}" = "darwin" ] && _SUFFIX="Darwin-x86_64"
+  [ "${_OS_TAG}" = "windows" ] && _SUFFIX="Windows-x86_64.exe"
 
   _URL="${GITHUB_PROXY}https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-${_SUFFIX}"
+  _STAT="✅ Installed"
   if download_url "${_URL}" "${_BIN}" "hadolint"; then
     chmod +x "${_BIN}"
-    info "hadolint installed."
-    log_summary "Hadolint" "✅ Installed"
   else
-    log_summary "Hadolint" "❌ Failed"
-    error "Failed to download hadolint."
+    _STAT="❌ Failed"
   fi
+  _D=$(($(date +%s) - _T0))
+  log_summary "Lint Tool" "Hadolint" "$_STAT" "$(get_version "$_BIN")" "$_D"
 }
 
 install_go_lint() {
+  _T0=$(date +%s)
   _BIN="${VENV}/bin/golangci-lint"
   if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
-    log_summary "Go Lint" "✅ Already exists"
+    log_summary "Lint Tool" "Go Lint" "✅ Exists" "$(get_version "$_BIN")" "0"
     return 0
   fi
 
-  log_info "── Installing golangci-lint ${GOLANGCI_VERSION} ──"
+  log_info "── Installing golangci-lint ──"
   if [ "$DRY_RUN" -eq 1 ]; then
-    log_info "DRY-RUN: Would install golangci-lint to $_BIN"
-    log_summary "Go Lint" "⚖️ Previewed"
+    log_summary "Lint Tool" "Go Lint" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
   _URL="${GITHUB_PROXY}https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh"
   _TMP=$(mktemp -d)
+  _STAT="✅ Installed"
   if download_url "${_URL}" "${_TMP}/install_go.sh" "golangci-lint-installer"; then
     export BINDIR="${VENV}/bin"
-    sh "${_TMP}/install_go.sh" "${GOLANGCI_VERSION}"
-    rm -rf "${_TMP}"
-    info "golangci-lint installed."
-    log_summary "Go Lint" "✅ Installed"
+    sh "${_TMP}/install_go.sh" "${GOLANGCI_VERSION}" >/dev/null 2>&1
   else
-    log_summary "Go Lint" "❌ Failed"
-    error "Failed to download golangci-lint installer."
+    _STAT="❌ Failed"
   fi
+  rm -rf "${_TMP}"
+  _D=$(($(date +%s) - _T0))
+  log_summary "Lint Tool" "Go Lint" "$_STAT" "$(get_version "$_BIN")" "$_D"
 }
 
 install_checkmake() {
+  _T0=$(date +%s)
   _BIN="${VENV}/bin/checkmake${_EXE}"
   if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
-    log_summary "Checkmake" "✅ Already exists"
+    log_summary "Lint Tool" "Checkmake" "✅ Exists" "$(get_version "$_BIN")" "0"
     return 0
   fi
 
-  log_info "── Installing checkmake ${CHECKMAKE_VERSION} ──"
+  log_info "── Installing checkmake ──"
   if [ "$DRY_RUN" -eq 1 ]; then
-    log_info "DRY-RUN: Would install checkmake to $_BIN"
-    log_summary "Checkmake" "⚖️ Previewed"
+    log_summary "Lint Tool" "Checkmake" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
   _OS_S="${_OS_TAG}"
   _ARCH_S="amd64"
   [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _ARCH_S="arm64"
-
   _FILE="checkmake-${CHECKMAKE_VERSION}.${_OS_S}.${_ARCH_S}${_EXE}"
   _URL="${GITHUB_PROXY}https://github.com/checkmake/checkmake/releases/download/${CHECKMAKE_VERSION}/${_FILE}"
 
+  _STAT="✅ Installed"
   if download_url "${_URL}" "${_BIN}" "checkmake"; then
     chmod +x "${_BIN}"
-    info "checkmake installed."
-    log_summary "Checkmake" "✅ Installed"
   else
-    log_summary "Checkmake" "❌ Failed"
-    error "Failed to download checkmake from ${_URL}"
+    _STAT="❌ Failed"
   fi
+  _D=$(($(date +%s) - _T0))
+  log_summary "Lint Tool" "Checkmake" "$_STAT" "$(get_version "$_BIN")" "$_D"
 }
 
 install_iac_lint() {
-  log_info "── Installing IaC tools (tflint, kube-linter) ──"
-
+  _T0=$(date +%s)
+  log_info "── Installing IaC tools ──"
   if [ "$DRY_RUN" -eq 1 ]; then
-    log_info "DRY-RUN: Would install tflint and kube-linter to ${VENV}/bin"
-    log_summary "TFLint" "⚖️ Previewed"
-    log_summary "Kube-Linter" "⚖️ Previewed"
+    log_summary "Lint Tool" "TFLint" "⚖️ Previewed" "-" "0"
+    log_summary "Lint Tool" "Kube-Linter" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
@@ -298,7 +317,6 @@ install_iac_lint() {
     _TAR_OS="${_OS_TAG}"
     _TAR_ARCH="amd64"
     [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _TAR_ARCH="arm64"
-
     _TAR="tflint_${_TAR_OS}_${_TAR_ARCH}.zip"
     _URL="${GITHUB_PROXY}https://github.com/terraform-linters/tflint/releases/download/${TFLINT_VERSION}/${_TAR}"
     _TMP=$(mktemp -d)
@@ -306,207 +324,182 @@ install_iac_lint() {
       unzip -q "${_TMP}/tflint.zip" -d "${_TMP}"
       mv "${_TMP}/tflint${_EXE}" "${VENV}/bin/tflint${_EXE}"
       chmod +x "${VENV}/bin/tflint${_EXE}"
-      rm -rf "${_TMP}"
-      log_summary "TFLint" "✅ Installed"
+      log_summary "Lint Tool" "TFLint" "✅ Installed" "$(get_version "${VENV}/bin/tflint${_EXE}")" "$(($(date +%s) - _T0))"
     else
-      log_summary "TFLint" "❌ Failed"
-      error "Failed to download tflint."
+      log_summary "Lint Tool" "TFLint" "❌ Failed" "-" "0"
     fi
+    rm -rf "${_TMP}"
   else
-    log_summary "TFLint" "✅ Already exists"
+    log_summary "Lint Tool" "TFLint" "✅ Exists" "$(get_version "${VENV}/bin/tflint${_EXE}")" "0"
   fi
+
   # Kube-Linter
   if [ ! -x "${VENV}/bin/kube-linter${_EXE}" ]; then
     _K_OS="linux"
     [ "${OS}" = "darwin" ] && _K_OS="darwin"
-    [ "${_OS_TAG}" = "windows" ] && _K_OS="windows"
-
     _K_SUFFIX=""
-    if [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; then
-      _K_SUFFIX="_arm64"
-    fi
-
-    # v0.8.1 uses kube-linter-{os}{_arch}{.exe}
-    # BUT Windows assets are kube-linter.exe and kube-linter_arm64.exe (no 'windows' prefix)
+    { [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; } && _K_SUFFIX="_arm64"
     if [ "${_OS_TAG}" = "windows" ]; then
       _FILE="kube-linter${_K_SUFFIX}.exe"
     else
       _FILE="kube-linter-${_K_OS}${_K_SUFFIX}"
     fi
-
     _URL="${GITHUB_PROXY}https://github.com/stackrox/kube-linter/releases/download/${KUBE_LINTER_VERSION}/${_FILE}"
     if download_url "${_URL}" "${VENV}/bin/kube-linter${_EXE}" "kube-linter"; then
       chmod +x "${VENV}/bin/kube-linter${_EXE}"
-      log_summary "Kube-Linter" "✅ Installed"
+      log_summary "Lint Tool" "Kube-Linter" "✅ Installed" "$(get_version "${VENV}/bin/kube-linter${_EXE}" "version")" "$(($(date +%s) - _T0))"
     else
-      log_summary "Kube-Linter" "❌ Failed"
-      error "Failed to download kube-linter from ${_URL}"
+      log_summary "Lint Tool" "Kube-Linter" "❌ Failed" "-" "0"
     fi
   else
-    log_summary "Kube-Linter" "✅ Already exists"
+    log_summary "Lint Tool" "Kube-Linter" "✅ Exists" "$(get_version "${VENV}/bin/kube-linter${_EXE}" "version")" "0"
   fi
-  info "IaC tools installed."
 }
 
 setup_hooks() {
-  log_info "── Activating Pre-commit Hooks ──"
-
+  _T0=$(date +%s)
+  log_info "── Setting up Pre-commit Hooks ──"
   if [ "$DRY_RUN" -eq 1 ]; then
-    log_info "DRY-RUN: Would activate pre-commit hooks."
-    log_summary "Hooks" "⚖️ Previewed"
+    log_summary "Other" "Hooks" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
   if [ -x "$VENV/bin/pre-commit" ]; then
-    "$VENV/bin/pre-commit" install --hook-type pre-commit --hook-type pre-merge-commit --hook-type commit-msg
-    info "Pre-commit hooks activated."
-    log_summary "Hooks" "✅ Activated"
+    "$VENV/bin/pre-commit" install --hook-type pre-commit --hook-type pre-merge-commit --hook-type commit-msg >/dev/null 2>&1
+    _V=$(get_version "$VENV/bin/pre-commit")
+    _D=$(($(date +%s) - _T0))
+    log_summary "Other" "Hooks" "✅ Activated" "$_V" "$_D"
   else
-    warn "Warning: pre-commit not found. Run python module first."
-    log_summary "Hooks" "❌ Failed (missing pre-commit)"
+    log_summary "Other" "Hooks" "❌ Failed" "-" "0"
   fi
 }
 
 setup_powershell() {
+  _T0=$(date +%s)
   log_info "── Setting up PowerShell Linter ──"
-
   if [ "$DRY_RUN" -eq 1 ]; then
-    log_info "DRY-RUN: Would install PSScriptAnalyzer."
-    log_summary "PowerShell" "⚖️ Previewed"
+    log_summary "Lint Tool" "PowerShell" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
   if command -v pwsh >/dev/null 2>&1; then
-    pwsh -NoProfile -Command "if (!(Get-Module -ListAvailable PSScriptAnalyzer)) { Install-Module -Name PSScriptAnalyzer -Force -SkipPublisherCheck -Scope CurrentUser }"
-    info "PSScriptAnalyzer installed."
-    log_summary "PowerShell" "✅ Installed"
+    pwsh -NoProfile -Command "if (!(Get-Module -ListAvailable PSScriptAnalyzer)) { Install-Module -Name PSScriptAnalyzer -Force -SkipPublisherCheck -Scope CurrentUser }" >/dev/null 2>&1
+    # shellcheck disable=SC2016
+    _V=$(pwsh -NoProfile -Command '(Get-Module PSScriptAnalyzer -ListAvailable).Version | Select-Object -First 1 | ForEach-Object { $_.ToString() }' 2>/dev/null || echo "installed")
+    _D=$(($(date +%s) - _T0))
+    log_summary "Lint Tool" "PowerShell" "✅ Installed" "$_V" "$_D"
   else
-    warn "Warning: pwsh not found. Skipping PowerShell linter setup."
-    log_summary "PowerShell" "⏭️ Skipped (no pwsh)"
+    log_summary "Lint Tool" "PowerShell" "⏭️ Skipped" "-" "0"
   fi
 }
 
 install_java_lint() {
+  _T0=$(date +%s)
   _JAR="${VENV}/bin/google-java-format.jar"
   _BIN="${VENV}/bin/google-java-format"
   if [ -f "${_JAR}" ] && [ "$DRY_RUN" -eq 0 ]; then
-    log_summary "Java Lint" "✅ Already exists"
+    log_summary "Lint Tool" "Java Lint" "✅ Exists" "$JAVA_FORMAT_VERSION" "0"
     return 0
   fi
 
-  log_info "── Installing google-java-format ${JAVA_FORMAT_VERSION} ──"
+  log_info "── Installing google-java-format ──"
   if [ "$DRY_RUN" -eq 1 ]; then
-    log_info "DRY-RUN: Would install google-java-format to $_BIN"
-    log_summary "Java Lint" "⚖️ Previewed"
+    log_summary "Lint Tool" "Java Lint" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
   _URL="${GITHUB_PROXY}https://github.com/google/google-java-format/releases/download/v${JAVA_FORMAT_VERSION}/google-java-format-${JAVA_FORMAT_VERSION}-all-deps.jar"
+  _STAT="✅ Installed"
   if download_url "${_URL}" "${_JAR}" "google-java-format"; then
     printf "#!/bin/sh\njava -jar \"%s\" \"\$@\"\n" "${_JAR}" >"${_BIN}"
     chmod +x "${_BIN}"
-    info "google-java-format installed."
-    log_summary "Java Lint" "✅ Installed"
   else
-    log_summary "Java Lint" "❌ Failed"
-    error "Failed to download google-java-format."
+    _STAT="❌ Failed"
   fi
+  _D=$(($(date +%s) - _T0))
+  log_summary "Lint Tool" "Java Lint" "$_STAT" "$JAVA_FORMAT_VERSION" "$_D"
 }
 
 install_ruby_lint() {
+  _T0=$(date +%s)
   log_info "── Setting up Rubocop ──"
-
   if [ "$DRY_RUN" -eq 1 ]; then
-    log_info "DRY-RUN: Would install Rubocop via gem."
-    log_summary "Rubocop" "⚖️ Previewed"
+    log_summary "Lint Tool" "Rubocop" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
   if command -v gem >/dev/null 2>&1; then
-    _RUBY_VER=$(ruby -e 'print RUBY_VERSION')
-    _RUBY_MAJOR=$(echo "$_RUBY_VER" | cut -d. -f1)
-    _RUBY_MINOR=$(echo "$_RUBY_VER" | cut -d. -f2)
-
-    if [ "$_RUBY_MAJOR" -lt 2 ] || { [ "$_RUBY_MAJOR" -eq 2 ] && [ "$_RUBY_MINOR" -lt 7 ]; }; then
-      warn "Warning: Ruby version $_RUBY_VER is too old (< 2.7.0). Attempting to install Rubocop v0.93.1."
-      gem install rubocop -v 0.93.1 --user-install --no-document --quiet || warn "Failed to install Rubocop."
-    else
-      gem install rubocop --user-install --no-document --quiet || warn "Failed to install Rubocop."
-    fi
-    info "Rubocop setup finished."
-    log_summary "Rubocop" "✅ Installed"
+    gem install rubocop --user-install --no-document --quiet >/dev/null 2>&1 || true
+    _V=$(get_version rubocop)
+    _D=$(($(date +%s) - _T0))
+    log_summary "Lint Tool" "Rubocop" "✅ Installed" "$_V" "$_D"
   else
-    warn "Warning: gem not found. Skipping Rubocop setup."
-    log_summary "Rubocop" "⏭️ Skipped (no gem)"
+    log_summary "Lint Tool" "Rubocop" "⏭️ Skipped" "-" "0"
   fi
 }
 
 install_php_lint() {
+  _T0=$(date +%s)
   _BIN="${VENV}/bin/php-cs-fixer"
   if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
-    log_summary "PHP Lint" "✅ Already exists"
+    log_summary "Lint Tool" "PHP Lint" "✅ Exists" "$PHP_CS_FIXER_VERSION" "0"
     return 0
   fi
 
-  log_info "── Installing php-cs-fixer ${PHP_CS_FIXER_VERSION} ──"
+  log_info "── Installing php-cs-fixer ──"
   if [ "$DRY_RUN" -eq 1 ]; then
-    log_info "DRY-RUN: Would install php-cs-fixer to $_BIN"
-    log_summary "PHP Lint" "⚖️ Previewed"
+    log_summary "Lint Tool" "PHP Lint" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
   _URL="${GITHUB_PROXY}https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/releases/download/${PHP_CS_FIXER_VERSION}/php-cs-fixer.phar"
+  _STAT="✅ Installed"
   if download_url "${_URL}" "${_BIN}" "php-cs-fixer"; then
     chmod +x "${_BIN}"
-    info "php-cs-fixer installed."
-    log_summary "PHP Lint" "✅ Installed"
   else
-    log_summary "PHP Lint" "❌ Failed"
-    error "Failed to download php-cs-fixer."
+    _STAT="❌ Failed"
   fi
+  _D=$(($(date +%s) - _T0))
+  log_summary "Lint Tool" "PHP Lint" "$_STAT" "$PHP_CS_FIXER_VERSION" "$_D"
 }
 
 setup_dart() {
   log_info "── Checking Dart SDK ──"
   if command -v dart >/dev/null 2>&1; then
-    log_summary "Dart" "✅ Available"
+    log_summary "Runtime" "Dart" "✅ Available" "$(get_version dart)" "0"
   else
-    warn "Warning: dart SDK not found."
-    log_summary "Dart" "⏭️ Not found"
+    log_summary "Runtime" "Dart" "⏭️ Missing" "-" "0"
   fi
 }
 
 setup_swift() {
+  _T0=$(date +%s)
   if [ "${OS}" = "darwin" ]; then
     log_info "── Setting up Swift Linters (macOS) ──"
-
     if [ "$DRY_RUN" -eq 1 ]; then
-      log_info "DRY-RUN: Would install swiftformat and swiftlint via brew."
-      log_summary "Swift" "⚖️ Previewed"
+      log_summary "Lint Tool" "Swift" "⚖️ Previewed" "-" "0"
       return 0
     fi
 
     if command -v brew >/dev/null 2>&1; then
-      brew list swiftformat >/dev/null 2>&1 || brew install swiftformat
-      brew list swiftlint >/dev/null 2>&1 || brew install swiftlint
-      info "Swift linters ensured."
-      log_summary "Swift" "✅ Installed via brew"
+      brew list swiftformat >/dev/null 2>&1 || brew install swiftformat >/dev/null 2>&1
+      brew list swiftlint >/dev/null 2>&1 || brew install swiftlint >/dev/null 2>&1
+      _D=$(($(date +%s) - _T0))
+      log_summary "Lint Tool" "Swift" "✅ Installed" "$(get_version swiftlint lint --version)" "$_D"
     else
-      warn "Warning: brew not found. Cannot install Swift linters."
-      log_summary "Swift" "❌ Failed (no brew)"
+      log_summary "Lint Tool" "Swift" "❌ No brew" "-" "0"
     fi
   else
-    log_summary "Swift" "⏭️ Skipped (non-macOS)"
+    log_summary "Lint Tool" "Swift" "⏭️ Skipped" "-" "0"
   fi
 }
 
 setup_dotnet() {
   log_info "── Checking .NET SDK ──"
   if command -v dotnet >/dev/null 2>&1; then
-    log_summary ".NET" "✅ Available"
+    log_summary "Runtime" ".NET" "✅ Available" "$(get_version dotnet)" "0"
   else
-    warn "Warning: .NET SDK not found."
-    log_summary ".NET" "⏭️ Not found"
+    log_summary "Runtime" ".NET" "⏭️ Missing" "-" "0"
   fi
 }
 
@@ -535,15 +528,15 @@ for arg in "$@"; do
   esac
 done
 
-if [ -z "$(echo "${RAW_ARGS}" | tr -d ' ')" ]; then
+if [ -z "$(echo "${RAW_ARGS}" | tr -d ' ')" ] || [ "${RAW_ARGS# *}" = "all" ]; then
   modules="node python gitleaks checkmake powershell java ruby php dart swift dotnet hooks"
 else
   modules="${RAW_ARGS}"
 fi
 
 printf "### Setup Execution Summary\n\n" >"$TMP_SUMMARY"
-printf "| Module | Status |\n" >>"$TMP_SUMMARY"
-printf "| :--- | :--- |\n" >>"$TMP_SUMMARY"
+printf "| Category | Module | Status | Version | Time |\n" >>"$TMP_SUMMARY"
+printf "| :--- | :--- | :--- | :--- | :--- |\n" >>"$TMP_SUMMARY"
 
 for module in $modules; do
   case $module in
@@ -583,9 +576,23 @@ for module in $modules; do
   esac
 done
 
-# Write summary to CI if available
+# ── Global Detections (Environment & Other Runtimes) ──
+_TOTAL_DUR=$(($(date +%s) - _START_TIME))
+log_summary "Environment" "System" "✅ Active" "${OS}/${ARCH}" "0"
+log_summary "Environment" "Shell" "✅ Active" "$(basename "$SHELL")" "0"
+
+# Detect Go/Rust even if not explicitly setup
+command -v go >/dev/null 2>&1 && log_summary "Runtime" "Go" "✅ Detected" "$(get_version go)" "0"
+command -v cargo >/dev/null 2>&1 && log_summary "Runtime" "Rust" "✅ Detected" "$(get_version cargo)" "0"
+
+printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR" >>"$TMP_SUMMARY"
+
+# Write summary to CI if available, otherwise print to terminal
 if [ -n "$GITHUB_STEP_SUMMARY" ]; then
   cat "$TMP_SUMMARY" >>"$GITHUB_STEP_SUMMARY"
+else
+  printf "\n"
+  cat "$TMP_SUMMARY"
 fi
 rm -f "$TMP_SUMMARY"
 
