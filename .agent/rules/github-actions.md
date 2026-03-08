@@ -268,5 +268,26 @@
   echo "✅ All ${PASSING} tests passed" >> "$GITHUB_STEP_SUMMARY"
   ```
 
+### Robust Cross-Step Reporting (Sentinel Pattern)
+
+When scripts are called across multiple independent GitHub Action steps, use the **Dual-Sentinel (双重哨兵)** pattern to prevent duplicate headers, legends, or global detections:
+
+1. **Grep Sentinel**: Check `$GITHUB_STEP_SUMMARY` for existing content markers.
+2. **Environment Sentinel**: Use `$GITHUB_ENV` to persist state across steps.
+
+```bash
+# Example Dual-Sentinel Implementation
+check_ci_summary() {
+  [ -n "$GITHUB_STEP_SUMMARY" ] && [ -f "$GITHUB_STEP_SUMMARY" ] && grep -qF "$1" "$GITHUB_STEP_SUMMARY"
+}
+
+# 1. Check BOTH grep and environment sentinel
+if [ "$_SUMMARY_HEADER_SENTINEL" != "true" ] && ! check_ci_summary "### Project Summary"; then
+  printf "### Project Summary\n\n" >> "$GITHUB_STEP_SUMMARY"
+  # 2. Set environment sentinel for subsequent steps
+  [ -n "$GITHUB_ENV" ] && echo "_SUMMARY_HEADER_SENTINEL=true" >> "$GITHUB_ENV"
+fi
+```
+
 - Use **`ossf/scorecard-action`** on the default branch to measure supply chain security: pinned actions, branch protection, vulnerability alerts, dependency review.
 - Periodically audit active workflows and disable/delete unused ones. Monitor Actions billing with `gh api /repos/{owner}/{repo}/actions/billing/usage`.

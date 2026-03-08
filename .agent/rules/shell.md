@@ -393,3 +393,26 @@ if [ ! -f "CHANGELOG.md" ] || [ ! -d ".git" ]; then
   exit 1
 fi
 ```
+
+### Robust Shared Summary Logging
+
+When multiple scripts or multiple invocations of the same script contribute to a single report (e.g., in CI), use a **shared summary file** and top-level guard:
+
+```sh
+# ── Shared Summary Management ──
+if [ -z "$SHARED_SUMMARY_FILE" ]; then
+  # Initialize only ONCE
+  SHARED_SUMMARY_FILE=$(mktemp)
+  export SHARED_SUMMARY_FILE
+  _IS_TOP_LEVEL=true
+  # ... Print Header/Legend ...
+fi
+
+# ... Log items to $SHARED_SUMMARY_FILE ...
+
+if [ "$_IS_TOP_LEVEL" = "true" ]; then
+  # Final Output and Cleanup only ONCE
+  cat "$SHARED_SUMMARY_FILE"
+  rm -f "$SHARED_SUMMARY_FILE"
+fi
+```
