@@ -284,6 +284,10 @@ install_checkmake() {
     return 0
   fi
   _BIN="${VENV}/bin/checkmake${_EXE}"
+  if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
+    log_summary "Lint Tool" "Checkmake" "✅ Exists" "$(get_version "$_BIN")" "0"
+    return 0
+  fi
 
   log_info "── Installing checkmake ──"
   if [ "$DRY_RUN" -eq 1 ]; then
