@@ -639,22 +639,30 @@ setup_security() {
   # Install govulncheck if go exists
   if command -v go >/dev/null 2>&1; then
     _T0=$(date +%s)
-    log_info "Installing govulncheck..."
-    if run_quiet go install golang.org/x/vuln/cmd/govulncheck@latest; then
-      log_summary "Security Tool" "Govulncheck" "✅ Installed" "$(get_version govulncheck)" "$(($(date +%s) - _T0))"
+    if command -v govulncheck >/dev/null 2>&1; then
+      log_summary "Security Tool" "Govulncheck" "✅ Exists" "$(get_version govulncheck)" "0"
     else
-      log_summary "Security Tool" "Govulncheck" "❌ Failed" "-" "0"
+      log_info "Installing govulncheck..."
+      if run_quiet go install golang.org/x/vuln/cmd/govulncheck@latest; then
+        log_summary "Security Tool" "Govulncheck" "✅ Installed" "$(get_version govulncheck)" "$(($(date +%s) - _T0))"
+      else
+        log_summary "Security Tool" "Govulncheck" "❌ Failed" "-" "0"
+      fi
     fi
   fi
 
   # Install cargo-audit if cargo exists
   if command -v cargo >/dev/null 2>&1; then
     _T0=$(date +%s)
-    log_info "Installing cargo-audit..."
-    if run_quiet cargo install cargo-audit; then
-      log_summary "Security Tool" "Cargo-Audit" "✅ Installed" "$(get_version cargo-audit)" "$(($(date +%s) - _T0))"
+    if command -v cargo-audit >/dev/null 2>&1; then
+      log_summary "Security Tool" "Cargo-Audit" "✅ Exists" "$(get_version cargo-audit)" "0"
     else
-      log_summary "Security Tool" "Cargo-Audit" "❌ Failed" "-" "0"
+      log_info "Installing cargo-audit..."
+      if run_quiet cargo install cargo-audit; then
+        log_summary "Security Tool" "Cargo-Audit" "✅ Installed" "$(get_version cargo-audit)" "$(($(date +%s) - _T0))"
+      else
+        log_summary "Security Tool" "Cargo-Audit" "❌ Failed" "-" "0"
+      fi
     fi
   fi
 }
