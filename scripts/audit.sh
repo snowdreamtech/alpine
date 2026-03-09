@@ -16,6 +16,7 @@ guard_project_root
 # ── Configuration ────────────────────────────────────────────────────────────
 
 # Help Message
+# shellcheck disable=SC2329
 show_help() {
   cat <<EOF
 Usage: $0 [OPTIONS]
@@ -31,15 +32,6 @@ EOF
 }
 
 # 2. Argument Parsing
-for arg in "$@"; do
-  case "$arg" in
-  -h | --help)
-    show_help
-    exit 0
-    ;;
-  esac
-done
-
 parse_common_args "$@"
 
 _START_=$(date +%s)
@@ -138,7 +130,7 @@ if [ -f "$REQUIREMENTS_TXT" ] || [ -f "requirements.txt" ] || [ -f "$PYPROJECT_T
       log_summary "Python" "pip-audit" "⚖️ Previewed" "-" "0"
     else
       # Get version directly to avoid common.sh grep issues with warnings
-      _V=$("$PIPAUDIT" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1 || echo "-")
+      _V=$(get_version "$PIPAUDIT")
       if run_quiet "$PIPAUDIT"; then
         log_summary "Python" "pip-audit" "✅ Secure" "$_V" "$(($(date +%s) - _T0))"
       else

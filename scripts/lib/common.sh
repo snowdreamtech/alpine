@@ -247,6 +247,19 @@ run_quiet() {
   fi
 }
 
+# Atomic file swap helper (Build-then-Swap pattern)
+# Usage: atomic_swap source_tmp target
+atomic_swap() {
+  _SRC="$1"
+  _DST="$2"
+  if [ ! -f "$_SRC" ]; then
+    log_warn "atomic_swap: Source file $_SRC does not exist."
+    return 1
+  fi
+  # Use mv for atomic operation on the same filesystem
+  mv "$_SRC" "$_DST"
+}
+
 # Standard argument parsing for DRY_RUN and VERBOSE
 parse_common_args() {
   for _arg in "$@"; do
@@ -309,6 +322,14 @@ get_version() {
     pip-audit)
       # pip-audit version output: "pip-audit 2.8.0" or with warnings
       "$_CMD" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
+      ;;
+    swift)
+      # Swift version output: "swift-driver version: 1.115 Apple Swift version 6.0.3 (swiftlang-6.0.3.1.10 ...)"
+      "$_CMD" "$_ARG" 2>&1 | sed -n 's/.*Swift version \([0-9][0-9.]*\).*/\1/p' | head -n 1
+      ;;
+    java)
+      # java -version outputs to stderr and puts version in quotes
+      "$_CMD" "$_ARG" 2>&1 | sed -n 's/.*version "\([0-9][0-9.]*\).*/\1/p' | head -n 1
       ;;
     *)
       # For other binaries, try to get version from the output

@@ -79,69 +79,22 @@ cleanup() {
 trap cleanup EXIT INT TERM
 
 # Get current major version (Universal Source)
-CURRENT_MAJOR=""
+raw_v=$(get_project_version)
+case "$raw_v" in
+'' | '-' | 'null')
+  log_warn "Could not determine version from project files. Falling back to Git tags..."
+  GIT_TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
+  raw_v="$GIT_TAG"
+  ;;
+esac
 
-# Helper function to extract major version from a semantic version string
-get_major() { echo "$1" | sed 's/^v//;s/\..*//'; }
-
-# 1. Check package.json (Node.js)
-if [ -f "$PACKAGE_JSON" ]; then
-  log_debug "Checking $PACKAGE_JSON for version..."
-  if command -v jq >/dev/null 2>&1; then
-    raw_v=$(jq -r '.version' "$PACKAGE_JSON" 2>/dev/null || true)
-  else
-    # Improved POSIX sed for package.json
-    raw_v=$(grep '"version":' "$PACKAGE_JSON" | head -n 1 | sed 's/.*"version":[[:space:]]*"//;s/".*//' || true)
-  fi
-  if [ -n "$raw_v" ] && [ "$raw_v" != "null" ]; then
-    CURRENT_MAJOR=$(get_major "$raw_v")
-  fi
-fi
-
-# 2. Check Cargo.toml (Rust)
-if [ -z "$CURRENT_MAJOR" ] && [ -f "$CARGO_TOML" ]; then
-  log_debug "Checking $CARGO_TOML for version..."
-  # Improved POSIX sed for Cargo.toml
-  raw_v=$(grep '^version =' "$CARGO_TOML" | head -n 1 | sed -e 's/.*"\(.*\)"/\1/' -e "s/.*'\(.*\)'/\1/" || true)
-  if [ -n "$raw_v" ]; then
-    CURRENT_MAJOR=$(get_major "$raw_v")
-  fi
-fi
-
-# 3. Check pyproject.toml (Python)
-if [ -z "$CURRENT_MAJOR" ] && [ -f "$PYPROJECT_TOML" ]; then
-  log_debug "Checking $PYPROJECT_TOML for version..."
-  # Improved POSIX sed for pyproject.toml
-  raw_v=$(grep '^version =' "$PYPROJECT_TOML" | head -n 1 | sed -e 's/.*"\(.*\)"/\1/' -e "s/.*'\(.*\)'/\1/" || true)
-  if [ -n "$raw_v" ]; then
-    CURRENT_MAJOR=$(get_major "$raw_v")
-  fi
-fi
-
-# 4. Check VERSION file (Generic)
-if [ -z "$CURRENT_MAJOR" ] && [ -f "$VERSION_FILE" ]; then
-  log_debug "Checking $VERSION_FILE for version..."
-  raw_v=$(cat "$VERSION_FILE" | head -n 1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//' || true)
-  if [ -n "$raw_v" ]; then
-    CURRENT_MAJOR=$(get_major "$raw_v")
-  fi
-fi
-
-# 5. Fallback to Git tags if all files fail
-if [ -z "$CURRENT_MAJOR" ] || [ "$CURRENT_MAJOR" = "null" ]; then
-  if command -v git >/dev/null 2>&1 && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-    log_debug "Falling back to Git tags for version..."
-    GIT_TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
-    if [ -n "$GIT_TAG" ]; then
-      CURRENT_MAJOR=$(get_major "$GIT_TAG")
-    fi
-  fi
-fi
+# Extract major version
+CURRENT_MAJOR=$(echo "$raw_v" | sed 's/^v//' | cut -d. -f1)
 
 # Input Validation
 case "$CURRENT_MAJOR" in
 '' | *[!0-9]*)
-  log_error "Error: Could not determine a valid numeric major version (Found: '$CURRENT_MAJOR')"
+  log_error "Error: Could not determine a valid numeric major version (Found: '$CURRENT_MAJOR' from '$raw_v')"
   exit 1
   ;;
 esac
@@ -235,7 +188,7 @@ for arch_file in "$TMP_ARCHIVE_PREFIX"/v*.md; do
         cat "$FILTERED_CONTENT" >"$tmp_arch"
         printf "\n" >>"$tmp_arch"
         sed '1,2d' "$FINAL_ARCH_FILE" >>"$tmp_arch"
-        mv "$tmp_arch" "$FINAL_ARCH_FILE"
+        atomic_swap "$tmp_arch" "$FINAL_ARCH_FILE"
         printf "| v%s | Updated | %s |\n" "$v_num" "$FINAL_ARCH_FILE" >>"$TMP_SUMMARY"
       fi
       ARCHIVE_COUNT=$((ARCHIVE_COUNT + 1))
@@ -296,7 +249,7 @@ if [ "$DRY_RUN" -eq 1 ]; then
   log_warn "DRY-RUN: History section preview:"
   grep -A 100 "^## History" "$NEW_CHANGELOG" || true
 else
-  mv "$NEW_CHANGELOG" "$CHANGELOG"
+  atomic_swap "$NEW_CHANGELOG" "$CHANGELOG"
   log_success "Successfully updated $CHANGELOG"
 fi
 

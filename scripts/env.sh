@@ -38,6 +38,7 @@ COMMAND="setup"
 for _arg in "$@"; do
   case "$_arg" in
   setup | check | sync) COMMAND="$_arg" ;;
+  -q | --quiet | -v | --verbose | --dry-run | -h | --help) ;;
   esac
 done
 parse_common_args "$@"

@@ -53,28 +53,9 @@ check_version() {
     return 1
   fi
 
-  _RAW_OUT=$($_VER_CMD 2>&1)
-
-  # Specialized extraction for tricky outputs
-  case "$_NAME" in
-  Swift)
-    _CURRENT_VER=$(echo "$_RAW_OUT" | sed -n 's/.*Swift version \([0-9][0-9.]*\).*/\1/p' | head -n 1)
-    ;;
-  Java)
-    # java -version outputs to stderr and puts version in quotes
-    _CURRENT_VER=$(echo "$_RAW_OUT" | sed -n 's/.*version "\([0-9][0-9.]*\).*/\1/p' | head -n 1)
-    ;;
-  *)
-    # Generic: Find the first sequence of digits and dots that has at least one dot
-    _CURRENT_VER=$(echo "$_RAW_OUT" | sed -n 's/[^0-9.]*\([0-9][0-9.]*\.[0-9][0-9.]*\).*/\1/p' | head -n 1)
-    # Fallback to digits only if still empty
-    [ -z "$_CURRENT_VER" ] && _CURRENT_VER=$(echo "$_RAW_OUT" | sed -n 's/[^0-9.]*\([0-9][0-9.]*\).*/\1/p' | head -n 1)
-    ;;
-  esac
-
-  # Strip any non-version trailing chars, limit components, and fallback to 0.0
-  _CURRENT_VER=$(echo "$_CURRENT_VER" | sed 's/[^0-9.]//g' | cut -d. -f1-3)
-  [ -z "$_CURRENT_VER" ] && _CURRENT_VER="0.0"
+  # Use unified version detection from common.sh
+  _CURRENT_VER=$(get_version "$_CMD")
+  [ "$_CURRENT_VER" = "-" ] && _CURRENT_VER="0.0"
 
   # Simple version comparison using sort -n
   _LOWER_VER=$(printf "%s\n%s" "$_MIN_VER" "$_CURRENT_VER" | sort -n -t. -k1,1 -k2,2 -k3,3 | head -n1)

@@ -55,6 +55,7 @@ for _arg in "$@"; do
   --author=*) AUTHOR_NAME="${_arg#*=}" ;;
   --github=*) GITHUB_ORG="${_arg#*=}" ;;
   -y | --yes) AUTO_CONFIRM=1 ;;
+  -q | --quiet | -v | --verbose | --dry-run | -h | --help) ;;
   esac
 done
 

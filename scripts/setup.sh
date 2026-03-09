@@ -63,12 +63,7 @@ EOF
 
 # Backward compatibility (some modules might still use log internally)
 log() { log_info "$1"; }
-info() { log_success "$1"; }
-warn() { log_warn "$1"; }
-error() {
-  log_error "$1"
-  exit 1
-}
+# log_success, log_warn, log_error are used from common.sh
 
 # ── Functions ────────────────────────────────────────────────────────────────
 
@@ -663,24 +658,12 @@ setup_security() {
 # ── Main Execution ───────────────────────────────────────────────────────────
 
 # Argument parsing for flags
+parse_common_args "$@"
+# Re-extract raw args to avoid flags
 RAW_ARGS=""
 for arg in "$@"; do
   case "$arg" in
-  -q | --quiet)
-    VERBOSE=0
-    ;;
-  -v | --verbose)
-    # shellcheck disable=SC2034
-    VERBOSE=2
-    ;;
-  --dry-run)
-    DRY_RUN=1
-    log_warn "Running in DRY-RUN mode. No changes will be applied."
-    ;;
-  -h | --help)
-    show_help
-    exit 0
-    ;;
+  -q | --quiet | -v | --verbose | --dry-run | -h | --help) ;;
   *) RAW_ARGS="${RAW_ARGS} ${arg}" ;;
   esac
 done
