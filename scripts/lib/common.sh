@@ -234,7 +234,7 @@ run_npm_script() {
       return 0
     fi
   fi
-  return 1
+  return 0
 }
 
 # Helper to run a command while respecting the quiet flag (-q/--quiet)
