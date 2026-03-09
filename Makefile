@@ -110,9 +110,9 @@ endif
 
 commit:
 ifeq ($(OS_NAME),Windows)
-	@scripts/commit.bat
+	@scripts/commit.bat $(ARGS)
 else
-	@sh scripts/commit.sh
+	@sh scripts/commit.sh $(ARGS)
 endif
 
 verify:

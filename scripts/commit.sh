@@ -44,7 +44,17 @@ if command -v sh >/dev/null 2>&1 && [ -f "scripts/check-env.sh" ]; then
   }
 fi
 
-# 3. Check for dependencies
+# 3. Check for staged files
+if [ "$DRY_RUN" -eq 0 ]; then
+  if ! git diff --cached --quiet; then
+    log_debug "Staged changes detected."
+  else
+    log_error "Error: No files added to staging! Did you forget to run 'git add'?"
+    exit 1
+  fi
+fi
+
+# 4. Check for dependencies
 NPM=${NPM:-pnpm}
 if ! command -v "$NPM" >/dev/null 2>&1; then
   log_error "Error: $NPM client not found."
@@ -63,12 +73,8 @@ if [ "$DRY_RUN" -eq 1 ]; then
 fi
 
 log_info "Launching interactive CLI..."
-if [ -f "package.json" ] && grep -q '"commit":' package.json; then
-  "$NPM" run commit
-else
-  # Fallback to direct npx if script not found
-  "$NPM" exec cz
-fi
+# We use direct exec to avoid recursion if the npm script points back here
+"$NPM" exec cz
 
 # Next Actions
 if [ "$DRY_RUN" -eq 0 ]; then

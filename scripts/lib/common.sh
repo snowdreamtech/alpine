@@ -227,12 +227,14 @@ run_npm_script() {
       # Avoid infinite loop if the command points back to this script
       if echo "$_CMD" | grep -q "$_CURRENT_SCRIPT"; then
         log_debug "npm script '$_SCRIPT_NAME' is a self-reference to '$_CURRENT_SCRIPT'. Skipping."
-        return 0
+        return 1
       fi
       log_info "── Running Node.js script: $NPM $_SCRIPT_NAME ──"
       "$NPM" run "$_SCRIPT_NAME"
+      return 0
     fi
   fi
+  return 1
 }
 
 # Helper to run a command while respecting the quiet flag (-q/--quiet)
