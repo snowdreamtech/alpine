@@ -764,7 +764,7 @@ if [ "$_CREATED_SUMMARY" = "true" ]; then
 fi
 
 if [ "$_IS_TOP_LEVEL" = "true" ]; then
-  info "\n✨ Setup step $modules complete!"
+  log_info "\n✨ Setup step $modules complete!"
 
   # Next Actions
   if [ "$DRY_RUN" -eq 0 ]; then
