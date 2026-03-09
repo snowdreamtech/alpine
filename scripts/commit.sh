@@ -32,9 +32,13 @@ EOF
 }
 
 # Argument parsing
-parse_common_args "$@"
-
 main() {
+  # 1. Execution Context Guard
+  guard_project_root
+
+  # 2. Argument Parsing
+  parse_common_args "$@"
+
   log_info "📝 Starting Structured Commit Guide...\n"
 
   # 2. Pre-check: Environment
@@ -66,9 +70,9 @@ main() {
   fi
 
   # 4. Check for dependencies
-  _NPM=${NPM:-pnpm}
-  if ! command -v "$_NPM" >/dev/null 2>&1; then
-    log_error "Error: $_NPM client not found."
+  _NPM_LOCAL=${NPM:-pnpm}
+  if ! command -v "$_NPM_LOCAL" >/dev/null 2>&1; then
+    log_error "Error: $_NPM_LOCAL client not found."
     exit 1
   fi
 
@@ -76,16 +80,16 @@ main() {
   if [ "$DRY_RUN" -eq 1 ]; then
     log_success "DRY-RUN: Would launch interactive Commitizen CLI."
     if [ -f "package.json" ] && grep -q '"commit":' package.json; then
-      log_info "Command: $_NPM run commit"
+      log_info "Command: $_NPM_LOCAL run commit"
     else
-      log_info "Command: $_NPM exec cz"
+      log_info "Command: $_NPM_LOCAL exec cz"
     fi
     exit 0
   fi
 
   log_info "Launching interactive CLI..."
   # We use direct exec to avoid recursion if the npm script points back here
-  "$_NPM" exec cz
+  "$_NPM_LOCAL" exec cz
 
   # Next Actions
   if [ "$DRY_RUN" -eq 0 ]; then

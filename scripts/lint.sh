@@ -29,16 +29,20 @@ EOF
 }
 
 # Argument parsing
-FIX=""
-for _arg in "$@"; do
-  case "$_arg" in
-  --fix) FIX="--fix" ;;
-  -q | --quiet | -v | --verbose | --dry-run | -h | --help) ;;
-  esac
-done
-parse_common_args "$@"
-
 main() {
+  # 1. Execution Context Guard
+  guard_project_root
+
+  # 2. Argument Parsing
+  _FIX=""
+  for _arg in "$@"; do
+    case "$_arg" in
+    --fix) _FIX="--fix" ;;
+    -q | --quiet | -v | --verbose | --dry-run | -h | --help) ;;
+    esac
+  done
+  parse_common_args "$@"
+
   log_info "🔍 Starting Unified Project Linter...\n"
 
   run_pre_commit() {
@@ -56,7 +60,7 @@ main() {
     fi
 
     # Run on all files
-    if [ -n "$FIX" ]; then
+    if [ -n "$_FIX" ]; then
       log_info "Running in auto-fix mode..."
       # pre-commit doesn't have a direct --fix flag for everything at once,
       # but many hooks auto-fix by default.

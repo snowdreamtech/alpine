@@ -35,73 +35,23 @@ EOF
 }
 
 # Argument parsing
-SUITE="all"
-for _arg in "$@"; do
-  case "$_arg" in
-  shell | python | powershell | all) SUITE="$_arg" ;;
-  -q | --quiet | -v | --verbose | --dry-run | -h | --help) ;;
-  esac
-done
-parse_common_args "$@"
-
-log_info "🧪 Starting Unified Test Runner...\n"
-
-run_shell_tests() {
-  if [ -d "tests" ] && find tests -name "*.bats" | grep -q .; then
-    log_info "── Running Shell Tests (bats) ──"
-    if [ "$DRY_RUN" -eq 1 ]; then
-      log_success "DRY-RUN: Would run bats tests in tests/"
-    elif command -v bats >/dev/null 2>&1; then
-      bats tests/
-    elif [ -f "node_modules/.bin/bats" ]; then
-      ./node_modules/.bin/bats tests/
-    else
-      log_warn "Warning: bats not found. Skipping shell tests."
-    fi
-  else
-    log_debug "No .bats files found in tests/. Skipping shell tests."
-  fi
-}
-
-run_python_tests() {
-  if [ -f "pytest.ini" ] || [ -f "pyproject.toml" ] || find tests -name "test_*.py" | grep -q .; then
-    log_info "── Running Python Tests (pytest) ──"
-    if [ "$DRY_RUN" -eq 1 ]; then
-      log_success "DRY-RUN: Would run pytest on tests/"
-    else
-      VENV=${VENV:-.venv}
-      if [ -x "$VENV/bin/python3" ]; then
-        "$VENV/bin/python3" -m pytest --tb=short
-      elif command -v pytest >/dev/null 2>&1; then
-        pytest --tb=short
-      else
-        log_warn "Warning: pytest not found. Skipping python tests."
-      fi
-    fi
-  else
-    log_debug "No python test indicators found. Skipping python tests."
-  fi
-}
-
-run_powershell_tests() {
-  if find tests -name "*.Tests.ps1" | grep -q .; then
-    log_info "── Running PowerShell Tests (Pester) ──"
-    if [ "$DRY_RUN" -eq 1 ]; then
-      log_success "DRY-RUN: Would run Pester tests in tests/"
-    elif command -v pwsh >/dev/null 2>&1; then
-      pwsh -NoProfile -Command "Invoke-Pester tests/"
-    else
-      log_warn "Warning: pwsh not found. Skipping powershell tests."
-    fi
-  else
-    log_debug "No .Tests.ps1 files found in tests/. Skipping powershell tests."
-  fi
-}
-
 main() {
+  # 1. Execution Context Guard
+  guard_project_root
+
+  # 2. Argument Parsing
+  _SUITE="all"
+  for _arg in "$@"; do
+    case "$_arg" in
+    shell | python | powershell | all) _SUITE="$_arg" ;;
+    -q | --quiet | -v | --verbose | --dry-run | -h | --help) ;;
+    esac
+  done
+  parse_common_args "$@"
+
   log_info "🧪 Starting Unified Test Runner...\n"
 
-  case "$SUITE" in
+  case "$_SUITE" in
   shell) run_shell_tests ;;
   python) run_python_tests ;;
   powershell) run_powershell_tests ;;

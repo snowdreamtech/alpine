@@ -36,25 +36,31 @@ EOF
 
 # Argument parsing
 main() {
+  # 1. Execution Context Guard
+  guard_project_root
+
+  # 2. Argument Parsing
+  parse_common_args "$@"
+
   log_info "🏗️  Starting Project Build...\n"
 
-  # 2. Go build (GoReleaser or native)
+  # 3. Go build (GoReleaser or native)
   if [ -f ".goreleaser.yaml" ] || [ -f ".goreleaser.yml" ]; then
-    GORELEASER=${GORELEASER:-goreleaser}
-    run_build "$GORELEASER build --snapshot --clean" "GoReleaser snapshot build"
+    _GORELEASER=${GORELEASER:-goreleaser}
+    run_build "$_GORELEASER build --snapshot --clean" "GoReleaser snapshot build"
   elif [ -f "go.mod" ]; then
     run_build "go build ./..." "Go build (native)"
   fi
 
-  # 3. Node.js build
+  # 4. Node.js build
   run_npm_script "build"
 
-  # 4. Python build
+  # 5. Python build
   if [ -f "pyproject.toml" ]; then
-    VENV=${VENV:-.venv}
+    _VENV=${VENV:-.venv}
     _PYTHON_BIN=""
-    if [ -x "$VENV/bin/python3" ]; then
-      _PYTHON_BIN="$VENV/bin/python3"
+    if [ -x "$_VENV/bin/python3" ]; then
+      _PYTHON_BIN="$_VENV/bin/python3"
     elif command -v python3 >/dev/null 2>&1; then
       _PYTHON_BIN="python3"
     fi

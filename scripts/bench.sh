@@ -33,16 +33,20 @@ Suites (default: all):
 EOF
 }
 
-# 2. Argument Parsing
-SUITE="all"
-for _arg in "$@"; do
-  case "$_arg" in
-  python | node | all) SUITE="$_arg" ;;
-  esac
-done
-parse_common_args "$@"
-
+# Argument parsing
 main() {
+  # 1. Execution Context Guard
+  guard_project_root
+
+  # 2. Argument Parsing
+  _SUITE="all"
+  for _arg in "$@"; do
+    case "$_arg" in
+    python | node | all) _SUITE="$_arg" ;;
+    esac
+  done
+  parse_common_args "$@"
+
   log_info "⚡ Starting Performance Benchmarker...\n"
 
   run_python_bench() {
@@ -62,7 +66,7 @@ main() {
     run_npm_script "bench"
   }
 
-  case "$SUITE" in
+  case "$_SUITE" in
   python) run_python_bench ;;
   node) run_node_bench ;;
   all)

@@ -29,9 +29,6 @@ Options:
 EOF
 }
 
-# 2. Argument Parsing
-parse_common_args "$@"
-
 # ── Functions ────────────────────────────────────────────────────────────────
 
 update_pnpm_global() {
@@ -255,9 +252,14 @@ update_cargo_deps() {
   fi
 }
 
-# ── Main Execution ───────────────────────────────────────────────────────────
-
+# Argument parsing
 main() {
+  # 1. Execution Context Guard
+  guard_project_root
+
+  # 2. Argument Parsing
+  parse_common_args "$@"
+
   _START_TIME=$(date +%s)
 
   # Initialize Summary File if not already done

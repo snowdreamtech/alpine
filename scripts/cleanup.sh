@@ -29,9 +29,13 @@ EOF
 }
 
 # Argument parsing
-parse_common_args "$@"
-
 main() {
+  # 1. Execution Context Guard
+  guard_project_root
+
+  # 2. Argument Parsing
+  parse_common_args "$@"
+
   log_info "🧹 Starting deep project cleanup...\n"
 
   clean_item() {
