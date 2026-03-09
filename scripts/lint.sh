@@ -38,40 +38,44 @@ for _arg in "$@"; do
 done
 parse_common_args "$@"
 
-log_info "🔍 Starting Unified Project Linter...\n"
+main() {
+  log_info "🔍 Starting Unified Project Linter...\n"
 
-run_pre_commit() {
-  log_info "── Running pre-commit hooks (Pass 1/1) ──"
-  VENV=${VENV:-.venv}
-  PRE_COMMIT=""
+  run_pre_commit() {
+    log_info "── Running pre-commit hooks (Pass 1/1) ──"
+    _VENV=${VENV:-.venv}
+    _PRE_COMMIT=""
 
-  if [ -x "$VENV/bin/pre-commit" ]; then
-    PRE_COMMIT="$VENV/bin/pre-commit"
-  elif command -v pre-commit >/dev/null 2>&1; then
-    PRE_COMMIT="pre-commit"
-  else
-    log_error "Error: pre-commit not found. Please run 'make setup' first."
-    exit 1
-  fi
+    if [ -x "$_VENV/bin/pre-commit" ]; then
+      _PRE_COMMIT="$_VENV/bin/pre-commit"
+    elif command -v pre-commit >/dev/null 2>&1; then
+      _PRE_COMMIT="pre-commit"
+    else
+      log_error "Error: pre-commit not found. Please run 'make setup' first."
+      exit 1
+    fi
 
-  # Run on all files
-  if [ -n "$FIX" ]; then
-    log_info "Running in auto-fix mode..."
-    # pre-commit doesn't have a direct --fix flag for everything at once,
-    # but many hooks auto-fix by default.
-    "$PRE_COMMIT" run --all-files || log_warn "Some hooks modified files or reported errors."
-  else
-    "$PRE_COMMIT" run --all-files
+    # Run on all files
+    if [ -n "$FIX" ]; then
+      log_info "Running in auto-fix mode..."
+      # pre-commit doesn't have a direct --fix flag for everything at once,
+      # but many hooks auto-fix by default.
+      "$_PRE_COMMIT" run --all-files || log_warn "Some hooks modified files or reported errors."
+    else
+      "$_PRE_COMMIT" run --all-files
+    fi
+  }
+
+  run_pre_commit
+
+  log_success "\n✨ Linting complete!"
+
+  # Next Actions
+  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+    printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
+    printf "  - Run %bmake test%b to run the unified test suite.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake verify%b to ensure full project health.\n" "${GREEN}" "${NC}"
   fi
 }
 
-run_pre_commit
-
-log_success "\n✨ Linting complete!"
-
-# Next Actions
-if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
-  printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-  printf "  - Run %bmake test%b to run the unified test suite.\n" "${GREEN}" "${NC}"
-  printf "  - Run %bmake verify%b to ensure full project health.\n" "${GREEN}" "${NC}"
-fi
+main "$@"

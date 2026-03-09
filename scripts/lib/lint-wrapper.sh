@@ -4,73 +4,73 @@
 # Usage: sh scripts/lib/lint-wrapper.sh LINTER_NAME [ARGS...]
 # Features: POSIX compliant, Graceful tool detection, Cross-platform runtime checks.
 
-LINTER="$1"
-shift
+main() {
+  _LINTER="$1"
+  shift
 
-# 1. Resolve Binary Path
-# Check .venv/bin (POSIX), .venv/Scripts (Windows), node_modules/.bin, and PATH
-VENV_BIN=".venv/bin/${LINTER}"
-VENV_SCRIPTS=".venv/Scripts/${LINTER}"
-VENV_EXE_BIN=".venv/bin/${LINTER}.exe"
-VENV_EXE_SCRIPTS=".venv/Scripts/${LINTER}.exe"
-NODE_BIN="node_modules/.bin/${LINTER}"
-NODE_CMD="node_modules/.bin/${LINTER}.cmd"
+  # 1. Resolve Binary Path
+  # Check .venv/bin (POSIX), .venv/Scripts (Windows), node_modules/.bin, and PATH
+  _VENV_BIN=".venv/bin/${_LINTER}"
+  _VENV_SCRIPTS=".venv/Scripts/${_LINTER}"
+  _VENV_EXE_BIN=".venv/bin/${_LINTER}.exe"
+  _VENV_EXE_SCRIPTS=".venv/Scripts/${_LINTER}.exe"
+  _NODE_BIN="node_modules/.bin/${_LINTER}"
+  _NODE_CMD="node_modules/.bin/${_LINTER}.cmd"
 
-# Load common library for shared helpers (check_runtime, logging)
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
-. "$SCRIPT_DIR/common.sh"
+  _RESOLVED_BIN=""
 
-RESOLVED_BIN=""
+  if [ -x "$_VENV_BIN" ]; then
+    _RESOLVED_BIN="$_VENV_BIN"
+  elif [ -x "$_VENV_EXE_BIN" ]; then
+    _RESOLVED_BIN="$_VENV_EXE_BIN"
+  elif [ -x "$_VENV_SCRIPTS" ]; then
+    _RESOLVED_BIN="$_VENV_SCRIPTS"
+  elif [ -x "$_VENV_EXE_SCRIPTS" ]; then
+    _RESOLVED_BIN="$_VENV_EXE_SCRIPTS"
+  elif [ -x "$_NODE_BIN" ]; then
+    _RESOLVED_BIN="$_NODE_BIN"
+  elif [ -x "$_NODE_CMD" ]; then
+    _RESOLVED_BIN="$_NODE_CMD"
+  elif command -v "$_LINTER" >/dev/null 2>&1; then
+    _RESOLVED_BIN="$_LINTER"
+  fi
 
-if [ -x "$VENV_BIN" ]; then
-  RESOLVED_BIN="$VENV_BIN"
-elif [ -x "$VENV_EXE_BIN" ]; then
-  RESOLVED_BIN="$VENV_EXE_BIN"
-elif [ -x "$VENV_SCRIPTS" ]; then
-  RESOLVED_BIN="$VENV_SCRIPTS"
-elif [ -x "$VENV_EXE_SCRIPTS" ]; then
-  RESOLVED_BIN="$VENV_EXE_SCRIPTS"
-elif [ -x "$NODE_BIN" ]; then
-  RESOLVED_BIN="$NODE_BIN"
-elif [ -x "$NODE_CMD" ]; then
-  RESOLVED_BIN="$NODE_CMD"
-elif command -v "$LINTER" >/dev/null 2>&1; then
-  RESOLVED_BIN="$LINTER"
-fi
-
-# 2. Check Existence
-if [ -z "$RESOLVED_BIN" ]; then
-  log_warn "⚠️  ${LINTER} not found. Skipping linting for this module."
-  log_info "💡 Run 'make setup' to install required tools."
-  exit 0
-fi
-
-# 3. Special Runtime Checks
-case "$LINTER" in
-google-java-format | ktlint) check_runtime java "$LINTER" ;;
-php-cs-fixer) check_runtime php "$LINTER" ;;
-rubocop) check_runtime gem "$LINTER" ;;
-dart) check_runtime dart "$LINTER" ;;
-gofmt | cargo | goreleaser)
-  # cargo and gofmt require their respective toolchains
-  _RT="${LINTER}"
-  [ "$LINTER" = "cargo" ] && _RT="cargo"
-  [ "$LINTER" = "gofmt" ] && _RT="go"
-  [ "$LINTER" = "goreleaser" ] && _RT="goreleaser"
-  check_runtime "$_RT" "$LINTER"
-  ;;
-eslint | prettier | stylelint | spectral | sort-package-json | markdownlint-cli2 | taplo | dockerfile-utils | editorconfig-checker | commitlint)
-  check_runtime node "$LINTER"
-  ;;
-swiftformat | swiftlint)
-  if [ "$(uname -s)" != "Darwin" ]; then
-    log_info "⏭️  ${LINTER} is only supported on macOS. Skipping."
+  # 2. Check Existence
+  if [ -z "$_RESOLVED_BIN" ]; then
+    log_warn "⚠️  ${_LINTER} not found. Skipping linting for this module."
+    log_info "💡 Run 'make setup' to install required tools."
     exit 0
   fi
-  ;;
-dotnet) check_runtime dotnet "$LINTER" ;;
-esac
 
-# 4. Execute Linter
-# shellcheck disable=SC2086
-exec "$RESOLVED_BIN" "$@"
+  # 3. Special Runtime Checks
+  case "$_LINTER" in
+  google-java-format | ktlint) check_runtime java "$_LINTER" ;;
+  php-cs-fixer) check_runtime php "$_LINTER" ;;
+  rubocop) check_runtime gem "$_LINTER" ;;
+  dart) check_runtime dart "$_LINTER" ;;
+  gofmt | cargo | goreleaser)
+    # cargo and gofmt require their respective toolchains
+    _RT="${_LINTER}"
+    [ "$_LINTER" = "cargo" ] && _RT="cargo"
+    [ "$_LINTER" = "gofmt" ] && _RT="go"
+    [ "$_LINTER" = "goreleaser" ] && _RT="goreleaser"
+    check_runtime "$_RT" "$_LINTER"
+    ;;
+  eslint | prettier | stylelint | spectral | sort-package-json | markdownlint-cli2 | taplo | dockerfile-utils | editorconfig-checker | commitlint)
+    check_runtime node "$_LINTER"
+    ;;
+  swiftformat | swiftlint)
+    if [ "$(uname -s)" != "Darwin" ]; then
+      log_info "⏭️  ${_LINTER} is only supported on macOS. Skipping."
+      exit 0
+    fi
+    ;;
+  dotnet) check_runtime dotnet "$_LINTER" ;;
+  esac
+
+  # 4. Execute Linter
+  # shellcheck disable=SC2086
+  exec "$_RESOLVED_BIN" "$@"
+}
+
+main "$@"

@@ -98,27 +98,33 @@ run_powershell_tests() {
   fi
 }
 
-case "$SUITE" in
-shell) run_shell_tests ;;
-python) run_python_tests ;;
-powershell) run_powershell_tests ;;
-all)
-  run_shell_tests
-  printf "\n"
-  run_python_tests
-  printf "\n"
-  run_powershell_tests
-  ;;
-esac
+main() {
+  log_info "🧪 Starting Unified Test Runner...\n"
 
-# Note: We no longer call run_npm_script "test" here as it creates
-# a redundant (and potentially recursive) loop back to this script.
+  case "$SUITE" in
+  shell) run_shell_tests ;;
+  python) run_python_tests ;;
+  powershell) run_powershell_tests ;;
+  all)
+    run_shell_tests
+    printf "\n"
+    run_python_tests
+    printf "\n"
+    run_powershell_tests
+    ;;
+  esac
 
-log_success "\n✨ All tests passed!"
+  # Note: We no longer call run_npm_script "test" here as it creates
+  # a redundant (and potentially recursive) loop back to this script.
 
-# Next Actions
-if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
-  printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-  printf "  - Run %bmake audit%b to check for security vulnerabilities.\n" "${GREEN}" "${NC}"
-  printf "  - Run %bmake commit%b to finalize your changes.\n" "${GREEN}" "${NC}"
-fi
+  log_success "\n✨ All tests passed!"
+
+  # Next Actions
+  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+    printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
+    printf "  - Run %bmake audit%b to check for security vulnerabilities.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake commit%b to finalize your changes.\n" "${GREEN}" "${NC}"
+  fi
+}
+
+main "$@"
