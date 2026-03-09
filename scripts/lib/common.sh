@@ -165,6 +165,28 @@ get_macos_pkg_mgr() {
   fi
 }
 
+# Detect if project uses a language based on config files OR file extensions
+# usage: has_lang_files "file1 file2" "*.ext1 *.ext2"
+has_lang_files() {
+  _FILES="$1"
+  _EXTS="$2"
+
+  # 1. Check for specific config files in root
+  for f in $_FILES; do
+    [ -f "$f" ] && return 0
+  done
+
+  # 2. Check for file extensions (recursive, maxdepth 3 for performance)
+  for ext in $_EXTS; do
+    # Use find for POSIX compatibility and performance
+    if [ "$(find . -maxdepth 3 -name "$ext" -print -quit 2>/dev/null)" ]; then
+      return 0
+    fi
+  done
+
+  return 1
+}
+
 # Universal project version detector
 get_project_version() {
   if [ -f "$PACKAGE_JSON" ]; then

@@ -227,11 +227,11 @@ install_hadolint() {
     return 0
   fi
 
-  log_info "── Installing hadolint ──"
-  if [ "$DRY_RUN" -eq 1 ]; then
-    log_summary "Lint Tool" "Hadolint" "⚖️ Previewed" "-" "0"
+  if ! has_lang_files "Dockerfile docker-compose.yml" "*.dockerfile *.Dockerfile"; then
+    log_summary "Lint Tool" "Hadolint" "⏭️ Skipped" "-" "0"
     return 0
   fi
+  log_info "── Installing hadolint ──"
 
   _H_ARCH="x86_64"
   [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _H_ARCH="arm64"
@@ -262,11 +262,11 @@ install_go_lint() {
     return 0
   fi
 
-  log_info "── Installing golangci-lint ──"
-  if [ "$DRY_RUN" -eq 1 ]; then
-    log_summary "Lint Tool" "Go Lint" "⚖️ Previewed" "-" "0"
+  if ! has_lang_files "go.mod go.sum" "*.go"; then
+    log_summary "Lint Tool" "Go Lint" "⏭️ Skipped" "-" "0"
     return 0
   fi
+  log_info "── Installing golangci-lint ──"
 
   _URL="${GITHUB_PROXY}https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh"
   _TMP=$(mktemp -d)
@@ -284,11 +284,11 @@ install_go_lint() {
 
 install_checkmake() {
   _T0=$(date +%s)
-  _BIN="${VENV}/bin/checkmake${_EXE}"
-  if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
-    log_summary "Lint Tool" "Checkmake" "✅ Exists" "$(get_version "$_BIN")" "0"
+  if ! has_lang_files "Makefile" "*.make"; then
+    log_summary "Lint Tool" "Checkmake" "基础 Skipped" "-" "0"
     return 0
   fi
+  _BIN="${VENV}/bin/checkmake${_EXE}"
 
   log_info "── Installing checkmake ──"
   if [ "$DRY_RUN" -eq 1 ]; then
@@ -314,6 +314,10 @@ install_checkmake() {
 
 install_iac_lint() {
   _T0=$(date +%s)
+  if ! has_lang_files "" "*.tf *.tfvars *.yaml *.yml *.json"; then
+    log_summary "Lint Tool" "IaC" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
   log_info "── Installing IaC tools ──"
   if [ "$DRY_RUN" -eq 1 ]; then
     log_summary "Lint Tool" "TFLint" "⚖️ Previewed" "-" "0"
@@ -390,6 +394,10 @@ setup_hooks() {
 
 setup_powershell() {
   _T0=$(date +%s)
+  if ! has_lang_files "" "*.ps1 *.psm1 *.psd1"; then
+    log_summary "Lint Tool" "PowerShell" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
   log_info "── Setting up PowerShell Linter ──"
   if [ "$DRY_RUN" -eq 1 ]; then
     log_summary "Lint Tool" "PowerShell" "⚖️ Previewed" "-" "0"
@@ -417,11 +425,11 @@ install_java_lint() {
     return 0
   fi
 
-  log_info "── Installing google-java-format ──"
-  if [ "$DRY_RUN" -eq 1 ]; then
-    log_summary "Lint Tool" "Java Lint" "⚖️ Previewed" "-" "0"
+  if ! has_lang_files "pom.xml build.gradle" "*.java"; then
+    log_summary "Lint Tool" "Java Lint" "⏭️ Skipped" "-" "0"
     return 0
   fi
+  log_info "── Installing google-java-format ──"
 
   _URL="${GITHUB_PROXY}https://github.com/google/google-java-format/releases/download/v${JAVA_FORMAT_VERSION}/google-java-format-${JAVA_FORMAT_VERSION}-all-deps.jar"
   _STAT="✅ Installed"
@@ -437,11 +445,11 @@ install_java_lint() {
 
 install_ruby_lint() {
   _T0=$(date +%s)
-  log_info "── Setting up Rubocop ──"
-  if [ "$DRY_RUN" -eq 1 ]; then
-    log_summary "Lint Tool" "Rubocop" "⚖️ Previewed" "-" "0"
+  if ! has_lang_files "Gemfile Gemfile.lock .ruby-version" "*.rb"; then
+    log_summary "Lint Tool" "Rubocop" "⏭️ Skipped" "-" "0"
     return 0
   fi
+  log_info "── Setting up Rubocop ──"
 
   if command -v gem >/dev/null 2>&1; then
     _STAT="✅ Installed"
@@ -462,11 +470,11 @@ install_php_lint() {
     return 0
   fi
 
-  log_info "── Installing php-cs-fixer ──"
-  if [ "$DRY_RUN" -eq 1 ]; then
-    log_summary "Lint Tool" "PHP Lint" "⚖️ Previewed" "-" "0"
+  if ! has_lang_files "composer.json composer.lock" "*.php"; then
+    log_summary "Lint Tool" "PHP Lint" "⏭️ Skipped" "-" "0"
     return 0
   fi
+  log_info "── Installing php-cs-fixer ──"
 
   _URL="${GITHUB_PROXY}https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/releases/download/${PHP_CS_FIXER_VERSION}/php-cs-fixer.phar"
   _STAT="✅ Installed"
@@ -490,12 +498,12 @@ setup_dart() {
 
 setup_swift() {
   _T0=$(date +%s)
+  if ! has_lang_files "Package.swift" "*.swift"; then
+    log_summary "Lint Tool" "Swift" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
   if [ "${OS}" = "darwin" ]; then
     log_info "── Setting up Swift Linters (macOS) ──"
-    if [ "$DRY_RUN" -eq 1 ]; then
-      log_summary "Lint Tool" "Swift" "⚖️ Previewed" "-" "0"
-      return 0
-    fi
 
     _PKG_MGR=$(get_macos_pkg_mgr)
     if [ "$_PKG_MGR" = "brew" ]; then
@@ -520,6 +528,10 @@ setup_swift() {
 }
 
 setup_dotnet() {
+  if ! has_lang_files "global.json" "*.csproj *.sln *.cs"; then
+    log_summary "Runtime" ".NET" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
   log_info "── Checking .NET SDK ──"
   if command -v dotnet >/dev/null 2>&1; then
     log_summary "Runtime" ".NET" "✅ Available" "$(get_version dotnet)" "0"
