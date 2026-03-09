@@ -30,7 +30,7 @@ teardown() {
 
   cat <<EOF >"$TEMP_DIR/bin/node"
 #!/bin/sh
-echo "v20.0.0"
+echo "v24.1.0"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/pnpm"
 #!/bin/sh
@@ -60,7 +60,7 @@ EOF
   mkdir -p "$TEMP_DIR/bin"
   # shellcheck disable=SC2030,SC2031
   export PATH="$TEMP_DIR/bin:$PATH"
-  printf '#!/bin/sh\necho "v20.0.0"' >"$TEMP_DIR/bin/node"
+  printf '#!/bin/sh\necho "v24.1.0"' >"$TEMP_DIR/bin/node"
   printf '#!/bin/sh\necho "9.0.0"' >"$TEMP_DIR/bin/pnpm"
   printf '#!/bin/sh\necho "Python 3.10.0"' >"$TEMP_DIR/bin/python3"
   printf '#!/bin/sh\necho "git version 2.30.0"' >"$TEMP_DIR/bin/git"
@@ -92,5 +92,5 @@ EOF
 
   run sh scripts/check-env.sh
   assert_failure
-  assert_output --partial "Node.js: v18.0.0 (below recommended v20.0.0)"
+  assert_output --partial "Node.js: v18.0.0 (below recommended v24.1.0)"
 }

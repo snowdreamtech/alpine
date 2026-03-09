@@ -107,7 +107,7 @@ if [ "$VERBOSE" -ge 1 ]; then
 fi
 
 if [ "$DRY_RUN" -eq 0 ] && [ "$VERBOSE" -ge 1 ] && [ "$AUTO_CONFIRM" -eq 0 ]; then
-  if [ "$IS_TTY" -eq 1 ]; then
+  if [ "$IS_TTY" -eq 1 ] || [ "$SNOWDREAM_TEST_FORCE_CONFIRM" = "1" ]; then
     printf "\nProceed with hydration? (y/N): "
     read -r CONFIRM
     case "$CONFIRM" in

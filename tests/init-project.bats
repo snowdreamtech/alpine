@@ -28,8 +28,8 @@ teardown() {
 @test "Hydration script aborts on 'N' confirmation" {
   cd "$TEMP_DIR"
 
-  # Provide inputs: project, author, org, NO confirmation
-  run bash -c "echo -e 'dummy-app\nJane Doe\njaneorg\nn\n' | ./scripts/init-project.sh"
+  # Provide flags: project, author, org, and NO confirmation via pipe
+  run bash -c "export SNOWDREAM_TEST_FORCE_CONFIRM=1 && echo -e 'n\n' | ./scripts/init-project.sh --project=dummy-app --author='Jane Doe' --github=janeorg"
 
   assert_failure
   assert_output --partial "Aborted."
@@ -42,8 +42,8 @@ teardown() {
 @test "Hydration script replaces placeholders correctly on 'Y'" {
   cd "$TEMP_DIR"
 
-  # Provide inputs: project, author, org, YES confirmation, NO git reinit
-  run bash -c "echo -e 'dummy-app\nJane Doe\njaneorg\ny\nn\n' | ./scripts/init-project.sh"
+  # Provide flags: project, author, org, and YES confirmation via --yes, NO git reinit via pipe
+  run bash -c "echo -e 'n\n' | ./scripts/init-project.sh --project=dummy-app --author='Jane Doe' --github=janeorg --yes"
 
   assert_success
   assert_output --partial "Project Hydration Complete!"
