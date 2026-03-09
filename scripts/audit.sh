@@ -51,7 +51,7 @@ fi
 # ── Audit Modules ─────────────────────────────────────────────────────────────
 
 # 3. Secrets Scanning
-if command -v gitleaks >/dev/null 2>&1; then
+if command -v gitleaks; then
   _T0=$(date +%s)
   log_info "── Scanning for Secrets (gitleaks) ──"
   if [ "$DRY_RUN" -eq 1 ]; then
@@ -71,7 +71,7 @@ fi
 if [ -d ".github/workflows" ]; then
   _T0=$(date +%s)
   log_info "\n── Auditing GitHub Actions (zizmor) ──"
-  if command -v zizmor >/dev/null 2>&1; then
+  if command -v zizmor; then
     if [ "$DRY_RUN" -eq 1 ]; then
       log_success "DRY-RUN: Would run zizmor"
       log_summary "GitHub" "zizmor" "⚖️ Previewed" "-" "0"
@@ -103,7 +103,7 @@ if [ -f "$PACKAGE_JSON" ]; then
       _REG_ARG="--registry=https://registry.npmjs.org"
     fi
 
-    if "$NPM" audit $_REG_ARG >/dev/null 2>&1; then
+    if "$NPM" audit $_REG_ARG; then
       log_summary "Node.js" "$NPM-audit" "✅ Secure" "$(get_version "$NPM")" "$(($(date +%s) - _T0))"
     else
       log_summary "Node.js" "$NPM-audit" "❌ Vulnerable" "$(get_version "$NPM")" "$(($(date +%s) - _T0))"
@@ -145,7 +145,7 @@ fi
 
 # 7. Multi-Stack Audit (OSV-Scanner)
 _T0=$(date +%s)
-if command -v osv-scanner >/dev/null 2>&1; then
+if command -v osv-scanner; then
   log_info "\n── Generic Vulnerability Scan (osv-scanner) ──"
   if [ "$DRY_RUN" -eq 1 ]; then
     log_success "DRY-RUN: Would run osv-scanner"
@@ -164,7 +164,7 @@ fi
 if [ -f "go.mod" ]; then
   _T0=$(date +%s)
   log_info "\n── Auditing Go dependencies (govulncheck) ──"
-  if command -v govulncheck >/dev/null 2>&1; then
+  if command -v govulncheck; then
     if [ "$DRY_RUN" -eq 1 ]; then
       log_success "DRY-RUN: Would run govulncheck"
       log_summary "Go" "govulncheck" "⚖️ Previewed" "-" "0"
@@ -185,7 +185,7 @@ fi
 if [ -f "Cargo.toml" ]; then
   _T0=$(date +%s)
   log_info "\n── Auditing Rust dependencies (cargo audit) ──"
-  if command -v cargo >/dev/null 2>&1 && cargo audit --version >/dev/null 2>&1; then
+  if command -v cargo && cargo audit --version; then
     if [ "$DRY_RUN" -eq 1 ]; then
       log_success "DRY-RUN: Would run cargo audit"
       log_summary "Rust" "cargo-audit" "⚖️ Previewed" "-" "0"
@@ -206,7 +206,7 @@ fi
 if [ -f "Dockerfile" ] || [ -f "docker-compose.yml" ]; then
   _T0=$(date +%s)
   log_info "\n── Auditing Containers (trivy) ──"
-  if command -v trivy >/dev/null 2>&1; then
+  if command -v trivy; then
     if [ "$DRY_RUN" -eq 1 ]; then
       log_success "DRY-RUN: Would run trivy fs ."
       log_summary "DevOps" "trivy" "⚖️ Previewed" "-" "0"

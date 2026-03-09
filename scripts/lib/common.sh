@@ -148,7 +148,7 @@ verify_checksum() {
 check_runtime() {
   _RT="$1"
   _TOOL="${2:-Tool}"
-  if ! command -v "$_RT" >/dev/null 2>&1; then
+  if ! command -v "$_RT"; then
     log_warn "⏭️  Required runtime '$_RT' for $_TOOL is missing. Skipping."
     exit 0
   fi

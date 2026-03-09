@@ -43,7 +43,7 @@ if [ -f "$PACKAGE_JSON" ]; then
     log_debug "Skipping recursive pnpm install call."
   else
     log_info "── Installing Node.js dependencies ($NPM) ──"
-    if command -v "$NPM" >/dev/null 2>&1; then
+    if command -v "$NPM"; then
       export IN_INSTALL_SCRIPT=1
       "$NPM" install
     else
@@ -79,7 +79,7 @@ if [ -f "$REQUIREMENTS_TXT" ] || [ -f "requirements.txt" ] || [ -f "$PYPROJECT_T
 fi
 
 # 4. Git Hooks (if setup script already ran)
-if [ -d ".git/hooks" ] && command -v pre-commit >/dev/null 2>&1; then
+if [ -d ".git/hooks" ] && command -v pre-commit; then
   printf "\n"
   log_info "── Installing pre-commit hooks ──"
   pre-commit install
