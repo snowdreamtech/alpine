@@ -69,7 +69,7 @@ run_pre_commit
 log_success "\n✨ Linting complete!"
 
 # Next Actions
-if [ "$DRY_RUN" -eq 0 ]; then
+if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
   printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
   printf "  - Run %bmake test%b to run the unified test suite.\n" "${GREEN}" "${NC}"
   printf "  - Run %bmake verify%b to ensure full project health.\n" "${GREEN}" "${NC}"

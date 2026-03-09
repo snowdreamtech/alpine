@@ -37,9 +37,9 @@ run_shfmt() {
   log_info "── Formatting Shell Scripts (shfmt) ──"
   if command -v shfmt >/dev/null 2>&1; then
     if [ "$DRY_RUN" -eq 1 ]; then
-      shfmt -d scripts/*.sh tests/*.bats
+      shfmt -d -s -i 2 scripts/*.sh tests/*.bats
     else
-      shfmt -w scripts/*.sh tests/*.bats
+      shfmt -w -s -i 2 scripts/*.sh tests/*.bats
     fi
   else
     log_warn "Warning: shfmt not found. Skipping shell formatting."

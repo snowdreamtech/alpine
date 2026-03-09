@@ -42,13 +42,13 @@ done
 
 parse_common_args "$@"
 
-_START_TIME=$(date +%s)
+_START_=$(date +%s)
 
 # Initialize Summary File if not already done
 if [ -z "$SETUP_SUMMARY_FILE" ]; then
   SETUP_SUMMARY_FILE=$(mktemp)
   export SETUP_SUMMARY_FILE
-  _IS_TOP_LEVEL=true
+  _CREATED_SUMMARY=true
 
   {
     printf "### Security Audit Execution Summary\n\n"
@@ -236,7 +236,7 @@ fi
 
 # ── Final Report ─────────────────────────────────────────────────────────────
 
-if [ "$_IS_TOP_LEVEL" = "true" ]; then
+if [ "$_CREATED_SUMMARY" = "true" ]; then
   _TOTAL_DUR=$(($(date +%s) - _START_TIME))
   printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR" >>"$SETUP_SUMMARY_FILE"
 
@@ -246,7 +246,9 @@ if [ "$_IS_TOP_LEVEL" = "true" ]; then
     cat "$SETUP_SUMMARY_FILE" >>"$GITHUB_STEP_SUMMARY"
   fi
   rm -f "$SETUP_SUMMARY_FILE"
+fi
 
+if [ "$_IS_TOP_LEVEL" = "true" ]; then
   if [ "$_OVERALL_EXIT" -eq 0 ]; then
     log_success "\n✨ Security audit finished successfully."
     # Next Actions
@@ -255,7 +257,6 @@ if [ "$_IS_TOP_LEVEL" = "true" ]; then
       printf "  - Run %bmake commit%b to finalize your changes.\n" "${GREEN}" "${NC}"
       printf "  - Run %bmake build%b to create project artifacts.\n" "${GREEN}" "${NC}"
     fi
-
   else
     log_error "\n⚠️ Security audit finished with vulnerabilities or leaks found."
   fi

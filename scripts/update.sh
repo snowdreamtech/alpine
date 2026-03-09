@@ -238,7 +238,7 @@ _START_TIME=$(date +%s)
 if [ -z "$SETUP_SUMMARY_FILE" ]; then
   SETUP_SUMMARY_FILE=$(mktemp)
   export SETUP_SUMMARY_FILE
-  _IS_TOP_LEVEL=true
+  _CREATED_SUMMARY=true
 
   {
     printf "### Update Execution Summary\n\n"
@@ -260,7 +260,7 @@ update_pre_commit
 run_npm_script "update"
 
 # Final Output Management
-if [ "$_IS_TOP_LEVEL" = "true" ]; then
+if [ "$_CREATED_SUMMARY" = "true" ]; then
   _TOTAL_DUR=$(($(date +%s) - _START_TIME))
   printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR" >>"$SETUP_SUMMARY_FILE"
 
@@ -270,6 +270,9 @@ if [ "$_IS_TOP_LEVEL" = "true" ]; then
     cat "$SETUP_SUMMARY_FILE" >>"$GITHUB_STEP_SUMMARY"
   fi
   rm -f "$SETUP_SUMMARY_FILE"
+fi
+
+if [ "$_IS_TOP_LEVEL" = "true" ]; then
   log_success "\n✨ All tools and dependencies updated successfully!"
 
   # Next Actions

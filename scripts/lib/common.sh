@@ -15,6 +15,15 @@ NC=$(printf '\033[0m')
 VERBOSE=${VERBOSE:-1} # 0: quiet, 1: normal, 2: verbose
 DRY_RUN=${DRY_RUN:-0}
 
+# Orchestration tracking (detect if we are running as a sub-script)
+if [ -z "$_SNOWDREAM_TOP_LEVEL_SCRIPT" ]; then
+  _SCRIPT_NAME=$(basename "$0")
+  export _SNOWDREAM_TOP_LEVEL_SCRIPT="$_SCRIPT_NAME"
+  _IS_TOP_LEVEL=true
+else
+  _IS_TOP_LEVEL=false
+fi
+
 # SSoT Constants (Paths and Files)
 CHANGELOG="CHANGELOG.md"
 PACKAGE_JSON="package.json"

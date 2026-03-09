@@ -687,12 +687,11 @@ done
 
 # ── Execution Timing & Summary Management ──
 _START_TIME=$(date +%s)
-_IS_TOP_LEVEL=false
 
 if [ -z "$SETUP_SUMMARY_FILE" ]; then
   SETUP_SUMMARY_FILE=$(mktemp)
   export SETUP_SUMMARY_FILE
-  _IS_TOP_LEVEL=true
+  _CREATED_SUMMARY=true
 
   # Initialize Summary (Only once per CI Job or first call)
   if [ "$_SETUP_SUMMARY_INITIALIZED" != "true" ]; then
@@ -769,7 +768,7 @@ for module in $modules; do
 done
 
 # ── Final Output Management ──
-if [ "$_IS_TOP_LEVEL" = "true" ]; then
+if [ "$_CREATED_SUMMARY" = "true" ]; then
   _TOTAL_DUR=$(($(date +%s) - _START_TIME))
   printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR" >>"$SETUP_SUMMARY_FILE"
 
@@ -779,6 +778,9 @@ if [ "$_IS_TOP_LEVEL" = "true" ]; then
     cat "$SETUP_SUMMARY_FILE" >>"$GITHUB_STEP_SUMMARY"
   fi
   rm -f "$SETUP_SUMMARY_FILE"
+fi
+
+if [ "$_IS_TOP_LEVEL" = "true" ]; then
   info "\n✨ Setup step $modules complete!"
 
   # Next Actions
