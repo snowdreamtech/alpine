@@ -186,6 +186,7 @@ update_pre_commit() {
       fi
     fi
   fi
+  return 0
 }
 
 update_go_mod() {
@@ -264,6 +265,7 @@ if [ "$_CREATED_SUMMARY" = "true" ]; then
   _TOTAL_DUR=$(($(date +%s) - _START_TIME))
   printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR" >>"$SETUP_SUMMARY_FILE"
 
+  printf "\n"
   printf "\n"
   cat "$SETUP_SUMMARY_FILE"
   if [ -n "$GITHUB_STEP_SUMMARY" ]; then

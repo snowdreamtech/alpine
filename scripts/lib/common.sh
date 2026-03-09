@@ -227,7 +227,7 @@ run_npm_script() {
       # Avoid infinite loop if the command points back to this script
       if echo "$_CMD" | grep -q "$_CURRENT_SCRIPT"; then
         log_debug "npm script '$_SCRIPT_NAME' is a self-reference to '$_CURRENT_SCRIPT'. Skipping."
-        return 1
+        return 0
       fi
       log_info "── Running Node.js script: $NPM $_SCRIPT_NAME ──"
       "$NPM" run "$_SCRIPT_NAME"
