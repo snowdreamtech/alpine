@@ -497,14 +497,22 @@ setup_swift() {
       return 0
     fi
 
-    if command -v brew >/dev/null 2>&1; then
+    _PKG_MGR=$(get_macos_pkg_mgr)
+    if [ "$_PKG_MGR" = "brew" ]; then
       _STAT="✅ Installed"
       brew list swiftformat >/dev/null 2>&1 || brew install swiftformat >/dev/null 2>&1 || _STAT="⚠️ Partial"
       brew list swiftlint >/dev/null 2>&1 || brew install swiftlint >/dev/null 2>&1 || _STAT="❌ Failed"
       _D=$(($(date +%s) - _T0))
       log_summary "Lint Tool" "Swift" "$_STAT" "$(get_version swiftlint lint --version)" "$_D"
+    elif [ "$_PKG_MGR" = "port" ]; then
+      _STAT="✅ Installed"
+      log_info "Installing Swift formatters via MacPorts (requires sudo)..."
+      port installed swiftformat 2>/dev/null | grep -q active || sudo port install swiftformat || _STAT="⚠️ Partial"
+      port installed swiftlint 2>/dev/null | grep -q active || sudo port install swiftlint || _STAT="❌ Failed"
+      _D=$(($(date +%s) - _T0))
+      log_summary "Lint Tool" "Swift" "$_STAT" "$(get_version swiftlint lint --version)" "$_D"
     else
-      log_summary "Lint Tool" "Swift" "⏭️ Skipped (brew missing)" "-" "0"
+      log_summary "Lint Tool" "Swift" "⏭️ Skipped (brew/port missing)" "-" "0"
     fi
   else
     log_summary "Lint Tool" "Swift" "⏭️ Skipped" "-" "0"

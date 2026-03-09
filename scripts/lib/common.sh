@@ -154,6 +154,17 @@ check_runtime() {
   fi
 }
 
+# Package manager detection for macOS
+get_macos_pkg_mgr() {
+  if command -v brew >/dev/null 2>&1; then
+    echo "brew"
+  elif command -v port >/dev/null 2>&1; then
+    echo "port"
+  else
+    echo "none"
+  fi
+}
+
 # Universal project version detector
 get_project_version() {
   if [ -f "$PACKAGE_JSON" ]; then

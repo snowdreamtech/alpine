@@ -127,6 +127,25 @@ update_homebrew() {
         log_summary "Manager" "Homebrew" "❌ Failed" "-" "$(($(date +%s) - _T0))"
       fi
     fi
+  else
+    # If brew is not found, try macports
+    update_macports
+  fi
+}
+
+update_macports() {
+  _T0=$(date +%s)
+  if command -v port >/dev/null 2>&1; then
+    log_info "Updating MacPorts (requires sudo)..."
+    if [ "$DRY_RUN" -eq 1 ]; then
+      log_summary "Manager" "MacPorts" "⚖️ Previewed" "-" "0"
+    else
+      if sudo port selfupdate && sudo port upgrade outdated; then
+        log_summary "Manager" "MacPorts" "✅ Updated" "-" "$(($(date +%s) - _T0))"
+      else
+        log_summary "Manager" "MacPorts" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+      fi
+    fi
   fi
 }
 
