@@ -240,11 +240,10 @@ if [ "$_IS_TOP_LEVEL" = "true" ]; then
   _TOTAL_DUR=$(($(date +%s) - _START_TIME))
   printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR" >>"$SETUP_SUMMARY_FILE"
 
+  printf "\n"
+  cat "$SETUP_SUMMARY_FILE"
   if [ -n "$GITHUB_STEP_SUMMARY" ]; then
     cat "$SETUP_SUMMARY_FILE" >>"$GITHUB_STEP_SUMMARY"
-  else
-    printf "\n"
-    cat "$SETUP_SUMMARY_FILE"
   fi
   rm -f "$SETUP_SUMMARY_FILE"
 
