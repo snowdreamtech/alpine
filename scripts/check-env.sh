@@ -67,7 +67,7 @@ check_version() {
 
 # 2. Tool Checks
 # Core runtimes are CRITICAL (1)
-check_version "Node.js" "node" "20.0.0" "node -v" 1
+check_version "Node.js" "node" "24.1.0" "node -v" 1
 check_version "pnpm" "pnpm" "9.0.0" "pnpm -v" 1
 check_version "Python" "$PYTHON" "3.10.0" "$PYTHON --version" 1
 check_version "Git" "git" "2.30.0" "git --version" 1

@@ -3,6 +3,9 @@
   "version": "0.0.1",
   "private": true,
   "description": "VitePress documentation site for Snowdream Tech AI IDE Template",
+  "engines": {
+    "node": "24.1.0"
+  },
   "scripts": {
     "archive-changelog": "sh scripts/archive-changelog.sh",
     "audit": "sh scripts/audit.sh",
