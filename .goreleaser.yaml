@@ -10,7 +10,7 @@
 version: 2
 
 archives:
-  - format: tar.gz
+  - formats: [tar.gz]
     # This name template makes the OS and Arch compatible with uname and includes the version.
     name_template: >-
       {{ .ProjectName }}_{{ .Version }}_
@@ -24,7 +24,7 @@ archives:
     # Use zip for windows archives
     format_overrides:
       - goos: windows
-        format: zip
+        formats: [zip]
     # Include all relevant standard documentation arrays using Globs
     files:
       - src: "LICENSE*"

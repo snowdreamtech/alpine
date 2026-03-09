@@ -63,6 +63,20 @@ repos:
         types: [text]
         description: "Ensure that files starting with a shebang are marked as executable."
 
+      - id: check-case-conflict
+        name: check for case conflicts
+        entry: python3 -c 'import sys, os; [sys.exit(1) for d in set(os.path.dirname(f) or "." for f in sys.argv[1:]) for files in [[f.lower() for f in os.listdir(d)]] if len(files) != len(set(files))]'
+        language: system
+        stages: [pre-commit, pre-merge-commit]
+        description: "Check for files that would conflict on a case-insensitive filesystem."
+
+      - id: check-symlinks
+        name: check for broken symlinks
+        entry: python3 -c 'import sys, os; [sys.exit(1) for f in sys.argv[1:] if os.path.islink(f) and not os.path.exists(f)]'
+        language: system
+        stages: [pre-commit, pre-merge-commit]
+        description: "Verify that symlinks do not point to non-existent locations."
+
       # ── Secret Scanning ────────────────────────────────────────────────────
       - id: gitleaks
         name: gitleaks
@@ -110,6 +124,22 @@ repos:
         entry: sh scripts/lib/lint-wrapper.sh clang-format
         args: [-i]
         types_or: [objective-c, c, c++]
+
+      - id: cargo-fmt
+        name: cargo fmt
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh cargo fmt --all --
+        types: [rust]
+        pass_filenames: false
+        description: "Format Rust code using cargo fmt."
+
+      - id: goreleaser-check
+        name: goreleaser check
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh goreleaser check
+        files: ^\.goreleaser\.ya?ml$
+        pass_filenames: false
+        description: "Check Goreleaser configuration for errors."
 
       # ── EditorConfig & Consistency ─────────────────────────────────────────
       - id: editorconfig-checker

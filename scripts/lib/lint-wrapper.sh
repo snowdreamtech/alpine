@@ -50,7 +50,14 @@ google-java-format | ktlint) check_runtime java "$LINTER" ;;
 php-cs-fixer) check_runtime php "$LINTER" ;;
 rubocop) check_runtime gem "$LINTER" ;;
 dart) check_runtime dart "$LINTER" ;;
-gofmt) check_runtime go "$LINTER" ;;
+gofmt | cargo | goreleaser)
+  # cargo and gofmt require their respective toolchains
+  _RT="${LINTER}"
+  [ "$LINTER" = "cargo" ] && _RT="cargo"
+  [ "$LINTER" = "gofmt" ] && _RT="go"
+  [ "$LINTER" = "goreleaser" ] && _RT="goreleaser"
+  check_runtime "$_RT" "$LINTER"
+  ;;
 eslint | prettier | stylelint | spectral | sort-package-json | markdownlint-cli2 | taplo | dockerfile-utils | editorconfig-checker | commitlint)
   check_runtime node "$LINTER"
   ;;
