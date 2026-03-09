@@ -112,9 +112,8 @@ all)
   ;;
 esac
 
-# Optional: run npm test if extra tools are defined in package.json
-# ensuring we don't loop back to this script.
-run_npm_script "test"
+# Note: We no longer call run_npm_script "test" here as it creates
+# a redundant (and potentially recursive) loop back to this script.
 
 log_success "\n✨ All tests passed!"
 

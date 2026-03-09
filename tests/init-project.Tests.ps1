@@ -3,7 +3,7 @@ Describe "Init-Project PowerShell Wrapper" {
         $ScriptPath = Join-Path $PSScriptRoot "..\scripts\init-project.ps1"
         # 'sh' is expected to be available in the test environment (macOS/Linux/WSL/Git Bash).
         # We simulate user input causing the underlying script to abort to prove it was called.
-        $output = "dummy`ndummy`ndummy`nn`n" | & pwsh -NoProfile -Command $ScriptPath 2>&1
+        $output = "n`n" | & pwsh -NoProfile -Command "$ScriptPath --project=dummy-app --author='Jane Doe' --github=janeorg" 2>&1
 
         # Check if the output contains the start of the hydration script
         $outputString = $output -join "`n"
