@@ -4,4 +4,5 @@ mode: agent
 ---
 
 <!-- markdownlint-disable-next-line MD018 -->
+
 #file:../../.agent/workflows/speckit.constitution.md

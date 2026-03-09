@@ -19,7 +19,7 @@ Fixes # (issue)
 
 - [ ] Unit tests passed
 - [ ] Local environment deployment verified
-- [ ] Other (please specify): ****\_****
+- [ ] Other (please specify): \***\*\_\*\***
 
 ## Checklist
 

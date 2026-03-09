@@ -4,8 +4,8 @@ The `.agent/rules/` directory is the **single source of truth** for all developm
 
 ## Rule Files
 
-| File                                       | Scope                                        |
-| ------------------------------------------ | -------------------------------------------- |
+| File                                          | Scope                                        |
+| --------------------------------------------- | -------------------------------------------- |
 | [01 · General](./01-general.md)               | Language, communication, core principles     |
 | [02 · Coding Style](./02-coding-style.md)     | Commit messages, naming, formatting          |
 | [03 · Architecture](./03-architecture.md)     | Project structure, cross-platform design     |
