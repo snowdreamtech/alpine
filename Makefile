@@ -73,7 +73,7 @@ else
 	@sh scripts/setup.sh
 endif
 
-install:
+install: setup
 ifeq ($(OS_NAME),Windows)
 	@scripts/install.bat
 else
