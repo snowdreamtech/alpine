@@ -53,7 +53,28 @@ check_version() {
     return 1
   fi
 
-  _CURRENT_VER=$($_VER_CMD | sed 's/[^0-9.]//g' | cut -d. -f1-3)
+  _RAW_OUT=$($_VER_CMD 2>&1)
+
+  # Specialized extraction for tricky outputs
+  case "$_NAME" in
+  Swift)
+    _CURRENT_VER=$(echo "$_RAW_OUT" | sed -n 's/.*Swift version \([0-9][0-9.]*\).*/\1/p' | head -n 1)
+    ;;
+  Java)
+    # java -version outputs to stderr and puts version in quotes
+    _CURRENT_VER=$(echo "$_RAW_OUT" | sed -n 's/.*version "\([0-9][0-9.]*\).*/\1/p' | head -n 1)
+    ;;
+  *)
+    # Generic: Find the first sequence of digits and dots that has at least one dot
+    _CURRENT_VER=$(echo "$_RAW_OUT" | sed -n 's/[^0-9.]*\([0-9][0-9.]*\.[0-9][0-9.]*\).*/\1/p' | head -n 1)
+    # Fallback to digits only if still empty
+    [ -z "$_CURRENT_VER" ] && _CURRENT_VER=$(echo "$_RAW_OUT" | sed -n 's/[^0-9.]*\([0-9][0-9.]*\).*/\1/p' | head -n 1)
+    ;;
+  esac
+
+  # Strip any non-version trailing chars, limit components, and fallback to 0.0
+  _CURRENT_VER=$(echo "$_CURRENT_VER" | sed 's/[^0-9.]//g' | cut -d. -f1-3)
+  [ -z "$_CURRENT_VER" ] && _CURRENT_VER="0.0"
 
   # Simple version comparison using sort -n
   _LOWER_VER=$(printf "%s\n%s" "$_MIN_VER" "$_CURRENT_VER" | sort -n -t. -k1,1 -k2,2 -k3,3 | head -n1)
@@ -117,9 +138,62 @@ if has_lang_files "Gemfile .ruby-version package.json" "*.rb"; then
 else
   log_info "⏭️  Ruby: Skipped (no ruby files)"
 fi
+
+# Java (Checked if pom.xml or build.gradle exists)
+if has_lang_files "pom.xml build.gradle" "*.java"; then
+  check_version "Java" "java" "17" "java -version" 0
+else
+  log_info "⏭️  Java: Skipped (no java files)"
+fi
+
+# PHP (Checked if composer.json or *.php exists)
+if has_lang_files "composer.json" "*.php"; then
+  check_version "PHP" "php" "8.0.0" "php -v" 0
+else
+  log_info "⏭️  PHP: Skipped (no php files)"
+fi
+
+# .NET (Checked if project/solution files exist)
+if has_lang_files "global.json" "*.csproj *.sln *.cs"; then
+  check_version ".NET" "dotnet" "6.0.0" "dotnet --version" 0
+else
+  log_info "⏭️  .NET: Skipped (no dotnet files)"
+fi
+
+# Rust (Checked if Cargo.toml exists)
+if has_lang_files "Cargo.toml" "*.rs"; then
+  check_version "Rust" "cargo" "1.70.0" "cargo --version" 0
+else
+  log_info "⏭️  Rust: Skipped (no rust files)"
+fi
 printf "\n"
 
-# 4. Group: Security & Quality Tools
+# 4. Group: Mobile Support (Dynamic Detection)
+if has_lang_files "Package.swift pubspec.yaml build.gradle.kts" "*.swift *.kt *.dart"; then
+  log_info "── Mobile Support ──"
+
+  # Swift (macOS only for real usage)
+  if has_lang_files "Package.swift" "*.swift"; then
+    check_version "Swift" "swift" "5.0" "swift --version" 0
+  fi
+
+  # Kotlin
+  if has_lang_files "build.gradle.kts" "*.kt *.kts"; then
+    check_version "Kotlin" "kotlin" "1.9.0" "kotlin -version" 0
+  fi
+
+  # Dart/Flutter
+  if [ -f "pubspec.yaml" ] || has_lang_files "" "*.dart"; then
+    if command -v flutter >/dev/null 2>&1; then
+      check_version "Flutter" "flutter" "3.0.0" "flutter --version" 0
+    else
+      check_version "Dart" "dart" "3.0.0" "dart --version" 0
+    fi
+  fi
+  printf "\n"
+fi
+
+# 5. Group: Security & Quality Tools
 log_info "── Security & Quality Tools ──"
 
 # Security Tools (Always recommended)
@@ -160,7 +234,7 @@ if has_lang_files "go.mod" "*.go"; then
 fi
 printf "\n"
 
-# 5. Project File Integrity
+# 6. Project File Integrity
 log_info "── Project Integrity ──"
 for f in "Makefile" "$PACKAGE_JSON" "README.md" ".agent/rules/01-general.md"; do
   if [ -f "$f" ]; then

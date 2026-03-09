@@ -56,10 +56,38 @@ EOF
 #!/bin/sh
 echo "ruby 3.2.2 (2023-03-30 revision e51014f9c0) [arm64-darwin22]"
 EOF
+  cat <<EOF >"$TEMP_DIR/bin/java"
+#!/bin/sh
+echo "openjdk version \"17.0.8\" 2023-07-18"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/php"
+#!/bin/sh
+echo "PHP 8.2.10 (cli) (built: Aug 31 2023 15:52:53) (NTS)"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/dotnet"
+#!/bin/sh
+echo "7.0.401"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/cargo"
+#!/bin/sh
+echo "cargo 1.72.1 (103487372 2023-09-19)"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/swift"
+#!/bin/sh
+echo "swift-driver version: 1.82.2 Apple Swift version 5.9 (swiftlang-5.9.0.128.108 clang-1500.0.40.1)"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/kotlin"
+#!/bin/sh
+echo "Kotlin version 1.9.10-release-445 (JRE 17.0.8+7)"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/dart"
+#!/bin/sh
+echo "Dart SDK version: 3.1.2 (stable) (Tue Sep 12 14:43:30 2023 +0000) on \"macos_arm64\""
+EOF
   chmod +x "$TEMP_DIR/bin/"*
 
   # Create files to trigger language checks
-  touch go.mod main.py Gemfile
+  touch go.mod main.py Gemfile pom.xml composer.json global.json Cargo.toml Package.swift build.gradle.kts pubspec.yaml
 
   run sh scripts/check-env.sh
   assert_success
@@ -67,6 +95,14 @@ EOF
   assert_output --partial "Go: v1.21.0"
   assert_output --partial "Python: v3.10.0"
   assert_output --partial "Ruby: v3.2.2"
+  assert_output --partial "Java: v17.0.8"
+  assert_output --partial "PHP: v8.2.10"
+  assert_output --partial ".NET: v7.0.401"
+  assert_output --partial "Rust: v1.72.1"
+  assert_output --partial "── Mobile Support ──"
+  assert_output --partial "Swift: v5.9"
+  assert_output --partial "Kotlin: v1.9.10"
+  assert_output --partial "Dart: v3.1.2"
 }
 
 @test "check-env.sh: reports failure when a non-guard critical file is missing" {
@@ -74,11 +110,11 @@ EOF
   mkdir -p "$TEMP_DIR/bin"
   # shellcheck disable=SC2030,SC2031
   export PATH="$TEMP_DIR/bin:$PATH"
-  printf '#!/bin/sh\necho "v24.1.0"' >"$TEMP_DIR/bin/node"
-  printf '#!/bin/sh\necho "9.0.0"' >"$TEMP_DIR/bin/pnpm"
-  printf '#!/bin/sh\necho "Python 3.10.0"' >"$TEMP_DIR/bin/python3"
-  printf '#!/bin/sh\necho "git version 2.30.0"' >"$TEMP_DIR/bin/git"
-  printf '#!/bin/sh\necho "GNU Make 3.81"' >"$TEMP_DIR/bin/make"
+  printf '#!/bin/sh\necho "v24.1.0"\n' >"$TEMP_DIR/bin/node"
+  printf '#!/bin/sh\necho "9.0.0"\n' >"$TEMP_DIR/bin/pnpm"
+  printf '#!/bin/sh\necho "Python 3.10.0"\n' >"$TEMP_DIR/bin/python3"
+  printf '#!/bin/sh\necho "git version 2.30.0"\n' >"$TEMP_DIR/bin/git"
+  printf '#!/bin/sh\necho "GNU Make 3.81"\n' >"$TEMP_DIR/bin/make"
   chmod +x "$TEMP_DIR/bin/"*
 
   # Remove critical file (README.md is NOT a guard file in common.sh)
@@ -96,12 +132,12 @@ EOF
   export PATH="$TEMP_DIR/bin:$PATH"
 
   # Node version too low
-  printf '#!/bin/sh\necho "v18.0.0"' >"$TEMP_DIR/bin/node"
+  printf '#!/bin/sh\necho "v18.0.0"\n' >"$TEMP_DIR/bin/node"
   # Other tools ok
-  printf '#!/bin/sh\necho "9.0.0"' >"$TEMP_DIR/bin/pnpm"
-  printf '#!/bin/sh\necho "Python 3.10.0"' >"$TEMP_DIR/bin/python3"
-  printf '#!/bin/sh\necho "git version 2.30.0"' >"$TEMP_DIR/bin/git"
-  printf '#!/bin/sh\necho "GNU Make 3.81"' >"$TEMP_DIR/bin/make"
+  printf '#!/bin/sh\necho "9.0.0"\n' >"$TEMP_DIR/bin/pnpm"
+  printf '#!/bin/sh\necho "Python 3.10.0"\n' >"$TEMP_DIR/bin/python3"
+  printf '#!/bin/sh\necho "git version 2.30.0"\n' >"$TEMP_DIR/bin/git"
+  printf '#!/bin/sh\necho "GNU Make 3.81"\n' >"$TEMP_DIR/bin/make"
   chmod +x "$TEMP_DIR/bin/"*
 
   touch main.py
