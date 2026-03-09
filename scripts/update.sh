@@ -140,7 +140,7 @@ update_macports() {
     if [ "$DRY_RUN" -eq 1 ]; then
       log_summary "Manager" "MacPorts" "⚖️ Previewed" "-" "0"
     else
-      if sudo port selfupdate && sudo port upgrade outdated; then
+      if sudo port selfupdate && sudo port -N upgrade outdated; then
         log_summary "Manager" "MacPorts" "✅ Updated" "-" "$(($(date +%s) - _T0))"
       else
         log_summary "Manager" "MacPorts" "❌ Failed" "-" "$(($(date +%s) - _T0))"
