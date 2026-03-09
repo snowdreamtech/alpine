@@ -2,6 +2,7 @@
 # scripts/lib/lint-wrapper.sh - Robust wrapper for pre-commit hooks.
 # Ensures that optional linters skip gracefully if tools/runtimes are missing.
 # Usage: sh scripts/lib/lint-wrapper.sh LINTER_NAME [ARGS...]
+# Features: POSIX compliant, Graceful tool detection, Cross-platform runtime checks.
 
 LINTER="$1"
 shift
