@@ -667,32 +667,35 @@ setup_security() {
   fi
 }
 
-# ── Main Execution ───────────────────────────────────────────────────────────
+main() {
+  # 1. Execution Context Guard
+  guard_project_root
 
-# Argument parsing for flags
-parse_common_args "$@"
-# Re-extract raw args to avoid flags
-RAW_ARGS=""
-for arg in "$@"; do
-  case "$arg" in
-  -q | --quiet | -v | --verbose | --dry-run | -h | --help) ;;
-  *) RAW_ARGS="${RAW_ARGS} ${arg}" ;;
-  esac
-done
+  # 2. Argument Parsing
+  parse_common_args "$@"
 
-# ── Execution Timing & Summary Management ──
-_START_TIME=$(date +%s)
+  # Re-extract raw args to avoid flags
+  _RAW_ARGS=""
+  for _arg in "$@"; do
+    case "$_arg" in
+    -q | --quiet | -v | --verbose | --dry-run | -h | --help) ;;
+    *) _RAW_ARGS="${_RAW_ARGS} ${_arg}" ;;
+    esac
+  done
 
-if [ -z "$SETUP_SUMMARY_FILE" ]; then
-  SETUP_SUMMARY_FILE=$(mktemp)
-  export SETUP_SUMMARY_FILE
-  _CREATED_SUMMARY=true
+  # ── Execution Timing & Summary Management ──
+  _START_TIME=$(date +%s)
 
-  # Initialize Summary (Only once per CI Job or first call)
-  if [ "$_SETUP_SUMMARY_INITIALIZED" != "true" ]; then
-    {
-      printf "### Setup Execution Summary\n\n"
-      cat <<EOF
+  if [ -z "$SETUP_SUMMARY_FILE" ]; then
+    SETUP_SUMMARY_FILE=$(mktemp)
+    export SETUP_SUMMARY_FILE
+    _CREATED_SUMMARY=true
+
+    # Initialize Summary (Only once per CI Job or first call)
+    if [ "$_SETUP_SUMMARY_INITIALIZED" != "true" ]; then
+      {
+        printf "### Setup Execution Summary\n\n"
+        cat <<EOF
 > **Status Legend:**
 > ⚖️ **Previewed**: Running in \`--dry-run\` mode.
 > ✅ **Active/Detected/Available**: System/Shell active or Runtime detected.
@@ -704,84 +707,87 @@ if [ -z "$SETUP_SUMMARY_FILE" ]; then
 > ❌ **Failed**: An error occurred during installation or setup.
 
 EOF
-      # Add Global Environment Detections immediately after the legend
-      log_summary "Environment" "System" "✅ Active" "${OS}/${ARCH}" "0"
-      log_summary "Environment" "Shell" "✅ Active" "$(basename "$SHELL")" "0"
+        # Add Global Environment Detections immediately after the legend
+        log_summary "Environment" "System" "✅ Active" "${OS}/${ARCH}" "0"
+        log_summary "Environment" "Shell" "✅ Active" "$(basename "$SHELL")" "0"
 
-      # Detect Go/Rust even if not explicitly setup
-      if command -v go >/dev/null 2>&1; then
-        log_summary "Runtime" "Go" "✅ Detected" "$(get_version go)" "0"
-      fi
-      if command -v cargo >/dev/null 2>&1; then
-        log_summary "Runtime" "Rust" "✅ Detected" "$(get_version cargo)" "0"
-      fi
-    } >"$SETUP_SUMMARY_FILE"
+        # Detect Go/Rust even if not explicitly setup
+        if command -v go >/dev/null 2>&1; then
+          log_summary "Runtime" "Go" "✅ Detected" "$(get_version go)" "0"
+        fi
+        if command -v cargo >/dev/null 2>&1; then
+          log_summary "Runtime" "Rust" "✅ Detected" "$(get_version cargo)" "0"
+        fi
+      } >"$SETUP_SUMMARY_FILE"
 
-    # Set master sentinel for subsequent steps in CI
-    if [ -n "$GITHUB_ENV" ]; then
-      echo "_SETUP_SUMMARY_INITIALIZED=true" >>"$GITHUB_ENV"
+      # Set master sentinel for subsequent steps in CI
+      if [ -n "$GITHUB_ENV" ]; then
+        echo "_SETUP_SUMMARY_INITIALIZED=true" >>"$GITHUB_ENV"
+      fi
+      export _SETUP_SUMMARY_INITIALIZED=true
+    else
+      touch "$SETUP_SUMMARY_FILE"
     fi
-    export _SETUP_SUMMARY_INITIALIZED=true
+
+    # Always provide a table header for the current process invocation
+    {
+      printf "| Category | Module | Status | Version | Time |\n"
+      printf "| :--- | :--- | :--- | :--- | :--- |\n"
+    } >>"$SETUP_SUMMARY_FILE"
+  fi
+
+  # ── Module Selection ──
+  if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "${_RAW_ARGS# *}" = "all" ]; then
+    _MODULES="node python gitleaks hadolint go checkmake iac powershell java ruby php dart swift dotnet security hooks"
   else
-    touch "$SETUP_SUMMARY_FILE"
+    _MODULES="${_RAW_ARGS}"
   fi
 
-  # Always provide a table header for the current process invocation
-  {
-    printf "| Category | Module | Status | Version | Time |\n"
-    printf "| :--- | :--- | :--- | :--- | :--- |\n"
-  } >>"$SETUP_SUMMARY_FILE"
-fi
+  for _module in $_MODULES; do
+    case $_module in
+    node) setup_node ;;
+    python) setup_python ;;
+    gitleaks) install_gitleaks ;;
+    checkmake) install_checkmake ;;
+    hadolint) install_hadolint ;;
+    go) install_go_lint ;;
+    iac) install_iac_lint ;;
+    powershell) setup_powershell ;;
+    java) install_java_lint ;;
+    ruby) install_ruby_lint ;;
+    php) install_php_lint ;;
+    dart) setup_dart ;;
+    swift) setup_swift ;;
+    dotnet) setup_dotnet ;;
+    security) setup_security ;;
+    hooks) setup_hooks ;;
+    *) log_error "Unknown module: $_module" ;;
+    esac
+  done
 
-# ── Module Selection ──
-if [ -z "$(echo "${RAW_ARGS}" | tr -d ' ')" ] || [ "${RAW_ARGS# *}" = "all" ]; then
-  modules="node python gitleaks hadolint go checkmake iac powershell java ruby php dart swift dotnet security hooks"
-else
-  modules="${RAW_ARGS}"
-fi
+  # ── Final Output Management ──
+  if [ "$_CREATED_SUMMARY" = "true" ]; then
+    _TOTAL_DUR=$(($(date +%s) - _START_TIME))
+    printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR" >>"$SETUP_SUMMARY_FILE"
 
-for module in $modules; do
-  case $module in
-  node) setup_node ;;
-  python) setup_python ;;
-  gitleaks) install_gitleaks ;;
-  checkmake) install_checkmake ;;
-  hadolint) install_hadolint ;;
-  go) install_go_lint ;;
-  iac) install_iac_lint ;;
-  powershell) setup_powershell ;;
-  java) install_java_lint ;;
-  ruby) install_ruby_lint ;;
-  php) install_php_lint ;;
-  dart) setup_dart ;;
-  swift) setup_swift ;;
-  dotnet) setup_dotnet ;;
-  security) setup_security ;;
-  hooks) setup_hooks ;;
-  *) error "Unknown module: $module" ;;
-  esac
-done
-
-# ── Final Output Management ──
-if [ "$_CREATED_SUMMARY" = "true" ]; then
-  _TOTAL_DUR=$(($(date +%s) - _START_TIME))
-  printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR" >>"$SETUP_SUMMARY_FILE"
-
-  printf "\n"
-  cat "$SETUP_SUMMARY_FILE"
-  if [ -n "$GITHUB_STEP_SUMMARY" ]; then
-    cat "$SETUP_SUMMARY_FILE" >>"$GITHUB_STEP_SUMMARY"
+    printf "\n"
+    cat "$SETUP_SUMMARY_FILE"
+    if [ -n "$GITHUB_STEP_SUMMARY" ]; then
+      cat "$SETUP_SUMMARY_FILE" >>"$GITHUB_STEP_SUMMARY"
+    fi
+    rm -f "$SETUP_SUMMARY_FILE"
   fi
-  rm -f "$SETUP_SUMMARY_FILE"
-fi
 
-if [ "$_IS_TOP_LEVEL" = "true" ]; then
-  log_info "\n✨ Setup step $modules complete!"
+  if [ "$_IS_TOP_LEVEL" = "true" ]; then
+    log_info "\n✨ Setup step complete!"
 
-  # Next Actions
-  if [ "$DRY_RUN" -eq 0 ]; then
-    printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    printf "  - Run %bmake install%b to install project dependencies.\n" "${GREEN}" "${NC}"
-    printf "  - Run %bmake verify%b to ensure environment health.\n" "${GREEN}" "${NC}"
+    # Next Actions
+    if [ "$DRY_RUN" -eq 0 ]; then
+      printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
+      printf "  - Run %bmake install%b to install project dependencies.\n" "${GREEN}" "${NC}"
+      printf "  - Run %bmake verify%b to ensure environment health.\n" "${GREEN}" "${NC}"
+    fi
   fi
-fi
+}
+
+main "$@"

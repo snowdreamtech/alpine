@@ -42,32 +42,36 @@ for _arg in "$@"; do
 done
 parse_common_args "$@"
 
-log_info "⚡ Starting Performance Benchmarker...\n"
+main() {
+  log_info "⚡ Starting Performance Benchmarker...\n"
 
-run_python_bench() {
-  if find . -maxdepth 2 -name "*benchmark*" | grep -q .; then
-    log_info "── Testing Python Benchmarks (pytest-benchmark) ──"
-    if [ "$DRY_RUN" -eq 1 ]; then
-      log_success "DRY-RUN: Would run pytest-benchmark"
-    elif [ -x "$VENV/bin/pytest" ]; then
-      "$VENV/bin/pytest" --benchmark-only
-    else
-      log_warn "pytest-benchmark not found. Skipping."
+  run_python_bench() {
+    if find . -maxdepth 2 -name "*benchmark*" | grep -q .; then
+      log_info "── Testing Python Benchmarks (pytest-benchmark) ──"
+      if [ "$DRY_RUN" -eq 1 ]; then
+        log_success "DRY-RUN: Would run pytest-benchmark"
+      elif [ -x "$VENV/bin/pytest" ]; then
+        "$VENV/bin/pytest" --benchmark-only
+      else
+        log_warn "pytest-benchmark not found. Skipping."
+      fi
     fi
-  fi
+  }
+
+  run_node_bench() {
+    run_npm_script "bench"
+  }
+
+  case "$SUITE" in
+  python) run_python_bench ;;
+  node) run_node_bench ;;
+  all)
+    run_python_bench
+    run_node_bench
+    ;;
+  esac
+
+  log_success "\n✨ Benchmarking finished."
 }
 
-run_node_bench() {
-  run_npm_script "bench"
-}
-
-case "$SUITE" in
-python) run_python_bench ;;
-node) run_node_bench ;;
-all)
-  run_python_bench
-  run_node_bench
-  ;;
-esac
-
-log_success "\n✨ Benchmarking finished."
+main "$@"
