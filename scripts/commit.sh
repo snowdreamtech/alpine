@@ -49,8 +49,18 @@ if [ "$DRY_RUN" -eq 0 ]; then
   if ! git diff --cached --quiet; then
     log_debug "Staged changes detected."
   else
-    log_error "Error: No files added to staging! Did you forget to run 'git add'?"
-    exit 1
+    # Check if there are ANY changes at all
+    if [ -z "$(git status --porcelain)" ]; then
+      log_success "Nothing to commit, working tree clean. ✨"
+      exit 0
+    else
+      log_warn "⚠️  No files added to staging! Your changes are currently unstaged."
+      log_info "Modified files:"
+      git status --porcelain | grep -E '^ [MADRC]' || true
+      printf "\n"
+      log_info "💡 Run 'git add <file>' or 'make format' (which stages some files) before committing."
+      exit 0
+    fi
   fi
 fi
 
