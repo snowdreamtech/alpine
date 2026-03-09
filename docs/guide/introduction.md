@@ -45,9 +45,10 @@ Beyond just rules, the template includes the **SpecKit** workflow suite — a se
 
 Quality is enforced at every stage:
 
-- **Pre-commit hooks**: 40+ checks run locally before any commit reaches the remote.
-- **GitHub Actions**: Full CI pipeline with linting, security scanning, and CodeQL analysis.
-- **DevContainer**: Reproducible environment ensures "works on my machine" is never an excuse.
+- **Pre-commit hooks**: 40+ standardized checks run locally to catch issues early.
+- **Unified CI Pipeline**: Modernized GitHub Actions (`make lint`, `make audit`, `make test`) ensure 100% environment parity.
+- **Standardized Runtimes**: Consistent use of Node.js 22 and Python 3.12 across all stages.
+- **DevContainer**: Reproducible environment ensures 100% setup reliability.
 
 ## Technology Stack
 

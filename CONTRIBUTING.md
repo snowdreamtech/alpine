@@ -8,16 +8,16 @@ We welcome contributions of all kinds, including bug fixes, new AI agent rules, 
 
 ### 1. Setting Up Your Environment
 
-Before submitting any changes, you must set up your local development environment to ensure your code matches our strict project standards:
+Our project uses a standardized environment targeting **Node.js 22** and **Python 3.12**.
 
-1. **Install `pre-commit`**: We rely heavily on `pre-commit` to catch linting, formatting, and security issues _before_ they are committed.
+To set up your local development environment, follow the unified 4-step sequence:
 
-   ```bash
-   pip install pre-commit
-   pre-commit install --hook-type pre-commit --hook-type pre-merge-commit --hook-type commit-msg
-   ```
+1. **Initialize**: `make init` (Hydrate project branding)
+2. **Setup**: `make setup` (Install system-level linter/security tools)
+3. **Install**: `make install` (Install dependencies and activate git hooks)
+4. **Verify**: `make verify` (Final project health check)
 
-2. **Verify Setup**: Run `make setup` and `make install` to ensure all system and project dependencies are available, then run `make lint` to verify.
+Run `make help` for a complete automation matrix.
 
 ### 2. General Workflow
 
