@@ -37,36 +37,43 @@ parse_common_args "$@"
 update_pnpm_global() {
   _T0=$(date +%s)
   if command -v pnpm >/dev/null 2>&1; then
-    # Intelligent pnpm update: detects if managed by corepack
-    if command -v corepack >/dev/null 2>&1 && pnpm self-update --help 2>&1 | grep -q "corepack" >/dev/null 2>&1; then
-      log_info "Updating pnpm (via corepack)..."
-      if [ "$DRY_RUN" -eq 1 ]; then
-        log_summary "Manager" "pnpm" "⚖️ Previewed" "-" "0"
-      else
-        if run_quiet corepack prepare pnpm@latest --activate; then
-          log_summary "Manager" "pnpm" "✅ Updated" "$(get_version pnpm)" "$(($(date +%s) - _T0))"
+    if check_update_cooldown "pnpm-global"; then
+      # Intelligent pnpm update: detects if managed by corepack
+      if command -v corepack >/dev/null 2>&1 && pnpm self-update --help 2>&1 | grep -q "corepack" >/dev/null 2>&1; then
+        log_info "Updating pnpm (via corepack)..."
+        if [ "$DRY_RUN" -eq 1 ]; then
+          log_summary "Manager" "pnpm" "⚖️ Previewed" "-" "0"
         else
-          log_summary "Manager" "pnpm" "❌ Failed" "-" "$(($(date +%s) - _T0))"
-        fi
-      fi
-    else
-      if [ "$DRY_RUN" -eq 1 ]; then
-        log_summary "Manager" "pnpm" "⚖️ Previewed" "-" "0"
-      else
-        log_info "Updating pnpm (self-update)..."
-        if _OUT=$(run_quiet pnpm self-update 2>&1); then
-          log_summary "Manager" "pnpm" "✅ Updated" "$(get_version pnpm)" "$(($(date +%s) - _T0))"
-        elif echo "$_OUT" | grep -q "ERR_PNPM_CANT_SELF_UPDATE_IN_COREPACK"; then
-          log_warn "pnpm is managed by corepack. Switching to corepack update..."
           if run_quiet corepack prepare pnpm@latest --activate; then
+            save_update_timestamp "pnpm-global"
             log_summary "Manager" "pnpm" "✅ Updated" "$(get_version pnpm)" "$(($(date +%s) - _T0))"
           else
             log_summary "Manager" "pnpm" "❌ Failed" "-" "$(($(date +%s) - _T0))"
           fi
+        fi
+      else
+        if [ "$DRY_RUN" -eq 1 ]; then
+          log_summary "Manager" "pnpm" "⚖️ Previewed" "-" "0"
         else
-          log_summary "Manager" "pnpm" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+          log_info "Updating pnpm (self-update)..."
+          if _OUT=$(run_quiet pnpm self-update 2>&1); then
+            save_update_timestamp "pnpm-global"
+            log_summary "Manager" "pnpm" "✅ Updated" "$(get_version pnpm)" "$(($(date +%s) - _T0))"
+          elif echo "$_OUT" | grep -q "ERR_PNPM_CANT_SELF_UPDATE_IN_COREPACK"; then
+            log_warn "pnpm is managed by corepack. Switching to corepack update..."
+            if run_quiet corepack prepare pnpm@latest --activate; then
+              save_update_timestamp "pnpm-global"
+              log_summary "Manager" "pnpm" "✅ Updated" "$(get_version pnpm)" "$(($(date +%s) - _T0))"
+            else
+              log_summary "Manager" "pnpm" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+            fi
+          else
+            log_summary "Manager" "pnpm" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+          fi
         fi
       fi
+    else
+      log_summary "Manager" "pnpm" "✅ Up-to-date (Cooldown)" "$(get_version pnpm)" "0"
     fi
   fi
 }
@@ -160,15 +167,20 @@ update_ruby_gems() {
   _T0=$(date +%s)
   if command -v gem >/dev/null 2>&1; then
     if gem list rubocop -i >/dev/null 2>&1; then
-      log_info "Updating Rubocop gem..."
-      if [ "$DRY_RUN" -eq 1 ]; then
-        log_summary "Lint Tool" "Rubocop" "⚖️ Previewed" "-" "0"
-      else
-        if run_quiet gem update rubocop --user-install --no-document --quiet; then
-          log_summary "Lint Tool" "Rubocop" "✅ Updated" "$(get_version rubocop)" "$(($(date +%s) - _T0))"
+      if check_update_cooldown "rubocop"; then
+        log_info "Updating Rubocop gem..."
+        if [ "$DRY_RUN" -eq 1 ]; then
+          log_summary "Lint Tool" "Rubocop" "⚖️ Previewed" "-" "0"
         else
-          log_summary "Lint Tool" "Rubocop" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+          if run_quiet gem update rubocop --user-install --no-document --quiet; then
+            save_update_timestamp "rubocop"
+            log_summary "Lint Tool" "Rubocop" "✅ Updated" "$(get_version rubocop)" "$(($(date +%s) - _T0))"
+          else
+            log_summary "Lint Tool" "Rubocop" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+          fi
         fi
+      else
+        log_summary "Lint Tool" "Rubocop" "✅ Up-to-date (Cooldown)" "$(get_version rubocop)" "0"
       fi
     fi
   fi
@@ -182,15 +194,20 @@ update_pre_commit() {
   elif command -v pre-commit >/dev/null 2>&1; then _BIN="pre-commit"; fi
 
   if [ -n "$_BIN" ] && [ -f ".pre-commit-config.yaml" ]; then
-    log_info "Updating pre-commit hooks..."
-    if [ "$DRY_RUN" -eq 1 ]; then
-      log_summary "Other" "Hooks" "⚖️ Previewed" "-" "0"
-    else
-      if run_quiet "$_BIN" autoupdate; then
-        log_summary "Other" "Hooks" "✅ Updated" "$(get_version "$_BIN")" "$(($(date +%s) - _T0))"
+    if check_update_cooldown "pre-commit"; then
+      log_info "Updating pre-commit hooks..."
+      if [ "$DRY_RUN" -eq 1 ]; then
+        log_summary "Other" "Hooks" "⚖️ Previewed" "-" "0"
       else
-        log_summary "Other" "Hooks" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+        if run_quiet "$_BIN" autoupdate; then
+          save_update_timestamp "pre-commit"
+          log_summary "Other" "Hooks" "✅ Updated" "$(get_version "$_BIN")" "$(($(date +%s) - _T0))"
+        else
+          log_summary "Other" "Hooks" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+        fi
       fi
+    else
+      log_summary "Other" "Hooks" "✅ Up-to-date (Cooldown)" "$(get_version "$_BIN")" "0"
     fi
   fi
   return 0
