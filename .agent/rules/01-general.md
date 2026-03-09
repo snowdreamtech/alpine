@@ -34,6 +34,7 @@
 - Avoid hard-coding system-specific paths or commands. Adapt dynamically:
   - Use `path.join()` (Node.js), `os.path.join()` / `pathlib.Path` (Python), `filepath.Join()` (Go).
   - Detect OS at runtime: `process.platform`, `sys.platform`, `runtime.GOOS`.
+- **No Absolute Local Paths**: All paths in scripts, configurations, documentation, and source code MUST be **relative** to the project root or the current file. Never use paths starting with `/Users/`, `C:\`, or `~`. This is critical for portability across different developer machines and CI environments.
 - **Cross-Platform Shell Delegation Pattern (MANDATORY)**: When shell scripts are required, provide **three** script variants following a strict delegation chain to ensure a Single Source of Truth (SSoT):
   1. **`script.sh`** — POSIX-compliant shell script containing **all primary logic**.
   2. **`script.ps1`** — PowerShell wrapper that detects `sh` and delegates: `Invoke-ShellDelegation "script.sh" ($args -join " ")`.

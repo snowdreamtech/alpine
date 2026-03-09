@@ -157,4 +157,4 @@
 - **Language-Aware & Contextual Automation**: When creating or modifying health checks, setup scripts, or CI pipelines, AI agents MUST implement **Language-Aware Detection** and **Selective Display**.
   - Scripts SHOULD auto-detect active languages and tools.
   - Irrelevant checks SHOULD be skipped or groups hidden to avoid noise.
-  - See [08-dev-env.md](file:///Users/snowdream/Workspace/snowdreamtech/template/.agent/rules/08-dev-env.md) and [10-ui-ux.md](file:///Users/snowdream/Workspace/snowdreamtech/template/.agent/rules/10-ui-ux.md) for UX standards.
+  - See [08-dev-env.md](08-dev-env.md) and [10-ui-ux.md](10-ui-ux.md) for UX standards.

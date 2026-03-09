@@ -158,7 +158,7 @@ renv.lock             # ✅ Commit this
   data <- readr::read_csv(here::here("data", "raw", "survey.csv"))
 
   # ❌ Fragile absolute path — breaks on any other machine
-  data <- readr::read_csv("/Users/alice/project/data/raw/survey.csv")
+  data <- readr::read_csv("data/raw/survey.csv")
 
   # ❌ Relative path — depends on working directory
   data <- readr::read_csv("../data/raw/survey.csv")
