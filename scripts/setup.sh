@@ -445,11 +445,25 @@ install_java_lint() {
 
 install_ruby_lint() {
   _T0=$(date +%s)
-  if ! has_lang_files "Gemfile Gemfile.lock .ruby-version" "*.rb"; then
+  if ! has_lang_files "Gemfile Gemfile.lock" "*.rb"; then
     log_summary "Lint Tool" "Rubocop" "⏭️ Skipped" "-" "0"
     return 0
   fi
   log_info "── Setting up Rubocop ──"
+
+  # Check in PATH and common user-gem locations to avoid redundant slow gem install
+  _RUBO_BIN="rubocop"
+  if ! command -v rubocop >/dev/null 2>&1; then
+    _GEM_BIN=$(gem environment 2>/dev/null | grep "EXECUTABLE DIRECTORY" | awk '{print $NF}')
+    if [ -x "$_GEM_BIN/rubocop" ]; then
+      _RUBO_BIN="$_GEM_BIN/rubocop"
+    fi
+  fi
+
+  if command -v "$_RUBO_BIN" >/dev/null 2>&1 && [ "$DRY_RUN" -eq 0 ]; then
+    log_summary "Lint Tool" "Rubocop" "✅ Exists" "$(get_version "$_RUBO_BIN")" "0"
+    return 0
+  fi
 
   if command -v gem >/dev/null 2>&1; then
     _STAT="✅ Installed"
