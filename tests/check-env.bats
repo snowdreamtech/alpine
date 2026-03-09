@@ -48,11 +48,25 @@ EOF
 #!/bin/sh
 echo "GNU Make 3.81"
 EOF
+  cat <<EOF >"$TEMP_DIR/bin/go"
+#!/bin/sh
+echo "go version go1.21.0 darwin/arm64"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/ruby"
+#!/bin/sh
+echo "ruby 3.2.2 (2023-03-30 revision e51014f9c0) [arm64-darwin22]"
+EOF
   chmod +x "$TEMP_DIR/bin/"*
+
+  # Create files to trigger language checks
+  touch go.mod main.py Gemfile
 
   run sh scripts/check-env.sh
   assert_success
   assert_output --partial "Environment is HEALTHY"
+  assert_output --partial "Go: v1.21.0"
+  assert_output --partial "Python: v3.10.0"
+  assert_output --partial "Ruby: v3.2.2"
 }
 
 @test "check-env.sh: reports failure when a non-guard critical file is missing" {
@@ -90,6 +104,8 @@ EOF
   printf '#!/bin/sh\necho "GNU Make 3.81"' >"$TEMP_DIR/bin/make"
   chmod +x "$TEMP_DIR/bin/"*
 
+  touch main.py
+  touch main.py
   run sh scripts/check-env.sh
   assert_failure
   assert_output --partial "Node.js: v18.0.0 (below recommended v24.1.0)"
