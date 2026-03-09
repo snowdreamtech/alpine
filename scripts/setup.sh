@@ -94,6 +94,7 @@ sanitize_path() {
 }
 
 setup_node() {
+  local _T0
   _T0=$(date +%s)
   log_info "── Setting up Node.js & pnpm ──"
   if [ "$DRY_RUN" -eq 1 ]; then
@@ -106,9 +107,11 @@ setup_node() {
   fi
 
   if [ -f package.json ]; then
-    _STAT="✅ Installed"
+    local _STAT="✅ Installed"
     run_quiet "$NPM" install || _STAT="❌ Failed"
+    local _V
     _V=$(get_version node)
+    local _D
     _D=$(($(date +%s) - _T0))
     log_summary "Runtime" "Node.js" "$_STAT" "$_V" "$_D"
 
@@ -133,6 +136,7 @@ setup_node() {
 }
 
 setup_python() {
+  local _T0
   _T0=$(date +%s)
   log_info "── Setting up Python Virtual Environment ──"
   if [ "$DRY_RUN" -eq 1 ]; then
@@ -140,7 +144,7 @@ setup_python() {
     return 0
   fi
 
-  _STAT="✅ Installed"
+  local _STAT="✅ Installed"
   if [ ! -d "$VENV" ]; then
     "$PYTHON" -m venv "$VENV" || _STAT="❌ Failed"
   fi
@@ -153,7 +157,9 @@ setup_python() {
   fi
 
   if [ -d "$VENV" ]; then
+    local _V
     _V=$(get_version "$VENV/bin/python")
+    local _D
     _D=$(($(date +%s) - _T0))
     log_summary "Runtime" "Python" "$_STAT" "$_V" "$_D"
   else
@@ -162,7 +168,9 @@ setup_python() {
 }
 
 install_gitleaks() {
+  local _T0
   _T0=$(date +%s)
+  local _BIN
   _BIN="${VENV}/bin/gitleaks${_EXE}"
   if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
     log_summary "Lint Tool" "Gitleaks" "✅ Exists" "$(get_version "$_BIN")" "0"
@@ -175,14 +183,18 @@ install_gitleaks() {
     return 0
   fi
 
+  local _TAR_TAG
   _TAR_TAG="${_OS_TAG}"
+  local _TMP
   _TMP=$(mktemp -d)
-  _STAT="✅ Installed"
+  local _STAT="✅ Installed"
 
   if [ "${_OS_TAG}" = "windows" ]; then
-    _ARCH_W="x64"
+    local _ARCH_W="x64"
     [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _ARCH_W="arm64"
+    local _TAR
     _TAR="gitleaks_${GITLEAKS_VERSION#v}_windows_${_ARCH_W}.zip"
+    local _URL
     _URL="${GITHUB_PROXY}https://github.com/gitleaks/gitleaks/releases/download/${GITLEAKS_VERSION}/${_TAR}"
 
     if download_url "${_URL}" "${_TMP}/gitleaks.zip" "gitleaks"; then
@@ -194,7 +206,9 @@ install_gitleaks() {
       _STAT="❌ Failed"
     fi
   else
+    local _TAR
     _TAR="gitleaks_${GITLEAKS_VERSION#v}_${_TAR_TAG}_${_ARCH_N}.tar.gz"
+    local _URL
     _URL="${GITHUB_PROXY}https://github.com/gitleaks/gitleaks/releases/download/${GITLEAKS_VERSION}/${_TAR}"
     if download_url "${_URL}" "${_TMP}/gitleaks.tar.gz" "gitleaks"; then
       tar -xzf "${_TMP}/gitleaks.tar.gz" -C "${_TMP}" gitleaks || _STAT="❌ Failed"
@@ -206,6 +220,7 @@ install_gitleaks() {
     fi
   fi
   if "${_BIN}" --version >/dev/null 2>&1; then
+    local _D
     _D=$(($(date +%s) - _T0))
     log_summary "Lint Tool" "Gitleaks" "$_STAT" "$(get_version "$_BIN")" "$_D"
   else
@@ -214,7 +229,9 @@ install_gitleaks() {
 }
 
 install_hadolint() {
+  local _T0
   _T0=$(date +%s)
+  local _BIN
   _BIN="${VENV}/bin/hadolint${_EXE}"
   if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
     log_summary "Lint Tool" "Hadolint" "✅ Exists" "$(get_version "$_BIN")" "0"
@@ -227,29 +244,33 @@ install_hadolint() {
   fi
   log_info "── Installing hadolint ──"
 
-  _H_ARCH="x86_64"
+  local _H_ARCH="x86_64"
   [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _H_ARCH="arm64"
 
-  _H_OS="Linux"
+  local _H_OS="Linux"
   [ "${OS}" = "darwin" ] && _H_OS="Darwin"
   [ "${_OS_TAG}" = "windows" ] && _H_OS="Windows"
 
-  _SUFFIX="${_H_OS}-${_H_ARCH}"
+  local _SUFFIX="${_H_OS}-${_H_ARCH}"
   [ "${_OS_TAG}" = "windows" ] && _SUFFIX="${_SUFFIX}.exe"
 
+  local _URL
   _URL="${GITHUB_PROXY}https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-${_SUFFIX}"
-  _STAT="✅ Installed"
+  local _STAT="✅ Installed"
   if download_url "${_URL}" "${_BIN}" "hadolint"; then
     chmod +x "${_BIN}" 2>/dev/null || true
   else
     _STAT="❌ Failed"
   fi
+  local _D
   _D=$(($(date +%s) - _T0))
   log_summary "Lint Tool" "Hadolint" "$_STAT" "$(get_version "$_BIN")" "$_D"
 }
 
 install_go_lint() {
+  local _T0
   _T0=$(date +%s)
+  local _BIN
   _BIN="${VENV}/bin/golangci-lint"
   if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
     log_summary "Lint Tool" "Go Lint" "✅ Exists" "$(get_version "$_BIN")" "0"
@@ -262,9 +283,11 @@ install_go_lint() {
   fi
   log_info "── Installing golangci-lint ──"
 
+  local _URL
   _URL="${GITHUB_PROXY}https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh"
+  local _TMP
   _TMP=$(mktemp -d)
-  _STAT="✅ Installed"
+  local _STAT="✅ Installed"
   if download_url "${_URL}" "${_TMP}/install_go.sh" "golangci-lint-installer"; then
     export BINDIR="${VENV}/bin"
     run_quiet sh "${_TMP}/install_go.sh" "${GOLANGCI_VERSION}"
@@ -272,16 +295,19 @@ install_go_lint() {
     _STAT="❌ Failed"
   fi
   rm -rf "${_TMP}"
+  local _D
   _D=$(($(date +%s) - _T0))
   log_summary "Lint Tool" "Go Lint" "$_STAT" "$(get_version "$_BIN")" "$_D"
 }
 
 install_checkmake() {
+  local _T0
   _T0=$(date +%s)
   if ! has_lang_files "Makefile" "*.make"; then
     log_summary "Lint Tool" "Checkmake" "基础 Skipped" "-" "0"
     return 0
   fi
+  local _BIN
   _BIN="${VENV}/bin/checkmake${_EXE}"
   if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
     log_summary "Lint Tool" "Checkmake" "✅ Exists" "$(get_version "$_BIN")" "0"
@@ -294,18 +320,21 @@ install_checkmake() {
     return 0
   fi
 
-  _OS_S="${_OS_TAG}"
-  _ARCH_S="amd64"
+  local _OS_S="${_OS_TAG}"
+  local _ARCH_S="amd64"
   [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _ARCH_S="arm64"
+  local _FILE
   _FILE="checkmake-${CHECKMAKE_VERSION}.${_OS_S}.${_ARCH_S}${_EXE}"
+  local _URL
   _URL="${GITHUB_PROXY}https://github.com/checkmake/checkmake/releases/download/${CHECKMAKE_VERSION}/${_FILE}"
 
-  _STAT="✅ Installed"
+  local _STAT="✅ Installed"
   if download_url "${_URL}" "${_BIN}" "checkmake"; then
     chmod +x "${_BIN}" 2>/dev/null || true
   else
     _STAT="❌ Failed"
   fi
+  local _D
   _D=$(($(date +%s) - _T0))
   log_summary "Lint Tool" "Checkmake" "$_STAT" "$(get_version "$_BIN")" "$_D"
 }
@@ -325,12 +354,16 @@ install_iac_lint() {
 
   # TFLint
   if [ ! -x "${VENV}/bin/tflint${_EXE}" ]; then
-    _TAR_OS="${_OS_TAG}"
-    _TAR_ARCH="amd64"
+    local _TAR_OS="${_OS_TAG}"
+    local _TAR_ARCH="amd64"
     [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _TAR_ARCH="arm64"
+    local _TAR
     _TAR="tflint_${_TAR_OS}_${_TAR_ARCH}.zip"
+    local _URL
     _URL="${GITHUB_PROXY}https://github.com/terraform-linters/tflint/releases/download/${TFLINT_VERSION}/${_TAR}"
+    local _TMP
     _TMP=$(mktemp -d)
+    local _T_STAT=""
     if download_url "${_URL}" "${_TMP}/tflint.zip" "tflint"; then
       unzip -q "${_TMP}/tflint.zip" -d "${_TMP}" || _T_STAT="failed"
       if [ "$_T_STAT" != "failed" ]; then
@@ -350,15 +383,17 @@ install_iac_lint() {
 
   # Kube-Linter
   if [ ! -x "${VENV}/bin/kube-linter${_EXE}" ]; then
-    _K_OS="linux"
+    local _K_OS="linux"
     [ "${OS}" = "darwin" ] && _K_OS="darwin"
-    _K_SUFFIX=""
+    local _K_SUFFIX=""
     { [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; } && _K_SUFFIX="_arm64"
+    local _FILE
     if [ "${_OS_TAG}" = "windows" ]; then
       _FILE="kube-linter${_K_SUFFIX}.exe"
     else
       _FILE="kube-linter-${_K_OS}${_K_SUFFIX}"
     fi
+    local _URL
     _URL="${GITHUB_PROXY}https://github.com/stackrox/kube-linter/releases/download/${KUBE_LINTER_VERSION}/${_FILE}"
     if download_url "${_URL}" "${VENV}/bin/kube-linter${_EXE}" "kube-linter"; then
       chmod +x "${VENV}/bin/kube-linter${_EXE}" 2>/dev/null || true
@@ -372,6 +407,7 @@ install_iac_lint() {
 }
 
 setup_hooks() {
+  local _T0
   _T0=$(date +%s)
   log_info "── Setting up Pre-commit Hooks ──"
   if [ "$DRY_RUN" -eq 1 ]; then
@@ -380,9 +416,11 @@ setup_hooks() {
   fi
 
   if [ -x "$VENV/bin/pre-commit" ]; then
-    _STAT="✅ Activated"
+    local _STAT="✅ Activated"
     run_quiet "$VENV/bin/pre-commit" install --hook-type pre-commit --hook-type pre-merge-commit --hook-type commit-msg || _STAT="❌ Failed"
+    local _V
     _V=$(get_version "$VENV/bin/pre-commit")
+    local _D
     _D=$(($(date +%s) - _T0))
     log_summary "Other" "Hooks" "$_STAT" "$_V" "$_D"
   else
@@ -391,6 +429,7 @@ setup_hooks() {
 }
 
 setup_powershell() {
+  local _T0
   _T0=$(date +%s)
   if ! has_lang_files "" "*.ps1 *.psm1 *.psd1"; then
     log_summary "Lint Tool" "PowerShell" "⏭️ Skipped" "-" "0"
@@ -403,10 +442,11 @@ setup_powershell() {
   fi
 
   if command -v pwsh >/dev/null 2>&1; then
-    _STAT="✅ Installed"
+    local _STAT="✅ Installed"
     run_quiet pwsh -NoProfile -Command "if (!(Get-Module -ListAvailable PSScriptAnalyzer)) { Install-Module -Name PSScriptAnalyzer -Force -SkipPublisherCheck -Scope CurrentUser }" || _STAT="❌ Failed"
     # shellcheck disable=SC2016
     _V=$(pwsh -NoProfile -Command '(Get-Module PSScriptAnalyzer -ListAvailable).Version | Select-Object -First 1 | ForEach-Object { $_.ToString() }' 2>/dev/null || echo "installed")
+    local _D
     _D=$(($(date +%s) - _T0))
     log_summary "Lint Tool" "PowerShell" "$_STAT" "$_V" "$_D"
   else
@@ -415,8 +455,11 @@ setup_powershell() {
 }
 
 install_java_lint() {
+  local _T0
   _T0=$(date +%s)
+  local _JAR
   _JAR="${VENV}/bin/google-java-format.jar"
+  local _BIN
   _BIN="${VENV}/bin/google-java-format"
   if [ -f "${_JAR}" ] && [ "$DRY_RUN" -eq 0 ]; then
     log_summary "Lint Tool" "Java Lint" "✅ Exists" "$JAVA_FORMAT_VERSION" "0"
@@ -429,19 +472,22 @@ install_java_lint() {
   fi
   log_info "── Installing google-java-format ──"
 
+  local _URL
   _URL="${GITHUB_PROXY}https://github.com/google/google-java-format/releases/download/v${JAVA_FORMAT_VERSION}/google-java-format-${JAVA_FORMAT_VERSION}-all-deps.jar"
-  _STAT="✅ Installed"
+  local _STAT="✅ Installed"
   if download_url "${_URL}" "${_JAR}" "google-java-format"; then
     printf "#!/bin/sh\njava -jar \"%s\" \"\$@\"\n" "${_JAR}" >"${_BIN}" || _STAT="❌ Failed"
     chmod +x "${_BIN}" 2>/dev/null || true
   else
     _STAT="❌ Failed"
   fi
+  local _D
   _D=$(($(date +%s) - _T0))
   log_summary "Lint Tool" "Java Lint" "$_STAT" "$JAVA_FORMAT_VERSION" "$_D"
 }
 
 install_ruby_lint() {
+  local _T0
   _T0=$(date +%s)
   if ! has_lang_files "Gemfile Gemfile.lock" "*.rb"; then
     log_summary "Lint Tool" "Rubocop" "⏭️ Skipped" "-" "0"
@@ -450,8 +496,9 @@ install_ruby_lint() {
   log_info "── Setting up Rubocop ──"
 
   # Check in PATH and common user-gem locations to avoid redundant slow gem install
-  _RUBO_BIN="rubocop"
+  local _RUBO_BIN="rubocop"
   if ! command -v rubocop >/dev/null 2>&1; then
+    local _GEM_BIN
     _GEM_BIN=$(gem environment 2>/dev/null | grep "EXECUTABLE DIRECTORY" | awk '{print $NF}')
     if [ -x "$_GEM_BIN/rubocop" ]; then
       _RUBO_BIN="$_GEM_BIN/rubocop"
@@ -464,9 +511,11 @@ install_ruby_lint() {
   fi
 
   if command -v gem >/dev/null 2>&1; then
-    _STAT="✅ Installed"
+    local _STAT="✅ Installed"
     run_quiet gem install rubocop --user-install --no-document --quiet || _STAT="❌ Failed"
+    local _V
     _V=$(get_version rubocop)
+    local _D
     _D=$(($(date +%s) - _T0))
     log_summary "Lint Tool" "Rubocop" "$_STAT" "$_V" "$_D"
   else
@@ -475,7 +524,9 @@ install_ruby_lint() {
 }
 
 install_php_lint() {
+  local _T0
   _T0=$(date +%s)
+  local _BIN
   _BIN="${VENV}/bin/php-cs-fixer"
   if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
     log_summary "Lint Tool" "PHP Lint" "✅ Exists" "$PHP_CS_FIXER_VERSION" "0"
@@ -488,13 +539,15 @@ install_php_lint() {
   fi
   log_info "── Installing php-cs-fixer ──"
 
+  local _URL
   _URL="${GITHUB_PROXY}https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/releases/download/${PHP_CS_FIXER_VERSION}/php-cs-fixer.phar"
-  _STAT="✅ Installed"
+  local _STAT="✅ Installed"
   if download_url "${_URL}" "${_BIN}" "php-cs-fixer"; then
     chmod +x "${_BIN}" 2>/dev/null || true
   else
     _STAT="❌ Failed"
   fi
+  local _D
   _D=$(($(date +%s) - _T0))
   log_summary "Lint Tool" "PHP Lint" "$_STAT" "$PHP_CS_FIXER_VERSION" "$_D"
 }
@@ -509,6 +562,7 @@ setup_dart() {
 }
 
 setup_swift() {
+  local _T0
   _T0=$(date +%s)
   if ! has_lang_files "Package.swift" "*.swift"; then
     log_summary "Lint Tool" "Swift" "⏭️ Skipped" "-" "0"
@@ -517,18 +571,20 @@ setup_swift() {
   if [ "${OS}" = "darwin" ]; then
     log_info "── Setting up Swift Linters (macOS) ──"
 
+    local _PKG_MGR
     _PKG_MGR=$(get_macos_pkg_mgr)
+    local _STAT="✅ Installed"
     if [ "$_PKG_MGR" = "brew" ]; then
-      _STAT="✅ Installed"
       brew list swiftformat >/dev/null 2>&1 || brew install swiftformat >/dev/null 2>&1 || _STAT="⚠️ Partial"
       brew list swiftlint >/dev/null 2>&1 || brew install swiftlint >/dev/null 2>&1 || _STAT="❌ Failed"
+      local _D
       _D=$(($(date +%s) - _T0))
       log_summary "Lint Tool" "Swift" "$_STAT" "$(get_version swiftlint lint --version)" "$_D"
     elif [ "$_PKG_MGR" = "port" ]; then
-      _STAT="✅ Installed"
       log_info "Installing Swift formatters via MacPorts (requires sudo)..."
       port installed swiftformat 2>/dev/null | grep -q active || sudo port install swiftformat || _STAT="⚠️ Partial"
       port installed swiftlint 2>/dev/null | grep -q active || sudo port install swiftlint || _STAT="❌ Failed"
+      local _D
       _D=$(($(date +%s) - _T0))
       log_summary "Lint Tool" "Swift" "$_STAT" "$(get_version swiftlint lint --version)" "$_D"
     else
@@ -553,7 +609,9 @@ setup_dotnet() {
 }
 
 install_osv_scanner() {
+  local _T0
   _T0=$(date +%s)
+  local _BIN
   _BIN="${VENV}/bin/osv-scanner${_EXE}"
   if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
     log_summary "Security Tool" "OSV-Scanner" "✅ Exists" "$(get_version "$_BIN")" "0"
@@ -566,25 +624,30 @@ install_osv_scanner() {
     return 0
   fi
 
-  _O_OS="${_OS_TAG}"
-  _O_ARCH="amd64"
+  local _O_OS="${_OS_TAG}"
+  local _O_ARCH="amd64"
   [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _O_ARCH="arm64"
   # osv-scanner asset naming: osv-scanner_{os}_{arch}[.exe] (no version in filename)
+  local _FILE
   _FILE="osv-scanner_${_O_OS}_${_O_ARCH}${_EXE}"
+  local _URL
   _URL="${GITHUB_PROXY}https://github.com/google/osv-scanner/releases/download/${OSV_SCANNER_VERSION}/${_FILE}"
 
-  _STAT="✅ Installed"
+  local _STAT="✅ Installed"
   if download_url "${_URL}" "${_BIN}" "osv-scanner"; then
     chmod +x "${_BIN}" 2>/dev/null || true
   else
     _STAT="❌ Failed"
   fi
+  local _D
   _D=$(($(date +%s) - _T0))
   log_summary "Security Tool" "OSV-Scanner" "$_STAT" "$(get_version "$_BIN")" "$_D"
 }
 
 install_trivy() {
+  local _T0
   _T0=$(date +%s)
+  local _BIN
   _BIN="${VENV}/bin/trivy${_EXE}"
   if [ -x "${_BIN}" ] && [ "$DRY_RUN" -eq 0 ]; then
     log_summary "Security Tool" "Trivy" "✅ Exists" "$(get_version "$_BIN")" "0"
@@ -597,21 +660,24 @@ install_trivy() {
     return 0
   fi
 
-  _T_OS="Linux"
+  local _T_OS="Linux"
   [ "${OS}" = "darwin" ] && _T_OS="macOS"
   # trivy arch naming: ARM64 for arm64, 64bit for amd64
-  _T_ARCH="64bit"
+  local _T_ARCH="64bit"
   { [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; } && _T_ARCH="ARM64"
 
+  local _TAR
   if [ "${_OS_TAG}" = "windows" ]; then
     _TAR="trivy_${TRIVY_VERSION#v}_windows-64bit.zip"
   else
     _TAR="trivy_${TRIVY_VERSION#v}_${_T_OS}-${_T_ARCH}.tar.gz"
   fi
 
+  local _URL
   _URL="${GITHUB_PROXY}https://github.com/aquasecurity/trivy/releases/download/${TRIVY_VERSION}/${_TAR}"
+  local _TMP
   _TMP=$(mktemp -d)
-  _STAT="✅ Installed"
+  local _STAT="✅ Installed"
 
   if download_url "${_URL}" "${_TMP}/trivy_pkg" "trivy"; then
     if [ "${_OS_TAG}" = "windows" ]; then
@@ -626,6 +692,7 @@ install_trivy() {
     _STAT="❌ Failed"
   fi
   rm -rf "${_TMP}"
+  local _D
   _D=$(($(date +%s) - _T0))
   log_summary "Security Tool" "Trivy" "$_STAT" "$(get_version "$_BIN")" "$_D"
 }
@@ -637,6 +704,7 @@ setup_security() {
 
   # Install govulncheck if go exists
   if command -v go >/dev/null 2>&1; then
+    local _T0
     _T0=$(date +%s)
     if command -v govulncheck >/dev/null 2>&1; then
       log_summary "Security Tool" "Govulncheck" "✅ Exists" "$(get_version govulncheck)" "0"
@@ -652,6 +720,7 @@ setup_security() {
 
   # Install cargo-audit if cargo exists
   if command -v cargo >/dev/null 2>&1; then
+    local _T0
     _T0=$(date +%s)
     if command -v cargo-audit >/dev/null 2>&1; then
       log_summary "Security Tool" "Cargo-Audit" "✅ Exists" "$(get_version cargo-audit)" "0"
@@ -674,7 +743,8 @@ main() {
   parse_common_args "$@"
 
   # Re-extract raw args to avoid flags
-  _RAW_ARGS=""
+  local _RAW_ARGS=""
+  local _arg
   for _arg in "$@"; do
     case "$_arg" in
     -q | --quiet | -v | --verbose | --dry-run | -h | --help) ;;
@@ -683,12 +753,13 @@ main() {
   done
 
   # ── Execution Timing & Summary Management ──
+  local _START_TIME
   _START_TIME=$(date +%s)
 
   if [ -z "$SETUP_SUMMARY_FILE" ]; then
     SETUP_SUMMARY_FILE=$(mktemp)
     export SETUP_SUMMARY_FILE
-    _CREATED_SUMMARY=true
+    local _CREATED_SUMMARY=true
 
     # Initialize Summary (Only once per CI Job or first call)
     if [ "$_SETUP_SUMMARY_INITIALIZED" != "true" ]; then
@@ -736,12 +807,14 @@ EOF
   fi
 
   # ── Module Selection ──
+  local _MODULES
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "${_RAW_ARGS# *}" = "all" ]; then
     _MODULES="node python gitleaks hadolint go checkmake iac powershell java ruby php dart swift dotnet security hooks"
   else
     _MODULES="${_RAW_ARGS}"
   fi
 
+  local _module
   for _module in $_MODULES; do
     case $_module in
     node) setup_node ;;
@@ -766,6 +839,7 @@ EOF
 
   # ── Final Output Management ──
   if [ "$_CREATED_SUMMARY" = "true" ]; then
+    local _TOTAL_DUR
     _TOTAL_DUR=$(($(date +%s) - _START_TIME))
     printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR" >>"$SETUP_SUMMARY_FILE"
 

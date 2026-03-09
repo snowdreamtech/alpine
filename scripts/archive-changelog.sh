@@ -27,7 +27,7 @@ main() {
 
   # Smart Directory Discovery
   # shellcheck disable=SC2153
-  _ARCHIVE_DIR="$ARCHIVE_DIR"
+  local _ARCHIVE_DIR="$ARCHIVE_DIR"
   if [ -z "$_ARCHIVE_DIR" ]; then
     if [ -d "docs/changelogs" ]; then
       _ARCHIVE_DIR="docs/changelogs"
@@ -48,6 +48,10 @@ main() {
   fi
 
   # Cleanup on exit
+  local _TMP_HEADER
+  local _TMP_ARCHIVE_PREFIX
+  local _NEW_CHANGELOG
+  local _TMP_SUMMARY
   _TMP_HEADER=$(mktemp)
   _TMP_ARCHIVE_PREFIX=$(mktemp -d)
   _NEW_CHANGELOG=$(mktemp)
@@ -55,24 +59,29 @@ main() {
   _TMP_SUMMARY=$(mktemp)
 
   cleanup() {
+    local _exit_code=$?
     log_debug "Cleaning up temporary files..."
     rm -f "$_TMP_HEADER" "$_NEW_CHANGELOG" "$_TMP_SUMMARY"
     rm -rf "$_TMP_ARCHIVE_PREFIX"
     [ "$DRY_RUN" -eq 0 ] && rmdir "$LOCK_DIR" 2>/dev/null || true
+    return "$_exit_code"
   }
   trap cleanup EXIT INT TERM
 
   # Get current major version (Universal Source)
+  local _RAW_V
   _RAW_V=$(get_project_version)
   case "$_RAW_V" in
   '' | '-' | 'null')
     log_warn "Could not determine version from project files. Falling back to Git tags..."
+    local _GIT_TAG
     _GIT_TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
     _RAW_V="$_GIT_TAG"
     ;;
   esac
 
   # Extract major version
+  local _CURRENT_MAJOR
   _CURRENT_MAJOR=$(echo "$_RAW_V" | sed 's/^v//' | cut -d. -f1)
 
   # Input Validation
@@ -86,6 +95,7 @@ main() {
   log_info "Targeting major version: $_CURRENT_MAJOR"
 
   # 1. Extract the header (everything up to the first version header)
+  local _FIRST_H2_LINE
   _FIRST_H2_LINE=$(grep -n "^## \[" "$CHANGELOG" | head -n1 | cut -d: -f1)
   if [ -z "$_FIRST_H2_LINE" ]; then
     log_warn "No version headers found in $CHANGELOG. Nothing to archive."
@@ -136,17 +146,20 @@ main() {
   printf "### Archival Execution Summary\n\n" >"$_TMP_SUMMARY"
   printf "| Major Version | Action | Destination |\n" >>"$_TMP_SUMMARY"
   printf "| :--- | :--- | :--- |\n" >>"$_TMP_SUMMARY"
-  _ARCHIVE_COUNT=0
+  local _ARCHIVE_COUNT=0
 
+  local _arch_file
   for _arch_file in "$_TMP_ARCHIVE_PREFIX"/v*.md; do
     [ -e "$_arch_file" ] || continue
 
     _V_TAG=$(basename "$_arch_file" .md)
+    local _V_NUM
     _V_NUM=$(echo "$_V_TAG" | sed 's/^v//')
-    _FINAL_ARCH_FILE="$_ARCHIVE_DIR/CHANGELOG-v$_V_NUM.md"
+    local _FINAL_ARCH_FILE="$_ARCHIVE_DIR/CHANGELOG-v$_V_NUM.md"
     log_debug "Processing archival block for major version $_V_NUM..."
 
     if [ -f "$_FINAL_ARCH_FILE" ]; then
+      local _FILTERED_CONTENT
       _FILTERED_CONTENT=$(mktemp)
       awk -v arch="$_FINAL_ARCH_FILE" '
         BEGIN {
@@ -168,6 +181,7 @@ main() {
           printf "| v%s | Prepend (Dry Run) | %s |\n" "$_V_NUM" "$_FINAL_ARCH_FILE" >>"$_TMP_SUMMARY"
         else
           log_info "Updating archive: $_FINAL_ARCH_FILE"
+          local _tmp_arch
           _tmp_arch=$(mktemp)
           cat "$_FILTERED_CONTENT" >"$_tmp_arch"
           printf "\n" >>"$_tmp_arch"
@@ -201,11 +215,15 @@ main() {
 
   # 5. Rebuild History section in NEW_CHANGELOG (Sorted)
   log_info "Rebuilding History section (Archive Directory: $_ARCHIVE_DIR)..."
+  local _HISTORY_LINKS_TMP
   _HISTORY_LINKS_TMP=$(mktemp)
   # Check filesystem for existing archives in ARCHIVE_DIR
+  local _f
   for _f in "$_ARCHIVE_DIR"/CHANGELOG-v*.md; do
     [ -e "$_f" ] || continue
+    local _FILE_NAME
     _FILE_NAME=$(basename "$_f")
+    local _V_NUM_PROC
     _V_NUM_PROC=$(echo "$_FILE_NAME" | sed 's/^CHANGELOG-v//;s/\.md$//')
     printf "%s|%s\n" "$_V_NUM_PROC" "- [v$_V_NUM_PROC.x.x Archive](./$_f)" >>"$_HISTORY_LINKS_TMP"
   done
@@ -213,7 +231,9 @@ main() {
   # Merge with newly planned archives from TMP_ARCHIVE_PREFIX
   for _f in "$_TMP_ARCHIVE_PREFIX"/v*.md; do
     [ -e "$_f" ] || continue
+    local _V_NUM_PROC
     _V_NUM_PROC=$(echo "$_f" | sed 's|^.*/v||;s/.md$//')
+    local _LINK
     _LINK="- [v$_V_NUM_PROC.x.x Archive](./$_ARCHIVE_DIR/CHANGELOG-v$_V_NUM_PROC.md)"
     # Normalize link paths (remove repeated ./)
     _LINK=$(echo "$_LINK" | sed 's|\./\./|\./|g')

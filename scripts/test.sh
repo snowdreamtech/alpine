@@ -64,6 +64,7 @@ run_python_tests() {
       log_success "DRY-RUN: Would run pytest on tests/"
     else
       # shellcheck disable=SC2030
+      local _VENV_PATH
       _VENV_PATH="${VENV:-.venv}"
       if [ -x "$_VENV_PATH/bin/python3" ]; then
         "$_VENV_PATH/bin/python3" -m pytest --tb=short
@@ -101,7 +102,8 @@ main() {
   guard_project_root
 
   # 2. Argument Parsing
-  _SUITE="all"
+  local _SUITE="all"
+  local _arg
   for _arg in "$@"; do
     case "$_arg" in
     shell | python | powershell | all) _SUITE="$_arg" ;;

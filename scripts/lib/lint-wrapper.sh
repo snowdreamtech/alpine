@@ -15,20 +15,20 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 # @param $@ - Arguments passed to the linter
 # @returns 0 if linter succeeds or is skipped; otherwise returns linter exit code.
 main() {
-  _LINTER_WRAP="$1"
+  local _LINTER_WRAP="$1"
   [ -z "$_LINTER_WRAP" ] && return 0
   shift
 
   # 1. Resolve Binary Path
   # Check .venv/bin (POSIX), .venv/Scripts (Windows), node_modules/.bin, and PATH
-  _VENV_BIN_WRAP=".venv/bin/${_LINTER_WRAP}"
-  _VENV_SCRIPTS_WRAP=".venv/Scripts/${_LINTER_WRAP}"
-  _VENV_EXE_BIN_WRAP=".venv/bin/${_LINTER_WRAP}.exe"
-  _VENV_EXE_SCRIPTS_WRAP=".venv/Scripts/${_LINTER_WRAP}.exe"
-  _NODE_BIN_WRAP="node_modules/.bin/${_LINTER_WRAP}"
-  _NODE_CMD_WRAP="node_modules/.bin/${_LINTER_WRAP}.cmd"
+  local _VENV_BIN_WRAP=".venv/bin/${_LINTER_WRAP}"
+  local _VENV_SCRIPTS_WRAP=".venv/Scripts/${_LINTER_WRAP}"
+  local _VENV_EXE_BIN_WRAP=".venv/bin/${_LINTER_WRAP}.exe"
+  local _VENV_EXE_SCRIPTS_WRAP=".venv/Scripts/${_LINTER_WRAP}.exe"
+  local _NODE_BIN_WRAP="node_modules/.bin/${_LINTER_WRAP}"
+  local _NODE_CMD_WRAP="node_modules/.bin/${_LINTER_WRAP}.cmd"
 
-  _RESOLVED_BIN_WRAP=""
+  local _RESOLVED_BIN_WRAP=""
 
   if [ -x "$_VENV_BIN_WRAP" ]; then
     _RESOLVED_BIN_WRAP="$_VENV_BIN_WRAP"
@@ -61,7 +61,7 @@ main() {
   dart) check_runtime dart "$_LINTER_WRAP" ;;
   gofmt | cargo | goreleaser)
     # cargo and gofmt require their respective toolchains
-    _RT_WRAP="${_LINTER_WRAP}"
+    local _RT_WRAP="${_LINTER_WRAP}"
     [ "$_LINTER_WRAP" = "cargo" ] && _RT_WRAP="cargo"
     [ "$_LINTER_WRAP" = "gofmt" ] && _RT_WRAP="go"
     [ "$_LINTER_WRAP" = "goreleaser" ] && _RT_WRAP="goreleaser"

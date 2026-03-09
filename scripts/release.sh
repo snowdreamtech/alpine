@@ -39,7 +39,8 @@ main() {
   guard_project_root
 
   # 2. Argument Parsing
-  _TARGET_VERSION=""
+  local _TARGET_VERSION=""
+  local _arg
   for _arg in "$@"; do
     case "$_arg" in
     [0-9]* | v[0-9]*)

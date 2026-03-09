@@ -36,7 +36,8 @@ main() {
   guard_project_root
 
   # 2. Argument Parsing
-  _FIX=""
+  local _FIX=""
+  local _arg
   for _arg in "$@"; do
     case "$_arg" in
     --fix) _FIX="--fix" ;;
@@ -49,8 +50,9 @@ main() {
 
   run_pre_commit() {
     log_info "── Running pre-commit hooks (Pass 1/1) ──"
+    local _VENV
     _VENV=${VENV:-.venv}
-    _PRE_COMMIT=""
+    local _PRE_COMMIT=""
 
     if [ -x "$_VENV/bin/pre-commit" ]; then
       _PRE_COMMIT="$_VENV/bin/pre-commit"

@@ -48,6 +48,7 @@ main() {
       "$PYTHON" -m venv "$VENV"
     fi
 
+    local _PIP
     if [ -x "$VENV/bin/pip" ]; then
       _PIP="$VENV/bin/pip"
     elif [ -x "$VENV/Scripts/pip.exe" ]; then

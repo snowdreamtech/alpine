@@ -42,12 +42,14 @@ main() {
   guard_project_root
 
   # 2. Argument Parsing
+  local _arg
   parse_common_args "$@"
 
   log_info "🏗️  Starting Project Build...\n"
 
   # 3. Go build (GoReleaser or native)
   if [ -f ".goreleaser.yaml" ] || [ -f ".goreleaser.yml" ]; then
+    local _GORELEASER
     _GORELEASER=${GORELEASER:-goreleaser}
     run_build "$_GORELEASER build --snapshot --clean" "GoReleaser snapshot build"
   elif [ -f "go.mod" ]; then
@@ -59,8 +61,9 @@ main() {
 
   # 5. Python build
   if [ -f "pyproject.toml" ]; then
+    local _VENV
     _VENV=${VENV:-.venv}
-    _PYTHON_BIN=""
+    local _PYTHON_BIN=""
     if [ -x "$_VENV/bin/python3" ]; then
       _PYTHON_BIN="$_VENV/bin/python3"
     elif command -v python3 >/dev/null 2>&1; then

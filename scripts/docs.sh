@@ -43,7 +43,8 @@ main() {
   guard_project_root
 
   # 2. Argument Parsing
-  _COMMAND="dev"
+  local _COMMAND="dev"
+  local _arg
   for _arg in "$@"; do
     case "$_arg" in
     dev | build | preview) _COMMAND="$_arg" ;;

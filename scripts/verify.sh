@@ -36,7 +36,8 @@ main() {
   guard_project_root
 
   # 2. Argument Parsing
-  _SUB_ARGS=""
+  local _SUB_ARGS=""
+  local _arg
   for _arg in "$@"; do
     case "$_arg" in
     -q | --quiet) _SUB_ARGS="--quiet" ;;
@@ -53,8 +54,8 @@ main() {
   log_info "🚀 Starting Full Project Verification...\n"
 
   run_step() {
-    _SCRIPT="$1"
-    _MSG="$2"
+    local _SCRIPT="$1"
+    local _MSG="$2"
     log_info "── Step: $_MSG ──"
     if [ -f "$_SCRIPT" ]; then
       # shellcheck disable=SC2086

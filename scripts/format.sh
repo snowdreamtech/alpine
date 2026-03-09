@@ -54,7 +54,7 @@ main() {
 
   run_prettier() {
     log_info "── Formatting Web/General Files (Prettier) ──"
-    _PRETTIER=""
+    local _PRETTIER=""
     if [ -f "node_modules/.bin/prettier" ]; then
       _PRETTIER="./node_modules/.bin/prettier"
     elif command -v prettier >/dev/null 2>&1; then
@@ -73,8 +73,9 @@ main() {
 
   run_ruff() {
     log_info "── Formatting Python Files (Ruff) ──"
+    local _VENV
     _VENV=${VENV:-.venv}
-    _RUFF=""
+    local _RUFF=""
     if [ -x "$_VENV/bin/ruff" ]; then
       _RUFF="$_VENV/bin/ruff"
     elif command -v ruff >/dev/null 2>&1; then

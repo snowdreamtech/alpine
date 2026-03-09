@@ -79,19 +79,24 @@ export OSV_SCANNER_VERSION TRIVY_VERSION
 # Standardized logging functions for consistent colored output.
 # @param $1 - Message to log
 log_info() {
-  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "$BLUE" "$1" "$NC"; fi
+  local _msg="$1"
+  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "$BLUE" "$_msg" "$NC"; fi
 }
 log_success() {
-  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "$GREEN" "$1" "$NC"; fi
+  local _msg="$1"
+  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "$GREEN" "$_msg" "$NC"; fi
 }
 log_warn() {
-  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "$YELLOW" "$1" "$NC"; fi
+  local _msg="$1"
+  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "$YELLOW" "$_msg" "$NC"; fi
 }
 log_error() {
-  printf "%s%b%s\n" "$RED" "$1" "$NC" >&2
+  local _msg="$1"
+  printf "%s%b%s\n" "$RED" "$_msg" "$NC" >&2
 }
 log_debug() {
-  if [ "${VERBOSE:-1}" -ge 2 ]; then printf "[DEBUG] %b\n" "$1"; fi
+  local _msg="$1"
+  if [ "${VERBOSE:-1}" -ge 2 ]; then printf "[DEBUG] %b\n" "$_msg"; fi
 }
 
 # Verifies that the current working directory is the project root.
@@ -108,12 +113,14 @@ guard_project_root() {
 # @param $2 - Cooldown duration in seconds (default: 86400 / 24h)
 # @returns 0 if cooldown expired (update needed), 1 if within cooldown
 check_update_cooldown() {
-  _NAME_COOL="$1"
-  _DURATION_COOL="${2:-86400}" # Default: 24h
-  _MARKER_COOL="${VENV}/.last_update_${_NAME_COOL}"
+  local _NAME_COOL="$1"
+  local _DURATION_COOL="${2:-86400}" # Default: 24h
+  local _MARKER_COOL="${VENV}/.last_update_${_NAME_COOL}"
 
   if [ ! -f "$_MARKER_COOL" ]; then return 0; fi
 
+  local _NOW_COOL
+  local _LAST_COOL
   _NOW_COOL=$(date +%s)
   _LAST_COOL=$(cat "$_MARKER_COOL")
   if [ $((_NOW_COOL - _LAST_COOL)) -ge "$_DURATION_COOL" ]; then
@@ -125,8 +132,8 @@ check_update_cooldown() {
 # Persists the current timestamp for a specific task to manage its cooldown.
 # @param $1 - Task name
 save_update_timestamp() {
-  _NAME_TS="$1"
-  _MARKER_TS="${VENV}/.last_update_${_NAME_TS}"
+  local _NAME_TS="$1"
+  local _MARKER_TS="${VENV}/.last_update_${_NAME_TS}"
   mkdir -p "$(dirname "$_MARKER_TS")"
   date +%s >"$_MARKER_TS"
 }
@@ -137,9 +144,9 @@ save_update_timestamp() {
 # @param $3 - Description of the item for logging
 # @returns 0 on success, 1 on fatal failure
 download_url() {
-  _URL_DL="$1"
-  _OUT_DL="$2"
-  _DESC_DL="$3"
+  local _URL_DL="$1"
+  local _OUT_DL="$2"
+  local _DESC_DL="$3"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY-RUN: Would download $_URL_DL to $_OUT_DL"
@@ -147,6 +154,7 @@ download_url() {
   fi
 
   # Ensure output directory exists
+  local _DIR_DL
   _DIR_DL=$(dirname "$_OUT_DL")
   mkdir -p "$_DIR_DL"
 
@@ -160,7 +168,7 @@ download_url() {
 
   # Fallback if proxy failed and it was a proxied URL
   if [ -n "${GITHUB_PROXY}" ] && echo "${_URL_DL}" | grep -q "^${GITHUB_PROXY}"; then
-    _FALLBACK_URL_DL="${_URL_DL#"$GITHUB_PROXY"}"
+    local _FALLBACK_URL_DL="${_URL_DL#"$GITHUB_PROXY"}"
     log_warn "Proxy download failed for ${_DESC_DL}, retrying directly from ${_FALLBACK_URL_DL}..."
     if curl --retry 5 --retry-delay 2 --retry-connrefused --fail \
       --connect-timeout 10 --max-time 60 \
@@ -178,8 +186,8 @@ download_url() {
 # @param $2 - Expected SHA256 hash
 # @returns 0 if verified, 1 on mismatch
 verify_checksum() {
-  _FILE_CS="$1"
-  _EXPECTED_SHA_CS="$2"
+  local _FILE_CS="$1"
+  local _EXPECTED_SHA_CS="$2"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY-RUN: Would verify checksum for $_FILE_CS"
@@ -187,6 +195,7 @@ verify_checksum() {
   fi
 
   log_info "Verifying checksum for $(basename "$_FILE_CS")..."
+  local _ACTUAL_SHA_CS
   if command -v sha256sum >/dev/null 2>&1; then
     _ACTUAL_SHA_CS=$(sha256sum "$_FILE_CS" | awk '{print $1}')
   elif command -v shasum >/dev/null 2>&1; then
@@ -212,8 +221,8 @@ verify_checksum() {
 # @param $1 - Command/Binary name to check
 # @param $2 - Human-readable tool name for logging
 check_runtime() {
-  _RT_NAME="$1"
-  _TOOL_DESC="${2:-Tool}"
+  local _RT_NAME="$1"
+  local _TOOL_DESC="${2:-Tool}"
   if ! command -v "$_RT_NAME" >/dev/null 2>&1; then
     log_warn "⏭️  Required runtime '$_RT_NAME' for $_TOOL_DESC is missing. Skipping."
     exit 0
@@ -237,15 +246,17 @@ get_macos_pkg_mgr() {
 # @param $2 - Space-separated list of file globs (e.g., "*.go *.ts")
 # @returns 0 if detected, 1 otherwise
 has_lang_files() {
-  _FILES_LANG="$1"
-  _EXTS_LANG="$2"
+  local _FILES_LANG="$1"
+  local _EXTS_LANG="$2"
 
   # 1. Check for specific config files in root
+  local _f
   for _f in $_FILES_LANG; do
     [ -f "$_f" ] && return 0
   done
 
   # 2. Check for file extensions (recursive, maxdepth 3 for performance)
+  local _ext
   for _ext in $_EXTS_LANG; do
     # Use find for POSIX compatibility and performance
     if [ "$(find . -maxdepth 3 -name "$_ext" -print -quit 2>/dev/null)" ]; then
@@ -280,10 +291,12 @@ get_project_version() {
 # Executes an npm/pnpm script while preventing infinite recursion if the script delegates back to itself.
 # @param $1 - Name of the script to run (e.g., "test", "build")
 run_npm_script() {
-  _SCRIPT_NAME_NPM="$1"
+  local _SCRIPT_NAME_NPM="$1"
+  local _CURRENT_SCRIPT_NPM
   _CURRENT_SCRIPT_NPM=$(basename "$0")
 
   if [ -f "$PACKAGE_JSON" ]; then
+    local _CMD_NPM
     _CMD_NPM=$(grep "\"$_SCRIPT_NAME_NPM\":" "$PACKAGE_JSON" | sed "s/.*\"$_SCRIPT_NAME_NPM\":[[:space:]]*\"//;s/\".*//" || true)
     if [ -n "$_CMD_NPM" ]; then
       # Avoid infinite loop if the command points back to this script
@@ -314,8 +327,8 @@ run_quiet() {
 # @param $2 - Target destination path
 # @returns 0 on success, 1 if source is missing
 atomic_swap() {
-  _SRC_ATOMIC="$1"
-  _DST_ATOMIC="$2"
+  local _SRC_ATOMIC="$1"
+  local _DST_ATOMIC="$2"
   if [ ! -f "$_SRC_ATOMIC" ]; then
     log_warn "atomic_swap: Source file $_SRC_ATOMIC does not exist."
     return 1
@@ -328,6 +341,7 @@ atomic_swap() {
 # Handles: --dry-run, -q/--quiet, -v/--verbose, -h/--help
 # @param $@ - Script arguments
 parse_common_args() {
+  local _arg_parse
   for _arg_parse in "$@"; do
     case "$_arg_parse" in
     --dry-run)
@@ -361,12 +375,12 @@ parse_common_args() {
 # @param $5 - Duration in seconds
 # @param $6 - Override path to summary file (internal use)
 log_summary() {
-  _CAT_SUM="${1:-Other}"
-  _MOD_SUM="${2:-Unknown}"
-  _STAT_SUM="${3:-⏭️ Skipped}"
-  _VER_SUM="${4:--}"
-  _DUR_SUM="${5:--}"
-  _FILE_SUM="${6:-$SETUP_SUMMARY_FILE}"
+  local _CAT_SUM="${1:-Other}"
+  local _MOD_SUM="${2:-Unknown}"
+  local _STAT_SUM="${3:-⏭️ Skipped}"
+  local _VER_SUM="${4:--}"
+  local _DUR_SUM="${5:--}"
+  local _FILE_SUM="${6:-$SETUP_SUMMARY_FILE}"
 
   if [ -z "$_FILE_SUM" ] || [ ! -f "$_FILE_SUM" ]; then
     return 0
@@ -392,8 +406,8 @@ log_summary() {
 # @param $2 - Version argument (default: --version)
 # @returns The extracted version number or "-" if not detected.
 get_version() {
-  _CMD_VER="$1"
-  _ARG_VER="${2:---version}"
+  local _CMD_VER="$1"
+  local _ARG_VER="${2:---version}"
   if command -v "$_CMD_VER" >/dev/null 2>&1; then
     # Standard version extraction: find the first sequence starting with a digit
     case "$_CMD_VER" in

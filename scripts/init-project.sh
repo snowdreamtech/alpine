@@ -22,13 +22,14 @@ main() {
   fi
 
   # 2. Argument Parsing
-  _PROJECT_NAME=""
-  _AUTHOR_NAME=""
-  _GITHUB_ORG=""
-  _AUTO_CONFIRM=0
+  local _PROJECT_NAME=""
+  local _AUTHOR_NAME=""
+  local _GITHUB_ORG=""
+  local _AUTO_CONFIRM=0
 
   parse_common_args "$@"
 
+  local _arg
   for _arg in "$@"; do
     case "$_arg" in
     --project=*) _PROJECT_NAME="${_arg#*=}" ;;
@@ -39,7 +40,7 @@ main() {
   done
 
   # Check if we are running in a terminal
-  _IS_TTY=0
+  local _IS_TTY=0
   [ -t 0 ] && _IS_TTY=1
 
   if [ "$VERBOSE" -ge 1 ]; then
@@ -77,9 +78,9 @@ main() {
     fi
   fi
 
-  _OLD_PROJECT="template"
-  _OLD_ORG="snowdreamtech"
-  _OLD_USER="snowdream"
+  local _OLD_PROJECT="template"
+  local _OLD_ORG="snowdreamtech"
+  local _OLD_USER="snowdream"
 
   # 4. Confirmation
   if [ "$VERBOSE" -ge 1 ]; then
@@ -92,6 +93,7 @@ main() {
   if [ "$DRY_RUN" -eq 0 ] && [ "$VERBOSE" -ge 1 ] && [ "$_AUTO_CONFIRM" -eq 0 ]; then
     if [ "$_IS_TTY" -eq 1 ] || [ "$SNOWDREAM_TEST_FORCE_CONFIRM" = "1" ]; then
       printf "\nProceed with hydration? (y/N): "
+      local _CONFIRM
       read -r _CONFIRM
       case "$_CONFIRM" in
       [yY]*) ;;
@@ -131,6 +133,7 @@ main() {
 
   # 6. Update LICENSE
   log_info "Step 2: Updating LICENSE..."
+  local _CURRENT_YEAR
   _CURRENT_YEAR=$(date +%Y)
   if [ "$DRY_RUN" -eq 1 ]; then
     log_warn "DRY-RUN: Would update LICENSE copyright to $_CURRENT_YEAR and $_AUTHOR_NAME."
@@ -141,6 +144,7 @@ main() {
   # 7. Git Initialization
   if [ "$DRY_RUN" -eq 0 ] && [ "$VERBOSE" -ge 1 ]; then
     printf "\nRe-initialize Git repository? (y/N): "
+    local _REINIT_GIT
     read -r _REINIT_GIT
     case "$_REINIT_GIT" in
     [yY]*)

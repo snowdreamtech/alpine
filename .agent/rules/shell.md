@@ -19,7 +19,8 @@ When Bash-specific features are genuinely required, the script MUST:
 3. Explicitly document the Bash version requirement.
 
 > [!WARNING]
-> **POSIX `sh` does NOT support `set -o pipefail`**. Using this in a `#!/bin/sh` script will cause it to crash on many Linux systems (e.g. Debian/Ubuntu). Always use standard pipes and check exit codes manually or use Bash if pipefail is critical.
+> **POSIX `sh` and `local`**: While the official POSIX `sh` specification does not define the `local` keyword, it is supported by almost all modern shells (dash, ash, ksh, bash, zsh). This project **standardizes** on using `local` for variable scoping to ensure script robustness.
+> To prevent `shellcheck` warnings (SC3043), we have globally disabled this check in `.shellcheckrc`.
 
 ### Global Library (MANDATORY)
 
@@ -139,7 +140,7 @@ IFS=$'\n\t'
   EXTRA_ARGS="${VERBOSE:+--verbose}"
   ```
 
-- Use **`local`** for all variables inside functions to prevent polluting the global scope:
+- Use **`local`** for all variables inside functions to prevent polluting the global scope. This is a project-wide requirement for all functions:
 
   ```bash
   install_dependency() {
@@ -149,6 +150,9 @@ IFS=$'\n\t'
     ...
   }
   ```
+
+  > [!NOTE]
+  > We prioritize variable safety (`local`) over strict POSIX pedantry. This extension is widely supported and required for our library architecture.
 
 - Declare constants with **`readonly`**: `readonly MAX_RETRIES=3 TIMEOUT=30`
 - Use **`UPPER_SNAKE_CASE`** for exported/environment variables and `lower_snake_case` for local function variables.

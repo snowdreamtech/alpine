@@ -40,7 +40,8 @@ main() {
   guard_project_root
 
   # 2. Argument Parsing
-  _COMMAND="setup"
+  local _COMMAND="setup"
+  local _arg
   for _arg in "$@"; do
     case "$_arg" in
     setup | check | sync) _COMMAND="$_arg" ;;
@@ -81,12 +82,13 @@ main() {
     fi
 
     log_info "Checking .env for missing keys from .env.example..."
-    _MISSING=0
+    local _MISSING=0
     while IFS= read -r line || [ -n "$line" ]; do
       case "$line" in
       \#* | '') continue ;;
       esac
 
+      local _KEY
       _KEY=$(echo "$line" | cut -d'=' -f1 | sed 's/[[:space:]]*$//')
       if ! grep -q "^$_KEY=" ".env" && ! grep -q "^$_KEY =" ".env"; then
         log_warn "Missing key: $_KEY"
@@ -114,18 +116,20 @@ main() {
     fi
 
     log_info "Syncing missing keys from .env.example to .env..."
-    _ADDED=0
+    local _ADDED=0
     while IFS= read -r line || [ -n "$line" ]; do
       case "$line" in
       \#* | '') continue ;;
       esac
 
+      local _KEY
       _KEY=$(echo "$line" | cut -d'=' -f1 | sed 's/[[:space:]]*$//')
       if ! grep -q "^$_KEY=" ".env" && ! grep -q "^$_KEY =" ".env"; then
         if [ "$DRY_RUN" -eq 1 ]; then
           log_info "DRY-RUN: Would add $_KEY to .env"
         else
           printf "Missing key found: %b%s%b. Add to .env? (y/N): " "${YELLOW}" "$_KEY" "${NC}"
+          local _CONFIRM
           read -r _CONFIRM
           case "$_CONFIRM" in
           [yY]*)

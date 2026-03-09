@@ -20,10 +20,12 @@ main() {
   # 2. Argument Parsing
   parse_common_args "$@"
 
-  _OVERALL_EXIT=0
+  local _OVERALL_EXIT=0
+  local _START_
   _START_=$(date +%s)
 
   # Initialize Summary File if not already done
+  local _CREATED_SUMMARY=false
   if [ -z "$SETUP_SUMMARY_FILE" ]; then
     SETUP_SUMMARY_FILE=$(mktemp)
     export SETUP_SUMMARY_FILE
@@ -38,6 +40,7 @@ main() {
 
   # 3. Secrets Scanning
   if run_quiet command -v gitleaks; then
+    local _T0
     _T0=$(date +%s)
     log_info "── Scanning for Secrets (gitleaks) ──"
     if [ "$DRY_RUN" -eq 1 ]; then
@@ -55,6 +58,7 @@ main() {
 
   # 4. GitHub Actions Security
   if [ -d ".github/workflows" ]; then
+    local _T0
     _T0=$(date +%s)
     log_info "\n── Auditing GitHub Actions (zizmor) ──"
     if run_quiet command -v zizmor; then
@@ -74,13 +78,14 @@ main() {
 
   # 5. Dependency Audits (Node.js)
   if [ -f "$PACKAGE_JSON" ]; then
+    local _T0
     _T0=$(date +%s)
     log_info "\n── Auditing Node.js dependencies ($NPM audit) ──"
     if [ "$DRY_RUN" -eq 1 ]; then
       log_success "DRY-RUN: Would run $NPM audit"
       log_summary "Node.js" "$NPM-audit" "⚖️ Previewed" "-" "0"
     else
-      _REG_ARG=""
+      local _REG_ARG=""
       if [ "$NPM" = "pnpm" ] || [ "$NPM" = "npm" ]; then
         _REG_ARG="--registry=https://registry.npmjs.org"
       fi
@@ -96,9 +101,10 @@ main() {
 
   # 6. Dependency Audits (Python)
   if [ -f "$REQUIREMENTS_TXT" ] || [ -f "requirements.txt" ] || [ -f "$PYPROJECT_TOML" ]; then
+    local _T0
     _T0=$(date +%s)
     log_info "\n── Auditing Python dependencies (pip-audit) ──"
-    _PIPAUDIT=""
+    local _PIPAUDIT=""
     if [ -x "$VENV/bin/pip-audit" ]; then
       _PIPAUDIT="$VENV/bin/pip-audit"
     elif command -v pip-audit >/dev/null 2>&1; then
@@ -126,6 +132,7 @@ main() {
 
   # 7. Multi-Stack Audit (OSV-Scanner)
   if run_quiet command -v osv-scanner; then
+    local _T0
     _T0=$(date +%s)
     log_info "\n── Generic Vulnerability Scan (osv-scanner) ──"
     if [ "$DRY_RUN" -eq 1 ]; then
@@ -143,6 +150,7 @@ main() {
 
   # 8. Stack Specific (Go/Rust/Containers)
   if [ -f "go.mod" ]; then
+    local _T0
     _T0=$(date +%s)
     log_info "\n── Auditing Go dependencies (govulncheck) ──"
     if run_quiet command -v govulncheck; then
@@ -164,6 +172,7 @@ main() {
   fi
 
   if [ -f "Cargo.toml" ]; then
+    local _T0
     _T0=$(date +%s)
     log_info "\n── Auditing Rust dependencies (cargo audit) ──"
     if run_quiet command -v cargo && run_quiet cargo audit --version; then
@@ -185,6 +194,7 @@ main() {
   fi
 
   if [ -f "Dockerfile" ] || [ -f "docker-compose.yml" ]; then
+    local _T0
     _T0=$(date +%s)
     log_info "\n── Auditing Containers (trivy) ──"
     if run_quiet command -v trivy; then
@@ -208,6 +218,7 @@ main() {
   # ── Final Report ─────────────────────────────────────────────────────────────
 
   if [ "$_CREATED_SUMMARY" = "true" ]; then
+    local _TOTAL_DUR
     _TOTAL_DUR=$(($(date +%s) - _START_))
     printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR" >>"$SETUP_SUMMARY_FILE"
 

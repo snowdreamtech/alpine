@@ -24,16 +24,16 @@ main() {
 
   log_info "🔍 Checking Development Environment Health...\n"
 
-  _HEALTHY=0
-  _CORE_HEALTHY=0
+  local _HEALTHY=0
+  local _CORE_HEALTHY=0
 
   # Internal helper for version checking
   _check_version() {
-    _NAME_PROC="$1"
-    _CMD_PROC="$2"
-    _MIN_VER_PROC="$3"
-    _VER_CMD_PROC="$4"
-    _CRITICAL_PROC="${5:-0}"
+    local _NAME_PROC="$1"
+    local _CMD_PROC="$2"
+    local _MIN_VER_PROC="$3"
+    local _VER_CMD_PROC="$4"
+    local _CRITICAL_PROC="${5:-0}"
 
     log_debug "Checking $_NAME_PROC (min: $_MIN_VER_PROC)..."
 
@@ -44,9 +44,11 @@ main() {
       return 1
     fi
 
+    local _CURRENT_VER_PROC
     _CURRENT_VER_PROC=$(get_version "$_CMD_PROC")
     [ "$_CURRENT_VER_PROC" = "-" ] && _CURRENT_VER_PROC="0.0"
 
+    local _LOWER_VER_PROC
     _LOWER_VER_PROC=$(printf "%s\n%s" "$_MIN_VER_PROC" "$_CURRENT_VER_PROC" | sort -n -t. -k1,1 -k2,2 -k3,3 | head -n1)
 
     if [ "$_LOWER_VER_PROC" = "$_MIN_VER_PROC" ] || [ "$_CURRENT_VER_PROC" = "$_MIN_VER_PROC" ]; then
@@ -172,6 +174,7 @@ main() {
 
   # 7. Project File Integrity
   log_info "── Project Integrity ──"
+  local f
   for f in "Makefile" "$PACKAGE_JSON" "README.md" ".agent/rules/01-general.md"; do
     if [ -f "$f" ]; then
       log_debug "Found $f"

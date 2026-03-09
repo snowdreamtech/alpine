@@ -72,6 +72,7 @@ main() {
   fi
 
   # 4. Check for dependencies
+  local _NPM_LOCAL
   _NPM_LOCAL=${NPM:-pnpm}
   if ! command -v "$_NPM_LOCAL" >/dev/null 2>&1; then
     log_error "Error: $_NPM_LOCAL client not found."

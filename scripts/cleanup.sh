@@ -41,8 +41,8 @@ main() {
   log_info "🧹 Starting deep project cleanup...\n"
 
   clean_item() {
-    _PATH="$1"
-    _DESC="$2"
+    local _PATH="$1"
+    local _DESC="$2"
 
     if [ -e "$_PATH" ]; then
       if [ "$DRY_RUN" -eq 1 ]; then

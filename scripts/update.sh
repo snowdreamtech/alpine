@@ -35,6 +35,7 @@ EOF
 # ── Functions ────────────────────────────────────────────────────────────────
 
 update_pnpm_global() {
+  local _T0
   _T0=$(date +%s)
   if command -v pnpm >/dev/null 2>&1; then
     if check_update_cooldown "pnpm-global"; then
@@ -56,6 +57,7 @@ update_pnpm_global() {
           log_summary "Manager" "pnpm" "⚖️ Previewed" "-" "0"
         else
           log_info "Updating pnpm (self-update)..."
+          local _OUT
           if _OUT=$(run_quiet pnpm self-update 2>&1); then
             save_update_timestamp "pnpm-global"
             log_summary "Manager" "pnpm" "✅ Updated" "$(get_version pnpm)" "$(($(date +%s) - _T0))"
@@ -79,6 +81,7 @@ update_pnpm_global() {
 }
 
 update_pnpm_project() {
+  local _T0
   _T0=$(date +%s)
   if [ -f "pnpm-lock.yaml" ]; then
     if command -v pnpm >/dev/null 2>&1; then
@@ -100,6 +103,7 @@ update_pnpm_project() {
 }
 
 update_python_venv() {
+  local _T0
   _T0=$(date +%s)
   if [ -d "$VENV" ]; then
     if [ -x "$VENV/bin/pip" ]; then
@@ -107,7 +111,7 @@ update_python_venv() {
       if [ "$DRY_RUN" -eq 1 ]; then
         log_summary "Project" "Python-Venv" "⚖️ Previewed" "-" "0"
       else
-        _STAT="✅ Updated"
+        local _STAT="✅ Updated"
         run_quiet "$VENV/bin/pip" install --upgrade pip || _STAT="⚠️ Warning"
         if [ -f "$REQUIREMENTS_TXT" ]; then
           run_quiet "$VENV/bin/pip" install -r "$REQUIREMENTS_TXT" --upgrade || _STAT="❌ Failed"
@@ -122,6 +126,7 @@ update_python_venv() {
 }
 
 update_homebrew() {
+  local _T0
   _T0=$(date +%s)
   if command -v brew >/dev/null 2>&1; then
     if check_update_cooldown "homebrew"; then
@@ -143,6 +148,7 @@ update_homebrew() {
 }
 
 update_macports() {
+  local _T0
   _T0=$(date +%s)
   if command -v port >/dev/null 2>&1; then
     if check_update_cooldown "macports"; then
@@ -164,6 +170,7 @@ update_macports() {
 }
 
 update_ruby_gems() {
+  local _T0
   _T0=$(date +%s)
   if command -v gem >/dev/null 2>&1; then
     if gem list rubocop -i >/dev/null 2>&1; then
@@ -187,8 +194,9 @@ update_ruby_gems() {
 }
 
 update_pre_commit() {
+  local _T0
   _T0=$(date +%s)
-  _BIN=""
+  local _BIN=""
   if [ -x "$VENV/bin/pre-commit" ]; then
     _BIN="$VENV/bin/pre-commit"
   elif command -v pre-commit >/dev/null 2>&1; then _BIN="pre-commit"; fi
@@ -214,6 +222,7 @@ update_pre_commit() {
 }
 
 update_go_mod() {
+  local _T0
   _T0=$(date +%s)
   if [ -f "go.mod" ]; then
     if command -v go >/dev/null 2>&1; then
@@ -235,6 +244,7 @@ update_go_mod() {
 }
 
 update_cargo_deps() {
+  local _T0
   _T0=$(date +%s)
   if [ -f "Cargo.toml" ]; then
     if command -v cargo >/dev/null 2>&1; then
@@ -263,13 +273,14 @@ main() {
   # 2. Argument Parsing
   parse_common_args "$@"
 
+  local _START_TIME
   _START_TIME=$(date +%s)
 
   # Initialize Summary File if not already done
   if [ -z "$SETUP_SUMMARY_FILE" ]; then
     SETUP_SUMMARY_FILE=$(mktemp)
     export SETUP_SUMMARY_FILE
-    _CREATED_SUMMARY=true
+    local _CREATED_SUMMARY=true
 
     {
       printf "### Update Execution Summary\n\n"
@@ -293,6 +304,7 @@ main() {
 
   # Final Output Management
   if [ "$_CREATED_SUMMARY" = "true" ]; then
+    local _TOTAL_DUR
     _TOTAL_DUR=$(($(date +%s) - _START_TIME))
     printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR" >>"$SETUP_SUMMARY_FILE"
 
