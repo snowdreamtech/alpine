@@ -4,8 +4,13 @@
 # Usage: sh scripts/lib/lint-wrapper.sh LINTER_NAME [ARGS...]
 # Features: POSIX compliant, Graceful tool detection, Cross-platform runtime checks.
 
+# ── Common Library ───────────────────────────────────────────────────────────
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+. "$SCRIPT_DIR/common.sh"
+
 main() {
   _LINTER="$1"
+  [ -z "$_LINTER" ] && return 0
   shift
 
   # 1. Resolve Binary Path

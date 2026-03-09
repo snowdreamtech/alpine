@@ -1,7 +1,19 @@
 #!/bin/sh
-# scripts/lib/common.sh - Shared logic for project scripts.
-# Unified logging, colors, and utility functions.
+# scripts/lib/common.sh - Shared utility library for automation scripts.
+#
+# This library provides centralized configuration, logging, and helper
+# functions used across the project's orchestration layer.
+#
+# Features:
+#   - Standardized colored logging (info, success, warn, error).
+#   - Robust downloading with retry and proxy logic.
+#   - Operation throttling (24h cooldown for heavy tasks).
+#   - Build-then-Swap atomic file operations.
+#   - POSIX-compliant environment detections.
+
 # shellcheck disable=SC2034
+
+# ── 🎨 Visual Assets ─────────────────────────────────────────────────────────
 
 # Colors (using printf to generate literal ESC characters for maximum compatibility)
 BLUE=$(printf '\033[0;34m')
@@ -9,6 +21,8 @@ GREEN=$(printf '\033[0;32m')
 YELLOW=$(printf '\033[1;33m')
 RED=$(printf '\033[0;31m')
 NC=$(printf '\033[0m')
+
+# ── ⚙️ Global Configuration ──────────────────────────────────────────────────
 
 # Default verbosity
 # shellcheck disable=SC2034
@@ -24,7 +38,8 @@ else
   _IS_TOP_LEVEL=false
 fi
 
-# SSoT Constants (Paths and Files)
+# ── 📄 SSoT Constants (Paths and Files) ──────────────────────────────────────
+
 CHANGELOG="CHANGELOG.md"
 PACKAGE_JSON="package.json"
 CARGO_TOML="Cargo.toml"
@@ -41,7 +56,8 @@ DOCS_DIR="docs"
 ARCHIVE_DIR="${ARCHIVE_DIR:-.}"
 GITHUB_PROXY="${GITHUB_PROXY:-https://gh-proxy.sn0wdr1am.com/}"
 
-# Tool Versions (SSoT)
+# ── 🔨 SSoT Tool Versions ────────────────────────────────────────────────────
+
 GITLEAKS_VERSION="${GITLEAKS_VERSION:-v8.30.0}"
 HADOLINT_VERSION="${HADOLINT_VERSION:-v2.14.0}"
 GOLANGCI_VERSION="${GOLANGCI_VERSION:-v1.64.5}"
@@ -57,6 +73,8 @@ TRIVY_VERSION="${TRIVY_VERSION:-v0.69.3}"
 export GITLEAKS_VERSION HADOLINT_VERSION GOLANGCI_VERSION CHECKMAKE_VERSION
 export TFLINT_VERSION KUBE_LINTER_VERSION JAVA_FORMAT_VERSION PHP_CS_FIXER_VERSION
 export OSV_SCANNER_VERSION TRIVY_VERSION
+
+# ── 📢 Standardized Logging ──────────────────────────────────────────────────
 
 # Logging functions
 log_info() {
