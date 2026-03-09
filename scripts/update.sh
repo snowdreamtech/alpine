@@ -257,55 +257,59 @@ update_cargo_deps() {
 
 # ── Main Execution ───────────────────────────────────────────────────────────
 
-_START_TIME=$(date +%s)
+main() {
+  _START_TIME=$(date +%s)
 
-# Initialize Summary File if not already done
-if [ -z "$SETUP_SUMMARY_FILE" ]; then
-  SETUP_SUMMARY_FILE=$(mktemp)
-  export SETUP_SUMMARY_FILE
-  _CREATED_SUMMARY=true
+  # Initialize Summary File if not already done
+  if [ -z "$SETUP_SUMMARY_FILE" ]; then
+    SETUP_SUMMARY_FILE=$(mktemp)
+    export SETUP_SUMMARY_FILE
+    _CREATED_SUMMARY=true
 
-  {
-    printf "### Update Execution Summary\n\n"
-    printf "| Category | Module | Status | Version | Time |\n"
-    printf "| :--- | :--- | :--- | :--- | :--- |\n"
-  } >"$SETUP_SUMMARY_FILE"
-fi
-
-update_homebrew
-update_macports
-update_pnpm_global
-update_pnpm_project
-update_python_venv
-update_go_mod
-update_cargo_deps
-update_ruby_gems
-update_pre_commit
-
-# Optional: run npm update if defined
-run_npm_script "update"
-
-# Final Output Management
-if [ "$_CREATED_SUMMARY" = "true" ]; then
-  _TOTAL_DUR=$(($(date +%s) - _START_TIME))
-  printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR" >>"$SETUP_SUMMARY_FILE"
-
-  printf "\n"
-  printf "\n"
-  cat "$SETUP_SUMMARY_FILE"
-  if [ -n "$GITHUB_STEP_SUMMARY" ]; then
-    cat "$SETUP_SUMMARY_FILE" >>"$GITHUB_STEP_SUMMARY"
+    {
+      printf "### Update Execution Summary\n\n"
+      printf "| Category | Module | Status | Version | Time |\n"
+      printf "| :--- | :--- | :--- | :--- | :--- |\n"
+    } >"$SETUP_SUMMARY_FILE"
   fi
-  rm -f "$SETUP_SUMMARY_FILE"
-fi
 
-if [ "$_IS_TOP_LEVEL" = "true" ]; then
-  log_success "\n✨ All tools and dependencies updated successfully!"
+  update_homebrew
+  update_macports
+  update_pnpm_global
+  update_pnpm_project
+  update_python_venv
+  update_go_mod
+  update_cargo_deps
+  update_ruby_gems
+  update_pre_commit
 
-  # Next Actions
-  if [ "$DRY_RUN" -eq 0 ]; then
-    printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    printf "  - Run %bmake install%b to synchronize project dependencies.\n" "${GREEN}" "${NC}"
-    printf "  - Run %bmake verify%b to ensure environment stability.\n" "${GREEN}" "${NC}"
+  # Optional: run npm update if defined
+  run_npm_script "update"
+
+  # Final Output Management
+  if [ "$_CREATED_SUMMARY" = "true" ]; then
+    _TOTAL_DUR=$(($(date +%s) - _START_TIME))
+    printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR" >>"$SETUP_SUMMARY_FILE"
+
+    printf "\n"
+    printf "\n"
+    cat "$SETUP_SUMMARY_FILE"
+    if [ -n "$GITHUB_STEP_SUMMARY" ]; then
+      cat "$SETUP_SUMMARY_FILE" >>"$GITHUB_STEP_SUMMARY"
+    fi
+    rm -f "$SETUP_SUMMARY_FILE"
   fi
-fi
+
+  if [ "$_IS_TOP_LEVEL" = "true" ]; then
+    log_success "\n✨ All tools and dependencies updated successfully!"
+
+    # Next Actions
+    if [ "$DRY_RUN" -eq 0 ]; then
+      printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
+      printf "  - Run %bmake install%b to synchronize project dependencies.\n" "${GREEN}" "${NC}"
+      printf "  - Run %bmake verify%b to ensure environment stability.\n" "${GREEN}" "${NC}"
+    fi
+  fi
+}
+
+main "$@"
