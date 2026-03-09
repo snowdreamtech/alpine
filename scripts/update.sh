@@ -252,5 +252,12 @@ if [ "$_IS_TOP_LEVEL" = "true" ]; then
     cat "$SETUP_SUMMARY_FILE"
   fi
   rm -f "$SETUP_SUMMARY_FILE"
-  log_success "\n✨ Update process finished."
+  log_success "\n✨ All tools and dependencies updated successfully!"
+
+  # Next Actions
+  if [ "$DRY_RUN" -eq 0 ]; then
+    printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
+    printf "  - Run %bmake install%b to synchronize project dependencies.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake verify%b to ensure environment stability.\n" "${GREEN}" "${NC}"
+  fi
 fi

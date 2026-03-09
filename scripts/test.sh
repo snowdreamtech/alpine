@@ -116,4 +116,11 @@ esac
 # ensuring we don't loop back to this script.
 run_npm_script "test"
 
-log_success "\n✨ Test execution finished."
+log_success "\n✨ All tests passed!"
+
+# Next Actions
+if [ "$DRY_RUN" -eq 0 ]; then
+  printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
+  printf "  - Run %bmake audit%b to check for security vulnerabilities.\n" "${GREEN}" "${NC}"
+  printf "  - Run %bmake commit%b to finalize your changes.\n" "${GREEN}" "${NC}"
+fi

@@ -174,6 +174,10 @@ else
 fi
 
 log_success "\n🚀 Project Hydration Complete!"
-if [ "$DRY_RUN" -eq 0 ] && [ "$VERBOSE" -ge 1 ]; then
-  printf "Next steps: Run 'make setup'.\n"
+
+# Next Actions
+if [ "$DRY_RUN" -eq 0 ]; then
+  printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
+  printf "  - Run %bmake setup%b to install system-level tools.\n" "${GREEN}" "${NC}"
+  printf "  - Run %bmake install%b to install project dependencies.\n" "${GREEN}" "${NC}"
 fi

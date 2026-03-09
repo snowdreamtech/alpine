@@ -747,4 +747,11 @@ if [ "$_IS_TOP_LEVEL" = "true" ]; then
   fi
   rm -f "$SETUP_SUMMARY_FILE"
   info "\n✨ Setup step $modules complete!"
+
+  # Next Actions
+  if [ "$DRY_RUN" -eq 0 ]; then
+    printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
+    printf "  - Run %bmake install%b to install project dependencies.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake verify%b to ensure environment health.\n" "${GREEN}" "${NC}"
+  fi
 fi

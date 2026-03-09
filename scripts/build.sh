@@ -77,4 +77,10 @@ if [ -f "pyproject.toml" ]; then
   fi
 fi
 
-log_success "\n✨ Build process finished."
+log_success "✨ Build completed successfully! Check the 'out/' or 'dist/' directory."
+
+# Next Actions
+if [ "$DRY_RUN" -eq 0 ]; then
+  printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
+  printf "  - Run %bmake release%b to create a new version tag.\n" "${GREEN}" "${NC}"
+fi

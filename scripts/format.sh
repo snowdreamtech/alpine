@@ -94,3 +94,10 @@ run_ruff
 run_npm_script "format"
 
 log_success "\n✨ Formatting complete!"
+
+# Next Actions
+if [ "$DRY_RUN" -eq 0 ]; then
+  printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
+  printf "  - Run %bmake lint%b to verify code quality.\n" "${GREEN}" "${NC}"
+  printf "  - Run %bmake test%b to run the unified test suite.\n" "${GREEN}" "${NC}"
+fi

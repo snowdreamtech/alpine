@@ -69,3 +69,9 @@ else
   # Fallback to direct npx if script not found
   "$NPM" exec cz
 fi
+
+# Next Actions
+if [ "$DRY_RUN" -eq 0 ]; then
+  printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
+  printf "  - Run %bgit push%b to upload your changes to the remote.\n" "${GREEN}" "${NC}"
+fi

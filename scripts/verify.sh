@@ -75,3 +75,10 @@ run_step "scripts/test.sh" "Core Functionality (Testing)"
 run_npm_script "verify"
 
 log_success "✨ All verification steps passed! Project is healthy."
+
+# Next Actions
+if [ "$DRY_RUN" -eq 0 ]; then
+  printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
+  printf "  - Run %bmake audit%b to check for security vulnerabilities.\n" "${GREEN}" "${NC}"
+  printf "  - Run %bmake commit%b to finalize your changes.\n" "${GREEN}" "${NC}"
+fi

@@ -250,6 +250,13 @@ if [ "$_IS_TOP_LEVEL" = "true" ]; then
 
   if [ "$_OVERALL_EXIT" -eq 0 ]; then
     log_success "\n✨ Security audit finished successfully."
+    # Next Actions
+    if [ "$DRY_RUN" -eq 0 ]; then
+      printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
+      printf "  - Run %bmake commit%b to finalize your changes.\n" "${GREEN}" "${NC}"
+      printf "  - Run %bmake build%b to create project artifacts.\n" "${GREEN}" "${NC}"
+    fi
+
   else
     log_error "\n⚠️ Security audit finished with vulnerabilities or leaks found."
   fi

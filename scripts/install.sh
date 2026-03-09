@@ -87,12 +87,9 @@ fi
 
 log_success "\n✨ All dependencies installed successfully!"
 
-# 5. Onboarding Next Steps (Phase 14)
-if [ "$VERBOSE" -ge 1 ]; then
-  printf "\n🚀 %bNext Actions:%b\n" "${YELLOW}" "${NC}"
-  if [ ! -f ".git/hooks/pre-commit" ]; then
-    printf "  - Run %bmake setup%b to activate pre-commit hooks.\n" "${GREEN}" "${NC}"
-  fi
-  printf "  - Run %bmake init%b to hydrate your project (if first time).\n" "${GREEN}" "${NC}"
+# Next Actions
+if [ "$DRY_RUN" -eq 0 ]; then
+  printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
   printf "  - Run %bmake verify%b to ensure environment health.\n" "${GREEN}" "${NC}"
+  printf "  - Run %bmake audit%b to check for security vulnerabilities.\n" "${GREEN}" "${NC}"
 fi

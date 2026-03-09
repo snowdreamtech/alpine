@@ -91,3 +91,9 @@ printf "\n"
 run_npm_script "release"
 
 log_success "\n✨ Release process completed successfully!"
+
+# Next Actions
+if [ "$DRY_RUN" -eq 0 ]; then
+  printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
+  printf "  - Run %bgit push --tags%b to publish the version tag.\n" "${GREEN}" "${NC}"
+fi
