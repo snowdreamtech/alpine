@@ -83,6 +83,30 @@ guard_project_root() {
   fi
 }
 
+# Returns 0 if update is needed (cooldown expired or missing), 1 if within cooldown
+check_update_cooldown() {
+  _NAME="$1"
+  _COOLDOWN="${2:-86400}" # Default: 24h
+  _MARKER="${VENV}/.last_update_${_NAME}"
+
+  if [ ! -f "$_MARKER" ]; then return 0; fi
+
+  _NOW=$(date +%s)
+  _LAST=$(cat "$_MARKER")
+  if [ $((_NOW - _LAST)) -ge "$_COOLDOWN" ]; then
+    return 0
+  fi
+  return 1
+}
+
+# Saves current timestamp to marker file
+save_update_timestamp() {
+  _NAME="$1"
+  _MARKER="${VENV}/.last_update_${_NAME}"
+  mkdir -p "$(dirname "$_MARKER")"
+  date +%s >"$_MARKER"
+}
+
 # Enhanced download helper with retry and proxy fallback
 download_url() {
   _URL="$1"

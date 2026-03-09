@@ -117,34 +117,41 @@ update_python_venv() {
 update_homebrew() {
   _T0=$(date +%s)
   if command -v brew >/dev/null 2>&1; then
-    log_info "Updating Homebrew..."
-    if [ "$DRY_RUN" -eq 1 ]; then
-      log_summary "Manager" "Homebrew" "⚖️ Previewed" "-" "0"
-    else
-      if run_quiet brew update; then
-        log_summary "Manager" "Homebrew" "✅ Updated" "-" "$(($(date +%s) - _T0))"
+    if check_update_cooldown "homebrew"; then
+      log_info "Updating Homebrew..."
+      if [ "$DRY_RUN" -eq 1 ]; then
+        log_summary "Manager" "Homebrew" "⚖️ Previewed" "-" "0"
       else
-        log_summary "Manager" "Homebrew" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+        if run_quiet brew update; then
+          save_update_timestamp "homebrew"
+          log_summary "Manager" "Homebrew" "✅ Updated" "-" "$(($(date +%s) - _T0))"
+        else
+          log_summary "Manager" "Homebrew" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+        fi
       fi
+    else
+      log_summary "Manager" "Homebrew" "✅ Up-to-date (Cooldown)" "-" "0"
     fi
-  else
-    # If brew is not found, try macports
-    update_macports
   fi
 }
 
 update_macports() {
   _T0=$(date +%s)
   if command -v port >/dev/null 2>&1; then
-    log_info "Updating MacPorts (requires sudo)..."
-    if [ "$DRY_RUN" -eq 1 ]; then
-      log_summary "Manager" "MacPorts" "⚖️ Previewed" "-" "0"
-    else
-      if sudo port selfupdate && sudo port -N upgrade outdated; then
-        log_summary "Manager" "MacPorts" "✅ Updated" "-" "$(($(date +%s) - _T0))"
+    if check_update_cooldown "macports"; then
+      log_info "Updating MacPorts (requires sudo)..."
+      if [ "$DRY_RUN" -eq 1 ]; then
+        log_summary "Manager" "MacPorts" "⚖️ Previewed" "-" "0"
       else
-        log_summary "Manager" "MacPorts" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+        if sudo port selfupdate && sudo port -N upgrade outdated; then
+          save_update_timestamp "macports"
+          log_summary "Manager" "MacPorts" "✅ Updated" "-" "$(($(date +%s) - _T0))"
+        else
+          log_summary "Manager" "MacPorts" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+        fi
       fi
+    else
+      log_summary "Manager" "MacPorts" "✅ Up-to-date (Cooldown)" "-" "0"
     fi
   fi
 }
@@ -249,6 +256,7 @@ if [ -z "$SETUP_SUMMARY_FILE" ]; then
 fi
 
 update_homebrew
+update_macports
 update_pnpm_global
 update_pnpm_project
 update_python_venv
