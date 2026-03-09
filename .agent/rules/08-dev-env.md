@@ -231,3 +231,27 @@
   | **Enhanced (Optional)** | Go, PHP, Java, Rust, Docker | **Robust**: Print `⚠️ Warning` but exit with `0` (FUNCTIONAL). |
 
   This ensures that a developer with a partially setup environment can still perform basic tasks (hydration, common linting) without being blocked by auxiliary language requirements.
+
+## 7. Recommended Project Lifecycle
+
+To maintain consistency and high quality, developers and AI agents MUST follow these standardized command sequences.
+
+### Initialization Sequence (首次初始化)
+
+Follow this order when setting up a new repository or onboarding to a new machine:
+
+1. **make init**: Hydrate the project and set identity.
+2. **make setup**: Install required system binaries and global tools.
+3. **make install**: Install project dependencies and activate git hooks.
+4. **make verify**: Perform a final comprehensive health and quality check.
+
+### Daily Development Loop (日常开发循环)
+
+Follow this iterative cycle for consistent delivery:
+
+1. **make install**: Ensure local dependencies are synchronized with the lockfile.
+2. **make format**: Apply automated formatting before every commit.
+3. **make lint**: Verify code adherence to project rules.
+4. **make test**: Ensure logic integrity.
+5. **make audit**: Run security and vulnerability scans (Mandatory before PR).
+6. **make commit**: Use the standardized commit CLI for versioning.

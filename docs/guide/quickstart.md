@@ -52,9 +52,13 @@ This triggers the AI agent to:
 
 ### Option B: Manual
 
+Follow the standardized sequence for a robust environment:
+
 ```bash
-make setup    # Install system-level tools
-make install  # Install project dependencies
+make init     # Step 1: Hydrate project from template
+make setup    # Step 2: Install system-level tools (binaries)
+make install  # Step 3: Install project dependencies & hooks
+make verify   # Step 4: Run comprehensive health check
 ```
 
 ## Step 4: Open in DevContainer

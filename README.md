@@ -36,23 +36,47 @@ project-root/
 
 ## 🚀 Getting Started
 
+To ensure a 100% pure and standardized environment, follow these steps in order:
+
+### 1. Project Initialization (首次初始化)
+
 1. **Clone the template**.
-2. **Bootstrap and Setup Environment**:
-   Run the cross-platform setup script to configure your local environment:
-   - **macOS / Linux**: `sh scripts/setup.sh`
-   - **Windows (PowerShell)**: `.\scripts\setup.ps1`
-   - **Windows (CMD)**: `scripts\setup.bat`
-3. **Project Hydration**:
-   Re-brand the template for your new project:
+2. **Setup Basic Runtimes**: Ensure you have Node.js and Python installed.
+3. **Hydrate Project**: Re-brand the template for your identity.
 
    ```bash
    make init
    ```
 
-4. **Initialize AI Workflows**:
-   Trigger the initialization by typing `@[/snowdreamtech.init]` in your AI agent chat. This will configure `corepack`, install local linters/formatters, and activate `pre-commit` hooks.
-5. **Read the Rules**:
-   Before coding, ensure both you and your AI assistant has read the core principles at `.agent/rules/01-general.md`.
+4. **Install System Tools**: Install security and linting binaries (gitleaks, trivy, etc.).
+
+   ```bash
+   make setup
+   ```
+
+5. **Install Dependencies**: Install project-specific packages and activate hooks.
+
+   ```bash
+   make install
+   ```
+
+6. **Final Verification**: Confirm everything is correctly configured.
+
+   ```bash
+   make verify
+   ```
+
+### 2. Daily Development Workflow (日常开发)
+
+For a high-quality development cycle, follow this cycle:
+
+1. **Sync**: `make install` (Ensure dependencies are up to date)
+2. **Code**: Implement features or fixes.
+3. **Format**: `make format` (Auto-fix style issues)
+4. **Lint**: `make lint` (Verify standards)
+5. **Test**: `make test` (Verify logic)
+6. **Audit**: `make audit` (Security check, recommended before PR)
+7. **Commit**: `make commit` (Conventional commit)
 
 ## 🛠️ Full Automation Matrix
 
@@ -60,12 +84,12 @@ This template features a professional-grade script library (18 tool suites) that
 
 | Suite        | Goal                       | Commands                                |
 | :----------- | :------------------------- | :-------------------------------------- |
-| **Core**     | Onboarding & Project Setup | `init`, `setup`, `check-env`            |
+| **Core**     | Onboarding & Project Setup | `init`, `setup`, `install`, `check-env` |
 | **Quality**  | Reliability & Standards    | `test`, `lint`, `format`, `verify`      |
 | **Security** | Auditing & Compliance      | `audit`, `env`                          |
 | **Ops**      | Building & Releasing       | `build`, `release`, `archive-changelog` |
 | **Maint**    | Tooling & Cleanup          | `update`, `cleanup`                     |
-| **DX**       | Developer Productivity     | `install`, `docs`, `commit`, `bench`    |
+| **DX**       | Developer Productivity     | `docs`, `commit`, `bench`               |
 
 ## 🛠️ SpecKit Collaboration Workflows
 
