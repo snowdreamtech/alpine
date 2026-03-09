@@ -5,12 +5,12 @@ settings:
   excludeLinksFromLockfile: false
 
 overrides:
-  minimatch: '>=3.1.4'
-  rollup: '>=2.80.0'
-  esbuild: '>=0.25.0'
-  lodash: '>=4.17.23'
-  '@eslint/plugin-kit': '>=0.3.5'
-  tmp: '>=0.2.5'
+  '@eslint/plugin-kit': 0.6.1
+  esbuild: 0.27.3
+  lodash: 4.17.23
+  minimatch: 3.1.5
+  rollup: 4.59.0
+  tmp: 0.2.5
 
 importers:
 
@@ -587,13 +587,13 @@ packages:
     resolution: {integrity: sha512-//NdP6iIwPbMTcazYsiBMbJW7gfmpHom33u1beiIoHDEM0Q9clvtQB1T0efvMqHeKsGohiHo97BCPCkBXdscwg==}
     engines: {node: '>= 12.0.0'}
     peerDependencies:
-      rollup: '>=2.80.0'
+      rollup: 4.59.0
 
   '@rollup/pluginutils@3.1.0':
     resolution: {integrity: sha512-GksZ6pr6TpIjHm8h9lSQ8pi8BE9VeubNT0OMJ3B5uZJ8pz73NPiqOtCog/x2/QzM1ENChPKxMDhiQuRHsqc+lg==}
     engines: {node: '>= 8.0.0'}
     peerDependencies:
-      rollup: '>=2.80.0'
+      rollup: 4.59.0
 
   '@rollup/rollup-android-arm-eabi@4.59.0':
     resolution: {integrity: sha512-upnNBkA6ZH2VKGcBj9Fyl9IGNPULcjXRlg0LLeaioQWueH30p6IXtJEbKAgvyv+mJaMxSm1l6xwDXYjpEMiLMg==}

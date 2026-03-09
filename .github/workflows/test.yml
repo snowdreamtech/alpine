@@ -50,7 +50,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6.2.0
         with:
-          node-version: "24"
+          node-version: "22"
 
       - name: Set up Python
         uses: actions/setup-python@v6.2.0
@@ -59,7 +59,8 @@ jobs:
 
       - name: Run Environment Setup
         run: |
-          sh scripts/setup.sh
+          make setup
+          make install
         env:
           VENV: ${{ env.VENV }}
 

@@ -70,16 +70,17 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6.2.0
         with:
-          node-version: "24"
+          node-version: "22"
 
       - name: Set up Python
         uses: actions/setup-python@v6.2.0
         with:
           python-version: "3.12"
 
-      - name: Run Foundational Environment Setup
+      - name: Project Setup
         run: |
-          sh scripts/setup.sh node python gitleaks
+          make setup
+          make install
         env:
           VENV: ${{ env.VENV }}
 
@@ -91,290 +92,26 @@ jobs:
             pnpm exec commitlint --last --verbose
           fi
 
-      - name: Run Gitleaks
-        run: |
-          ${{ env.VENV }}/bin/gitleaks detect --source . --verbose --config .gitleaks.toml || true
-
-      - name: Run markdownlint
-        run: |
-          find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name "*.md" -print0 | xargs -0 pnpm exec markdownlint-cli2
-
-      - name: Run ansible-lint
-        run: ${{ env.VENV }}/bin/ansible-lint -v
-
-      - name: Run ansible-playbook syntax-check
-        run: |
-          if [ -d playbooks ]; then
-            find playbooks -name "*.yml" -print0 | xargs -0 -I{} ${{ env.VENV }}/bin/ansible-playbook --syntax-check {}
-          else
-            echo "No playbooks/ directory found, skipping syntax-check."
-          fi
-
-      - name: Run Ruff
-        run: |
-          if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.py' -print -quit)" ]; then
-            ${{ env.VENV }}/bin/ruff check .
-            ${{ env.VENV }}/bin/ruff format --check .
-          else
-            echo "No Python files found, skipping ruff."
-          fi
-
-      - name: Run SQLFluff
-        run: |
-          if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.sql' -print -quit)" ]; then
-            ${{ env.VENV }}/bin/sqlfluff lint . --dialect postgres
-          else
-            echo "No SQL files found, skipping sqlfluff."
-          fi
-
-      - name: Run Prettier
-        run: pnpm exec prettier --check "**/*.{json,yml,yaml,vue,js,jsx,ts,tsx}"
-
-      - name: Run editorconfig-checker
-        run: pnpm exec editorconfig-checker -exclude '^(\.git|node_modules|\.venv|venv|env|vendor|dist|build|out|target|\.next|\.nuxt|\.output|__pycache__|\.specify)/'
+      - name: Run Unified Linting
+        run: make lint
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VENV: ${{ env.VENV }}
+
+      - name: Run Security Audit
+        run: make audit
+        env:
+          VENV: ${{ env.VENV }}
 
       - name: Run Lychee (Link Checker)
         uses: lycheeverse/lychee-action@v2.8.0
+        if: ${{ always() }}
         with:
           args: --root-dir "${{ github.workspace }}" --verbose --no-progress --exclude-path ".git" --exclude-path "node_modules" --exclude-path ".venv" --exclude-path "venv" --exclude-path "env" --exclude-path "vendor" --exclude-path "dist" --exclude-path "build" --exclude-path "out" --exclude-path "target" --exclude-path ".next" --exclude-path ".nuxt" --exclude-path ".output" --exclude-path "__pycache__" --exclude-path ".specify" '**/*.md'
           fail: true
 
-      - name: Run yamllint
-        run: |
-          if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.yaml' -o -name '*.yml' \) -print -quit)" ]; then
-            find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.yaml' -o -name '*.yml' \) -print0 | xargs -0 ${{ env.VENV }}/bin/yamllint --config-file .yamllint.yml
-          fi
-
-      - name: Run dotenv-linter
-        run: |
-          if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '.env' -o -name '.env.example' -o -name '.env.sample' \) -print -quit)" ]; then
-            find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '.env' -o -name '.env.example' -o -name '.env.sample' \) -exec ${{ env.VENV }}/bin/dotenv-linter {} +
-          fi
-
-      - name: Run ESLint
-        run: |
-          if [ -f "eslint.config.js" ] || [ -f "eslint.config.mjs" ] || [ -f ".eslintrc.js" ] || [ -f ".eslintrc.json" ]; then
-            pnpm exec eslint "."
-          else
-            echo "No ESLint configuration found, skipping ESLint."
-          fi
-
-      - name: Run sort-package-json
-        run: |
-          if [ -f "package.json" ]; then
-            pnpm exec sort-package-json --check "package.json"
-          else
-            echo "No package.json found, skipping sort-package-json."
-          fi
-
-      - name: Run Stylelint
-        run: |
-          if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.css' -o -name '*.scss' -o -name '*.less' \) -print -quit)" ]; then
-            find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.css' -o -name '*.scss' -o -name '*.less' \) -print0 | xargs -0 pnpm exec stylelint --fix
-          else
-            echo "No CSS/SCSS/LESS files found, skipping Stylelint."
-          fi
-
-      - name: Run Taplo
-        run: |
-          if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.toml' -print -quit)" ]; then
-            find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.toml' -print0 | xargs -0 pnpm exec taplo format --check
-          else
-            echo "No TOML files found, skipping Taplo."
-          fi
-
-      - name: Run golangci-lint
-        run: |
-          if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.go' -print -quit)" ]; then
-            sh scripts/setup.sh go
-            ${{ env.VENV }}/bin/golangci-lint run
-          else
-            echo "No Go files found, skipping golangci-lint."
-          fi
-
-      - name: Run govulncheck
-        run: |
-          if [ -f "go.mod" ]; then
-            # install govulncheck globally in the runner since it's a go tool
-            go install golang.org/x/vuln/cmd/govulncheck@latest
-            govulncheck ./...
-          else
-            echo "No go.mod found, skipping govulncheck."
-          fi
-
-      - name: Run Rustfmt and Clippy
-        run: |
-          if command -v cargo &> /dev/null && [ -f "Cargo.toml" ]; then
-            cargo fmt -- --check
-            cargo clippy -- -D warnings
-          else
-            echo "No Cargo.toml found or cargo not installed, skipping Rust linting."
-          fi
-
-      - name: Run dotnet format
-        run: |
-          if command -v dotnet &> /dev/null; then
-            if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.cs' -o -name '*.vb' \) -print -quit)" ]; then
-              dotnet format --verify-no-changes
-            else
-              echo "No C#/VB files found, skipping dotnet format."
-            fi
-          else
-            echo "dotnet SDK not installed, skipping .NET linting."
-          fi
-
-      - name: Run Rubocop
-        run: |
-          if command -v ruby &> /dev/null; then
-            if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.rb' -print -quit)" ]; then
-              gem install rubocop
-              rubocop --parallel
-            else
-              echo "No Ruby files found, skipping Rubocop."
-            fi
-          else
-            echo "Ruby not installed, skipping Rubocop."
-          fi
-
-      - name: Run php-cs-fixer
-        run: |
-          if command -v php &> /dev/null; then
-            if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.php' -print -quit)" ]; then
-              curl -sL https://cs.symfony.com/download/php-cs-fixer-v3.phar -o php-cs-fixer
-              php php-cs-fixer fix --dry-run
-            else
-              echo "No PHP files found, skipping php-cs-fixer."
-            fi
-          else
-            echo "PHP not installed, skipping php-cs-fixer."
-          fi
-
-      - name: Run Dart Format and Analyze
-        run: |
-          if command -v dart &> /dev/null; then
-            if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.dart' -print -quit)" ]; then
-              dart format --output=none --set-exit-if-changed .
-              dart analyze --fatal-infos
-            else
-              echo "No Dart files found, skipping Dart linting."
-            fi
-          else
-            echo "dart SDK not installed, skipping Dart linting."
-          fi
-
-      - name: Run Swiftformat and Swiftlint
-        run: |
-          if command -v swiftformat &> /dev/null && command -v swiftlint &> /dev/null; then
-            if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.swift' -print -quit)" ]; then
-              swiftformat --lint .
-              swiftlint lint --strict
-            else
-              echo "No Swift files found, skipping Swift linting."
-            fi
-          else
-            echo "swiftformat or swiftlint not installed. Skipping Swift linting."
-          fi
-
-      - name: Run clang-format
-        run: |
-          if [ -x ${{ env.VENV }}/bin/clang-format ]; then
-            if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.m' -o -name '*.mm' -o -name '*.h' -o -name '*.c' -o -name '*.cpp' \) -print -quit)" ]; then
-              find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.m' -o -name '*.mm' -o -name '*.h' -o -name '*.c' -o -name '*.cpp' \) -exec ${{ env.VENV }}/bin/clang-format --dry-run --Werror {} +
-            fi
-          fi
-
-      - name: Run Kube-Linter and TFLint
-        run: |
-          # Detect K8s
-          if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.yaml' -o -name '*.yml' \) -print -quit)" ]; then
-            K8S_FILES=true
-          fi
-          # Detect TF
-          if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.tf' -print -quit)" ]; then
-            TF_FILES=true
-          fi
-
-          if [ "$K8S_FILES" = true ] || [ "$TF_FILES" = true ]; then
-            sh scripts/setup.sh iac
-            if [ "$K8S_FILES" = true ]; then
-              (find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -name '*.yaml' -o -name '*.yml' \) -print0 | xargs -0 ${{ env.VENV }}/bin/kube-linter lint) || true
-            fi
-            if [ "$TF_FILES" = true ]; then
-              ${{ env.VENV }}/bin/tflint --init && ${{ env.VENV }}/bin/tflint
-            fi
-          fi
-
-      - name: Run ktlint and google-java-format
-        run: |
-          if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.kt' -print -quit)" ]; then
-            pnpm exec ktlint || true
-          fi
-          if command -v google-java-format &> /dev/null; then
-            if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.java' -print -quit)" ]; then
-              find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name '*.java' -exec google-java-format --set-exit-if-changed --dry-run {} +
-            fi
-          fi
-
-      - name: Run Spectral (OpenAPI / AsyncAPI)
-        run: |
-          if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -iname '*openapi*.yaml' -o -iname '*openapi*.yml' -o -iname '*openapi*.json' -o -iname '*swagger*.yaml' -o -iname '*swagger*.yml' -o -iname '*swagger*.json' -o -iname '*asyncapi*.yaml' -o -iname '*asyncapi*.yml' -o -iname '*asyncapi*.json' \) -print -quit)" ]; then
-            find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f \( -iname '*openapi*.yaml' -o -iname '*openapi*.yml' -o -iname '*openapi*.json' -o -iname '*swagger*.yaml' -o -iname '*swagger*.yml' -o -iname '*swagger*.json' -o -iname '*asyncapi*.yaml' -o -iname '*asyncapi*.yml' -o -iname '*asyncapi*.json' \) -exec pnpm exec spectral lint {} +
-          fi
-
-      - name: Run ShellCheck
-        run: |
-          find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name "*.sh" -print0 | xargs -0 ${{ env.VENV }}/bin/shellcheck
-
-      - name: Run shfmt
-        run: |
-          if [ -x ${{ env.VENV }}/bin/shfmt ]; then
-            find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name "*.sh" -print0 | xargs -0 ${{ env.VENV }}/bin/shfmt -d
-          fi
-
-      - name: Run actionlint
-        run: ${{ env.VENV }}/bin/actionlint
-
-      - name: Run PSScriptAnalyzer
-        shell: pwsh
-        run: |
-          if (-not (Get-Module -ListAvailable PSScriptAnalyzer)) {
-            Install-Module -Name PSScriptAnalyzer -Force -SkipPublisherCheck -Scope CurrentUser
-          }
-          $psFiles = Get-ChildItem -Path . -Recurse -Include *.ps1,*.psm1,*.psd1 -Exclude .git,node_modules,.venv,venv,env,vendor,dist,build,out,target,.next,.nuxt,.output,__pycache__,.specify
-          if ($psFiles.Count -gt 0) {
-            $results = $psFiles.FullName | Invoke-ScriptAnalyzer -Severity Error,Warning
-            if ($results) {
-              $results | Format-Table -AutoSize
-              exit 1
-            }
-          }
-
-      - name: Run Semgrep
-        run: |
-          pip install --quiet semgrep setuptools
-          semgrep scan \
-            --config=auto \
-            --error \
-            --exclude=.git \
-            --exclude=node_modules \
-            --exclude=.venv \
-            --exclude=venv \
-            --exclude=env \
-            --exclude=vendor \
-            --exclude=dist \
-            --exclude=build \
-            --exclude=out \
-            --exclude=target \
-            --exclude=.next \
-            --exclude=.nuxt \
-            --exclude=.output \
-            --exclude=__pycache__ \
-            --exclude=.specify || true
-
-      - name: Run Trivy Vulnerability Scanner
+      - name: Run Trivy Vulnerability Scanner (SARIF)
         uses: aquasecurity/trivy-action@0.34.2
+        if: ${{ always() }}
         env:
           TRIVY_DB_REPOSITORY: "public.ecr.aws/aquasecurity/trivy-db"
           TRIVY_CHECKS_BUNDLE_REPOSITORY: "public.ecr.aws/aquasecurity/trivy-checks"
@@ -394,20 +131,3 @@ jobs:
         if: ${{ always() && hashFiles('trivy-results.sarif') != '' }}
         with:
           sarif_file: "trivy-results.sarif"
-
-      - name: Run hadolint
-        run: |
-          if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name "*Dockerfile*" -print -quit)" ]; then
-            sh scripts/setup.sh hadolint
-            find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name "*Dockerfile*" -print0 | \
-              xargs -0 -I{} ${{ env.VENV }}/bin/hadolint {}
-          else
-            echo "No Dockerfiles found, skipping hadolint."
-          fi
-
-      - name: Run checkmake
-        run: |
-          if [ -n "$(find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name 'Makefile' -print -quit)" ]; then
-            sh scripts/setup.sh checkmake
-            find . -type d \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify \) -prune -o -type f -name 'Makefile' -exec ${{ env.VENV }}/bin/checkmake --config .checkmake.ini {} +
-          fi

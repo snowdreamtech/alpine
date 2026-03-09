@@ -54,12 +54,12 @@
   "packageManager": "pnpm@10.28.0",
   "pnpm": {
     "overrides": {
-      "@eslint/plugin-kit": ">=0.3.5",
-      "esbuild": ">=0.25.0",
-      "lodash": ">=4.17.23",
-      "minimatch": ">=3.1.4",
-      "rollup": ">=2.80.0",
-      "tmp": ">=0.2.5"
+      "@eslint/plugin-kit": "0.6.1",
+      "esbuild": "0.27.3",
+      "lodash": "4.17.23",
+      "minimatch": "3.1.5",
+      "rollup": "4.59.0",
+      "tmp": "0.2.5"
     }
   }
 }

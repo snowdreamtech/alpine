@@ -31,6 +31,15 @@ EOF
 }
 
 # 2. Argument Parsing
+for arg in "$@"; do
+  case "$arg" in
+  -h | --help)
+    show_help
+    exit 0
+    ;;
+  esac
+done
+
 parse_common_args "$@"
 
 _START_TIME=$(date +%s)
