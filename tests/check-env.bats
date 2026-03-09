@@ -84,6 +84,22 @@ EOF
 #!/bin/sh
 echo "Dart SDK version: 3.1.2 (stable) (Tue Sep 12 14:43:30 2023 +0000) on \"macos_arm64\""
 EOF
+  cat <<EOF >"$TEMP_DIR/bin/gitleaks"
+#!/bin/sh
+echo "v8.18.0"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/osv-scanner"
+#!/bin/sh
+echo "v1.5.0"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/trivy"
+#!/bin/sh
+echo "v0.45.0"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/golangci-lint"
+#!/bin/sh
+echo "golangci-lint has version 1.55.0 built from (unknown, git@github.com:golangci/golangci-lint.git, unknown) on unknown"
+EOF
   chmod +x "$TEMP_DIR/bin/"*
 
   # Create files to trigger language checks
@@ -103,6 +119,10 @@ EOF
   assert_output --partial "Swift: v5.9"
   assert_output --partial "Kotlin: v1.9.10"
   assert_output --partial "Dart: v3.1.2"
+  assert_output --partial "Gitleaks: Installed"
+  assert_output --partial "OSV-scanner: Installed"
+  assert_output --partial "Trivy: Installed"
+  assert_output --partial "golangci-lint: v1.55.0"
 }
 
 @test "check-env.sh: reports failure when a non-guard critical file is missing" {

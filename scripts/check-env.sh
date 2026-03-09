@@ -200,7 +200,7 @@ log_info "── Security & Quality Tools ──"
 if command -v gitleaks >/dev/null 2>&1; then
   log_success "✅ Gitleaks: Installed"
 else
-  log_warn "❌ Gitleaks: Not found."
+  log_warn "⚠️  Gitleaks: Not found."
   HEALTHY=1
 fi
 
