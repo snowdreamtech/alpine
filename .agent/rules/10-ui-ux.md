@@ -185,7 +185,8 @@
 - **Atomic Operations (File Integrity)**: Scripts that modify critical files SHOULD use the **Build-then-Swap** pattern: generate a temporary file first, then use an atomic `mv` to swap it into place. This prevents data corruption if the process is interrupted.
 - **Deduplication Intelligence**: When appending or prepending to logs/archives, scripts MUST implement a check to prevent redundant entries, ensuring data remains clean and unique.
 - Implement **Smart Discovery**: Command-line tools should attempt to auto-detect common project directories (e.g., `docs/changelogs/`, `bin/`, `dist/`) to minimize required manual configuration.
-- **Universal Sensing (Context Awareness)**: CLI tools SHOULD automatically detect the project type and version by scanning for standard manifest files (e.g., `package.json`, `Cargo.toml`, `pyproject.toml`, `VERSION`) to provide a zero-config experience.
+- **Universal Sensing (Context Awareness)**: CLI tools SHOULD automatically detect the project type and version by scanning for standard manifest files (e.g., `package.json`, `Cargo.toml`, `pyproject.toml`, `VERSION`).
+- **Selective Display (Smart Filtering)**: Complex health checks or setup scripts SHOULD only display information relevant to the detected project context. Irrelevant language runtimes or specialized tool groups (e.g., "Mobile Support") SHOULD be hidden or collapsed when no corresponding files are present to ensure a zero-noise experience.
 - Support **Non-Destructive Previews**: Every tool that modifies files on a large scale MUST implement a `--dry-run` flag.
 - **Defensive Programming**:
   - **Execution Context Guard**: Scripts MUST verify they are running from the correct location (e.g., project root) before making changes.

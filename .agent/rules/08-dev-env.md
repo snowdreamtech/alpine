@@ -230,7 +230,12 @@
   | **Lifeline (Critical)** | Node, Python, Git, Make | **Strict**: Exit with `1` (BROKEN) if missing or version too low. |
   | **Enhanced (Optional)** | Go, PHP, Java, Rust, Docker | **Robust**: Print `⚠️ Warning` but exit with `0` (FUNCTIONAL). |
 
-  This ensures that a developer with a partially setup environment can still perform basic tasks (hydration, common linting) without being blocked by auxiliary language requirements.
+- **Language-Aware Detection**: Health checks MUST be context-sensitive. Tools and runtimes (e.g., `golangci-lint`, `Ruby`) SHOULD only be checked if corresponding source files or manifests (e.g., `go.mod`, `Gemfile`) are detected in the repository. This minimizes "Setup Noise" for single-language or focused contributors.
+
+- **Grouped UX & Selective Display**:
+  - Output MUST be organized into logical groups (e.g., Core Infrastructure, Language Runtimes, Mobile Support).
+  - Groups that are entirely irrelevant to the current project (e.g., "Mobile Support" in a CLI-only project) SHOULD be hidden entirely from the output to maintain high signal-to-noise ratio.
+  - Skip reasons SHOULD be explicitly stated as `⏭️  Skipped (reason)`.
 
 ## 7. Recommended Project Lifecycle
 

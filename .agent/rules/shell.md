@@ -415,34 +415,38 @@ if [ "$_IS_TOP_LEVEL" = "true" ]; then
   cat "$SHARED_SUMMARY_FILE"
   rm -f "$SHARED_SUMMARY_FILE"
 fi
-### Intelligent Priority Health Check Pattern
+### Language-Aware Health Check Pattern
 
-To balance environmental strictness with robustness (especially in polyglot projects), use a class-based priority check.
+To balance environmental strictness with robustness (especially in polyglot projects), use a class-based priority check combined with **Language-Aware Detection**.
 
 ```sh
-# check_version standard: name, cmd, min_ver, ver_cmd, is_critical(0|1)
-check_version() {
-  _NAME="$1"; _CMD="$2"; _MIN_VER="$3"; _VER_CMD="$4"; _CRITICAL="${5:-0}"
-  if ! command -v "$_CMD" >/dev/null 2>&1; then
-    log_warn "❌ $_NAME: Not found."
-    HEALTHY=1
-    [ "$_CRITICAL" -eq 1 ] && CORE_HEALTHY=1
-    return 1
-  fi
-  # ... Version extraction and comparison logic ...
-  if [ "$_VERSION_TOO_LOW" = "true" ]; then
-    log_warn "⚠️  $_NAME: v$_CURRENT_VER (below v$_MIN_VER)"
-    HEALTHY=1
-    [ "$_CRITICAL" -eq 1 ] && CORE_HEALTHY=1
-  fi
-}
+# check-env.sh implementation pattern
 
-# Usage: 1 = Critical (exit 1), 0 = Optional (exit 0)
-check_version "Node.js" "node" "20.0.0" "node -v" 1
-check_version "Go" "go" "1.21.0" "go version" 0
+# 1. Detection Helpers (from lib/common.sh)
+# has_lang_files "manifests" "extensions"
 
-if [ "$CORE_HEALTHY" -ne 0 ]; then
-  log_error "❌ Environment is BROKEN (Critical tools missing)."
-  exit 1
+# 2. Main Health Check Groups
+# ── Group: Language Runtimes ──
+if has_lang_files "go.mod" "*.go"; then
+  check_version "Go" "go" "1.21.0" "go version" 0
+else
+  # Explicitly log skip for common backend languages
+  log_info "⏭️  Go: Skipped (no go files)"
+fi
+
+# ── Group: Mobile Support (Selective Display) ──
+# Only show group header if relevant files exist
+if has_lang_files "Package.swift" "*.swift *.kt *.dart"; then
+  log_info "── Mobile Support ──"
+  if has_lang_files "Package.swift" "*.swift"; then
+    check_version "Swift" "swift" "5.0" "swift --version" 0
+  fi
+  # ... other mobile tools ...
 fi
 ```
+
+**Key Principles**:
+
+1. **Context Sensitivity**: Do not fail or warn about missing tools that the project doesn't use.
+2. **Explicit Skips**: For major backend/frontend languages, explicitly log `⏭️  Skipped` to affirm the check was considered but bypassed.
+3. **Clean Signal**: Hide entire groups (e.g., Mobile, Security) if no triggers are found, ensuring developers only see what matters to them.
