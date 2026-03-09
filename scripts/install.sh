@@ -45,7 +45,7 @@ if [ -f "$PACKAGE_JSON" ]; then
     log_info "── Installing Node.js dependencies ($NPM) ──"
     if command -v "$NPM"; then
       export IN_INSTALL_SCRIPT=1
-      "$NPM" install
+      run_quiet "$NPM" install
     else
       log_warn "Warning: $NPM not found. Skipping Node.js dependencies."
     fi
@@ -82,7 +82,7 @@ fi
 if [ -d ".git/hooks" ] && command -v pre-commit; then
   printf "\n"
   log_info "── Installing pre-commit hooks ──"
-  pre-commit install
+  run_quiet pre-commit install
 fi
 
 log_success "\n✨ All dependencies installed successfully!"

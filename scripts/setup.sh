@@ -113,7 +113,7 @@ setup_node() {
 
   if [ -f package.json ]; then
     _STAT="✅ Installed"
-    "$NPM" install || _STAT="❌ Failed"
+    run_quiet "$NPM" install || _STAT="❌ Failed"
     _V=$(get_version node)
     _D=$(($(date +%s) - _T0))
     log_summary "Runtime" "Node.js" "$_STAT" "$_V" "$_D"
@@ -152,9 +152,9 @@ setup_python() {
   fi
 
   if [ "$_STAT" = "✅ Installed" ]; then
-    "$VENV/bin/pip" install --upgrade pip || _STAT="⚠️ Warning"
+    run_quiet "$VENV/bin/pip" install --upgrade pip || _STAT="⚠️ Warning"
     if [ -f requirements-dev.txt ]; then
-      "$VENV/bin/pip" install -r requirements-dev.txt || _STAT="❌ Failed"
+      run_quiet "$VENV/bin/pip" install -r requirements-dev.txt || _STAT="❌ Failed"
     fi
   fi
 
@@ -273,7 +273,7 @@ install_go_lint() {
   _STAT="✅ Installed"
   if download_url "${_URL}" "${_TMP}/install_go.sh" "golangci-lint-installer"; then
     export BINDIR="${VENV}/bin"
-    sh "${_TMP}/install_go.sh" "${GOLANGCI_VERSION}"
+    run_quiet sh "${_TMP}/install_go.sh" "${GOLANGCI_VERSION}"
   else
     _STAT="❌ Failed"
   fi
@@ -379,7 +379,7 @@ setup_hooks() {
 
   if [ -x "$VENV/bin/pre-commit" ]; then
     _STAT="✅ Activated"
-    "$VENV/bin/pre-commit" install --hook-type pre-commit --hook-type pre-merge-commit --hook-type commit-msg || _STAT="❌ Failed"
+    run_quiet "$VENV/bin/pre-commit" install --hook-type pre-commit --hook-type pre-merge-commit --hook-type commit-msg || _STAT="❌ Failed"
     _V=$(get_version "$VENV/bin/pre-commit")
     _D=$(($(date +%s) - _T0))
     log_summary "Other" "Hooks" "$_STAT" "$_V" "$_D"
@@ -398,7 +398,7 @@ setup_powershell() {
 
   if command -v pwsh >/dev/null 2>&1; then
     _STAT="✅ Installed"
-    pwsh -NoProfile -Command "if (!(Get-Module -ListAvailable PSScriptAnalyzer)) { Install-Module -Name PSScriptAnalyzer -Force -SkipPublisherCheck -Scope CurrentUser }" || _STAT="❌ Failed"
+    run_quiet pwsh -NoProfile -Command "if (!(Get-Module -ListAvailable PSScriptAnalyzer)) { Install-Module -Name PSScriptAnalyzer -Force -SkipPublisherCheck -Scope CurrentUser }" || _STAT="❌ Failed"
     # shellcheck disable=SC2016
     _V=$(pwsh -NoProfile -Command '(Get-Module PSScriptAnalyzer -ListAvailable).Version | Select-Object -First 1 | ForEach-Object { $_.ToString() }' 2>/dev/null || echo "installed")
     _D=$(($(date +%s) - _T0))
@@ -445,7 +445,7 @@ install_ruby_lint() {
 
   if command -v gem >/dev/null 2>&1; then
     _STAT="✅ Installed"
-    gem install rubocop --user-install --no-document --quiet || _STAT="❌ Failed"
+    run_quiet gem install rubocop --user-install --no-document --quiet || _STAT="❌ Failed"
     _V=$(get_version rubocop)
     _D=$(($(date +%s) - _T0))
     log_summary "Lint Tool" "Rubocop" "$_STAT" "$_V" "$_D"
@@ -607,7 +607,7 @@ setup_security() {
   if command -v go >/dev/null 2>&1; then
     _T0=$(date +%s)
     log_info "Installing govulncheck..."
-    if go install golang.org/x/vuln/cmd/govulncheck@latest; then
+    if run_quiet go install golang.org/x/vuln/cmd/govulncheck@latest; then
       log_summary "Security Tool" "Govulncheck" "✅ Installed" "$(get_version govulncheck)" "$(($(date +%s) - _T0))"
     else
       log_summary "Security Tool" "Govulncheck" "❌ Failed" "-" "0"
@@ -618,7 +618,7 @@ setup_security() {
   if command -v cargo >/dev/null 2>&1; then
     _T0=$(date +%s)
     log_info "Installing cargo-audit..."
-    if cargo install cargo-audit; then
+    if run_quiet cargo install cargo-audit; then
       log_summary "Security Tool" "Cargo-Audit" "✅ Installed" "$(get_version cargo-audit)" "$(($(date +%s) - _T0))"
     else
       log_summary "Security Tool" "Cargo-Audit" "❌ Failed" "-" "0"

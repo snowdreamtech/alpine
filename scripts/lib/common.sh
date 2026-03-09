@@ -193,6 +193,16 @@ run_npm_script() {
   fi
 }
 
+# Helper to run a command while respecting the quiet flag (-q/--quiet)
+# Usage: run_quiet cmd arg1 arg2 ...
+run_quiet() {
+  if [ "$VERBOSE" -eq 0 ]; then
+    "$@" >/dev/null 2>&1
+  else
+    "$@"
+  fi
+}
+
 # Standard argument parsing for DRY_RUN and VERBOSE
 parse_common_args() {
   for _arg in "$@"; do

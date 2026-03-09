@@ -43,7 +43,7 @@ update_pnpm_global() {
       if [ "$DRY_RUN" -eq 1 ]; then
         log_summary "Manager" "pnpm" "⚖️ Previewed" "-" "0"
       else
-        if corepack prepare pnpm@latest --activate; then
+        if run_quiet corepack prepare pnpm@latest --activate; then
           log_summary "Manager" "pnpm" "✅ Updated" "$(get_version pnpm)" "$(($(date +%s) - _T0))"
         else
           log_summary "Manager" "pnpm" "❌ Failed" "-" "$(($(date +%s) - _T0))"
@@ -54,11 +54,11 @@ update_pnpm_global() {
         log_summary "Manager" "pnpm" "⚖️ Previewed" "-" "0"
       else
         log_info "Updating pnpm (self-update)..."
-        if _OUT=$(pnpm self-update 2>&1); then
+        if _OUT=$(run_quiet pnpm self-update 2>&1); then
           log_summary "Manager" "pnpm" "✅ Updated" "$(get_version pnpm)" "$(($(date +%s) - _T0))"
         elif echo "$_OUT" | grep -q "ERR_PNPM_CANT_SELF_UPDATE_IN_COREPACK"; then
           log_warn "pnpm is managed by corepack. Switching to corepack update..."
-          if corepack prepare pnpm@latest --activate; then
+          if run_quiet corepack prepare pnpm@latest --activate; then
             log_summary "Manager" "pnpm" "✅ Updated" "$(get_version pnpm)" "$(($(date +%s) - _T0))"
           else
             log_summary "Manager" "pnpm" "❌ Failed" "-" "$(($(date +%s) - _T0))"
@@ -79,7 +79,7 @@ update_pnpm_project() {
       if [ "$DRY_RUN" -eq 1 ]; then
         log_summary "Project" "pnpm-deps" "⚖️ Previewed" "-" "0"
       else
-        if pnpm update; then
+        if run_quiet pnpm update; then
           log_summary "Project" "pnpm-deps" "✅ Updated" "-" "$(($(date +%s) - _T0))"
         else
           log_summary "Project" "pnpm-deps" "❌ Failed" "-" "$(($(date +%s) - _T0))"
@@ -101,9 +101,9 @@ update_python_venv() {
         log_summary "Project" "Python-Venv" "⚖️ Previewed" "-" "0"
       else
         _STAT="✅ Updated"
-        "$VENV/bin/pip" install --upgrade pip || _STAT="⚠️ Warning"
+        run_quiet "$VENV/bin/pip" install --upgrade pip || _STAT="⚠️ Warning"
         if [ -f "$REQUIREMENTS_TXT" ]; then
-          "$VENV/bin/pip" install -r "$REQUIREMENTS_TXT" --upgrade || _STAT="❌ Failed"
+          run_quiet "$VENV/bin/pip" install -r "$REQUIREMENTS_TXT" --upgrade || _STAT="❌ Failed"
         fi
         log_summary "Project" "Python-Venv" "$_STAT" "$(get_version "$VENV/bin/pip")" "$(($(date +%s) - _T0))"
       fi
@@ -121,7 +121,7 @@ update_homebrew() {
     if [ "$DRY_RUN" -eq 1 ]; then
       log_summary "Manager" "Homebrew" "⚖️ Previewed" "-" "0"
     else
-      if brew update; then
+      if run_quiet brew update; then
         log_summary "Manager" "Homebrew" "✅ Updated" "-" "$(($(date +%s) - _T0))"
       else
         log_summary "Manager" "Homebrew" "❌ Failed" "-" "$(($(date +%s) - _T0))"
@@ -138,7 +138,7 @@ update_ruby_gems() {
       if [ "$DRY_RUN" -eq 1 ]; then
         log_summary "Lint Tool" "Rubocop" "⚖️ Previewed" "-" "0"
       else
-        if gem update rubocop --user-install --no-document --quiet; then
+        if run_quiet gem update rubocop --user-install --no-document --quiet; then
           log_summary "Lint Tool" "Rubocop" "✅ Updated" "$(get_version rubocop)" "$(($(date +%s) - _T0))"
         else
           log_summary "Lint Tool" "Rubocop" "❌ Failed" "-" "$(($(date +%s) - _T0))"
@@ -160,7 +160,7 @@ update_pre_commit() {
     if [ "$DRY_RUN" -eq 1 ]; then
       log_summary "Other" "Hooks" "⚖️ Previewed" "-" "0"
     else
-      if "$_BIN" autoupdate; then
+      if run_quiet "$_BIN" autoupdate; then
         log_summary "Other" "Hooks" "✅ Updated" "$(get_version "$_BIN")" "$(($(date +%s) - _T0))"
       else
         log_summary "Other" "Hooks" "❌ Failed" "-" "$(($(date +%s) - _T0))"
@@ -177,7 +177,7 @@ update_go_mod() {
       if [ "$DRY_RUN" -eq 1 ]; then
         log_summary "Project" "Go-Mod" "⚖️ Previewed" "-" "0"
       else
-        if go get -u ./... && go mod tidy; then
+        if run_quiet go get -u ./... && run_quiet go mod tidy; then
           log_summary "Project" "Go-Mod" "✅ Updated" "$(get_version go)" "$(($(date +%s) - _T0))"
         else
           log_summary "Project" "Go-Mod" "❌ Failed" "-" "$(($(date +%s) - _T0))"
@@ -198,7 +198,7 @@ update_cargo_deps() {
       if [ "$DRY_RUN" -eq 1 ]; then
         log_summary "Project" "Cargo-Deps" "⚖️ Previewed" "-" "0"
       else
-        if cargo update; then
+        if run_quiet cargo update; then
           log_summary "Project" "Cargo-Deps" "✅ Updated" "$(get_version cargo)" "$(($(date +%s) - _T0))"
         else
           log_summary "Project" "Cargo-Deps" "❌ Failed" "-" "$(($(date +%s) - _T0))"

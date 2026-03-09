@@ -51,14 +51,14 @@ fi
 # ── Audit Modules ─────────────────────────────────────────────────────────────
 
 # 3. Secrets Scanning
-if command -v gitleaks; then
+if run_quiet command -v gitleaks; then
   _T0=$(date +%s)
   log_info "── Scanning for Secrets (gitleaks) ──"
   if [ "$DRY_RUN" -eq 1 ]; then
     log_success "DRY-RUN: Would run gitleaks detect"
     log_summary "Security" "gitleaks" "⚖️ Previewed" "-" "0"
   else
-    if gitleaks detect --source . --verbose; then
+    if run_quiet gitleaks detect --source . --verbose; then
       log_summary "Security" "gitleaks" "✅ Clean" "$(get_version gitleaks)" "$(($(date +%s) - _T0))"
     else
       log_summary "Security" "gitleaks" "❌ Leaks Found" "$(get_version gitleaks)" "$(($(date +%s) - _T0))"
@@ -71,12 +71,12 @@ fi
 if [ -d ".github/workflows" ]; then
   _T0=$(date +%s)
   log_info "\n── Auditing GitHub Actions (zizmor) ──"
-  if command -v zizmor; then
+  if run_quiet command -v zizmor; then
     if [ "$DRY_RUN" -eq 1 ]; then
       log_success "DRY-RUN: Would run zizmor"
       log_summary "GitHub" "zizmor" "⚖️ Previewed" "-" "0"
     else
-      if zizmor .; then
+      if run_quiet zizmor . --format plain; then
         log_summary "GitHub" "zizmor" "✅ Secure" "$(get_version zizmor)" "$(($(date +%s) - _T0))"
       else
         log_summary "GitHub" "zizmor" "❌ Vulnerable" "$(get_version zizmor)" "$(($(date +%s) - _T0))"
@@ -103,7 +103,7 @@ if [ -f "$PACKAGE_JSON" ]; then
       _REG_ARG="--registry=https://registry.npmjs.org"
     fi
 
-    if "$NPM" audit $_REG_ARG; then
+    if run_quiet "$NPM" audit $_REG_ARG; then
       log_summary "Node.js" "$NPM-audit" "✅ Secure" "$(get_version "$NPM")" "$(($(date +%s) - _T0))"
     else
       log_summary "Node.js" "$NPM-audit" "❌ Vulnerable" "$(get_version "$NPM")" "$(($(date +%s) - _T0))"
@@ -130,7 +130,7 @@ if [ -f "$REQUIREMENTS_TXT" ] || [ -f "requirements.txt" ] || [ -f "$PYPROJECT_T
     else
       # Get version directly to avoid common.sh grep issues with warnings
       _V=$("$PIPAUDIT" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1 || echo "-")
-      if "$PIPAUDIT"; then
+      if run_quiet "$PIPAUDIT"; then
         log_summary "Python" "pip-audit" "✅ Secure" "$_V" "$(($(date +%s) - _T0))"
       else
         log_summary "Python" "pip-audit" "❌ Vulnerable" "$_V" "$(($(date +%s) - _T0))"
@@ -145,13 +145,13 @@ fi
 
 # 7. Multi-Stack Audit (OSV-Scanner)
 _T0=$(date +%s)
-if command -v osv-scanner; then
+if run_quiet command -v osv-scanner; then
   log_info "\n── Generic Vulnerability Scan (osv-scanner) ──"
   if [ "$DRY_RUN" -eq 1 ]; then
     log_success "DRY-RUN: Would run osv-scanner"
     log_summary "Security" "osv-scanner" "⚖️ Previewed" "-" "0"
   else
-    if osv-scanner -r .; then
+    if run_quiet osv-scanner -r .; then
       log_summary "Security" "osv-scanner" "✅ Secure" "$(get_version osv-scanner)" "$(($(date +%s) - _T0))"
     else
       log_summary "Security" "osv-scanner" "❌ Vulnerable" "$(get_version osv-scanner)" "$(($(date +%s) - _T0))"
@@ -164,12 +164,12 @@ fi
 if [ -f "go.mod" ]; then
   _T0=$(date +%s)
   log_info "\n── Auditing Go dependencies (govulncheck) ──"
-  if command -v govulncheck; then
+  if run_quiet command -v govulncheck; then
     if [ "$DRY_RUN" -eq 1 ]; then
       log_success "DRY-RUN: Would run govulncheck"
       log_summary "Go" "govulncheck" "⚖️ Previewed" "-" "0"
     else
-      if govulncheck ./...; then
+      if run_quiet govulncheck ./...; then
         log_summary "Go" "govulncheck" "✅ Secure" "$(get_version govulncheck)" "$(($(date +%s) - _T0))"
       else
         log_summary "Go" "govulncheck" "❌ Vulnerable" "$(get_version govulncheck)" "$(($(date +%s) - _T0))"
@@ -185,12 +185,12 @@ fi
 if [ -f "Cargo.toml" ]; then
   _T0=$(date +%s)
   log_info "\n── Auditing Rust dependencies (cargo audit) ──"
-  if command -v cargo && cargo audit --version; then
+  if run_quiet command -v cargo && run_quiet cargo audit --version; then
     if [ "$DRY_RUN" -eq 1 ]; then
       log_success "DRY-RUN: Would run cargo audit"
       log_summary "Rust" "cargo-audit" "⚖️ Previewed" "-" "0"
     else
-      if cargo audit; then
+      if run_quiet cargo audit; then
         log_summary "Rust" "cargo-audit" "✅ Secure" "$(get_version cargo-audit)" "$(($(date +%s) - _T0))"
       else
         log_summary "Rust" "cargo-audit" "❌ Vulnerable" "$(get_version cargo-audit)" "$(($(date +%s) - _T0))"
@@ -206,13 +206,13 @@ fi
 if [ -f "Dockerfile" ] || [ -f "docker-compose.yml" ]; then
   _T0=$(date +%s)
   log_info "\n── Auditing Containers (trivy) ──"
-  if command -v trivy; then
+  if run_quiet command -v trivy; then
     if [ "$DRY_RUN" -eq 1 ]; then
       log_success "DRY-RUN: Would run trivy fs ."
       log_summary "DevOps" "trivy" "⚖️ Previewed" "-" "0"
     else
       # scan filesystem and config
-      if trivy fs . && trivy config .; then
+      if run_quiet trivy fs . && run_quiet trivy config .; then
         log_summary "DevOps" "trivy" "✅ Secure" "$(get_version trivy)" "$(($(date +%s) - _T0))"
       else
         log_summary "DevOps" "trivy" "❌ Vulnerable" "$(get_version trivy)" "$(($(date +%s) - _T0))"
