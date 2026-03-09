@@ -1,16 +1,21 @@
 #!/bin/sh
-# scripts/audit.sh - Security Auditor
-# Standardizes execution of security scans (gitleaks, npm audit, pip-audit, osv-scanner, etc.).
+# scripts/audit.sh - Automated Security Auditor
+# Standardizes execution of dependency scans and secret detection modules.
+#
+# Features:
+#   - POSIX compliant, encapsulated main() pattern.
+#   - Multi-stack scanning (npm, pip, go, cargo, osv, trivy).
+#   - Gitleaks integration for secrets detection.
+#   - Non-terminating execution with overall exit status reporting.
 
 # Note: We do NOT set -e here because we want to run all audit modules even if some fail.
 # We will track overall exit status manually.
+
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
 main() {
-  # 1. Execution Context Guard
-  guard_project_root
 
   # 2. Argument Parsing
   parse_common_args "$@"

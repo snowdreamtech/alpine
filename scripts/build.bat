@@ -1,6 +1,7 @@
 @echo off
-REM scripts/build.bat - Entry point for Windows
-REM Delegates to build.ps1 to maintain Single Source of Truth.
+REM scripts/build.bat - Windows wrapper for scripts/build.sh
+REM
+REM Professional delegation to PowerShell to maintain Single Source of Truth (SSoT).
 
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0build.ps1" %*
 exit /b %ERRORLEVEL%

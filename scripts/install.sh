@@ -1,7 +1,12 @@
 #!/bin/sh
-# scripts/install.sh - Unified Project Dependency Installer
-# Consolidates pnpm, pip, and other dependency managers into a professional CLI.
-# Features: POSIX compliant, Execution Guard, SSoT Architecture, Professional UX.
+# scripts/install.sh - Unified Dependency Orchestrator
+# Consolidates disparate package managers (pnpm, pip, pre-commit) into a single CLI.
+#
+# Features:
+#   - POSIX compliant, encapsulated main() pattern.
+#   - Multi-stack dependency resolution and installation.
+#   - Virtualenv aware for Python environments.
+#   - Professional UX with clear installation metrics.
 
 set -e
 

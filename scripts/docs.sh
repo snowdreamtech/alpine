@@ -1,16 +1,18 @@
 #!/bin/sh
-# scripts/docs.sh - Documentation Management Script
-# Professional CLI wrapper for VitePress dev, build, and preview.
-# Features: POSIX compliant, Execution Guard, SSoT Architecture, Professional UX.
+# scripts/docs.sh - Documentation Lifecycle Manager
+# Unified entrance for VitePress development, artifact building, and previews.
+#
+# Features:
+#   - POSIX compliant, encapsulated main() pattern.
+#   - Automated VitePress installation checks.
+#   - Environment-aware routing for local and CI docs.
+#   - Professional UX for project documentation maintenance.
 
 set -e
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
-
-# 1. Execution Context Guard
-guard_project_root
 
 # Help message
 show_help() {

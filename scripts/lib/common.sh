@@ -76,24 +76,26 @@ export OSV_SCANNER_VERSION TRIVY_VERSION
 
 # ── 📢 Standardized Logging ──────────────────────────────────────────────────
 
-# Logging functions
+# Standardized logging functions for consistent colored output.
+# @param $1 - Message to log
 log_info() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%s%b%s\n" "$BLUE" "$1" "$NC"; fi
+  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "$BLUE" "$1" "$NC"; fi
 }
 log_success() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%s%b%s\n" "$GREEN" "$1" "$NC"; fi
+  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "$GREEN" "$1" "$NC"; fi
 }
 log_warn() {
-  if [ "$VERBOSE" -ge 1 ]; then printf "%s%b%s\n" "$YELLOW" "$1" "$NC"; fi
+  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "$YELLOW" "$1" "$NC"; fi
 }
 log_error() {
   printf "%s%b%s\n" "$RED" "$1" "$NC" >&2
 }
 log_debug() {
-  if [ "$VERBOSE" -ge 2 ]; then printf "[DEBUG] %b\n" "$1"; fi
+  if [ "${VERBOSE:-1}" -ge 2 ]; then printf "[DEBUG] %b\n" "$1"; fi
 }
 
-# Execution context guard
+# Verifies that the current working directory is the project root.
+# Exit 1 if critical root files (Makefile or package.json) are missing.
 guard_project_root() {
   if [ ! -f "Makefile" ] && [ ! -f "package.json" ]; then
     log_error "Error: This script must be run from the project root."
@@ -101,92 +103,103 @@ guard_project_root() {
   fi
 }
 
-# Returns 0 if update is needed (cooldown expired or missing), 1 if within cooldown
+# Checks if a task is within its cooldown period to avoid redundant high-cost operations.
+# @param $1 - Task name (used for marker filename)
+# @param $2 - Cooldown duration in seconds (default: 86400 / 24h)
+# @returns 0 if cooldown expired (update needed), 1 if within cooldown
 check_update_cooldown() {
-  _NAME="$1"
-  _COOLDOWN="${2:-86400}" # Default: 24h
-  _MARKER="${VENV}/.last_update_${_NAME}"
+  _NAME_COOL="$1"
+  _DURATION_COOL="${2:-86400}" # Default: 24h
+  _MARKER_COOL="${VENV}/.last_update_${_NAME_COOL}"
 
-  if [ ! -f "$_MARKER" ]; then return 0; fi
+  if [ ! -f "$_MARKER_COOL" ]; then return 0; fi
 
-  _NOW=$(date +%s)
-  _LAST=$(cat "$_MARKER")
-  if [ $((_NOW - _LAST)) -ge "$_COOLDOWN" ]; then
+  _NOW_COOL=$(date +%s)
+  _LAST_COOL=$(cat "$_MARKER_COOL")
+  if [ $((_NOW_COOL - _LAST_COOL)) -ge "$_DURATION_COOL" ]; then
     return 0
   fi
   return 1
 }
 
-# Saves current timestamp to marker file
+# Persists the current timestamp for a specific task to manage its cooldown.
+# @param $1 - Task name
 save_update_timestamp() {
-  _NAME="$1"
-  _MARKER="${VENV}/.last_update_${_NAME}"
-  mkdir -p "$(dirname "$_MARKER")"
-  date +%s >"$_MARKER"
+  _NAME_TS="$1"
+  _MARKER_TS="${VENV}/.last_update_${_NAME_TS}"
+  mkdir -p "$(dirname "$_MARKER_TS")"
+  date +%s >"$_MARKER_TS"
 }
 
-# Enhanced download helper with retry and proxy fallback
+# Downloads a file from a URL with built-in retries and proxy fallback.
+# @param $1 - Source URL
+# @param $2 - Target destination path
+# @param $3 - Description of the item for logging
+# @returns 0 on success, 1 on fatal failure
 download_url() {
-  _URL="$1"
-  _OUT="$2"
-  _DESC="$3"
+  _URL_DL="$1"
+  _OUT_DL="$2"
+  _DESC_DL="$3"
 
-  if [ "$DRY_RUN" -eq 1 ]; then
-    log_debug "DRY-RUN: Would download $_URL to $_OUT"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY-RUN: Would download $_URL_DL to $_OUT_DL"
     return 0
   fi
 
   # Ensure output directory exists
-  _DIR=$(dirname "$_OUT")
-  mkdir -p "$_DIR"
+  _DIR_DL=$(dirname "$_OUT_DL")
+  mkdir -p "$_DIR_DL"
 
-  log_info "Downloading $_DESC..."
+  log_info "Downloading $_DESC_DL..."
   # curl with retry flags as per rules
   if curl --retry 5 --retry-delay 2 --retry-connrefused --fail \
     --connect-timeout 10 --max-time 60 \
-    -fsSL "${_URL}" -o "${_OUT}"; then
+    -fsSL "${_URL_DL}" -o "${_OUT_DL}"; then
     return 0
   fi
 
   # Fallback if proxy failed and it was a proxied URL
-  if [ -n "${GITHUB_PROXY}" ] && echo "${_URL}" | grep -q "^${GITHUB_PROXY}"; then
-    _FALLBACK_URL="${_URL#"$GITHUB_PROXY"}"
-    log_warn "Proxy download failed for ${_DESC}, retrying directly from ${_FALLBACK_URL}..."
+  if [ -n "${GITHUB_PROXY}" ] && echo "${_URL_DL}" | grep -q "^${GITHUB_PROXY}"; then
+    _FALLBACK_URL_DL="${_URL_DL#"$GITHUB_PROXY"}"
+    log_warn "Proxy download failed for ${_DESC_DL}, retrying directly from ${_FALLBACK_URL_DL}..."
     if curl --retry 5 --retry-delay 2 --retry-connrefused --fail \
       --connect-timeout 10 --max-time 60 \
-      -fsSL "${_FALLBACK_URL}" -o "${_OUT}"; then
+      -fsSL "${_FALLBACK_URL_DL}" -o "${_OUT_DL}"; then
       return 0
     fi
   fi
 
-  log_error "Failed to download $_DESC from $_URL"
+  log_error "Failed to download $_DESC_DL from $_URL_DL"
   return 1
 }
 
-# Checksum verification helper
+# Verifies the SHA256 checksum of a file.
+# @param $1 - Path to the file
+# @param $2 - Expected SHA256 hash
+# @returns 0 if verified, 1 on mismatch
 verify_checksum() {
-  _FILE="$1"
-  _EXPECTED_SHA="$2"
+  _FILE_CS="$1"
+  _EXPECTED_SHA_CS="$2"
 
-  if [ "$DRY_RUN" -eq 1 ]; then
-    log_debug "DRY-RUN: Would verify checksum for $_FILE"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY-RUN: Would verify checksum for $_FILE_CS"
     return 0
   fi
 
-  log_info "Verifying checksum for $(basename "$_FILE")..."
+  log_info "Verifying checksum for $(basename "$_FILE_CS")..."
   if command -v sha256sum >/dev/null 2>&1; then
-    _ACTUAL_SHA=$(sha256sum "$_FILE" | awk '{print $1}')
+    _ACTUAL_SHA_CS=$(sha256sum "$_FILE_CS" | awk '{print $1}')
   elif command -v shasum >/dev/null 2>&1; then
-    _ACTUAL_SHA=$(shasum -a 256 "$_FILE" | awk '{print $1}')
+    _ACTUAL_SHA_CS=$(shasum -a 256 "$_FILE_CS" | awk '{print $1}')
   else
     log_warn "sha256sum/shasum not found. Skipping checksum verification."
     return 0
   fi
 
-  if [ "$_ACTUAL_SHA" != "$_EXPECTED_SHA" ]; then
-    log_error "Checksum mismatch for $_FILE!"
-    log_error "Expected: $_EXPECTED_SHA"
-    log_error "Actual:   $_ACTUAL_SHA"
+  if [ "$_ACTUAL_SHA_CS" != "$_EXPECTED_SHA_CS" ]; then
+    log_error "Checksum mismatch for $_FILE_CS!"
+    log_error "Expected: $_EXPECTED_SHA_CS"
+    log_error "Actual:   $_ACTUAL_SHA_CS"
     return 1
   fi
 
@@ -194,18 +207,21 @@ verify_checksum() {
   return 0
 }
 
-# Graceful runtime check helper
-# Usage: check_runtime "node" "LINTER_NAME"
+# Verifies if a required runtime or tool is available in the environment.
+# Silently exits the script (skip) if the runtime is missing, assuming it's an optional module.
+# @param $1 - Command/Binary name to check
+# @param $2 - Human-readable tool name for logging
 check_runtime() {
-  _RT="$1"
-  _TOOL="${2:-Tool}"
-  if ! command -v "$_RT"; then
-    log_warn "⏭️  Required runtime '$_RT' for $_TOOL is missing. Skipping."
+  _RT_NAME="$1"
+  _TOOL_DESC="${2:-Tool}"
+  if ! command -v "$_RT_NAME" >/dev/null 2>&1; then
+    log_warn "⏭️  Required runtime '$_RT_NAME' for $_TOOL_DESC is missing. Skipping."
     exit 0
   fi
 }
 
-# Package manager detection for macOS
+# Identifies the primary package manager on macOS (Homebrew or MacPorts).
+# @returns "brew", "port", or "none"
 get_macos_pkg_mgr() {
   if command -v brew >/dev/null 2>&1; then
     echo "brew"
@@ -216,21 +232,23 @@ get_macos_pkg_mgr() {
   fi
 }
 
-# Detect if project uses a language based on config files OR file extensions
-# usage: has_lang_files "file1 file2" "*.ext1 *.ext2"
+# Detects if the project uses a specific language based on manifest files or file extensions.
+# @param $1 - Space-separated list of manifest files (e.g., "go.mod package.json")
+# @param $2 - Space-separated list of file globs (e.g., "*.go *.ts")
+# @returns 0 if detected, 1 otherwise
 has_lang_files() {
-  _FILES="$1"
-  _EXTS="$2"
+  _FILES_LANG="$1"
+  _EXTS_LANG="$2"
 
   # 1. Check for specific config files in root
-  for f in $_FILES; do
-    [ -f "$f" ] && return 0
+  for _f in $_FILES_LANG; do
+    [ -f "$_f" ] && return 0
   done
 
   # 2. Check for file extensions (recursive, maxdepth 3 for performance)
-  for ext in $_EXTS; do
+  for _ext in $_EXTS_LANG; do
     # Use find for POSIX compatibility and performance
-    if [ "$(find . -maxdepth 3 -name "$ext" -print -quit 2>/dev/null)" ]; then
+    if [ "$(find . -maxdepth 3 -name "$_ext" -print -quit 2>/dev/null)" ]; then
       return 0
     fi
   done
@@ -238,7 +256,8 @@ has_lang_files() {
   return 1
 }
 
-# Universal project version detector
+# Dynamically detects the project version from various manifests (package.json, Cargo.toml, pyproject.toml, VERSION).
+# @returns The detected version string (e.g., "1.2.3") or "0.0.0" as fallback.
 get_project_version() {
   if [ -f "$PACKAGE_JSON" ]; then
     grep '"version":' "$PACKAGE_JSON" | head -n 1 | sed 's/.*"version":[[:space:]]*"//;s/".*//'
@@ -258,54 +277,59 @@ get_project_version() {
   fi
 }
 
-# Helper to run npm/pnpm scripts without infinite recursion
+# Executes an npm/pnpm script while preventing infinite recursion if the script delegates back to itself.
+# @param $1 - Name of the script to run (e.g., "test", "build")
 run_npm_script() {
-  _SCRIPT_NAME="$1"
-  _CURRENT_SCRIPT=$(basename "$0")
+  _SCRIPT_NAME_NPM="$1"
+  _CURRENT_SCRIPT_NPM=$(basename "$0")
 
   if [ -f "$PACKAGE_JSON" ]; then
-    _CMD=$(grep "\"$_SCRIPT_NAME\":" "$PACKAGE_JSON" | sed "s/.*\"$_SCRIPT_NAME\":[[:space:]]*\"//;s/\".*//" || true)
-    if [ -n "$_CMD" ]; then
+    _CMD_NPM=$(grep "\"$_SCRIPT_NAME_NPM\":" "$PACKAGE_JSON" | sed "s/.*\"$_SCRIPT_NAME_NPM\":[[:space:]]*\"//;s/\".*//" || true)
+    if [ -n "$_CMD_NPM" ]; then
       # Avoid infinite loop if the command points back to this script
-      if echo "$_CMD" | grep -q "$_CURRENT_SCRIPT"; then
-        log_debug "npm script '$_SCRIPT_NAME' is a self-reference to '$_CURRENT_SCRIPT'. Skipping."
+      if echo "$_CMD_NPM" | grep -q "$_CURRENT_SCRIPT_NPM"; then
+        log_debug "npm script '$_SCRIPT_NAME_NPM' is a self-reference to '$_CURRENT_SCRIPT_NPM'. Skipping."
         return 0
       fi
-      log_info "── Running Node.js script: $NPM $_SCRIPT_NAME ──"
-      "$NPM" run "$_SCRIPT_NAME"
+      log_info "── Running Node.js script: $NPM $_SCRIPT_NAME_NPM ──"
+      "$NPM" run "$_SCRIPT_NAME_NPM"
       return 0
     fi
   fi
   return 0
 }
 
-# Helper to run a command while respecting the quiet flag (-q/--quiet)
-# Usage: run_quiet cmd arg1 arg2 ...
+# Executes a command while suppressing output if the quiet flag (-q/--quiet) is active.
+# @param $@ - Command and arguments to execute
 run_quiet() {
-  if [ "$VERBOSE" -eq 0 ]; then
+  if [ "${VERBOSE:-1}" -eq 0 ]; then
     "$@" >/dev/null 2>&1
   else
     "$@"
   fi
 }
 
-# Atomic file swap helper (Build-then-Swap pattern)
-# Usage: atomic_swap source_tmp target
+# Performs an atomic file swap using the Build-then-Swap pattern.
+# @param $1 - Source (temporary) file path
+# @param $2 - Target destination path
+# @returns 0 on success, 1 if source is missing
 atomic_swap() {
-  _SRC="$1"
-  _DST="$2"
-  if [ ! -f "$_SRC" ]; then
-    log_warn "atomic_swap: Source file $_SRC does not exist."
+  _SRC_ATOMIC="$1"
+  _DST_ATOMIC="$2"
+  if [ ! -f "$_SRC_ATOMIC" ]; then
+    log_warn "atomic_swap: Source file $_SRC_ATOMIC does not exist."
     return 1
   fi
   # Use mv for atomic operation on the same filesystem
-  mv "$_SRC" "$_DST"
+  mv "$_SRC_ATOMIC" "$_DST_ATOMIC"
 }
 
-# Standard argument parsing for DRY_RUN and VERBOSE
+# Standardizes argument parsing for global flags across all project scripts.
+# Handles: --dry-run, -q/--quiet, -v/--verbose, -h/--help
+# @param $@ - Script arguments
 parse_common_args() {
-  for _arg in "$@"; do
-    case "$_arg" in
+  for _arg_parse in "$@"; do
+    case "$_arg_parse" in
     --dry-run)
       # shellcheck disable=SC2034
       DRY_RUN=1
@@ -316,7 +340,12 @@ parse_common_args() {
     -v | --verbose) # shellcheck disable=SC2034
       VERBOSE=2 ;;
     -h | --help)
-      show_help
+      # shellcheck disable=SC2317
+      if command -v show_help >/dev/null 2>&1; then
+        show_help
+      else
+        printf "Usage: %s [OPTIONS]\n\nOptions:\n  --dry-run      Show what would be done\n  -q, --quiet    Suppress output\n  -v, --verbose  Enable debug logging\n  -h, --help     Show this help\n" "$0"
+      fi
       exit 0
       ;;
     esac
@@ -324,58 +353,68 @@ parse_common_args() {
 }
 # ── Summary Helpers ─────────────────────────────────────────────────────────
 
+# Appends a standardized status row to the shared summary report.
+# @param $1 - Category (e.g., "Runtime", "Tool", "Audit")
+# @param $2 - Module name (e.g., "Node.js", "Gitleaks")
+# @param $3 - Status indicator (e.g., "✅ Success", "❌ Failed")
+# @param $4 - Version detected (or "-" if N/A)
+# @param $5 - Duration in seconds
+# @param $6 - Override path to summary file (internal use)
 log_summary() {
-  _CAT="${1:-Other}"
-  _MOD="${2:-Unknown}"
-  _STAT="${3:-⏭️ Skipped}"
-  _VER="${4:--}"
-  _DUR="${5:--}"
-  _SUMMARY_FILE="${6:-$SETUP_SUMMARY_FILE}"
+  _CAT_SUM="${1:-Other}"
+  _MOD_SUM="${2:-Unknown}"
+  _STAT_SUM="${3:-⏭️ Skipped}"
+  _VER_SUM="${4:--}"
+  _DUR_SUM="${5:--}"
+  _FILE_SUM="${6:-$SETUP_SUMMARY_FILE}"
 
-  if [ -z "$_SUMMARY_FILE" ] || [ ! -f "$_SUMMARY_FILE" ]; then
+  if [ -z "$_FILE_SUM" ] || [ ! -f "$_FILE_SUM" ]; then
     return 0
   fi
 
   # Automatically demote to Warning if status is supposedly Active/Installed but version detection failed
-  case "$_STAT" in
+  case "$_STAT_SUM" in
   ✅*)
-    if [ "$_VER" = "-" ] || [ -z "$_VER" ]; then
-      case "$_MOD" in
+    if [ "$_VER_SUM" = "-" ] || [ -z "$_VER_SUM" ]; then
+      case "$_MOD_SUM" in
       System | Shell | React | Vue | Tailwind | VitePress | Vite | pnpm-deps | Python-Venv | Homebrew | Hooks | Go-Mod | Cargo-Deps | Ruby-Gems) ;; # These don't always have a single version command
-      *) _STAT="⚠️ Warning" ;;
+      *) _STAT_SUM="⚠️ Warning" ;;
       esac
     fi
     ;;
   esac
 
-  printf "| %-12s | %-15s | %-20s | %-15s | %-6s |\n" "$_CAT" "$_MOD" "$_STAT" "$_VER" "${_DUR}s" >>"$_SUMMARY_FILE"
+  printf "| %-12s | %-15s | %-20s | %-15s | %-6s |\n" "$_CAT_SUM" "$_MOD_SUM" "$_STAT_SUM" "$_VER_SUM" "${_DUR_SUM}s" >>"$_FILE_SUM"
 }
 
-# Helper to get version safely
+# Safely extracts the version string from a binary or command.
+# @param $1 - Command or binary path
+# @param $2 - Version argument (default: --version)
+# @returns The extracted version number or "-" if not detected.
 get_version() {
-  _CMD="$1"
-  _ARG="${2:---version}"
-  if command -v "$_CMD" >/dev/null 2>&1; then
+  _CMD_VER="$1"
+  _ARG_VER="${2:---version}"
+  if command -v "$_CMD_VER" >/dev/null 2>&1; then
     # Standard version extraction: find the first sequence starting with a digit
-    case "$_CMD" in
+    case "$_CMD_VER" in
     node | python | go | cargo | dotnet | dart | pwsh)
-      "$_CMD" "$_ARG" 2>&1 | head -n 1 | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
+      "$_CMD_VER" "$_ARG_VER" 2>&1 | head -n 1 | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
       ;;
     pip-audit)
       # pip-audit version output: "pip-audit 2.8.0" or with warnings
-      "$_CMD" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
+      "$_CMD_VER" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
       ;;
     swift)
       # Swift version output: "swift-driver version: 1.115 Apple Swift version 6.0.3 (swiftlang-6.0.3.1.10 ...)"
-      "$_CMD" "$_ARG" 2>&1 | sed -n 's/.*Swift version \([0-9][0-9.]*\).*/\1/p' | head -n 1
+      "$_CMD_VER" "$_ARG_VER" 2>&1 | sed -n 's/.*Swift version \([0-9][0-9.]*\).*/\1/p' | head -n 1
       ;;
     java)
       # java -version outputs to stderr and puts version in quotes
-      "$_CMD" "$_ARG" 2>&1 | sed -n 's/.*version "\([0-9][0-9.]*\).*/\1/p' | head -n 1
+      "$_CMD_VER" "$_ARG_VER" 2>&1 | sed -n 's/.*version "\([0-9][0-9.]*\).*/\1/p' | head -n 1
       ;;
     *)
       # For other binaries, try to get version from the output
-      "$_CMD" "$_ARG" 2>&1 | head -n 1 | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
+      "$_CMD_VER" "$_ARG_VER" 2>&1 | head -n 1 | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
       ;;
     esac
   else

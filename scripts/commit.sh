@@ -1,16 +1,18 @@
 #!/bin/sh
-# scripts/commit.sh - Structured Committer Script
-# Professional CLI wrapper for Commitizen and pre-commit health checks.
-# Features: POSIX compliant, Execution Guard, SSoT Architecture, Professional UX.
+# scripts/commit.sh - Guided Commit Manager
+# Facilitates high-quality, conventional commits with Commitizen and health checks.
+#
+# Features:
+#   - POSIX compliant, encapsulated main() pattern.
+#   - Pre-commit verification before guided entry.
+#   - Node.js dependency detection and routing.
+#   - Professional UX for streamlined version control.
 
 set -e
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
-
-# 1. Execution Context Guard
-guard_project_root
 
 # Help message
 show_help() {

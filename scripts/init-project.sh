@@ -1,7 +1,12 @@
 #!/bin/sh
-# scripts/init-project.sh - Project Hydration Script
-# Re-brands the template for a new project by replacing placeholders.
-# Features: POSIX compliant, Execution Guard, Dry-run support, Professional UX.
+# scripts/init-project.sh - Project Branding Hydrator
+# Customizes the template for a new project by replacing branded placeholders.
+#
+# Features:
+#   - POSIX compliant, encapsulated main() pattern.
+#   - Safe placeholder replacement across the entire codebase.
+#   - Integrated Git re-initialization and remote cleanup.
+#   - Professional UX for streamlined project onboarding.
 
 set -e
 

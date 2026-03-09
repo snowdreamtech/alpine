@@ -1,6 +1,7 @@
 @echo off
-REM scripts/format.bat - Entry point for Windows
-REM Delegates to format.ps1 to maintain Single Source of Truth.
+REM scripts/format.bat - Windows wrapper for scripts/format.sh
+REM
+REM Professional delegation to PowerShell to maintain Single Source of Truth (SSoT).
 
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0format.ps1" %*
 exit /b %ERRORLEVEL%

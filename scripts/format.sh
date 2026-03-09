@@ -1,16 +1,18 @@
 #!/bin/sh
-# scripts/format.sh - Unified Project Formatter
-# Consolidates formatting tools for Shell, JS/TS, Python, and more.
-# Features: POSIX compliant, Execution Guard, Dry-run support, Professional UX.
+# scripts/format.sh - Unified Code Formatter
+# Consolidates toolchains (shfmt, prettier, black, gofmt, etc.) for automated styling.
+#
+# Features:
+#   - POSIX compliant, encapsulated main() pattern.
+#   - Multi-stack auto-formatting (Shell, JS/TS, Python, Go, Rust, etc.).
+#   - Safe dry-run support to preview changes without applying.
+#   - Professional UX with clear remediation logs.
 
 set -e
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
-
-# 1. Execution Context Guard
-guard_project_root
 
 # Help message
 show_help() {

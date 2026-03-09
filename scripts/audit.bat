@@ -1,6 +1,7 @@
 @echo off
-REM scripts/audit.bat - Entry point for Windows
-REM Delegates to audit.ps1 to maintain Single Source of Truth.
+REM scripts/audit.bat - Windows wrapper for scripts/audit.sh
+REM
+REM Professional delegation to PowerShell to maintain Single Source of Truth (SSoT).
 
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0audit.ps1" %*
 exit /b %ERRORLEVEL%

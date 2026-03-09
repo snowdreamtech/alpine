@@ -1,16 +1,18 @@
 #!/bin/sh
 # scripts/release.sh - Standardized Release Manager
-# Automates versioning, tagging, and pre-release verification.
-# Features: POSIX compliant, Execution Guard, Dry-run support, Professional UX.
+# Automates semantic versioning, git tagging, and pre-release verification.
+#
+# Features:
+#   - POSIX compliant, encapsulated main() pattern.
+#   - Automated version extraction from manifests.
+#   - Guarded git operations with dry-run support.
+#   - Professional UX with clear next-action prompts.
 
 set -e
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
-
-# 1. Execution Context Guard
-guard_project_root
 
 # Help message
 show_help() {

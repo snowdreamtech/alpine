@@ -1,16 +1,18 @@
 #!/bin/sh
-# scripts/cleanup.sh - Deep Project Cleanup Script
-# Removes temporary files, build artifacts, and caches across all supported stacks.
-# Features: POSIX compliant, Execution Guard, Dry-run support, Professional UX.
+# scripts/cleanup.sh - Deep Project Sanitizer
+# Thoroughly removes build artifacts, temporary files, and caches across all platforms.
+#
+# Features:
+#   - POSIX compliant, encapsulated main() pattern.
+#   - Cross-stack cleanup (node, python, go, rust, iac).
+#   - Safe dry-run support for destructive operations.
+#   - Professional UX with detailed reclamation logs.
 
 set -e
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
-
-# 1. Execution Context Guard
-guard_project_root
 
 # Help message
 show_help() {

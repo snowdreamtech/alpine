@@ -1,15 +1,18 @@
 #!/bin/sh
-# scripts/update.sh - Tooling Update Manager
-# Standardizes updating of global and project tools (pnpm, pre-commit, brew, etc.).
+# scripts/update.sh - Toolchain Update Manager
+# Standardizes the maintenance of global and project-local development toolsets.
+#
+# Features:
+#   - POSIX compliant, encapsulated main() pattern.
+#   - Orchestrated updates for Brew, NPM, Python, and Git Hooks.
+#   - Operation throttling with 24h cooldown to minimize disruption.
+#   - Professional UX with clear update summaries.
 
 set -e
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
-
-# 1. Execution Context Guard
-guard_project_root
 
 # ── Configuration ────────────────────────────────────────────────────────────
 

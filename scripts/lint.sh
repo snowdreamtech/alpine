@@ -1,16 +1,18 @@
 #!/bin/sh
-# scripts/lint.sh - Unified Project Linter
-# Wraps pre-commit and language-specific linters into a professional CLI.
-# Features: POSIX compliant, Execution Guard, CI-optimized, Professional UX.
+# scripts/lint.sh - Unified Quality Orchestrator
+# Wraps pre-commit hooks and specialized language linters into a single CLI.
+#
+# Features:
+#   - POSIX compliant, encapsulated main() pattern.
+#   - Orchestrated linting for all supported language stacks.
+#   - CI-optimized execution with strict error checking.
+#   - Professional UX with detailed diagnostic output.
 
 set -e
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
-
-# 1. Execution Context Guard
-guard_project_root
 
 # Help message
 show_help() {

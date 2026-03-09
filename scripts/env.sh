@@ -1,16 +1,18 @@
 #!/bin/sh
-# scripts/env.sh - Environment Configuration Manager
-# Manages .env files, validation, and template synchronization.
-# Features: POSIX compliant, Execution Guard, Dry-run support, Professional UX.
+# scripts/env.sh - Environment Configuration Orchestrator
+# Standardizes management of .env files, validation, and template synchronization.
+#
+# Features:
+#   - POSIX compliant, encapsulated main() pattern.
+#   - Safe template extraction and missing variable detection.
+#   - Conditional overwrite protection for local secrets.
+#   - Professional UX for environment onboarding.
 
 set -e
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
-
-# 1. Execution Context Guard
-guard_project_root
 
 # Help message
 show_help() {

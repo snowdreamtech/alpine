@@ -1,6 +1,7 @@
 @echo off
-REM scripts/release.bat - Entry point for Windows
-REM Delegates to release.ps1 to maintain Single Source of Truth.
+REM scripts/release.bat - Windows wrapper for scripts/release.sh
+REM
+REM Professional delegation to PowerShell to maintain Single Source of Truth (SSoT).
 
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0release.ps1" %*
 exit /b %ERRORLEVEL%

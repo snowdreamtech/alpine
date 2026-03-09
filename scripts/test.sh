@@ -1,16 +1,18 @@
 #!/bin/sh
-# scripts/test.sh - Unified Project Test Runner
-# Consolidates execution of bats, pytest, Pester, and other test suites.
-# Features: POSIX compliant, Execution Guard, Auto-discovery, Professional UX.
+# scripts/test.sh - Multi-Stack Test Runner
+# Orchestrates test suites (bats, pytest, pester, vitest) for holistic verification.
+#
+# Features:
+#   - POSIX compliant, encapsulated main() pattern.
+#   - Automated test-discovery for all project components.
+#   - Cross-platform support for Shell, Python, and Node.js tests.
+#   - Professional UX with clear results reporting.
 
 set -e
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
-
-# 1. Execution Context Guard
-guard_project_root
 
 # Help message
 show_help() {
@@ -32,6 +34,65 @@ Suites (default: all):
   all              Run all detected test suites
 
 EOF
+}
+
+# Executes Shell-specific test suites using the bats framework.
+# Scans the tests/ directory for .bats files.
+run_shell_tests() {
+  if [ -d "tests" ] && find tests -name "*.bats" | grep -q .; then
+    log_info "── Running Shell Tests (bats) ──"
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
+      log_success "DRY-RUN: Would run bats tests in tests/"
+    elif command -v bats >/dev/null 2>&1; then
+      bats tests/
+    elif [ -f "node_modules/.bin/bats" ]; then
+      ./node_modules/.bin/bats tests/
+    else
+      log_warn "Warning: bats not found. Skipping shell tests."
+    fi
+  else
+    log_debug "No .bats files found in tests/. Skipping shell tests."
+  fi
+}
+
+# Executes Python-specific test suites using the pytest framework.
+# Detects tests via pytest.ini, pyproject.toml, or test_*.py files.
+run_python_tests() {
+  if [ -f "pytest.ini" ] || [ -f "pyproject.toml" ] || find tests -name "test_*.py" | grep -q .; then
+    log_info "── Running Python Tests (pytest) ──"
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
+      log_success "DRY-RUN: Would run pytest on tests/"
+    else
+      # shellcheck disable=SC2030
+      _VENV_PATH="${VENV:-.venv}"
+      if [ -x "$_VENV_PATH/bin/python3" ]; then
+        "$_VENV_PATH/bin/python3" -m pytest --tb=short
+      elif command -v pytest >/dev/null 2>&1; then
+        pytest --tb=short
+      else
+        log_warn "Warning: pytest not found. Skipping python tests."
+      fi
+    fi
+  else
+    log_debug "No python test indicators found. Skipping python tests."
+  fi
+}
+
+# Executes PowerShell-specific test suites using the Pester framework.
+# Scans the tests/ directory for .Tests.ps1 files.
+run_powershell_tests() {
+  if [ -d "tests" ] && find tests -name "*.Tests.ps1" | grep -q .; then
+    log_info "── Running PowerShell Tests (Pester) ──"
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
+      log_success "DRY-RUN: Would run Pester tests in tests/"
+    elif command -v pwsh >/dev/null 2>&1; then
+      pwsh -NoProfile -Command "Invoke-Pester tests/"
+    else
+      log_warn "Warning: pwsh not found. Skipping powershell tests."
+    fi
+  else
+    log_debug "No .Tests.ps1 files found in tests/. Skipping powershell tests."
+  fi
 }
 
 # Argument parsing

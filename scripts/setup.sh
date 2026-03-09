@@ -1,19 +1,18 @@
 #!/bin/sh
-# scripts/setup.sh - Modularized Project Setup Script
-# This script is designed for both local development and CI/CD JIT installation.
-# usage: sh scripts/setup.sh [OPTIONS] [module1] [module2] ...
-# modules: node, python, gitleaks, hadolint, go, iac, hooks, all (default)
-# Features: POSIX compliant, Execution Guard, CI Job Summary, Professional UX,
-#           Verbosity Control, Dry-run support.
+# scripts/setup.sh - Modular Project Setup Engine
+# Facilitates local development and CI/CD JIT toolchain installation.
+#
+# Features:
+#   - POSIX compliant, encapsulated main() pattern.
+#   - Specialized modules (node, python, go, rust, etc.).
+#   - Operation throttling with 24h cooldown.
+#   - Detailed performance summary and next-action prompts.
 
 set -e
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
-
-# 1. Execution Context Guard
-guard_project_root
 
 # ── Configuration ────────────────────────────────────────────────────────────
 # Global variables (VENV, PYTHON, etc.) are sourced from common.sh

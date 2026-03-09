@@ -1,15 +1,18 @@
 #!/bin/sh
-# scripts/bench.sh - Performance Benchmarker
-# Standard entry point for benchmarking suites across the project.
+# scripts/bench.sh - Performance Benchmarking Suite
+# Standard entrance for performance measurements and regression testing.
+#
+# Features:
+#   - POSIX compliant, encapsulated main() pattern.
+#   - Automated discovery of language-specific benchmarking tools.
+#   - Modular execution for Go, Node.js, and Python.
+#   - Professional UX with performance reporting.
 
 set -e
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
-
-# 1. Execution Context Guard
-guard_project_root
 
 # ── Configuration ────────────────────────────────────────────────────────────
 

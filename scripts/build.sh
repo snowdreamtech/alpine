@@ -1,16 +1,18 @@
 #!/bin/sh
 # scripts/build.sh - Unified Project Builder
-# Consolidates goreleaser, go, npm, and python build systems into a professional CLI.
-# Features: POSIX compliant, Execution Guard, SSoT Architecture, Professional UX.
+# Orchestrates multi-stack build systems (npm, go, python, goreleaser) into a single CLI.
+#
+# Features:
+#   - POSIX compliant, encapsulated main() pattern.
+#   - Multi-language artifact generation.
+#   - Environment-aware build routing.
+#   - Professional UX with clear build summaries.
 
 set -e
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
-
-# 1. Execution Context Guard
-guard_project_root
 
 # Help message
 show_help() {

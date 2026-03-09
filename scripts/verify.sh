@@ -1,16 +1,18 @@
 #!/bin/sh
 # scripts/verify.sh - Project Pre-flight Verifier
-# Orchestrates environment checks, linting, and testing for full validation.
-# Features: POSIX compliant, Execution Guard, Orchestration, Professional UX.
+# Orchestrates environment health checks, linting, and unit testing for full validation.
+#
+# Features:
+#   - POSIX compliant, encapsulated main() pattern.
+#   - Holistic orchestration of specialized sub-scripts.
+#   - Exit status propagation for CI/CD usage.
+#   - Professional UX with colored status reporting.
 
 set -e
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
-
-# 1. Execution Context Guard
-guard_project_root
 
 # Help message
 show_help() {

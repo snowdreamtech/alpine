@@ -1,4 +1,6 @@
-# PowerShell wrapper for install.sh
-# Ensures that the POSIX shell script remains the single source of truth (SSoT).
+# scripts/install.ps1 - PowerShell wrapper for scripts/install.sh
+#
+# Professional delegation to POSIX shell to maintain Single Source of Truth (SSoT).
+
 . "$PSScriptRoot/lib/common.ps1"
 Invoke-ShellDelegation "install.sh" $args

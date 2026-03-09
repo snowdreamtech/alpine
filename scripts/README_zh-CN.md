@@ -13,11 +13,28 @@
 - **健壮性**: 包含安全守卫、原子操作和标准化的错误处理。
 - **Windows 优化**: 从 CMD 和 PowerShell 完全委托给核心逻辑。
 
+### 架构
+
+```text
+[ 用户 / 开发者 / CI ]
+         |
+    [ Makefile ] (便捷入口点)
+         |
+         v
+    [ scripts/*.sh ] (核心 POSIX 逻辑, SSoT)
+    /    |      \
+   /     |       \
+  /      |        \
+[lib/common.sh] [lib/lint-wrapper.sh] [Windows 包装器]
+(工具库/SSoT)   (钩子中间层)          (.bat, .ps1)
+```
+
 ### 设计原则
 
 - **SSoT (单一事实来源)**: 逻辑绝不会在 `.sh` 和 `.ps1` 之间重复。
 - **幂等性**: 脚本可以安全地多次运行。
 - **快速失败**: 出错时立即退出并提供明确的诊断信息。
+- **可移植性**: 遵循 POSIX shell 标准，确保通用兼容性。
 
 ## 2. 使用指南
 
@@ -55,13 +72,15 @@ sh scripts/verify.sh
 
 - **权限不足**: 运行 `chmod +x scripts/*.sh`。
 - **Windows 脚本执行策略**: 如果 `.ps1` 失败，运行 `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`。
-- **被杀掉 (Exit 137)**: 通常表示二进制文件由于下载中断而损坏。运行 `rm .venv/bin/<tool>` 并重新运行 setup。
+- **被杀掉 (Exit 137)**: 通常表示二进制文件由于下载中断而损坏或内存溢出 (OOM)。运行 `rm .venv/bin/<tool>` 并重新运行 setup。
+- **代理/网络问题**: 如果下载失败，脚本会自动尝试使用代理。如果需要，请确保配置了 `GITHUB_PROXY`。
 
 ## 4. 安全考虑
 
-- **无需 Sudo**: 大多数脚本将工具安装到项目本地的 `.venv/bin` 或用户本地目录。
-- **校验逻辑**: 安装函数会验证二进制文件的存在和基本功能。
-- **Gitleaks 集成**: `audit.sh` 和钩子确保不会提交任何敏感信息（密钥等）。
+- **无需 Sudo**: 大多数脚本将工具安装到项目本地的 `.venv/bin` 或用户本地目录，以尽量减少对系统的影响。
+- **校验逻辑**: 关键安装函数会验证二进制文件的存在和基本功能。
+- **Gitleaks 集成**: `audit.sh` 和 pre-commit 钩子确保不会提交任何敏感信息（密钥等）到仓库。
+- **执行策略**: Windows 包装器使用 `-ExecutionPolicy Bypass` 以确保功能正常，且不破坏系统的全局安全设置。
 
 ## 5. 开发指南
 

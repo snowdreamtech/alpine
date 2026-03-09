@@ -1,6 +1,7 @@
 @echo off
-REM scripts/cleanup.bat - Entry point for Windows
-REM Delegates to cleanup.ps1 to maintain Single Source of Truth.
+REM scripts/cleanup.bat - Windows wrapper for scripts/cleanup.sh
+REM
+REM Professional delegation to PowerShell to maintain Single Source of Truth (SSoT).
 
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0cleanup.ps1" %*
 exit /b %ERRORLEVEL%

@@ -1,6 +1,7 @@
 @echo off
-REM scripts/lint.bat - Entry point for Windows
-REM Delegates to lint.ps1 to maintain Single Source of Truth.
+REM scripts/lint.bat - Windows wrapper for scripts/lint.sh
+REM
+REM Professional delegation to PowerShell to maintain Single Source of Truth (SSoT).
 
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0lint.ps1" %*
 exit /b %ERRORLEVEL%

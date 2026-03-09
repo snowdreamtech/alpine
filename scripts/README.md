@@ -13,11 +13,28 @@ This component provides a suite of cross-platform scripts to manage the developm
 - **Robust**: Includes safety guards, atomic operations, and standardized error handling.
 - **Windows Optimized**: Full delegation from CMD and PowerShell to the core logic.
 
+### Architecture
+
+```text
+[ User / Developer / CI ]
+         |
+    [ Makefile ] (Convenience Entry)
+         |
+         v
+    [ scripts/*.sh ] (Core POSIX Logic, SSoT)
+    /    |      \
+   /     |       \
+  /      |        \
+[lib/common.sh] [lib/lint-wrapper.sh] [Windows Wrappers]
+(Utils/SSoT)    (Hook Mediation)      (.bat, .ps1)
+```
+
 ### Design Principles
 
 - **SSoT**: Logic is never duplicated between `.sh` and `.ps1`.
 - **Idempotent**: Scripts can be run multiple times safely.
 - **Fail-Fast**: Immediate exit on error with clear diagnostics.
+- **Portable**: Adheres to POSIX shell standards for universal compatibility.
 
 ## 2. Usage Guide
 
@@ -55,13 +72,15 @@ sh scripts/verify.sh
 
 - **Permission Denied**: Run `chmod +x scripts/*.sh`.
 - **Windows Script Execution**: If `.ps1` fails, run `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`.
-- **Killed (Exit 137)**: Usually indicates a corrupted binary. Run `rm .venv/bin/<tool>` and re-run setup.
+- **Killed (Exit 137)**: Usually indicates a corrupted binary or OOM. Run `rm .venv/bin/<tool>` and re-run setup.
+- **Proxy/Network Issues**: If downloads fail, the script will automatically retry with a proxy fallback. Ensure `GITHUB_PROXY` is configured if needed.
 
 ## 4. Security Considerations
 
-- **No Sudo Requirement**: Most scripts install tools into the project-local `.venv/bin` or user-local directories.
-- **Checksum Logic**: Installation functions verify binary existence and basic functionality.
-- **Gitleaks Integration**: `audit.sh` and `hooks` ensure no secrets are committed.
+- **No Sudo Requirement**: Most scripts install tools into the project-local `.venv/bin` or user-local directories to minimize system-wide impact.
+- **Checksum Logic**: Critical installation functions verify binary existence and basic functionality.
+- **Gitleaks Integration**: `audit.sh` and pre-commit hooks ensure no secrets are committed to the repository.
+- **Execution Policy**: Windows wrappers use `-ExecutionPolicy Bypass` to ensure functionality without compromising system-wide security settings.
 
 ## 5. Development Guide
 

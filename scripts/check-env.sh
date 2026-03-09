@@ -1,7 +1,12 @@
 #!/bin/sh
-# scripts/check-env.sh - Environment Health Check Script
-# Validates the development environment and required tool versions.
-# Features: POSIX compliant, Execution Guard, Language-Aware detection, Professional UX.
+# scripts/check-env.sh - Environment Health Auditor
+# Validates the developer workstation against project-required runtimes and tools.
+#
+# Features:
+#   - POSIX compliant, encapsulated main() pattern.
+#   - Language-aware runtime detection (Node, Go, Python, etc.).
+#   - High-performance, non-destructive validation scans.
+#   - Professional UX with version-compatibility reporting.
 
 set -e
 

@@ -1,6 +1,7 @@
 @echo off
-REM scripts/verify.bat - Entry point for Windows
-REM Delegates to verify.ps1 to maintain Single Source of Truth.
+REM scripts/verify.bat - Windows wrapper for scripts/verify.sh
+REM
+REM Professional delegation to PowerShell to maintain Single Source of Truth (SSoT).
 
 powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0verify.ps1" %*
 exit /b %ERRORLEVEL%
