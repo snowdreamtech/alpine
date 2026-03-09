@@ -1,5 +1,11 @@
-# scripts/lib/common.ps1 - Shared logic for PowerShell wrappers.
-# Enables delegation from Windows to POSIX shell scripts while maintaining SSoT.
+# scripts/lib/common.ps1 - Shared utility library for PowerShell wrappers.
+#
+# Enables delegation from Windows to POSIX shell scripts while maintaining
+# the Shell (.sh) scripts as the Single Source of Truth (SSoT).
+#
+# Features:
+#   - POSIX Shell delegation (sh/bash detection).
+#   - Uniform argument passthrough.
 
 function Invoke-ShellDelegation {
     param(
