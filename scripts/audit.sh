@@ -237,7 +237,7 @@ fi
 # ── Final Report ─────────────────────────────────────────────────────────────
 
 if [ "$_CREATED_SUMMARY" = "true" ]; then
-  _TOTAL_DUR=$(($(date +%s) - _START_TIME))
+  _TOTAL_DUR=$(($(date +%s) - _START_))
   printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR" >>"$SETUP_SUMMARY_FILE"
 
   printf "\n"

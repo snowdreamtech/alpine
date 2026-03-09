@@ -7,12 +7,12 @@
 > **Strictly enforced when implementing multiple suggestions or changes in sequence.**
 
 - **One commit = one logical change.** Each commit must address a **single, well-defined topic** (e.g., one feature, one bug fix, one refactor, one config change). Never batch unrelated changes into a single commit.
-- **Implement → Commit → Next.** When executing multiple suggestions or tasks in sequence:
+- **Implement → Commit → Next.** When executing multiple suggestions or tasks in sequence, the AI agent **MUST** perform an automatic commit after each logical change:
   1. Implement the first item completely.
-  2. Commit it immediately with a precise commit message.
-  3. Only then proceed to the next item.
-- **No bulk commits.** Do NOT accumulate multiple changes across files and then commit them all at once. This breaks auditability and makes `git bisect`, `git revert`, and code review harder.
-- **Applies regardless of user selection.** Whether the user has selected one suggestion from a list or confirmed all of them, always commit after each individual change — not after all of them together.
+  2. Run lint/format auto-fixes.
+  3. **Commit immediately** with a precise Conventional Commit message.
+  4. Only then proceed to the next item.
+- **Auto-Commit is Mandatory.** AI agents must never wait for the end of a session or a batch of changes to commit. Every feature implementation or bug fix must result in an immediate, independent commit.
 - **NEVER use `--no-verify`**. Bypassing pre-commit hooks or commit-msg hooks is strictly prohibited. If a hook fails, you MUST fix the underlying code or configuration instead of using the bypass flag.
 
 ```bash
