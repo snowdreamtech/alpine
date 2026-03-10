@@ -40,10 +40,15 @@ permissions:
   statuses: write
   security-events: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   lint:
     name: Run Linter
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     env:
       VENV: ${{ github.event.inputs.venv || inputs.venv || '.venv' }}
 

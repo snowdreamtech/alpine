@@ -12,6 +12,10 @@ permissions:
   statuses: write
   security-events: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify:
     uses: ./.github/workflows/verify.yml
@@ -20,6 +24,7 @@ jobs:
   release-please:
     needs: [verify]
     runs-on: ubuntu-latest
+    timeout-minutes: 15
     steps:
       - uses: googleapis/release-please-action@v4.4.0
         with:

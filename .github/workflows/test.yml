@@ -31,10 +31,15 @@ permissions:
   contents: read
   pull-requests: read
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   test:
     name: Run Automated Tests
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     env:
       VENV: ${{ github.event.inputs.venv || '.venv' }}
 

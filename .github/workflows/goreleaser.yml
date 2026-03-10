@@ -11,6 +11,10 @@ permissions:
   statuses: write
   security-events: write
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   verify:
     uses: ./.github/workflows/verify.yml
@@ -19,6 +23,7 @@ jobs:
   goreleaser:
     needs: [verify]
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout
         uses: actions/checkout@v6.0.2
