@@ -23,8 +23,8 @@ importers:
         specifier: 19.7.1
         version: 19.7.1
       '@naturalcycles/ktlint':
-        specifier: 1.5.0
-        version: 1.5.0
+        specifier: 1.16.1
+        version: 1.16.1
       '@stoplight/spectral-cli':
         specifier: 6.11.1
         version: 6.11.1
@@ -569,9 +569,9 @@ packages:
   '@keyv/serialize@1.1.1':
     resolution: {integrity: sha512-dXn3FZhPv0US+7dtJsIi2R+c7qWYiReoEh5zUntWCf4oSpMNib8FDhSoed6m3QyZdx5hK7iLFkYk3rNxwt8vTA==}
 
-  '@naturalcycles/ktlint@1.5.0':
-    resolution: {integrity: sha512-tJI8Q0XeXkUd0iSDXY7V9MpHlrc8eZL4Zt6xQMCQ699fzfsYen+SIqNqQHzei3QwfFAnM6J0Q7KOoMMy7tcfRw==}
-    engines: {node: '>=14.15.0'}
+  '@naturalcycles/ktlint@1.16.1':
+    resolution: {integrity: sha512-JCXd3R3d64rU0L77B6bl91uYswWCZj/HWkRNTajdfamLgRJ0cIny1xLE3eAiv6OtQWDBLWyv+7T4f2YROoYnDQ==}
+    engines: {node: '>=20.13.0'}
     hasBin: true
 
   '@nodelib/fs.scandir@2.1.5':
@@ -3620,7 +3620,7 @@ snapshots:
 
   '@keyv/serialize@1.1.1': {}
 
-  '@naturalcycles/ktlint@1.5.0': {}
+  '@naturalcycles/ktlint@1.16.1': {}
 
   '@nodelib/fs.scandir@2.1.5':
     dependencies:
