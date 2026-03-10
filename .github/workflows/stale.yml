@@ -34,9 +34,10 @@ jobs:
       pull-requests: write # Required to label and close stagnant PRs
     timeout-minutes: 10 # Maintenance tasks are usually fast API operations
     steps:
-      - name: Mark Stale Issues and PRs
+      - name: "🧹 Mark Inactive Issues & PRs (Stale)"
         uses: actions/stale@v10.2.0
         with:
+          # Automatically identifies and labels stagnant items to maintain repository focus.
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           stale-issue-message: >
             This issue is stale because it has been open for 60 days with no activity.

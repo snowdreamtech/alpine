@@ -47,43 +47,47 @@ jobs:
       VENV: ${{ github.event.inputs.venv || '.venv' }}
 
     steps:
-      - name: Checkout
+      - name: "📂 Checkout Repository Code"
         uses: actions/checkout@v6.0.2
+        # Fetches source documentation and site assets for the build process.
         with:
           fetch-depth: 0
 
-      - name: Setup pnpm
+      - name: "📦 Configure pnpm Package Manager"
         uses: pnpm/action-setup@v4.2.0
+        # pnpm is required to manage documentation build-time dependencies efficiently.
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v6.2.0
+      - name: "🟢 Configure Node.js Runtime"
+        uses: actions/setup-node@v6.3.0
         with:
-          node-version: "24.1.0" # Stable long-term support version
+          # Aligns the Node runtime with the project's supported documentation stable version.
+          node-version: "24.1.0"
 
-      - name: Set up Python
+      - name: "🐍 Configure Python Runtime"
         uses: actions/setup-python@v6.2.0
         with:
+          # Python is required for specialized doc generation and build-time logic.
           python-version: "3.12"
 
-      - name: Run Environment Setup
+      - name: "🔧 Initialize Build Toolchain"
         shell: sh
         run: |
-          # Ensures the CI runner has the correct toolchain (Node, Python, pnpm).
+          # Prepares the CI container with the cross-stack tools (Node, Python) needed for the site.
           make setup
           make install
         env:
           VENV: ${{ env.VENV }}
 
-      - name: Build VitePress site
+      - name: "🚀 Compile Documentation Artifacts"
         shell: sh
         run: |
-          # Compiles Markdown source into a static HTML site for production deployment.
+          # Executes the static site generator (VitePress) to build the production frontend.
           pnpm docs:build
 
-      - name: Upload artifact
+      - name: "📦 Stage Assets for Web Deployment"
         uses: actions/upload-pages-artifact@v4.0.0
         with:
-          # Points to the generated distribution folder
+          # Bundles the compiled static site into a secure artifact for GitHub Pages.
           path: docs/.vitepress/dist
 
   deploy:
@@ -98,6 +102,7 @@ jobs:
       id-token: write # Required for OIDC-based deployment
     timeout-minutes: 10
     steps:
-      - name: Deploy to GitHub Pages
+      - name: "🚀 Deploy to GitHub Pages"
         id: deployment
         uses: actions/deploy-pages@v4.0.5
+        # Finalizes the deployment, making the new documentation live.

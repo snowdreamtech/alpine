@@ -144,6 +144,9 @@ graph TD
 ### Contribution Requirements
 
 - All new workflows MUST include a standard "World Class" header.
+- **Naming Convention**: All steps MUST follow the `Emoji + Verb + Object` format (e.g., `📂 Checkout Repository Code`).
+- **Technical Rationales**: Every non-trivial step MUST include a `# Why` comment explaining the technical rationale.
+- **Versioning**: All actions MUST be pinned to exact `x.y.z` tags (e.g., `v6.0.2`); major version tags or SHAs are prohibited.
 - Use `shell: sh` for cross-platform POSIX compliance.
 - Keep English and Chinese READMEs in sync.
 

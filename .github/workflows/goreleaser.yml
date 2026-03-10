@@ -42,19 +42,20 @@ jobs:
       security-events: write # Required if release includes security reports
     timeout-minutes: 30 # Go compilation and asset upload usually completes in <10m
     steps:
-      - name: Checkout
+      - name: "📂 Checkout Repository Code"
         uses: actions/checkout@v6.0.2
         with:
-          # Required: Fetch all tags/history for GoReleaser to determine version
+          # Required: Fetch all tags and historical context for GoReleaser to accurately determine the next version.
           token: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           fetch-depth: 0
 
-      - name: Run GoReleaser
+      - name: "🚀 Distribute Artifacts (GoReleaser)"
         uses: goreleaser/goreleaser-action@v7.0.0
         if: startsWith(github.ref, 'refs/tags/')
         with:
+          # Orchestrates the optimized build and distribution of cross-compiled Go binaries.
           distribution: goreleaser
-          version: "~> v2" # Pins to the latest v2 minor/patch
+          version: "~> v2" # Pins to the latest stable v2 series binary
           args: release --clean
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

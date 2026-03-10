@@ -70,19 +70,23 @@ jobs:
           # - swift                 # Swift (*.swift) — swiftformat, swiftlint
 
     steps:
-      - name: Checkout Code
+      - name: "📂 Checkout Repository Code"
         uses: actions/checkout@v6.0.2
+        # Required to provide the full source tree for deep semantic analysis.
 
-      - name: Initialize CodeQL
+      - name: "🛡️ Initialize CodeQL Engine"
         uses: github/codeql-action/init@v4.32.5
         with:
+          # Sets up the CodeQL database for the specified technical stack (e.g., Python, Go).
           languages: ${{ matrix.language }}
           config-file: .github/codeql/codeql-config.yml
 
-      - name: Autobuild
+      - name: "🚀 Bootstrap Target Build"
         uses: github/codeql-action/autobuild@v4.32.5
+        # Attempts to automatically compile the project to enable full-trace analysis.
 
-      - name: Perform CodeQL Analysis
+      - name: "🔍 Perform Deep Security Analysis"
         uses: github/codeql-action/analyze@v4.32.5
         with:
+          # Executes the semantic queries and generates the final vulnerability report.
           category: "/language:${{ matrix.language }}"

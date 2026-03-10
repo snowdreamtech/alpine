@@ -34,12 +34,11 @@ jobs:
       pull-requests: read # Required to read the pull request metadata via the GitHub API
     timeout-minutes: 5 # Title linting is near-instant
     steps:
-      - name: Validate PR Title (Conventional Commits)
+      - name: "🔍 Validate PR Title Integrity"
         uses: amannn/action-semantic-pull-request@v6.1.1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          # Require a scope (e.g., feat(api): instead of just feat:)
+          # Ensures PR titles follow Conventional Commits to maintain repository history purity.
           requireScope: false
-          # Customize error message
           validateSingleCommit: true

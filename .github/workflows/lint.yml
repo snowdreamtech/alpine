@@ -69,97 +69,110 @@ jobs:
       VENV: ${{ github.event.inputs.venv || inputs.venv || '.venv' }}
 
     steps:
-      - name: Checkout Code
+      - name: "📂 Checkout Repository Code"
         uses: actions/checkout@v6.0.2
         with:
+          # Required for Commitlint and deep inspection to handle historical context.
           token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: true
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
 
-      - name: Set environment variables
+      - name: "🔧 Initialize Environment Variables"
         shell: sh # POSIX compliant
         run: |
+          # Sets up standardized environment metadata used by subsequent build/audit steps.
           {
             echo "BRANCH=${GITHUB_REF##*/}"
             echo "http_proxy=${http_proxy}"
             echo "no_proxy=${no_proxy}"
           } >> "$GITHUB_ENV"
 
-      - name: Setup pnpm
+      - name: "📦 Configure pnpm Package Manager"
         uses: pnpm/action-setup@v4.2.0
+        # pnpm is the project's primary dependency manager; Ensuring it's available for Node steps.
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v6.2.0
+      - name: "🟢 Configure Node.js Runtime"
+        uses: actions/setup-node@v6.3.0
         with:
-          node-version: "24.1.0" # Explicit stable version
+          # Standardized Node version used across development and production environments.
+          node-version: "24.1.0"
 
-      - name: Set up Python
+      - name: "🐍 Configure Python Runtime"
         uses: actions/setup-python@v6.2.0
         with:
+          # Python is required for specialized scripting and logic validation in the 'audit' phase.
           python-version: "3.12"
 
-      - name: Project Setup
+      - name: "🚀 Initialize Project Dependencies"
         shell: sh
         run: |
+          # Bootstraps the environment and installs cross-stack dependencies (Go, Node, Python).
           make setup
           make install
         env:
           VENV: ${{ env.VENV }}
 
-      - name: Run Commitlint Check
+      - name: "📝 Validate Commit Convention (Commitlint)"
         shell: sh
         env:
           EVENT_NAME: ${{ github.event_name }}
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          # Validates commit messages following Conventional Commits to maintain history purity.
+          # Ensures every commit follows the Conventional Commits spec to maintain changelog integrity.
           if [ "$EVENT_NAME" = "pull_request" ]; then
             pnpm exec commitlint --from "$BASE_SHA" --to "$HEAD_SHA" --verbose
           else
             pnpm exec commitlint --last --verbose
           fi
 
-      - name: Run Unified Linting
+      - name: "🔍 Inspect Code Quality (Lint)"
         shell: sh
-        run: make lint
+        run: |
+          # Executes the unified linting suite covering all supported languages in the project.
+          make lint
         env:
           VENV: ${{ env.VENV }}
 
-      - name: Run Security Audit
+      - name: "🛡️ Perform Security Audit"
         shell: sh
-        run: make audit
+        run: |
+          # Scans for known vulnerabilities and security misconfigurations across the codebase.
+          make audit
         env:
           VENV: ${{ env.VENV }}
 
-      - name: Run Lychee (Link Checker)
+      - name: "🔗 Verify Documentation Links (Lychee)"
         uses: lycheeverse/lychee-action@v2.8.0
         if: ${{ always() }}
         with:
+          # Ensures zero broken links in documentation to maintain a professional user experience.
           args: --root-dir "${{ github.workspace }}" --verbose --no-progress --exclude-path ".git" --exclude-path "node_modules" --exclude-path ".venv" --exclude-path "venv" --exclude-path "env" --exclude-path "vendor" --exclude-path "dist" --exclude-path "build" --exclude-path "out" --exclude-path "target" --exclude-path ".next" --exclude-path ".nuxt" --exclude-path ".output" --exclude-path "__pycache__" --exclude-path ".specify" '**/*.md'
           fail: true
 
-      - name: Run Trivy Vulnerability Scanner (SARIF)
-        uses: aquasecurity/trivy-action@0.34.2
+      - name: "🕵️ Detect Vulnerabilities (Trivy FS)"
+        uses: aquasecurity/trivy-action@0.35.2
         if: ${{ always() }}
         env:
-          # Use specific AWS public ECR mirrors for reliability
+          # Use specific AWS public ECR mirrors for high reliability and scan consistency.
           TRIVY_DB_REPOSITORY: "public.ecr.aws/aquasecurity/trivy-db"
           TRIVY_CHECKS_BUNDLE_REPOSITORY: "public.ecr.aws/aquasecurity/trivy-checks"
         with:
+          # Performs deep file-system scanning for vulnerabilities in OS packages and dependencies.
           scan-type: "fs"
           ignore-unfixed: true
           format: "sarif"
           output: "trivy-results.sarif"
           severity: "CRITICAL,HIGH,MEDIUM,LOW"
-          exit-code: "1" # Fail the build on found vulnerabilities
+          exit-code: "1"
           version: "v0.69.2"
           token-setup-trivy: ${{ secrets.GITHUB_TOKEN }}
           skip-dirs: ".git,node_modules,.venv,venv,env,vendor,dist,build,out,target,.next,.nuxt,.output,__pycache__,.specify"
 
-      - name: Upload Trivy scan results to GitHub Security tab
+      - name: "📊 Upload Audit Intelligence (SARIF)"
         uses: github/codeql-action/upload-sarif@v4.32.5
         if: ${{ always() && hashFiles('trivy-results.sarif') != '' }}
         with:
+          # Consolidates security findings into the GitHub Security tab for centralized management.
           sarif_file: "trivy-results.sarif"

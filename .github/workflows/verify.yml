@@ -35,42 +35,46 @@ jobs:
       contents: read # Required for repository inspection
     timeout-minutes: 15 # Lightweight check that should finish fast
     steps:
-      - name: Checkout Code
+      - name: "📂 Checkout Repository Code"
         uses: actions/checkout@v6.0.2
+        # Fetches source code to perform pre-flight integrity and health checks.
 
-      - name: Install pnpm
+      - name: "📦 Configure pnpm Package Manager"
         uses: pnpm/action-setup@v4.2.0
+        # pnpm is required to bootstrap Node-based verification tools.
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v6.2.0
+      - name: "🟢 Configure Node.js Runtime"
+        uses: actions/setup-node@v6.3.0
         with:
-          node-version: "24.1.0" # Explicit stable version
+          # Aligns the Node environment with the project's supported stable version.
+          node-version: "24.1.0"
 
-      - name: Setup Python
+      - name: "🐍 Configure Python Runtime"
         uses: actions/setup-python@v6.2.0
         with:
+          # Python is leveraged for core health auditing and logic pre-flighting.
           python-version: "3.12"
 
-      - name: Project Setup
+      - name: "🔧 Align Runtime Environment"
         shell: sh
         run: |
-          # Ensures the local environment matches the production CI runner.
+          # Prepares the CI runner to mirror the production development environment.
           make setup
 
-      - name: Install Project Dependencies
+      - name: "📦 Bootstrap Project Dependencies"
         shell: sh
         run: |
-          # Installs language-specific deps (Python, Node, etc.) required for verification.
+          # Installs all cross-stack dependencies required for full verification.
           make install
 
-      - name: Run Full Verification
+      - name: "🧪 Validate Project Health (Verify)"
         shell: sh
         run: |
-          # Performs high-level integrity checks (env, formatting, basic logic).
+          # Executes a rapid, high-level verification of environment, syntax, and logic.
           make verify
 
-      - name: Run Security Audit
+      - name: "🛡️ Audit Dependency Supply Chain"
         shell: sh
         run: |
-          # Scans for known vulnerabilities in dependencies.
+          # Scans for vulnerabilities to ensure the build pipeline remains secure.
           make audit

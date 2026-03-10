@@ -44,11 +44,11 @@ jobs:
       security-events: write # Required for SARIF report association
     timeout-minutes: 15
     steps:
-      - name: Run Release Please
+      - name: "📝 Orchestrate Release Lifecycle (Release Please)"
         uses: googleapis/release-please-action@v4.4.0
         with:
-          # Uses the GITHUB_TOKEN for basic operations; a PAT is recommended for trigger cascading
+          # Automates versioning, PR creation, and CHANGELOG updates based on Conventional Commits.
           token: ${{ secrets.GITHUB_TOKEN }}
-          # 'simple' release type for conventional commit projects
+          # 'simple' release type is optimized for standard conventional commit projects.
           release-type: simple
           config-file: .release-please-config.json

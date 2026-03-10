@@ -36,7 +36,7 @@ jobs:
       contents: read # Required for repository metadata access
     timeout-minutes: 10 # 10m is more than enough for cache list/delete operations
     steps:
-      - name: Cleanup
+      - name: "🧹 Prune Inactive GitHub Caches"
         shell: sh # POSIX compliant shell for better portability
         run: |
           gh extension install actions/gh-actions-cache

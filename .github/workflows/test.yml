@@ -58,43 +58,47 @@ jobs:
       VENV: ${{ github.event.inputs.venv || '.venv' }}
 
     steps:
-      - name: Checkout Code
+      - name: "📂 Checkout Repository Code"
         uses: actions/checkout@v6.0.2
         with:
+          # Minimum scope checkout to enable multi-stack test execution.
           persist-credentials: false
 
-      - name: Setup pnpm
+      - name: "📦 Configure pnpm Package Manager"
         uses: pnpm/action-setup@v4.2.0
+        # pnpm is selected for its superior performance and strict dependency resolution.
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v6.2.0
+      - name: "🟢 Configure Node.js Runtime"
+        uses: actions/setup-node@v6.3.0
         with:
-          node-version: "24.1.0" # Explicit stable version
+          # Standardized LTS Node version ensuring consistent behavior between CI and local dev.
+          node-version: "24.1.0"
 
-      - name: Set up Python
+      - name: "🐍 Configure Python Runtime"
         uses: actions/setup-python@v6.2.0
         with:
+          # Python 3.12 is the canonical platform for the project's logic validation modules.
           python-version: "3.12"
 
-      - name: Run Environment Setup
+      - name: "🚀 Bootstrap Development Environment"
         shell: sh # POSIX compliant
         run: |
-          # Bootstraps the development environment using standardized scripts.
+          # Standardizes the environment prep to mirror the local developer's initial 'make setup' flow.
           make setup
           make install
         env:
           VENV: ${{ env.VENV }}
 
-      - name: Setup PowerShell
+      - name: "💻 Verify PowerShell Environment"
         shell: sh
         run: |
-          # PowerShell handles cross-platform scripting in this project; verifying presence.
+          # PowerShell is used for cross-platform platform logic; Verifying accessibility.
           pwsh --version
 
-      - name: Run Test Matrix (Shell & PowerShell & Python & Go)
+      - name: "🧪 Execute Multi-Stack Test Suite"
         shell: sh
         run: |
-          # Executes the unified test suite to validate logic across all supported stacks.
+          # Runs the full cross-language matrix (Shell, PS, Python, Go) to ensure absolute stability.
           make test
         env:
           VENV: ${{ env.VENV }}
