@@ -146,23 +146,35 @@ EOF
   assert_output --partial "Missing critical file: README.md"
 }
 
-@test "check-env.sh: reports warning/failure when tool version is too low" {
+@test "check-env.sh: reports warning when pnpm version is too low" {
   mkdir -p "$TEMP_DIR/bin"
   # shellcheck disable=SC2030,SC2031
   export PATH="$TEMP_DIR/bin:$PATH"
-
-  # Node version too low
-  printf '#!/bin/sh\necho "v18.0.0"\n' >"$TEMP_DIR/bin/node"
-  # Other tools ok
-  printf '#!/bin/sh\necho "9.0.0"\n' >"$TEMP_DIR/bin/pnpm"
+  printf '#!/bin/sh\necho "v24.1.0"\n' >"$TEMP_DIR/bin/node"
+  printf '#!/bin/sh\necho "8.0.0"\n' >"$TEMP_DIR/bin/pnpm"
   printf '#!/bin/sh\necho "Python 3.10.0"\n' >"$TEMP_DIR/bin/python3"
   printf '#!/bin/sh\necho "git version 2.30.0"\n' >"$TEMP_DIR/bin/git"
   printf '#!/bin/sh\necho "GNU Make 3.81"\n' >"$TEMP_DIR/bin/make"
   chmod +x "$TEMP_DIR/bin/"*
 
-  touch main.py
+  run sh scripts/check-env.sh
+  assert_failure
+  assert_output --partial "pnpm: v8.0.0 (below recommended v9.0.0)"
+}
+
+@test "check-env.sh: reports warning when Python version is too low" {
+  mkdir -p "$TEMP_DIR/bin"
+  # shellcheck disable=SC2030,SC2031
+  export PATH="$TEMP_DIR/bin:$PATH"
+  printf '#!/bin/sh\necho "v24.1.0"\n' >"$TEMP_DIR/bin/node"
+  printf '#!/bin/sh\necho "9.0.0"\n' >"$TEMP_DIR/bin/pnpm"
+  printf '#!/bin/sh\necho "Python 3.7.0"\n' >"$TEMP_DIR/bin/python3"
+  printf '#!/bin/sh\necho "git version 2.30.0"\n' >"$TEMP_DIR/bin/git"
+  printf '#!/bin/sh\necho "GNU Make 3.81"\n' >"$TEMP_DIR/bin/make"
+  chmod +x "$TEMP_DIR/bin/"*
+
   touch main.py
   run sh scripts/check-env.sh
   assert_failure
-  assert_output --partial "Node.js: v18.0.0 (below recommended v24.1.0)"
+  assert_output --partial "Python: v3.7.0 (below recommended v3.10.0)"
 }

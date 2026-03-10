@@ -20,6 +20,9 @@ case "\$1" in
   guard) guard_project_root ;;
   log) log_info "test info"; log_success "test success"; log_warn "test warn"; log_error "test error" ;;
   args) parse_common_args "\$@"; echo "VERBOSE=\$VERBOSE"; echo "DRY_RUN=\$DRY_RUN" ;;
+  version) get_project_version ;;
+  swap) atomic_swap "\$2" "\$3" ;;
+  check_rt) check_runtime "\$2" "Test Tool" ;;
 esac
 EOF
   chmod +x "$TEMP_DIR/test_script.sh"
@@ -68,4 +71,46 @@ teardown() {
   assert_line --partial "test info"
   assert_line --partial "test success"
   assert_line --partial "test error"
+}
+
+@test "common.sh: get_project_version detects version from package.json" {
+  cd "$TEMP_DIR" || exit
+  echo '{"version":"1.2.3"}' >"package.json"
+  run sh test_script.sh version
+  assert_success
+  assert_output "1.2.3"
+}
+
+@test "common.sh: get_project_version detects version from VERSION file" {
+  cd "$TEMP_DIR" || exit
+  echo "2.0.0" >"VERSION"
+  run sh test_script.sh version
+  assert_success
+  assert_output "2.0.0"
+}
+
+@test "common.sh: atomic_swap successfully moves file" {
+  echo "new content" >"$TEMP_DIR/new.tmp"
+  touch "$TEMP_DIR/old.txt"
+  run sh "$TEMP_DIR/test_script.sh" swap "$TEMP_DIR/new.tmp" "$TEMP_DIR/old.txt"
+  assert_success
+  assert [ -f "$TEMP_DIR/old.txt" ]
+  assert [ ! -f "$TEMP_DIR/new.tmp" ]
+  run cat "$TEMP_DIR/old.txt"
+  assert_output "new content"
+}
+
+@test "common.sh: check_runtime exits 0 if tool exists" {
+  # Mock a command
+  mkdir -p "$TEMP_DIR/bin"
+  touch "$TEMP_DIR/bin/dummy-tool"
+  chmod +x "$TEMP_DIR/bin/dummy-tool"
+  PATH="$TEMP_DIR/bin:$PATH" run sh "$TEMP_DIR/test_script.sh" check_rt dummy-tool
+  assert_success
+}
+
+@test "common.sh: check_runtime exits 0 (skips) if tool missing" {
+  run sh "$TEMP_DIR/test_script.sh" check_rt non-existent-tool
+  assert_success
+  assert_output --partial "Required runtime 'non-existent-tool' for Test Tool is missing. Skipping."
 }
