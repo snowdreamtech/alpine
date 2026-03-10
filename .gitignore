@@ -25,6 +25,7 @@ sc.tar.gz
 gitleaks-bin
 hadolint-*/
 golangci-lint-*
+health_report_*.md
 
 # =============================================================================
 # Operating Systems
