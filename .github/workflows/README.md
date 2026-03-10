@@ -6,52 +6,154 @@ This directory contains the automated CI/CD pipelines and repository maintenance
 
 ## 1. Design & Architecture
 
-The CI/CD system follows the **Triple Guarantee (三重保证)** quality mechanism:
+### Overview
 
-1. **Local Hooks**: `pre-commit` for instant feedback.
-2. **CI Pipeline**: Rigorous verification on every pull request.
-3. **Continuous Delivery**: Automated versioning and deployment.
+The GitHub Actions infrastructure provides a robust, multi-layered validation system that ensures every commit meets the project's high standards for quality, security, and performance.
 
-### Core Principles
+### Key Capabilities
 
-- **Least Privilege**: All workflows run with the minimum GITHUB_TOKEN scope.
-- **Fail Fast**: Aggressive timeouts and parallel execution ensure rapid feedback.
-- **Traceability**: Structured headers and "Why" comments explain every design decision.
-- **Idempotency**: All verification steps are designed to be repeatable and safe.
+- **Automated Quality Gates**: Unified linting and security auditing on every PR.
+- **Cross-Stack Testing**: Validation across Python, Node.js, Go, Shell, and PowerShell.
+- **Continuous Delivery**: Automated versioning, changelog generation, and Pages deployment.
+- **Resource Efficiency**: Intelligent caching and aggressive concurrency management.
+
+### Architecture Diagram
+
+```mermaid
+graph TD
+    A[Local Commit] --> B{Pre-commit Hooks}
+    B -- Pass --> C[GitHub Push/PR]
+    C --> D[CI Pipeline]
+    subgraph "CI Pipeline"
+        D1[verify.yml]
+        D2[lint.yml]
+        D3[test.yml]
+        D4[codeql.yml]
+    end
+    D1 & D2 & D3 & D4 --> E{Release Ready?}
+    E -- Yes --> F[release-please.yml]
+    F --> G[Production Release]
+    F --> H[pages.yml]
+    H --> I[GitHub Pages Docs]
+```
+
+### Design Principles
+
+- **Auditable**: Every workflow run is traced with unique IDs and logged in the Actions tab.
+- **Overridable**: Configurable via `workflow_dispatch` inputs and repository secrets.
+- **Extensible**: Component-based YAML structures allow for easy addition of new language stacks.
+- **Lean**: No unnecessary steps; specific path filters used to skip irrelevant runs.
+
+### Responsibilities
+
+- **CI Layer**: Owns code validation, formatting, and unit testing.
+- **Security Layer**: Owns static analysis (CodeQL) and vulnerability scanning (Trivy).
+- **CD Layer**: Owns release orchestration and artifact publishing.
 
 ## 2. Usage Guide
 
-Most workflows are automatic. You can manually trigger them via the **Actions** tab in GitHub using `workflow_dispatch`.
+### Prerequisites
 
-### Key Workflows
+- A GitHub repository with Actions enabled.
+- Correctly configured repository secrets (if using external integrations like Slack).
+- Node.js (v24.1.0+) and Python (v3.12+) for local verification.
 
-| Workflow             | Responsibility                | Trigger      |
-| :------------------- | :---------------------------- | :----------- |
-| `lint.yml`           | Code quality & Security audit | Push/PR      |
-| `test.yml`           | Multi-language test suite     | Push/PR      |
-| `verify.yml`         | Pre-flight environment check  | Push/PR      |
-| `release-please.yml` | Automated versioning          | Push to main |
-| `pages.yml`          | Documentation site deploy     | Docs change  |
+### Quick Start
+
+1. Push a feature branch: `git push origin feat/my-feature`.
+2. Open a Pull Request to `main`.
+3. Monitor the status checks in the PR UI.
+4. Address any failures reported by `lint` or `test` jobs.
+
+### Configuration Reference
+
+| Parameter | Type    | Default | Description                                            |
+| :-------- | :------ | :------ | :----------------------------------------------------- |
+| `venv`    | String  | `.venv` | Path to the Python virtual environment.                |
+| `pnpm`    | Boolean | `true`  | Whether to use pnpm for Node.js dependency management. |
+
+### Workflow Patterns
+
+- **PR Check Pattern**: Triggered on `pull_request` to validate incoming code.
+- **Main Sync Pattern**: Triggered on `push` to `main` for release and deployment.
+- **Maintenance Pattern**: Scheduled via `cron` for stale issue management and security scans.
+
+### File Structure
+
+```text
+.github/workflows/
+├── README.md           # This guide
+├── README_zh-CN.md     # Chinese version
+├── verify.yml          # Pre-flight environment check
+├── lint.yml            # Linting & Security audit
+├── test.yml            # Multi-stack test runner
+├── codeql.yml          # Deep security analysis
+├── release-please.yml  # Versioning automation
+├── pages.yml           # Docs deployment
+├── cache.yml           # Cache maintenance
+├── labeler.yml         # PR categorization
+├── stale.yml           # Issue management
+├── goreleaser.yml      # Binary release automation
+└── pr-title.yml        # Semantic title validation
+```
 
 ## 3. Operations Guide
 
+### Pre-deployment Checklist
+
+1. Verify `actionlint` passes on all workflow changes.
+2. Ensure `make verify` passes locally.
+3. Check `GITHUB_TOKEN` permissions for new workflows.
+
+### Performance Considerations
+
+- **Caching**: Use `pnpm` and `pip` caching in every job to reduce build time by ~40%.
+- **Matrix**: Limit test matrices to supported OS/version combinations to save runner minutes.
+
 ### Troubleshooting
 
-- **Permission Denied**: Check the `permissions` block in the workflow header.
-- **Action Pinning**: Ensure actions use `x.y.z` tags for stability.
-- **Timeout**: Some matrix tests (e.g., Go/Python) may require increased `timeout-minutes`.
+- **Problem**: Workflow fails with "Resource not accessible by integration".
+  - **Diagnosis**: Check the `permissions` block in the Job definition.
+  - **Solution**: Grant the required scope (e.g., `contents: write`) at the job or workflow level.
+- **Problem**: `lint` job fails on a specific file.
+  - **Diagnosis**: Run `make lint` locally to identify the specific formatting or syntax error.
+  - **Solution**: Fix the file and push the correction; CI will re-trigger automatically.
+- **Problem**: `test` job times out.
+  - **Diagnosis**: Review the logs to see if a specific test case is hanging.
+  - **Solution**: Increase `timeout-minutes` or optimize the slow test case.
 
 ## 4. Security Considerations
 
-- **Secret Handling**: Never log secrets. Always pass them via env vars in `run:` steps.
-- **Action Supply Chain**: Use stable semantic version tags for all external actions.
-- **OIDC**: Used for cloud integrations to avoid long-lived credentials.
+### Security Model
+
+- **Double-Zero Policy**: `permissions: {}` at root level to prevent accidental token misuse.
+- **Job Isolation**: Each job runs in a clean, isolated environment.
+- **OIDC Integration**: Uses OpenID Connect for cloud authentication where possible.
+
+### Best Practices
+
+| Aspect          | Requirement      | Implementation                                        |
+| :-------------- | :--------------- | :---------------------------------------------------- |
+| **Permissions** | Least Privilege  | Job-level `permissions` blocks.                       |
+| **Secrets**     | No logging       | Passed via `env` variables, never echoed.             |
+| **Injection**   | Sanitized inputs | Use `env` variables for `${{ github.event.* }}` data. |
+| **Pinning**     | Stability        | Use `x.y.z` tags for all third-party actions.         |
 
 ## 5. Development Guide
 
-To add a new workflow:
+### Contribution Requirements
 
-1. Create a `.yml` file in this directory.
-2. Follow the **World Class AI Documentation** header template.
-3. Enforce `shell: sh` for cross-platform compatibility.
-4. Run `make verify` and `actionlint` locally before committing.
+- All new workflows MUST include a standard "World Class" header.
+- Use `shell: sh` for cross-platform POSIX compliance.
+- Keep English and Chinese READMEs in sync.
+
+### Local Setup
+
+1. Install `actionlint`: `brew install actionlint`.
+2. Validate workflows: `actionlint .github/workflows/*.yml`.
+3. Check project health: `make verify`.
+
+### References
+
+- [Official GitHub Actions Documentation](https://docs.github.com/en/actions)
+- [Conventional Commits Specification](https://www.conventionalcommits.org/)
