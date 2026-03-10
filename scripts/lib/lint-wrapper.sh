@@ -84,7 +84,7 @@ main() {
     [ "$_LINTER_WRAP" = "goreleaser" ] && _RT_CHECK="goreleaser"
     check_runtime "$_RT_CHECK" "$_LINTER_WRAP"
     ;;
-  eslint | prettier | stylelint | spectral | sort-package-json | markdownlint-cli2 | taplo | dockerfile-utils | editorconfig-checker | commitlint)
+  eslint | prettier | stylelint | spectral | sort-package-json | markdownlint-cli2 | taplo | dockerfile-utils | commitlint)
     check_runtime node "$_LINTER_WRAP"
     ;;
   swiftformat | swiftlint)

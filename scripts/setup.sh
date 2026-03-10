@@ -60,6 +60,7 @@ Modules (default: all):
   swift              Install Swift linters (macOS)
   dotnet             Check .NET SDK
   security           Install security audit tools (osv-scanner, trivy, etc.)
+  editorconfig-checker Install editorconfig-checker
   hooks              Activate Pre-commit Hooks
   all                Run all of the above
 
@@ -843,6 +844,80 @@ install_trivy() {
   log_summary "Security Tool" "Trivy" "$_STAT_TRIVY" "$(get_version "$_BIN_TRIVY")" "$_DUR_TRIVY"
 }
 
+# Purpose: Installs editorconfig-checker for compliance validation.
+# Params:
+#   None (uses global EDITORCONFIG_CHECKER_VERSION)
+# Examples:
+#   install_editorconfig_checker
+install_editorconfig_checker() {
+  local _T0_EC
+  _T0_EC=$(date +%s)
+  local _BIN_EC
+  _BIN_EC="${VENV}/bin/editorconfig-checker${_EXE}"
+  if [ -x "${_BIN_EC}" ] && [ "$DRY_RUN" -eq 0 ]; then
+    log_summary "Lint Tool" "EditorConfig" "✅ Exists" "$(get_version "$_BIN_EC")" "0"
+    return 0
+  fi
+
+  log_info "── Installing editorconfig-checker ──"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_summary "Lint Tool" "EditorConfig" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  local _TMP_EC
+  _TMP_EC=$(mktemp -d)
+  local _STAT_EC="✅ Installed"
+
+  local _O_OS="${OS}" # Uses OS detection from previous steps
+  [ "${OS}" = "darwin" ] && _O_OS="darwin"
+  [ "${OS}" = "linux" ] && _O_OS="linux"
+
+  local _O_ARCH="amd64"
+  { [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; } && _O_ARCH="arm64"
+
+  # Asset naming:
+  # Darwin/Windows: ec-{os}-{arch}.tar.gz
+  # Linux: editorconfig-checker-{os}-{arch}.tar.gz
+  local _FILE_EC
+  if [ "${OS}" = "linux" ]; then
+    _FILE_EC="editorconfig-checker-${_O_OS}-${_O_ARCH}.tar.gz"
+  else
+    _FILE_EC="ec-${_O_OS}-${_O_ARCH}.tar.gz"
+  fi
+
+  local _URL_EC="${GITHUB_PROXY}https://github.com/editorconfig-checker/editorconfig-checker/releases/download/${EDITORCONFIG_CHECKER_VERSION}/${_FILE_EC}"
+
+  if download_url "${_URL_EC}" "${_TMP_EC}/ec_pkg" "editorconfig-checker"; then
+    tar -xzf "${_TMP_EC}/ec_pkg" -C "${_TMP_EC}" || _STAT_EC="❌ Failed"
+    if [ "$_STAT_EC" = "✅ Installed" ]; then
+      # Internal structure differs:
+      # Darwin: bin/ec
+      # Linux: bin/editorconfig-checker
+      local _SRC_EC_BIN=""
+      if [ -x "${_TMP_EC}/bin/editorconfig-checker${_EXE}" ]; then
+        _SRC_EC_BIN="${_TMP_EC}/bin/editorconfig-checker${_EXE}"
+      elif [ -x "${_TMP_EC}/bin/ec${_EXE}" ]; then
+        _SRC_EC_BIN="${_TMP_EC}/bin/ec${_EXE}"
+      fi
+
+      if [ -n "$_SRC_EC_BIN" ]; then
+        mv "$_SRC_EC_BIN" "${_BIN_EC}" || _STAT_EC="❌ Failed"
+        chmod +x "${_BIN_EC}" 2>/dev/null || true
+      else
+        _STAT_EC="❌ Failed"
+      fi
+    fi
+  else
+    _STAT_EC="❌ Failed"
+  fi
+
+  rm -rf "${_TMP_EC}"
+  local _DUR_EC
+  _DUR_EC=$(($(date +%s) - _T0_EC))
+  log_summary "Lint Tool" "EditorConfig" "$_STAT_EC" "$(get_version "$_BIN_EC")" "$_DUR_EC"
+}
+
 # Purpose: Sets up several security audit tools (OSV-Scanner, Trivy, Govulncheck, etc.).
 # Params:
 #   None
@@ -970,7 +1045,7 @@ EOF
   # ── Module Selection ──
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "${_RAW_ARGS# *}" = "all" ]; then
-    _MODULES_LIST="node python gitleaks hadolint go checkmake iac powershell java ruby php dart swift dotnet security hooks"
+    _MODULES_LIST="node python gitleaks hadolint go checkmake iac powershell java ruby php dart swift dotnet security editorconfig-checker hooks"
   else
     _MODULES_LIST="${_RAW_ARGS}"
   fi
@@ -993,6 +1068,7 @@ EOF
     swift) setup_swift ;;
     dotnet) setup_dotnet ;;
     security) setup_security ;;
+    editorconfig-checker) install_editorconfig_checker ;;
     hooks) setup_hooks ;;
     *) log_error "Unknown module: $_cur_module" ;;
     esac
