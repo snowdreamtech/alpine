@@ -128,6 +128,7 @@ Synchronization rules:
 2. **Code blocks**: code, variable names, and CLI commands stay in English in both versions.
 3. **Simultaneous updates**: a PR that changes one version MUST update the other in the same commit. A PR updating only one language version is insufficient grounds for merge.
 4. **Terminology**: maintain a project glossary (`docs/glossary.md`) for consistent term translation — do not translate the same term differently across documents.
+5. **Navigation**: All bilingual documents MUST include a language navigation bar at the top (typically below the title or badges) in the format: `[English](path/to/README.md) | [简体中文](path/to/README_zh-CN.md)`.
 
 ## 4. API Documentation
 

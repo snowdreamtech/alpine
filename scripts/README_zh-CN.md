@@ -1,5 +1,7 @@
 # 自动化脚本工具箱
 
+[English](README.md) | [简体中文](README_zh-CN.md)
+
 > [!NOTE]
 > 此目录包含了项目自动化基础设施的实现。它遵循 **Single Source of Truth (SSoT)** 模式，核心逻辑位于 POSIX shell 脚本 (`.sh`) 中，并为 Windows 兼容性提供了包装器 (`.ps1`, `.bat`)。
 

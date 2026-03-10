@@ -1,5 +1,7 @@
 # Automation Scripts
 
+[English](README.md) | [简体中文](README_zh-CN.md)
+
 > [!NOTE]
 > This directory contains the implementation of the project's automation infrastructure. It follows a **Single Source of Truth (SSoT)** pattern where the core logic resides in POSIX shell scripts (`.sh`), with wrappers provided for Windows compatibility (`.ps1`, `.bat`).
 
