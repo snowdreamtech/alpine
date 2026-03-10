@@ -184,6 +184,12 @@ main() {
   esac
 
   log_success "\n✨ Environment management task complete."
+
+  # Next Actions
+  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+    printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
+    printf "  - Run %bmake setup%b to install tooling based on the environment.\n" "${GREEN}" "${NC}"
+  fi
 }
 
 main "$@"

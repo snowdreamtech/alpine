@@ -57,13 +57,13 @@ main() {
 
   # Temporary report buffer
   local _TMP_REPORT
-  _TMP_REPORT="/tmp/project_health_$$.md"
+  _TMP_REPORT=$(mktemp)
 
   cat <<EOF >"$_TMP_REPORT"
 # Project Health Dashboard
 
 > Generated on: $(date)
-> Target OS: $OS_NAME
+> Target OS: $(uname -s)
 
 ## 🛡️ Quality Gate Summary
 

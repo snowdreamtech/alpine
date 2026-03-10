@@ -126,6 +126,12 @@ main() {
   fi
 
   log_success "\n✨ Cleanup complete!"
+
+  # Next Actions
+  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+    printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
+    printf "  - Run %bmake setup%b to re-initialize the environment.\n" "${GREEN}" "${NC}"
+  fi
 }
 
 main "$@"

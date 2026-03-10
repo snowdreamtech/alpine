@@ -329,6 +329,12 @@ main() {
     log_debug "Writing to GITHUB_STEP_SUMMARY..."
     cat "$_TMP_SUM" >>"$GITHUB_STEP_SUMMARY"
   fi
+
+  # Next Actions
+  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+    printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
+    printf "  - Run %bmake commit%b to finalize the archival changes.\n" "${GREEN}" "${NC}"
+  fi
 }
 
 main "$@"

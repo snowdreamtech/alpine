@@ -234,7 +234,7 @@ main() {
   log_success "\n🚀 Project Hydration Complete!"
 
   # Next Actions
-  if [ "$DRY_RUN" -eq 0 ]; then
+  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
     printf "  - Run %bmake setup%b to install system-level tools.\n" "${GREEN}" "${NC}"
     printf "  - Run %bmake install%b to install project dependencies.\n" "${GREEN}" "${NC}"

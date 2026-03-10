@@ -104,6 +104,12 @@ main() {
   esac
 
   log_success "\n✨ Benchmarking finished."
+
+  # Next Actions
+  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+    printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
+    printf "  - Run %bmake test%b for full functional verification.\n" "${GREEN}" "${NC}"
+  fi
 }
 
 main "$@"
