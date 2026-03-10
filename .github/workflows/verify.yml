@@ -1,4 +1,12 @@
 ---
+# Project Verification
+# Purpose: High-level verification of project integrity, environment health, and basic security.
+# Trigger: Runs on core branch events. Designed as a lightweight pre-flight check.
+# Design:
+#   - Reuses 'make verify' and 'make audit' for consistency across local/CI.
+#   - Uses specific version tags for stable environment setup.
+#   - Implements concurrency to ensure atomic verification runs.
+
 name: Project Verification
 
 "on":
@@ -10,7 +18,7 @@ name: Project Verification
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: read # Required for environment inspection and code review
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -20,7 +28,7 @@ jobs:
   verify:
     name: Full Verification
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 15 # Lightweight check that should finish fast
     steps:
       - name: Checkout Code
         uses: actions/checkout@v6.0.2
@@ -31,7 +39,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v6.2.0
         with:
-          node-version: "24.1.0"
+          node-version: "24.1.0" # Explicit stable version
 
       - name: Setup Python
         uses: actions/setup-python@v6.2.0
@@ -39,13 +47,17 @@ jobs:
           python-version: "3.12"
 
       - name: Project Setup
+        shell: sh
         run: make setup
 
       - name: Install Project Dependencies
+        shell: sh
         run: make install
 
       - name: Run Full Verification
+        shell: sh
         run: make verify
 
       - name: Run Security Audit
+        shell: sh
         run: make audit

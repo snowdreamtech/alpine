@@ -1,4 +1,12 @@
 ---
+# Release Please (Automated Versioning & Changelogs)
+# Purpose: Automatically creates release PRs, updates versions, and generates CHANGELOG.md.
+# Trigger: Runs on every push to the default branch (main).
+# Design:
+#   - Depends on 'verify' to prevent broken releases.
+#   - Uses the manifest approach to manage project versions seamlessly.
+#   - Uses specific version tags for stable automation.
+
 name: Release Please
 
 "on":
@@ -7,10 +15,10 @@ name: Release Please
       - main
 
 permissions:
-  contents: write
-  pull-requests: write
-  statuses: write
-  security-events: write
+  contents: write # Required for creating release tags and editing CHANGELOG.md
+  pull-requests: write # Required for creating and updating release PRs
+  statuses: write # Required for repository status integration
+  security-events: write # Required if release includes vulnerability reports
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -18,20 +26,21 @@ concurrency:
 
 jobs:
   verify:
+    # Pre-flight check before opening/merging releases
     uses: ./.github/workflows/verify.yml
     secrets: inherit
 
   release-please:
+    name: Manage Release PRs
     needs: [verify]
     runs-on: ubuntu-latest
     timeout-minutes: 15
     steps:
-      - uses: googleapis/release-please-action@v4.4.0
+      - name: Run Release Please
+        uses: googleapis/release-please-action@v4.4.0
         with:
-          # this assumes that you have created a personal access token
-          # (PAT) and configured it as a GitHub action secret named
-          # `MY_RELEASE_PLEASE_TOKEN` (this secret name is not important).
+          # Uses the GITHUB_TOKEN for basic operations; a PAT is recommended for trigger cascading
           token: ${{ secrets.GITHUB_TOKEN }}
-          # Using the manifest approach allows managing multiple components or a single monorepo seamlessly
+          # 'simple' release type for conventional commit projects
           release-type: simple
           config-file: .release-please-config.json

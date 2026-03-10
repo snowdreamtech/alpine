@@ -1,42 +1,52 @@
 ---
+# GitHub Cache Cleanup
+# Purpose: Automatically cleans up old GitHub Actions caches to stay within storage limits.
+# Trigger: Runs weekly on Sundays at 16:00 UTC and can be manually triggered.
+# Design:
+#   - Uses the GitHub CLI (gh) with the actions-cache extension.
+#   - Implements concurrency to prevent redundant cleanup runs.
+#   - Sets timeout-minutes to prevent hung processes from consuming minutes.
+
 name: Github Cache Cleanup
 
 "on":
   schedule:
-    # Automatically run on every Day
+    # Staggered to avoid peak load times on GitHub's infrastructure
     - cron: "0 16 * * 0"
   workflow_dispatch:
 
 permissions:
-  actions: write
-  contents: read
+  actions: write # Required for deleting caches
+  contents: read # Base permission for environment access
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
+  # Older cleanup runs are irrelevant if a new one starts
   cancel-in-progress: true
 
 jobs:
   cleanup:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 10 # 10m is more than enough for cache list/delete operations
     steps:
       - name: Cleanup
+        shell: sh # POSIX compliant shell for better portability
         run: |
           gh extension install actions/gh-actions-cache
 
-          echo "Fetching list of cache key"
+          echo "Fetching list of cache keys..."
           cacheKeys=$(gh actions-cache list \
             -R "$REPO" -B "$BRANCH" -L 100 \
             --sort created-at --order desc | cut -f 1)
 
-          ## Setting this to not fail the workflow while deleting cache keys.
+          # set +e: don't fail the whole job if one deletion fails (e.g., race condition)
           set +e
           echo "Deleting caches..."
           for cacheKey in $cacheKeys
           do
               gh actions-cache delete "$cacheKey" -R "$REPO" -B "$BRANCH" --confirm
           done
-          echo "Done"
+          echo "Cleanup completed successfully."
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}

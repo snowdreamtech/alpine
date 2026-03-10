@@ -1,20 +1,23 @@
 ---
-# This workflow warns and then closes issues and PRs that have had no activity for a specified amount of time.
-#
-# You can adjust the behavior by modifying this file.
-# For more information, see:
-# https://github.com/actions/stale
+# Mark Stale Issues and PRs
+# Purpose: Automatically identifies and closes inactive issues and pull requests to maintain backlog health.
+# Trigger: Runs daily at 01:30 UTC.
+# Design:
+#   - Avoids bothering active contributors by exempting specific labels (pinned, security, bug).
+#   - Implements concurrency to ensure only one maintenance run at a time.
+#   - Uses stable version tags for maintenance tasks.
 
 name: Mark Stale Issues and PRs
 
 "on":
   schedule:
+    # Staggered to run during low-traffic hours
     - cron: "30 1 * * *"
   workflow_dispatch:
 
 permissions:
-  issues: write
-  pull-requests: write
+  issues: write # Required for labeling and closing issues
+  pull-requests: write # Required for labeling and closing PRs
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -23,9 +26,10 @@ concurrency:
 jobs:
   stale:
     runs-on: ubuntu-latest
-    timeout-minutes: 10
+    timeout-minutes: 10 # Maintenance tasks are usually fast API operations
     steps:
-      - uses: actions/stale@v10.2.0
+      - name: Mark Stale Issues and PRs
+        uses: actions/stale@v10.2.0
         with:
           repo-token: ${{ secrets.GITHUB_TOKEN }}
           stale-issue-message: >

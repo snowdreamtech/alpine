@@ -1,4 +1,12 @@
 ---
+# Deploy Docs to GitHub Pages
+# Purpose: Builds the VitePress documentation site and deploys it to GitHub Pages.
+# Trigger: Runs on pushes to 'main' that affect documentation or dependencies.
+# Design:
+#   - Separates 'build' and 'deploy' jobs for better traceability.
+#   - Uses specific version tags for stable action execution.
+#   - Implements concurrency to ensure only the latest documentation is live.
+
 name: Deploy Docs to GitHub Pages
 
 "on":
@@ -17,16 +25,17 @@ name: Deploy Docs to GitHub Pages
         default: ".venv"
 
 permissions:
-  contents: read
-  pages: write
-  id-token: write
+  contents: read # Required for checkout
+  pages: write # Required for deploying to Pages
+  id-token: write # Required for OIDC-based deployment
 
 concurrency:
   group: pages
-  cancel-in-progress: false
+  cancel-in-progress: false # Never cancel in-progress deploys to avoid inconsistent states
 
 jobs:
   build:
+    name: Build Documentation
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
@@ -44,7 +53,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6.2.0
         with:
-          node-version: "24.1.0"
+          node-version: "24.1.0" # Stable long-term support version
 
       - name: Set up Python
         uses: actions/setup-python@v6.2.0
@@ -52,6 +61,7 @@ jobs:
           python-version: "3.12"
 
       - name: Run Environment Setup
+        shell: sh
         run: |
           make setup
           make install
@@ -59,6 +69,7 @@ jobs:
           VENV: ${{ env.VENV }}
 
       - name: Build VitePress site
+        shell: sh
         run: pnpm docs:build
 
       - name: Upload artifact
@@ -67,13 +78,13 @@ jobs:
           path: docs/.vitepress/dist
 
   deploy:
+    name: Deploy to GitHub Pages
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
     needs: build
     runs-on: ubuntu-latest
     timeout-minutes: 10
-    name: Deploy
     steps:
       - name: Deploy to GitHub Pages
         id: deployment

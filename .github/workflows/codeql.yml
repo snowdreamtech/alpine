@@ -1,11 +1,11 @@
 ---
-# CodeQL Advanced Setup
-# This workflow overrides GitHub's Default Setup to explicitly control which
-# languages are scanned, preventing false warnings about undetected languages.
-#
-# To enable scanning for additional languages:
-#   1. Uncomment the desired language in the 'language' matrix below.
-#   2. Ensure source files of that language exist in the repository.
+# CodeQL Security Analysis (Advanced Setup)
+# Purpose: Deep semantic code analysis to detect vulnerabilities and security flaws.
+# Trigger: Runs on pushes to main/dev/feature branches, PRs, and weekly on Mondays.
+# Design:
+#   - Explicitly controls scanned languages to reduce false positives.
+#   - Uses concurrency to optimize CI minutes on active PRs.
+#   - Implements high timeouts due to the nature of static analysis deep scans.
 
 name: CodeQL
 
@@ -29,12 +29,13 @@ name: CodeQL
       - "fix/**"
       - "pr/**"
   schedule:
-    - cron: "0 3 * * 1" # Every Monday at 03:00 UTC
+    # Staggered weekly scan to ensure deep coverage outside peak hours
+    - cron: "0 3 * * 1"
 
 permissions:
-  contents: read
-  security-events: write
-  actions: read
+  contents: read # Required for code checkout
+  security-events: write # Required for posting analysis results
+  actions: read # Required to find current workflow run
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -44,7 +45,7 @@ jobs:
   analyze:
     name: Analyze (${{ matrix.language }})
     runs-on: ubuntu-latest
-    timeout-minutes: 360
+    timeout-minutes: 360 # Deep scans on large repos can take significant time
 
     strategy:
       fail-fast: false

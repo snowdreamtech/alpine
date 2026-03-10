@@ -1,4 +1,12 @@
 ---
+# Unified Project Linter & Security Auditor
+# Purpose: Authoritative gate for code quality, formatting, and security vulnerabilities.
+# Trigger: Runs on all pushes and PRs to core branches. Can be called manually or by other workflows.
+# Design:
+#   - Implements the "Shift-Right" full-repository scan for final validation.
+#   - Consists of multi-language linting (Project-level, Python, JS/TS, Shell, YAML).
+#   - Includes deep security audits (Trivy, Lychee) and Commitlint for history purity.
+
 name: Lint
 
 "on":
@@ -35,10 +43,10 @@ name: Lint
         default: ".venv"
 
 permissions:
-  contents: write
-  pull-requests: read
-  statuses: write
-  security-events: write
+  contents: write # Required for potential auto-fixes or scan results
+  pull-requests: read # Required to analyze PR context (Commitlint)
+  statuses: write # Required for updating commit status indicators
+  security-events: write # Required for SARIF uploads (Trivy)
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -48,7 +56,7 @@ jobs:
   lint:
     name: Run Linter
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 20 # Full scan including Trivy and build steps
     env:
       VENV: ${{ github.event.inputs.venv || inputs.venv || '.venv' }}
 
@@ -61,7 +69,8 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha || github.sha }}
           fetch-depth: 0
 
-      - name: Set env variables
+      - name: Set environment variables
+        shell: sh # POSIX compliant
         run: |
           {
             echo "BRANCH=${GITHUB_REF##*/}"
@@ -75,7 +84,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6.2.0
         with:
-          node-version: "24.1.0"
+          node-version: "24.1.0" # Explicit stable version
 
       - name: Set up Python
         uses: actions/setup-python@v6.2.0
@@ -83,6 +92,7 @@ jobs:
           python-version: "3.12"
 
       - name: Project Setup
+        shell: sh
         run: |
           make setup
           make install
@@ -90,19 +100,22 @@ jobs:
           VENV: ${{ env.VENV }}
 
       - name: Run Commitlint Check
+        shell: sh
         run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            pnpm exec commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose
+          if [ "${{ github.event_name }}" = "pull_request" ]; then
+            pnpm exec commitlint --from ${{ github.event_name == 'pull_request' && github.event.pull_request.base.sha || '' }} --to ${{ github.event_name == 'pull_request' && github.event.pull_request.head.sha || '' }} --verbose
           else
             pnpm exec commitlint --last --verbose
           fi
 
       - name: Run Unified Linting
+        shell: sh
         run: make lint
         env:
           VENV: ${{ env.VENV }}
 
       - name: Run Security Audit
+        shell: sh
         run: make audit
         env:
           VENV: ${{ env.VENV }}

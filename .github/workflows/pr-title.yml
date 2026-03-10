@@ -1,4 +1,12 @@
 ---
+# PR Title Check
+# Purpose: Ensures all pull request titles follow the Conventional Commits specification.
+# Trigger: Runs when a PR is opened, edited, or synchronized.
+# Design:
+#   - Uses 'pull_request_target' to allow title checking even on fork PRs.
+#   - Prevents unsemantic PR titles from landing in the repository history.
+#   - Uses specific version tags for stable linting.
+
 name: PR Title Check
 
 "on":
@@ -9,7 +17,7 @@ name: PR Title Check
       - synchronize
 
 permissions:
-  pull-requests: read
+  pull-requests: read # Required to read the PR title
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -19,7 +27,7 @@ jobs:
   commitlint:
     name: Check Semantic PR Title
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 5 # Title linting is near-instant
     steps:
       - name: Validate PR Title (Conventional Commits)
         uses: amannn/action-semantic-pull-request@v6.1.1

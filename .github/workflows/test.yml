@@ -1,4 +1,12 @@
 ---
+# Project Automated Test Runner
+# Purpose: Executes the full test matrix including Shell, PowerShell, Python, and Go tests.
+# Trigger: Runs on all pushes and PRs to safeguard logically critical changes.
+# Design:
+#   - Implements a unified test runner via 'make test'.
+#   - Uses stable version tags for all environment setup actions.
+#   - Implements aggressive timeouts to fail fast and save CI minutes.
+
 name: Test
 
 "on":
@@ -28,8 +36,8 @@ name: Test
         default: ".venv"
 
 permissions:
-  contents: read
-  pull-requests: read
+  contents: read # Required for code checkout
+  pull-requests: read # Required for PR context if needed by tests
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -39,7 +47,7 @@ jobs:
   test:
     name: Run Automated Tests
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 30 # Matrix tests can be time-consuming
     env:
       VENV: ${{ github.event.inputs.venv || '.venv' }}
 
@@ -55,7 +63,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v6.2.0
         with:
-          node-version: "24.1.0"
+          node-version: "24.1.0" # Explicit stable version
 
       - name: Set up Python
         uses: actions/setup-python@v6.2.0
@@ -63,6 +71,7 @@ jobs:
           python-version: "3.12"
 
       - name: Run Environment Setup
+        shell: sh # POSIX compliant
         run: |
           make setup
           make install
@@ -72,10 +81,11 @@ jobs:
       - name: Setup PowerShell
         shell: sh
         run: |
-          # PowerShell is pre-installed on ubuntu-latest runners.
+          # PowerShell is pre-installed on ubuntu-latest runners; verifying path.
           pwsh --version
 
       - name: Run Test Matrix (Shell & PowerShell & Python & Go)
+        shell: sh
         run: make test
         env:
           VENV: ${{ env.VENV }}
