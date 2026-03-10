@@ -32,6 +32,7 @@ main() {
   local _AUTHOR_NAME_HYD=""
   local _GITHUB_ORG_HYD=""
   local _AUTO_CON_HYD=0
+  local _STACK_HYD=""
 
   parse_common_args "$@"
 
@@ -41,6 +42,7 @@ main() {
     --project=*) _PROJECT_NAME_HYD="${_arg_hyd#*=}" ;;
     --author=*) _AUTHOR_NAME_HYD="${_arg_hyd#*=}" ;;
     --github=*) _GITHUB_ORG_HYD="${_arg_hyd#*=}" ;;
+    --stack=*) _STACK_HYD="${_arg_hyd#*=}" ;;
     -y | --yes) _AUTO_CON_HYD=1 ;;
     esac
   done
@@ -164,6 +166,62 @@ main() {
     esac
   elif [ "$DRY_RUN" -eq 1 ]; then
     log_warn "DRY-RUN: Would prompt for Git re-initialization."
+  fi
+
+  # 8. Scaffolding (Optional)
+  if [ -n "$_STACK_HYD" ]; then
+    log_info "\nStep 4: Creating $_STACK_HYD scaffolding..."
+    if [ "$DRY_RUN" -eq 1 ]; then
+      log_warn "DRY-RUN: Would create source and tests for $_STACK_HYD."
+    else
+      case "$_STACK_HYD" in
+      python)
+        mkdir -p src tests
+        [ ! -f src/main.py ] && printf 'def main():\n    print("Hello, World!")\n\nif __name__ == "__main__":\n    main()\n' >src/main.py
+        [ ! -f tests/test_main.py ] && printf 'def test_main():\n    assert True\n' >tests/test_main.py
+        ;;
+      node)
+        mkdir -p src tests
+        [ ! -f src/index.js ] && printf 'console.log("Hello, World!");\n' >src/index.js
+        [ ! -f tests/index.test.js ] && printf 'test("basic", () => { expect(true).toBe(true); });\n' >tests/index.test.js
+        ;;
+      go)
+        mkdir -p src tests
+        [ ! -f src/main.go ] && printf 'package main\n\nimport "fmt"\n\nfunc main() {\n    fmt.Println("Hello, World!")\n}\n' >src/main.go
+        [ ! -f tests/main_test.go ] && printf 'package main\n\nimport "testing"\n\nfunc TestMain(t *testing.T) {\n    // test logic\n}\n' >tests/main_test.go
+        ;;
+      java)
+        mkdir -p src/main/java/com/example src/test/java/com/example
+        [ ! -f src/main/java/com/example/Main.java ] && printf 'package com.example;\n\npublic class Main {\n    public static void main(String[] args) {\n        System.out.println("Hello, World!");\n    }\n}\n' >src/main/java/com/example/Main.java
+        [ ! -f src/test/java/com/example/MainTest.java ] && printf 'package com.example;\n\nimport org.junit.jupiter.api.Test;\nimport static org.junit.jupiter.api.Assertions.assertTrue;\n\nclass MainTest {\n    @Test\n    void contextLoads() {\n        assertTrue(true);\n    }\n}\n' >src/test/java/com/example/MainTest.java
+        ;;
+      php)
+        mkdir -p src tests
+        [ ! -f src/index.php ] && printf '<?php\n\necho "Hello, World!";\n' >src/index.php
+        # shellcheck disable=SC2016
+        [ ! -f tests/IndexTest.php ] && printf '<?php\n\nuse PHPUnit\\Framework\\TestCase;\n\nclass IndexTest extends TestCase {\n    public function testBasic() {\n        $this->assertTrue(true);\n    }\n}\n' >tests/IndexTest.php
+        ;;
+      rust)
+        mkdir -p src tests
+        [ ! -f src/main.rs ] && printf 'fn main() {\n    println!("Hello, World!");\n}\n' >src/main.rs
+        [ ! -f tests/main_test.rs ] && printf '#[test]\nfn test_basic() {\n    assert!(true);\n}\n' >tests/test_main.rs
+        ;;
+      ruby)
+        mkdir -p lib spec
+        # shellcheck disable=SC2016
+        [ ! -f lib/main.rb ] && printf 'def main\n  puts "Hello, World!"\nend\n\nmain if __FILE__ == $0\n' >lib/main.rb
+        [ ! -f spec/main_spec.rb ] && printf 'RSpec.describe "Main" do\n  it "works" do\n    expect(true).to be true\n  end\nend\n' >spec/main_spec.rb
+        ;;
+      dotnet)
+        mkdir -p src tests
+        [ ! -f src/Program.cs ] && printf 'using System;\n\nnamespace MyProject {\n    class Program {\n        static void Main(string[] args) {\n            Console.WriteLine("Hello, World!");\n        }\n    }\n}\n' >src/Program.cs
+        [ ! -f tests/UnitTest1.cs ] && printf 'using Xunit;\n\nnamespace MyProject.Tests {\n    public class UnitTest1 {\n        [Fact]\n        public void Test1() {\n            Assert.True(true);\n        }\n    }\n}\n' >tests/UnitTest1.cs
+        ;;
+      *)
+        log_warn "Unknown stack: $_STACK_HYD. Skipping scaffolding."
+        ;;
+      esac
+    fi
   fi
 
   log_success "\n🚀 Project Hydration Complete!"

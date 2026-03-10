@@ -27,7 +27,7 @@ endif
 # =============================================================================
 # Targets
 # =============================================================================
-.PHONY: all help init setup install lint format test build clean commit verify release env update audit bench docs archive-changelog check-env
+.PHONY: all help init setup install lint format test build clean commit verify release env update audit health bench docs archive-changelog check-env
 
 # Default target: display help
 all: help
@@ -54,6 +54,7 @@ help:
 	@echo "  $(GREEN)check-env$(NC) Onboarding environment health check"
 	@echo "  $(GREEN)update$(NC)   Update global/project tools and hooks"
 	@echo "  $(GREEN)audit$(NC)    Run security audit and vulnerability scans"
+	@echo "  $(GREEN)health$(NC)   Generate unified project health dashboard"
 	@echo "  $(GREEN)bench$(NC)    Run performance benchmarks"
 	@echo "  $(GREEN)clean$(NC)    Remove temporary and generated files"
 	@echo "  $(GREEN)help$(NC)     Show this help message"
@@ -148,6 +149,13 @@ ifeq ($(OS_NAME),Windows)
 	@scripts/audit.bat
 else
 	@sh scripts/audit.sh
+endif
+
+health:
+ifeq ($(OS_NAME),Windows)
+	@scripts/health.bat
+else
+	@sh scripts/health.sh
 endif
 
 bench:

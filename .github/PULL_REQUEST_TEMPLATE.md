@@ -1,31 +1,40 @@
-## Description
+## 📝 Description
 
-<!-- Please include a summary of the change and which issue is fixed. Please also include relevant motivation and context. -->
+<!-- Please include a summary of the change and which issue is fixed. -->
 
 Fixes # (issue)
 
-## Type of change
+## 🚀 Type of change
 
-<!-- Please delete options that are not relevant. -->
+- [ ] `feat`: A new feature
+- [ ] `fix`: A bug fix
+- [ ] `docs`: Documentation only changes
+- [ ] `style`: Formatting, whitespace — no logic change
+- [ ] `refactor`: Restructuring without behavior change
+- [ ] `perf`: Performance improvement
+- [ ] `test`: Adding/updating tests
+- [ ] `chore`: Maintenance, build, tooling
+- [ ] `breaking`: BREAKING CHANGE (fix or feature that would cause existing functionality to change)
 
-- [ ] Bug fix (non-breaking change which fixes an issue)
-- [ ] New feature (non-breaking change which adds functionality)
-- [ ] Breaking change (fix or feature that would cause existing functionality to not work as expected)
-- [ ] This change requires a documentation update
+## 🧪 How Has This Been Tested?
 
-## How Has This Been Tested?
+<!-- Describe the tests that you ran to verify your changes. -->
 
-<!-- Please describe the tests that you ran to verify your changes. Provide instructions so we can reproduce. -->
+- [ ] Automated tests passed (`make test`)
+- [ ] Manual verification completed
+- [ ] UI/UX changes verified (if applicable)
 
-- [ ] Unit tests passed
-- [ ] Local environment deployment verified
-- [ ] Other (please specify): \***\*\_\*\***
+## 🛡️ Triple Guarantee Checklist
 
-## Checklist
+As per the **Triple Guarantee** mechanism (`.agent/rules/02-coding-style.md`), I have:
 
-- [ ] My code follows the style guidelines of this project (`.agent/rules/02-coding-style.md`)
-- [ ] I have performed a self-review of my own code
-- [ ] I have commented my code, particularly in hard-to-understand areas
-- [ ] I have made corresponding changes to the documentation (if applicable)
-- [ ] My changes generate no new warnings or linting errors
-- [ ] Any dependent changes have been merged and published in downstream modules
+- [ ] **1. Auto-fix Applied**: Ran `make format` to fix all style issues.
+- [ ] **2. Pre-commit Passed**: Ran `make lint` and all hooks passed locally.
+- [ ] **3. Self-Review Verified**: Performed a self-review and the code follows project standards.
+
+## ✅ Final Checklist
+
+- [ ] My code follows the project's rule system (`.agent/rules/`).
+- [ ] I have updated the documentation accordingly (including bilingual sync).
+- [ ] My changes generate no new warnings or linting errors.
+- [ ] I have updated the `CHANGELOG.md` (via Conventional Commits).
