@@ -22,7 +22,7 @@ setup() {
   echo "repos: []" >.pre-commit-config.yaml
 
   # Create a proper CHANGELOG.md for archive-changelog test
-  echo -e "# Changelog\n\n## [v2.0.0]\n- Current\n\n## [v1.0.0]\n- Old" >CHANGELOG.md
+  printf "# Changelog\n\n## [v2.0.0]\n- Current\n\n## [v1.0.0]\n- Old\n" >CHANGELOG.md
 
   git init -q
   git config user.email "test@example.com"
