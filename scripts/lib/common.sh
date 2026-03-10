@@ -8,7 +8,7 @@
 # Standards:
 #   - POSIX-compliant sh logic.
 #   - "World Class" AI Documentation (English-only).
-#   - Rule 01 (Idempotency), Rule 04 (Network), Rule 09 (Interaction).
+#   - Rule 01 (General, Network), Rule 03 (Architecture), Rule 09 (Interaction).
 #
 # Features:
 #   - Standardized colored logging (info, success, warn, error).

@@ -11,7 +11,7 @@
 # Standards:
 #   - POSIX-compliant sh logic.
 #   - "World Class" AI Documentation (English-only).
-#   - Rule 01 (Idempotency), Rule 02 (Coding Style).
+#   - Rule 01 (General), Rule 02 (Coding Style), Rule 06 (CI/Testing).
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.

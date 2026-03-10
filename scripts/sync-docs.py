@@ -45,7 +45,15 @@ RULE_CATEGORIES = {
 
 
 def extract_metadata(file_path):
-    """Extracts title and top-level sections from a markdown file."""
+    """
+    Extracts title, objective, and top-level sections (##) from a markdown file.
+
+    Args:
+        file_path (Path): Path to the markdown source file.
+
+    Returns:
+        tuple[str, str, list[str]]: Title, Objective string, and list of section titles.
+    """
     with open(file_path, "r", encoding="utf-8") as f:
         content = f.read()
 
@@ -64,7 +72,16 @@ def extract_metadata(file_path):
 
 
 def create_bridge_file(dest_path, source_rel_path, title, objective, sections):
-    """Creates a VitePress bridge file."""
+    """
+    Generates a VitePress-compatible bridge file linking to the source rules or workflows.
+
+    Args:
+        dest_path (Path): Path where the bridge file should be created.
+        source_rel_path (str): Relative path to the source file within the repo.
+        title (str): The extracted title of the rule/workflow.
+        objective (str): The extracted objective/description.
+        sections (list[str]): List of top-level sections within the file.
+    """
     os.makedirs(dest_path.parent, exist_ok=True)
 
     repo_url = f"https://github.com/snowdreamtech/template/blob/main/{source_rel_path}"
@@ -88,6 +105,10 @@ def create_bridge_file(dest_path, source_rel_path, title, objective, sections):
 
 
 def sync_rules():
+    """
+    Orchestrates the synchronization of project rules from .agent/rules to docs/rules.
+    Handles category mapping and bridge file generation.
+    """
     print("Syncing rules...")
     for rule_file in RULES_SRC.glob("*.md"):
         # Skip numbering for core rules to handle them specifically if needed
@@ -124,6 +145,9 @@ def sync_rules():
 
 
 def sync_workflows():
+    """
+    Orchestrates the synchronization of project workflows from .agent/workflows to docs/workflows.
+    """
     print("Syncing workflows...")
     for wf_file in WORKFLOWS_SRC.glob("*.md"):
         rel_path = f".agent/workflows/{wf_file.name}"

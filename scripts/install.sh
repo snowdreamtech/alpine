@@ -11,7 +11,7 @@
 # Standards:
 #   - POSIX-compliant sh logic.
 #   - "World Class" AI Documentation (English-only).
-#   - Rule 01 (Idempotency), Rule 05 (Dependencies), Rule 08 (Dev Env).
+#   - Rule 01 (General, Network), Rule 05 (Dependencies), Rule 08 (Dev Env).
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
@@ -24,22 +24,12 @@ set -e
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
-# Purpose: Main entry point for dependency installation.
-#          Detects project type and runs appropriate package managers.
-# Params:
-#   $@ - Command line arguments
+# ── Functions ────────────────────────────────────────────────────────────────
+
+# Purpose: Extracts and installs Node.js dependencies using pnpm.
 # Examples:
-#   main --verbose
-main() {
-  # 1. Execution Context Guard
-  guard_project_root
-
-  # 2. Argument Parsing
-  parse_common_args "$@"
-
-  log_info "📦 Installing Project Dependencies...\n"
-
-  # 2. Node.js dependencies
+#   install_node_deps
+install_node_deps() {
   if [ -f "$PACKAGE_JSON" ]; then
     if [ "$IN_INSTALL_SCRIPT" = "1" ]; then
       log_debug "Skipping recursive pnpm install call."
@@ -53,8 +43,12 @@ main() {
       fi
     fi
   fi
+}
 
-  # 3. Python dependencies
+# Purpose: Extracts and installs Python dependencies into a virtual environment.
+# Examples:
+#   install_python_deps
+install_python_deps() {
   if [ -f "$REQUIREMENTS_TXT" ] || [ -f "requirements.txt" ] || [ -f "$PYPROJECT_TOML" ]; then
     printf "\n"
     log_info "── Installing Python dependencies ──"
@@ -80,8 +74,12 @@ main() {
       "$_PIP_INST" install -r requirements.txt
     fi
   fi
+}
 
-  # 4. Git Hooks (if setup script already ran)
+# Purpose: Installs pre-commit hooks into the local .git directory.
+# Examples:
+#   install_git_hooks
+install_git_hooks() {
   if [ -d ".git/hooks" ]; then
     local _PRE_COMMIT_BIN=""
     if [ -x "$VENV/bin/pre-commit" ]; then
@@ -98,6 +96,27 @@ main() {
       run_quiet "$_PRE_COMMIT_BIN" install
     fi
   fi
+}
+
+# Purpose: Main entry point for dependency installation.
+#          Detects project type and runs appropriate package managers.
+# Params:
+#   $@ - Command line arguments
+# Examples:
+#   main --verbose
+main() {
+  # 1. Execution Context Guard
+  guard_project_root
+
+  # 2. Argument Parsing
+  parse_common_args "$@"
+
+  log_info "📦 Installing Project Dependencies...\n"
+
+  # 3. Execution
+  install_node_deps
+  install_python_deps
+  install_git_hooks
 
   log_success "\n✨ All dependencies installed successfully!"
 

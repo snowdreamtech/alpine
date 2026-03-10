@@ -15,7 +15,6 @@ Invoke with `/snowdreamtech.init` in any AI IDE.
 ## What It Does
 
 1. **Installs tools** required by the development workflow:
-
    - `corepack enable` — enables zero-config `pnpm`
    - `pnpm install` — installs all project-local linters/formatters:
      - `commitlint`
@@ -25,7 +24,6 @@ Invoke with `/snowdreamtech.init` in any AI IDE.
      - `stylelint`
 
 2. **Sets up pre-commit hooks**:
-
    - Installs `pre-commit` Python package
    - Runs `pre-commit install` for commit hooks
    - Runs `pre-commit install --hook-type commit-msg` for commit message hooks
