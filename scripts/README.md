@@ -56,15 +56,26 @@ sh scripts/verify.sh
 
 ### Script Reference
 
-| Script                 | Purpose                      | Key Modules                  |
-| :--------------------- | :--------------------------- | :--------------------------- |
-| `setup.sh`             | Install system-level tools   | node, python, go, rust, etc. |
-| `install.sh`           | Install project dependencies | pnpm, pip, pre-commit        |
-| `check-env.sh`         | Validate tool versions       | Runtimes, Quality Tools      |
-| `verify.sh`            | Full project verification    | env, test, lint, audit       |
-| `update.sh`            | Update all tooling           | managers, hooks, deps        |
-| `init-project.sh`      | Rebrand template             | placeholders, git init       |
-| `archive-changelog.sh` | Archive old versions         | major version rotation       |
+| Script                 | Purpose                       | Key Modules                  |
+| :--------------------- | :---------------------------- | :--------------------------- |
+| `setup.sh`             | Install system-level tools    | node, python, go, rust, etc. |
+| `install.sh`           | Install project dependencies  | pnpm, pip, pre-commit        |
+| `check-env.sh`         | Validate tool versions        | Runtimes, Quality Tools      |
+| `verify.sh`            | Full project verification     | env, test, lint, audit       |
+| `update.sh`            | Update all tooling            | managers, hooks, deps        |
+| `build.sh`             | Build project artifacts       | goreleaser, tsc, pyproject   |
+| `lint.sh`              | Run linters and fixers        | pre-commit, auto-fix         |
+| `test.sh`              | Execute test suites           | bats, pytest, vitest, pester |
+| `bench.sh`             | Run performance benchmarks    | pytest-benchmark, k6         |
+| `audit.sh`             | Security & vulnerability scan | gitleaks, trivy, osv-scanner |
+| `commit.sh`            | Guided conventional commit    | commitizen (cz)              |
+| `release.sh`           | Standardized tagged release   | git tag, release-please      |
+| `docs.sh`              | Manage documentation site     | vitepress                    |
+| `env.sh`               | Manage environment variables  | .env synchronization         |
+| `format.sh`            | Unified code formatting       | shfmt, prettier, ruff, gofmt |
+| `cleanup.sh`           | Remove build/temp artifacts   | build, dist, cache, .venv    |
+| `init-project.sh`      | Rebrand template              | placeholders, git init       |
+| `archive-changelog.sh` | Archive old versions          | major version rotation       |
 
 ## 3. Operations Guide
 

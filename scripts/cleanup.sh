@@ -2,6 +2,9 @@
 # scripts/cleanup.sh - Deep Project Sanitizer
 # Thoroughly removes build artifacts, temporary files, and caches across all platforms.
 #
+# Usage:
+#   sh scripts/cleanup.sh [OPTIONS]
+#
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Cross-stack cleanup (node, python, go, rust, iac).
@@ -14,7 +17,11 @@ set -e
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
-# Help message
+# ── Functions ────────────────────────────────────────────────────────────────
+
+# Purpose: Displays usage information for the cleanup script.
+# Examples:
+#   show_help
 show_help() {
   cat <<EOF
 Usage: $0 [OPTIONS]
@@ -30,7 +37,33 @@ Options:
 EOF
 }
 
-# Argument parsing
+# Purpose: Safe wrapper for removing project artifacts.
+# Params:
+#   $1 - Absolute or relative path to the item.
+#   $2 - Human-readable description of the item.
+# Examples:
+#   clean_item "dist" "Build distribution"
+clean_item() {
+  local _PATH_CLN="$1"
+  local _DESC_CLN="$2"
+
+  if [ -e "$_PATH_CLN" ]; then
+    if [ "$DRY_RUN" -eq 1 ]; then
+      log_success "DRY-RUN: Would remove $_DESC_CLN_CLNS ($_PATH_CLN)"
+    else
+      log_info "Removing $_DESC_CLN ($_PATH_CLN)..."
+      rm -rf "$_PATH_CLN"
+    fi
+  else
+    log_debug "Skipping $_DESC_CLN ($_PATH_CLN) - Not found."
+  fi
+}
+
+# Purpose: Main entry point for the deep project cleanup.
+# Params:
+#   $@ - Command line arguments
+# Examples:
+#   main --dry-run
 main() {
   # 1. Execution Context Guard
   guard_project_root
@@ -39,22 +72,6 @@ main() {
   parse_common_args "$@"
 
   log_info "🧹 Starting deep project cleanup...\n"
-
-  clean_item() {
-    local _PATH="$1"
-    local _DESC="$2"
-
-    if [ -e "$_PATH" ]; then
-      if [ "$DRY_RUN" -eq 1 ]; then
-        log_success "DRY-RUN: Would remove $_DESC ($_PATH)"
-      else
-        log_info "Removing $_DESC ($_PATH)..."
-        rm -rf "$_PATH"
-      fi
-    else
-      log_debug "Skipping $_DESC ($_PATH) - Not found."
-    fi
-  }
 
   # 2. General Artifacts
   clean_item "dist" "Build distribution"

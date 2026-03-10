@@ -2,6 +2,9 @@
 # scripts/commit.sh - Guided Commit Manager
 # Facilitates high-quality, conventional commits with Commitizen and health checks.
 #
+# Usage:
+#   sh scripts/commit.sh [OPTIONS]
+#
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Pre-commit verification before guided entry.
@@ -14,7 +17,9 @@ set -e
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
-# Help message
+# Purpose: Displays usage information for the guided commit manager.
+# Examples:
+#   show_help
 show_help() {
   cat <<EOF
 Usage: $0 [OPTIONS]
@@ -33,7 +38,12 @@ Environment Variables:
 EOF
 }
 
-# Argument parsing
+# Purpose: Main entry point for the guided commit experience.
+#          Ensures staged changes exist and launches the Commitizen CLI.
+# Params:
+#   $@ - Command line arguments
+# Examples:
+#   main --verbose
 main() {
   # 1. Execution Context Guard
   guard_project_root
@@ -72,10 +82,10 @@ main() {
   fi
 
   # 4. Check for dependencies
-  local _NPM_LOCAL
-  _NPM_LOCAL=${NPM:-pnpm}
-  if ! command -v "$_NPM_LOCAL" >/dev/null 2>&1; then
-    log_error "Error: $_NPM_LOCAL client not found."
+  local _NPM_LOCAL_CMT
+  _NPM_LOCAL_CMT=${NPM:-pnpm}
+  if ! command -v "$_NPM_LOCAL_CMT" >/dev/null 2>&1; then
+    log_error "Error: $_NPM_LOCAL_CMT client not found."
     exit 1
   fi
 
@@ -83,16 +93,16 @@ main() {
   if [ "$DRY_RUN" -eq 1 ]; then
     log_success "DRY-RUN: Would launch interactive Commitizen CLI."
     if [ -f "package.json" ] && grep -q '"commit":' package.json; then
-      log_info "Command: $_NPM_LOCAL run commit"
+      log_info "Command: $_NPM_LOCAL_CMT run commit"
     else
-      log_info "Command: $_NPM_LOCAL exec cz"
+      log_info "Command: $_NPM_LOCAL_CMT exec cz"
     fi
     exit 0
   fi
 
   log_info "Launching interactive CLI..."
   # We use direct exec to avoid recursion if the npm script points back here
-  "$_NPM_LOCAL" exec cz
+  "$_NPM_LOCAL_CMT" exec cz
 
   # Next Actions
   if [ "$DRY_RUN" -eq 0 ]; then

@@ -2,6 +2,9 @@
 # scripts/format.sh - Unified Code Formatter
 # Consolidates toolchains (shfmt, prettier, black, gofmt, etc.) for automated styling.
 #
+# Usage:
+#   sh scripts/format.sh [OPTIONS]
+#
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Multi-stack auto-formatting (Shell, JS/TS, Python, Go, Rust, etc.).
@@ -14,7 +17,11 @@ set -e
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
-# Help message
+# ── Functions ────────────────────────────────────────────────────────────────
+
+# Purpose: Displays usage information for the unified project formatter.
+# Examples:
+#   show_help
 show_help() {
   cat <<EOF
 Usage: $0 [OPTIONS]
@@ -30,6 +37,73 @@ Options:
 EOF
 }
 
+# Purpose: Formats shell scripts using the shfmt tool.
+# Examples:
+#   run_shfmt_format
+run_shfmt_format() {
+  log_info "── Formatting Shell Scripts (shfmt) ──"
+  if command -v shfmt >/dev/null 2>&1; then
+    if [ "$DRY_RUN" -eq 1 ]; then
+      shfmt -d -s -i 2 scripts/*.sh tests/*.bats 2>/dev/null || true
+    else
+      shfmt -w -s -i 2 scripts/*.sh tests/*.bats 2>/dev/null || true
+    fi
+  else
+    log_warn "Warning: shfmt not found. Skipping shell formatting."
+  fi
+}
+
+# Purpose: Formats web and general files using Prettier.
+# Examples:
+#   run_prettier_format
+run_prettier_format() {
+  log_info "── Formatting Web/General Files (Prettier) ──"
+  local _PRETTIER_BIN=""
+  if [ -f "node_modules/.bin/prettier" ]; then
+    _PRETTIER_BIN="./node_modules/.bin/prettier"
+  elif command -v prettier >/dev/null 2>&1; then
+    _PRETTIER_BIN="prettier"
+  else
+    log_warn "Warning: prettier not found. Skipping web/general formatting."
+    return
+  fi
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    "$_PRETTIER_BIN" --check .
+  else
+    "$_PRETTIER_BIN" --write .
+  fi
+}
+
+# Purpose: Formats Python files using the Ruff tool.
+# Examples:
+#   run_ruff_format
+run_ruff_format() {
+  log_info "── Formatting Python Files (Ruff) ──"
+  local _VENV_FMT
+  _VENV_FMT=${VENV:-.venv}
+  local _RUFF_FMT_BIN=""
+  if [ -x "$_VENV_FMT/bin/ruff" ]; then
+    _RUFF_FMT_BIN="$_VENV_FMT/bin/ruff"
+  elif command -v ruff >/dev/null 2>&1; then
+    _RUFF_FMT_BIN="ruff"
+  else
+    log_warn "Warning: ruff not found. Skipping python formatting."
+    return
+  fi
+
+  if [ "$DRY_RUN" -eq 1 ]; then
+    "$_RUFF_FMT_BIN" format --check .
+  else
+    "$_RUFF_FMT_BIN" format .
+  fi
+}
+
+# Purpose: Main entry point for the unified project formatting engine.
+# Params:
+#   $@ - Command line arguments
+# Examples:
+#   main --dry-run
 main() {
   # 1. Execution Context Guard
   guard_project_root
@@ -39,64 +113,12 @@ main() {
 
   log_info "✨ Starting Unified Project Formatter...\n"
 
-  run_shfmt() {
-    log_info "── Formatting Shell Scripts (shfmt) ──"
-    if command -v shfmt >/dev/null 2>&1; then
-      if [ "$DRY_RUN" -eq 1 ]; then
-        shfmt -d -s -i 2 scripts/*.sh tests/*.bats 2>/dev/null || true
-      else
-        shfmt -w -s -i 2 scripts/*.sh tests/*.bats 2>/dev/null || true
-      fi
-    else
-      log_warn "Warning: shfmt not found. Skipping shell formatting."
-    fi
-  }
-
-  run_prettier() {
-    log_info "── Formatting Web/General Files (Prettier) ──"
-    local _PRETTIER=""
-    if [ -f "node_modules/.bin/prettier" ]; then
-      _PRETTIER="./node_modules/.bin/prettier"
-    elif command -v prettier >/dev/null 2>&1; then
-      _PRETTIER="prettier"
-    else
-      log_warn "Warning: prettier not found. Skipping web/general formatting."
-      return
-    fi
-
-    if [ "$DRY_RUN" -eq 1 ]; then
-      "$_PRETTIER" --check .
-    else
-      "$_PRETTIER" --write .
-    fi
-  }
-
-  run_ruff() {
-    log_info "── Formatting Python Files (Ruff) ──"
-    local _VENV
-    _VENV=${VENV:-.venv}
-    local _RUFF=""
-    if [ -x "$_VENV/bin/ruff" ]; then
-      _RUFF="$_VENV/bin/ruff"
-    elif command -v ruff >/dev/null 2>&1; then
-      _RUFF="ruff"
-    else
-      log_warn "Warning: ruff not found. Skipping python formatting."
-      return
-    fi
-
-    if [ "$DRY_RUN" -eq 1 ]; then
-      "$_RUFF" format --check .
-    else
-      "$_RUFF" format .
-    fi
-  }
-
-  run_shfmt
+  # 3. Individual Tool Orchestration
+  run_shfmt_format
   printf "\n"
-  run_prettier
+  run_prettier_format
   printf "\n"
-  run_ruff
+  run_ruff_format
 
   # Optional: run npm format if extra tools are defined in package.json
   run_npm_script "format"

@@ -2,6 +2,9 @@
 # scripts/lint.sh - Unified Quality Orchestrator
 # Wraps pre-commit hooks and specialized language linters into a single CLI.
 #
+# Usage:
+#   sh scripts/lint.sh [OPTIONS]
+#
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Orchestrated linting for all supported language stacks.
@@ -14,7 +17,9 @@ set -e
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
-# Help message
+# Purpose: Displays usage information for the quality orchestrator.
+# Examples:
+#   show_help
 show_help() {
   cat <<EOF
 Usage: $0 [OPTIONS]
@@ -30,17 +35,55 @@ Options:
 EOF
 }
 
-# Argument parsing
+# Purpose: Orchestrates pre-commit hooks execution across all files.
+# Params:
+#   $1 - Optional fix flag (--fix)
+# Examples:
+#   run_pre_commit_lint "--fix"
+run_pre_commit_lint() {
+  local _LV_FIX="$1"
+  log_info "── Running pre-commit hooks (Pass 1/1) ──"
+  local _VENV_LNT
+  _VENV_LNT=${VENV:-.venv}
+  local _PRE_COMMIT_LNT=""
+
+  if [ -x "$_VENV_LNT/bin/pre-commit" ]; then
+    _PRE_COMMIT_LNT="$_VENV_LNT/bin/pre-commit"
+  elif [ -x "$_VENV_LNT/Scripts/pre-commit.exe" ]; then
+    _PRE_COMMIT_LNT="$_VENV_LNT/Scripts/pre-commit.exe"
+  elif command -v pre-commit >/dev/null 2>&1; then
+    _PRE_COMMIT_LNT="pre-commit"
+  else
+    log_error "Error: pre-commit not found. Please run 'make setup' first."
+    exit 1
+  fi
+
+  # Run on all files
+  if [ -n "$_LV_FIX" ]; then
+    log_info "Running in auto-fix mode..."
+    # pre-commit doesn't have a direct --fix flag for everything at once,
+    # but many hooks auto-fix by default.
+    "$_PRE_COMMIT_LNT" run --all-files || log_warn "Some hooks modified files or reported errors."
+  else
+    "$_PRE_COMMIT_LNT" run --all-files
+  fi
+}
+
+# Purpose: Main entry point for the quality orchestration engine.
+# Params:
+#   $@ - Command line arguments
+# Examples:
+#   main --fix
 main() {
   # 1. Execution Context Guard
   guard_project_root
 
   # 2. Argument Parsing
-  local _FIX=""
-  local _arg
-  for _arg in "$@"; do
-    case "$_arg" in
-    --fix) _FIX="--fix" ;;
+  local _FIX_LNT=""
+  local _arg_lnt
+  for _arg_lnt in "$@"; do
+    case "$_arg_lnt" in
+    --fix) _FIX_LNT="--fix" ;;
     -q | --quiet | -v | --verbose | --dry-run | -h | --help) ;;
     esac
   done
@@ -48,33 +91,7 @@ main() {
 
   log_info "🔍 Starting Unified Project Linter...\n"
 
-  run_pre_commit() {
-    log_info "── Running pre-commit hooks (Pass 1/1) ──"
-    local _VENV
-    _VENV=${VENV:-.venv}
-    local _PRE_COMMIT=""
-
-    if [ -x "$_VENV/bin/pre-commit" ]; then
-      _PRE_COMMIT="$_VENV/bin/pre-commit"
-    elif command -v pre-commit >/dev/null 2>&1; then
-      _PRE_COMMIT="pre-commit"
-    else
-      log_error "Error: pre-commit not found. Please run 'make setup' first."
-      exit 1
-    fi
-
-    # Run on all files
-    if [ -n "$_FIX" ]; then
-      log_info "Running in auto-fix mode..."
-      # pre-commit doesn't have a direct --fix flag for everything at once,
-      # but many hooks auto-fix by default.
-      "$_PRE_COMMIT" run --all-files || log_warn "Some hooks modified files or reported errors."
-    else
-      "$_PRE_COMMIT" run --all-files
-    fi
-  }
-
-  run_pre_commit
+  run_pre_commit_lint "$_FIX_LNT"
 
   log_success "\n✨ Linting complete!"
 

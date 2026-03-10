@@ -2,6 +2,9 @@
 # scripts/docs.sh - Documentation Lifecycle Manager
 # Unified entrance for VitePress development, artifact building, and previews.
 #
+# Usage:
+#   sh scripts/docs.sh [OPTIONS] [COMMAND]
+#
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Automated VitePress installation checks.
@@ -14,7 +17,9 @@ set -e
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
-# Help message
+# Purpose: Displays usage information for the documentation manager.
+# Examples:
+#   show_help
 show_help() {
   cat <<EOF
 Usage: $0 [OPTIONS] [COMMAND]
@@ -38,21 +43,27 @@ Environment Variables:
 EOF
 }
 
+# Purpose: Main entry point for the documentation management engine.
+#          Routes to appropriate VitePress commands based on user input.
+# Params:
+#   $@ - Command line arguments and optional command
+# Examples:
+#   main build
 main() {
   # 1. Execution Context Guard
   guard_project_root
 
   # 2. Argument Parsing
-  local _COMMAND="dev"
-  local _arg
-  for _arg in "$@"; do
-    case "$_arg" in
-    dev | build | preview) _COMMAND="$_arg" ;;
+  local _COMMAND_DOC="dev"
+  local _arg_doc
+  for _arg_doc in "$@"; do
+    case "$_arg_doc" in
+    dev | build | preview) _COMMAND_DOC="$_arg_doc" ;;
     esac
   done
   parse_common_args "$@"
 
-  log_info "📖 Documentation Manager ($_COMMAND)...\n"
+  log_info "📖 Documentation Manager ($_COMMAND_DOC)...\n"
 
   # 3. Check for dependencies
   if [ ! -d "$DOCS_DIR" ]; then
@@ -66,7 +77,7 @@ main() {
   fi
 
   # 4. Execute VitePress via NPM
-  case "$_COMMAND" in
+  case "$_COMMAND_DOC" in
   dev)
     if [ "$DRY_RUN" -eq 1 ]; then
       log_success "DRY-RUN: Would start VitePress dev server on $DOCS_DIR"

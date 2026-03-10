@@ -2,6 +2,9 @@
 # scripts/build.sh - Unified Project Builder
 # Orchestrates multi-stack build systems (npm, go, python, goreleaser) into a single CLI.
 #
+# Usage:
+#   sh scripts/build.sh [OPTIONS]
+#
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Multi-language artifact generation.
@@ -14,7 +17,9 @@ set -e
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
-# Help message
+# Purpose: Displays usage information for the project builder.
+# Examples:
+#   show_help
 show_help() {
   cat <<EOF
 Usage: $0 [OPTIONS]
@@ -36,22 +41,26 @@ Environment Variables:
 EOF
 }
 
-# Argument parsing
+# Purpose: Main entry point for the project building engine.
+#          Detects project type and runs appropriate build commands.
+# Params:
+#   $@ - Command line arguments
+# Examples:
+#   main --verbose
 main() {
   # 1. Execution Context Guard
   guard_project_root
 
   # 2. Argument Parsing
-  local _arg
   parse_common_args "$@"
 
   log_info "🏗️  Starting Project Build...\n"
 
   # 3. Go build (GoReleaser or native)
   if [ -f ".goreleaser.yaml" ] || [ -f ".goreleaser.yml" ]; then
-    local _GORELEASER
-    _GORELEASER=${GORELEASER:-goreleaser}
-    run_build "$_GORELEASER build --snapshot --clean" "GoReleaser snapshot build"
+    local _GORELEASER_BIN
+    _GORELEASER_BIN=${GORELEASER:-goreleaser}
+    run_build "$_GORELEASER_BIN build --snapshot --clean" "GoReleaser snapshot build"
   elif [ -f "go.mod" ]; then
     run_build "go build ./..." "Go build (native)"
   fi
@@ -61,17 +70,17 @@ main() {
 
   # 5. Python build
   if [ -f "pyproject.toml" ]; then
-    local _VENV
-    _VENV=${VENV:-.venv}
-    local _PYTHON_BIN=""
-    if [ -x "$_VENV/bin/python3" ]; then
-      _PYTHON_BIN="$_VENV/bin/python3"
+    local _VENV_BLD
+    _VENV_BLD=${VENV:-.venv}
+    local _PYTHON_BLD_BIN=""
+    if [ -x "$_VENV_BLD/bin/python3" ]; then
+      _PYTHON_BLD_BIN="$_VENV_BLD/bin/python3"
     elif command -v python3 >/dev/null 2>&1; then
-      _PYTHON_BIN="python3"
+      _PYTHON_BLD_BIN="python3"
     fi
 
-    if [ -n "$_PYTHON_BIN" ]; then
-      run_build "$_PYTHON_BIN -m build" "Python build"
+    if [ -n "$_PYTHON_BLD_BIN" ]; then
+      run_build "$_PYTHON_BLD_BIN -m build" "Python build"
     fi
   fi
 

@@ -2,6 +2,9 @@
 # scripts/test.sh - Multi-Stack Test Runner
 # Orchestrates test suites (bats, pytest, pester, vitest) for holistic verification.
 #
+# Usage:
+#   sh scripts/test.sh [OPTIONS] [SUITE_TYPE]
+#
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Automated test-discovery for all project components.
@@ -14,7 +17,9 @@ set -e
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
-# Help message
+# Purpose: Displays usage information for the multi-stack test runner.
+# Examples:
+#   show_help
 show_help() {
   cat <<EOF
 Usage: $0 [OPTIONS] [SUITE_TYPE]
@@ -36,8 +41,10 @@ Suites (default: all):
 EOF
 }
 
-# Executes Shell-specific test suites using the bats framework.
+# Purpose: Executes Shell-specific test suites using the bats framework.
 # Scans the tests/ directory for .bats files.
+# Examples:
+#   run_shell_tests
 run_shell_tests() {
   if [ -d "tests" ] && find tests -name "*.bats" | grep -q .; then
     log_info "── Running Shell Tests (bats) ──"
@@ -55,8 +62,10 @@ run_shell_tests() {
   fi
 }
 
-# Executes Python-specific test suites using the pytest framework.
+# Purpose: Executes Python-specific test suites using the pytest framework.
 # Detects tests via pytest.ini, pyproject.toml, or test_*.py files.
+# Examples:
+#   run_python_tests
 run_python_tests() {
   if [ -f "pytest.ini" ] || [ -f "pyproject.toml" ] || find tests -name "test_*.py" | grep -q .; then
     log_info "── Running Python Tests (pytest) ──"
@@ -64,10 +73,10 @@ run_python_tests() {
       log_success "DRY-RUN: Would run pytest on tests/"
     else
       # shellcheck disable=SC2030
-      local _VENV_PATH
-      _VENV_PATH="${VENV:-.venv}"
-      if [ -x "$_VENV_PATH/bin/python3" ]; then
-        "$_VENV_PATH/bin/python3" -m pytest --tb=short
+      local _VENV_PATH_TST
+      _VENV_PATH_TST="${VENV:-.venv}"
+      if [ -x "$_VENV_PATH_TST/bin/python3" ]; then
+        "$_VENV_PATH_TST/bin/python3" -m pytest --tb=short
       elif command -v pytest >/dev/null 2>&1; then
         pytest --tb=short
       else
@@ -79,8 +88,10 @@ run_python_tests() {
   fi
 }
 
-# Executes PowerShell-specific test suites using the Pester framework.
+# Purpose: Executes PowerShell-specific test suites using the Pester framework.
 # Scans the tests/ directory for .Tests.ps1 files.
+# Examples:
+#   run_powershell_tests
 run_powershell_tests() {
   if [ -d "tests" ] && find tests -name "*.Tests.ps1" | grep -q .; then
     log_info "── Running PowerShell Tests (Pester) ──"
@@ -96,17 +107,21 @@ run_powershell_tests() {
   fi
 }
 
-# Argument parsing
+# Purpose: Main entry point for the multi-stack test orchestration engine.
+# Params:
+#   $@ - Command line arguments and optional suite selection
+# Examples:
+#   main --verbose python
 main() {
   # 1. Execution Context Guard
   guard_project_root
 
   # 2. Argument Parsing
-  local _SUITE="all"
-  local _arg
-  for _arg in "$@"; do
-    case "$_arg" in
-    shell | python | powershell | all) _SUITE="$_arg" ;;
+  local _SUITE_TST="all"
+  local _arg_tst
+  for _arg_tst in "$@"; do
+    case "$_arg_tst" in
+    shell | python | powershell | all) _SUITE_TST="$_arg_tst" ;;
     -q | --quiet | -v | --verbose | --dry-run | -h | --help) ;;
     esac
   done
@@ -114,7 +129,7 @@ main() {
 
   log_info "🧪 Starting Unified Test Runner...\n"
 
-  case "$_SUITE" in
+  case "$_SUITE_TST" in
   shell) run_shell_tests ;;
   python) run_python_tests ;;
   powershell) run_powershell_tests ;;

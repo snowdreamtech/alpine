@@ -8,12 +8,17 @@
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/common.sh"
 
-# Robust wrapper for individual pre-commit hooks or linters.
-# Ensures that optional linters skip gracefully if specialized tools or runtimes are missing.
-#
-# @param $1 - Linter binary/hook name (e.g., "eslint", "gofmt")
-# @param $@ - Arguments passed to the linter
-# @returns 0 if linter succeeds or is skipped; otherwise returns linter exit code.
+# Purpose: Robust wrapper for individual pre-commit hooks or linters.
+#          Ensures that optional linters skip gracefully if specialized tools
+#          or runtimes are missing, maintaining cross-platform compatibility.
+# Params:
+#   $1 - Linter binary/hook name (e.g., "eslint", "gofmt")
+#   $@ - Arguments passed to the linter
+# Returns:
+#   0 - Linter succeeds or is skipped (graceful skip)
+#   Linter Exit Code - Otherwise
+# Examples:
+#   sh scripts/lib/lint-wrapper.sh eslint --fix path/to/file.js
 main() {
   local _LINTER_WRAP="$1"
   [ -z "$_LINTER_WRAP" ] && return 0
@@ -21,27 +26,27 @@ main() {
 
   # 1. Resolve Binary Path
   # Check .venv/bin (POSIX), .venv/Scripts (Windows), node_modules/.bin, and PATH
-  local _VENV_BIN_WRAP=".venv/bin/${_LINTER_WRAP}"
-  local _VENV_SCRIPTS_WRAP=".venv/Scripts/${_LINTER_WRAP}"
-  local _VENV_EXE_BIN_WRAP=".venv/bin/${_LINTER_WRAP}.exe"
-  local _VENV_EXE_SCRIPTS_WRAP=".venv/Scripts/${_LINTER_WRAP}.exe"
-  local _NODE_BIN_WRAP="node_modules/.bin/${_LINTER_WRAP}"
-  local _NODE_CMD_WRAP="node_modules/.bin/${_LINTER_WRAP}.cmd"
+  local _VENV_BIN_PATH=".venv/bin/${_LINTER_WRAP}"
+  local _VENV_SCRIPTS_PATH=".venv/Scripts/${_LINTER_WRAP}"
+  local _VENV_EXE_BIN_PATH=".venv/bin/${_LINTER_WRAP}.exe"
+  local _VENV_EXE_SCRIPTS_PATH=".venv/Scripts/${_LINTER_WRAP}.exe"
+  local _NODE_BIN_PATH="node_modules/.bin/${_LINTER_WRAP}"
+  local _NODE_CMD_PATH="node_modules/.bin/${_LINTER_WRAP}.cmd"
 
   local _RESOLVED_BIN_WRAP=""
 
-  if [ -x "$_VENV_BIN_WRAP" ]; then
-    _RESOLVED_BIN_WRAP="$_VENV_BIN_WRAP"
-  elif [ -x "$_VENV_EXE_BIN_WRAP" ]; then
-    _RESOLVED_BIN_WRAP="$_VENV_EXE_BIN_WRAP"
-  elif [ -x "$_VENV_SCRIPTS_WRAP" ]; then
-    _RESOLVED_BIN_WRAP="$_VENV_SCRIPTS_WRAP"
-  elif [ -x "$_VENV_EXE_SCRIPTS_WRAP" ]; then
-    _RESOLVED_BIN_WRAP="$_VENV_EXE_SCRIPTS_WRAP"
-  elif [ -x "$_NODE_BIN_WRAP" ]; then
-    _RESOLVED_BIN_WRAP="$_NODE_BIN_WRAP"
-  elif [ -x "$_NODE_CMD_WRAP" ]; then
-    _RESOLVED_BIN_WRAP="$_NODE_CMD_WRAP"
+  if [ -x "$_VENV_BIN_PATH" ]; then
+    _RESOLVED_BIN_WRAP="$_VENV_BIN_PATH"
+  elif [ -x "$_VENV_EXE_BIN_PATH" ]; then
+    _RESOLVED_BIN_WRAP="$_VENV_EXE_BIN_PATH"
+  elif [ -x "$_VENV_SCRIPTS_PATH" ]; then
+    _RESOLVED_BIN_WRAP="$_VENV_SCRIPTS_PATH"
+  elif [ -x "$_VENV_EXE_SCRIPTS_PATH" ]; then
+    _RESOLVED_BIN_WRAP="$_VENV_EXE_SCRIPTS_PATH"
+  elif [ -x "$_NODE_BIN_PATH" ]; then
+    _RESOLVED_BIN_WRAP="$_NODE_BIN_PATH"
+  elif [ -x "$_NODE_CMD_PATH" ]; then
+    _RESOLVED_BIN_WRAP="$_NODE_CMD_PATH"
   elif command -v "$_LINTER_WRAP" >/dev/null 2>&1; then
     _RESOLVED_BIN_WRAP="$_LINTER_WRAP"
   fi
@@ -61,11 +66,11 @@ main() {
   dart) check_runtime dart "$_LINTER_WRAP" ;;
   gofmt | cargo | goreleaser)
     # cargo and gofmt require their respective toolchains
-    local _RT_WRAP="${_LINTER_WRAP}"
-    [ "$_LINTER_WRAP" = "cargo" ] && _RT_WRAP="cargo"
-    [ "$_LINTER_WRAP" = "gofmt" ] && _RT_WRAP="go"
-    [ "$_LINTER_WRAP" = "goreleaser" ] && _RT_WRAP="goreleaser"
-    check_runtime "$_RT_WRAP" "$_LINTER_WRAP"
+    local _RT_CHECK="${_LINTER_WRAP}"
+    [ "$_LINTER_WRAP" = "cargo" ] && _RT_CHECK="cargo"
+    [ "$_LINTER_WRAP" = "gofmt" ] && _RT_CHECK="go"
+    [ "$_LINTER_WRAP" = "goreleaser" ] && _RT_CHECK="goreleaser"
+    check_runtime "$_RT_CHECK" "$_LINTER_WRAP"
     ;;
   eslint | prettier | stylelint | spectral | sort-package-json | markdownlint-cli2 | taplo | dockerfile-utils | editorconfig-checker | commitlint)
     check_runtime node "$_LINTER_WRAP"

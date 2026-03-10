@@ -77,30 +77,61 @@ export OSV_SCANNER_VERSION TRIVY_VERSION
 # ── 📢 Standardized Logging ──────────────────────────────────────────────────
 
 # Standardized logging functions for consistent colored output.
-# @param $1 - Message to log
+#
+# Purpose: Log an informational message in blue.
+# Params:
+#   $1 - Message to log
+# Examples:
+#   log_info "Starting build process..."
 log_info() {
-  local _msg="$1"
-  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "$BLUE" "$_msg" "$NC"; fi
-}
-log_success() {
-  local _msg="$1"
-  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "$GREEN" "$_msg" "$NC"; fi
-}
-log_warn() {
-  local _msg="$1"
-  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "$YELLOW" "$_msg" "$NC"; fi
-}
-log_error() {
-  local _msg="$1"
-  printf "%s%b%s\n" "$RED" "$_msg" "$NC" >&2
-}
-log_debug() {
-  local _msg="$1"
-  if [ "${VERBOSE:-1}" -ge 2 ]; then printf "[DEBUG] %b\n" "$_msg"; fi
+  local _msg_info="$1"
+  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "$BLUE" "$_msg_info" "$NC"; fi
 }
 
-# Verifies that the current working directory is the project root.
-# Exit 1 if critical root files (Makefile or package.json) are missing.
+# Purpose: Log a success message in green.
+# Params:
+#   $1 - Message to log
+# Examples:
+#   log_success "Build completed successfully."
+log_success() {
+  local _msg_suc="$1"
+  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "$GREEN" "$_msg_suc" "$NC"; fi
+}
+
+# Purpose: Log a warning message in yellow.
+# Params:
+#   $1 - Message to log
+# Examples:
+#   log_warn "Dependency 'jq' not found. Some features may be limited."
+log_warn() {
+  local _msg_warn="$1"
+  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "$YELLOW" "$_msg_warn" "$NC"; fi
+}
+
+# Purpose: Log an error message in red to stderr.
+# Params:
+#   $1 - Message to log
+# Examples:
+#   log_error "Critical error: Database connection failed."
+log_error() {
+  local _msg_err="$1"
+  printf "%s%b%s\n" "$RED" "$_msg_err" "$NC" >&2
+}
+
+# Purpose: Log a debug message if verbose level is 2 or higher.
+# Params:
+#   $1 - Message to log
+# Examples:
+#   log_debug "Temporary path: /tmp/build-123"
+log_debug() {
+  local _msg_dbg="$1"
+  if [ "${VERBOSE:-1}" -ge 2 ]; then printf "[DEBUG] %b\n" "$_msg_dbg"; fi
+}
+
+# Purpose: Verifies that the current working directory is the project root.
+#          Exit 1 if critical root files (Makefile or package.json) are missing.
+# Examples:
+#   guard_project_root
 guard_project_root() {
   if [ ! -f "Makefile" ] && [ ! -f "package.json" ]; then
     log_error "Error: This script must be run from the project root."
@@ -108,10 +139,15 @@ guard_project_root() {
   fi
 }
 
-# Checks if a task is within its cooldown period to avoid redundant high-cost operations.
-# @param $1 - Task name (used for marker filename)
-# @param $2 - Cooldown duration in seconds (default: 86400 / 24h)
-# @returns 0 if cooldown expired (update needed), 1 if within cooldown
+# Purpose: Checks if a task is within its cooldown period.
+# Params:
+#   $1 - Task name (used for marker filename)
+#   $2 - Cooldown duration in seconds (default: 86400 / 24h)
+# Returns:
+#   0 - Cooldown expired (update needed)
+#   1 - Within cooldown (skip update)
+# Examples:
+#   if check_update_cooldown "brew" 86400; then update_brew; fi
 check_update_cooldown() {
   local _NAME_COOL="$1"
   local _DURATION_COOL="${2:-86400}" # Default: 24h
@@ -129,8 +165,11 @@ check_update_cooldown() {
   return 1
 }
 
-# Persists the current timestamp for a specific task to manage its cooldown.
-# @param $1 - Task name
+# Purpose: Persists the current timestamp for a specific task marker.
+# Params:
+#   $1 - Task name
+# Examples:
+#   save_update_timestamp "brew"
 save_update_timestamp() {
   local _NAME_TS="$1"
   local _MARKER_TS="${VENV}/.last_update_${_NAME_TS}"
@@ -138,11 +177,16 @@ save_update_timestamp() {
   date +%s >"$_MARKER_TS"
 }
 
-# Downloads a file from a URL with built-in retries and proxy fallback.
-# @param $1 - Source URL
-# @param $2 - Target destination path
-# @param $3 - Description of the item for logging
-# @returns 0 on success, 1 on fatal failure
+# Purpose: Downloads a file from a URL with built-in retries and proxy fallback.
+# Params:
+#   $1 - Source URL
+#   $2 - Target destination path
+#   $3 - Description of the item (for logging)
+# Returns:
+#   0 - Success
+#   1 - Fatal failure
+# Examples:
+#   download_url "https://example.com/tool.tar.gz" "/tmp/tool.tar.gz" "Awesome Tool"
 download_url() {
   local _URL_DL="$1"
   local _OUT_DL="$2"
@@ -181,10 +225,15 @@ download_url() {
   return 1
 }
 
-# Verifies the SHA256 checksum of a file.
-# @param $1 - Path to the file
-# @param $2 - Expected SHA256 hash
-# @returns 0 if verified, 1 on mismatch
+# Purpose: Verifies the SHA256 checksum of a file.
+# Params:
+#   $1 - Path to the file
+#   $2 - Expected SHA256 hash
+# Returns:
+#   0 - Verified
+#   1 - Mismatch
+# Examples:
+#   verify_checksum "/tmp/tool.tar.gz" "abc123def..."
 verify_checksum() {
   local _FILE_CS="$1"
   local _EXPECTED_SHA_CS="$2"
@@ -216,10 +265,13 @@ verify_checksum() {
   return 0
 }
 
-# Verifies if a required runtime or tool is available in the environment.
-# Silently exits the script (skip) if the runtime is missing, assuming it's an optional module.
-# @param $1 - Command/Binary name to check
-# @param $2 - Human-readable tool name for logging
+# Purpose: Verifies if a required runtime or tool is available in the environment.
+#          Silently EXITS the script (skip) if missing, assuming optionality.
+# Params:
+#   $1 - Command/Binary name to check
+#   $2 - Human-readable tool name (for logging)
+# Examples:
+#   check_runtime "go" "Golang Builder"
 check_runtime() {
   local _RT_NAME="$1"
   local _TOOL_DESC="${2:-Tool}"
@@ -229,8 +281,10 @@ check_runtime() {
   fi
 }
 
-# Identifies the primary package manager on macOS (Homebrew or MacPorts).
-# @returns "brew", "port", or "none"
+# Purpose: Identifies the primary package manager on macOS.
+# Returns: "brew", "port", or "none"
+# Examples:
+#   MGR=$(get_macos_pkg_mgr)
 get_macos_pkg_mgr() {
   if command -v brew >/dev/null 2>&1; then
     echo "brew"
@@ -241,25 +295,30 @@ get_macos_pkg_mgr() {
   fi
 }
 
-# Detects if the project uses a specific language based on manifest files or file extensions.
-# @param $1 - Space-separated list of manifest files (e.g., "go.mod package.json")
-# @param $2 - Space-separated list of file globs (e.g., "*.go *.ts")
-# @returns 0 if detected, 1 otherwise
+# Purpose: Detects project language affiliation based on manifests or extensions.
+# Params:
+#   $1 - Manifest files (space-separated, e.g., "go.mod package.json")
+#   $2 - File globs/extensions (space-separated, e.g., "*.go *.ts")
+# Returns:
+#   0 - Detected
+#   1 - Not detected
+# Examples:
+#   if has_lang_files "package.json" "*.ts *.js"; then echo "Node project"; fi
 has_lang_files() {
   local _FILES_LANG="$1"
   local _EXTS_LANG="$2"
 
   # 1. Check for specific config files in root
-  local _f
-  for _f in $_FILES_LANG; do
-    [ -f "$_f" ] && return 0
+  local _f_lang
+  for _f_lang in $_FILES_LANG; do
+    [ -f "$_f_lang" ] && return 0
   done
 
   # 2. Check for file extensions (recursive, maxdepth 3 for performance)
-  local _ext
-  for _ext in $_EXTS_LANG; do
+  local _ext_lang
+  for _ext_lang in $_EXTS_LANG; do
     # Use find for POSIX compatibility and performance
-    if [ "$(find . -maxdepth 3 -name "$_ext" -print -quit 2>/dev/null)" ]; then
+    if [ "$(find . -maxdepth 3 -name "$_ext_lang" -print -quit 2>/dev/null)" ]; then
       return 0
     fi
   done
@@ -267,8 +326,10 @@ has_lang_files() {
   return 1
 }
 
-# Dynamically detects the project version from various manifests (package.json, Cargo.toml, pyproject.toml, VERSION).
-# @returns The detected version string (e.g., "1.2.3") or "0.0.0" as fallback.
+# Purpose: Dynamically extracts the project version from manifest files.
+# Returns: Version string (detected) or "0.0.0" (fallback).
+# Examples:
+#   VER=$(get_project_version)
 get_project_version() {
   if [ -f "$PACKAGE_JSON" ]; then
     grep '"version":' "$PACKAGE_JSON" | head -n 1 | sed 's/.*"version":[[:space:]]*"//;s/".*//'
@@ -288,20 +349,23 @@ get_project_version() {
   fi
 }
 
-# Executes an npm/pnpm script while preventing infinite recursion if the script delegates back to itself.
-# @param $1 - Name of the script to run (e.g., "test", "build")
+# Purpose: Executes an npm/pnpm script with infinite-recursion detection.
+# Params:
+#   $1 - Name of the npm script (e.g., "test")
+# Examples:
+#   run_npm_script "test"
 run_npm_script() {
   local _SCRIPT_NAME_NPM="$1"
-  local _CURRENT_SCRIPT_NPM
-  _CURRENT_SCRIPT_NPM=$(basename "$0")
+  local _CURRENT_BASENAME_NPM
+  _CURRENT_BASENAME_NPM=$(basename "$0")
 
   if [ -f "$PACKAGE_JSON" ]; then
     local _CMD_NPM
     _CMD_NPM=$(grep "\"$_SCRIPT_NAME_NPM\":" "$PACKAGE_JSON" | sed "s/.*\"$_SCRIPT_NAME_NPM\":[[:space:]]*\"//;s/\".*//" || true)
     if [ -n "$_CMD_NPM" ]; then
       # Avoid infinite loop if the command points back to this script
-      if echo "$_CMD_NPM" | grep -q "$_CURRENT_SCRIPT_NPM"; then
-        log_debug "npm script '$_SCRIPT_NAME_NPM' is a self-reference to '$_CURRENT_SCRIPT_NPM'. Skipping."
+      if echo "$_CMD_NPM" | grep -q "$_CURRENT_BASENAME_NPM"; then
+        log_debug "npm script '$_SCRIPT_NAME_NPM' is a self-reference to '$_CURRENT_BASENAME_NPM'. Skipping."
         return 0
       fi
       log_info "── Running Node.js script: $NPM $_SCRIPT_NAME_NPM ──"
@@ -312,8 +376,11 @@ run_npm_script() {
   return 0
 }
 
-# Executes a command while suppressing output if the quiet flag (-q/--quiet) is active.
-# @param $@ - Command and arguments to execute
+# Purpose: Executes a command while suppressing output in quiet mode.
+# Params:
+#   $@ - Command and arguments
+# Examples:
+#   run_quiet git rev-parse --is-inside-work-tree
 run_quiet() {
   if [ "${VERBOSE:-1}" -eq 0 ]; then
     "$@" >/dev/null 2>&1
@@ -322,10 +389,15 @@ run_quiet() {
   fi
 }
 
-# Performs an atomic file swap using the Build-then-Swap pattern.
-# @param $1 - Source (temporary) file path
-# @param $2 - Target destination path
-# @returns 0 on success, 1 if source is missing
+# Purpose: Performs an atomic file replacement (Build-then-Swap).
+# Params:
+#   $1 - Source (temporary) file
+#   $2 - Target destination
+# Returns:
+#   0 - Success
+#   1 - Source missing
+# Examples:
+#   atomic_swap "new_config.json.tmp" "config.json"
 atomic_swap() {
   local _SRC_ATOMIC="$1"
   local _DST_ATOMIC="$2"
@@ -337,13 +409,15 @@ atomic_swap() {
   mv "$_SRC_ATOMIC" "$_DST_ATOMIC"
 }
 
-# Standardizes argument parsing for global flags across all project scripts.
-# Handles: --dry-run, -q/--quiet, -v/--verbose, -h/--help
-# @param $@ - Script arguments
+# Purpose: Orchestrates global argument parsing for all project scripts.
+# Params:
+#   $@ - Command-line arguments
+# Examples:
+#   parse_common_args "$@"
 parse_common_args() {
-  local _arg_parse
-  for _arg_parse in "$@"; do
-    case "$_arg_parse" in
+  local _arg_common
+  for _arg_common in "$@"; do
+    case "$_arg_common" in
     --dry-run)
       # shellcheck disable=SC2034
       DRY_RUN=1
@@ -365,15 +439,17 @@ parse_common_args() {
     esac
   done
 }
-# ── Summary Helpers ─────────────────────────────────────────────────────────
 
-# Appends a standardized status row to the shared summary report.
-# @param $1 - Category (e.g., "Runtime", "Tool", "Audit")
-# @param $2 - Module name (e.g., "Node.js", "Gitleaks")
-# @param $3 - Status indicator (e.g., "✅ Success", "❌ Failed")
-# @param $4 - Version detected (or "-" if N/A)
-# @param $5 - Duration in seconds
-# @param $6 - Override path to summary file (internal use)
+# Purpose: Appends a status record to the centralized execution summary.
+# Params:
+#   $1 - Category (Runtime, Tool, Audit)
+#   $2 - Module name (Node.js, Gitleaks)
+#   $3 - Status indicator (✅ Success, ❌ Failed)
+#   $4 - Version (or "-")
+#   $5 - Duration (seconds)
+#   $6 - Summary file path (optional)
+# Examples:
+#   log_summary "Security" "Gitleaks" "✅ Clean" "v8.1.0" "5"
 log_summary() {
   local _CAT_SUM="${1:-Other}"
   local _MOD_SUM="${2:-Unknown}"
@@ -401,10 +477,14 @@ log_summary() {
   printf "| %-12s | %-15s | %-20s | %-15s | %-6s |\n" "$_CAT_SUM" "$_MOD_SUM" "$_STAT_SUM" "$_VER_SUM" "${_DUR_SUM}s" >>"$_FILE_SUM"
 }
 
-# Safely extracts the version string from a binary or command.
-# @param $1 - Command or binary path
-# @param $2 - Version argument (default: --version)
-# @returns The extracted version number or "-" if not detected.
+# Purpose: Safely extracts version strings from various command outputs.
+# Params:
+#   $1 - Binary/Command path
+#   $2 - Selection argument (default: --version)
+# Returns:
+#   Detected version or "-"
+# Examples:
+#   V=$(get_version "node")
 get_version() {
   local _CMD_VER="$1"
   local _ARG_VER="${2:---version}"

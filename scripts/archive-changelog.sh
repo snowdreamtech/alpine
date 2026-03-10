@@ -1,10 +1,16 @@
 #!/bin/sh
 # scripts/archive-changelog.sh - Automate major-version changelog archiving
 # This script moves entries of previous major versions from CHANGELOG.md to archival files.
-# Features: POSIX compliant, Atomic Operations, Deduplication, Safety Traps,
-#           History Sorting, Universal Versioning, Subdirectory Support, Concurrency Lock,
-#           Smart Directory Discovery, ANSI Colored Output, Verbosity Control,
-#           GitHub Actions Job Summary, Execution Context Guard, Multi-Language Versioning.
+#
+# Usage:
+#   sh scripts/archive-changelog.sh [OPTIONS]
+#
+# Features:
+#   - POSIX compliant, encapsulated main() pattern.
+#   - Atomic Operations & Safety Traps (atomic_swap).
+#   - Deduplication and History Sorting logic.
+#   - Universal Versioning & Multi-Language Support.
+#   - GitHub Actions Job Summary integration.
 
 set -e
 
@@ -12,6 +18,53 @@ set -e
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
+# ── Functions ────────────────────────────────────────────────────────────────
+
+# Purpose: Displays usage information for the changelog archival manager.
+# Examples:
+#   show_help
+show_help() {
+  cat <<EOF
+Usage: $0 [OPTIONS]
+
+Automates the archival of old major versions from CHANGELOG.md.
+
+Options:
+  --dry-run        Preview archival actions without modifying files.
+  -q, --quiet      Suppress informational output.
+  -v, --verbose    Enable verbose/debug output.
+  -h, --help       Show this help message.
+
+EOF
+}
+
+# Purpose: Safely removes temporary files and releases concurrency locks.
+# Params:
+#   $1 - Temporary header file
+#   $2 - New changelog file
+#   $3 - Temporary summary file
+#   $4 - Temporary archive directory
+#   $5 - Dry run flag
+# Examples:
+#   run_archival_cleanup "$_TMP_HEADER" "$_NEW_CHANGELOG" "$_TMP_SUMMARY" "$_TMP_ARCHIVE_PREFIX" "$DRY_RUN"
+run_archival_cleanup() {
+  local _TMP_HEADER_CLN="$1"
+  local _NEW_CHANGELOG_CLN="$2"
+  local _TMP_SUMMARY_CLN="$3"
+  local _TMP_ARCH_DIR_CLN="$4"
+  local _DRY_RUN_CLN="$5"
+
+  log_debug "Cleaning up temporary files..."
+  rm -f "$_TMP_HEADER_CLN" "$_NEW_CHANGELOG_CLN" "$_TMP_SUMMARY_CLN"
+  rm -rf "$_TMP_ARCH_DIR_CLN"
+  [ "$_DRY_RUN_CLN" -eq 0 ] && rmdir "$LOCK_DIR" 2>/dev/null || true
+}
+
+# Purpose: Main entry point for the changelog archival engine.
+# Params:
+#   $@ - Command line arguments
+# Examples:
+#   main --dry-run
 main() {
   # 1. Execution Context Guard: Ensure we are in the project root
   guard_project_root
@@ -26,15 +79,14 @@ main() {
   log_info "💧 Starting Changelog Archival Process...\n"
 
   # Smart Directory Discovery
-  # shellcheck disable=SC2153
-  local _ARCHIVE_DIR="$ARCHIVE_DIR"
-  if [ -z "$_ARCHIVE_DIR" ]; then
+  local _REL_ARCHIVE_DIR="$ARCHIVE_DIR"
+  if [ -z "$_REL_ARCHIVE_DIR" ]; then
     if [ -d "docs/changelogs" ]; then
-      _ARCHIVE_DIR="docs/changelogs"
+      _REL_ARCHIVE_DIR="docs/changelogs"
     elif [ -d "changelogs" ]; then
-      _ARCHIVE_DIR="changelogs"
+      _REL_ARCHIVE_DIR="changelogs"
     else
-      _ARCHIVE_DIR="."
+      _REL_ARCHIVE_DIR="."
     fi
   fi
 
@@ -47,67 +99,59 @@ main() {
     log_debug "Lock acquired: $LOCK_DIR"
   fi
 
-  # Cleanup on exit
-  local _TMP_HEADER
-  local _TMP_ARCHIVE_PREFIX
-  local _NEW_CHANGELOG
-  local _TMP_SUMMARY
-  _TMP_HEADER=$(mktemp)
-  _TMP_ARCHIVE_PREFIX=$(mktemp -d)
-  _NEW_CHANGELOG=$(mktemp)
-  # For Job Summary
-  _TMP_SUMMARY=$(mktemp)
+  # Preparation of local scratch variables
+  local _TMP_HDR
+  local _TMP_ARCH_PFX
+  local _NEW_CHLOG
+  local _TMP_SUM
+  _TMP_HDR=$(mktemp)
+  _TMP_ARCH_PFX=$(mktemp -d)
+  _NEW_CHLOG=$(mktemp)
+  _TMP_SUM=$(mktemp)
 
-  cleanup() {
-    local _exit_code=$?
-    log_debug "Cleaning up temporary files..."
-    rm -f "$_TMP_HEADER" "$_NEW_CHANGELOG" "$_TMP_SUMMARY"
-    rm -rf "$_TMP_ARCHIVE_PREFIX"
-    [ "$DRY_RUN" -eq 0 ] && rmdir "$LOCK_DIR" 2>/dev/null || true
-    return "$_exit_code"
-  }
-  trap cleanup EXIT INT TERM
+  # Setup Trap for cleanup
+  trap 'run_archival_cleanup "$_TMP_HDR" "$_NEW_CHLOG" "$_TMP_SUM" "$_TMP_ARCH_PFX" "$DRY_RUN"' EXIT INT TERM
 
   # Get current major version (Universal Source)
-  local _RAW_V
-  _RAW_V=$(get_project_version)
-  case "$_RAW_V" in
+  local _RAW_VER_ARCH
+  _RAW_VER_ARCH=$(get_project_version)
+  case "$_RAW_VER_ARCH" in
   '' | '-' | 'null')
     log_warn "Could not determine version from project files. Falling back to Git tags..."
-    local _GIT_TAG
-    _GIT_TAG=$(git describe --tags --abbrev=0 2>/dev/null || true)
-    _RAW_V="$_GIT_TAG"
+    local _GIT_TAG_ARCH
+    _GIT_TAG_ARCH=$(git describe --tags --abbrev=0 2>/dev/null || true)
+    _RAW_VER_ARCH="$_GIT_TAG_ARCH"
     ;;
   esac
 
   # Extract major version
-  local _CURRENT_MAJOR
-  _CURRENT_MAJOR=$(echo "$_RAW_V" | sed 's/^v//' | cut -d. -f1)
+  local _CURRENT_MAJOR_ARCH
+  _CURRENT_MAJOR_ARCH=$(echo "$_RAW_VER_ARCH" | sed 's/^v//' | cut -d. -f1)
 
   # Input Validation
-  case "$_CURRENT_MAJOR" in
+  case "$_CURRENT_MAJOR_ARCH" in
   '' | *[!0-9]*)
-    log_error "Error: Could not determine a valid numeric major version (Found: '$_CURRENT_MAJOR' from '$_RAW_V')"
+    log_error "Error: Could not determine a valid numeric major version (Found: '$_CURRENT_MAJOR_ARCH' from '$_RAW_VER_ARCH')"
     exit 1
     ;;
   esac
 
-  log_info "Targeting major version: $_CURRENT_MAJOR"
+  log_info "Targeting major version: $_CURRENT_MAJOR_ARCH"
 
   # 1. Extract the header (everything up to the first version header)
-  local _FIRST_H2_LINE
-  _FIRST_H2_LINE=$(grep -n "^## \[" "$CHANGELOG" | head -n1 | cut -d: -f1)
-  if [ -z "$_FIRST_H2_LINE" ]; then
+  local _FIRST_H2_LINE_ARCH
+  _FIRST_H2_LINE_ARCH=$(grep -n "^## \[" "$CHANGELOG" | head -n1 | cut -d: -f1)
+  if [ -z "$_FIRST_H2_LINE_ARCH" ]; then
     log_warn "No version headers found in $CHANGELOG. Nothing to archive."
     return 0
   fi
 
-  log_debug "Header ends at line $_FIRST_H2_LINE"
-  head -n "$((_FIRST_H2_LINE - 1))" "$CHANGELOG" >"$_TMP_HEADER"
+  log_debug "Header ends at line $_FIRST_H2_LINE_ARCH"
+  head -n "$((_FIRST_H2_LINE_ARCH - 1))" "$CHANGELOG" >"$_TMP_HDR"
 
   # 2. Process all versions using a portable awk approach
   log_info "Scanning $CHANGELOG for older major versions..."
-  tail -n +"$_FIRST_H2_LINE" "$CHANGELOG" | awk -v major="$_CURRENT_MAJOR" -v prefix="$_TMP_ARCHIVE_PREFIX" '
+  tail -n +"$_FIRST_H2_LINE_ARCH" "$CHANGELOG" | awk -v major="$_CURRENT_MAJOR_ARCH" -v prefix="$_TMP_ARCH_PFX" '
     /^## History/ { skip_history = 1; next; }
     /^## \[/ {
       skip_history = 0;
@@ -136,31 +180,32 @@ main() {
   '
 
   # 3. Preparation for rebuild (Atomic)
-  cat "$_TMP_HEADER" >"$_NEW_CHANGELOG"
-  if [ -f "$_TMP_ARCHIVE_PREFIX/current.md" ]; then
+  cat "$_TMP_HDR" >"$_NEW_CHLOG"
+  if [ -f "$_TMP_ARCH_PFX/current.md" ]; then
     log_debug "Preserving current major version content."
-    cat "$_TMP_ARCHIVE_PREFIX/current.md" >>"$_NEW_CHANGELOG"
+    cat "$_TMP_ARCH_PFX/current.md" >>"$_NEW_CHLOG"
   fi
 
   # 4. Handle archives with deduplication
-  printf "### Archival Execution Summary\n\n" >"$_TMP_SUMMARY"
-  printf "| Major Version | Action | Destination |\n" >>"$_TMP_SUMMARY"
-  printf "| :--- | :--- | :--- |\n" >>"$_TMP_SUMMARY"
-  local _ARCHIVE_COUNT=0
+  printf "### Archival Execution Summary\n\n" >"$_TMP_SUM"
+  printf "| Major Version | Action | Destination |\n" >>"$_TMP_SUM"
+  printf "| :--- | :--- | :--- |\n" >>"$_TMP_SUM"
+  local _ARCHIVE_COUNT_ARCH=0
 
-  local _arch_file
-  for _arch_file in "$_TMP_ARCHIVE_PREFIX"/v*.md; do
-    [ -e "$_arch_file" ] || continue
+  local _arch_file_iter
+  for _arch_file_iter in "$_TMP_ARCH_PFX"/v*.md; do
+    [ -e "$_arch_file_iter" ] || continue
 
-    _V_TAG=$(basename "$_arch_file" .md)
-    local _V_NUM
-    _V_NUM=$(echo "$_V_TAG" | sed 's/^v//')
-    local _FINAL_ARCH_FILE="$_ARCHIVE_DIR/CHANGELOG-v$_V_NUM.md"
-    log_debug "Processing archival block for major version $_V_NUM..."
+    local _V_TAG_PROC
+    _V_TAG_PROC=$(basename "$_arch_file_iter" .md)
+    local _V_NUM_PROC
+    _V_NUM_PROC=$(echo "$_V_TAG_PROC" | sed 's/^v//')
+    local _FINAL_ARCH_FILE="$_REL_ARCHIVE_DIR/CHANGELOG-v$_V_NUM_PROC.md"
+    log_debug "Processing archival block for major version $_V_NUM_PROC..."
 
     if [ -f "$_FINAL_ARCH_FILE" ]; then
-      local _FILTERED_CONTENT
-      _FILTERED_CONTENT=$(mktemp)
+      local _FILTERED_CONTENT_ARCH
+      _FILTERED_CONTENT_ARCH=$(mktemp)
       awk -v arch="$_FINAL_ARCH_FILE" '
         BEGIN {
           while ((getline line < arch) > 0) {
@@ -173,94 +218,94 @@ main() {
           else { skip = 0; }
         }
         { if (!skip) print; }
-      ' "$_arch_file" >"$_FILTERED_CONTENT"
+      ' "$_arch_file_iter" >"$_FILTERED_CONTENT_ARCH"
 
-      if [ -s "$_FILTERED_CONTENT" ]; then
+      if [ -s "$_FILTERED_CONTENT_ARCH" ]; then
         if [ "$DRY_RUN" -eq 1 ]; then
           log_warn "DRY-RUN: Would prepend new entries to $_FINAL_ARCH_FILE"
-          printf "| v%s | Prepend (Dry Run) | %s |\n" "$_V_NUM" "$_FINAL_ARCH_FILE" >>"$_TMP_SUMMARY"
+          printf "| v%s | Prepend (Dry Run) | %s |\n" "$_V_NUM_PROC" "$_FINAL_ARCH_FILE" >>"$_TMP_SUM"
         else
           log_info "Updating archive: $_FINAL_ARCH_FILE"
-          local _tmp_arch
-          _tmp_arch=$(mktemp)
-          cat "$_FILTERED_CONTENT" >"$_tmp_arch"
-          printf "\n" >>"$_tmp_arch"
-          sed '1,2d' "$_FINAL_ARCH_FILE" >>"$_tmp_arch"
-          atomic_swap "$_tmp_arch" "$_FINAL_ARCH_FILE"
-          printf "| v%s | Updated | %s |\n" "$_V_NUM" "$_FINAL_ARCH_FILE" >>"$_TMP_SUMMARY"
+          local _tmp_arch_swap
+          _tmp_arch_swap=$(mktemp)
+          cat "$_FILTERED_CONTENT_ARCH" >"$_tmp_arch_swap"
+          printf "\n" >>"$_tmp_arch_swap"
+          sed '1,2d' "$_FINAL_ARCH_FILE" >>"$_tmp_arch_swap"
+          atomic_swap "$_tmp_arch_swap" "$_FINAL_ARCH_FILE"
+          printf "| v%s | Updated | %s |\n" "$_V_NUM_PROC" "$_FINAL_ARCH_FILE" >>"$_TMP_SUM"
         fi
-        _ARCHIVE_COUNT=$((_ARCHIVE_COUNT + 1))
+        _ARCHIVE_COUNT_ARCH=$((_ARCHIVE_COUNT_ARCH + 1))
       else
-        log_debug "No new entries for v$_V_NUM, skipping."
+        log_debug "No new entries for v$_V_NUM_PROC, skipping."
       fi
-      rm -f "$_FILTERED_CONTENT"
+      rm -f "$_FILTERED_CONTENT_ARCH"
     else
       if [ "$DRY_RUN" -eq 1 ]; then
         log_warn "DRY-RUN: Would create $_FINAL_ARCH_FILE"
-        printf "| v%s | Create (Dry Run) | %s |\n" "$_V_NUM" "$_FINAL_ARCH_FILE" >>"$_TMP_SUMMARY"
+        printf "| v%s | Create (Dry Run) | %s |\n" "$_V_NUM_PROC" "$_FINAL_ARCH_FILE" >>"$_TMP_SUM"
       else
         log_success "Creating new archive: $_FINAL_ARCH_FILE"
-        mkdir -p "$_ARCHIVE_DIR"
-        printf "# Changelog Archive v%s\n\n" "$_V_NUM" >"$_FINAL_ARCH_FILE"
-        cat "$_arch_file" >>"$_FINAL_ARCH_FILE"
-        printf "| v%s | Created | %s |\n" "$_V_NUM" "$_FINAL_ARCH_FILE" >>"$_TMP_SUMMARY"
+        mkdir -p "$_REL_ARCHIVE_DIR"
+        printf "# Changelog Archive v%s\n\n" "$_V_NUM_PROC" >"$_FINAL_ARCH_FILE"
+        cat "$_arch_file_iter" >>"$_FINAL_ARCH_FILE"
+        printf "| v%s | Created | %s |\n" "$_V_NUM_PROC" "$_FINAL_ARCH_FILE" >>"$_TMP_SUM"
       fi
-      _ARCHIVE_COUNT=$((_ARCHIVE_COUNT + 1))
+      _ARCHIVE_COUNT_ARCH=$((_ARCHIVE_COUNT_ARCH + 1))
     fi
   done
 
-  if [ "$_ARCHIVE_COUNT" -eq 0 ]; then
-    printf "| N/A | No changes required | %s is up to date |\n" "$CHANGELOG" >>"$_TMP_SUMMARY"
+  if [ "$_ARCHIVE_COUNT_ARCH" -eq 0 ]; then
+    printf "| N/A | No changes required | %s is up to date |\n" "$CHANGELOG" >>"$_TMP_SUM"
   fi
 
-  # 5. Rebuild History section in NEW_CHANGELOG (Sorted)
-  log_info "Rebuilding History section (Archive Directory: $_ARCHIVE_DIR)..."
-  local _HISTORY_LINKS_TMP
-  _HISTORY_LINKS_TMP=$(mktemp)
-  # Check filesystem for existing archives in ARCHIVE_DIR
-  local _f
-  for _f in "$_ARCHIVE_DIR"/CHANGELOG-v*.md; do
-    [ -e "$_f" ] || continue
-    local _FILE_NAME
-    _FILE_NAME=$(basename "$_f")
-    local _V_NUM_PROC
-    _V_NUM_PROC=$(echo "$_FILE_NAME" | sed 's/^CHANGELOG-v//;s/\.md$//')
-    printf "%s|%s\n" "$_V_NUM_PROC" "- [v$_V_NUM_PROC.x.x Archive](./$_f)" >>"$_HISTORY_LINKS_TMP"
+  # 5. Rebuild History section in NEW_CHLOG (Sorted)
+  log_info "Rebuilding History section (Archive Directory: $_REL_ARCHIVE_DIR)..."
+  local _HISTORY_LINKS_SCRATCH
+  _HISTORY_LINKS_SCRATCH=$(mktemp)
+  # Check filesystem for existing archives in _REL_ARCHIVE_DIR
+  local _f_hist
+  for _f_hist in "$_REL_ARCHIVE_DIR"/CHANGELOG-v*.md; do
+    [ -e "$_f_hist" ] || continue
+    local _F_NAME_HIST
+    _F_NAME_HIST=$(basename "$_f_hist")
+    local _V_NUM_HIST
+    _V_NUM_HIST=$(echo "$_F_NAME_HIST" | sed 's/^CHANGELOG-v//;s/\.md$//')
+    printf "%s|%s\n" "$_V_NUM_HIST" "- [v$_V_NUM_HIST.x.x Archive](./$_f_hist)" >>"$_HISTORY_LINKS_SCRATCH"
   done
 
-  # Merge with newly planned archives from TMP_ARCHIVE_PREFIX
-  for _f in "$_TMP_ARCHIVE_PREFIX"/v*.md; do
-    [ -e "$_f" ] || continue
-    local _V_NUM_PROC
-    _V_NUM_PROC=$(echo "$_f" | sed 's|^.*/v||;s/.md$//')
-    local _LINK
-    _LINK="- [v$_V_NUM_PROC.x.x Archive](./$_ARCHIVE_DIR/CHANGELOG-v$_V_NUM_PROC.md)"
+  # Merge with newly planned archives from _TMP_ARCH_PFX
+  for _f_hist in "$_TMP_ARCH_PFX"/v*.md; do
+    [ -e "$_f_hist" ] || continue
+    local _V_NUM_HIST
+    _V_NUM_HIST=$(echo "$_f_hist" | sed 's|^.*/v||;s/.md$//')
+    local _LINK_HIST
+    _LINK_HIST="- [v$_V_NUM_HIST.x.x Archive](./$_REL_ARCHIVE_DIR/CHANGELOG-v$_V_NUM_HIST.md)"
     # Normalize link paths (remove repeated ./)
-    _LINK=$(echo "$_LINK" | sed 's|\./\./|\./|g')
-    if ! grep -qF -- "$_LINK" "$_HISTORY_LINKS_TMP" 2>/dev/null; then
-      printf "%s|%s\n" "$_V_NUM_PROC" "$_LINK" >>"$_HISTORY_LINKS_TMP"
+    _LINK_HIST=$(echo "$_LINK_HIST" | sed 's|\./\./|\./|g')
+    if ! grep -qF -- "$_LINK_HIST" "$_HISTORY_LINKS_SCRATCH" 2>/dev/null; then
+      printf "%s|%s\n" "$_V_NUM_HIST" "$_LINK_HIST" >>"$_HISTORY_LINKS_SCRATCH"
     fi
   done
 
-  if [ -s "$_HISTORY_LINKS_TMP" ]; then
-    printf "\n## History\n" >>"$_NEW_CHANGELOG"
-    sort -t'|' -k1,1nr "$_HISTORY_LINKS_TMP" | cut -d'|' -f2 >>"$_NEW_CHANGELOG"
+  if [ -s "$_HISTORY_LINKS_SCRATCH" ]; then
+    printf "\n## History\n" >>"$_NEW_CHLOG"
+    sort -t'|' -k1,1nr "$_HISTORY_LINKS_SCRATCH" | cut -d'|' -f2 >>"$_NEW_CHLOG"
   fi
-  rm -f "$_HISTORY_LINKS_TMP"
+  rm -f "$_HISTORY_LINKS_SCRATCH"
 
   # 6. Final Swap (Atomic)
   if [ "$DRY_RUN" -eq 1 ]; then
     log_warn "DRY-RUN: History section preview:"
-    grep -A 100 "^## History" "$_NEW_CHANGELOG" || true
+    grep -A 100 "^## History" "$_NEW_CHLOG" || true
   else
-    atomic_swap "$_NEW_CHANGELOG" "$CHANGELOG"
+    atomic_swap "$_NEW_CHLOG" "$CHANGELOG"
     log_success "Successfully updated $CHANGELOG"
   fi
 
   # 7. Write to GITHUB_STEP_SUMMARY if available
   if [ -n "$GITHUB_STEP_SUMMARY" ]; then
     log_debug "Writing to GITHUB_STEP_SUMMARY..."
-    cat "$_TMP_SUMMARY" >>"$GITHUB_STEP_SUMMARY"
+    cat "$_TMP_SUM" >>"$GITHUB_STEP_SUMMARY"
   fi
 }
 
