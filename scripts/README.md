@@ -26,31 +26,42 @@ This component provides a suite of cross-platform scripts to manage the developm
    /     |       \
   /      |        \
 [lib/common.sh] [lib/lint-wrapper.sh] [Windows Wrappers]
-(Utils/SSoT)    (Hook Mediation)      (.bat, .ps1)
+(Utils/SSoT)    (Hook Mediation)      (.ps1, .bat)
 ```
 
 ### Design Principles
 
 - **SSoT**: Logic is never duplicated between `.sh` and `.ps1`.
-- **Idempotent**: Scripts can be run multiple times safely.
+- **Auditable**: Every decision is traceable via detailed logging and exit codes.
+- **Idempotent**: Scripts can be run multiple times safely without side effects.
 - **Fail-Fast**: Immediate exit on error with clear diagnostics.
-- **Portable**: Adheres to POSIX shell standards for universal compatibility.
+- **Lean**: Zero-dependency for core logic where possible (uses `sh`, `sed`, `awk`).
+
+### Responsibilities
+
+- **Environment Provisioning**: Installing runtimes and quality tools (`setup.sh`).
+- **Dependency Management**: Standardizing installation across stacks (`install.sh`).
+- **Quality Assurance**: Orchestrating linting, testing, and security audits (`verify.sh`).
+- **Lifecycle Automation**: Handling commits, releases, and changelog archival.
 
 ## 2. Usage Guide
 
 ### Prerequisites
 
-- **POSIX Shell** (standard on Linux/macOS; Git Bash or WSL on Windows)
-- **PowerShell 5.1+** (for Windows wrappers)
-- **Make** (optional, provides convenient entry points)
+- **POSIX Shell** (Standard on Linux/macOS; Git Bash or WSL on Windows)
+- **PowerShell 5.1+** (For Windows wrappers)
+- **Make** (Optional, provides convenient entry points)
 
 ### Quick Start
 
 ```bash
-# Setup development environment
+# 1. Setup development environment
 sh scripts/setup.sh
 
-# Verify environment health
+# 2. Install project dependencies
+sh scripts/install.sh
+
+# 3. Verify environment health
 sh scripts/verify.sh
 ```
 
@@ -77,36 +88,87 @@ sh scripts/verify.sh
 | `init-project.sh`      | Rebrand template              | placeholders, git init       |
 | `archive-changelog.sh` | Archive old versions          | major version rotation       |
 
+### Workflow Patterns
+
+1. **Onboarding**: `setup.sh` → `install.sh` → `verify.sh`.
+2. **Daily Development**: Work → `lint.sh` → `test.sh` → `commit.sh`.
+3. **Continuous Integration**: `check-env.sh` → `test.sh` → `build.sh`.
+
+### Directory Structure
+
+- `scripts/`: Primary automation entry points.
+- `scripts/lib/`: Internal libraries (`common.sh` for logic, `common.ps1` for delegation).
+- `scripts/*.ps1` & `scripts/*.bat`: Windows entry wrappers.
+
 ## 3. Operations Guide
+
+### Pre-deployment Checklist
+
+1. [ ] Run `sh scripts/check-env.sh` to ensure runtime parity.
+2. [ ] Run `sh scripts/verify.sh` for final QA pass.
+3. [ ] Run `sh scripts/audit.sh` to ensure no secrets or critical vulnerabilities.
+
+### Performance Considerations
+
+- **Parallelism**: Scripts run sequentially to ensure deterministic log ordering.
+- **Throttling**: `update.sh` uses a 24-hour cooldown period to prevent network abuse.
+- **Caching**: Virtualenvs (`.venv`) and `node_modules` are reused across runs.
 
 ### Troubleshooting
 
-- **Permission Denied**: Run `chmod +x scripts/*.sh`.
-- **Windows Script Execution**: If `.ps1` fails, run `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`.
-- **Killed (Exit 137)**: Usually indicates a corrupted binary or OOM. Run `rm .venv/bin/<tool>` and re-run setup.
-- **Proxy/Network Issues**: If downloads fail, the script will automatically retry with a proxy fallback. Ensure `GITHUB_PROXY` is configured if needed.
+- **Problem**: Permission Denied.
+  - **Solution**: Run `chmod +x scripts/*.sh`.
+- **Problem**: Windows Script Execution Failure.
+  - **Solution**: Run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
+- **Problem**: 404/Network failure during download.
+  - **Diagnosis**: Check if `GITHUB_PROXY` is reachable.
+  - **Solution**: Configure `GITHUB_PROXY` in `scripts/lib/common.sh` or env.
+
+### Maintenance Procedures
+
+- **Tool Updates**: Run `sh scripts/update.sh` weekly.
+- **Cache Purge**: Run `sh scripts/cleanup.sh` to reclaim disk space.
 
 ## 4. Security Considerations
 
-- **No Sudo Requirement**: Most scripts install tools into the project-local `.venv/bin` or user-local directories to minimize system-wide impact.
-- **Checksum Logic**: Critical installation functions verify binary existence and basic functionality.
-- **Gitleaks Integration**: `audit.sh` and pre-commit hooks ensure no secrets are committed to the repository.
-- **Execution Policy**: Windows wrappers use `-ExecutionPolicy Bypass` to ensure functionality without compromising system-wide security settings.
+### Security Model
+
+- **Principle of Least Privilege**: Scripts install tools to `.venv` or user directory; no `sudo` required.
+- **Validation**: Sub-scripts include checksum verification for external assets.
+- **Secret Hygiene**: Gitleaks integration prevents accidental credential leaks.
+
+### Best Practices
+
+| Aspect           | Requirement                 | Implementation            |
+| :--------------- | :-------------------------- | :------------------------ |
+| File Permissions | Scripts must be executable  | `chmod 755 scripts/*.sh`  |
+| Secret Integrity | No hardcoded keys           | Source from `.env` only   |
+| Proxy Handling   | Secure download gateway     | `GITHUB_PROXY` via TLS    |
+| Windows Security | Signed or restricted policy | `-ExecutionPolicy Bypass` |
 
 ## 5. Development Guide
 
-### Adding New Scripts
+### Code Organization
 
-1. Create the POSIX logic in `scripts/my-script.sh`.
-2. Source `scripts/lib/common.sh`.
-3. Use `guard_project_root` and `parse_common_args`.
-4. Create `.ps1` and `.bat` wrappers following the delegation template in `.agent/rules/shell.md`.
+- New logic MUST be added to a new `.sh` file in `scripts/`.
+- Shared utility functions MUST be placed in `scripts/lib/common.sh`.
+- Variables MUST be localized using `local` inside functions.
 
-### Library Usage
+### Contribution Requirements
 
-The `scripts/lib/common.sh` provides:
+1. All new scripts MUST include a `main()` function and call `parse_common_args`.
+2. All new scripts MUST pass `shellcheck --shell=sh`.
+3. All new scripts MUST provide `.ps1` and `.bat` wrappers for delegation.
+4. Keep English/Chinese README versions in sync.
 
-- `log_info`, `log_success`, `log_warn`, `log_error`: Colored logging.
-- `download_url`: Robust downloading with retries.
-- `atomic_swap`: Secure file replacement.
-- `check_update_cooldown`: 24h throttling for heavy tasks.
+### Local Development Setup
+
+1. Install ShellCheck: `brew install shellcheck`.
+2. Install PSScriptAnalyzer (on Windows): `Install-Module -Name PSScriptAnalyzer`.
+3. Run `make lint` to verify compliance.
+
+### References
+
+- [POSIX Standard](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html)
+- [ShellCheck Wiki](https://github.com/koalaman/shellcheck/wiki)
+- [PowerShell Guidelines](https://docs.microsoft.com/en-us/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands)

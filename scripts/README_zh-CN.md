@@ -32,25 +32,36 @@
 ### 设计原则
 
 - **SSoT (单一事实来源)**: 逻辑绝不会在 `.sh` 和 `.ps1` 之间重复。
-- **幂等性**: 脚本可以安全地多次运行。
+- **可审计性**: 通过详细的日志和退出状态码确保所有决策可追溯。
+- **幂等性**: 脚本可以安全地多次运行，无副作用。
 - **快速失败**: 出错时立即退出并提供明确的诊断信息。
-- **可移植性**: 遵循 POSIX shell 标准，确保通用兼容性。
+- **精简性**: 核心逻辑尽可能零依赖（仅依赖 `sh`, `sed`, `awk`）。
+
+### 职责范围
+
+- **环境调配**: 安装运行时工具链与质量工具 (`setup.sh`)。
+- **依赖管理**: 标准化多语言栈的依赖安装流程 (`install.sh`)。
+- **质量保证**: 编排代码检查、测试套件与安全审计 (`verify.sh`)。
+- **生命周期自动化**: 自动化规范化提交、发布与变更日志归档。
 
 ## 2. 使用指南
 
 ### 前置条件
 
-- **POSIX Shell** (Linux/macOS 标准配置；Windows 上建议使用 Git Bash 或 WSL)
+- **POSIX Shell** (Linux/macOS 标准配置；Windows 建议使用 Git Bash 或 WSL)
 - **PowerShell 5.1+** (用于 Windows 包装器)
 - **Make** (可选，提供便捷的入口点)
 
 ### 快速开始
 
 ```bash
-# 设置开发环境
+# 1. 设置开发环境
 sh scripts/setup.sh
 
-# 验证环境健康状况
+# 2. 安装项目依赖
+sh scripts/install.sh
+
+# 3. 验证环境健康状况
 sh scripts/verify.sh
 ```
 
@@ -77,36 +88,87 @@ sh scripts/verify.sh
 | `init-project.sh`      | 修改模板品牌       | 占位符替换、git 初始化       |
 | `archive-changelog.sh` | 归档旧版本         | 主版本更迭轮转               |
 
+### 工作流模式
+
+1. **项目初始化**: `setup.sh` → `install.sh` → `verify.sh`。
+2. **日常开发**: 编码 → `lint.sh` → `test.sh` → `commit.sh`。
+3. **持续集成 (CI)**: `check-env.sh` → `test.sh` → `build.sh`。
+
+### 目录结构
+
+- `scripts/`: 主自动化入口。
+- `scripts/lib/`: 内部库文件 (`common.sh` 提供逻辑，`common.ps1` 提供转发)。
+- `scripts/*.ps1` & `scripts/*.bat`: Windows 平台包装器。
+
 ## 3. 运维指南
+
+### 预部署检查清单
+
+1. [ ] 运行 `sh scripts/check-env.sh` 确保运行时环境一致。
+2. [ ] 运行 `sh scripts/verify.sh` 进行最终 QA 验收。
+3. [ ] 运行 `sh scripts/audit.sh` 确保无敏感信息泄漏或严重漏洞。
+
+### 性能考量
+
+- **并行性**: 脚本顺序执行，以确保日志顺序的确定性。
+- **频率限制**: `update.sh` 使用 24 小时冷却期，防止网络滥用。
+- **缓存利用**: Python 虚拟环境 (`.venv`) 与 `node_modules` 在不同运行间复用。
 
 ### 故障排除
 
-- **权限不足**: 运行 `chmod +x scripts/*.sh`。
-- **Windows 脚本执行策略**: 如果 `.ps1` 失败，运行 `Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope CurrentUser`。
-- **被杀掉 (Exit 137)**: 通常表示二进制文件由于下载中断而损坏或内存溢出 (OOM)。运行 `rm .venv/bin/<tool>` 并重新运行 setup。
-- **代理/网络问题**: 如果下载失败，脚本会自动尝试使用代理。如果需要，请确保配置了 `GITHUB_PROXY`。
+- **问题**: 权限不足 (Permission Denied)。
+  - **解决方案**: 运行 `chmod +x scripts/*.sh`。
+- **问题**: Windows 脚本执行策略拦截。
+  - **解决方案**: 运行 `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`。
+- **问题**: 下载过程中发生 404 或网络错误。
+  - **诊断**: 检查 `GITHUB_PROXY` 是否可达。
+  - **解决方案**: 在 `scripts/lib/common.sh` 或环境变量中配置 `GITHUB_PROXY`。
+
+### 维护程序
+
+- **工具更新**: 每周定期运行 `sh scripts/update.sh`。
+- **缓存清理**: 运行 `sh scripts/cleanup.sh` 回收磁盘空间。
 
 ## 4. 安全考虑
 
-- **无需 Sudo**: 大多数脚本将工具安装到项目本地的 `.venv/bin` 或用户本地目录，以尽量减少对系统的影响。
-- **校验逻辑**: 关键安装函数会验证二进制文件的存在和基本功能。
-- **Gitleaks 集成**: `audit.sh` 和 pre-commit 钩子确保不会提交任何敏感信息（密钥等）到仓库。
-- **执行策略**: Windows 包装器使用 `-ExecutionPolicy Bypass` 以确保功能正常，且不破坏系统的全局安全设置。
+### 安全模型
+
+- **最小权限原则**: 脚本将工具安装至 `.venv` 或用户目录，无需 `sudo`。
+- **完整性验证**: 关键安装逻辑包含对外部资源的校验。
+- **密钥卫生**: 集成 Gitleaks 静态扫描，防止凭据意外泄漏。
+
+### 最佳实践
+
+| 维度         | 要求                   | 实现方式                       |
+| :----------- | :--------------------- | :----------------------------- |
+| 文件权限     | 脚本必须具备可执行权限 | `chmod 755 scripts/*.sh`       |
+| 凭据完整性   | 禁止硬编码密钥         | 仅从 `.env` 或环境变量读取     |
+| 代理处理     | 安全的下载网关         | 通过 TLS 访问 `GITHUB_PROXY`   |
+| Windows 安全 | 签名或受限的执行策略   | 使用 `-ExecutionPolicy Bypass` |
 
 ## 5. 开发指南
 
-### 添加新脚本
+### 代码组织
 
-1. 在 `scripts/my-script.sh` 中创建 POSIX 逻辑。
-2. 引入 `scripts/lib/common.sh`。
-3. 使用 `guard_project_root` 和 `parse_common_args`。
-4. 按照 `.agent/rules/shell.md` 中的委托模板创建 `.ps1` 和 `.bat` 包装器。
+- 新逻辑必须以新的 `.sh` 文件形式添加至 `scripts/`。
+- 共享工具函数必须放入 `scripts/lib/common.sh`。
+- 函数内部变量必须使用 `local` 关键字进行私有化。
 
-### 库函数使用
+### 贡献要求
 
-`scripts/lib/common.sh` 提供：
+1. 所有新脚本必须包含 `main()` 函数并调用 `parse_common_args`。
+2. 所有新脚本必须通过 `shellcheck --shell=sh` 检查。
+3. 所有新脚本必须提供 `.ps1` 和 `.bat` 包装器。
+4. 保持英文与中文 README 版本的同步更新。
 
-- `log_info`, `log_success`, `log_warn`, `log_error`: 彩色日志。
-- `download_url`: 健壮的带重试下载。
-- `atomic_swap`: 安全的文件替换。
-- `check_update_cooldown`: 为重型任务提供 24 小时频率限制。
+### 本地开发环境准备
+
+1. 安装 ShellCheck: `brew install shellcheck`。
+2. 安装 PSScriptAnalyzer (Windows 下): `Install-Module -Name PSScriptAnalyzer`。
+3. 运行 `make lint` 验证合规性。
+
+### 参考资料
+
+- [POSIX 标准](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html)
+- [ShellCheck Wiki](https://github.com/koalaman/shellcheck/wiki)
+- [PowerShell 规范](https://docs.microsoft.com/en-us/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands)

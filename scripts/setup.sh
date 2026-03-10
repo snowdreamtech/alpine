@@ -183,7 +183,7 @@ setup_python() {
     _VER_PY=$(get_version "$VENV/bin/python")
     local _DUR_PY
     _DUR_PY=$(($(date +%s) - _T0_PY))
-    log_summary "Runtime" "Python" "$_STAT" "$_V" "$_D"
+    log_summary "Runtime" "Python" "$_STAT_PY" "$_VER_PY" "$_DUR_PY"
   else
     log_summary "Runtime" "Python" "❌ Failed" "-" "0"
   fi
