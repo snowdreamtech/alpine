@@ -11,7 +11,7 @@
 # Standards:
 #   - Python 3.10+ compatible.
 #   - "World Class" AI Documentation (English-only).
-#   - Rule 01 (Idempotency), Rule 03 (Architecture).
+#   - Rule 01 (General), Rule 03 (Architecture).
 #
 # Features:
 #   - Automated metadata extraction (titles, objectives, sections).

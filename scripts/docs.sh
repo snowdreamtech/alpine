@@ -111,6 +111,16 @@ main() {
     fi
     ;;
   esac
+
+  # Next Actions
+  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+    printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
+    if [ "$_COMMAND_DOC" = "build" ]; then
+      printf "  - Run %bmake deploy%b or push to trigger CI documentation updates.\n" "${GREEN}" "${NC}"
+    else
+      printf "  - Run %bmake docs build%b to create production artifacts.\n" "${GREEN}" "${NC}"
+    fi
+  fi
 }
 
 main "$@"

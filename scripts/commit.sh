@@ -112,7 +112,7 @@ main() {
   "$_NPM_LOCAL_CMT" exec cz
 
   # Next Actions
-  if [ "$DRY_RUN" -eq 0 ]; then
+  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
     printf "  - Run %bgit push%b to upload your changes to the remote.\n" "${GREEN}" "${NC}"
   fi

@@ -133,7 +133,7 @@ main() {
   log_success "\n✨ Formatting complete!"
 
   # Next Actions
-  if [ "$DRY_RUN" -eq 0 ]; then
+  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
     printf "  - Run %bmake lint%b to verify code quality.\n" "${GREEN}" "${NC}"
   fi
