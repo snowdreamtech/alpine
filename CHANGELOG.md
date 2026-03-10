@@ -1,3 +1,4 @@
+<!-- DO NOT EDIT MANUALLY - This file is managed by automated professional tools -->
 # Changelog
 
 All notable changes to this project will be documented in this file.

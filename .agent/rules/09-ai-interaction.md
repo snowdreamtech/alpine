@@ -8,6 +8,7 @@
 
 - **No Blind Refactoring**: AI MUST NOT perform large-scale refactoring unless explicitly requested by the user. A user asking to "fix a bug in function X" is not a request to refactor the entire file or module.
 - **Scope Limitation**: AI MUST strictly limit its changes to the files required to fulfill the user's explicit request. Do not "fix" unrelated code nearby unless it directly breaks the build or is a critical security issue. Every out-of-scope change MUST be flagged to the user.
+- **Restricted Files**: AI agents MUST NOT modify `CHANGELOG.md` directly. This file is managed by automated professional tools and is considered read-only for agents.
 - **Destructive Operations**: AI MUST ask for explicit confirmation before:
   - Deleting files or directories
   - Dropping database tables or executing irreversible migrations

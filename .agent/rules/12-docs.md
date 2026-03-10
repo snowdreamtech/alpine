@@ -248,10 +248,11 @@ ADR filenames follow the pattern `NNNN-<kebab-case-title>.md`. ADRs are append-o
 
 Rules:
 
-- Every user-visible change MUST be recorded in `[Unreleased]` at the time of the commit, not retroactively.
+- **[PROTECTED]**: `CHANGELOG.md` is managed by automated professional tools. AI agents and manual contributors MUST NOT edit this file.
+- Every user-visible change MUST be recorded in `[Unreleased]` via automated commit-msg triggers or tool invocations, not manual editing.
 - Breaking changes MUST appear under `### Changed` and be prefixed with **[BREAKING]**.
 - Automated dependency updates do not require changelog entries unless they change behavior.
-- Release process: rename `[Unreleased]` to `[x.y.z] - YYYY-MM-DD` when tagging a release.
+- Release process: rename `[Unreleased]` to `[x.y.z] - YYYY-MM-DD` when tagging a release (via tool).
 
 ## 7. Markdown Quality Standards
 
