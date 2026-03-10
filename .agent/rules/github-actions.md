@@ -51,6 +51,8 @@
   uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683  # v4.2.2
   ```
 
+- **Objective Version Verification**: Before updating or pinning an action to a new version, AI agents MUST verify that the tag or SHA exists in the official GitHub repository. NEVER assume a version number based on patterns from other actions.
+
 - Use **Dependabot** to keep action SHA pins current. Configure in `.github/dependabot.yml`:
 
   ```yaml

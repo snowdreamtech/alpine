@@ -16,6 +16,7 @@
 - Maintain **idempotency** in all scripts, infrastructure, and configuration: running any operation multiple times MUST produce the same result as running it once. Idempotency validation: re-run the script/apply and verify state is identical without errors or unintended duplication.
 - Prefer **declarative** over imperative configuration (e.g., desired-state IaC like Terraform/Ansible over ad-hoc shell scripts). Declarative configs are self-documenting and inherently idempotent when applied correctly.
 - Avoid side effects in initialization code. Setup scripts must be safe to re-run without human intervention.
+- **Objective Truth over Subjective Assumption**: All technical decisions, including version pinning, configuration defaults, and feature availability, MUST be based on objective facts verified through documentation, search, or direct testing. NEVER assume or "guess" a version number or a tool's behavior based on similar tools. If uncertainty exists, it MUST be explicitly stated and resolved through verification before implementation.
 - When a non-idempotent operation is unavoidable, guard it explicitly:
 
   ```bash

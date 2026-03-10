@@ -106,7 +106,10 @@
   const TOKEN_TTL_SECONDS = 60 * 60 * 24; // 24 hours — aligned with session cookie max-age
   ```
 
-- **Hallucination Prevention**: Before referencing a specific API, library function, or configuration option, verify it exists in the version being used. Clearly state when uncertain: "I believe this API exists in version X — please verify before using." Do not fabricate function signatures, module paths, or configuration keys.
+- **Rigorous Verification**: Before referencing a specific API, library function, version number, or configuration option, AI agents MUST verify its existence and exact syntax in the target environment or official documentation.
+  - **No Subjective Guessing**: NEVER guess version numbers (e.g., assuming `v1.2.0` exists because `v1.1.0` does).
+  - **No Feature Assumption**: NEVER assume a tool supports a flag or feature without verifying the specific version's man page or help output.
+  - **Uncertainty Disclosure**: If verification is impossible in the current context, clearly state: "I cannot verify if version X exists—please confirm before proceeding."
 
 ## 3. Communication Strategy
 
