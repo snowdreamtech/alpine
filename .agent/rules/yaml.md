@@ -160,6 +160,24 @@
   script: |-
     echo "line one"
     echo "line two"
+
+### Escaping in Block Scalars (CRITICAL)
+
+- **Block scalars (`|`, `>`) treat backslashes literally**. Unlike double-quoted strings, they do NOT support escape sequences like `\"`, `\n`, or `\t`.
+- If you need to include a quote inside a block scalar, just write it directly:
+
+  ```yaml
+  # ✅ Correct: write quotes directly in block scalars
+  entry: >-
+    pwsh -Command "& { Write-Host 'Hello "World"' }"
+
+  # ❌ Wrong: redundant/literal backslashes
+  entry: >-
+    pwsh -Command \"& { Write-Host 'Hello \"World\"' }\"
+  ```
+
+- **Avoid mixed quoting** if possible. For complex shell commands in `pre-commit`, use block scalars to avoid the "quoting hell" of single-line strings.
+
   ```
 
 ### Quotes and Strings
@@ -495,6 +513,7 @@ differences prevents silent bugs:
 | Duplicate key silently ignored | YAML 1.1 last-wins behavior     | Enable strict parser mode    |
 | `true` string used as boolean  | Missing quotes around value     | Quote: `'true'`              |
 | Config differs across envs     | Env-specific values baked in    | Use env var references       |
+| Shell syntax errors in hooks   | Literal `\` in block scalars    | Use direct quotes, no `\`    |
 
 ## 12. Pre-commit & Toolchain Integration
 

@@ -151,6 +151,8 @@
   - **Shift-Left (Local/Pre-commit)**: Reserved for **lightweight, language-level, and high-frequency** checks.
     - _Examples_: Language linters (ESLint, Ruff, golangci-lint, sqlfluff, ktlint, checkmake), formatters (Prettier, shfmt, google-java-format), infrastructure (tflint, kube-linter v0.8.1+), Docker (hadolint), and critical local security (Gitleaks).
     - _Constraint_: MUST remain fast (seconds) and incrementally triggered by file extensions to maintain developer velocity.
+    - > [!TIP]
+      > When defining complex shell/PowerShell commands in `.pre-commit-config.yaml`, prefer **block scalars** (`>-` or `|-`) to avoid manual quote escaping. Remember: backslashes (`\`) inside block scalars are treated **literally**; do not use them to escape quotes.
   - **Shift-Right (GitHub Actions Only)**: Reserved for **heavy, high-latency, cross-file, and deep-audit** tools.
     - _Examples_: Vulnerability scanners (Trivy), full-repo security analysis (Semgrep), and remote link checkers (Lychee).
     - _Constraint_: These are the final authoritative gates for repository purity and deep security, but MUST NOT block local commit flows.
