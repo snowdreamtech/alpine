@@ -34,7 +34,7 @@ jobs:
     secrets: inherit
 
   release-please:
-    name: Manage Release PRs
+    name: "🚀 Release Orchestration"
     needs: [verify]
     runs-on: ubuntu-latest
     permissions:

@@ -26,6 +26,7 @@ concurrency:
 
 jobs:
   label:
+    name: "🏷️ Pull Request Categorization"
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write # Required to apply labels to the pull request

@@ -48,7 +48,7 @@ concurrency:
 
 jobs:
   test:
-    name: Run Automated Tests
+    name: "🧪 Automated Testing Suite"
     runs-on: ubuntu-latest
     permissions:
       contents: read # Required for codebase checkout

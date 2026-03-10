@@ -28,6 +28,7 @@ concurrency:
 
 jobs:
   stale:
+    name: "⏳ Inactivity Management"
     runs-on: ubuntu-latest
     permissions:
       issues: write # Required to label and close stagnant issues

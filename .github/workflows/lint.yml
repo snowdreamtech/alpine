@@ -57,7 +57,7 @@ concurrency:
 
 jobs:
   lint:
-    name: Run Linter
+    name: "🛡️ Quality Assurance Gate"
     runs-on: ubuntu-latest
     permissions:
       contents: read # Required for codebase inspection
@@ -152,7 +152,7 @@ jobs:
           fail: true
 
       - name: "🕵️ Detect Vulnerabilities (Trivy FS)"
-        uses: aquasecurity/trivy-action@0.35.2
+        uses: aquasecurity/trivy-action@v0.35.0
         if: ${{ always() }}
         env:
           # Use specific AWS public ECR mirrors for high reliability and scan consistency.

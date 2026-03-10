@@ -29,7 +29,7 @@ concurrency:
 
 jobs:
   verify:
-    name: Full Verification
+    name: "🏁 Pre-flight Integrity Check"
     runs-on: ubuntu-latest
     permissions:
       contents: read # Required for repository inspection

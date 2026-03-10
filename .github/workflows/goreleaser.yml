@@ -33,7 +33,7 @@ jobs:
 
   goreleaser:
     needs: [verify]
-    name: Run GoReleaser
+    name: "📦 Distribution Packaging"
     runs-on: ubuntu-latest
     permissions:
       contents: write # Required to create GitHub Releases, upload assets, and push tags

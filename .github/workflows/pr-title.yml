@@ -28,7 +28,7 @@ concurrency:
 
 jobs:
   commitlint:
-    name: Check Semantic PR Title
+    name: "🔍 Semantic Title Validation"
     runs-on: ubuntu-latest
     permissions:
       pull-requests: read # Required to read the pull request metadata via the GitHub API

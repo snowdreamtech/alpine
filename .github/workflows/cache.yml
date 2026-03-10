@@ -29,7 +29,7 @@ concurrency:
 
 jobs:
   cleanup:
-    name: Cleanup Inactive Caches
+    name: "🧹 Cache Sanitation Maintenance"
     runs-on: ubuntu-latest
     permissions:
       actions: write # Required to delete caches via the GitHub API
