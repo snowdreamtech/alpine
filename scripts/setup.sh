@@ -65,13 +65,19 @@ EOF
 
 # ── Functions ────────────────────────────────────────────────────────────────
 
-# Backward compatibility (some modules might still use log internally)
+# Purpose: Legacy compatibility wrapper for informational logging.
+#          Redirects to log_info from the common library.
+# Params:
+#   $1 - Message to log
+# Examples:
+#   log "Old style message"
 log() { log_info "$1"; }
-# log_success, log_warn, log_error are used from common.sh
 
-# ── Functions ────────────────────────────────────────────────────────────────
+# Note: log_success, log_warn, and log_error are provided by common.sh
 
-# OS/Arch Detection
+# ── Environment Detection ────────────────────────────────────────────────────
+
+# OS/Arch Detection for module-specific binaries
 OS=$(uname -s | tr '[:upper:]' '[:lower:]')
 ARCH=$(uname -m)
 case "${ARCH}" in
