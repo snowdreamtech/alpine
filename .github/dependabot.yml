@@ -1,14 +1,19 @@
 ---
-# To get started with Dependabot version updates, you'll need to specify which
-# package ecosystems to update and where the package manifests are located.
-# Please see the documentation for all configuration options:
-# https://docs.github.com/github/administering-a-repository/configuration-options-for-dependency-updates
+# Dependabot Version Updates
+# Purpose: Automatically maintains project dependencies to ensure security and stability.
+# Trigger: Weekly schedule (synchronized across all ecosystems).
+# Target Branch: dev (Ensures updates are validated in development before production).
+# Design:
+#   - Centralized manifest approach for all project technical stacks.
+#   - Semantic 'chore(deps)' prefixing for clean version history.
+#   - Automated labeling for improved maintenance visibility.
 
 version: 2
 updates:
   # Maintain dependencies for GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -20,6 +25,7 @@ updates:
   # Maintain dependencies for npm (linters and config)
   - package-ecosystem: "npm"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -31,6 +37,7 @@ updates:
   # Maintain dependencies for pre-commit hooks
   - package-ecosystem: "pip"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -42,6 +49,7 @@ updates:
   # Maintain dependencies for Go Modules
   - package-ecosystem: "gomod"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -53,6 +61,7 @@ updates:
   # Maintain dependencies for PHP (Composer)
   - package-ecosystem: "composer"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -64,6 +73,7 @@ updates:
   # Maintain dependencies for Ruby (Bundler)
   - package-ecosystem: "bundler"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -75,6 +85,7 @@ updates:
   # Maintain dependencies for Rust (Cargo)
   - package-ecosystem: "cargo"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -86,6 +97,7 @@ updates:
   # Maintain dependencies for Docker
   - package-ecosystem: "docker"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -97,6 +109,7 @@ updates:
   # Maintain dependencies for Elixir/Erlang (Mix)
   - package-ecosystem: "mix"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -108,6 +121,7 @@ updates:
   # Maintain dependencies for Elm
   - package-ecosystem: "elm"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -119,6 +133,7 @@ updates:
   # Maintain dependencies for Git Submodules
   - package-ecosystem: "gitsubmodule"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -130,6 +145,7 @@ updates:
   # Maintain dependencies for Java/Kotlin (Gradle)
   - package-ecosystem: "gradle"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -141,6 +157,7 @@ updates:
   # Maintain dependencies for Java (Maven)
   - package-ecosystem: "maven"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -152,6 +169,7 @@ updates:
   # Maintain dependencies for C#/.NET (NuGet)
   - package-ecosystem: "nuget"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -163,6 +181,7 @@ updates:
   # Maintain dependencies for Dart/Flutter (Pub)
   - package-ecosystem: "pub"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -174,6 +193,7 @@ updates:
   # Maintain dependencies for Swift
   - package-ecosystem: "swift"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -185,6 +205,7 @@ updates:
   # Maintain dependencies for Terraform
   - package-ecosystem: "terraform"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -196,6 +217,7 @@ updates:
   # Maintain dependencies for Dev Containers
   - package-ecosystem: "devcontainers"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -207,6 +229,7 @@ updates:
   # Maintain dependencies for Bazel
   - package-ecosystem: "bazel"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -218,6 +241,7 @@ updates:
   # Maintain dependencies for Bun
   - package-ecosystem: "bun"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -229,6 +253,7 @@ updates:
   # Maintain dependencies for Conda
   - package-ecosystem: "conda"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -240,6 +265,7 @@ updates:
   # Maintain dependencies for Docker Compose
   - package-ecosystem: "docker-compose"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -251,6 +277,7 @@ updates:
   # Maintain dependencies for .NET SDK
   - package-ecosystem: "dotnet-sdk"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -262,6 +289,7 @@ updates:
   # Maintain dependencies for Helm
   - package-ecosystem: "helm"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -273,6 +301,7 @@ updates:
   # Maintain dependencies for Julia
   - package-ecosystem: "julia"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -284,6 +313,7 @@ updates:
   # Maintain dependencies for OpenTofu
   - package-ecosystem: "opentofu"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -295,6 +325,7 @@ updates:
   # Maintain dependencies for Pre-Commit hooks natively
   - package-ecosystem: "pre-commit"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -306,6 +337,7 @@ updates:
   # Maintain dependencies for Rust Toolchain
   - package-ecosystem: "rust-toolchain"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -317,6 +349,7 @@ updates:
   # Maintain dependencies for Rust Toolchain (UV)
   - package-ecosystem: "uv"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
@@ -328,6 +361,7 @@ updates:
   # Maintain dependencies for VCPKG (C/C++)
   - package-ecosystem: "vcpkg"
     directory: "/"
+    target-branch: "dev"
     schedule:
       interval: "weekly"
     commit-message:
