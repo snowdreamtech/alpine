@@ -65,7 +65,7 @@ repos:
 
       - id: check-merge-conflict
         name: check for merge conflicts
-        entry: sh -c "! grep -qE '^(<<<<<<<|=======|>>>>>>>)' \"$@\"" --
+        entry: sh -c '! grep -qE "^(<<<<<<<|=======|>>>>>>>)" "$@"' --
         language: system
         stages: [pre-commit, pre-merge-commit]
         description: "Intercept files containing git merge conflict markers."
@@ -205,7 +205,7 @@ repos:
         language: system
         entry: >-
           pwsh -NoProfile -Command
-          \"& { if (!(Get-Command Invoke-ScriptAnalyzer -ErrorAction SilentlyContinue)) { exit 0 }; $r = $args | ForEach-Object { Invoke-ScriptAnalyzer -Path $_ -Severity Error,Warning }; if ($r) { $r | Format-Table -AutoSize; exit 1 } }\"
+          "& { if (!(Get-Command Invoke-ScriptAnalyzer -ErrorAction SilentlyContinue)) { exit 0 }; $r = $args | ForEach-Object { Invoke-ScriptAnalyzer -Path $_ -Severity Error,Warning }; if ($r) { $r | Format-Table -AutoSize; exit 1 } }"
         types: [powershell]
         description: "PowerShell static analysis tool (macOS/Windows)."
 
