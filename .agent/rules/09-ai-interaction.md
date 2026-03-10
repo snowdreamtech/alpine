@@ -132,7 +132,7 @@
   2. Project conventions (naming, file structure, error handling patterns)
   3. Relevant architecture documents or ADRs
   4. Any related tests that document expected behavior
-
+- **CLI-First Research Strategy**: AI agents MUST prioritize command-line tools (e.g., `grep`, `find`, `curl`, `gh api`) over browser-based research. Browser tools are considered high-latency fallbacks; use them only for complex visual documentation or when CLI-accessible resources are exhausted.
 - **Artifact Usage**: Utilize designated memory or "brain" directories (if configured) to store and retrieve long-running task context, architectural decisions, checklists, and completed vs pending work. Reference prior decisions rather than re-inventing them.
 - **Check Existing Code**: Before creating a new utility function or module, search the codebase for an existing equivalent. Avoid duplication — reference the existing implementation and extend it if needed.
 - **Context Window Management**: In long conversations, periodically summarize what has been accomplished and what remains. If the context is too large to process accurately, proactively request a focused sub-task definition.
