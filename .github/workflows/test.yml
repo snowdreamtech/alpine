@@ -48,8 +48,13 @@ concurrency:
 
 jobs:
   test:
-    name: "🧪 Automated Testing Suite"
-    runs-on: ubuntu-latest
+    name: "🧪 Automated Testing Suite (${{ matrix.os }})"
+    runs-on: ${{ matrix.os }}
+    strategy:
+      # Validates logic integrity across the complete project compatibility matrix.
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
     permissions:
       contents: read # Required for codebase checkout
       pull-requests: read # Required for PR context integration during testing
