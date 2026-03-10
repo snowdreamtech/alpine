@@ -47,7 +47,10 @@ EOF
 run_release_verify() {
   log_info "── Verification: Running pre-flight checks ──"
   if [ -f "scripts/verify.sh" ]; then
-    sh scripts/verify.sh --quiet || {
+    local _VFY_ARGS="--quiet"
+    [ "$DRY_RUN" -eq 1 ] && _VFY_ARGS="$_VFY_ARGS --dry-run"
+    # shellcheck disable=SC2086
+    sh scripts/verify.sh $_VFY_ARGS || {
       log_error "Error: Verification failed. Cannot proceed with release."
       exit 1
     }

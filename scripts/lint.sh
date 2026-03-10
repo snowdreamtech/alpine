@@ -53,6 +53,9 @@ run_pre_commit_lint() {
     _PRE_COMMIT_LNT="$_VENV_LNT/Scripts/pre-commit.exe"
   elif command -v pre-commit >/dev/null 2>&1; then
     _PRE_COMMIT_LNT="pre-commit"
+  elif [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_warn "DRY-RUN: pre-commit not found. Using placeholder for preview."
+    _PRE_COMMIT_LNT="pre-commit"
   else
     log_error "Error: pre-commit not found. Please run 'make setup' first."
     exit 1
