@@ -372,22 +372,22 @@ install_checkmake() {
   fi
 
   local _OS_TAG_CM="${_OS_TAG}"
-  local _ARCH_S_CM="amd64"
-  [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _ARCH_S="arm64"
-  local _FILE
-  _FILE="checkmake-${CHECKMAKE_VERSION}.${_OS_S}.${_ARCH_S}${_EXE}"
-  local _URL
-  _URL="${GITHUB_PROXY}https://github.com/checkmake/checkmake/releases/download/${CHECKMAKE_VERSION}/${_FILE}"
+  local _ARCH_N_CM="amd64"
+  [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _ARCH_N_CM="arm64"
+  local _FILE_CM
+  _FILE_CM="checkmake-${CHECKMAKE_VERSION}.${_OS_TAG_CM}.${_ARCH_N_CM}${_EXE}"
+  local _URL_CM
+  _URL_CM="${GITHUB_PROXY}https://github.com/checkmake/checkmake/releases/download/${CHECKMAKE_VERSION}/${_FILE_CM}"
 
-  local _STAT="✅ Installed"
-  if download_url "${_URL}" "${_BIN}" "checkmake"; then
-    chmod +x "${_BIN}" 2>/dev/null || true
+  local _STAT_CM="✅ Installed"
+  if download_url "${_URL_CM}" "${_BIN_CM}" "checkmake"; then
+    chmod +x "${_BIN_CM}" 2>/dev/null || true
   else
-    _STAT="❌ Failed"
+    _STAT_CM="❌ Failed"
   fi
-  local _D
-  _D=$(($(date +%s) - _T0))
-  log_summary "Lint Tool" "Checkmake" "$_STAT" "$(get_version "$_BIN")" "$_D"
+  local _DUR_CM
+  _DUR_CM=$(($(date +%s) - _T0_CM))
+  log_summary "Lint Tool" "Checkmake" "$_STAT_CM" "$(get_version "$_BIN_CM")" "$_DUR_CM"
 }
 
 # Purpose: Installs IaC linting tools (TFLint and Kube-Linter).
