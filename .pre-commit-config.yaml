@@ -299,7 +299,7 @@ repos:
         language: system
         entry: >-
           pwsh -NoProfile -Command
-          "& { param([string[]]$paths) if (!(Get-Command Invoke-ScriptAnalyzer -ErrorAction SilentlyContinue)) { Write-Host 'PSScriptAnalyzer missing, skipping.'; exit 0 }; $r = Invoke-ScriptAnalyzer -Path $paths -Severity Error,Warning; if ($r) { $r | Format-Table -AutoSize; exit 1 } }" -args
+          "& { if (!(Get-Command Invoke-ScriptAnalyzer -ErrorAction SilentlyContinue)) { exit 0 }; $r = $args | ForEach-Object { Invoke-ScriptAnalyzer -Path $_ -Severity Error,Warning }; if ($r) { $r | Format-Table -AutoSize; exit 1 } }"
         types: [powershell]
         description: "PowerShell script analyzer. Requires pwsh and PSScriptAnalyzer module."
 
