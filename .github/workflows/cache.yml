@@ -6,7 +6,7 @@
 #   - actions: write (Required to delete caches via the GitHub API).
 #   - contents: read (Required for repository metadata access).
 # Concurrency:
-#   - group: cache (Ensures atomic cache cleanup operations; prevents race conditions).
+#   - group: ${{ github.workflow }}-${{ github.ref }} (Prevents overlapping cleanup runs).
 #   - cancel-in-progress: false (Cleanup should always complete to ensure consistent state).
 # Design:
 #   - Uses POSIX-compliant shell for maximum compatibility with runner environments.

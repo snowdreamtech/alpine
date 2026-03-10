@@ -5,7 +5,7 @@
 # Permissions:
 #   - pull-requests: read (Required to read the pull request metadata via the GitHub API).
 # Concurrency:
-#   - group: pr-title-${{ github.event.pull_request.number || github.ref }} (Scoped to PR/ref).
+#   - group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }} (Scoped to PR/ref).
 #   - cancel-in-progress: true (Immediate feedback on updated PR titles).
 # Design:
 #   - Uses 'pull_request_target' to allow linting even from fork contributions.

@@ -6,8 +6,8 @@
 #   - issues: write (Required to label and close stagnant issues).
 #   - pull-requests: write (Required to label and close stagnant PRs).
 # Concurrency:
-#   - group: stale-refining (Prevents overlapping maintenance runs).
-#   - cancel-in-progress: true (Maintenance can be restarted without risk).
+#   - group: ${{ github.workflow }}-${{ github.ref }} (Prevents overlapping maintenance runs).
+#   - cancel-in-progress: true (Maintenance can be safely restarted).
 # Design:
 #   - Safeguards sensitive items by exempting 'pinned', 'security', and 'bug' labels.
 #   - Non-disruptive: Provides a 7-day grace period after stale marking.

@@ -6,8 +6,8 @@
 #   - contents: write (Required to create GitHub Releases, upload assets, and push tags).
 #   - packages: write (Required for container registry publishing if configured).
 # Concurrency:
-#   - group: release (Ensures atomic release operations; prevents duplicate version tags).
-#   - cancel-in-progress: false (Release processes must complete to avoid corrupted or partial releases).
+#   - group: ${{ github.workflow }}-${{ github.ref }} (Ensures atomic release operations).
+#   - cancel-in-progress: false (Release processes must complete to avoid partial releases).
 # Design:
 #   - Focused on dry-run validation for non-tag pushes to ensure build integrity.
 #   - Uses specific semantic version tags for GoReleaser to ensure build reproducibility.

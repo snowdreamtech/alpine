@@ -1,7 +1,7 @@
 ---
 # Pull Request Labeler
 # Purpose: Automatically categorizes PRs based on changed file paths to improve backlog visibility.
-# Trigger: PR events (opened, synchronized).
+# Trigger: PR events (opened, synchronize, reopened).
 # Permissions:
 #   - pull-requests: write (Required to apply labels to the pull request).
 #   - contents: read (Required to analyze changed files via the GitHub API).

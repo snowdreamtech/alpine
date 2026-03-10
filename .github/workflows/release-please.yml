@@ -6,9 +6,9 @@
 #   - contents: write (Required to create release tags and update the repository).
 #   - pull-requests: write (Required to create and manage release PRs).
 #   - statuses: write (Required to reflect release status in the GitHub UI).
-#   - security-events: write (Required if the release process includes vulnerability reports).
+#   - security-events: write (Required for SARIF report association).
 # Concurrency:
-#   - group: release-please (Ensures atomic release transitions per branch).
+#   - group: ${{ github.workflow }}-${{ github.ref }} (Ensures atomic release transitions).
 #   - cancel-in-progress: true (Superseded by newer merges to main).
 # Design:
 #   - Depends on 'verify' pre-flight checks to prevent broken releases.

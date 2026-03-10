@@ -7,7 +7,7 @@
 #   - actions: read (Required to determine workflow run status).
 #   - contents: read (Required for code analysis).
 # Concurrency:
-#   - group: codeql (Ensures only the latest scan results are processed per branch).
+#   - group: ${{ github.workflow }}-${{ github.ref }} (Ensures only the latest scan results are processed).
 #   - cancel-in-progress: true (In-progress scans are superseded by newer commits to save resources).
 # Design:
 #   - Utilizes advanced matrix strategy for multi-language support (Go, Python).

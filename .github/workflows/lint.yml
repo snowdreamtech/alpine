@@ -3,11 +3,12 @@
 # Purpose: Unified linter and security scanner (Commitlint, Lychee, Trivy, pre-commit).
 # Trigger: Every push and PR to ensure high standards during the development lifecycle.
 # Permissions:
-#   - contents: read (Required for code inspection).
-#   - pull-requests: read (Required for Commitlint context in PR events).
+#   - contents: read (Required for codebase inspection).
+#   - pull-requests: read (Required to analyze PR context in Commitlint).
+#   - statuses: write (Required to update commit status indicators).
 #   - security-events: write (Required for uploading Trivy SARIF audit reports).
 # Concurrency:
-#   - group: lint (Ensures consistent quality state per branch).
+#   - group: lint-${{ github.event.pull_request.number || github.ref }} (Scoped to PR/ref).
 #   - cancel-in-progress: true (Superseded by newer commits to minimize redundant CI load).
 # Design:
 #   - Fail-fast strategy: Lints code before more expensive security scans.
@@ -49,7 +50,7 @@ name: Quality & Audit
         default: ".venv"
 
 permissions:
-  contents: write # Required for potential auto-fixes or scan results
+  contents: read # Required for code inspection
   pull-requests: read # Required to analyze PR context (Commitlint)
   statuses: write # Required for updating commit status indicators
   security-events: write # Required for SARIF uploads (Trivy)
