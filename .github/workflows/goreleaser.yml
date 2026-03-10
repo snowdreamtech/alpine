@@ -19,10 +19,7 @@ name: GoReleaser
     tags:
       - "*"
 
-permissions:
-  contents: write # Required for creating releases and uploading assets
-  statuses: write # Required for updating commit statuses
-  security-events: write # Required if release includes security reports
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -36,7 +33,13 @@ jobs:
 
   goreleaser:
     needs: [verify]
+    name: Run GoReleaser
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required to create GitHub Releases, upload assets, and push tags
+      packages: write # Required for container registry publishing if configured
+      statuses: write # Required for updating commit statuses
+      security-events: write # Required if release includes security reports
     timeout-minutes: 30 # Go compilation and asset upload usually completes in <10m
     steps:
       - name: Checkout

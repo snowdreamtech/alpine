@@ -18,9 +18,7 @@ name: Pull Request Labeler
   pull_request_target:
     types: [opened, synchronize, reopened]
 
-permissions:
-  contents: read # Base permission
-  pull-requests: write # Required for adding labels to PRs
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -29,6 +27,9 @@ concurrency:
 jobs:
   label:
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write # Required to apply labels to the pull request
+      contents: read # Required to analyze changed files via the GitHub API
     timeout-minutes: 5 # Path-based labeling is extremely fast
     steps:
       - name: Triage Pull Request

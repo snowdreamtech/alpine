@@ -40,9 +40,7 @@ name: Test
         required: false
         default: ".venv"
 
-permissions:
-  contents: read # Required for code checkout
-  pull-requests: read # Required for PR context if needed by tests
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -52,6 +50,9 @@ jobs:
   test:
     name: Run Automated Tests
     runs-on: ubuntu-latest
+    permissions:
+      contents: read # Required for codebase checkout
+      pull-requests: read # Required for PR context integration during testing
     timeout-minutes: 30 # Matrix tests can be time-consuming
     env:
       VENV: ${{ github.event.inputs.venv || '.venv' }}
@@ -78,6 +79,7 @@ jobs:
       - name: Run Environment Setup
         shell: sh # POSIX compliant
         run: |
+          # Bootstraps the development environment using standardized scripts.
           make setup
           make install
         env:
@@ -86,11 +88,13 @@ jobs:
       - name: Setup PowerShell
         shell: sh
         run: |
-          # PowerShell is pre-installed on ubuntu-latest runners; verifying path.
+          # PowerShell handles cross-platform scripting in this project; verifying presence.
           pwsh --version
 
       - name: Run Test Matrix (Shell & PowerShell & Python & Go)
         shell: sh
-        run: make test
+        run: |
+          # Executes the unified test suite to validate logic across all supported stacks.
+          make test
         env:
           VENV: ${{ env.VENV }}

@@ -1,6 +1,6 @@
 # GitHub Actions 工作流指南
 
-[English](file:///Users/snowdream/Workspace/snowdreamtech/template/.github/workflows/README.md) | [简体中文](file:///Users/snowdream/Workspace/snowdreamtech/template/.github/workflows/README_zh-CN.md)
+[English](README.md) | [简体中文](README_zh-CN.md)
 
 本目录包含了 Snowdream Tech 项目的自动化 CI/CD 流水线和仓库维护任务。
 

@@ -1,6 +1,6 @@
 # GitHub Actions Workflows Guide
 
-[简体中文](file:///Users/snowdream/Workspace/snowdreamtech/template/.github/workflows/README_zh-CN.md) | [English](file:///Users/snowdream/Workspace/snowdreamtech/template/.github/workflows/README.md)
+[English](README.md) | [简体中文](README_zh-CN.md)
 
 This directory contains the automated CI/CD pipelines and repository maintenance tasks for the Snowdream Tech project.
 

@@ -30,10 +30,7 @@ name: Deploy Docs to GitHub Pages
         required: false
         default: ".venv"
 
-permissions:
-  contents: read # Required for checkout
-  pages: write # Required for deploying to Pages
-  id-token: write # Required for OIDC-based deployment
+permissions: {}
 
 concurrency:
   group: pages
@@ -43,6 +40,8 @@ jobs:
   build:
     name: Build Documentation
     runs-on: ubuntu-latest
+    permissions:
+      contents: read # Required for repository checkout
     timeout-minutes: 15
     env:
       VENV: ${{ github.event.inputs.venv || '.venv' }}
@@ -69,6 +68,7 @@ jobs:
       - name: Run Environment Setup
         shell: sh
         run: |
+          # Ensures the CI runner has the correct toolchain (Node, Python, pnpm).
           make setup
           make install
         env:
@@ -76,11 +76,14 @@ jobs:
 
       - name: Build VitePress site
         shell: sh
-        run: pnpm docs:build
+        run: |
+          # Compiles Markdown source into a static HTML site for production deployment.
+          pnpm docs:build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v4.0.0
         with:
+          # Points to the generated distribution folder
           path: docs/.vitepress/dist
 
   deploy:
@@ -90,6 +93,9 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write # Required for deploying to GitHub Pages
+      id-token: write # Required for OIDC-based deployment
     timeout-minutes: 10
     steps:
       - name: Deploy to GitHub Pages

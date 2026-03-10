@@ -20,9 +20,7 @@ name: Cache Cleanup
     - cron: "0 16 * * 0"
   workflow_dispatch:
 
-permissions:
-  actions: write # Required for deleting caches
-  contents: read # Base permission for environment access
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -31,7 +29,11 @@ concurrency:
 
 jobs:
   cleanup:
+    name: Cleanup Inactive Caches
     runs-on: ubuntu-latest
+    permissions:
+      actions: write # Required to delete caches via the GitHub API
+      contents: read # Required for repository metadata access
     timeout-minutes: 10 # 10m is more than enough for cache list/delete operations
     steps:
       - name: Cleanup

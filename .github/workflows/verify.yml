@@ -21,8 +21,7 @@ name: Project Verification
   workflow_call:
   workflow_dispatch:
 
-permissions:
-  contents: read # Required for environment inspection and code review
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -32,6 +31,8 @@ jobs:
   verify:
     name: Full Verification
     runs-on: ubuntu-latest
+    permissions:
+      contents: read # Required for repository inspection
     timeout-minutes: 15 # Lightweight check that should finish fast
     steps:
       - name: Checkout Code
@@ -52,16 +53,24 @@ jobs:
 
       - name: Project Setup
         shell: sh
-        run: make setup
+        run: |
+          # Ensures the local environment matches the production CI runner.
+          make setup
 
       - name: Install Project Dependencies
         shell: sh
-        run: make install
+        run: |
+          # Installs language-specific deps (Python, Node, etc.) required for verification.
+          make install
 
       - name: Run Full Verification
         shell: sh
-        run: make verify
+        run: |
+          # Performs high-level integrity checks (env, formatting, basic logic).
+          make verify
 
       - name: Run Security Audit
         shell: sh
-        run: make audit
+        run: |
+          # Scans for known vulnerabilities in dependencies.
+          make audit

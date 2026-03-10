@@ -20,8 +20,7 @@ name: PR Title Check
       - edited
       - synchronize
 
-permissions:
-  pull-requests: read # Required to read the PR title
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -31,6 +30,8 @@ jobs:
   commitlint:
     name: Check Semantic PR Title
     runs-on: ubuntu-latest
+    permissions:
+      pull-requests: read # Required to read the pull request metadata via the GitHub API
     timeout-minutes: 5 # Title linting is near-instant
     steps:
       - name: Validate PR Title (Conventional Commits)

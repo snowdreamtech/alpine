@@ -21,11 +21,7 @@ name: Release Please
     branches:
       - main
 
-permissions:
-  contents: write # Required for creating release tags and editing CHANGELOG.md
-  pull-requests: write # Required for creating and updating release PRs
-  statuses: write # Required for repository status integration
-  security-events: write # Required if release includes vulnerability reports
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -41,6 +37,11 @@ jobs:
     name: Manage Release PRs
     needs: [verify]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write # Required to create release tags and update the repository
+      pull-requests: write # Required to create and manage release PRs
+      statuses: write # Required to reflect release status in the GitHub UI
+      security-events: write # Required for SARIF report association
     timeout-minutes: 15
     steps:
       - name: Run Release Please

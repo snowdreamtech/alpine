@@ -38,10 +38,7 @@ name: "CodeQL Analysis"
     # Staggered weekly scan to ensure deep coverage outside peak hours
     - cron: "0 3 * * 1"
 
-permissions:
-  contents: read # Required for code checkout
-  security-events: write # Required for posting analysis results
-  actions: read # Required to find current workflow run
+permissions: {}
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
@@ -51,6 +48,10 @@ jobs:
   analyze:
     name: Analyze (${{ matrix.language }})
     runs-on: ubuntu-latest
+    permissions:
+      security-events: write # Required to upload SARIF results to the GitHub Security tab
+      actions: read # Required to determine workflow run status
+      contents: read # Required for code analysis
     timeout-minutes: 360 # Deep scans on large repos can take significant time
 
     strategy:
