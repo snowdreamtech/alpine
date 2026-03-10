@@ -42,6 +42,7 @@ EOF
 }
 
 # Purpose: Executes Python-specific performance benchmarks using pytest-benchmark.
+#          Scans for files containing "benchmark" and runs pytest --benchmark-only.
 # Examples:
 #   run_python_bench
 run_python_bench() {
@@ -58,6 +59,7 @@ run_python_bench() {
 }
 
 # Purpose: Executes Node.js-specific performance benchmarks.
+#          Runs the 'bench' script defined in package.json.
 # Examples:
 #   run_node_bench
 run_node_bench() {

@@ -22,7 +22,7 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 # Params:
 #   $@ - Command line arguments
 # Examples:
-#   sh scripts/install.sh --verbose
+#   main --verbose
 main() {
   # 1. Execution Context Guard
   guard_project_root

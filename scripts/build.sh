@@ -41,6 +41,27 @@ Environment Variables:
 EOF
 }
 
+# ── Functions ────────────────────────────────────────────────────────────────
+
+# Purpose: Safe wrapper for executing build commands with logging.
+# Params:
+#   $1 - Build command to execute
+#   $2 - Human-readable description of the build step
+# Examples:
+#   run_build "go build ./..." "Go build (native)"
+run_build() {
+  local _CMD_BLD="$1"
+  local _DESC_BLD="$2"
+
+  log_info "── Step: $_DESC_BLD ──"
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_success "DRY-RUN: Would run: $_CMD_BLD"
+  else
+    # shellcheck disable=SC2086
+    eval "$_CMD_BLD"
+  fi
+}
+
 # Purpose: Main entry point for the project building engine.
 #          Detects project type and runs appropriate build commands.
 # Params:
