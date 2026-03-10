@@ -31,6 +31,8 @@ jobs:
   verify:
     # Pre-flight check before opening/merging releases
     uses: ./.github/workflows/verify.yml
+    permissions:
+      contents: read
     secrets: inherit
 
   release-please:

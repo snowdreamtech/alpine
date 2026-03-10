@@ -29,6 +29,8 @@ jobs:
   verify:
     # Reusable workflow for pre-flight checks
     uses: ./.github/workflows/verify.yml
+    permissions:
+      contents: read
     secrets: inherit
 
   goreleaser:
