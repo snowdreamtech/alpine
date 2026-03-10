@@ -491,12 +491,17 @@ get_version() {
   if command -v "$_CMD_VER" >/dev/null 2>&1; then
     # Standard version extraction: find the first sequence starting with a digit
     case "$_CMD_VER" in
-    node | python | go | cargo | dotnet | dart | pwsh)
+    go)
+      "$_CMD_VER" version 2>&1 | head -n 1 | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
+      ;;
+    node | python | cargo | dotnet | dart | pwsh)
       "$_CMD_VER" "$_ARG_VER" 2>&1 | head -n 1 | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
       ;;
     pip-audit)
-      # pip-audit version output: "pip-audit 2.8.0" or with warnings
       "$_CMD_VER" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
+      ;;
+    govulncheck)
+      "$_CMD_VER" -version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
       ;;
     swift)
       # Swift version output: "swift-driver version: 1.115 Apple Swift version 6.0.3 (swiftlang-6.0.3.1.10 ...)"
