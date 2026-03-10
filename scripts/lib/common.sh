@@ -376,9 +376,9 @@ run_npm_script() {
   return 0
 }
 
-# Purpose: Executes a command while suppressing output in quiet mode.
+# Purpose: Executes a command while suppressing its output in quiet mode.
 # Params:
-#   $@ - Command and arguments
+#   $@ - Command and arguments to execute
 # Examples:
 #   run_quiet git rev-parse --is-inside-work-tree
 run_quiet() {
@@ -391,8 +391,8 @@ run_quiet() {
 
 # Purpose: Performs an atomic file replacement (Build-then-Swap).
 # Params:
-#   $1 - Source (temporary) file
-#   $2 - Target destination
+#   $1 - Source (temporary) file path
+#   $2 - Target destination path
 # Returns:
 #   0 - Success
 #   1 - Source missing
@@ -411,7 +411,7 @@ atomic_swap() {
 
 # Purpose: Orchestrates global argument parsing for all project scripts.
 # Params:
-#   $@ - Command-line arguments
+#   $@ - Command-line arguments to parse
 # Examples:
 #   parse_common_args "$@"
 parse_common_args() {
@@ -445,9 +445,9 @@ parse_common_args() {
 #   $1 - Category (Runtime, Tool, Audit)
 #   $2 - Module name (Node.js, Gitleaks)
 #   $3 - Status indicator (✅ Success, ❌ Failed)
-#   $4 - Version (or "-")
-#   $5 - Duration (seconds)
-#   $6 - Summary file path (optional)
+#   $4 - Version identifier (or "-" if unavailable)
+#   $5 - Duration in seconds
+#   $6 - Summary file path (optional, defaults to $SETUP_SUMMARY_FILE)
 # Examples:
 #   log_summary "Security" "Gitleaks" "✅ Clean" "v8.1.0" "5"
 log_summary() {
@@ -479,10 +479,10 @@ log_summary() {
 
 # Purpose: Safely extracts version strings from various command outputs.
 # Params:
-#   $1 - Binary/Command path
+#   $1 - Binary or Command path
 #   $2 - Selection argument (default: --version)
 # Returns:
-#   Detected version or "-"
+#   Detected version string or "-"
 # Examples:
 #   V=$(get_version "node")
 get_version() {

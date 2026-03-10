@@ -1,24 +1,30 @@
 #!/bin/sh
 # scripts/lib/lint-wrapper.sh - Robust wrapper for pre-commit hooks.
-# Ensures that optional linters skip gracefully if tools/runtimes are missing.
-# Usage: sh scripts/lib/lint-wrapper.sh LINTER_NAME [ARGS...]
-# Features: POSIX compliant, Graceful tool detection, Cross-platform runtime checks.
+# This utility ensures that optional linters skip gracefully if specialized tools
+# or runtimes are missing, maintaining cross-platform integrity.
+#
+# Usage:
+#   sh scripts/lib/lint-wrapper.sh LINTER_NAME [ARGS...]
+#
+# Features:
+#   - POSIX compliant, encapsulated main() pattern.
+#   - Dynamic binary resolution (.venv, node_modules, PATH).
+#   - Native runtime detection (Java, PHP, Ruby, Node, Dart, DOTNET).
+#   - OS-specific guards (Apple Swift).
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/common.sh"
 
-# Purpose: Robust wrapper for individual pre-commit hooks or linters.
-#          Ensures that optional linters skip gracefully if specialized tools
-#          or runtimes are missing, maintaining cross-platform compatibility.
+# ── Functions ────────────────────────────────────────────────────────────────
+
+# Purpose: Main entry point for the linter delegation engine.
+#          Resolves the linter binary path and performs language-specific checks.
 # Params:
 #   $1 - Linter binary/hook name (e.g., "eslint", "gofmt")
 #   $@ - Arguments passed to the linter
-# Returns:
-#   0 - Linter succeeds or is skipped (graceful skip)
-#   Linter Exit Code - Otherwise
 # Examples:
-#   sh scripts/lib/lint-wrapper.sh eslint --fix path/to/file.js
+#   main eslint --fix path/to/file.js
 main() {
   local _LINTER_WRAP="$1"
   [ -z "$_LINTER_WRAP" ] && return 0
