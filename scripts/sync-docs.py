@@ -1,4 +1,23 @@
 #!/usr/bin/env python3
+# scripts/sync-docs.py - Documentation Bridge Generator
+#
+# Purpose:
+#   Synchronizes project rules and workflows with the VitePress documentation site.
+#   Generates "bridge" files that link documentation pages to their source rule files.
+#
+# Usage:
+#   python3 scripts/sync-docs.py
+#
+# Standards:
+#   - Python 3.10+ compatible.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 03 (Architecture).
+#
+# Features:
+#   - Automated metadata extraction (titles, objectives, sections).
+#   - Intelligent category mapping for rules.
+#   - VitePress-optimized Markdown generation.
+
 import os
 import re
 from pathlib import Path

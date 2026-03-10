@@ -1,16 +1,22 @@
 #!/bin/sh
 # scripts/lib/common.sh - Shared utility library for automation scripts.
 #
-# This library provides centralized configuration, logging, and helper
-# functions used across the project's orchestration layer.
+# Purpose:
+#   Provides centralized configuration, logging, and helper functions
+#   used across the project's orchestration layer.
+#
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 04 (Network), Rule 09 (Interaction).
 #
 # Features:
 #   - Standardized colored logging (info, success, warn, error).
 #   - Robust downloading with retry and proxy logic.
 #   - Operation throttling (24h cooldown for heavy tasks).
 #   - Build-then-Swap atomic file operations.
-#   - POSIX-compliant environment detections.
-
+#   - Dual-Sentinel (双重哨兵) pattern for CI reporting.
+#
 # shellcheck disable=SC2034
 
 # ── 🎨 Visual Assets ─────────────────────────────────────────────────────────
@@ -137,6 +143,19 @@ guard_project_root() {
     log_error "Error: This script must be run from the project root."
     exit 1
   fi
+}
+
+# Purpose: Checks if a specific string exists in the GITHUB_STEP_SUMMARY.
+#          Used as part of the Dual-Sentinel (双重哨兵) pattern.
+# Params:
+#   $1 - String/Pattern to search for
+# Returns:
+#   0 - Pattern found
+#   1 - Pattern missing
+# Examples:
+#   if ! check_ci_summary "### Summary"; then ...; fi
+check_ci_summary() {
+  [ -n "$GITHUB_STEP_SUMMARY" ] && [ -f "$GITHUB_STEP_SUMMARY" ] && grep -qF "$1" "$GITHUB_STEP_SUMMARY"
 }
 
 # Purpose: Checks if a task is within its cooldown period.
@@ -440,14 +459,14 @@ parse_common_args() {
   done
 }
 
-# Purpose: Appends a status record to the centralized execution summary.
+# Purpose: Appends a status record to the centralized execution summary table.
 # Params:
-#   $1 - Category (Runtime, Tool, Audit)
-#   $2 - Module name (Node.js, Gitleaks)
-#   $3 - Status indicator (✅ Success, ❌ Failed)
-#   $4 - Version identifier (or "-" if unavailable)
-#   $5 - Duration in seconds
-#   $6 - Summary file path (optional, defaults to $SETUP_SUMMARY_FILE)
+#   $1 - Category (e.g., Runtime, Tool, Audit)
+#   $2 - Module name (e.g., Node.js, Gitleaks)
+#   $3 - Status indicator (e.g., ✅ Success, ❌ Failed)
+#   $4 - Version identifier string (or "-" if unavailable)
+#   $5 - Duration in seconds (elapsed time)
+#   $6 - Summary file path (optional, default: $SETUP_SUMMARY_FILE)
 # Examples:
 #   log_summary "Security" "Gitleaks" "✅ Clean" "v8.1.0" "5"
 log_summary() {
@@ -479,12 +498,13 @@ log_summary() {
 
 # Purpose: Safely extracts version strings from various command outputs.
 # Params:
-#   $1 - Binary or Command path
-#   $2 - Selection argument (default: --version)
+#   $1 - Binary or Command path to execute
+#   $2 - Argument to fetch version (default: --version)
 # Returns:
-#   Detected version string or "-"
+#   Detected version string (stripped) or "-" if command fails/missing.
 # Examples:
 #   V=$(get_version "node")
+#   V=$(get_version "go" "version")
 get_version() {
   local _CMD_VER="$1"
   local _ARG_VER="${2:---version}"

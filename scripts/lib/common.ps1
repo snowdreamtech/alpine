@@ -1,11 +1,20 @@
 # scripts/lib/common.ps1 - Shared utility library for PowerShell wrappers.
 #
-# Enables delegation from Windows to POSIX shell scripts while maintaining
-# the Shell (.sh) scripts as the Single Source of Truth (SSoT).
+# Purpose:
+#   Enables delegation from Windows to POSIX shell scripts while maintaining
+#   the Shell (.sh) scripts as the Single Source of Truth (SSoT).
+#
+# Usage:
+#   . "$PSScriptRoot/lib/common.ps1"
+#
+# Standards:
+#   - PowerShell-native function patterns.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 03 (Architecture).
 #
 # Features:
 #   - POSIX Shell delegation (sh/bash detection).
-#   - Uniform argument passthrough.
+#   - Robust argument passthrough (@args splatting).
 
 <#
 .SYNOPSIS

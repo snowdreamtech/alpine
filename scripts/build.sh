@@ -1,15 +1,22 @@
 #!/bin/sh
 # scripts/build.sh - Unified Project Builder
-# Orchestrates multi-stack build systems (npm, go, python, goreleaser) into a single CLI.
+#
+# Purpose:
+#   Orchestrates multi-stack build systems (npm, go, python, goreleaser) into a single CLI.
+#   Generates production-ready artifacts and distributions for all supported languages.
 #
 # Usage:
 #   sh scripts/build.sh [OPTIONS]
+#
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 03 (Architecture).
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Multi-language artifact generation.
 #   - Environment-aware build routing.
-#   - Professional UX with clear build summaries.
 
 set -e
 

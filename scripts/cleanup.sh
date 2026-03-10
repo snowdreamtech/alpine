@@ -1,15 +1,22 @@
 #!/bin/sh
 # scripts/cleanup.sh - Deep Project Sanitizer
-# Thoroughly removes build artifacts, temporary files, and caches across all platforms.
+#
+# Purpose:
+#   Thoroughly removes build artifacts, temporary files, and caches across all platforms.
+#   Restores the project to a clean, "fresh-start" state safely.
 #
 # Usage:
 #   sh scripts/cleanup.sh [OPTIONS]
+#
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency).
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Cross-stack cleanup (node, python, go, rust, iac).
 #   - Safe dry-run support for destructive operations.
-#   - Professional UX with detailed reclamation logs.
 
 set -e
 

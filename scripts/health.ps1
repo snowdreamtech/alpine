@@ -1,13 +1,13 @@
-# scripts/health.ps1 - Windows Delegation Wrapper
-# Powershell wrapper for health.sh
+# scripts/health.ps1 - PowerShell wrapper for scripts/health.sh
+#
+# Purpose:
+#   Consolidates environment checks, linting, testing, and security auditing.
+#   Delegates to POSIX shell to maintain Single Source of Truth (SSoT).
+#
+# Standards:
+#   - POSIX Shell delegation (sh/bash detection).
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 03 (Architecture).
 
-$ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Definition
-$CommonLib = Join-Path $ScriptDir "lib"
-$CommonPs1 = Join-Path $CommonLib "common.ps1"
-
-# Load common library for Invoke-ShellDelegation
-if (Test-Path $CommonPs1) {
-    . $CommonPs1
-}
-
-Invoke-ShellDelegation "health.sh" ($args -join " ")
+. "$PSScriptRoot/lib/common.ps1"
+Invoke-ShellDelegation "health.sh" $args

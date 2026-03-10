@@ -1,15 +1,22 @@
 #!/bin/sh
 # scripts/init-project.sh - Project Branding Hydrator
-# Customizes the template for a new project by replacing branded placeholders.
+#
+# Purpose:
+#   Customizes the template for a new project by replacing branded placeholders.
+#   Streamlines project onboarding with safe, global metadata injection.
 #
 # Usage:
 #   sh scripts/init-project.sh [OPTIONS]
+#
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 03 (Architecture).
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Safe placeholder replacement across the entire codebase.
 #   - Integrated Git re-initialization and remote cleanup.
-#   - Professional UX for streamlined project onboarding.
 
 set -e
 

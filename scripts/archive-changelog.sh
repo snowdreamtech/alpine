@@ -1,16 +1,22 @@
 #!/bin/sh
 # scripts/archive-changelog.sh - Automate major-version changelog archiving
-# This script moves entries of previous major versions from CHANGELOG.md to archival files.
+#
+# Purpose:
+#   Moves entries of previous major versions from CHANGELOG.md to archival files.
+#   Ensures the primary changelog remains concise while preserving historical data.
 #
 # Usage:
 #   sh scripts/archive-changelog.sh [OPTIONS]
+#
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 03 (Architecture).
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Atomic Operations & Safety Traps (atomic_swap).
 #   - Deduplication and History Sorting logic.
-#   - Universal Versioning & Multi-Language Support.
-#   - GitHub Actions Job Summary integration.
 
 set -e
 
@@ -187,9 +193,25 @@ main() {
   fi
 
   # 4. Handle archives with deduplication
-  printf "### Archival Execution Summary\n\n" >"$_TMP_SUM"
-  printf "| Major Version | Action | Destination |\n" >>"$_TMP_SUM"
-  printf "| :--- | :--- | :--- |\n" >>"$_TMP_SUM"
+  if [ "$_ARCH_SUMMARY_INITIALIZED" != "true" ] && ! check_ci_summary "### Archival Execution Summary"; then
+    {
+      printf "### Archival Execution Summary\n\n"
+    } >"$_TMP_SUM"
+    [ -n "$GITHUB_ENV" ] && echo "_ARCH_SUMMARY_INITIALIZED=true" >>"$GITHUB_ENV"
+    export _ARCH_SUMMARY_INITIALIZED=true
+  else
+    touch "$_TMP_SUM"
+  fi
+
+  # Provide table header if not already present
+  if [ "$_SUMMARY_TABLE_HEADER_SENTINEL" != "true" ] && ! check_ci_summary "| Major Version | Action | Destination |"; then
+    {
+      printf "| Major Version | Action | Destination |\n"
+      printf "| :--- | :--- | :--- |\n"
+    } >>"$_TMP_SUM"
+    [ -n "$GITHUB_ENV" ] && echo "_SUMMARY_TABLE_HEADER_SENTINEL=true" >>"$GITHUB_ENV"
+    export _SUMMARY_TABLE_HEADER_SENTINEL=true
+  fi
   local _ARCHIVE_COUNT_ARCH=0
 
   local _arch_file_iter

@@ -1,15 +1,22 @@
 #!/bin/sh
 # scripts/format.sh - Unified Code Formatter
-# Consolidates toolchains (shfmt, prettier, black, gofmt, etc.) for automated styling.
+#
+# Purpose:
+#   Consolidates toolchains (shfmt, prettier, black, gofmt, etc.) for automated styling.
+#   Optimizes code style across all project components using uniform rules.
 #
 # Usage:
 #   sh scripts/format.sh [OPTIONS]
+#
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 02 (Coding Style).
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Multi-stack auto-formatting (Shell, JS/TS, Python, Go, Rust, etc.).
 #   - Safe dry-run support to preview changes without applying.
-#   - Professional UX with clear remediation logs.
 
 set -e
 

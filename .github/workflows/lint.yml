@@ -71,7 +71,7 @@ jobs:
 
     steps:
       - name: "📂 Checkout Repository Code"
-        uses: actions/checkout@v6.2.0
+        uses: actions/checkout@v6.0.2
         with:
           persist-credentials: false
 

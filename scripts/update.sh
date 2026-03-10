@@ -1,15 +1,22 @@
 #!/bin/sh
 # scripts/update.sh - Toolchain Update Manager
-# Standardizes the maintenance of global and project-local development toolsets.
+#
+# Purpose:
+#   Standardizes the maintenance of global and project-local development toolsets.
+#   Orchestrates updates for Brew, NPM, Python, and Git Hooks in a unified CLI.
 #
 # Usage:
 #   sh scripts/update.sh [OPTIONS]
 #
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 08 (Dev Env).
+#
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
-#   - Orchestrated updates for Brew, NPM, Python, and Git Hooks.
 #   - Operation throttling with 24h cooldown to minimize disruption.
-#   - Professional UX with clear update summaries.
+#   - Unified reporting for multi-stack toolchain maintenance.
 
 set -e
 
@@ -312,16 +319,31 @@ main() {
   _START_TIME_M=$(date +%s)
 
   # Initialize Summary File if not already done
+  local _CREATED_SUMMARY_M=false
   if [ -z "$SETUP_SUMMARY_FILE" ]; then
     SETUP_SUMMARY_FILE=$(mktemp)
     export SETUP_SUMMARY_FILE
-    local _CREATED_SUMMARY_M=true
+    _CREATED_SUMMARY_M=true
 
-    {
-      printf "### Update Execution Summary\n\n"
-      printf "| Category | Module | Status | Version | Time |\n"
-      printf "| :--- | :--- | :--- | :--- | :--- |\n"
-    } >"$SETUP_SUMMARY_FILE"
+    if [ "$_UPDATE_SUMMARY_INITIALIZED" != "true" ] && ! check_ci_summary "### Update Execution Summary"; then
+      {
+        printf "### Update Execution Summary\n\n"
+      } >"$SETUP_SUMMARY_FILE"
+      [ -n "$GITHUB_ENV" ] && echo "_UPDATE_SUMMARY_INITIALIZED=true" >>"$GITHUB_ENV"
+      export _UPDATE_SUMMARY_INITIALIZED=true
+    else
+      touch "$SETUP_SUMMARY_FILE"
+    fi
+
+    # Provide table header if not already present
+    if [ "$_SUMMARY_TABLE_HEADER_SENTINEL" != "true" ] && ! check_ci_summary "| Category | Module | Status |"; then
+      {
+        printf "| Category | Module | Status | Version | Time |\n"
+        printf "| :--- | :--- | :--- | :--- | :--- |\n"
+      } >>"$SETUP_SUMMARY_FILE"
+      [ -n "$GITHUB_ENV" ] && echo "_SUMMARY_TABLE_HEADER_SENTINEL=true" >>"$GITHUB_ENV"
+      export _SUMMARY_TABLE_HEADER_SENTINEL=true
+    fi
   fi
 
   update_homebrew

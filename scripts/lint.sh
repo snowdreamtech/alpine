@@ -1,15 +1,22 @@
 #!/bin/sh
 # scripts/lint.sh - Unified Quality Orchestrator
-# Wraps pre-commit hooks and specialized language linters into a single CLI.
+#
+# Purpose:
+#   Wraps pre-commit hooks and specialized language linters into a single CLI.
+#   Enforces consistent code quality standards across the entire project.
 #
 # Usage:
 #   sh scripts/lint.sh [OPTIONS]
+#
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 02 (Coding Style).
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Orchestrated linting for all supported language stacks.
 #   - CI-optimized execution with strict error checking.
-#   - Professional UX with detailed diagnostic output.
 
 set -e
 

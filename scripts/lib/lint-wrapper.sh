@@ -1,13 +1,19 @@
 #!/bin/sh
 # scripts/lib/lint-wrapper.sh - Robust wrapper for pre-commit hooks.
-# This utility ensures that optional linters skip gracefully if specialized tools
-# or runtimes are missing, maintaining cross-platform integrity.
+#
+# Purpose:
+#   Ensures that optional linters skip gracefully if specialized tools
+#   or runtimes are missing, maintaining cross-platform integrity.
 #
 # Usage:
 #   sh scripts/lib/lint-wrapper.sh LINTER_NAME [ARGS...]
 #
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 02 (Coding Style).
+#
 # Features:
-#   - POSIX compliant, encapsulated main() pattern.
 #   - Dynamic binary resolution (.venv, node_modules, PATH).
 #   - Native runtime detection (Java, PHP, Ruby, Node, Dart, DOTNET).
 #   - OS-specific guards (Apple Swift).

@@ -1,15 +1,22 @@
 #!/bin/sh
 # scripts/commit.sh - Guided Commit Manager
-# Facilitates high-quality, conventional commits with Commitizen and health checks.
+#
+# Purpose:
+#   Facilitates high-quality, conventional commits with Commitizen and health checks.
+#   Ensures all changes meet the project's quality standards before version control entry.
 #
 # Usage:
 #   sh scripts/commit.sh [OPTIONS]
+#
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 02 (Coding Style).
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Pre-commit verification before guided entry.
 #   - Node.js dependency detection and routing.
-#   - Professional UX for streamlined version control.
 
 set -e
 

@@ -1,15 +1,22 @@
 #!/bin/sh
 # scripts/install.sh - Unified Dependency Orchestrator
-# Consolidates disparate package managers (pnpm, pip, pre-commit) into a single CLI.
+#
+# Purpose:
+#   Consolidates disparate package managers (pnpm, pip, pre-commit) into a single CLI.
+#   Ensures all environmental dependencies are installed and properly linked.
 #
 # Usage:
 #   sh scripts/install.sh [OPTIONS]
+#
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 05 (Dependencies), Rule 08 (Dev Env).
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Multi-stack dependency resolution and installation.
 #   - Virtualenv aware for Python environments.
-#   - Professional UX with clear installation metrics.
 
 set -e
 

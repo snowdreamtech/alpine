@@ -1,15 +1,22 @@
 #!/bin/sh
 # scripts/test.sh - Multi-Stack Test Runner
-# Orchestrates test suites (bats, pytest, pester, vitest) for holistic verification.
+#
+# Purpose:
+#   Orchestrates test suites (bats, pytest, pester, vitest) for holistic verification.
+#   Ensures functional correctness across all supported project components.
 #
 # Usage:
 #   sh scripts/test.sh [OPTIONS] [SUITE_TYPE]
 #
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 06 (CI/Testing).
+#
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Automated test-discovery for all project components.
-#   - Cross-platform support for Shell, Python, and Node.js tests.
-#   - Professional UX with clear results reporting.
+#   - Cross-platform support (Shell, Python, Node.js, PowerShell).
 
 set -e
 

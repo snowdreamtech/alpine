@@ -1,16 +1,23 @@
 #!/bin/sh
 # scripts/health.sh - Unified Project Health Dashboard
 #
-# Provides a "Single Pane of Glass" view of the project's health by consolidating
-# results from environment checks, linting, testing, and security auditing.
+# Purpose:
+#   Provides a "Single Pane of Glass" view of the project's health by consolidating
+#   results from environment checks, linting, testing, and security auditing.
 #
 # Usage:
 #   sh scripts/health.sh [OPTIONS]
 #
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 06 (CI/Testing).
+#
 # Features:
 #   - Aggregates multiple quality gates.
-#   - Produces a professional Markdown summary.
-#   - POSIX compliant with cross-platform support via wrappers.
+#   - Produces a professional Markdown health summary.
+#
+# shellcheck disable=SC2034
 
 set -e
 
@@ -18,9 +25,11 @@ set -e
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
-# Purpose: Main entry point for the health dashboard.
+# Purpose: Main entry point for the health dashboard aggregation engine.
 # Params:
 #   $@ - Command line arguments
+# Examples:
+#   main --output=health_report.md
 main() {
   # 1. Execution Context Guard
   guard_project_root

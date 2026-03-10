@@ -1,15 +1,22 @@
 #!/bin/sh
 # scripts/audit.sh - Automated Security Auditor
-# Standardizes execution of dependency scans and secret detection modules.
+#
+# Purpose:
+#   Standardizes execution of dependency scans and secret detection modules.
+#   Identifies vulnerabilities and leaks across all project stacks.
 #
 # Usage:
 #   sh scripts/audit.sh [OPTIONS]
+#
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 04 (Network), Rule 05 (Dependencies).
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Multi-stack scanning (npm, pip, go, cargo, osv, trivy).
 #   - Gitleaks integration for secrets detection.
-#   - Non-terminating execution with overall exit status reporting.
 
 # Note: We do NOT set -e here because we want to run all audit modules even if some fail.
 # We will track overall exit status manually.
@@ -58,11 +65,25 @@ main() {
     export SETUP_SUMMARY_FILE
     _CREATED_SUMMARY_AUDIT=true
 
-    {
-      printf "### Security Audit Execution Summary\n\n"
-      printf "| Category | Module | Status | Version | Time |\n"
-      printf "| :--- | :--- | :--- | :--- | :--- |\n"
-    } >"$SETUP_SUMMARY_FILE"
+    if [ "$_AUDIT_SUMMARY_INITIALIZED" != "true" ] && ! check_ci_summary "### Security Audit Execution Summary"; then
+      {
+        printf "### Security Audit Execution Summary\n\n"
+      } >"$SETUP_SUMMARY_FILE"
+      [ -n "$GITHUB_ENV" ] && echo "_AUDIT_SUMMARY_INITIALIZED=true" >>"$GITHUB_ENV"
+      export _AUDIT_SUMMARY_INITIALIZED=true
+    else
+      touch "$SETUP_SUMMARY_FILE"
+    fi
+
+    # Provide table header if not already present
+    if [ "$_SUMMARY_TABLE_HEADER_SENTINEL" != "true" ] && ! check_ci_summary "| Category | Module | Status |"; then
+      {
+        printf "| Category | Module | Status | Version | Time |\n"
+        printf "| :--- | :--- | :--- | :--- | :--- |\n"
+      } >>"$SETUP_SUMMARY_FILE"
+      [ -n "$GITHUB_ENV" ] && echo "_SUMMARY_TABLE_HEADER_SENTINEL=true" >>"$GITHUB_ENV"
+      export _SUMMARY_TABLE_HEADER_SENTINEL=true
+    fi
   fi
 
   # 3. Secrets Scanning

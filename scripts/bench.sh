@@ -1,15 +1,22 @@
 #!/bin/sh
 # scripts/bench.sh - Performance Benchmarking Suite
-# Standard entrance for performance measurements and regression testing.
+#
+# Purpose:
+#   Standard entrance for performance measurements and regression testing.
+#   Orchestrates benchmarks for Go, Node.js, and Python targeting high performance.
 #
 # Usage:
 #   sh scripts/bench.sh [OPTIONS] [SUITE]
 #
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 06 (CI/Testing).
+#
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Automated discovery of language-specific benchmarking tools.
-#   - Modular execution for Go, Node.js, and Python.
-#   - Professional UX with performance reporting.
+#   - Modular execution for multiple language stacks.
 
 set -e
 

@@ -1,15 +1,22 @@
 #!/bin/sh
 # scripts/check-env.sh - Environment Health Auditor
-# Validates the developer workstation against project-required runtimes and tools.
+#
+# Purpose:
+#   Validates the developer workstation against project-required runtimes and tools.
+#   Identifies missing dependencies or version mismatches before development starts.
 #
 # Usage:
 #   sh scripts/check-env.sh [OPTIONS]
+#
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 08 (Dev Env).
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Language-aware runtime detection (Node, Go, Python, etc.).
 #   - High-performance, non-destructive validation scans.
-#   - Professional UX with version-compatibility reporting.
 
 set -e
 

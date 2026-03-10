@@ -1,15 +1,22 @@
 #!/bin/sh
 # scripts/docs.sh - Documentation Lifecycle Manager
-# Unified entrance for VitePress development, artifact building, and previews.
+#
+# Purpose:
+#   Unified entrance for VitePress development, artifact building, and previews.
+#   Streamlines the maintenance and publication of project documentation.
 #
 # Usage:
 #   sh scripts/docs.sh [OPTIONS] [COMMAND]
+#
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 03 (Architecture).
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Automated VitePress installation checks.
 #   - Environment-aware routing for local and CI docs.
-#   - Professional UX for project documentation maintenance.
 
 set -e
 

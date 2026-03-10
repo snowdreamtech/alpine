@@ -1,15 +1,22 @@
 #!/bin/sh
 # scripts/env.sh - Environment Configuration Orchestrator
-# Standardizes management of .env files, validation, and template synchronization.
+#
+# Purpose:
+#   Standardizes management of .env files, validation, and template synchronization.
+#   Ensures mandatory environment variables are populated before runtime.
 #
 # Usage:
 #   sh scripts/env.sh [OPTIONS] [COMMAND]
+#
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 03 (Architecture).
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Safe template extraction and missing variable detection.
 #   - Conditional overwrite protection for local secrets.
-#   - Professional UX for environment onboarding.
 
 set -e
 

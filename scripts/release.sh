@@ -1,15 +1,22 @@
 #!/bin/sh
 # scripts/release.sh - Standardized Release Manager
-# Automates semantic versioning, git tagging, and pre-release verification.
+#
+# Purpose:
+#   Automates semantic versioning, git tagging, and pre-release verification.
+#   Ensures a reliable and documented release flow for all project artifacts.
 #
 # Usage:
 #   sh scripts/release.sh [OPTIONS] [VERSION]
+#
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 03 (Architecture).
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Automated version extraction from manifests.
 #   - Guarded git operations with dry-run support.
-#   - Professional UX with clear next-action prompts.
 
 set -e
 

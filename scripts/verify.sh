@@ -1,15 +1,22 @@
 #!/bin/sh
 # scripts/verify.sh - Project Pre-flight Verifier
-# Orchestrates environment health checks, linting, and unit testing for full validation.
+#
+# Purpose:
+#   Orchestrates environment health checks, linting, and unit testing for full validation.
+#   Acts as the final quality gate before commits or releases.
 #
 # Usage:
 #   sh scripts/verify.sh [OPTIONS]
+#
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 06 (CI/Testing).
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Holistic orchestration of specialized sub-scripts.
 #   - Exit status propagation for CI/CD usage.
-#   - Professional UX with colored status reporting.
 
 set -e
 
@@ -36,11 +43,11 @@ Options:
 EOF
 }
 
-# Purpose: Safe execution of a verification step (sub-script).
+# Purpose: Safely executes a verification sub-script.
 # Params:
-#   $1 - Path to the script to execute.
-#   $2 - Human-readable description of the step.
-#   $3 - Optional sub-arguments.
+#   $1 - Path to the script to execute (absolute or relative)
+#   $2 - Human-readable description of the step (for logging)
+#   $3 - Optional sub-arguments (passed to the sub-script)
 # Examples:
 #   run_verify_step "scripts/lint.sh" "Code Quality" "--fix"
 run_verify_step() {

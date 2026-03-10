@@ -1,15 +1,23 @@
 #!/bin/sh
 # scripts/setup.sh - Modular Project Setup Engine
-# Facilitates local development and CI/CD JIT toolchain installation.
+#
+# Purpose:
+#   Facilitates local development and CI/CD JIT toolchain installation.
+#   Maintains an isolated, reproducible development environment.
 #
 # Usage:
 #   sh scripts/setup.sh [OPTIONS] [MODULES]
 #
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - "World Class" AI Documentation (English-only).
+#   - Rule 01 (Idempotency), Rule 04 (Network), Rule 08 (Dev Env).
+#
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
-#   - Specialized modules (node, python, go, rust, etc.).
-#   - Operation throttling with 24h cooldown.
-#   - Detailed performance summary and next-action prompts.
+#   - Delta-based installation (cooldown 24h).
+#   - Multi-language support (Node, Python, Go, Rust, Java, etc.).
+#   - JIT security toolchain (Trivy, OSV-Scanner).
 
 set -e
 
@@ -65,13 +73,15 @@ EOF
 
 # ── Functions ────────────────────────────────────────────────────────────────
 
-# Purpose: Legacy compatibility wrapper for informational logging.
-#          Redirects to log_info from the common library.
+# Purpose: Internal logging wrapper for informational output.
+#          Delegates to log_info in the common library.
 # Params:
 #   $1 - Message to log
 # Examples:
-#   log "Old style message"
-log() { log_info "$1"; }
+#   log "Starting setup..."
+log() {
+  log_info "$1"
+}
 
 # Note: log_success, log_warn, and log_error are provided by common.sh
 
@@ -110,6 +120,8 @@ sanitize_path() {
 }
 
 # Purpose: Configures Node.js runtime and installs pnpm dependencies.
+# Params:
+#   None (uses global SSoT variables)
 # Examples:
 #   setup_node
 setup_node() {
@@ -155,6 +167,8 @@ setup_node() {
 }
 
 # Purpose: Initializes a Python virtual environment and installs development dependencies.
+# Params:
+#   None (uses global SSoT variables)
 # Examples:
 #   setup_python
 setup_python() {
@@ -190,6 +204,8 @@ setup_python() {
 }
 
 # Purpose: Installs Gitleaks for secrets scanning into the project's virtualenv.
+# Params:
+#   None (uses global GITLEAKS_VERSION)
 # Examples:
 #   install_gitleaks
 install_gitleaks() {
@@ -261,6 +277,8 @@ install_gitleaks() {
 }
 
 # Purpose: Installs Hadolint for Dockerfile linting.
+# Params:
+#   None (uses global HADOLINT_VERSION)
 # Examples:
 #   install_hadolint
 install_hadolint() {
@@ -308,6 +326,8 @@ install_hadolint() {
 }
 
 # Purpose: Installs golangci-lint for Go project linting.
+# Params:
+#   None (uses global GOLANGCI_VERSION)
 # Examples:
 #   install_go_lint
 install_go_lint() {
@@ -349,6 +369,8 @@ install_go_lint() {
 }
 
 # Purpose: Installs checkmake for Makefile linting.
+# Params:
+#   None (uses global CHECKMAKE_VERSION)
 # Examples:
 #   install_checkmake
 install_checkmake() {
@@ -391,6 +413,8 @@ install_checkmake() {
 }
 
 # Purpose: Installs IaC linting tools (TFLint and Kube-Linter).
+# Params:
+#   None (uses global TFLINT_VERSION and KUBE_LINTER_VERSION)
 # Examples:
 #   install_iac_lint
 install_iac_lint() {
@@ -462,6 +486,8 @@ install_iac_lint() {
 }
 
 # Purpose: Activates git pre-commit hooks.
+# Params:
+#   None
 # Examples:
 #   setup_hooks
 setup_hooks() {
@@ -487,6 +513,8 @@ setup_hooks() {
 }
 
 # Purpose: Configures PSScriptAnalyzer for PowerShell linting.
+# Params:
+#   None
 # Examples:
 #   setup_powershell
 setup_powershell() {
@@ -518,6 +546,8 @@ setup_powershell() {
 }
 
 # Purpose: Installs google-java-format for Java project linting.
+# Params:
+#   None (uses global JAVA_FORMAT_VERSION)
 # Examples:
 #   install_java_lint
 install_java_lint() {
@@ -558,6 +588,8 @@ install_java_lint() {
 }
 
 # Purpose: Sets up Rubocop for Ruby project linting.
+# Params:
+#   None
 # Examples:
 #   install_ruby_lint
 install_ruby_lint() {
@@ -603,6 +635,8 @@ install_ruby_lint() {
 }
 
 # Purpose: Installs php-cs-fixer for PHP project linting.
+# Params:
+#   None (uses global PHP_CS_FIXER_VERSION)
 # Examples:
 #   install_php_lint
 install_php_lint() {
@@ -640,6 +674,8 @@ install_php_lint() {
 }
 
 # Purpose: Verifies Dart SDK availability.
+# Params:
+#   None
 # Examples:
 #   setup_dart
 setup_dart() {
@@ -652,6 +688,8 @@ setup_dart() {
 }
 
 # Purpose: Sets up Swift linting tools on macOS.
+# Params:
+#   None
 # Examples:
 #   setup_swift
 setup_swift() {
@@ -689,6 +727,8 @@ setup_swift() {
 }
 
 # Purpose: Verifies .NET SDK availability.
+# Params:
+#   None
 # Examples:
 #   setup_dotnet
 setup_dotnet() {
@@ -705,6 +745,8 @@ setup_dotnet() {
 }
 
 # Purpose: Installs osv-scanner for vulnerability scanning.
+# Params:
+#   None (uses global OSV_SCANNER_VERSION)
 # Examples:
 #   install_osv_scanner
 install_osv_scanner() {
@@ -744,6 +786,8 @@ install_osv_scanner() {
 }
 
 # Purpose: Installs Trivy for security scanning.
+# Params:
+#   None (uses global TRIVY_VERSION)
 # Examples:
 #   install_trivy
 install_trivy() {
@@ -800,6 +844,8 @@ install_trivy() {
 }
 
 # Purpose: Sets up several security audit tools (OSV-Scanner, Trivy, Govulncheck, etc.).
+# Params:
+#   None
 # Examples:
 #   setup_security
 setup_security() {
@@ -873,7 +919,7 @@ main() {
     local _CREATED_SUMMARY_MAIN=true
 
     # Initialize Summary (Only once per CI Job or first call)
-    if [ "$_SETUP_SUMMARY_INITIALIZED" != "true" ]; then
+    if [ "$_SETUP_SUMMARY_INITIALIZED" != "true" ] && ! check_ci_summary "### Setup Execution Summary"; then
       {
         printf "### Setup Execution Summary\n\n"
         cat <<EOF
@@ -889,7 +935,7 @@ main() {
 
 EOF
         # Add Global Environment Detections immediately after the legend
-        log_summary "Environment" "System" "✅ Active" "${OS}/${ARCH}" "0"
+        log_summary "Environment" "System" "✅ Active" "$(uname -s)/$(uname -m)" "0"
         log_summary "Environment" "Shell" "✅ Active" "$(basename "$SHELL")" "0"
 
         # Detect Go/Rust even if not explicitly setup
@@ -910,11 +956,15 @@ EOF
       touch "$SETUP_SUMMARY_FILE"
     fi
 
-    # Always provide a table header for the current process invocation
-    {
-      printf "| Category | Module | Status | Version | Time |\n"
-      printf "| :--- | :--- | :--- | :--- | :--- |\n"
-    } >>"$SETUP_SUMMARY_FILE"
+    # Provide table header if not already present in the summary
+    if [ "$_SUMMARY_TABLE_HEADER_SENTINEL" != "true" ] && ! check_ci_summary "| Category | Module | Status |"; then
+      {
+        printf "| Category | Module | Status | Version | Time |\n"
+        printf "| :--- | :--- | :--- | :--- | :--- |\n"
+      } >>"$SETUP_SUMMARY_FILE"
+      [ -n "$GITHUB_ENV" ] && echo "_SUMMARY_TABLE_HEADER_SENTINEL=true" >>"$GITHUB_ENV"
+      export _SUMMARY_TABLE_HEADER_SENTINEL=true
+    fi
   fi
 
   # ── Module Selection ──
