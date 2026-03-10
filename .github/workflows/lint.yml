@@ -51,14 +51,13 @@ name: Quality & Audit
 
 permissions: {}
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
 jobs:
   lint:
     name: "🛡️ Quality Assurance Gate (${{ matrix.os }})"
     runs-on: ${{ matrix.os }}
+    concurrency:
+      group: lint-${{ github.workflow }}-${{ matrix.os }}-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: true
     strategy:
       fail-fast: false
       matrix:
@@ -106,6 +105,9 @@ jobs:
   audit:
     name: "🕵️ Security & Standards Audit (ubuntu-latest)"
     runs-on: ubuntu-latest
+    concurrency:
+      group: audit-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: true
     permissions:
       contents: read # Required for codebase inspection
       pull-requests: read # Required to analyze PR context in Commitlint

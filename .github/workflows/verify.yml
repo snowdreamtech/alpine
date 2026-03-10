@@ -23,14 +23,13 @@ name: Project Verification
 
 permissions: {}
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
 jobs:
   verify:
     name: "🏁 Pre-flight Integrity Check (${{ matrix.os }})"
     runs-on: ${{ matrix.os }}
+    concurrency:
+      group: verify-${{ github.workflow }}-${{ matrix.os }}-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: true
     strategy:
       # Ensures full cross-platform compatibility across all supported operating systems.
       fail-fast: false
