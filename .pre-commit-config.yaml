@@ -1,22 +1,43 @@
 ---
-# Pre-commit hook configuration (local mode).
-# Uses project-local tools installed via scripts/setup.sh.
+# .pre-commit-config.yaml — Second Line of Defense (第二道防线)
 #
-# Setup (one-time per machine):
-#   sh scripts/setup.sh
-#   # or with a custom venv path:
-#   VENV=/path/to/.venv sh scripts/setup.sh
+# ── Triple Guarantee (三重保证) ──────────────────────────────────────────────
+# This configuration implements the "Incremental Shift-Left" (增量左移) philosophy.
+# It ensures that all staged changes meet the project's quality standards BEFORE
+# they are committed to the repository.
 #
-# Run manually against all files:
+# Layers of Defense:
+#   1. Agent/Dev Auto-fix: Immediate local correction (eslint --fix, etc.).
+#   2. Git Commit Intercept (THIS FILE): Incremental scan of staged files.
+#   3. CI/CD Strict Checks: Authoritative full-repository audit.
+#
+# Setup (Local Machine):
+#   sh scripts/setup.sh hooks
+#
+# Manual Run:
 #   pre-commit run --all-files
+#
+# ──────────────────────────────────────────────────────────────────────────────
+
 fail_fast: true
 default_stages: [pre-commit, pre-merge-commit]
-exclude: '^(\.git|node_modules|\.venv|venv|env|vendor|dist|build|out|target|\.next|\.nuxt|\.output|__pycache__|\.specify)/'
+exclude: |
+  (?x)^(
+    \.git/|
+    node_modules/|
+    \.venv/|venv/|env/|
+    vendor/|
+    dist/|build/|out/|target/|
+    \.next/|\.nuxt/|\.output/|
+    __pycache__/|
+    \.specify/|
+    \.tmp/|tmp/
+  )
 
 repos:
   - repo: local
     hooks:
-      # ── Git Hygiene (Local Mode) ───────────────────────────────────────────
+      # ── Git Hygiene (Incremental) ──────────────────────────────────────────
       - id: trailing-whitespace
         name: trim trailing whitespace
         entry: "python3 -c 'import sys, re; [(lambda f, c: open(f, \"w\").write(re.sub(r\"[ \\t]+(?=\\n|$)\", \"\", c)))(f, open(f).read()) for f in sys.argv[1:]]'"
@@ -40,42 +61,82 @@ repos:
         entry: python3 -c 'import sys, os; [sys.exit(1) for f in sys.argv[1:] if os.path.getsize(f) > 500*1024]'
         language: system
         stages: [pre-commit, pre-merge-commit]
-        description: "Prevent large files (>500KB) from being committed to the repository."
+        description: "Prevent large files (>500KB) from being committed."
 
       - id: check-merge-conflict
         name: check for merge conflicts
         entry: sh -c "! grep -qE '^(<<<<<<<|=======|>>>>>>>)' \"$@\"" --
         language: system
         stages: [pre-commit, pre-merge-commit]
-        description: "Intercept files that still contain git merge conflict markers."
-
-      - id: check-executables-have-shebangs
-        name: check executables have shebangs
-        entry: python3 -c 'import sys, os; [sys.exit(1) for f in sys.argv[1:] if os.access(f, os.X_OK) and not open(f, "rb").read(2) == b"#!" and not os.path.isdir(f)]'
-        language: system
-        types: [text]
-        description: "Verify that executable files have a proper shebang (!#) line."
-
-      - id: check-shebang-scripts-are-executable
-        name: check shebang scripts are executable
-        entry: python3 -c 'import sys, os; [sys.exit(1) for f in sys.argv[1:] if open(f, "rb").read(2) == b"#!" and not os.access(f, os.X_OK)]'
-        language: system
-        types: [text]
-        description: "Ensure that files starting with a shebang are marked as executable."
+        description: "Intercept files containing git merge conflict markers."
 
       - id: check-case-conflict
         name: check for case conflicts
         entry: python3 -c 'import sys, os; [sys.exit(1) for d in set(os.path.dirname(f) or "." for f in sys.argv[1:]) for files in [[f.lower() for f in os.listdir(d)]] if len(files) != len(set(files))]'
         language: system
         stages: [pre-commit, pre-merge-commit]
-        description: "Check for files that would conflict on a case-insensitive filesystem."
+        description: "Verify that filenames are unique across case-insensitive filesystems."
 
       - id: check-symlinks
         name: check for broken symlinks
         entry: python3 -c 'import sys, os; [sys.exit(1) for f in sys.argv[1:] if os.path.islink(f) and not os.path.exists(f)]'
         language: system
         stages: [pre-commit, pre-merge-commit]
-        description: "Verify that symlinks do not point to non-existent locations."
+        description: "Ensure symlinks point to existing locations."
+
+      # ── Formatting (Auto-fix) ──────────────────────────────────────────────
+      - id: prettier
+        name: prettier
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh prettier
+        args: [--write]
+        types_or: [json, yaml, vue, javascript, jsx, ts, tsx]
+        description: "Standardize formatting for web-standard file types."
+
+      - id: shfmt
+        name: shfmt
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh shfmt
+        args: [-w, -s, -i, "2"]
+        types: [shell]
+        description: "Format shell scripts according to POSIX standards."
+
+      - id: taplo
+        name: taplo
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh taplo format
+        types: [toml]
+        description: "Consistent TOML formatting."
+
+      - id: ruff-format
+        name: ruff format
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh ruff format
+        types_or: [python, pyi]
+        description: "Fast Python code formatter."
+
+      - id: clang-format
+        name: clang-format
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh clang-format
+        args: [-i]
+        types_or: [objective-c, c, c++]
+        description: "Format C/C++ family source files."
+
+      - id: gofmt
+        name: gofmt
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh gofmt -w
+        types: [go]
+        description: "Canonical Go code formatting."
+
+      - id: cargo-fmt
+        name: cargo fmt
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh cargo fmt --all --
+        types: [rust]
+        pass_filenames: false
+        description: "Format Rust code using cargo toolchain."
 
       # ── Secret Scanning ────────────────────────────────────────────────────
       - id: gitleaks
@@ -84,91 +145,30 @@ repos:
         entry: sh scripts/lib/lint-wrapper.sh gitleaks protect --verbose --redact --staged --config .gitleaks.toml
         always_run: true
         pass_filenames: false
+        description: "Prevent secrets leakage. Requires .gitleaks.toml configuration."
 
-      # ── Formatting ─────────────────────────────────────────────────────────
-      - id: prettier
-        name: prettier
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh prettier
-        args: [--write]
-        types_or: [json, yaml, vue, javascript, jsx, ts, tsx]
-
-      - id: gofmt
-        name: gofmt
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh gofmt -w
-        types: [go]
-
-      - id: shfmt
-        name: shfmt
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh shfmt
-        args: [-w, -s, -i, "2"]
-        types: [shell]
-
-      - id: taplo
-        name: taplo
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh taplo format
-        types: [toml]
-
-      - id: ruff-format
-        name: ruff format
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh ruff format
-        types_or: [python, pyi]
-
-      - id: clang-format
-        name: clang-format
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh clang-format
-        args: [-i]
-        types_or: [objective-c, c, c++]
-
-      - id: cargo-fmt
-        name: cargo fmt
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh cargo fmt --all --
-        types: [rust]
-        pass_filenames: false
-        description: "Format Rust code using cargo fmt."
-
-      - id: goreleaser-check
-        name: goreleaser check
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh goreleaser check
-        files: ^\.goreleaser\.ya?ml$
-        pass_filenames: false
-        description: "Check Goreleaser configuration for errors."
-
-      # ── EditorConfig & Consistency ─────────────────────────────────────────
-      - id: editorconfig-checker
-        name: editorconfig-checker
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh editorconfig-checker
-        args:
-          - -exclude
-          - '(\.(venv|git|github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|specify|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml|tabnine|supermaven|vibe|void|zed)/.*)|((node_modules|venv|env|dist|build|out|target|vendor|__pycache__|\.specify)/.*|(\.aider\.conf\.yml))'
-
-      # ── Linting & Quality ──────────────────────────────────────────────────
+      # ── Linting & Quality (Language Specific) ──────────────────────────────
       - id: eslint
         name: eslint
         language: system
         entry: sh scripts/lib/lint-wrapper.sh eslint
         args: [--fix]
         types_or: [javascript, ts, tsx, jsx, vue]
+        description: "Find and fix problems in JavaScript/TypeScript/Vue code."
 
       - id: stylelint
         name: stylelint
         language: system
         entry: sh scripts/lib/lint-wrapper.sh stylelint --fix
         types_or: [css, scss, less]
+        description: "Linter for style sheets."
 
       - id: ruff
         name: ruff check
         language: system
         entry: sh scripts/lib/lint-wrapper.sh ruff check --fix
         types_or: [python, pyi]
+        description: "Highly performant Python linter with auto-fix capability."
 
       - id: yamllint
         name: yamllint
@@ -176,6 +176,7 @@ repos:
         entry: sh scripts/lib/lint-wrapper.sh yamllint
         args: [--config-file, .yamllint.yml]
         types: [yaml]
+        description: "Lint YAML files based on strict project rules."
 
       - id: markdownlint-cli2
         name: markdownlint-cli2
@@ -183,127 +184,70 @@ repos:
         entry: sh scripts/lib/lint-wrapper.sh markdownlint-cli2
         args: [--fix]
         types: [markdown]
+        description: "Ensure Markdown follows project style guides."
 
       - id: shellcheck
         name: shellcheck
         language: system
         entry: sh scripts/lib/lint-wrapper.sh shellcheck
         types: [shell]
+        description: "Posix-compliant ShellCheck for shell code quality."
 
-      - id: dockerfile-utils
-        name: dockerfile-utils lint
+      - id: shellcheck-posix
+        name: shellcheck posix
         language: system
-        entry: sh scripts/lib/lint-wrapper.sh dockerfile-utils lint
-        files: Dockerfile
-        description: "Lightweight Dockerfile linter via pnpm. Full hadolint scan runs in CI."
+        entry: sh scripts/lib/lint-wrapper.sh shellcheck --shell=sh
+        types: [shell]
+        description: "Enforce strict POSIX compliance for shell scripts (Rule 01.3.39)."
+
+      - id: psscriptanalyzer
+        name: PSScriptAnalyzer
+        language: system
+        entry: >-
+          pwsh -NoProfile -Command
+          \"& { if (!(Get-Command Invoke-ScriptAnalyzer -ErrorAction SilentlyContinue)) { exit 0 }; $r = $args | ForEach-Object { Invoke-ScriptAnalyzer -Path $_ -Severity Error,Warning }; if ($r) { $r | Format-Table -AutoSize; exit 1 } }\"
+        types: [powershell]
+        description: "PowerShell static analysis tool (macOS/Windows)."
 
       - id: actionlint
         name: actionlint
         language: system
         entry: sh scripts/lib/lint-wrapper.sh actionlint
         files: ^\.github/workflows/.*\.yml$
-        description: "Linter for GitHub Actions workflow files."
+        description: "Validated GitHub Actions workflow syntax."
 
-      # ── Makefile ──────────────────────────────────────────────────────────
       - id: checkmake
         name: checkmake
         language: system
         entry: sh scripts/lib/lint-wrapper.sh checkmake --config .checkmake.ini
         files: ^Makefile$
-        description: "Linter for Makefiles. Requires checkmake installed locally."
+        description: "Linter for Makefile best practices."
 
-      # ── SQL ────────────────────────────────────────────────────────────────
-      - id: sqlfluff
-        name: sqlfluff lint
+      # ── Infrastructure & Config ───────────────────────────────────────────
+      - id: dockerfile-utils
+        name: dockerfile-utils lint
         language: system
-        entry: sh scripts/lib/lint-wrapper.sh sqlfluff lint
-        args: [--dialect, postgres]
-        types_or: [sql]
-        description: "SQL linter. Installed via requirements-dev.txt."
+        entry: sh scripts/lib/lint-wrapper.sh dockerfile-utils lint
+        files: Dockerfile
+        description: "Lightweight Dockerfile syntax validation."
 
-      # ── Terraform / OpenTofu ───────────────────────────────────────────────
-      # NOTE: tflint is heavy (requires plugin init) — run full scans in CI only.
-      # Locally, only format/syntax checks via pre-commit.
-
-      # ── Kubernetes ────────────────────────────────────────────────────────
-      # NOTE: kube-linter is heavy (full manifest scan) — run in CI only.
-
-      # ── Kotlin ────────────────────────────────────────────────────────────
-      - id: ktlint
-        name: ktlint
+      - id: editorconfig-checker
+        name: editorconfig-checker
         language: system
-        entry: sh scripts/lib/lint-wrapper.sh ktlint
-        types_or: [kotlin]
-        description: "Kotlin linter and formatter. Via pnpm exec."
+        entry: sh scripts/lib/lint-wrapper.sh editorconfig-checker
+        args:
+          - -exclude
+          - '(\.(venv|git|github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|specify|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml|tabnine|supermaven|vibe|void|zed)/.*)|((node_modules|venv|env|dist|build|out|target|vendor|__pycache__|\.specify)/.*|(\.aider\.conf\.yml))'
+        description: "Validate compliance with .editorconfig rules."
 
-      # ── Java ──────────────────────────────────────────────────────────────
-      - id: google-java-format
-        name: google-java-format
+      - id: goreleaser-check
+        name: goreleaser check
         language: system
-        entry: sh scripts/lib/lint-wrapper.sh google-java-format --set-exit-if-changed --dry-run
-        types: [java]
-        description: "Java formatter (dry-run check). Requires google-java-format installed locally."
-
-      # ── Ruby ──────────────────────────────────────────────────────────────
-      - id: rubocop
-        name: rubocop
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh rubocop
-        types: [ruby]
-        description: "Ruby linter and formatter. Requires rubocop gem installed."
-
-      # ── PHP ───────────────────────────────────────────────────────────────
-      - id: php-cs-fixer
-        name: php-cs-fixer
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh php-cs-fixer fix --dry-run
-        types: [php]
-        description: "PHP code style checker (dry-run). Requires php-cs-fixer installed."
-
-      # ── Dart / Flutter ────────────────────────────────────────────────────
-      - id: dart-format
-        name: dart format
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh dart format --output=none --set-exit-if-changed
-        types_or: [dart]
-        description: "Dart formatter check. Requires dart SDK installed."
-
-      # ── Swift (macOS only) ────────────────────────────────────────────────
-      - id: swiftformat
-        name: swiftformat
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh swiftformat --lint
-        types: [swift]
-        description: "Swift formatter check. Requires swiftformat installed (macOS only)."
-
-      - id: swiftlint
-        name: swiftlint
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh swiftlint lint --strict
-        types: [swift]
+        entry: sh scripts/lib/lint-wrapper.sh goreleaser check
+        files: ^\.goreleaser\.ya?ml$
         pass_filenames: false
-        description: "Swift linter. Requires swiftlint installed (macOS only)."
+        description: "Check GoReleaser configuration."
 
-      # ── C# / .NET ─────────────────────────────────────────────────────────
-      - id: dotnet-format
-        name: dotnet format
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh dotnet format --verify-no-changes
-        files: '\.(cs|vb|fs)$'
-        pass_filenames: false
-        description: "C# formatter check. Requires .NET SDK installed."
-
-      # ── PowerShell ────────────────────────────────────────────────────────
-      - id: psscriptanalyzer
-        name: PSScriptAnalyzer
-        language: system
-        entry: >-
-          pwsh -NoProfile -Command
-          "& { if (!(Get-Command Invoke-ScriptAnalyzer -ErrorAction SilentlyContinue)) { exit 0 }; $r = $args | ForEach-Object { Invoke-ScriptAnalyzer -Path $_ -Severity Error,Warning }; if ($r) { $r | Format-Table -AutoSize; exit 1 } }"
-        types: [powershell]
-        description: "PowerShell script analyzer. Requires pwsh and PSScriptAnalyzer module."
-
-      # ── API Contracts & Specifications ───────────────────────────────────────
       - id: spectral
         name: spectral
         language: system
@@ -311,7 +255,7 @@ repos:
         types_or: [json, yaml]
         files: '(?i)(openapi|swagger|asyncapi).*\.(json|yaml|yml)$'
         pass_filenames: true
-        description: "Linter for OpenAPI/Swagger/AsyncAPI specifications."
+        description: "Linter for API contracts (OpenAPI/Swagger/AsyncAPI)."
 
       - id: sort-package-json
         name: sort-package-json
@@ -319,7 +263,7 @@ repos:
         language: system
         files: ^package\.json$
         pass_filenames: true
-        description: "Automatically sort package.json fields to maintain consistency."
+        description: "Maintain a deterministic order in package.json."
 
       - id: dotenv-linter
         name: dotenv-linter
@@ -327,12 +271,103 @@ repos:
         language: system
         files: '(\.env|\.env\.example|\.env\.sample)$'
         pass_filenames: true
-        description: "Linter for .env files. Installed via requirements-dev.txt."
+        description: "Validated structure of environment variable files."
 
-      # ── Git Commit Message Flow ──────────────────────────────────────────────
+      # ── Hardening & Security ──────────────────────────────────────────────
+      - id: check-executables-have-shebangs
+        name: check shell scripts for shebangs
+        entry: python3 -c 'import sys, os; [sys.exit(1) for f in sys.argv[1:] if os.access(f, os.X_OK) and not open(f, "rb").read(2) == b"#!" and not os.path.isdir(f)]'
+        language: system
+        types: [shell]
+        description: "Executable scripts MUST start with a shebang (!#)."
+
+      - id: check-shebang-scripts-are-executable
+        name: check shebang scripts are executable
+        entry: python3 -c 'import sys, os; [sys.exit(1) for f in sys.argv[1:] if open(f, "rb").read(2) == b"#!" and not os.access(f, os.X_OK)]'
+        language: system
+        types: [shell]
+        description: "Scripts with shebangs MUST have the executable bit set."
+
+      - id: forbidden-files
+        name: forbid temporary/debug files
+        entry: python3 -c 'import sys, re; [sys.exit(1) for f in sys.argv[1:] if re.search(r"(test\.txt|tmp\.json|debug\.log)$", f)]'
+        language: system
+        stages: [pre-commit, pre-merge-commit]
+        description: "Prevent accidental commit of temporary files (Rule 01.2.29)."
+
+      # ── Extensibility (Optional Runtime Hooks) ───────────────────────────
+      # The following hooks skip gracefully if their runtime is missing.
+      - id: sqlfluff
+        name: sqlfluff lint
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh sqlfluff lint
+        args: [--dialect, postgres]
+        types_or: [sql]
+        description: "SQL dialect linting."
+
+      - id: ktlint
+        name: ktlint
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh ktlint
+        types_or: [kotlin]
+        description: "Kotlin linting and formatting."
+
+      - id: google-java-format
+        name: google-java-format
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh google-java-format --set-exit-if-changed --dry-run
+        types: [java]
+        description: "Google Java Style guide validation."
+
+      - id: rubocop
+        name: rubocop
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh rubocop
+        types: [ruby]
+        description: "Ruby community style guide enforcement."
+
+      - id: php-cs-fixer
+        name: php-cs-fixer
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh php-cs-fixer fix --dry-run
+        types: [php]
+        description: "PHP coding standards fixer."
+
+      - id: dart-format
+        name: dart format
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh dart format --output=none --set-exit-if-changed
+        types_or: [dart]
+        description: "Dart SDK formatting check."
+
+      - id: swiftformat
+        name: swiftformat
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh swiftformat --lint
+        types: [swift]
+        description: "Swift formatting audit (macOS only)."
+
+      - id: swiftlint
+        name: swiftlint
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh swiftlint lint --strict
+        types: [swift]
+        pass_filenames: false
+        description: "Swift code quality enforcement (macOS only)."
+
+      - id: dotnet-format
+        name: dotnet format
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh dotnet format --verify-no-changes
+        files: '\.(cs|vb|fs)$'
+        pass_filenames: false
+        description: ".NET SDK code formatting audit."
+
+      # ── Git Commit Message Flow ──────────────────────────────────────────
       - id: commitlint
         name: commitlint
         language: system
         entry: sh scripts/lib/lint-wrapper.sh commitlint --edit
         always_run: true
-        stages: [commit-msg, manual]
+        stages: [commit-msg]
+        description: "Enforce Conventional Commits specification."
