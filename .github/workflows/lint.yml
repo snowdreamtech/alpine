@@ -1,13 +1,19 @@
 ---
-# Unified Project Linter & Security Auditor
-# Purpose: Authoritative gate for code quality, formatting, and security vulnerabilities.
-# Trigger: Runs on all pushes and PRs to core branches. Can be called manually or by other workflows.
+# Code Quality & Security Audit
+# Purpose: Unified linter and security scanner (Commitlint, Lychee, Trivy, pre-commit).
+# Trigger: Every push and PR to ensure high standards during the development lifecycle.
+# Permissions:
+#   - contents: read (Required for code inspection).
+#   - pull-requests: read (Required for Commitlint context in PR events).
+#   - security-events: write (Required for uploading Trivy SARIF audit reports).
+# Concurrency:
+#   - group: lint (Ensures consistent quality state per branch).
+#   - cancel-in-progress: true (Superseded by newer commits to minimize redundant CI load).
 # Design:
-#   - Implements the "Shift-Right" full-repository scan for final validation.
-#   - Consists of multi-language linting (Project-level, Python, JS/TS, Shell, YAML).
-#   - Includes deep security audits (Trivy, Lychee) and Commitlint for history purity.
+#   - Fail-fast strategy: Lints code before more expensive security scans.
+#   - POSIX-compliant shell enforcement for all inspection steps.
 
-name: Lint
+name: Quality & Audit
 
 "on":
   push:

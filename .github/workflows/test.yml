@@ -1,11 +1,16 @@
 ---
 # Project Automated Test Runner
-# Purpose: Executes the full test matrix including Shell, PowerShell, Python, and Go tests.
-# Trigger: Runs on all pushes and PRs to safeguard logically critical changes.
+# Purpose: Executes the full test matrix across multiple languages (Shell, PowerShell, Python, Go).
+# Trigger: Comprehensive coverage on every push and pull request.
+# Permissions:
+#   - contents: read (Required for codebase checkout).
+#   - pull-requests: read (Required for PR context integration during testing).
+# Concurrency:
+#   - group: test-${{ github.event.pull_request.number || github.ref }} (Scoped to PR/ref).
+#   - cancel-in-progress: true (Immediate resource release when newer commits arrive).
 # Design:
-#   - Implements a unified test runner via 'make test'.
-#   - Uses stable version tags for all environment setup actions.
-#   - Implements aggressive timeouts to fail fast and save CI minutes.
+#   - Uses unified 'make test' interface for parity between local and CI.
+#   - Implements strict timeouts to prevent hung tests from consuming quota.
 
 name: Test
 

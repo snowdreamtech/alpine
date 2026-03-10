@@ -1,13 +1,18 @@
 ---
-# GitHub Cache Cleanup
-# Purpose: Automatically cleans up old GitHub Actions caches to stay within storage limits.
-# Trigger: Runs weekly on Sundays at 16:00 UTC and can be manually triggered.
+# GitHub Cache Management
+# Purpose: Automatically clears stale GitHub Actions caches to optimize storage and prevents build pollution.
+# Trigger: Manual execution (workflow_dispatch) with optional branch/tag filtering.
+# Permissions:
+#   - actions: write (Required to delete caches via the GitHub API).
+#   - contents: read (Required for repository metadata access).
+# Concurrency:
+#   - group: cache (Ensures atomic cache cleanup operations; prevents race conditions).
+#   - cancel-in-progress: false (Cleanup should always complete to ensure consistent state).
 # Design:
-#   - Uses the GitHub CLI (gh) with the actions-cache extension.
-#   - Implements concurrency to prevent redundant cleanup runs.
-#   - Sets timeout-minutes to prevent hung processes from consuming minutes.
+#   - Uses POSIX-compliant shell for maximum compatibility with runner environments.
+#   - Implements safe-fail logic (set +e) for non-critical cleanup tasks.
 
-name: Github Cache Cleanup
+name: Cache Cleanup
 
 "on":
   schedule:

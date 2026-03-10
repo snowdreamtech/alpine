@@ -1,11 +1,16 @@
 ---
 # Pull Request Labeler
-# Purpose: Automatically triages pull requests by applying labels based on modified file paths.
-# Trigger: Runs on PR events (opened, synchronized, reopened).
+# Purpose: Automatically categorizes PRs based on changed file paths to improve backlog visibility.
+# Trigger: PR events (opened, synchronized).
+# Permissions:
+#   - pull-requests: write (Required to apply labels to the pull request).
+#   - contents: read (Required to analyze changed files via the GitHub API).
+# Concurrency:
+#   - group: labeler-${{ github.event.pull_request.number }} (Scoped to PR to avoid global collisions).
+#   - cancel-in-progress: true (Subsequent PR updates supersede previous labeling runs).
 # Design:
-#   - Uses 'pull_request_target' to allow labeler access to the repo even from fork PRs.
-#   - Implements concurrency to prevent duplicate labeling runs.
-#   - Uses specific version tags for stability.
+#   - Configuration-driven via '.github/labeler.yml' for easy maintenance.
+#   - Lightweight, event-driven categorization with near-zero resource footprint.
 
 name: Pull Request Labeler
 

@@ -1,11 +1,17 @@
 ---
 # Deploy Docs to GitHub Pages
 # Purpose: Builds the VitePress documentation site and deploys it to GitHub Pages.
-# Trigger: Runs on pushes to 'main' that affect documentation or dependencies.
+# Trigger: Runs on pushes to 'main' affecting 'docs/' or dependency manifests.
+# Permissions:
+#   - contents: read (Required for repository checkout).
+#   - pages: write (Required for deploying to GitHub Pages).
+#   - id-token: write (Required for OIDC-based deployment).
+# Concurrency:
+#   - group: pages (Ensures atomic documentation deployments).
+#   - cancel-in-progress: false (Deploys must complete to ensure site consistency).
 # Design:
-#   - Separates 'build' and 'deploy' jobs for better traceability.
-#   - Uses specific version tags for stable action execution.
-#   - Implements concurrency to ensure only the latest documentation is live.
+#   - Decouples build and deployment jobs for enhanced traceability.
+#   - Uses specific semantic version tags for VitePress and setup actions.
 
 name: Deploy Docs to GitHub Pages
 

@@ -1,11 +1,15 @@
 ---
 # Project Verification
-# Purpose: High-level verification of project integrity, environment health, and basic security.
-# Trigger: Runs on core branch events. Designed as a lightweight pre-flight check.
+# Purpose: Lightweight pre-flight check for project integrity, environment health, and basic security.
+# Trigger: Runs on core branch events. Designed as a gate for main-line stability.
+# Permissions:
+#   - contents: read (Required for repository inspection).
+# Concurrency:
+#   - group: verify-${{ github.event.pull_request.number || github.ref }} (Scoped to PR/ref).
+#   - cancel-in-progress: true (Efficient verification cycle).
 # Design:
-#   - Reuses 'make verify' and 'make audit' for consistency across local/CI.
-#   - Uses specific version tags for stable environment setup.
-#   - Implements concurrency to ensure atomic verification runs.
+#   - Reuses production-grade 'make verify' and 'make audit' scripts.
+#   - Fast feedback: Optimized for speed over depth (depth provided by 'test' job).
 
 name: Project Verification
 

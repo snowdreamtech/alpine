@@ -1,13 +1,19 @@
 ---
-# CodeQL Security Analysis (Advanced Setup)
-# Purpose: Deep semantic code analysis to detect vulnerabilities and security flaws.
-# Trigger: Runs on pushes to main/dev/feature branches, PRs, and weekly on Mondays.
+# CodeQL Security Analysis
+# Purpose: Performs deep static analysis to detect security vulnerabilities and coding errors.
+# Trigger: Push to main, weekly schedule, and manual dispatch.
+# Permissions:
+#   - security-events: write (Required to upload SARIF results to the GitHub Security tab).
+#   - actions: read (Required to determine workflow run status).
+#   - contents: read (Required for code analysis).
+# Concurrency:
+#   - group: codeql (Ensures only the latest scan results are processed per branch).
+#   - cancel-in-progress: true (In-progress scans are superseded by newer commits to save resources).
 # Design:
-#   - Explicitly controls scanned languages to reduce false positives.
-#   - Uses concurrency to optimize CI minutes on active PRs.
-#   - Implements high timeouts due to the nature of static analysis deep scans.
+#   - Utilizes advanced matrix strategy for multi-language support (Go, Python).
+#   - Leverages internal CodeQL autobuild for zero-config compilation where possible.
 
-name: CodeQL
+name: "CodeQL Analysis"
 
 "on":
   push:

@@ -1,11 +1,16 @@
 ---
 # Mark Stale Issues and PRs
-# Purpose: Automatically identifies and closes inactive issues and pull requests to maintain backlog health.
-# Trigger: Runs daily at 01:30 UTC.
+# Purpose: Maintains repository health by identifying and closing inactive issues and pull requests.
+# Trigger: Daily cron schedule (01:30 UTC) and manual backup.
+# Permissions:
+#   - issues: write (Required to label and close stagnant issues).
+#   - pull-requests: write (Required to label and close stagnant PRs).
+# Concurrency:
+#   - group: stale-refining (Prevents overlapping maintenance runs).
+#   - cancel-in-progress: true (Maintenance can be restarted without risk).
 # Design:
-#   - Avoids bothering active contributors by exempting specific labels (pinned, security, bug).
-#   - Implements concurrency to ensure only one maintenance run at a time.
-#   - Uses stable version tags for maintenance tasks.
+#   - Safeguards sensitive items by exempting 'pinned', 'security', and 'bug' labels.
+#   - Non-disruptive: Provides a 7-day grace period after stale marking.
 
 name: Mark Stale Issues and PRs
 

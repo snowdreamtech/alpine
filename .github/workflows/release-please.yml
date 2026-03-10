@@ -1,11 +1,18 @@
 ---
 # Release Please (Automated Versioning & Changelogs)
-# Purpose: Automatically creates release PRs, updates versions, and generates CHANGELOG.md.
-# Trigger: Runs on every push to the default branch (main).
+# Purpose: Manages the release lifecycle by automating PR creation, versioning, and CHANGELOG updates.
+# Trigger: Every push to the default branch (main).
+# Permissions:
+#   - contents: write (Required to create release tags and update the repository).
+#   - pull-requests: write (Required to create and manage release PRs).
+#   - statuses: write (Required to reflect release status in the GitHub UI).
+#   - security-events: write (Required if the release process includes vulnerability reports).
+# Concurrency:
+#   - group: release-please (Ensures atomic release transitions per branch).
+#   - cancel-in-progress: true (Superseded by newer merges to main).
 # Design:
-#   - Depends on 'verify' to prevent broken releases.
-#   - Uses the manifest approach to manage project versions seamlessly.
-#   - Uses specific version tags for stable automation.
+#   - Depends on 'verify' pre-flight checks to prevent broken releases.
+#   - Uses manifest approach for consistent monorepo or project versioning.
 
 name: Release Please
 
