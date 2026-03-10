@@ -152,7 +152,7 @@ jobs:
           fail: true
 
       - name: "🕵️ Detect Vulnerabilities (Trivy FS)"
-        uses: aquasecurity/trivy-action@v0.35.0
+        uses: aquasecurity/trivy-action@0.35.0
         if: ${{ always() }}
         env:
           # Use specific AWS public ECR mirrors for high reliability and scan consistency.
