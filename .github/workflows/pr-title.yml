@@ -8,6 +8,9 @@ name: PR Title Check
       - edited
       - synchronize
 
+permissions:
+  pull-requests: read
+
 jobs:
   commitlint:
     name: Check Semantic PR Title

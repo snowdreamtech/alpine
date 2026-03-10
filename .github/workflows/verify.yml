@@ -9,6 +9,9 @@ name: Project Verification
   workflow_call:
   workflow_dispatch:
 
+permissions:
+  contents: read
+
 jobs:
   verify:
     name: Full Verification
