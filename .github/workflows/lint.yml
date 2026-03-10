@@ -185,7 +185,7 @@ jobs:
           output: "trivy-results.sarif"
           severity: "CRITICAL,HIGH,MEDIUM,LOW"
           exit-code: "1"
-          version: "0.69.3"
+          version: "v0.69.3"
           token-setup-trivy: ${{ secrets.GITHUB_TOKEN }}
           skip-dirs: ".git,node_modules,.venv,venv,env,vendor,dist,build,out,target,.next,.nuxt,.output,__pycache__,.specify"
 

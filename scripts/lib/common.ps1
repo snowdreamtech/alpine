@@ -10,7 +10,7 @@
 # Standards:
 #   - PowerShell-native function patterns.
 #   - "World Class" AI Documentation (English-only).
-#   - Rule 01 (Idempotency), Rule 03 (Architecture).
+#   - Rule 01 (General), Rule 03 (Architecture).
 #
 # Features:
 #   - POSIX Shell delegation (sh/bash detection).
