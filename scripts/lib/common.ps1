@@ -7,13 +7,23 @@
 #   - POSIX Shell delegation (sh/bash detection).
 #   - Uniform argument passthrough.
 
-# Purpose: Facilitates professional delegation from Windows to POSIX shell scripts.
-#          Maintains the Shell (.sh) scripts as the Single Source of Truth (SSoT).
-# Params:
-#   $ScriptName - Name of the core .sh script to invoke (e.g., "setup.sh").
-#   $Arguments  - Array of command-line arguments to pass through.
-# Examples:
-#   Invoke-ShellDelegation "setup.sh" $args
+<#
+.SYNOPSIS
+    Facilitates professional delegation from Windows to POSIX shell scripts.
+
+.DESCRIPTION
+    Maintains the Shell (.sh) scripts as the Single Source of Truth (SSoT) by
+    detecting a POSIX shell (sh or bash) and passing all arguments through.
+
+.PARAMETER ScriptName
+    The name of the core .sh script to invoke (e.g., "setup.sh").
+
+.PARAMETER Arguments
+    The array of command-line arguments to pass through to the shell script.
+
+.EXAMPLE
+    Invoke-ShellDelegation "setup.sh" $args
+#>
 function Invoke-ShellDelegation {
     param(
         [string]$ScriptName,
