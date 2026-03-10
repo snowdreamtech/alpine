@@ -9,13 +9,14 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Added
 
-- Standardized automation infrastructure with 18 core POSIX scripts and 36 Windows wrappers
-- Achieved 100% "World Class" AI-ready documentation across all scripts and libraries
-- Implemented Triple-Entry pattern (bat -> ps1 -> sh) for guaranteed cross-platform parity
-- Upgraded script READMEs to mandatory 5-section compliance structure
-- Enhanced pre-commit hooks with robust graceful skipping via `lint-wrapper.sh`
-- Unified performance benchmarking and security auditing toolsets across platforms
-- Standardized prompt messages and "Next Action" guidance for developer experience
+- Initial project template with AI IDE ecosystem support (50+ AI IDEs)
+- Core rule system in `.agent/rules/` as Single Source of Truth
+- SpecKit workflow suite for full feature lifecycle management
+- DevContainer with Docker Compose for reproducible development environments
+- Comprehensive CI/CD pipeline (lint, security scan, CodeQL, GoReleaser, stale)
+- Pre-commit hooks with 50+ quality gate checks
+- VS Code productivity configurations (tasks and launch profiles)
+- Project hydration script (`scripts/init-project.sh`)
 - GitHub community health files (SECURITY, CONTRIBUTING, CODE_OF_CONDUCT)
 - Multi-IDE prompt/command shortcuts for all major AI coding assistants
 
