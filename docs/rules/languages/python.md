@@ -1,4 +1,4 @@
-# Python Development Guidelines
+# Python
 
 > Objective: Define standards for modern, clean, and maintainable Python code, covering version management, tooling, type hints, code style, async patterns, and testing.
 

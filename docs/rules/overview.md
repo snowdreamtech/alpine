@@ -17,6 +17,7 @@ The `.agent/rules/` directory is the **single source of truth** for all developm
 | [09 · AI Interaction](./09-ai-interaction.md) | AI agent behavior and boundaries             |
 | [10 · UI/UX](./10-ui-ux.md)                   | Frontend, accessibility, i18n                |
 | [11 · Deployment](./11-deployment.md)         | Docker, IaC, release pipelines               |
+| [12 · Docs](./12-docs.md)                     | Documentation standards, Sync logic          |
 
 ## How Rules Work
 

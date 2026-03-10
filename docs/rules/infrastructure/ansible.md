@@ -16,3 +16,12 @@ View the full rule: [`.agent/rules/ansible.md`](https://github.com/snowdreamtech
 - 1. Execution Safety
 - 1. File & Template Operations
 - 1. Error Handling & Verification
+- 1. Tags & Always Tag
+- 1. Cross-Platform & macOS Compatibility
+- 1. Delivery & Maintenance
+- 1. Testing & Linting
+- 1. App Development Standards (Multi-Distribution)
+- 1. Scenario Design Patterns
+- 1. Container Volume Configuration (Cross-Platform)
+- 1. Shell Script Standards (POSIX Compatibility)
+- 1. Windows Platform Standards

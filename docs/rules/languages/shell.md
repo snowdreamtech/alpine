@@ -13,3 +13,6 @@ View the full rule: [`.agent/rules/shell.md`](https://github.com/snowdreamtech/t
 - 1. Functions & Structure
 - 1. Portability & Best Practices
 - 1. Error Handling & Tooling
+- 1. Cross-Platform Delegation Pattern
+- 1. Linting Requirements (All Script Types)
+- 1. High-Performance & Robustness Patterns
