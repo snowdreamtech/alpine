@@ -62,7 +62,9 @@ run_pre_commit_lint() {
   fi
 
   # Run on all files
-  if [ -n "$_LV_FIX" ]; then
+  if [ "$DRY_RUN" -eq 1 ]; then
+    log_success "DRY-RUN: Would run $_PRE_COMMIT_LNT --all-files"
+  elif [ -n "$_LV_FIX" ]; then
     log_info "Running in auto-fix mode..."
     # pre-commit doesn't have a direct --fix flag for everything at once,
     # but many hooks auto-fix by default.
