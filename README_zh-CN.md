@@ -66,7 +66,21 @@ project-root/
    make verify
    ```
 
-### 2. 日常开发工作流 (日常开发)
+### 2. Git 同步 (Git Synchronization)
+
+> [!IMPORTANT]
+> 本仓库会定期进行历史记录清理。如果您遇到“分支分叉”或“拒绝合并无关历史”的情况，请使用以下命令同步：
+
+```bash
+# 1. 获取最新历史记录
+git fetch origin
+
+# 2. 将本地分支重置为远程状态
+# 警告：这会丢弃本地未提交的更改。请先执行 git stash！
+git reset --hard origin/dev  # 或 origin/main
+```
+
+### 3. 日常开发工作流 (日常开发)
 
 遵循以下循环以保持高质量开发：
 

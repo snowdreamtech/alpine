@@ -66,7 +66,21 @@ To ensure a 100% pure and standardized environment, follow these steps in order:
    make verify
    ```
 
-### 2. Daily Development Workflow (日常开发)
+### 2. Git Synchronization (Git 同步)
+
+> [!IMPORTANT]
+> This repository occasionally undergoes history sanitization for security and optimization. If you encounter "divergent branches" or "refusing to merge unrelated histories", please use the following commands to sync:
+
+```bash
+# 1. Fetch the latest history
+git fetch origin
+
+# 2. Reset your local branch to the remote state
+# WARNING: This will discard uncommitted local changes. Stash them first!
+git reset --hard origin/dev  # or origin/main
+```
+
+### 3. Daily Development Workflow (日常开发)
 
 For a high-quality development cycle, follow this cycle:
 
