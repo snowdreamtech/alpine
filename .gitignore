@@ -14,6 +14,12 @@
 skills/
 .agents/skills/
 .agent/skills/
+.agent/brain/
+.cursor/
+.cline/
+.trae/
+.windsurf/
+
 
 # =============================================================================
 # Linter Test Binaries & Artifacts (project-specific)

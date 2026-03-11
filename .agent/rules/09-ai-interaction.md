@@ -172,3 +172,25 @@ To prevent Context Window Overflow and hallucination caused by massive rule sets
   - Scripts SHOULD auto-detect active languages and tools.
   - Irrelevant checks SHOULD be skipped or groups hidden to avoid noise.
   - See [08-dev-env.md](08-dev-env.md) and [10-ui-ux.md](10-ui-ux.md) for UX standards.
+
+## 6. Advanced Agentic Workflows & Isolation
+
+### Artifact & State Management
+
+- **Persistent State Isolation**: When AI agents need to maintain persistence, long-running task context, or detailed checklists (e.g., `task.md`), they MUST create and use the **`.agent/brain/`** directory at the project root.
+- **Git Pollution Prevention**: To prevent these AI memory files from polluting the project's version control history, the `.agent/brain/` directory (along with proprietary IDE folders like `.cursor/`, `.cline/`, `.windsurf/`, etc.) is strictly ignored in `.gitignore`. AI agents MUST verify this isolation before writing state.
+- **Temporary Scratchpads**: For completely ephemeral work (one-off debug scripts, intermediate text processing), use the OS temporary directory (`/tmp/` or `%TEMP%`) to ensure zero trace is left after a restart.
+
+### Tool Calling Priorities
+
+When operating in an agentic mode equipped with system tools, AI MUST prioritize tools according to stability and safety:
+
+1. **Native APIs First**: ALWAYS use native, purpose-built file manipulation APIs (e.g., `replace_file_content`, `view_file` equivalents exposed by the host IDE) over raw Shell commands.
+2. **Strict Prohibition on Dangerous Shell Text Processing**: NEVER use `cat <<EOF > file`, `sed -i`, or `echo > file` in a shell command to modify source code. These workflows are highly prone to escaping errors and context corruption.
+3. **Targeted Search**: Use structured search tools (`grep_search`, `ast_search`) before falling back to full-disk `find` or unconstrained `grep -r`, to prevent IO exhaustion.
+4. **Absolute Paths**: Always construct and utilize **absolute paths** when interfacing with the filesystem to eliminate relative-path context confusion inside autonomous loops.
+
+### Self-Correction & Autonomous Rollback
+
+- **Mandatory Self-Correction Loop**: After making changes to source code or configuration, the AI MUST silently and autonomously run the appropriate linter, compiler, or test suite to verify the change.
+- **Silent Retry**: If the validation command fails, the AI MUST NOT immediately stop and report the error to the user as a failure. Instead, it MUST attempt to read the error logs, self-correct the code, and re-run the validation at least once. Only escalate to the user if the self-correction loop fails repeatedly or fundamentally changes the design constraints.
