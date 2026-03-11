@@ -212,30 +212,7 @@
 
 ## 16. Shell Script Standards (POSIX Compatibility)
 
-All shell scripts (`.sh`) invoked by Ansible MUST be POSIX-compatible unless Bash-specific features are explicitly required.
-
-- **Shebang**: MUST use `#!/bin/sh` unless Bash-specific features are unavoidable.
-- **Prohibited Bash-isms**:
-  - `[[ ]]` double-bracket tests → use `[ ]` single brackets
-  - `${BASH_SOURCE[0]}` → use `$0`
-  - `${var:offset:length}` → use `cut`/`sed`
-  - `${var,,}` / `${var^^}` case conversion → use `tr`/`awk`
-  - `&>>` redirect operator → use `>> file 2>&1`
-  - Arrays (in POSIX context) → use space-separated strings
-  - `function` keyword → use `func_name() { }` syntax
-  - `==` in tests → use `=` for string comparison
-  - `source` command → use `.` (dot)
-- **POSIX-Compatible Patterns**:
-  - Script directory detection: `SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)`
-  - Logical operators: `[ cond1 ] && [ cond2 ]` or `[ cond1 ] || [ cond2 ]`
-  - Non-empty test: `[ -n "$var" ]`; empty test: `[ -z "$var" ]`
-- **Cross-Platform Wrapper Sync**: When modifying or creating `.sh` scripts, MUST synchronously create or update the corresponding `.bat` (Windows Batch) and `.ps1` (PowerShell) wrappers to ensure consistent developer experience on Linux, macOS, and Windows/WSL.
-- **Execution Mode Guard**:
-  - **Tool scripts** (e.g., `home.sh`): MUST reject being `source`d.
-  - **Environment scripts** (e.g., `setup_venv.sh`): MUST reject being executed directly; prompt the user to use `source`.
-- **Fail Fast**: MUST use `set -euo pipefail` in all scripts.
-- **Command Detection**: Use `command -v` instead of `which`.
-- **GNU flag portability**: Avoid GNU-specific flags (e.g., `grep -P`, `sed -r`); use portable alternatives.
+All shell scripts (`.sh`) invoked by Ansible MUST be POSIX-compatible unless Bash-specific features are explicitly required. For detailed shell scripting rules (including POSIX patterns, safety flags, and cross-platform wrappers), refer to [shell.md](shell.md).
 
 ## 17. Windows Platform Standards
 

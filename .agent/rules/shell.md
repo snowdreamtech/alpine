@@ -419,6 +419,7 @@ if [ "$_IS_TOP_LEVEL" = "true" ]; then
   cat "$SHARED_SUMMARY_FILE"
   rm -f "$SHARED_SUMMARY_FILE"
 fi
+```
 
 ### Persistent Interactive Prompt Pattern (Next Actions)
 
