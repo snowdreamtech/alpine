@@ -26,17 +26,17 @@ The Snowdream Tech Template is architected to solve the "N-IDE Fragmentation" pr
 
 ```mermaid
 graph TD
-    A[Developers & Agents] -->|Operates via| IDE[Cursor / Windsurf / Copilot / 50+ Others]
-    IDE -->|Reads Rules via Redirects| R1[.vscode/]
-    IDE -->|Reads Rules via Redirects| R2[.github/]
-    IDE -->|Reads Rules via Redirects| R3[.cline/ .trae/ etc.]
+    A["Developers & Agents"] -->|Operates via| IDE["Cursor / Windsurf / Copilot / 50+ Others"]
+    IDE -->|Reads Rules via Redirects| R1[".vscode/"]
+    IDE -->|Reads Rules via Redirects| R2[".github/"]
+    IDE -->|Reads Rules via Redirects| R3[".cline/ .trae/ etc."]
 
-    R1 -.->|SSoT Pointer| CoreRules[.agent/rules/]
+    R1 -.->|SSoT Pointer| CoreRules[".agent/rules/"]
     R2 -.->|SSoT Pointer| CoreRules
     R3 -.->|SSoT Pointer| CoreRules
 
-    CoreRules -->|Governs| Src[Source Code]
-    CoreRules -->|Governs| Scripts[CI/CD & Shell Scripts]
+    CoreRules -->|Governs| Src["Source Code"]
+    CoreRules -->|Governs| Scripts["CI/CD & Shell Scripts"]
 ```
 
 ### Design Principles

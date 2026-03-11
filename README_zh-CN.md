@@ -26,17 +26,17 @@ Snowdream Tech 模板的架构旨在解决“单体项目多重 AI IDE 协作产
 
 ```mermaid
 graph TD
-    A[开发者与智能体 (Agents)] -->|操作| IDE[Cursor / Windsurf / Copilot / 50+ 其它]
-    IDE -->|通过重定向读取规则| R1[.vscode/]
-    IDE -->|通过重定向读取规则| R2[.github/]
-    IDE -->|通过重定向读取规则| R3[.cline/ .trae/ 等等]
+    A["开发者与智能体 (Agents)"] -->|操作| IDE["Cursor / Windsurf / Copilot / 50+ 其它"]
+    IDE -->|通过重定向读取规则| R1[".vscode/"]
+    IDE -->|通过重定向读取规则| R2[".github/"]
+    IDE -->|通过重定向读取规则| R3[".cline/ .trae/ 等等"]
 
-    R1 -.->|SSoT 指针| CoreRules[.agent/rules/]
+    R1 -.->|SSoT 指针| CoreRules[".agent/rules/"]
     R2 -.->|SSoT 指针| CoreRules
     R3 -.->|SSoT 指针| CoreRules
 
-    CoreRules -->|管理与约束| Src[项目应用源码]
-    CoreRules -->|管理与约束| Scripts[CI/CD 与统一自动化脚本]
+    CoreRules -->|管理与约束| Src["项目应用源码"]
+    CoreRules -->|管理与约束| Scripts["CI/CD 与统一自动化脚本"]
 ```
 
 ### 设计原则
