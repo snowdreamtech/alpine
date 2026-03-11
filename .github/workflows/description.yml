@@ -1,24 +1,40 @@
 ---
-name: GitHub Actions Description Updater
+# Container Metadata Synchronization
+# Purpose: Synchronizes the project's README or description from GitHub with Docker Hub.
+# Trigger: Every push to the main branch affecting README.md or this workflow file.
+# Permissions:
+#   - contents: read (Required to read README.md and repository description).
+
+name: Container Metadata Synchronization
 
 "on":
   push:
     branches:
-      - main
+      - "main"
     paths:
-      - README.md
-      - .github/workflows/description.yml
+      - "README.md"
+      - ".github/workflows/description.yml"
+
+permissions: {}
 
 jobs:
-  dockerHubDescription:
+  docker-hub-sync:
+    name: "📝 Synchronize Container Documentation (ubuntu-latest)"
     runs-on: ubuntu-latest
+    concurrency:
+      group: sync-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    permissions:
+      contents: read # Required to read README.md
+    timeout-minutes: 10
     steps:
-      - name: Checkout
+      - name: "📂 Checkout Repository Code"
         uses: actions/checkout@v6.0.2
         with:
-          # [Required] Access token with `workflow` scope.
+          # [Required] Access token with `workflow` scope for potential updates.
           token: ${{ secrets.WORKFLOW_SECRET }}
-      - name: Docker Hub Description
+
+      - name: "🏗️ Update Docker Hub Description/README"
         uses: christian-korneck/update-container-description-action@v1
         env:
           DOCKER_USER: ${{ secrets.DOCKER_HUB_USERNAME }}
@@ -28,11 +44,3 @@ jobs:
           provider: dockerhub
           short_description: ${{ github.event.repository.description }}
           readme_file: "README.md"
-      # - name: Quay.io Description
-      #   uses: christian-korneck/update-container-description-action@v1
-      #   env:
-      #     DOCKER_APIKEY: ${{ secrets.QUAY_API_TOKEN }}
-      #   with:
-      #     destination_container_repo: quay.io/snowdreamtech/alpine
-      #     provider: quay
-      #     readme_file: "README.md"
