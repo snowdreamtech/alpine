@@ -11,16 +11,7 @@
 
 An enterprise-grade, foundational template designed for multi-AI IDE collaboration. This repository serves as a **Single Source of Truth** for AI agent rules, workflows, and project configurations, supporting over 50 different AI-assisted IDEs with massive multi-language support.
 
-## 🌟 Features
-
-- **Multi-IDE Compatibility**: Out-of-the-box support for Cursor, Windsurf, GitHub Copilot, Cline, Roo Code, Trae, Gemini, Claude Code, and 50+ other AI editors.
-- **Unified Rule System**: Centralized rule definitions in `.agent/rules/`. Modifying a rule here propagates to all supported IDEs via safe symlink/redirect patterns.
-- **80+ Language & Framework Rules**: Pre-configured, high-quality rules for everything from Rust, Go, TypeScript, and Python to Ansible, Kubernetes, and API Design.
-- **Intelligent Workflows (SpecKit)**: Standardized `.agent/workflows/` (commands) such as `speckit.plan`, `speckit.analyze`, and `snowdreamtech.init` available uniformly across supported environments.
-- **Triple Guarantee Quality**: Integrated gated checks via Pre-commit and GitHub Actions to ensure 100% code purity.
-- **Cross-Platform Ready**: Seamless operation across macOS (Homebrew/MacPorts), Linux, and Windows.
-
-## 🏗️ Design & Architecture
+## 🏗️ Section 1 — Design & Architecture
 
 The Snowdream Tech Template is architected to solve the "N-IDE Fragmentation" problem, ensuring that rules and workflows remain consistent across all supported environments.
 
@@ -45,7 +36,40 @@ graph TD
 - **Cross-Platform Portability**: Heavy automation logic is written in POSIX Shell, with thin wrappers for Windows PowerShell/Batch.
 - **Triple Guarantee Quality**: Linting and formatting form an impenetrable wall, enforced at the IDE layer, pre-commit layer, and CI/CD GitHub Actions layer.
 
-## 📂 Directory Structure
+### Responsibilities
+
+- **.agent/rules/**: Owns the definitive behavioral logic for AI agents across all supported languages.
+- **scripts/**: Owns the cross-platform automation and lifecycle logic.
+- **.agent/workflows/**: Owns the interactive AI commands (SpecKit).
+
+---
+
+## 📖 Section 2 — Usage Guide
+
+### Prerequisites
+
+- **Runtime**: Node.js (>= 20.x), Python (>= 3.10.x).
+- **Git**: Global git installation required.
+- **Make**: Required for unified command execution.
+
+### Quick Start
+
+```bash
+make init     # Initialize project identity
+make setup    # Install system level tools
+make install  # Install dependencies & hooks
+make verify   # Run health check
+```
+
+### Configuration Reference
+
+| Parameter      | Purpose              | Location                |
+| :------------- | :------------------- | :---------------------- |
+| `PROJECT_NAME` | Project identity     | `init-project.sh`       |
+| `GITHUB_PROXY` | Network optimization | `scripts/lib/common.sh` |
+| `VERSION`      | Semantic versioning  | `package.json`          |
+
+### File Structure
 
 ```text
 project-root/
@@ -53,142 +77,76 @@ project-root/
 │   ├── rules/           # 📏 Unified AI behavioral rules (80+ sets, SSoT)
 │   └── workflows/       # 🛠️ Unified commands & AI workflows (SpecKit)
 ├── .agents/             # 🧩 Shared command sources (Auto-managed symlinks)
-├── .gemini/             # ♊ Gemini-specific extensions and CLI configs
 ├── .github/             # 🐙 GitHub integration & Copilot settings
 ├── .vscode/             # 💻 Optimized VS Code configurations
-├── .cline/              # 🔗 Example of IDE-specific redirect folder (50+ included)
-├── .pre-commit-config.yaml # ⚓ Pre-commit hook definitions
 └── src/                 # 📦 Your actual application source code
 ```
 
-## 🚀 Getting Started
+---
 
-To ensure a 100% pure and standardized environment, follow these steps in order:
+## 🛠️ Section 3 — Operations Guide
 
-### 1. Project Initialization (首次初始化)
+### Pre-deployment Checklist
 
-1. **Clone the template**.
-2. **Setup Basic Runtimes**: Ensure you have Node.js and Python installed.
-3. **Hydrate Project**: Re-brand the template for your identity.
+1. Run `make verify` to ensure all quality gates are green.
+2. Run `make audit` to verify security compliance.
+3. Ensure `CHANGELOG.md` is updated.
 
-   ```bash
-   make init
-   ```
+### Performance Considerations
 
-4. **Install System Tools**: Install security and linting binaries (gitleaks, trivy, etc.).
+- **Linting Speed**: Pre-commit hooks target < 5s by scanning staged files only.
+- **CI Throughput**: GitHub Actions use matrix builds for parallel testing across OS types.
 
-   ```bash
-   make setup
-   ```
+### Troubleshooting
 
-5. **Install Dependencies**: Install project-specific packages and activate hooks.
+- **Problem**: `make install` fails on Windows.
+  - **Diagnosis**: Check if `ExecutionPolicy` allows script execution.
+  - **Solution**: Run `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`.
+- **Problem**: Gitleaks detects false positives.
+  - **Diagnosis**: Check `.gitleaks.toml` allowlist.
+  - **Solution**: Add fingerprint to `.gitleaksignore`.
 
-   ```bash
-   make install
-   ```
+---
 
-6. **Final Verification**: Confirm everything is correctly configured.
+## 🔒 Section 4 — Security Considerations
 
-   ```bash
-   make verify
-   ```
+### Security Model
 
-### 2. Git Synchronization (Git 同步)
+- **Secret Management**: All secrets must be injected via environment variables or handled by HashiCorp Vault. Never commit `.env` files.
+- **Audit Logging**: All critical operations (commits, releases, state changes) are traced via Git and CI logs.
+- **Supply Chain**: All CI actions are pinned to exact versions/SHAs.
 
-> [!IMPORTANT]
-> This repository occasionally undergoes history sanitization for security and optimization. If you encounter "divergent branches" or "refusing to merge unrelated histories", please use the following commands to sync:
+### Best Practices
+
+| Aspect      | Requirement                  | Implementation                    |
+| :---------- | :--------------------------- | :-------------------------------- |
+| Secrets     | No plaintext secrets in repo | `gitleaks` enforced at commit     |
+| Integrity   | Verify downloads             | SHA-256 validation in `common.sh` |
+| Permissions | Non-root execution           | Dockerfile best practices         |
+
+---
+
+## 🧑‍💻 Section 5 — Development Guide
+
+### Extension Points
+
+1. **Adding Rules**: Create a new `.md` file in `.agent/rules/` and link it in `00-index.md`.
+2. **Adding Commands**: Add `.md` files to `.agent/workflows/`.
+3. **Adding IDE Support**: Create a redirect folder (e.g., `.myide/`) following the symlink pattern in Rule 03.
+
+### Local Development Setup
 
 ```bash
-# 1. Fetch the latest history
-git fetch origin
-
-# 2. Reset your local branch to the remote state
-# WARNING: This will discard uncommitted local changes. Stash them first!
-git reset --hard origin/dev  # or origin/main
+git clone <repo>
+make setup
+make install
 ```
 
-### 3. Daily Development Workflow (日常开发)
+### References
 
-For a high-quality development cycle, follow this cycle:
-
-1. **Sync**: `make install` (Ensure dependencies are up to date)
-2. **Code**: Implement features or fixes.
-3. **Format**: `make format` (Auto-fix style issues)
-4. **Lint**: `make lint` (Verify standards)
-5. **Test**: `make test` (Verify logic)
-6. **Audit**: `make audit` (Security check, recommended before PR)
-7. **Commit**: `make commit` (Conventional commit)
-
-## 🛠️ Full Automation Matrix
-
-This template features a professional-grade script library (18 tool suites) that ensures **Single Source of Truth (SSoT)** across macOS, Linux, and Windows. All tools are natively accessible via `make` or `pnpm/npm`.
-
-| Suite        | Goal                       | Commands                                |
-| :----------- | :------------------------- | :-------------------------------------- |
-| **Core**     | Onboarding & Project Setup | `init`, `setup`, `install`, `check-env` |
-| **Quality**  | Reliability & Standards    | `test`, `lint`, `format`, `verify`      |
-| **Security** | Auditing & Compliance      | `audit`, `env`                          |
-| **Ops**      | Building & Releasing       | `build`, `release`, `archive-changelog` |
-| **Maint**    | Tooling & Cleanup          | `update`, `cleanup`                     |
-| **DX**       | Developer Productivity     | `docs`, `commit`, `bench`               |
-
-### Release Governance
-
-Our release process enforces a strict **'v' prefix standard** for Git tags (e.g., `v1.2.3`) while keeping manifest versions numeric-only. By default, `make release` performs a local audit only; use `--git-tag` for explicit publishing.
-
-## 🛠️ SpecKit Collaboration Workflows
-
-## 📐 AI Interaction Guidelines
-
-This repository strictly enforces interaction rules to prevent "AI hallucinations". By design, our IDE settings redirect the agent to read `.agent/rules/09-ai-interaction.md` upon session startup.
-
-> **Language Notice:** While all technical code, commits, and rule definitions must be in English, all communication with the AI and user-facing documentation should default to **Simplified Chinese (简体中文)**.
-
-## 🤝 Project Rules Definition
-
-To augment AI behavior, **do not** modify individual IDE configuration directories directly. Instead:
-
-1. Add or modify markdown files inside `.agent/rules/`.
-2. The existing symlink topology will automatically apply your new rules to all 50+ AI environments.
-
-## 🐳 DevContainer
-
-This project provides a pre-configured **DevContainer** for a consistent, enterprise-grade development experience. It supports two modes:
-
-- **Single Container (Default)**: Lightweight environment with all 20+ CI tools and 40+ VS Code extensions pre-installed.
-- **Docker Compose (Optional)**: Includes additional services like **PostgreSQL** and **Redis**.
-
-### How to use
-
-#### Local Development (本地开发)
-
-1. Open the project in VS Code.
-2. Ensure Docker Desktop is running.
-3. If you have the "Dev Containers" extension installed, you will be prompted to "Reopen in Container".
-4. Alternatively, use the Command Palette (`F1`) and select `Dev Containers: Reopen in Container`.
-
-#### Remote Development (远程 SSH 开发)
-
-1. Connect to your remote server via `Remote - SSH` extension.
-2. Open this project folder on the remote server.
-3. Use the Command Palette (`F1`) and select `Dev Containers: Reopen in Container`. VS Code will build and run the container on the **remote server's Docker engine**.
-
-### Configuration
-
-#### Switch to Docker Compose (切换混合模式)
-
-To enable **PostgreSQL** and **Redis**:
-
-1. Open `.devcontainer/devcontainer.json`.
-2. Follow the internal comments to swap the `build` section with the `dockerComposeFile` section.
-3. Rebuild the container.
-
-#### Custom Base Image (自定义镜像)
-
-If you need to use a private or enterprise image:
-
-1. Modify the `FROM` instruction in `.devcontainer/Dockerfile`.
-2. Ensure your image has a `vscode` user or adjust the `remoteUser` setting in `devcontainer.json`.
+- [Full Documentation](docs/index.md)
+- [Project Glossary](docs/glossary.md)
+- [Conventional Commits](https://www.conventionalcommits.org/)
 
 ## 📄 License
 
