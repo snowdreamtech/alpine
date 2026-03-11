@@ -54,6 +54,7 @@ jobs:
           # 'simple' release type is optimized for standard conventional commit projects.
           release-type: simple
           config-file: .release-please-config.json
+          # manifest-file: .release-please-manifest.json # Optional: Explicitly define the version registry for Manifest mode.
 
       - name: "🏗️ Checkout Release PR Branch"
         if: ${{ steps.release.outputs.pr }}
