@@ -22,15 +22,13 @@ name: Cache Cleanup
 
 permissions: {}
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  # Older cleanup runs are irrelevant if a new one starts
-  cancel-in-progress: true
-
 jobs:
   cleanup:
     name: "🧹 Cache Sanitation Maintenance"
     runs-on: ubuntu-latest
+    concurrency:
+      group: cache-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     permissions:
       actions: write # Required to delete caches via the GitHub API
       contents: read # Required for repository metadata access

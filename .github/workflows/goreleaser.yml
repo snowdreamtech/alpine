@@ -21,10 +21,6 @@ name: GoReleaser
 
 permissions: {}
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   verify:
     # Reusable workflow for pre-flight checks
@@ -37,6 +33,9 @@ jobs:
     needs: [verify]
     name: "📦 Distribution Packaging"
     runs-on: ubuntu-latest
+    concurrency:
+      group: goreleaser-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     permissions:
       contents: write # Required to create GitHub Releases, upload assets, and push tags
       packages: write # Required for container registry publishing if configured

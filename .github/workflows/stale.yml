@@ -22,14 +22,13 @@ name: Mark Stale Issues and PRs
 
 permissions: {}
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   stale:
     name: "⏳ Inactivity Management"
     runs-on: ubuntu-latest
+    concurrency:
+      group: stale-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     permissions:
       issues: write # Required to label and close stagnant issues
       pull-requests: write # Required to label and close stagnant PRs

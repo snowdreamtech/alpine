@@ -42,14 +42,13 @@ name: Test
 
 permissions: {}
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
 jobs:
   test:
     name: "🧪 Automated Testing Suite (${{ matrix.os }})"
     runs-on: ${{ matrix.os }}
+    concurrency:
+      group: test-${{ github.workflow }}-${{ matrix.os }}-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: true
     strategy:
       # Validates logic integrity across the complete project compatibility matrix.
       fail-fast: false

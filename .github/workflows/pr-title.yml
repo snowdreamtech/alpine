@@ -22,14 +22,13 @@ name: PR Title Check
 
 permissions: {}
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-  cancel-in-progress: true
-
 jobs:
   commitlint:
     name: "🔍 Semantic Title Validation"
     runs-on: ubuntu-latest
+    concurrency:
+      group: pr-title-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: true
     permissions:
       pull-requests: read # Required to read the pull request metadata via the GitHub API
     timeout-minutes: 5 # Title linting is near-instant

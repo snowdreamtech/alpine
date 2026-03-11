@@ -23,10 +23,6 @@ name: Release Please
 
 permissions: {}
 
-concurrency:
-  group: ${{ github.workflow }}-${{ github.ref }}
-  cancel-in-progress: true
-
 jobs:
   verify:
     # Pre-flight check before opening/merging releases
@@ -39,6 +35,9 @@ jobs:
     name: "🚀 Release Orchestration"
     needs: [verify]
     runs-on: ubuntu-latest
+    concurrency:
+      group: release-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
     permissions:
       contents: write # Required to create release tags and update the repository
       pull-requests: write # Required to create and manage release PRs
