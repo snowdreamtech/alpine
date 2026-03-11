@@ -27,12 +27,20 @@
         - "docs/**"
   ```
 
-- Define `concurrency` to cancel in-progress runs for the same ref when new commits arrive — prevents duplicate CI runs on rapid pushes:
+- Define `concurrency` to cancel in-progress runs for the same ref when new commits arrive.
+- **Job-Level Concurrency Pattern (MANDATORY for Reusable Workflows)**: To prevent deadlocks in nested contexts (e.g., `Release Please` calling `verify.yml`), concurrency MUST be defined at the **job-level** instead of the top-level for all reusable workflows. Each group name MUST include a unique prefix:
 
   ```yaml
+  # ❌ Dangerous Top-Level — can deadlock during workflow_call
   concurrency:
     group: ${{ github.workflow }}-${{ github.ref }}
-    cancel-in-progress: ${{ github.ref != 'refs/heads/main' }} # don't cancel main branch deploys
+
+  # ✅ Safe Job-Level with Unique Prefix
+  jobs:
+    test:
+      concurrency:
+        group: test-${{ github.workflow }}-${{ github.ref }}
+        cancel-in-progress: true
   ```
 
 - Organize complex pipelines into multiple focused workflow files. Use reusable workflows (`workflow_call`) to compose them without duplication.
@@ -91,6 +99,7 @@
   ```
 
 - Never use `permissions: write-all` — it grants every permission to the `GITHUB_TOKEN`.
+- **Reusable Workflow Permissions**: When using `workflow_call`, the caller's permissions take precedence. If the top-level `permissions` are empty (`{}`), the calling job MUST explicitly grant necessary permissions (like `contents: read`) to the reusable job to avoid execution failures.
 
 ### Secrets & Injection Prevention
 

@@ -419,6 +419,26 @@ if [ "$_IS_TOP_LEVEL" = "true" ]; then
   cat "$SHARED_SUMMARY_FILE"
   rm -f "$SHARED_SUMMARY_FILE"
 fi
+
+### Persistent Interactive Prompt Pattern (Next Actions)
+
+Every top-level script MUST provide a standardized "Next Actions" prompt to guide the user. These prompts MUST be guarded by `_IS_TOP_LEVEL` to prevent clutter when scripts are called as dependencies.
+
+```sh
+# ── Standardized Next Actions ────────────────────────────────────────────────
+if [ "$_IS_TOP_LEVEL" = "true" ]; then
+    printf "\nNext Actions:\n"
+    printf "  - Run make verify to ensure project health.\n"
+fi
+```
+
+### Native Binary Installation vs. Runtime Wrappers
+
+For system-level utilities and linters, prefer **natively managed binaries** in `scripts/setup.sh` over npm/pip wrappers.
+
+- **Rationale**: Avoids API rate limits (e.g., GitHub API downloads during npm install), reduces runtime dependency bloat, and ensures strict version control via `scripts/lib/common.sh`.
+- **Example**: `editorconfig-checker` should be installed as a CGO/Go binary via `curl`, not via `npm install`.
+
 ### Language-Aware Health Check Pattern
 
 To balance environmental strictness with robustness (especially in polyglot projects), use a class-based priority check combined with **Language-Aware Detection**.

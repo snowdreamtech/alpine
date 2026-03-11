@@ -29,6 +29,8 @@
 
 - Document the reason and guard mechanism for every non-idempotent operation.
 - **No Temporary Files in Git**: All temporary files created during debugging, testing, or development (e.g., `test.txt`, `tmp.json`, empty debug scripts) MUST NEVER be committed to version control. They must be deleted immediately after testing or placed in a `.gitignore`'d directory (e.g., `.tmp/`). AI agents must proactively revert any such accidental commits before merging.
+- **CI/CD Orchestration (Deadlock-Free Logic)**: All workflows MUST define concurrency at the **job-level** with unique prefixes. Avoid top-level concurrency for reusable workflows to prevent deadlocks in nested contexts.
+- **CI Reporting Standard (Dual-Sentinel Pattern)**: When scripts span multiple GHA steps, use both file-based checks (`GITHUB_STEP_SUMMARY`) and environment-based guards (`GITHUB_ENV`) to prevent duplicate report headers or legends.
 
 ## 3. Cross-Platform Compatibility
 

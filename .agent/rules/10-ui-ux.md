@@ -191,8 +191,8 @@
 - **Defensive Programming**:
   - **Execution Context Guard**: Scripts MUST verify they are running from the correct location (e.g., project root) before making changes.
   - **Concurrency Safety**: Use standard POSIX locking mechanisms (like `mkdir` based locks) to prevent corruption during simultaneous local and CI executions.
-- Provide a standard **Help Interface** (`--help`) for all scripts to ensure discoverability and correct usage.
-- **CI Integration (Rich Reporting)**: Tools running in GitHub Actions SHOULD leverage `GITHUB_STEP_SUMMARY` to provide rich Markdown reports (e.g., summary tables of changed files) directly in the CI dashboard.
+- **Interactive Workflow Guidance (Next Actions)**: Every successful execution of a primary script MUST end with a clear "Next Actions" section. This section provides a logical path forward for the developer (e.g., "Run make verify").
+    - **UI Isolation**: These prompts MUST be guarded by `_IS_TOP_LEVEL` to ensure they only appear for the human user and not for background CI processes or nested script calls.
 - **Support Multiple Verbosity Levels**:
   - `--quiet` / `-q`: Silent mode, suppressing all output except critical errors.
   - Default: Standard progress and status information with ANSI colors.
