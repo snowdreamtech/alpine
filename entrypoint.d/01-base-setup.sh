@@ -7,13 +7,19 @@
 set -e
 
 # Create a user with PUID and PGID if specified and doesn't exist
-if [ "${USER}" != "root" ] && [ ! -d "/home/${USER}" ] && [ "${PUID}" -ne 0 ] && [ "${PGID}" -ne 0 ]; then
-  if [ "$DEBUG" = "true" ]; then
-    echo "→ [EXTENSION] Mapping user: ${USER} (UID: ${PUID}, GID: ${PGID})"
+if [ "$(id -u)" = "0" ]; then
+  if [ "${USER}" != "root" ] && [ ! -d "/home/${USER}" ] && [ "${PUID}" -ne 0 ] && [ "${PGID}" -ne 0 ]; then
+    if [ "$DEBUG" = "true" ]; then
+      echo "→ [EXTENSION] Mapping user: ${USER} (UID: ${PUID}, GID: ${PGID})"
+    fi
+    addgroup -g "${PGID}" "${USER}"
+    adduser -h /home/"${USER}" -u "${PUID}" -g "${USER}" -G "${USER}" -s /bin/sh -D "${USER}"
+    # Note: sudoers configuration can be added here if NOPASSWD:ALL is required.
   fi
-  addgroup -g "${PGID}" "${USER}"
-  adduser -h /home/"${USER}" -u "${PUID}" -g "${USER}" -G "${USER}" -s /bin/sh -D "${USER}"
-  # Note: sudoers configuration can be added here if NOPASSWD:ALL is required.
+else
+  if [ "$DEBUG" = "true" ]; then
+    echo "→ [EXTENSION] Running as non-root (UID: $(id -u)). Skipping dynamic user mapping."
+  fi
 fi
 
 # Apply system umask for file creation consistency
