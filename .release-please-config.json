@@ -2,7 +2,15 @@
   "release-type": "simple",
   "initial-version": "0.1.0",
   "include-v-in-tag": true,
-  "extra-files": ["package.json"],
+  "extra-files": [
+    "package.json",
+    "package-lock.json",
+    "pyproject.toml",
+    "Cargo.toml",
+    "Cargo.lock",
+    "composer.json",
+    "VERSION"
+  ],
   "bump-minor-pre-major": true,
   "bump-patch-for-minor-pre-major": true,
   "pull-request-title-pattern": "chore(release): ${version} 🚀",
