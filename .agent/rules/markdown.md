@@ -136,6 +136,20 @@
   Supported language identifiers: `bash`, `sh`, `python`, `javascript`, `typescript`, `go`, `rust`, `sql`, `yaml`, `json`, `dockerfile`, `html`, `css`, `markdown`, `text`.
   ```
 
+### Mermaid Diagrams
+
+- When creating Mermaid diagrams, **always wrap complex node labels in double quotes** (`"Label"`). Special characters (like spaces, parentheses `()`, or slashes `/`) inside unquoted labels will cause a **lexical parsing error** (`Parse error ... Expecting 'SQE'`) in many local offline Markdown editors and strict rendering engines:
+
+  ```mermaid
+  ✅ Correct (Quoted labels safely handle special characters):
+  graph TD
+      A["Developers & Agents"] -->|Operates via| IDE["Cursor / Windsurf / Copilot / 50+ Others"]
+
+  ❌ Wrong (Unquoted labels crash local Markdown parsers):
+  graph TD
+      A[Developers & Agents] -->|Operates via| IDE[Cursor / Windsurf / Copilot / 50+ Others]
+  ```
+
 ### Lists
 
 - Use **asterisks** (`*`) or **hyphens** (`-`) consistently for unordered lists. Pick one per repository and configure markdownlint `MD004` to enforce it:
