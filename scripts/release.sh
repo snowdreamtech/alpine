@@ -37,13 +37,14 @@ Standardized release manager for versioning and tagging.
 
 Options:
   --dry-run        Preview release actions without executing them.
+  --git-tag        Explicitly create a git tag and push to origin (default: skip).
   -q, --quiet      Suppress informational output.
   -v, --verbose    Enable verbose/debug output.
   -h, --help       Show this help message.
 
 VERSION:
   A semantic version (e.g., 1.2.3 or v1.2.3). If omitted,
-  release-please or standard versioning metadata is used.
+  the version is extracted from project manifests (SSoT).
 
 EOF
 }
@@ -69,27 +70,45 @@ run_release_verify() {
 # Purpose: Handles the actual git tagging and remote synchronization logic.
 # Params:
 #   $1 - The target version string
+#   $2 - Skip tag flag (1 to skip, 0 to perform)
 # Examples:
-#   perform_git_release "v1.0.0"
+#   perform_git_release "v1.0.0" 0
 perform_git_release() {
-  local _LV_TARGET_VERSION="$1"
-  log_info "── Action: Creating release $_LV_TARGET_VERSION ──"
+  local _LV_RAW_VERSION="$1"
+  local _LV_DO_TAG="${2:-0}"
+
+  if [ -z "$_LV_RAW_VERSION" ]; then
+    log_info "Synchronizing with manifest version..."
+    _LV_RAW_VERSION=$(get_project_version)
+  fi
+
+  # Normalize version: Manifests use numeric, Git Tags use 'v' prefix
+  local _LV_TAG_VERSION
+  if echo "$_LV_RAW_VERSION" | grep -q "^v"; then
+    _LV_TAG_VERSION="$_LV_RAW_VERSION"
+  else
+    _LV_TAG_VERSION="v$_LV_RAW_VERSION"
+  fi
+
+  log_info "── Target Release: $_LV_TAG_VERSION ──"
+
+  if [ "$_LV_DO_TAG" -eq 0 ]; then
+    log_info "Default mode: Local verification only. Skipping git tag operation."
+    log_info "Tip: Run with --git-tag to perform actual tagging and pushing."
+    return 0
+  fi
 
   if [ "$DRY_RUN" -eq 1 ]; then
-    log_info "DRY-RUN: Would tag version $_LV_TARGET_VERSION and push to origin."
-    log_info "DRY-RUN: Would trigger GitHub Actions release-please-manual workflow."
+    log_info "DRY-RUN: Would tag version $_LV_TAG_VERSION and push to origin."
   else
-    if [ -n "$_LV_TARGET_VERSION" ]; then
-      log_info "Tagging local repository..."
-      git tag -a "$_LV_TARGET_VERSION" -m "chore(release): $_LV_TARGET_VERSION"
-      log_info "Pushing tags to origin..."
-      git push origin "$_LV_TARGET_VERSION"
+    # Safety Gate: Check if tag already exists
+    if git rev-parse "$_LV_TAG_VERSION" >/dev/null 2>&1; then
+      log_warn "Warning: Git tag $_LV_TAG_VERSION already exists. Skipping tagging."
     else
-      log_info "No version specified. Relying on remote release-please automation."
-      # Placeholder for triggering manual workflow via CLI if needed
-      if command -v gh >/dev/null 2>&1; then
-        gh workflow run release-please-manual.yml --ref main
-      fi
+      log_info "Tagging local repository as $_LV_TAG_VERSION..."
+      git tag -a "$_LV_TAG_VERSION" -m "chore(release): $_LV_TAG_VERSION"
+      log_info "Pushing tag to origin..."
+      git push origin "$_LV_TAG_VERSION"
     fi
   fi
 }
@@ -105,9 +124,13 @@ main() {
 
   # 2. Argument Parsing
   local _REL_TARGET_VERSION=""
+  local _DO_TAG_MAIN=0
   local _arg_rel
   for _arg_rel in "$@"; do
     case "$_arg_rel" in
+    --git-tag)
+      _DO_TAG_MAIN=1
+      ;;
     [0-9]* | v[0-9]*)
       _REL_TARGET_VERSION="$_arg_rel"
       ;;
@@ -123,7 +146,7 @@ main() {
   printf "\n"
 
   # 4. Versioning & Tagging logic
-  perform_git_release "$_REL_TARGET_VERSION"
+  perform_git_release "$_REL_TARGET_VERSION" "$_DO_TAG_MAIN"
 
   printf "\n"
 

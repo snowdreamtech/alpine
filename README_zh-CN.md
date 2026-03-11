@@ -107,6 +107,10 @@ git reset --hard origin/dev  # 或 origin/main
 | **维护 (Maint)**    | 工具与清理     | `update`, `cleanup`                     |
 | **DX**              | 开发者效率     | `docs`, `commit`, `bench`               |
 
+### 发布治理 (Release Governance)
+
+我们的发布流程强制执行严格的 **'v' 前缀标准** 用于 Git 标签（例如 `v1.2.3`），同时保持 Manifest 版本号为纯数字。默认情况下，`make release` 仅执行本地审计；使用 `--git-tag` 进行显式发布。
+
 ## 📐 AI 交互指南
 
 本项目严格执行交互规则以防止“AI 幻觉”。通过设计，我们的 IDE 设置会在会话启动时引导 Agent 阅读 `.agent/rules/09-ai-interaction.md`。

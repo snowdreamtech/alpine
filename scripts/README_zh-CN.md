@@ -82,7 +82,7 @@ sh scripts/verify.sh
 | `bench.sh`             | 执行性能基准测试   | pytest-benchmark, k6         |
 | `audit.sh`             | 安全与脆弱性扫描   | gitleaks, trivy, osv-scanner |
 | `commit.sh`            | 引导式规范化提交   | commitizen (cz)              |
-| `release.sh`           | 标准化标签发布     | git tag, release-please      |
+| `release.sh`           | 标准化标签发布     | git tag (v-prefix), 自动同步 |
 | `docs.sh`              | 文档网站管理       | vitepress                    |
 | `env.sh`               | 环境变量管理       | .env 同步与校验              |
 | `format.sh`            | 统一代码格式化     | shfmt, prettier, ruff, gofmt |
@@ -109,6 +109,7 @@ sh scripts/verify.sh
 1. [ ] 运行 `sh scripts/check-env.sh` 确保运行时环境一致。
 2. [ ] 运行 `sh scripts/verify.sh` 进行最终 QA 验收。
 3. [ ] 运行 `sh scripts/audit.sh` 确保无敏感信息泄漏或严重漏洞。
+4. [ ] 验证版本号：运行 `make release`（审计本地状态并同步 Manifest 版本）。
 
 ### 性能考量
 

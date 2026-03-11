@@ -107,6 +107,10 @@ This template features a professional-grade script library (18 tool suites) that
 | **Maint**    | Tooling & Cleanup          | `update`, `cleanup`                     |
 | **DX**       | Developer Productivity     | `docs`, `commit`, `bench`               |
 
+### Release Governance
+
+Our release process enforces a strict **'v' prefix standard** for Git tags (e.g., `v1.2.3`) while keeping manifest versions numeric-only. By default, `make release` performs a local audit only; use `--git-tag` for explicit publishing.
+
 ## 🛠️ SpecKit Collaboration Workflows
 
 ## 📐 AI Interaction Guidelines
