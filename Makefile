@@ -1,5 +1,9 @@
 # Makefile for Snowdream Tech AI IDE Template
-# This file provides a standard entry point for common development tasks.
+# Purpose: Unified entry point for cross-platform project orchestration and developer governance.
+# Design:
+#   - POSIX-compliant shell delegation with Windows-specific Batch abstractions.
+#   - Standardized lifecycle targets: init -> setup -> install -> verify -> audit.
+#   - "World Class" AI documentation style (English-only technical metadata).
 
 # =============================================================================
 # OS Detection
