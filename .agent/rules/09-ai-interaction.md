@@ -178,7 +178,7 @@ To prevent Context Window Overflow and hallucination caused by massive rule sets
 ### Artifact & State Management
 
 - **Persistent State Isolation**: When AI agents need to maintain persistence, long-running task context, or detailed checklists (e.g., `task.md`), they MUST create and use the **`.agent/brain/`** directory at the project root.
-- **Git Pollution Prevention**: To prevent these AI memory files from polluting the project's version control history, the `.agent/brain/` directory (along with proprietary IDE folders like `.cursor/`, `.cline/`, `.windsurf/`, etc.) is strictly ignored in `.gitignore`. AI agents MUST verify this isolation before writing state.
+- **Git Pollution Prevention**: To prevent these AI memory files from polluting the project's version control history, the `.agent/brain/` directory is strictly ignored in `.gitignore`. AI agents MUST verify this isolation before writing state.
 - **Temporary Scratchpads**: For completely ephemeral work (one-off debug scripts, intermediate text processing), use the OS temporary directory (`/tmp/` or `%TEMP%`) to ensure zero trace is left after a restart.
 
 ### Tool Calling Priorities
