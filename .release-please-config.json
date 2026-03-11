@@ -2,6 +2,17 @@
   "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/schemas/config.json",
   "release-type": "simple",
   "changelog-path": "CHANGELOG.md",
+  "comment--manifest-mode": "To enable Manifest (Monorepo/Flavor) mode: 1. Rename 'x-packages' to 'packages'. 2. Create '.release-please-manifest.json'. 3. Remove top-level 'initial-version'.",
+  "x-packages": {
+    "dist/debian": {
+      "release-type": "simple",
+      "component": "debian"
+    },
+    "dist/alpine": {
+      "release-type": "simple",
+      "component": "alpine"
+    }
+  },
   "initial-version": "0.1.0",
   "include-v-in-tag": true,
   "extra-files": [
