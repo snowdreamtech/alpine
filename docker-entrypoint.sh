@@ -64,7 +64,7 @@ if [ $# -gt 0 ]; then
   # If running as root, we drop privileges to the configured PUID/PGID.
   # If already running as a non-root user (e.g., docker run -u 1000), we just exec.
   if [ "$(id -u)" = "0" ]; then
-    exec su-exec "${PUID}:${PGID}" "$@"
+    exec su-exec "${PUID:-0}:${PGID:-0}" "$@"
   else
     exec "$@"
   fi
