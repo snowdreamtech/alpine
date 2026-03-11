@@ -369,70 +369,13 @@
 > Docker Compose and CI tools but is not part of the YAML 1.2 spec.
 > Verify support before using it with strict YAML 1.2 parsers.
 
-## 7. Ecosystem-Specific Conventions
+## 7. Ecosystem Linkage
 
-### GitHub Actions
+YAML standards for specific ecosystems are defined in their dedicated rule files. Refer to these for specialized patterns:
 
-- Quote the `on:` trigger key with **single quotes** — unquoted `on` is
-  a YAML boolean in YAML 1.1:
-
-  ```yaml
-  ---
-  name: CI
-
-  "on":
-    push:
-      branches: ["main"]
-    pull_request:
-      branches: ["main"]
-  ```
-
-- Use block scalars (`|`) for all multi-step `run:` blocks:
-
-  ```yaml
-  - name: Build and test
-    run: |
-      go build ./...
-      go test ./... -race
-  ```
-
-### Docker Compose
-
-- Use `x-` prefixed extension fields with YAML anchors for shared service
-  configuration. This is the idiomatic DRY pattern in Compose:
-
-  ```yaml
-  ---
-  x-restart: &restart
-    restart: unless-stopped
-
-  services:
-    db:
-      <<: *restart
-      image: postgres:16-alpine
-  ```
-
-- Always quote port mappings to prevent colon-ambiguity parsing issues:
-
-  ```yaml
-  ports:
-    - "8080:80" # ✅ quoted
-    - 8080:80 # ❌ may cause parsing issues on some YAML parsers
-  ```
-
-### Ansible
-
-- Prefer `true`/`false` over `yes`/`no` for boolean task parameters —
-  `yes`/`no` are YAML 1.1 truthy values that may behave unexpectedly in
-  strict parsers or future Ansible versions:
-
-  ```yaml
-  - name: Enable service
-    ansible.builtin.service:
-      name: nginx
-      enabled: true # ✅ unambiguous
-      state: started
-  ```
+- **GitHub Actions**: See [github-actions.md](file:///Users/snowdream/Workspace/snowdreamtech/template/.agent/rules/github-actions.md) for trigger quoting and block scalar rules.
+- **Docker Compose**: See [docker.md](file:///Users/snowdream/Workspace/snowdreamtech/template/.agent/rules/docker.md) for extension fields and port mapping standards.
+- **Ansible**: See [ansible.md](file:///Users/snowdream/Workspace/snowdreamtech/template/.agent/rules/ansible.md) for boolean types and variable naming.
 
 ## 8. Key Naming Conventions
 
@@ -658,7 +601,7 @@ differences prevents silent bugs:
       assert parsed == reparsed, 'Round-trip mismatch: data loss detected'
   ```
 
-## 12. Security & Sensitive Values
+## 15. Security & Sensitive Values
 
 - **Never hardcode** secrets, API keys, tokens, or passwords in YAML files
   committed to version control. Reference environment variables or a secrets
