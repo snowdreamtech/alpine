@@ -11,5 +11,6 @@ View the full rule: [`.agent/rules/09-ai-interaction.md`](https://github.com/sno
 - 1. Safety & Boundaries
 - 1. Code Generation & Modification
 - 1. Communication Strategy
-- 1. Context Handling
+- 1. Context Handling & Token Management
 - 1. Quality & Review
+- 1. Advanced Agentic Workflows & Isolation

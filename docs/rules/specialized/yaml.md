@@ -14,7 +14,7 @@ View the full rule: [`.agent/rules/yaml.md`](https://github.com/snowdreamtech/te
 - 1. Comments
 - 1. Data Types & Scalars
 - 1. Anchors & Aliases (DRY)
-- 1. Ecosystem-Specific Conventions
+- 1. Ecosystem Linkage
 - 1. Key Naming Conventions
 - 1. Schema Validation & Editor Integration
 - 1. YAML 1.1 vs 1.2 — Version Awareness
