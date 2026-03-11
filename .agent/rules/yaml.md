@@ -373,9 +373,9 @@
 
 YAML standards for specific ecosystems are defined in their dedicated rule files. Refer to these for specialized patterns:
 
-- **GitHub Actions**: See [github-actions.md](file:///Users/snowdream/Workspace/snowdreamtech/template/.agent/rules/github-actions.md) for trigger quoting and block scalar rules.
-- **Docker Compose**: See [docker.md](file:///Users/snowdream/Workspace/snowdreamtech/template/.agent/rules/docker.md) for extension fields and port mapping standards.
-- **Ansible**: See [ansible.md](file:///Users/snowdream/Workspace/snowdreamtech/template/.agent/rules/ansible.md) for boolean types and variable naming.
+- **GitHub Actions**: See [github-actions.md](github-actions.md) for trigger quoting and block scalar rules.
+- **Docker Compose**: See [docker.md](docker.md) for extension fields and port mapping standards.
+- **Ansible**: See [ansible.md](ansible.md) for boolean types and variable naming.
 
 ## 8. Key Naming Conventions
 
