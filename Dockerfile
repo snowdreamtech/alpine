@@ -50,6 +50,10 @@ RUN echo "@main https://dl-cdn.alpinelinux.org/alpine/edge/main" | tee -a /etc/a
     && echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" | tee -a /etc/apk/repositories \
     && apk update \
     && apk add --no-cache \
+    bash \
+    zsh \
+    nano \
+    rsync \
     lsb-release \
     doas \
     sudo \

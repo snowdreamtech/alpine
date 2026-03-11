@@ -8,13 +8,35 @@ set -e
 
 # Create a user with PUID and PGID if specified and doesn't exist
 if [ "$(id -u)" = "0" ]; then
-  if [ "${USER}" != "root" ] && [ ! -d "/home/${USER}" ] && [ "${PUID:-0}" -ne 0 ] && [ "${PGID:-0}" -ne 0 ]; then
+  if [ "${USER}" != "root" ] && [ "${PUID:-0}" -ne 0 ] && [ "${PGID:-0}" -ne 0 ]; then
     if [ "$DEBUG" = "true" ]; then
-      echo "→ [EXTENSION] Mapping user: ${USER} (UID: ${PUID}, GID: ${PGID})"
+      echo "→ [EXTENSION] Ensuring user mapping: ${USER} (UID: ${PUID}, GID: ${PGID})"
     fi
-    addgroup -g "${PGID}" "${USER}"
-    adduser -h /home/"${USER}" -u "${PUID}" -g "${USER}" -G "${USER}" -s /bin/sh -D "${USER}"
-    # Note: sudoers configuration can be added here if NOPASSWD:ALL is required.
+
+    # 1. Handle group creation/mapping
+    if ! getent group "${PGID}" >/dev/null 2>&1; then
+      addgroup -g "${PGID}" "${USER}"
+    else
+      EXISTING_GROUP=$(getent group "${PGID}" | cut -d: -f1)
+      if [ "$DEBUG" = "true" ]; then
+        echo "→ [EXTENSION] GID ${PGID} already exists as group: ${EXISTING_GROUP}"
+      fi
+    fi
+
+    # 2. Handle user creation/mapping
+    if ! getent passwd "${PUID}" >/dev/null 2>&1; then
+      adduser -h /home/"${USER}" -u "${PUID}" -g "${USER}" -G "${USER}" -s /bin/sh -D "${USER}"
+    else
+      EXISTING_USER=$(getent passwd "${PUID}" | cut -d: -f1)
+      if [ "$DEBUG" = "true" ]; then
+        echo "→ [EXTENSION] UID ${PUID} already exists as user: ${EXISTING_USER}"
+      fi
+    fi
+
+    # 3. Ensure home directory permissions
+    if [ -d "/home/${USER}" ]; then
+      chown -R "${PUID}:${PGID}" "/home/${USER}"
+    fi
   fi
 else
   if [ "$DEBUG" = "true" ]; then
