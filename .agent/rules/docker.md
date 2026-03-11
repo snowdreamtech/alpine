@@ -158,6 +158,34 @@
   ```
 
 - Use `ENTRYPOINT` for the container's primary command and `CMD` for default arguments — this allows callers to override arguments cleanly without changing the entrypoint.
+
+### PID 1 Signal Forwarding (exec pattern)
+
+- **Always use `exec`** to hand over control to the main process in entrypoint scripts. This ensures the application becomes PID 1 and receives Unix signals (e.g., `SIGTERM`) directly from the orchestrator.
+- **Anti-pattern**: Running the main command as a subshell or a background process without `exec`. This "swallows" signals and prevents graceful shutdowns.
+
+  ```sh
+  # ✅ Correct: replaces shell with su-exec/application
+  exec su-exec "${PUID}:${PGID}" "$@"
+
+  # ❌ Incorrect: launches as sub-process
+  su-exec "${PUID}:${PGID}" "$@"
+  ```
+
+### Non-Root Execution Resilience
+
+- Containers must be designed to start successfully even if run as a non-root user (e.g., `docker run -u 1000`).
+- **Standard Guard**: Wrap all root-only setup logic (like `addgroup`, `adduser`, or `chown`) in a UID check:
+
+  ```sh
+  if [ "$(id -u)" = "0" ]; then
+    # Perform root-only initialization
+    setup_user_privileges
+  else
+    log_info "Running as non-root; skipping system setup."
+  fi
+  ```
+
 - Set resource-related environment hints where applicable (e.g., `JAVA_OPTS` for JVM heap size, `GOMAXPROCS` for Go goroutine scheduling on CPU-limited containers).
 
 ## 4. Image Tagging, Labels & SBOM

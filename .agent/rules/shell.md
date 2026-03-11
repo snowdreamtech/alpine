@@ -157,6 +157,32 @@ IFS=$'\n\t'
 - Declare constants with **`readonly`**: `readonly MAX_RETRIES=3 TIMEOUT=30`
 - Use **`UPPER_SNAKE_CASE`** for exported/environment variables and `lower_snake_case` for local function variables.
 
+### POSIX Null-Parameter Hardening
+
+- Under strict mode (`set -e`), integer comparisons (`-eq`, `-ne`, etc.) against empty variables cause fatal syntax errors.
+- **Always use parameter expansion** with a default fallback (usually `:-0`) for numeric evaluations to prevent container crashes from null inputs:
+
+  ```sh
+  # ✅ Safe: defaults to 0 if PUID is null or unset
+  if [ "${PUID:-0}" -ne 0 ]; then ...
+
+  # ❌ Unsafe: crashes if PUID=""
+  if [ "${PUID}" -ne 0 ]; then ...
+  ```
+
+- **String Casts**: For boolean-like toggles, prefer string comparison over integer checks to automatically handle null/empty states safely:
+
+  ```sh
+  # ✅ Safe string check
+  if [ "${KEEPALIVE}" = "1" ]; then ...
+  ```
+
+- **Command Hardening**: Use fallbacks during string concatenation for critical commands like `su-exec` to avoid invalid formatting (e.g., `":"` instead of `"0:0"`):
+
+  ```sh
+  exec su-exec "${PUID:-0}:${PGID:-0}" "$@"
+  ```
+
 ## 3. Functions & Structure
 
 ### Script Organization
@@ -218,7 +244,7 @@ IFS=$'\n\t'
 - When targeting `/bin/sh` (Alpine containers, minimal CI images), avoid Bash-specific syntax:
 
   | Bash-only | POSIX sh alternative |
-  |-----------|---------------------|
+  | :--- | :--- |
   | `[[ expr ]]` | `[ expr ]` with careful quoting |
   | `${BASH_SOURCE[0]}` | `$0` (less reliable) |
   | `${var,,}` lowercase | `echo "$var" \| tr '[:upper:]' '[:lower:]'` |
@@ -294,7 +320,7 @@ IFS=$'\n\t'
 
 For any automation script that must support Windows users, follow the **Single Source of Truth (SSoT) delegation** pattern. All logic lives in `.sh`; wrappers do nothing except forward execution:
 
-```
+```text
 script.bat   →   script.ps1   →   script.sh
 (CMD entry)      (PS entry)       (POSIX logic, SSoT)
 ```
@@ -331,7 +357,7 @@ powershell -NoProfile -ExecutionPolicy Bypass -File "%~dp0script.ps1" %*
 ALL scripts MUST pass their respective linters before being committed. This is enforced by pre-commit hooks and CI.
 
 | Script Type | Linter | Required Flags |
-|-------------|--------|----------------|
+| :--- | :--- | :--- |
 | `.sh` (POSIX) | `shellcheck` | `--shell=sh` |
 | `.sh` (Bash) | `shellcheck` | `--shell=bash` |
 | `.ps1` | `PSScriptAnalyzer` | `Invoke-ScriptAnalyzer -Path .` |
