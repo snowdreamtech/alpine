@@ -185,7 +185,10 @@ To prevent Context Window Overflow and hallucination caused by massive rule sets
 
 When operating in an agentic mode equipped with system tools, AI MUST prioritize tools according to stability and safety:
 
-1. **Native APIs First**: ALWAYS use native, purpose-built file manipulation APIs (e.g., `replace_file_content`, `view_file` equivalents exposed by the host IDE) over raw Shell commands.
+1. **The Hierarchy of Execution (Native API > Shell > Browser)**:
+   - **Tier 1 (Native APIs)**: ALWAYS use native, purpose-built file manipulation APIs (e.g., `replace_file_content`, `view_file` equivalents exposed by the host IDE) as the absolute first choice.
+   - **Tier 2 (Shell/CLI)**: If native APIs are insufficient, fall back to CLI tools (`grep`, `curl`, `jq`).
+   - **Tier 3 (Browser)**: The Browser tool is the absolute last resort. Use it ONLY for rendering visual documentation, passing CAPTCHAs, or interacting with heavy client-side SPAs where CLI scraping fails.
 2. **Strict Prohibition on Dangerous Shell Text Processing**: NEVER use `cat <<EOF > file`, `sed -i`, or `echo > file` in a shell command to modify source code. These workflows are highly prone to escaping errors and context corruption.
 3. **Targeted Search**: Use structured search tools (`grep_search`, `ast_search`) before falling back to full-disk `find` or unconstrained `grep -r`, to prevent IO exhaustion.
 4. **Absolute Paths**: Always construct and utilize **absolute paths** when interfacing with the filesystem to eliminate relative-path context confusion inside autonomous loops.
