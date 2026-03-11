@@ -4,6 +4,11 @@
 # Trigger: Every push to the main branch affecting README.md or this workflow file.
 # Permissions:
 #   - contents: read (Required to read README.md and repository description).
+# Concurrency:
+#   - group: sync-${{ github.workflow }}-${{ github.ref }} (Scoped to PR/ref).
+#   - cancel-in-progress: true (Atomic synchronization).
+# Design:
+#   - Uses high-performance metadata actions to ensure Docker Hub remains in sync with the repository.
 
 name: Container Metadata Synchronization
 
