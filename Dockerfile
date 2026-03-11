@@ -102,3 +102,4 @@ HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
 USER root
 WORKDIR /root
 ENTRYPOINT ["docker-entrypoint.sh"]
+CMD ["/bin/sh"]
