@@ -1,5 +1,7 @@
 {
+  "$schema": "https://raw.githubusercontent.com/googleapis/release-please/main/resources/config-schema.json",
   "release-type": "simple",
+  "changelog-path": "CHANGELOG.md",
   "initial-version": "0.1.0",
   "include-v-in-tag": true,
   "extra-files": [
