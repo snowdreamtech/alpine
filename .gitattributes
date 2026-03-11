@@ -175,12 +175,7 @@ target/ linguist-vendored=true
 /.zencoder/** linguist-vendored=true
 
 # Mark standalone AI rule files as vendored
-/.clinerules linguist-vendored=true
-/.cursorrules linguist-vendored=true
 /.replit.agent.md linguist-vendored=true
-/.roorules linguist-vendored=true
-/.traerules linguist-vendored=true
-/.windsurfrules linguist-vendored=true
 /AGENTS.md linguist-vendored=true
 /CLAUDE.md linguist-vendored=true
 /CONVENTIONS.md linguist-vendored=true

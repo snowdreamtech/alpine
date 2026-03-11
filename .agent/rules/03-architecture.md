@@ -88,11 +88,6 @@ This project uses a **redirect pattern** to maintain a Single Source of Truth: a
 | `AGENTS.md` | OpenAI Codex / Generic agents |
 | `CONVENTIONS.md` | Generic convention readers |
 | `codex.md` | OpenAI Codex |
-| `.cursorrules` | Cursor (legacy) |
-| `.clinerules` | Cline (legacy) |
-| `.roorules` | Roo Code (legacy) |
-| `.traerules` | Trae (legacy) |
-| `.windsurfrules` | Windsurf (legacy) |
 | `.replit.agent.md` | Replit Agent |
 | `.aider.conf.yml` | Aider (YAML format) |
 | `.coderabbit.yaml` | CodeRabbit (YAML format) |
