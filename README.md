@@ -1,127 +1,130 @@
-# Snowdream Tech AI IDE Template
+# Alpine
 
-[![GitHub Actions Lint](https://github.com/snowdreamtech/template/actions/workflows/lint.yml/badge.svg)](https://github.com/snowdreamtech/template/actions/workflows/lint.yml)
-[![GitHub Actions Verify](https://github.com/snowdreamtech/template/actions/workflows/verify.yml/badge.svg)](https://github.com/snowdreamtech/template/actions/workflows/verify.yml)
-[![GitHub Release](https://img.shields.io/github/v/release/snowdreamtech/template?include_prereleases&sort=semver)](https://github.com/snowdreamtech/template/releases/latest)
+[![GitHub Actions Lint](https://github.com/snowdreamtech/alpine/actions/workflows/lint.yml/badge.svg)](https://github.com/snowdreamtech/alpine/actions/workflows/lint.yml)
+[![GitHub Actions Verify](https://github.com/snowdreamtech/alpine/actions/workflows/verify.yml/badge.svg)](https://github.com/snowdreamtech/alpine/actions/workflows/verify.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/snowdreamtech/alpine?include_prereleases&sort=semver)](https://github.com/snowdreamtech/alpine/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
-[![CodeSize](https://img.shields.io/github/languages/code-size/snowdreamtech/template)](https://github.com/snowdreamtech/template)
-[![Dependabot Enabled](https://img.shields.io/badge/Dependabot-Enabled-brightgreen?logo=dependabot)](https://github.com/snowdreamtech/template/blob/main/.github/dependabot.yml)
+[![CodeSize](https://img.shields.io/github/languages/code-size/snowdreamtech/alpine)](https://github.com/snowdreamtech/alpine)
+[![Dependabot Enabled](https://img.shields.io/badge/Dependabot-Enabled-brightgreen?logo=dependabot)](https://github.com/snowdreamtech/alpine/blob/main/.github/dependabot.yml)
+![Docker Image Version](https://img.shields.io/docker/v/snowdreamtech/alpine)
+![Docker Image Size](https://img.shields.io/docker/image-size/snowdreamtech/alpine/latest)
+![Docker Pulls](https://img.shields.io/docker/pulls/snowdreamtech/alpine)
+![Docker Stars](https://img.shields.io/docker/stars/snowdreamtech/alpine)
 
 [English](README.md) | [简体中文](README_zh-CN.md)
 
-An enterprise-grade, foundational template designed for multi-AI IDE collaboration. This repository serves as a **Single Source of Truth** for AI agent rules, workflows, and project configurations, supporting over 50 different AI-assisted IDEs with massive multi-language support.
+Docker Image packaging for Alpine. (amd64, arm32v6, arm32v7, arm64v8, i386, ppc64le,riscv64, s390x)
 
-## 🌟 Features
+## Usage
 
-- **Multi-IDE Compatibility**: Out-of-the-box support for Cursor, Windsurf, GitHub Copilot, Cline, Roo Code, Trae, Gemini, Claude Code, and 50+ other AI editors.
-- **Unified Rule System**: Centralized rule definitions in `.agent/rules/`. Modifying a rule here propagates to all supported IDEs via safe symlink/redirect patterns.
-- **80+ Language & Framework Rules**: Pre-configured, high-quality rules for everything from Rust, Go, TypeScript, and Python to Ansible, Kubernetes, and API Design.
-- **Intelligent Workflows (SpecKit)**: Standardized `.agent/workflows/` (commands) such as `speckit.plan`, `speckit.analyze`, and `snowdreamtech.init` available uniformly across supported environments.
-- **Triple Guarantee Quality**: Integrated gated checks via Pre-commit and GitHub Actions to ensure 100% code purity.
-- **Cross-Platform Ready**: Seamless operation across macOS (Homebrew/MacPorts), Linux, and Windows.
+To help you get started creating a container from this image you can either use docker-compose or the docker cli.
 
-## 🏗️ Design & Architecture
+### Docker Cli
 
-The Snowdream Tech Template is architected to solve the "N-IDE Fragmentation" problem, ensuring that rules and workflows remain consistent across all supported environments.
-
-```mermaid
-graph TD
-    A["Developers & Agents"] -->|Operates via| IDE["Cursor / Windsurf / Copilot / 50+ Others"]
-    IDE -->|Reads Rules via Redirects| R1[".vscode/"]
-    IDE -->|Reads Rules via Redirects| R2[".github/"]
-    IDE -->|Reads Rules via Redirects| R3[".cline/ .trae/ etc."]
-
-    R1 -.->|SSoT Pointer| CoreRules[".agent/rules/"]
-    R2 -.->|SSoT Pointer| CoreRules
-    R3 -.->|SSoT Pointer| CoreRules
-
-    CoreRules -->|Governs| Src["Source Code"]
-    CoreRules -->|Governs| Scripts["CI/CD & Shell Scripts"]
-```
-
-### Design Principles
-
-- **Single Source of Truth (SSoT)**: All AI rules, commands, and Git hooks live in one place. No duplicated IDE configurations.
-- **Cross-Platform Portability**: Heavy automation logic is written in POSIX Shell, with thin wrappers for Windows PowerShell/Batch.
-- **Triple Guarantee Quality**: Linting and formatting form an impenetrable wall, enforced at the IDE layer, pre-commit layer, and CI/CD GitHub Actions layer.
-
-## 📂 Directory Structure
-
-```text
-project-root/
-├── .agent/              # 🤖 Canonical AI configuration (The Brain)
-│   ├── rules/           # 📏 Unified AI behavioral rules (80+ sets, SSoT)
-│   └── workflows/       # 🛠️ Unified commands & AI workflows (SpecKit)
-├── .agents/             # 🧩 Shared command sources (Auto-managed symlinks)
-├── .gemini/             # ♊ Gemini-specific extensions and CLI configs
-├── .github/             # 🐙 GitHub integration & Copilot settings
-├── .vscode/             # 💻 Optimized VS Code configurations
-├── .cline/              # 🔗 Example of IDE-specific redirect folder (50+ included)
-├── .pre-commit-config.yaml # ⚓ Pre-commit hook definitions
-└── src/                 # 📦 Your actual application source code
-```
-
-## 🚀 Getting Started
-
-To ensure a 100% pure and standardized environment, follow these steps in order:
-
-### 1. Project Initialization (首次初始化)
-
-1. **Clone the template**.
-2. **Setup Basic Runtimes**: Ensure you have Node.js and Python installed.
-3. **Hydrate Project**: Re-brand the template for your identity.
-
-   ```bash
-   make init
-   ```
-
-4. **Install System Tools**: Install security and linting binaries (gitleaks, trivy, etc.).
-
-   ```bash
-   make setup
-   ```
-
-5. **Install Dependencies**: Install project-specific packages and activate hooks.
-
-   ```bash
-   make install
-   ```
-
-6. **Final Verification**: Confirm everything is correctly configured.
-
-   ```bash
-   make verify
-   ```
-
-### 2. Git Synchronization (Git 同步)
-
-> [!IMPORTANT]
-> This repository occasionally undergoes history sanitization for security and optimization. If you encounter "divergent branches" or "refusing to merge unrelated histories", please use the following commands to sync:
+#### CLI - Simple
 
 ```bash
-# 1. Fetch the latest history
-git fetch origin
-
-# 2. Reset your local branch to the remote state
-# WARNING: This will discard uncommitted local changes. Stash them first!
-git reset --hard origin/dev  # or origin/main
+docker run -d \
+  --name=alpine \
+  -e TZ=Asia/Shanghai \
+  --restart unless-stopped \
+  snowdreamtech/alpine:latest
 ```
 
-### 3. Daily Development Workflow (日常开发)
+#### CLI - Advance
 
-For a high-quality development cycle, follow this cycle:
+```bash
+docker run -d \
+  --name=alpine \
+  -e TZ=Asia/Shanghai \
+  -v /path/to/data:/path/to/data \
+  --restart unless-stopped \
+  snowdreamtech/alpine:latest
+```
 
-1. **Sync**: `make install` (Ensure dependencies are up to date)
-2. **Code**: Implement features or fixes.
-3. **Format**: `make format` (Auto-fix style issues)
-4. **Lint**: `make lint` (Verify standards)
-5. **Test**: `make test` (Verify logic)
-6. **Audit**: `make audit` (Security check, recommended before PR)
-7. **Commit**: `make commit` (Conventional commit)
+### Docker Compose
 
-## 🛠️ Full Automation Matrix
+#### Compose - Simple
 
-This template features a professional-grade script library (18 tool suites) that ensures **Single Source of Truth (SSoT)** across macOS, Linux, and Windows. All tools are natively accessible via `make` or `pnpm/npm`.
+```yaml
+version: "3"
+
+services:
+  alpine:
+    image: snowdreamtech/alpine:latest
+    container_name: alpine
+    environment:
+      - TZ=Asia/Shanghai
+    restart: unless-stopped
+```
+
+#### Compose - Advance
+
+```yaml
+version: "3"
+
+services:
+  alpine:
+    image: snowdreamtech/alpine:latest
+    container_name: alpine
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - /path/to/data:/path/to/data
+    restart: unless-stopped
+```
+
+## Environment Variables
+
+This image provides several environment variables to customize its behavior.
+
+| Variable    | Default | Description                                            |
+| :---------- | :------ | :----------------------------------------------------- |
+| `PUID`      | `0`     | User ID for the running process.                       |
+| `PGID`      | `0`     | Group ID for the running process.                      |
+| `USER`      | `root`  | Username for the running process.                      |
+| `WORKDIR`   | `/root` | Working directory.                                     |
+| `UMASK`     | `022`   | Umask for file creation.                               |
+| `DEBUG`     | `false` | Enable debug logging for the entrypoint.               |
+| `KEEPALIVE` | `0`     | Set to `1` to keep the container running indefinitely. |
+| `TZ`        | `UTC`   | Timezone setting.                                      |
+
+## Features
+
+### User Mapping & Permissions
+
+You can map the internal user to your host user's ID and Group ID using `PUID` and `PGID`. This is extremely useful for avoiding permission issues when using volumes.
+
+```bash
+docker run -d \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  snowdreamtech/alpine:latest
+```
+
+### Entrypoint Extension (`entrypoint.d`)
+
+This image supports an extension mechanism for custom initialization scripts. Any executable script placed in `/usr/local/bin/entrypoint.d/` (or the project's `entrypoint.d/` folder before build) will be executed in alphabetical order during container startup.
+
+### Included Packages
+
+The image comes pre-installed with a curated set of essential tools:
+
+- **Shell**: `bash`, `zsh`
+- **Editors**: `vim`, `nano`
+- **Network**: `curl`, `wget`, `rsync`, `git`
+- **Utils**: `sudo`, `ca-certificates`, `tzdata`
+
+## Development
+
+```bash
+docker buildx create --use --name build --node build --driver-opt network=host
+docker buildx build -t snowdreamtech/alpine --platform=linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/riscv64,linux/s390x . --push
+```
+
+### Project Tooling
+
+This project uses the Snowdream Tech AI IDE Template for advanced automation.
 
 | Suite        | Goal                       | Commands                                |
 | :----------- | :------------------------- | :-------------------------------------- |
@@ -132,66 +135,17 @@ This template features a professional-grade script library (18 tool suites) that
 | **Maint**    | Tooling & Cleanup          | `update`, `cleanup`                     |
 | **DX**       | Developer Productivity     | `docs`, `commit`, `bench`               |
 
-### Release Governance
+For more details on the AI-first development workflow, refer to the [CONVENTIONS.md](CONVENTIONS.md).
 
-Our release process enforces a strict **'v' prefix standard** for Git tags (e.g., `v1.2.3`) while keeping manifest versions numeric-only. By default, `make release` performs a local audit only; use `--git-tag` for explicit publishing.
+## Reference
 
-## 🛠️ SpecKit Collaboration Workflows
+1. [使用 buildx 构建多平台 Docker 镜像](https://icloudnative.io/posts/multiarch-docker-with-buildx/)
+1. [如何使用 docker buildx 构建跨平台 Go 镜像](https://waynerv.com/posts/building-multi-architecture-images-with-docker-buildx/#buildx-%E7%9A%84%E8%B7%A8%E5%B9%B3%E5%8F%B0%E6%9E%84%E5%BB%BA%E7%AD%96%E7%95%A5)
+1. [Building Multi-Arch Images for Arm and x86 with Docker Desktop](https://www.docker.com/blog/multi-arch-images/)
+1. [How to Rapidly Build Multi-Architecture Images with Buildx](https://www.docker.com/blog/how-to-rapidly-build-multi-architecture-images-with-buildx/)
+1. [Faster Multi-Platform Builds: Dockerfile Cross-Compilation Guide](https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/)
+1. [docker/buildx](https://github.com/docker/buildx)
 
-## 📐 AI Interaction Guidelines
+---
 
-This repository strictly enforces interaction rules to prevent "AI hallucinations". By design, our IDE settings redirect the agent to read `.agent/rules/09-ai-interaction.md` upon session startup.
-
-> **Language Notice:** While all technical code, commits, and rule definitions must be in English, all communication with the AI and user-facing documentation should default to **Simplified Chinese (简体中文)**.
-
-## 🤝 Project Rules Definition
-
-To augment AI behavior, **do not** modify individual IDE configuration directories directly. Instead:
-
-1. Add or modify markdown files inside `.agent/rules/`.
-2. The existing symlink topology will automatically apply your new rules to all 50+ AI environments.
-
-## 🐳 DevContainer
-
-This project provides a pre-configured **DevContainer** for a consistent, enterprise-grade development experience. It supports two modes:
-
-- **Single Container (Default)**: Lightweight environment with all 20+ CI tools and 40+ VS Code extensions pre-installed.
-- **Docker Compose (Optional)**: Includes additional services like **PostgreSQL** and **Redis**.
-
-### How to use
-
-#### Local Development (本地开发)
-
-1. Open the project in VS Code.
-2. Ensure Docker Desktop is running.
-3. If you have the "Dev Containers" extension installed, you will be prompted to "Reopen in Container".
-4. Alternatively, use the Command Palette (`F1`) and select `Dev Containers: Reopen in Container`.
-
-#### Remote Development (远程 SSH 开发)
-
-1. Connect to your remote server via `Remote - SSH` extension.
-2. Open this project folder on the remote server.
-3. Use the Command Palette (`F1`) and select `Dev Containers: Reopen in Container`. VS Code will build and run the container on the **remote server's Docker engine**.
-
-### Configuration
-
-#### Switch to Docker Compose (切换混合模式)
-
-To enable **PostgreSQL** and **Redis**:
-
-1. Open `.devcontainer/devcontainer.json`.
-2. Follow the internal comments to swap the `build` section with the `dockerComposeFile` section.
-3. Rebuild the container.
-
-#### Custom Base Image (自定义镜像)
-
-If you need to use a private or enterprise image:
-
-1. Modify the `FROM` instruction in `.devcontainer/Dockerfile`.
-2. Ensure your image has a `vscode` user or adjust the `remoteUser` setting in `devcontainer.json`.
-
-## 📄 License
-
-This project is licensed under the **MIT License**.
-Copyright (c) 2026-present [SnowdreamTech Inc.](https://github.com/snowdreamtech)
-See the [LICENSE](./LICENSE) file for the full license text.
+Copyright (c) 2024-present [SnowdreamTech Inc.](https://github.com/snowdreamtech)

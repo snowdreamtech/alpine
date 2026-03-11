@@ -1,4 +1,4 @@
-FROM alpine:3.22.2
+FROM alpine:3.23.3
 
 # OCI annotations to image
 LABEL org.opencontainers.image.authors="Snowdream Tech" \
