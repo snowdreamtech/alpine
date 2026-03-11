@@ -5,6 +5,8 @@
   "extra-files": [
     "package.json",
     "package-lock.json",
+    "pnpm-lock.yaml",
+    "yarn.lock",
     "npm-shrinkwrap.json",
     "pyproject.toml",
     "setup.py",

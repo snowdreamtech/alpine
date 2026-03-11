@@ -46,6 +46,7 @@ jobs:
     timeout-minutes: 15
     steps:
       - name: "📝 Orchestrate Release Lifecycle (Release Please)"
+        id: release
         uses: googleapis/release-please-action@v4.4.0
         with:
           # Automates versioning, PR creation, and CHANGELOG updates based on Conventional Commits.
@@ -53,3 +54,46 @@ jobs:
           # 'simple' release type is optimized for standard conventional commit projects.
           release-type: simple
           config-file: .release-please-config.json
+
+      - name: "🏗️ Checkout Release PR Branch"
+        if: ${{ steps.release.outputs.pr }}
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ fromJson(steps.release.outputs.pr).headBranchName }}
+          token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: "📦 Setup Node Environment (Syncing)"
+        if: ${{ steps.release.outputs.pr }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: "📦 Setup pnpm Environment"
+        if: ${{ steps.release.outputs.pr && hashFiles('pnpm-lock.yaml') != '' }}
+        uses: pnpm/action-setup@v4
+        with:
+          run_install: false
+
+      - name: "🔗 Synchronize Manifests & Lockfiles"
+        if: ${{ steps.release.outputs.pr }}
+        run: |
+          # Git configuration for automated commit
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # 1. Sync Node lockfiles
+          if [ -f "pnpm-lock.yaml" ]; then
+            pnpm install --no-frozen-lockfile
+          elif [ -f "yarn.lock" ]; then
+            yarn install --no-immutable
+          elif [ -f "package-lock.json" ]; then
+            npm install --package-lock-only
+          fi
+
+          # 2. Sync other ecosystem lockfiles if tools are available
+          # Note: Add more specialized syncs here as the project grows.
+
+          # Commit and Push synchronization changes back to the PR
+          git add .
+          git commit -m "chore(release): synchronize lockfiles for version bump" || echo "No changes to sync"
+          git push origin HEAD
