@@ -8,7 +8,7 @@ set -e
 
 # Create a user with PUID and PGID if specified and doesn't exist
 if [ "$(id -u)" = "0" ]; then
-  if [ "${USER}" != "root" ] && [ ! -d "/home/${USER}" ] && [ "${PUID}" -ne 0 ] && [ "${PGID}" -ne 0 ]; then
+  if [ "${USER}" != "root" ] && [ ! -d "/home/${USER}" ] && [ "${PUID:-0}" -ne 0 ] && [ "${PGID:-0}" -ne 0 ]; then
     if [ "$DEBUG" = "true" ]; then
       echo "→ [EXTENSION] Mapping user: ${USER} (UID: ${PUID}, GID: ${PGID})"
     fi

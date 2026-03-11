@@ -46,7 +46,7 @@ fi
 cd "${WORKDIR}"
 
 # 3. Persistence logic for background-only or idle containers
-if [ "${KEEPALIVE}" -eq 1 ]; then
+if [ "${KEEPALIVE}" = "1" ]; then
   if [ "$DEBUG" = "true" ]; then
     echo "♾️ [ENTRYPOINT] Keep-alive enabled. Entering persistence loop..."
   fi
