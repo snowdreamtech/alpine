@@ -129,7 +129,7 @@ setup_node() {
   local _T0_NODE
   _T0_NODE=$(date +%s)
   log_info "── Setting up Node.js & pnpm ──"
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Node.js" "⚖️ Previewed" "-" "0"
     return 0
   fi
@@ -176,7 +176,7 @@ setup_python() {
   local _T0_PY
   _T0_PY=$(date +%s)
   log_info "── Setting up Python Virtual Environment ──"
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Python" "⚖️ Previewed" "-" "0"
     return 0
   fi
@@ -214,13 +214,13 @@ install_gitleaks() {
   _T0_GITL=$(date +%s)
   local _BIN_GITL
   _BIN_GITL="${VENV}/bin/gitleaks${_EXE}"
-  if [ -x "${_BIN_GITL}" ] && [ "$DRY_RUN" -eq 0 ]; then
+  if [ -x "${_BIN_GITL}" ] && [ "${DRY_RUN:-0}" -eq 0 ]; then
     log_summary "Lint Tool" "Gitleaks" "✅ Exists" "$(get_version "$_BIN_GITL")" "0"
     return 0
   fi
   log_info "── Installing gitleaks ──"
 
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "Gitleaks" "⚖️ Previewed" "-" "0"
     return 0
   fi
@@ -287,7 +287,7 @@ install_hadolint() {
   _T0_HADO=$(date +%s)
   local _BIN_HADO
   _BIN_HADO="${VENV}/bin/hadolint${_EXE}"
-  if [ -x "${_BIN_HADO}" ] && [ "$DRY_RUN" -eq 0 ]; then
+  if [ -x "${_BIN_HADO}" ] && [ "${DRY_RUN:-0}" -eq 0 ]; then
     log_summary "Lint Tool" "Hadolint" "✅ Exists" "$(get_version "$_BIN_HADO")" "0"
     return 0
   fi
@@ -298,7 +298,7 @@ install_hadolint() {
   fi
   log_info "── Installing hadolint ──"
 
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "Hadolint" "⚖️ Previewed" "-" "0"
     return 0
   fi
@@ -336,7 +336,7 @@ install_go_lint() {
   _T0_GO=$(date +%s)
   local _BIN_GO
   _BIN_GO="${VENV}/bin/golangci-lint"
-  if [ -x "${_BIN_GO}" ] && [ "$DRY_RUN" -eq 0 ]; then
+  if [ -x "${_BIN_GO}" ] && [ "${DRY_RUN:-0}" -eq 0 ]; then
     log_summary "Lint Tool" "Go Lint" "✅ Exists" "$(get_version "$_BIN_GO")" "0"
     return 0
   fi
@@ -347,7 +347,7 @@ install_go_lint() {
   fi
   log_info "── Installing golangci-lint ──"
 
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "Go Lint" "⚖️ Previewed" "-" "0"
     return 0
   fi
@@ -383,13 +383,13 @@ install_checkmake() {
   fi
   local _BIN_CM
   _BIN_CM="${VENV}/bin/checkmake${_EXE}"
-  if [ -x "${_BIN_CM}" ] && [ "$DRY_RUN" -eq 0 ]; then
+  if [ -x "${_BIN_CM}" ] && [ "${DRY_RUN:-0}" -eq 0 ]; then
     log_summary "Lint Tool" "Checkmake" "✅ Exists" "$(get_version "$_BIN_CM")" "0"
     return 0
   fi
 
   log_info "── Installing checkmake ──"
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "Checkmake" "⚖️ Previewed" "-" "0"
     return 0
   fi
@@ -426,7 +426,7 @@ install_iac_lint() {
     return 0
   fi
   log_info "── Installing IaC tools ──"
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "TFLint" "⚖️ Previewed" "-" "0"
     log_summary "Lint Tool" "Kube-Linter" "⚖️ Previewed" "-" "0"
     return 0
@@ -495,7 +495,7 @@ setup_hooks() {
   local _T0_HOOK
   _T0_HOOK=$(date +%s)
   log_info "── Setting up Pre-commit Hooks ──"
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Other" "Hooks" "⚖️ Previewed" "-" "0"
     return 0
   fi
@@ -526,7 +526,7 @@ setup_powershell() {
     return 0
   fi
   log_info "── Setting up PowerShell Linter ──"
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "PowerShell" "⚖️ Previewed" "-" "0"
     return 0
   fi
@@ -558,7 +558,7 @@ install_java_lint() {
   _JAR_JAVA="${VENV}/bin/google-java-format.jar"
   local _BIN_JAVA
   _BIN_JAVA="${VENV}/bin/google-java-format"
-  if [ -f "${_JAR_JAVA}" ] && [ "$DRY_RUN" -eq 0 ]; then
+  if [ -f "${_JAR_JAVA}" ] && [ "${DRY_RUN:-0}" -eq 0 ]; then
     log_summary "Lint Tool" "Java Lint" "✅ Exists" "$JAVA_FORMAT_VERSION" "0"
     return 0
   fi
@@ -569,7 +569,7 @@ install_java_lint() {
   fi
   log_info "── Installing google-java-format ──"
 
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "Java Lint" "⚖️ Previewed" "-" "0"
     return 0
   fi
@@ -602,7 +602,7 @@ install_ruby_lint() {
   fi
   log_info "── Setting up Rubocop ──"
 
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "Rubocop" "⚖️ Previewed" "-" "0"
     return 0
   fi
@@ -617,7 +617,7 @@ install_ruby_lint() {
     fi
   fi
 
-  if command -v "$_RUBO_BIN_REF" >/dev/null 2>&1 && [ "$DRY_RUN" -eq 0 ]; then
+  if command -v "$_RUBO_BIN_REF" >/dev/null 2>&1 && [ "${DRY_RUN:-0}" -eq 0 ]; then
     log_summary "Lint Tool" "Rubocop" "✅ Exists" "$(get_version "$_RUBO_BIN_REF")" "0"
     return 0
   fi
@@ -645,7 +645,7 @@ install_php_lint() {
   _T0_PHP=$(date +%s)
   local _BIN_PHP
   _BIN_PHP="${VENV}/bin/php-cs-fixer"
-  if [ -x "${_BIN_PHP}" ] && [ "$DRY_RUN" -eq 0 ]; then
+  if [ -x "${_BIN_PHP}" ] && [ "${DRY_RUN:-0}" -eq 0 ]; then
     log_summary "Lint Tool" "PHP Lint" "✅ Exists" "$PHP_CS_FIXER_VERSION" "0"
     return 0
   fi
@@ -656,7 +656,7 @@ install_php_lint() {
   fi
   log_info "── Installing php-cs-fixer ──"
 
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "PHP Lint" "⚖️ Previewed" "-" "0"
     return 0
   fi
@@ -755,13 +755,13 @@ install_osv_scanner() {
   _T0_OSV=$(date +%s)
   local _BIN_OSV
   _BIN_OSV="${VENV}/bin/osv-scanner${_EXE}"
-  if [ -x "${_BIN_OSV}" ] && [ "$DRY_RUN" -eq 0 ]; then
+  if [ -x "${_BIN_OSV}" ] && [ "${DRY_RUN:-0}" -eq 0 ]; then
     log_summary "Security Tool" "OSV-Scanner" "✅ Exists" "$(get_version "$_BIN_OSV")" "0"
     return 0
   fi
 
   log_info "── Installing osv-scanner ──"
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Security Tool" "OSV-Scanner" "⚖️ Previewed" "-" "0"
     return 0
   fi
@@ -796,13 +796,13 @@ install_trivy() {
   _T0_TRIVY=$(date +%s)
   local _BIN_TRIVY
   _BIN_TRIVY="${VENV}/bin/trivy${_EXE}"
-  if [ -x "${_BIN_TRIVY}" ] && [ "$DRY_RUN" -eq 0 ]; then
+  if [ -x "${_BIN_TRIVY}" ] && [ "${DRY_RUN:-0}" -eq 0 ]; then
     log_summary "Security Tool" "Trivy" "✅ Exists" "$(get_version "$_BIN_TRIVY")" "0"
     return 0
   fi
 
   log_info "── Installing trivy ──"
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Security Tool" "Trivy" "⚖️ Previewed" "-" "0"
     return 0
   fi
@@ -854,13 +854,13 @@ install_editorconfig_checker() {
   _T0_EC=$(date +%s)
   local _BIN_EC
   _BIN_EC="${VENV}/bin/editorconfig-checker${_EXE}"
-  if [ -x "${_BIN_EC}" ] && [ "$DRY_RUN" -eq 0 ]; then
+  if [ -x "${_BIN_EC}" ] && [ "${DRY_RUN:-0}" -eq 0 ]; then
     log_summary "Lint Tool" "EditorConfig" "✅ Exists" "$(get_version "$_BIN_EC")" "0"
     return 0
   fi
 
   log_info "── Installing editorconfig-checker ──"
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "EditorConfig" "⚖️ Previewed" "-" "0"
     return 0
   fi
@@ -1092,7 +1092,7 @@ EOF
     log_info "\n✨ Setup step complete!"
 
     # Next Actions
-    if [ "$DRY_RUN" -eq 0 ]; then
+    if [ "${DRY_RUN:-0}" -eq 0 ]; then
       printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
       printf "  - Run %bmake install%b to install project dependencies.\n" "${GREEN}" "${NC}"
       printf "  - Run %bmake verify%b to ensure environment health.\n" "${GREEN}" "${NC}"

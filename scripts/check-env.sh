@@ -69,7 +69,7 @@ check_tool_version() {
   if ! command -v "$_LV_CMD" >/dev/null 2>&1; then
     log_warn "❌ $_LV_NAME: Not found."
     HEALTHY_ST=1
-    [ "$_LV_CRITICAL" -eq 1 ] && CORE_HEALTHY_ST=1
+    [ "${_LV_CRITICAL:-0}" -eq 1 ] && CORE_HEALTHY_ST=1
     return 1
   fi
 
@@ -85,7 +85,7 @@ check_tool_version() {
   else
     log_warn "⚠️  $_LV_NAME: v$_LV_CURRENT_VER (below recommended v$_LV_MIN_VER)"
     HEALTHY_ST=1
-    [ "$_LV_CRITICAL" -eq 1 ] && CORE_HEALTHY_ST=1
+    [ "${_LV_CRITICAL:-0}" -eq 1 ] && CORE_HEALTHY_ST=1
   fi
 }
 
@@ -227,13 +227,13 @@ main() {
       CORE_HEALTHY_ST=1
     fi
   done
-  [ "$CORE_HEALTHY_ST" -eq 0 ] && log_success "✅ Basic project structure is intact."
+  [ "${CORE_HEALTHY_ST:-0}" -eq 0 ] && log_success "✅ Basic project structure is intact."
 
   # Final combined health check
-  if [ "$HEALTHY_ST" -eq 0 ]; then
+  if [ "${HEALTHY_ST:-0}" -eq 0 ]; then
     log_success "\n✨ Environment is HEALTHY! Ready for development."
     exit 0
-  elif [ "$CORE_HEALTHY_ST" -eq 0 ]; then
+  elif [ "${CORE_HEALTHY_ST:-0}" -eq 0 ]; then
     log_warn "\n🛠️  Environment is FUNCTIONAL but has warnings (missing recommended/optional tools)."
     log_warn "💡 Run 'make setup' to address the warnings above."
     exit 0

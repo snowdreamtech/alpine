@@ -126,12 +126,13 @@ EOF
 ## 🚀 Next Steps
 
 - Review the detailed logs if any check failed.
-- Run \`make verify\` for a high-verbosity verification run.
+- Run %bmake verify%b for a high-verbosity verification run.
+- Run %bmake commit%b if all gates are passed.
 - Keep standardizing and shifting-left!
 EOF
 
   # 5. Result
-  if [ "$DRY_RUN" -eq 0 ]; then
+  if [ "${DRY_RUN:-0}" -eq 0 ]; then
     cp "$_TMP_REPORT" "$_HEALTH_REPORT"
     rm "$_TMP_REPORT"
     log_success "\n✨ Health check complete! Report saved to: $_HEALTH_REPORT"

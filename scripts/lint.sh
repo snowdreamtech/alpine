@@ -69,7 +69,7 @@ run_pre_commit_lint() {
   fi
 
   # Run on all files
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_success "DRY-RUN: Would run $_PRE_COMMIT_LNT --all-files"
   elif [ -n "$_LV_FIX" ]; then
     log_info "Running in auto-fix mode..."
@@ -107,11 +107,11 @@ main() {
 
   log_success "\n✨ Linting complete!"
 
-  # Next Actions
-  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  # 5. Standardized Next Actions
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    printf "  - Run %bmake test%b to run the unified test suite.\n" "${GREEN}" "${NC}"
-    printf "  - Run %bmake verify%b to ensure full project health.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake test%b to execute functional test suites.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake verify%b to ensure full project stability.\n" "${GREEN}" "${NC}"
   fi
 }
 

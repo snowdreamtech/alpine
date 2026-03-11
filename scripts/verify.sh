@@ -89,7 +89,7 @@ main() {
   parse_common_args "$@"
 
   # Pass dry-run to sub-scripts
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     _SUB_PAR_ARGS="${_SUB_PAR_ARGS} --dry-run"
   fi
 
@@ -109,11 +109,11 @@ main() {
 
   log_success "✨ All verification steps passed! Project is healthy."
 
-  # Next Actions
-  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  # 5. Standardized Next Actions
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    printf "  - Run %bmake audit%b to check for security vulnerabilities.\n" "${GREEN}" "${NC}"
-    printf "  - Run %bmake commit%b to finalize your changes.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake audit%b to check for security vulnerabilities and licensing.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake commit%b to record your verified changes.\n" "${GREEN}" "${NC}"
   fi
 }
 

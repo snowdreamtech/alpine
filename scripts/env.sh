@@ -61,7 +61,7 @@ run_env_setup() {
   if [ -f ".env" ]; then
     log_info ".env already exists. No action needed."
   else
-    if [ "$DRY_RUN" -eq 1 ]; then
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_info "DRY-RUN: Would copy .env.example to .env"
     else
       log_info "Creating .env from .env.example..."
@@ -80,7 +80,7 @@ run_env_check() {
     log_info "💡 Ensure you are running this script from the workspace root."
     exit 1
   fi
-  if [ ! -f ".env" ] && [ "$DRY_RUN" -ne 1 ]; then
+  if [ ! -f ".env" ] && [ "${DRY_RUN:-0}" -ne 1 ]; then
     log_warn ".env not found. Please run 'scripts/env.sh setup' first."
     return
   fi
@@ -94,7 +94,7 @@ run_env_check() {
 
     local _KEY_ENV
     _KEY_ENV=$(echo "$line_env" | cut -d'=' -f1 | sed 's/[[:space:]]*$//')
-    if [ "$DRY_RUN" -eq 1 ]; then
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_debug "DRY-RUN: Would check if $_KEY_ENV exists in .env"
     else
       if ! grep -q "^$_KEY_ENV=" ".env" && ! grep -q "^$_KEY_ENV =" ".env"; then
@@ -136,7 +136,7 @@ run_env_sync() {
     local _KEY_SYNC
     _KEY_SYNC=$(echo "$line_sync" | cut -d'=' -f1 | sed 's/[[:space:]]*$//')
     if ! grep -q "^$_KEY_SYNC=" ".env" && ! grep -q "^$_KEY_SYNC =" ".env"; then
-      if [ "$DRY_RUN" -eq 1 ]; then
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_info "DRY-RUN: Would add $_KEY_SYNC to .env"
       else
         printf "Missing key found: %b%s%b. Add to .env? (y/N): " "${YELLOW}" "$_KEY_SYNC" "${NC}"
@@ -185,10 +185,11 @@ main() {
 
   log_success "\n✨ Environment management task complete."
 
-  # Next Actions
-  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  # 4. Standardized Next Actions
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    printf "  - Run %bmake setup%b to install tooling based on the environment.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake setup%b to prepare your development environment.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake install%b to synchronize project dependencies.\n" "${GREEN}" "${NC}"
   fi
 }
 

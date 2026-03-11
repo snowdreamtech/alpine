@@ -56,7 +56,7 @@ run_release_verify() {
   log_info "── Verification: Running pre-flight checks ──"
   if [ -f "scripts/verify.sh" ]; then
     local _VFY_ARGS="--quiet"
-    [ "$DRY_RUN" -eq 1 ] && _VFY_ARGS="$_VFY_ARGS --dry-run"
+    [ "${DRY_RUN:-0}" -eq 1 ] && _VFY_ARGS="$_VFY_ARGS --dry-run"
     # shellcheck disable=SC2086
     sh scripts/verify.sh $_VFY_ARGS || {
       log_error "Error: Verification failed. Cannot proceed with release."
@@ -98,7 +98,7 @@ perform_git_release() {
     return 0
   fi
 
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: Would tag version $_LV_TAG_VERSION and push to origin."
   else
     # Safety Gate: Check if tag already exists
@@ -155,10 +155,11 @@ main() {
 
   log_success "\n✨ Release process completed successfully!"
 
-  # Next Actions
-  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  # 7. Standardized Next Actions
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    printf "  - Run %bgit push --tags%b to publish the version tag.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bgit push --tags%b to synchronize version tags with the remote.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake cleanup%b to remove temporary release artifacts.\n" "${GREEN}" "${NC}"
   fi
 }
 

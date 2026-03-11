@@ -63,7 +63,7 @@ run_archival_cleanup() {
   log_debug "Cleaning up temporary files..."
   rm -f "$_TMP_HEADER_CLN" "$_NEW_CHANGELOG_CLN" "$_TMP_SUMMARY_CLN"
   rm -rf "$_TMP_ARCH_DIR_CLN"
-  [ "$_DRY_RUN_CLN" -eq 0 ] && rmdir "$LOCK_DIR" 2>/dev/null || true
+  [ "${_DRY_RUN_CLN:-0}" -eq 0 ] && rmdir "$LOCK_DIR" 2>/dev/null || true
 }
 
 # Purpose: Main entry point for the changelog archival engine.
@@ -97,7 +97,7 @@ main() {
   fi
 
   # Concurrency Lock (Atomic mkdir is standard POSIX lock)
-  if [ "$DRY_RUN" -eq 0 ]; then
+  if [ "${DRY_RUN:-0}" -eq 0 ]; then
     if ! mkdir "$LOCK_DIR" 2>/dev/null; then
       log_error "Error: Another archival process seems to be running (lock exists: $LOCK_DIR)."
       exit 1
@@ -116,7 +116,7 @@ main() {
   _TMP_SUM=$(mktemp)
 
   # Setup Trap for cleanup
-  trap 'run_archival_cleanup "$_TMP_HDR" "$_NEW_CHLOG" "$_TMP_SUM" "$_TMP_ARCH_PFX" "$DRY_RUN"' EXIT INT TERM
+  trap 'run_archival_cleanup "$_TMP_HDR" "$_NEW_CHLOG" "$_TMP_SUM" "$_TMP_ARCH_PFX" "${DRY_RUN:-0}"' EXIT INT TERM
 
   # Get current major version (Universal Source)
   local _RAW_VER_ARCH
@@ -243,7 +243,7 @@ main() {
       ' "$_arch_file_iter" >"$_FILTERED_CONTENT_ARCH"
 
       if [ -s "$_FILTERED_CONTENT_ARCH" ]; then
-        if [ "$DRY_RUN" -eq 1 ]; then
+        if [ "${DRY_RUN:-0}" -eq 1 ]; then
           log_warn "DRY-RUN: Would prepend new entries to $_FINAL_ARCH_FILE"
           printf "| v%s | Prepend (Dry Run) | %s |\n" "$_V_NUM_PROC" "$_FINAL_ARCH_FILE" >>"$_TMP_SUM"
         else
@@ -262,7 +262,7 @@ main() {
       fi
       rm -f "$_FILTERED_CONTENT_ARCH"
     else
-      if [ "$DRY_RUN" -eq 1 ]; then
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_warn "DRY-RUN: Would create $_FINAL_ARCH_FILE"
         printf "| v%s | Create (Dry Run) | %s |\n" "$_V_NUM_PROC" "$_FINAL_ARCH_FILE" >>"$_TMP_SUM"
       else
@@ -316,7 +316,7 @@ main() {
   rm -f "$_HISTORY_LINKS_SCRATCH"
 
   # 6. Final Swap (Atomic)
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_warn "DRY-RUN: History section preview:"
     grep -A 100 "^## History" "$_NEW_CHLOG" || true
   else
@@ -330,8 +330,8 @@ main() {
     cat "$_TMP_SUM" >>"$GITHUB_STEP_SUMMARY"
   fi
 
-  # Next Actions
-  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  # 8. Standardized Next Actions
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
     printf "  - Run %bmake commit%b to finalize the archival changes.\n" "${GREEN}" "${NC}"
   fi

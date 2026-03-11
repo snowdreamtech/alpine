@@ -86,7 +86,7 @@ main() {
   # 4. Execute VitePress via NPM
   case "$_COMMAND_DOC" in
   dev)
-    if [ "$DRY_RUN" -eq 1 ]; then
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would start VitePress dev server on $DOCS_DIR"
     else
       log_info "Starting development server..."
@@ -94,7 +94,7 @@ main() {
     fi
     ;;
   build)
-    if [ "$DRY_RUN" -eq 1 ]; then
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would build VitePress site from $DOCS_DIR"
     else
       log_info "Building documentation site..."
@@ -103,7 +103,7 @@ main() {
     fi
     ;;
   preview)
-    if [ "$DRY_RUN" -eq 1 ]; then
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would preview VitePress site in $DOCS_DIR"
     else
       log_info "Previewing production build..."
@@ -112,13 +112,13 @@ main() {
     ;;
   esac
 
-  # Next Actions
-  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  # 5. Standardized Next Actions
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
     if [ "$_COMMAND_DOC" = "build" ]; then
-      printf "  - Run %bmake deploy%b or push to trigger CI documentation updates.\n" "${GREEN}" "${NC}"
+      printf "  - Run %bmake release%b to publish the documentation and project.\n" "${GREEN}" "${NC}"
     else
-      printf "  - Run %bmake docs build%b to create production artifacts.\n" "${GREEN}" "${NC}"
+      printf "  - Run %bmake docs build%b to generate production-ready documentation.\n" "${GREEN}" "${NC}"
     fi
   fi
 }

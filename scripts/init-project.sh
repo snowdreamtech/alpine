@@ -58,13 +58,13 @@ main() {
   local _IS_TTY_HYD=0
   [ -t 0 ] && _IS_TTY_HYD=1
 
-  if [ "$VERBOSE" -ge 1 ]; then
+  if [ "${VERBOSE:-0}" -ge 1 ]; then
     printf "%b💧 Project Hydration: Converting Template to Project...%b\n\n" "${BLUE}" "${NC}"
   fi
 
   # 3. Input Collection (Interactive fallback or validation)
   if [ -z "$_PROJECT_NAME_HYD" ]; then
-    if [ "$_IS_TTY_HYD" -eq 1 ] && [ "$_AUTO_CON_HYD" -eq 0 ]; then
+    if [ "${_IS_TTY_HYD:-0}" -eq 1 ] && [ "${_AUTO_CON_HYD:-0}" -eq 0 ]; then
       printf "Enter Project Name (e.g., my-awesome-app): "
       read -r _PROJECT_NAME_HYD
     else
@@ -74,7 +74,7 @@ main() {
   fi
 
   if [ -z "$_AUTHOR_NAME_HYD" ]; then
-    if [ "$_IS_TTY_HYD" -eq 1 ] && [ "$_AUTO_CON_HYD" -eq 0 ]; then
+    if [ "${_IS_TTY_HYD:-0}" -eq 1 ] && [ "${_AUTO_CON_HYD:-0}" -eq 0 ]; then
       printf "Enter Author Name (e.g., John Doe): "
       read -r _AUTHOR_NAME_HYD
     else
@@ -84,7 +84,7 @@ main() {
   fi
 
   if [ -z "$_GITHUB_ORG_HYD" ]; then
-    if [ "$_IS_TTY_HYD" -eq 1 ] && [ "$_AUTO_CON_HYD" -eq 0 ]; then
+    if [ "${_IS_TTY_HYD:-0}" -eq 1 ] && [ "${_AUTO_CON_HYD:-0}" -eq 0 ]; then
       printf "Enter GitHub Username/Org (e.g., myorg): "
       read -r _GITHUB_ORG_HYD
     else
@@ -98,15 +98,15 @@ main() {
   local _OLD_USER_REF="snowdream"
 
   # 4. Confirmation
-  if [ "$VERBOSE" -ge 1 ]; then
+  if [ "${VERBOSE:-0}" -ge 1 ]; then
     printf "\n%bConfiguration Summary:%b\n" "${YELLOW}" "${NC}"
     printf "  Project: %b%s%b\n" "${GREEN}" "$_PROJECT_NAME_HYD" "${NC}"
     printf "  Author:  %b%s%b\n" "${GREEN}" "$_AUTHOR_NAME_HYD" "${NC}"
     printf "  GitHub:  %b%s%b\n" "${GREEN}" "$_GITHUB_ORG_HYD" "${NC}"
   fi
 
-  if [ "$DRY_RUN" -eq 0 ] && [ "$VERBOSE" -ge 1 ] && [ "$_AUTO_CON_HYD" -eq 0 ]; then
-    if [ "$_IS_TTY_HYD" -eq 1 ] || [ "$SNOWDREAM_TEST_FORCE_CONFIRM" = "1" ]; then
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${VERBOSE:-0}" -ge 1 ] && [ "${_AUTO_CON_HYD:-0}" -eq 0 ]; then
+    if [ "${_IS_TTY_HYD:-0}" -eq 1 ] || [ "${SNOWDREAM_TEST_FORCE_CONFIRM:-0}" = "1" ]; then
       printf "\nProceed with hydration? (y/N): "
       local _CONFIRM_HYD
       read -r _CONFIRM_HYD
@@ -125,7 +125,7 @@ main() {
   # 5. Replace Placeholders
   log_info "\nStep 1: Replacing placeholders in files..."
 
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_warn "DRY-RUN: Would replace '$_OLD_PROJ_REF' with '$_PROJECT_NAME_HYD' and '$_OLD_ORG_REF/$_OLD_USER_REF' with '$_GITHUB_ORG_HYD' in matching files."
   else
     # Use perl for cross-platform compatibility
@@ -150,14 +150,14 @@ main() {
   log_info "Step 2: Updating LICENSE..."
   local _CUR_YEAR_HYD
   _CUR_YEAR_HYD=$(date +%Y)
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_warn "DRY-RUN: Would update LICENSE copyright to $_CUR_YEAR_HYD and $_AUTHOR_NAME_HYD."
   else
     perl -pi -e "s/Copyright \(c\) \d{4}-present SnowdreamTech Inc\./Copyright (c) $_CUR_YEAR_HYD-present $_AUTHOR_NAME_HYD/g" LICENSE
   fi
 
   # 7. Git Initialization
-  if [ "$DRY_RUN" -eq 0 ] && [ "$VERBOSE" -ge 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${VERBOSE:-0}" -ge 1 ]; then
     printf "\nRe-initialize Git repository? (y/N): "
     local _REINIT_GIT_HYD
     read -r _REINIT_GIT_HYD
@@ -171,14 +171,14 @@ main() {
       ;;
     *) ;;
     esac
-  elif [ "$DRY_RUN" -eq 1 ]; then
+  elif [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_warn "DRY-RUN: Would prompt for Git re-initialization."
   fi
 
   # 8. Scaffolding (Optional)
   if [ -n "$_STACK_HYD" ]; then
     log_info "\nStep 4: Creating $_STACK_HYD scaffolding..."
-    if [ "$DRY_RUN" -eq 1 ]; then
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_warn "DRY-RUN: Would create source and tests for $_STACK_HYD."
     else
       case "$_STACK_HYD" in
@@ -233,11 +233,12 @@ main() {
 
   log_success "\n🚀 Project Hydration Complete!"
 
-  # Next Actions
-  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  # 9. Standardized Next Actions
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    printf "  - Run %bmake setup%b to install system-level tools.\n" "${GREEN}" "${NC}"
-    printf "  - Run %bmake install%b to install project dependencies.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake setup%b to initialize your development environment.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake install%b to install all project dependencies.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake verify%b to validate the project state.\n" "${GREEN}" "${NC}"
   fi
 }
 

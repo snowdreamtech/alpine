@@ -91,7 +91,7 @@ main() {
     local _T0_GL
     _T0_GL=$(date +%s)
     log_info "── Scanning for Secrets (gitleaks) ──"
-    if [ "$DRY_RUN" -eq 1 ]; then
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would run gitleaks detect"
       log_summary "Security" "gitleaks" "⚖️ Previewed" "-" "0"
     else
@@ -110,7 +110,7 @@ main() {
     _T0_ZM=$(date +%s)
     log_info "\n── Auditing GitHub Actions (zizmor) ──"
     if run_quiet command -v zizmor; then
-      if [ "$DRY_RUN" -eq 1 ]; then
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_success "DRY-RUN: Would run zizmor"
         log_summary "GitHub" "zizmor" "⚖️ Previewed" "-" "0"
       else
@@ -129,7 +129,7 @@ main() {
     local _T0_JS
     _T0_JS=$(date +%s)
     log_info "\n── Auditing Node.js dependencies ($NPM audit) ──"
-    if [ "$DRY_RUN" -eq 1 ]; then
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would run $NPM audit"
       log_summary "Node.js" "$NPM-audit" "⚖️ Previewed" "-" "0"
     else
@@ -160,7 +160,7 @@ main() {
     fi
 
     if [ -n "$_PIPAUDIT_BIN" ]; then
-      if [ "$DRY_RUN" -eq 1 ]; then
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_success "DRY-RUN: Would run $_PIPAUDIT_BIN"
         log_summary "Python" "pip-audit" "⚖️ Previewed" "-" "0"
       else
@@ -184,7 +184,7 @@ main() {
     local _T0_OSV_AUD
     _T0_OSV_AUD=$(date +%s)
     log_info "\n── Generic Vulnerability Scan (osv-scanner) ──"
-    if [ "$DRY_RUN" -eq 1 ]; then
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would run osv-scanner"
       log_summary "Security" "osv-scanner" "⚖️ Previewed" "-" "0"
     else
@@ -203,7 +203,7 @@ main() {
     _T0_GO_AUD=$(date +%s)
     log_info "\n── Auditing Go dependencies (govulncheck) ──"
     if run_quiet command -v govulncheck; then
-      if [ "$DRY_RUN" -eq 1 ]; then
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_success "DRY-RUN: Would run govulncheck"
         log_summary "Go" "govulncheck" "⚖️ Previewed" "-" "0"
       else
@@ -225,7 +225,7 @@ main() {
     _T0_RS_AUD=$(date +%s)
     log_info "\n── Auditing Rust dependencies (cargo audit) ──"
     if run_quiet command -v cargo && run_quiet cargo audit --version; then
-      if [ "$DRY_RUN" -eq 1 ]; then
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_success "DRY-RUN: Would run cargo audit"
         log_summary "Rust" "cargo-audit" "⚖️ Previewed" "-" "0"
       else
@@ -247,7 +247,7 @@ main() {
     _T0_DKR_AUD=$(date +%s)
     log_info "\n── Auditing Containers (trivy) ──"
     if run_quiet command -v trivy; then
-      if [ "$DRY_RUN" -eq 1 ]; then
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_success "DRY-RUN: Would run trivy fs ."
         log_summary "DevOps" "trivy" "⚖️ Previewed" "-" "0"
       else
@@ -282,10 +282,10 @@ main() {
   if [ "$_IS_TOP_LEVEL" = "true" ]; then
     if [ "$_OVERALL_EXIT_AUDIT" -eq 0 ]; then
       log_success "\n✨ Security audit finished successfully."
-      if [ "$DRY_RUN" -eq 0 ]; then
+      if [ "${DRY_RUN:-0}" -eq 0 ]; then
         printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-        printf "  - Run %bmake commit%b to finalize your changes.\n" "${GREEN}" "${NC}"
-        printf "  - Run %bmake build%b to create project artifacts.\n" "${GREEN}" "${NC}"
+        printf "  - Run %bmake commit%b to record your verified changes.\n" "${GREEN}" "${NC}"
+        printf "  - Run %bmake build%b to generate production artifacts.\n" "${GREEN}" "${NC}"
       fi
     else
       log_error "\n⚠️ Security audit finished with vulnerabilities or leaks found."

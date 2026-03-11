@@ -154,11 +154,11 @@ main() {
 
   log_success "\n✨ All tests passed!"
 
-  # Next Actions
-  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  # 5. Standardized Next Actions
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    printf "  - Run %bmake audit%b to check for security vulnerabilities.\n" "${GREEN}" "${NC}"
-    printf "  - Run %bmake commit%b to finalize your changes.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake audit%b to verify security and licensing compliance.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake commit%b to record your verified changes.\n" "${GREEN}" "${NC}"
   fi
 }
 

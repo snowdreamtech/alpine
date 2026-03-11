@@ -55,7 +55,7 @@ clean_item() {
   local _DESC_CLN="$2"
 
   if [ -e "$_PATH_CLN" ]; then
-    if [ "$DRY_RUN" -eq 1 ]; then
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would remove $_DESC_CLN ($_PATH_CLN)"
     else
       log_info "Removing $_DESC_CLN ($_PATH_CLN)..."
@@ -99,7 +99,7 @@ main() {
   clean_item ".venv" "Python virtual environment"
 
   # Finding and removing __pycache__ and .pyc files
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_success "DRY-RUN: Would search and remove all __pycache__ and *.pyc files."
   else
     # Using POSIX compliant find
@@ -117,7 +117,7 @@ main() {
   # Handled in General Artifacts (target, bin)
 
   # 4. OS Specific Caches
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_success "DRY-RUN: Would remove .DS_Store and Thumbs.db files."
   else
     # Using POSIX compliant find
@@ -127,10 +127,10 @@ main() {
 
   log_success "\n✨ Cleanup complete!"
 
-  # Next Actions
-  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  # 5. Standardized Next Actions
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    printf "  - Run %bmake setup%b to re-initialize the environment.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake setup%b to re-initialize the project environment.\n" "${GREEN}" "${NC}"
   fi
 }
 

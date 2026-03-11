@@ -57,7 +57,7 @@ update_pnpm_global() {
       # Intelligent pnpm update: detects if managed by corepack
       if command -v corepack >/dev/null 2>&1 && pnpm self-update --help 2>&1 | grep -q "corepack" >/dev/null 2>&1; then
         log_info "Updating pnpm (via corepack)..."
-        if [ "$DRY_RUN" -eq 1 ]; then
+        if [ "${DRY_RUN:-0}" -eq 1 ]; then
           log_summary "Manager" "pnpm" "⚖️ Previewed" "-" "0"
         else
           if run_quiet corepack prepare pnpm@latest --activate; then
@@ -68,7 +68,7 @@ update_pnpm_global() {
           fi
         fi
       else
-        if [ "$DRY_RUN" -eq 1 ]; then
+        if [ "${DRY_RUN:-0}" -eq 1 ]; then
           log_summary "Manager" "pnpm" "⚖️ Previewed" "-" "0"
         else
           log_info "Updating pnpm (self-update)..."
@@ -104,7 +104,7 @@ update_pnpm_project() {
   if [ -f "pnpm-lock.yaml" ]; then
     if command -v pnpm >/dev/null 2>&1; then
       log_info "Updating project dependencies (pnpm update)..."
-      if [ "$DRY_RUN" -eq 1 ]; then
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_summary "Project" "pnpm-deps" "⚖️ Previewed" "-" "0"
       else
         if run_quiet pnpm update; then
@@ -129,7 +129,7 @@ update_python_venv() {
   if [ -d "$VENV" ]; then
     if [ -x "$VENV/bin/pip" ]; then
       log_info "Updating Python environment ($VENV)..."
-      if [ "$DRY_RUN" -eq 1 ]; then
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_summary "Project" "Python-Venv" "⚖️ Previewed" "-" "0"
       else
         local _STAT_PY="✅ Updated"
@@ -155,7 +155,7 @@ update_homebrew() {
   if command -v brew >/dev/null 2>&1; then
     if check_update_cooldown "homebrew"; then
       log_info "Updating Homebrew..."
-      if [ "$DRY_RUN" -eq 1 ]; then
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_summary "Manager" "Homebrew" "⚖️ Previewed" "-" "0"
       else
         if run_quiet brew update; then
@@ -180,7 +180,7 @@ update_macports() {
   if command -v port >/dev/null 2>&1; then
     if check_update_cooldown "macports"; then
       log_info "Updating MacPorts (requires sudo)..."
-      if [ "$DRY_RUN" -eq 1 ]; then
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_summary "Manager" "MacPorts" "⚖️ Previewed" "-" "0"
       else
         if sudo port selfupdate && sudo port -N upgrade outdated; then
@@ -206,7 +206,7 @@ update_ruby_gems() {
     if gem list rubocop -i >/dev/null 2>&1; then
       if check_update_cooldown "rubocop"; then
         log_info "Updating Rubocop gem..."
-        if [ "$DRY_RUN" -eq 1 ]; then
+        if [ "${DRY_RUN:-0}" -eq 1 ]; then
           log_summary "Lint Tool" "Rubocop" "⚖️ Previewed" "-" "0"
         else
           if run_quiet gem update rubocop --user-install --no-document --quiet; then
@@ -237,7 +237,7 @@ update_pre_commit() {
   if [ -n "$_BIN_PC" ] && [ -f ".pre-commit-config.yaml" ]; then
     if check_update_cooldown "pre-commit"; then
       log_info "Updating pre-commit hooks..."
-      if [ "$DRY_RUN" -eq 1 ]; then
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_summary "Other" "Hooks" "⚖️ Previewed" "-" "0"
       else
         if run_quiet "$_BIN_PC" autoupdate; then
@@ -262,7 +262,7 @@ update_go_mod() {
   if [ -f "go.mod" ]; then
     if command -v go >/dev/null 2>&1; then
       log_info "Updating Go workspace (go get -u)..."
-      if [ "$DRY_RUN" -eq 1 ]; then
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_summary "Project" "Go-Mod" "⚖️ Previewed" "-" "0"
       else
         if run_quiet go get -u ./... && run_quiet go mod tidy; then
@@ -287,7 +287,7 @@ update_cargo_deps() {
   if [ -f "Cargo.toml" ]; then
     if command -v cargo >/dev/null 2>&1; then
       log_info "Updating Rust dependencies (cargo update)..."
-      if [ "$DRY_RUN" -eq 1 ]; then
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_summary "Project" "Cargo-Deps" "⚖️ Previewed" "-" "0"
       else
         if run_quiet cargo update; then
@@ -376,11 +376,11 @@ main() {
   if [ "$_IS_TOP_LEVEL" = "true" ]; then
     log_success "\n✨ All tools and dependencies updated successfully!"
 
-    # Next Actions
-    if [ "$DRY_RUN" -eq 0 ]; then
+    # 6. Standardized Next Actions
+    if [ "${DRY_RUN:-0}" -eq 0 ]; then
       printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
       printf "  - Run %bmake install%b to synchronize project dependencies.\n" "${GREEN}" "${NC}"
-      printf "  - Run %bmake verify%b to ensure environment stability.\n" "${GREEN}" "${NC}"
+      printf "  - Run %bmake verify%b to ensure environment health and stability.\n" "${GREEN}" "${NC}"
     fi
   fi
 }

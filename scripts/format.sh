@@ -50,7 +50,7 @@ EOF
 run_shfmt_format() {
   log_info "── Formatting Shell Scripts (shfmt) ──"
   if command -v shfmt >/dev/null 2>&1; then
-    if [ "$DRY_RUN" -eq 1 ]; then
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
       shfmt -d -s -i 2 scripts/*.sh tests/*.bats 2>/dev/null || true
     else
       shfmt -w -s -i 2 scripts/*.sh tests/*.bats 2>/dev/null || true
@@ -75,7 +75,7 @@ run_prettier_format() {
     return
   fi
 
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     "$_PRETTIER_BIN" --check .
   else
     "$_PRETTIER_BIN" --write .
@@ -99,7 +99,7 @@ run_ruff_format() {
     return
   fi
 
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     "$_RUFF_FMT_BIN" format --check .
   else
     "$_RUFF_FMT_BIN" format .
@@ -132,10 +132,11 @@ main() {
 
   log_success "\n✨ Formatting complete!"
 
-  # Next Actions
-  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  # 4. Standardized Next Actions
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    printf "  - Run %bmake lint%b to verify code quality.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake lint%b to verify code quality standards.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake test%b to ensure functional integrity.\n" "${GREEN}" "${NC}"
   fi
 }
 

@@ -55,7 +55,7 @@ EOF
 run_python_bench() {
   if find . -maxdepth 2 -name "*benchmark*" | grep -q .; then
     log_info "── Testing Python Benchmarks (pytest-benchmark) ──"
-    if [ "$DRY_RUN" -eq 1 ]; then
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would run pytest-benchmark"
     elif [ -x "$VENV/bin/pytest" ]; then
       "$VENV/bin/pytest" --benchmark-only
@@ -105,10 +105,11 @@ main() {
 
   log_success "\n✨ Benchmarking finished."
 
-  # Next Actions
-  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  # 5. Standardized Next Actions
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
     printf "  - Run %bmake test%b for full functional verification.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake verify%b to ensure overall project health.\n" "${GREEN}" "${NC}"
   fi
 }
 

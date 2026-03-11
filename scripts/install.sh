@@ -120,11 +120,11 @@ main() {
 
   log_success "\n✨ All dependencies installed successfully!"
 
-  # Next Actions
-  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  # 4. Standardized Next Actions
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    printf "  - Run %bmake verify%b to ensure environment health.\n" "${GREEN}" "${NC}"
-    printf "  - Run %bmake audit%b to check for security vulnerabilities.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake verify%b to ensure environment and project health.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake test%b to execute the functional test suite.\n" "${GREEN}" "${NC}"
   fi
 }
 

@@ -61,7 +61,7 @@ run_build() {
   local _DESC_BLD="$2"
 
   log_info "── Step: $_DESC_BLD ──"
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_success "DRY-RUN: Would run: $_CMD_BLD"
   else
     # shellcheck disable=SC2086
@@ -114,10 +114,11 @@ main() {
 
   log_success "✨ Build completed successfully! Check the 'out/' or 'dist/' directory."
 
-  # Next Actions
-  if [ "$DRY_RUN" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  # 6. Standardized Next Actions
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    printf "  - Run %bmake release%b to create a new version tag.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake release%b to create a production version tag.\n" "${GREEN}" "${NC}"
+    printf "  - Run %bmake verify%b to perform final artifact validation.\n" "${GREEN}" "${NC}"
   fi
 }
 
