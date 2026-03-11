@@ -20,6 +20,31 @@
 - **三重保证质量**：通过 Pre-commit 和 GitHub Actions 集成门禁检查，确保 100% 的代码纯净。
 - **跨平台就绪**：在 macOS (Homebrew/MacPorts)、Linux 和 Windows 上无缝运行。
 
+## 🏗️ 设计与架构
+
+Snowdream Tech 模板的架构旨在解决“单体项目多重 AI IDE 协作产生的配置碎片化”问题，确保在所有支持的环境中，规则和工作流保持绝对一致。
+
+```mermaid
+graph TD
+    A[开发者与智能体 (Agents)] -->|操作| IDE[Cursor / Windsurf / Copilot / 50+ 其它]
+    IDE -->|通过重定向读取规则| R1[.vscode/]
+    IDE -->|通过重定向读取规则| R2[.github/]
+    IDE -->|通过重定向读取规则| R3[.cline/ .trae/ 等等]
+
+    R1 -.->|SSoT 指针| CoreRules[.agent/rules/]
+    R2 -.->|SSoT 指针| CoreRules
+    R3 -.->|SSoT 指针| CoreRules
+
+    CoreRules -->|管理与约束| Src[项目应用源码]
+    CoreRules -->|管理与约束| Scripts[CI/CD 与统一自动化脚本]
+```
+
+### 设计原则
+
+- **唯一事实来源 (SSoT)**: 所有 AI 行为准则、开发脚手架命令和 Git 生态钩子均集中在一处维护，彻底消灭各 IDE 之间的配置孤岛与冗余。
+- **跨平台多态性 (Cross-Platform)**: 核心自动化流水线基于原生 POSIX Shell 编写，且强制为 Windows (PowerShell / Batch) 提供对等兼容的轻量级包装层。
+- **三重质量护城河 (Triple Guarantee)**: 由 IDE 实时自动修复、Pre-commit 本地强制阻断、以及 CI/CD (GitHub Actions) 远端全量审计，三层联防共同构建 100% 代码纯净度防线。
+
 ## 📂 目录结构
 
 ```text

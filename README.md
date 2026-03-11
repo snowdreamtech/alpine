@@ -20,6 +20,31 @@ An enterprise-grade, foundational template designed for multi-AI IDE collaborati
 - **Triple Guarantee Quality**: Integrated gated checks via Pre-commit and GitHub Actions to ensure 100% code purity.
 - **Cross-Platform Ready**: Seamless operation across macOS (Homebrew/MacPorts), Linux, and Windows.
 
+## 🏗️ Design & Architecture
+
+The Snowdream Tech Template is architected to solve the "N-IDE Fragmentation" problem, ensuring that rules and workflows remain consistent across all supported environments.
+
+```mermaid
+graph TD
+    A[Developers & Agents] -->|Operates via| IDE[Cursor / Windsurf / Copilot / 50+ Others]
+    IDE -->|Reads Rules via Redirects| R1[.vscode/]
+    IDE -->|Reads Rules via Redirects| R2[.github/]
+    IDE -->|Reads Rules via Redirects| R3[.cline/ .trae/ etc.]
+
+    R1 -.->|SSoT Pointer| CoreRules[.agent/rules/]
+    R2 -.->|SSoT Pointer| CoreRules
+    R3 -.->|SSoT Pointer| CoreRules
+
+    CoreRules -->|Governs| Src[Source Code]
+    CoreRules -->|Governs| Scripts[CI/CD & Shell Scripts]
+```
+
+### Design Principles
+
+- **Single Source of Truth (SSoT)**: All AI rules, commands, and Git hooks live in one place. No duplicated IDE configurations.
+- **Cross-Platform Portability**: Heavy automation logic is written in POSIX Shell, with thin wrappers for Windows PowerShell/Batch.
+- **Triple Guarantee Quality**: Linting and formatting form an impenetrable wall, enforced at the IDE layer, pre-commit layer, and CI/CD GitHub Actions layer.
+
 ## 📂 Directory Structure
 
 ```text

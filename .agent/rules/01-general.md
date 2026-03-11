@@ -134,7 +134,7 @@
 
 ## 6. Documentation Standards
 
-- Every repository MUST have a `README.md` in **Simplified Chinese** at the root with:
+- Every repository MUST have a `README_zh-CN.md` (Simplified Chinese) and `README.md` (English) at the root with:
   - Project description and purpose
   - Prerequisites (runtime versions, system dependencies)
   - Quick start instructions (< 5 commands to run the project)

@@ -97,7 +97,7 @@
   func ParseConfig(path string) (*Config, error) { ... }
   ```
 
-- `README.md` files and user-facing documentation MUST be in **Simplified Chinese (简体中文)**.
+- The canonical `README.md` MUST be in English, while `README_zh-CN.md` and other user-facing documentation MUST be in **Simplified Chinese (简体中文)**.
 - Comments explain **why**, not **what**. Avoid comments that merely restate the code:
 
   ```go
