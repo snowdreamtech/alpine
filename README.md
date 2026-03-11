@@ -78,16 +78,18 @@ services:
 
 This image provides several environment variables to customize its behavior.
 
-| Variable    | Default | Description                                            |
-| :---------- | :------ | :----------------------------------------------------- |
-| `PUID`      | `0`     | User ID for the running process.                       |
-| `PGID`      | `0`     | Group ID for the running process.                      |
-| `USER`      | `root`  | Username for the running process.                      |
-| `WORKDIR`   | `/root` | Working directory.                                     |
-| `UMASK`     | `022`   | Umask for file creation.                               |
-| `DEBUG`     | `false` | Enable debug logging for the entrypoint.               |
-| `KEEPALIVE` | `0`     | Set to `1` to keep the container running indefinitely. |
-| `TZ`        | `UTC`   | Timezone setting.                                      |
+| Variable               | Default   | Description                                                          |
+| :--------------------- | :-------- | :------------------------------------------------------------------- |
+| `PUID`                 | `0`       | User ID for the running process.                                     |
+| `PGID`                 | `0`       | Group ID for the running process.                                    |
+| `USER`                 | `root`    | Username for the running process.                                    |
+| `WORKDIR`              | `/root`   | Working directory.                                                   |
+| `UMASK`                | `022`     | Umask for file creation.                                             |
+| `DEBUG`                | `false`   | Enable debug logging for the entrypoint.                             |
+| `KEEPALIVE`            | `0`       | Set to `1` to keep the container running indefinitely.               |
+| `TZ`                   | `UTC`     | Timezone setting.                                                    |
+| `CAP_NET_BIND_SERVICE` | `0`       | Set to `1` to grant permission to bind to privileged ports (< 1024). |
+| `LANG`                 | `C.UTF-8` | System locale and language setting.                                  |
 
 ## Features
 
