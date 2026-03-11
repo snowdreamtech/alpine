@@ -123,7 +123,7 @@
   - "You should verify, but my understanding is..." — lower confidence
   - "This is based on the documentation for version X — verify for your version" — version uncertainty
 
-## 4. Context Handling
+## 4. Context Handling & Token Management
 
 ### Knowledge & Research
 
@@ -135,7 +135,16 @@
 - **CLI-First Research Strategy**: AI agents MUST prioritize command-line tools (e.g., `grep`, `find`, `curl`, `gh api`) over browser-based research. Browser tools are considered high-latency fallbacks; use them only for complex visual documentation or when CLI-accessible resources are exhausted.
 - **Artifact Usage**: Utilize designated memory or "brain" directories (if configured) to store and retrieve long-running task context, architectural decisions, checklists, and completed vs pending work. Reference prior decisions rather than re-inventing them.
 - **Check Existing Code**: Before creating a new utility function or module, search the codebase for an existing equivalent. Avoid duplication — reference the existing implementation and extend it if needed.
-- **Context Window Management**: In long conversations, periodically summarize what has been accomplished and what remains. If the context is too large to process accurately, proactively request a focused sub-task definition.
+
+### Token Limits & The Lazy-Loading Router (MANDATORY)
+
+To prevent Context Window Overflow and hallucination caused by massive rule sets, ALL AI agents MUST strictly adhere to the **Lazy-Loading Router Architecture** when consulting the project's Single Source of Truth (`.agent/rules`):
+
+1. **Anti-Global-Load Guard**: AI agents MUST NEVER attempt to load, read, or list all files in the `.agent/rules/` directory simultaneously.
+2. **Core Fundamentals**: AI agents inherently understand or must load the general rule set (`01` through `12`).
+3. **The Router (`00-index.md`)**: For any technology-specific logic (e.g., Go, React, Ansible, Docker), the agent MUST consult `00-index.md` to find the exact rule file name for that stack.
+4. **On-Demand Loading**: The agent MUST ONLY load the specialized rule file(s) definitively required for the current granular task. For example, if fixing a Python script, do not load Go or Ruby rules.
+5. **Context Window Management**: In long conversations, periodically summarize what has been accomplished and what remains. If the context is too large to process accurately, proactively request a focused sub-task definition or clear your localized memory of irrelevant files to free up token space.
 
 ## 5. Quality & Review
 
