@@ -1,6 +1,7 @@
+---
 name: GitHub Actions Continuous Delivery
 
-on:
+"on":
   push:
     branches:
       - "main"
@@ -60,22 +61,22 @@ jobs:
       #     cf_account_id: ${{ secrets.CF_ACCOUNT_ID }}
       #     cf_api_token: ${{ secrets.CF_API_TOKEN }}
       #     cf_zone_id: ${{ secrets.CF_ZONE_ID }}
-      #     github_api_token: ${{ secrets.GITHUB_TOKEN }}     
+      #     github_api_token: ${{ secrets.GITHUB_TOKEN }}
       - name: Free Disk Space (Ubuntu)
         uses: jlumbroso/free-disk-space@v1.3.1
         with:
-            # this might remove tools that are actually needed,
-            # if set to "true" but frees about 6 GB
-            tool-cache: false
-            
-            # all of these default to true, but feel free to set to
-            # "false" if necessary for your workflow
-            android: true
-            dotnet: true
-            haskell: true
-            large-packages: true
-            docker-images: false
-            swap-storage: false      
+          # this might remove tools that are actually needed,
+          # if set to "true" but frees about 6 GB
+          tool-cache: false
+
+          # all of these default to true, but feel free to set to
+          # "false" if necessary for your workflow
+          android: true
+          dotnet: true
+          haskell: true
+          large-packages: true
+          docker-images: false
+          swap-storage: false
       - name: Checkout
         uses: actions/checkout@v6.0.2
         with:
@@ -83,9 +84,11 @@ jobs:
           token: ${{ secrets.WORKFLOW_SECRET }}
       - name: Set env variables
         run: |
-          echo "BRANCH=${GITHUB_REF##*/}" >> $GITHUB_ENV
-          echo "http_proxy=${http_proxy}" >> $GITHUB_ENV
-          echo "no_proxy=${no_proxy}" >> $GITHUB_ENV
+          {
+            echo "BRANCH=${GITHUB_REF##*/}"
+            echo "http_proxy=${http_proxy}"
+            echo "no_proxy=${no_proxy}"
+          } >> "$GITHUB_ENV"
       - # Add support for more platforms with QEMU (optional)
         # https://github.com/docker/setup-qemu-action
         name: Set up QEMU
@@ -127,7 +130,7 @@ jobs:
             name=ghcr.io/snowdreamtech/alpine,enable=true
             name=quay.io/snowdreamtech/alpine,enable=true
           flavor: |
-            latest=false  
+            latest=false
             prefix=
             suffix=
           tags: |

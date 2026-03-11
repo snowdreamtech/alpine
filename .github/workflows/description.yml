@@ -1,6 +1,7 @@
+---
 name: GitHub Actions Description Updater
 
-on:
+"on":
   push:
     branches:
       - main
