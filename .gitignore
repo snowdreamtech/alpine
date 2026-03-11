@@ -26,6 +26,7 @@ gitleaks-bin
 hadolint-*/
 golangci-lint-*
 health_report_*.md
+lint_output.txt
 
 # =============================================================================
 # Operating Systems
