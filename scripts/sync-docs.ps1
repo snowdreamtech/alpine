@@ -1,4 +1,4 @@
-﻿# scripts/sync-docs.ps1 - Documentation Sync Wrapper (PowerShell)
+# scripts/sync-docs.ps1 - Documentation Sync Wrapper (PowerShell)
 <#
 .SYNOPSIS
     Provides a stable PowerShell entry point for the Python documentation sync logic.
@@ -13,7 +13,7 @@ $ScriptDir = Split-Path -Parent $MyInvocation.MyCommand.Path
 . "$ScriptDir\lib\common.ps1"
 
 function Main {
-    Log-Info "🔄 Synchronizing Rules and Workflows to Docs..."
+    Log-Info "[sync] Synchronizing Rules and Workflows to Docs..."
 
     if (Get-Command "python3" -ErrorAction SilentlyContinue) {
         python3 "$ScriptDir\sync-docs.py"
@@ -24,7 +24,7 @@ function Main {
         exit 1
     }
 
-    Log-Success "`n✨ Documentation synchronization complete!"
+    Log-Success "`n[success] Documentation synchronization complete!"
 }
 
 Main
