@@ -31,6 +31,10 @@
     "Chart.yaml",
     "kustomization.yaml",
     "sonar-project.properties",
+    "Package.swift",
+    "*.csproj",
+    "*.gemspec",
+    "mix.exs",
     "VERSION"
   ],
   "bump-minor-pre-major": true,
