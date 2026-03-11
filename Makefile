@@ -31,7 +31,7 @@ endif
 # =============================================================================
 # Targets
 # =============================================================================
-.PHONY: all help init setup install lint format test build clean commit verify release env update audit health bench docs archive-changelog check-env
+.PHONY: all help init setup install lint format test build clean commit verify release env update audit health bench docs archive-changelog check-env sync-docs
 
 # Default target: display help
 all: help
@@ -167,6 +167,13 @@ ifeq ($(OS_NAME),Windows)
 	@scripts/bench.bat
 else
 	@sh scripts/bench.sh
+endif
+
+sync-docs:
+ifeq ($(OS_NAME),Windows)
+	@scripts/sync-docs.bat
+else
+	@sh scripts/sync-docs.sh
 endif
 
 docs:

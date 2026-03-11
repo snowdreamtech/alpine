@@ -21,6 +21,7 @@
     "lint": "sh scripts/lint.sh",
     "release": "sh scripts/release.sh",
     "setup": "sh scripts/setup.sh",
+    "sync-docs": "sh scripts/sync-docs.sh",
     "test": "sh scripts/test.sh",
     "update": "sh scripts/update.sh",
     "verify": "sh scripts/verify.sh"
