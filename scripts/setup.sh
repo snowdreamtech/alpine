@@ -219,174 +219,71 @@ setup_python() {
   fi
 }
 
-# Purpose: Installs Gitleaks for secrets scanning into the project's virtualenv.
-# Params:
-#   None (uses global GITLEAKS_VERSION)
-# Examples:
-#   install_gitleaks
+# Purpose: Installs Gitleaks for secrets scanning.
+# Delegate: Managed by mise (.mise.toml)
 install_gitleaks() {
   local _T0_GITL
   _T0_GITL=$(date +%s)
-
-  if command -v mise >/dev/null 2>&1; then
-    log_debug "Using mise for gitleaks..."
-    if run_quiet mise install gitleaks; then
-      log_summary "Lint Tool" "Gitleaks" "✅ mise" "$(get_version gitleaks)" "0"
-      return 0
-    fi
-  fi
-
-  local _BIN_GITL
-  _BIN_GITL="${VENV}/bin/gitleaks${_EXE}"
-  log_info "── Installing gitleaks ──"
+  log_info "── Setting up Gitleaks ──"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "Gitleaks" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
-  local _TAR_TAG_GITL
-  _TAR_TAG_GITL="${_OS_TAG}"
-  local _TMP_GITL
-  _TMP_GITL=$(mktemp -d)
-  local _STAT_GITL="✅ Installed"
+  local _STAT_GITL="✅ mise"
+  run_quiet mise install gitleaks || _STAT_GITL="❌ Failed"
 
-  if [ "${_OS_TAG}" = "windows" ]; then
-    local _ARCH_W_GITL="x64"
-    [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _ARCH_W_GITL="arm64"
-    local _TAR_GITL
-    _TAR_GITL="gitleaks_${GITLEAKS_VERSION#v}_windows_${_ARCH_W_GITL}.zip"
-    local _URL_GITL
-    _URL_GITL="${GITHUB_PROXY}https://github.com/gitleaks/gitleaks/releases/download/${GITLEAKS_VERSION}/${_TAR_GITL}"
-
-    if download_url "${_URL_GITL}" "${_TMP_GITL}/gitleaks.zip" "gitleaks"; then
-      unzip -q "${_TMP_GITL}/gitleaks.zip" -d "${_TMP_GITL}" || _STAT_GITL="❌ Failed"
-      if [ "$_STAT_GITL" = "✅ Installed" ]; then
-        mv "${_TMP_GITL}/gitleaks.exe" "${_BIN_GITL}" || _STAT_GITL="❌ Failed"
-      fi
-    else
-      _STAT_GITL="❌ Failed"
-    fi
-  else
-    local _TAR_GITL
-    _TAR_GITL="gitleaks_${GITLEAKS_VERSION#v}_${_TAR_TAG_GITL}_${_ARCH_N}"
-    # Arm64 fix for linux if needed (gitleaks uses arm64 tag)
-    case "${_ARCH_N}" in
-    aarch64) _TAR_GITL="gitleaks_${GITLEAKS_VERSION#v}_${_TAR_TAG_GITL}_arm64" ;;
-    esac
-    _TAR_GITL="${_TAR_GITL}.tar.gz"
-
-    local _URL_GITL
-    _URL_GITL="${GITHUB_PROXY}https://github.com/gitleaks/gitleaks/releases/download/${GITLEAKS_VERSION}/${_TAR_GITL}"
-    if download_url "${_URL_GITL}" "${_TMP_GITL}/gitleaks.tar.gz" "gitleaks"; then
-      tar -xzf "${_TMP_GITL}/gitleaks.tar.gz" -C "${_TMP_GITL}" gitleaks || _STAT_GITL="❌ Failed"
-      if [ "$_STAT_GITL" = "✅ Installed" ]; then
-        mv "${_TMP_GITL}/gitleaks" "${_BIN_GITL}" || _STAT_GITL="❌ Failed"
-      fi
-    else
-      _STAT_GITL="❌ Failed"
-    fi
-  fi
-  if [ -x "${_BIN_GITL}" ]; then
-    local _DUR_GITL
-    _DUR_GITL=$(($(date +%s) - _T0_GITL))
-    log_summary "Lint Tool" "Gitleaks" "$_STAT_GITL" "$(get_version "$_BIN_GITL")" "$_DUR_GITL"
-  else
-    log_summary "Lint Tool" "Gitleaks" "❌ Failed" "-" "0"
-  fi
-  rm -rf "${_TMP_GITL}"
+  local _DUR_GITL=$(($(date +%s) - _T0_GITL))
+  log_summary "Lint Tool" "Gitleaks" "$_STAT_GITL" "$(get_version gitleaks)" "$_DUR_GITL"
 }
 
 # Purpose: Installs Hadolint for Dockerfile linting.
-# Params:
-#   None (uses global HADOLINT_VERSION)
-# Examples:
-#   install_hadolint
+# Delegate: Managed by mise (.mise.toml)
 install_hadolint() {
   local _T0_HADO
   _T0_HADO=$(date +%s)
-  local _BIN_HADO
-  _BIN_HADO="${VENV}/bin/hadolint${_EXE}"
-  if [ -x "${_BIN_HADO}" ] && [ "${DRY_RUN:-0}" -eq 0 ]; then
-    log_summary "Lint Tool" "Hadolint" "✅ Exists" "$(get_version "$_BIN_HADO")" "0"
-    return 0
-  fi
+  log_info "── Setting up Hadolint ──"
 
   if ! has_lang_files "Dockerfile docker-compose.yml" "*.dockerfile *.Dockerfile"; then
     log_summary "Lint Tool" "Hadolint" "⏭️ Skipped" "-" "0"
     return 0
   fi
-  log_info "── Installing hadolint ──"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "Hadolint" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
-  local _ARCH_HADO="x86_64"
-  [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _ARCH_HADO="arm64"
+  local _STAT_HADO="✅ mise"
+  run_quiet mise install hadolint || _STAT_HADO="❌ Failed"
 
-  local _OS_HADO="Linux"
-  [ "${OS}" = "darwin" ] && _OS_HADO="Darwin"
-  [ "${_OS_TAG}" = "windows" ] && _OS_HADO="Windows"
-
-  local _SUFFIX_HADO="${_OS_HADO}-${_ARCH_HADO}"
-  [ "${_OS_TAG}" = "windows" ] && _SUFFIX_HADO="${_SUFFIX_HADO}.exe"
-
-  local _URL_HADO
-  _URL_HADO="${GITHUB_PROXY}https://github.com/hadolint/hadolint/releases/download/${HADOLINT_VERSION}/hadolint-${_SUFFIX_HADO}"
-  local _STAT_HADO="✅ Installed"
-  if download_url "${_URL_HADO}" "${_BIN_HADO}" "hadolint"; then
-    chmod +x "${_BIN_HADO}" 2>/dev/null || true
-  else
-    _STAT_HADO="❌ Failed"
-  fi
-  local _DUR_HADO
-  _DUR_HADO=$(($(date +%s) - _T0_HADO))
-  log_summary "Lint Tool" "Hadolint" "$_STAT_HADO" "$(get_version "$_BIN_HADO")" "$_DUR_HADO"
+  local _DUR_HADO=$(($(date +%s) - _T0_HADO))
+  log_summary "Lint Tool" "Hadolint" "$_STAT_HADO" "$(get_version hadolint)" "$_DUR_HADO"
 }
 
-# Purpose: Installs golangci-lint for Go project linting.
-# Params:
-#   None (uses global GOLANGCI_VERSION)
-# Examples:
-#   install_go_lint
+# Purpose: Installs golangci-lint for Go projects.
+# Delegate: Managed by mise (.mise.toml)
 install_go_lint() {
   local _T0_GO
   _T0_GO=$(date +%s)
-  local _BIN_GO
-  _BIN_GO="${VENV}/bin/golangci-lint"
-  if [ -x "${_BIN_GO}" ] && [ "${DRY_RUN:-0}" -eq 0 ]; then
-    log_summary "Lint Tool" "Go Lint" "✅ Exists" "$(get_version "$_BIN_GO")" "0"
-    return 0
-  fi
+  log_info "── Setting up Go Lint ──"
 
   if ! has_lang_files "go.mod go.sum" "*.go"; then
     log_summary "Lint Tool" "Go Lint" "⏭️ Skipped" "-" "0"
     return 0
   fi
-  log_info "── Installing golangci-lint ──"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "Go Lint" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
-  local _URL_GO
-  _URL_GO="${GITHUB_PROXY}https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh"
-  local _TMP_GO
-  _TMP_GO=$(mktemp -d)
-  local _STAT_GO="✅ Installed"
-  if download_url "${_URL_GO}" "${_TMP_GO}/install_go.sh" "golangci-lint-installer"; then
-    export BINDIR="${VENV}/bin"
-    run_quiet sh "${_TMP_GO}/install_go.sh" "${GOLANGCI_VERSION}"
-  else
-    _STAT_GO="❌ Failed"
-  fi
-  rm -rf "${_TMP_GO}"
-  local _DUR_GO
-  _DUR_GO=$(($(date +%s) - _T0_GO))
-  log_summary "Lint Tool" "Go Lint" "$_STAT_GO" "$(get_version "$_BIN_GO")" "$_DUR_GO"
+  local _STAT_GO="✅ mise"
+  run_quiet mise install golangci-lint || _STAT_GO="❌ Failed"
+
+  local _DUR_GO=$(($(date +%s) - _T0_GO))
+  log_summary "Lint Tool" "Go Lint" "$_STAT_GO" "$(get_version golangci-lint)" "$_DUR_GO"
 }
 
 # Purpose: Installs checkmake for Makefile linting.
