@@ -221,13 +221,22 @@ main() {
   if command -v trivy >/dev/null 2>&1; then log_success "✅ Trivy: Installed"; else log_warn "⚠️  Trivy: Not found. Run 'make setup' to install."; fi
   if command -v zizmor >/dev/null 2>&1; then log_success "✅ Zizmor: Installed"; else log_warn "⚠️  Zizmor: Not found. Run 'make setup' to install."; fi
 
+  log_info "── Lint & Quality Tools ──"
+  if command -v shfmt >/dev/null 2>&1; then log_success "✅ Shfmt: Installed"; else log_warn "⚠️  Shfmt: Not found."; fi
+  if command -v shellcheck >/dev/null 2>&1; then log_success "✅ Shellcheck: Installed"; else log_warn "⚠️  Shellcheck: Not found."; fi
+  if command -v actionlint >/dev/null 2>&1; then log_success "✅ Actionlint: Installed"; else log_warn "⚠️  Actionlint: Not found."; fi
+  if command -v editorconfig-checker >/dev/null 2>&1; then log_success "✅ EditorConfig: Installed"; else log_warn "⚠️  EditorConfig: Not found."; fi
+
   if [ -f "Dockerfile" ] || [ -f "docker-compose.yml" ]; then
     if command -v hadolint >/dev/null 2>&1; then log_success "✅ Hadolint: Installed"; else log_warn "⚠️  Hadolint: Not found."; fi
   fi
   if has_lang_files "go.mod" "*.go"; then
     if command -v golangci-lint >/dev/null 2>&1; then
-      check_tool_version "golangci-lint" "golangci-lint" "1.55.0" "golangci-lint --version" 0
+      log_success "✅ golangci-lint: Installed"
     else log_warn "⚠️  golangci-lint: Not found."; fi
+  fi
+  if has_lang_files "Makefile" "*.make"; then
+    if command -v checkmake >/dev/null 2>&1; then log_success "✅ Checkmake: Installed"; else log_warn "⚠️  Checkmake: Not found."; fi
   fi
   printf "\n"
 
