@@ -290,116 +290,62 @@ install_go_lint() {
 # Params:
 #   None (uses global CHECKMAKE_VERSION)
 # Examples:
-#   install_checkmake
+# Purpose: Installs checkmake for Makefile linting.
+# Delegate: Managed by mise (.mise.toml)
 install_checkmake() {
   local _T0_CM
   _T0_CM=$(date +%s)
+  log_info "── Setting up Checkmake ──"
+
   if ! has_lang_files "Makefile" "*.make"; then
     log_summary "Lint Tool" "Checkmake" "⏭️ Skipped" "-" "0"
     return 0
   fi
-  local _BIN_CM
-  _BIN_CM="${VENV}/bin/checkmake${_EXE}"
-  if [ -x "${_BIN_CM}" ] && [ "${DRY_RUN:-0}" -eq 0 ]; then
-    log_summary "Lint Tool" "Checkmake" "✅ Exists" "$(get_version "$_BIN_CM")" "0"
-    return 0
-  fi
 
-  log_info "── Installing checkmake ──"
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "Checkmake" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
-  local _OS_TAG_CM="${_OS_TAG}"
-  local _ARCH_N_CM="amd64"
-  [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _ARCH_N_CM="arm64"
-  local _FILE_CM
-  _FILE_CM="checkmake-${CHECKMAKE_VERSION}.${_OS_TAG_CM}.${_ARCH_N_CM}${_EXE}"
-  local _URL_CM
-  _URL_CM="${GITHUB_PROXY}https://github.com/checkmake/checkmake/releases/download/${CHECKMAKE_VERSION}/${_FILE_CM}"
+  local _STAT_CM="✅ mise"
+  run_quiet mise install checkmake || _STAT_CM="❌ Failed"
 
-  local _STAT_CM="✅ Installed"
-  if download_url "${_URL_CM}" "${_BIN_CM}" "checkmake"; then
-    chmod +x "${_BIN_CM}" 2>/dev/null || true
-  else
-    _STAT_CM="❌ Failed"
-  fi
-  local _DUR_CM
-  _DUR_CM=$(($(date +%s) - _T0_CM))
-  log_summary "Lint Tool" "Checkmake" "$_STAT_CM" "$(get_version "$_BIN_CM")" "$_DUR_CM"
+  local _DUR_CM=$(($(date +%s) - _T0_CM))
+  log_summary "Lint Tool" "Checkmake" "$_STAT_CM" "$(get_version checkmake)" "$_DUR_CM"
 }
 
 # Purpose: Installs IaC linting tools (TFLint and Kube-Linter).
 # Params:
 #   None (uses global TFLINT_VERSION and KUBE_LINTER_VERSION)
 # Examples:
-#   install_iac_lint
+# Purpose: Installs IaC linting tools (TFLint and Kube-Linter).
+# Delegate: Managed by mise (.mise.toml)
 install_iac_lint() {
   local _T0_IAC
   _T0_IAC=$(date +%s)
-  if ! has_lang_files "" "*.tf *.tfvars *.yaml *.yml *.json"; then
-    log_summary "Lint Tool" "IaC" "⏭️ Skipped" "-" "0"
-    return 0
-  fi
-  log_info "── Installing IaC tools ──"
+  log_info "── Setting up IaC Linters ──"
+
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Lint Tool" "TFLint" "⚖️ Previewed" "-" "0"
-    log_summary "Lint Tool" "Kube-Linter" "⚖️ Previewed" "-" "0"
+    log_summary "Lint Tool" "IaC Linters" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
   # TFLint
-  if [ ! -x "${VENV}/bin/tflint${_EXE}" ]; then
-    local _TAR_OS_IAC="${_OS_TAG}"
-    local _TAR_ARCH_IAC="amd64"
-    [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _TAR_ARCH_IAC="arm64"
-    local _TAR_IAC
-    _TAR_IAC="tflint_${_TAR_OS_IAC}_${_TAR_ARCH_IAC}.zip"
-    local _URL_IAC
-    _URL_IAC="${GITHUB_PROXY}https://github.com/terraform-linters/tflint/releases/download/${TFLINT_VERSION}/${_TAR_IAC}"
-    local _TMP_IAC
-    _TMP_IAC=$(mktemp -d)
-    local _T_STAT_IAC=""
-    if download_url "${_URL_IAC}" "${_TMP_IAC}/tflint.zip" "tflint"; then
-      unzip -q "${_TMP_IAC}/tflint.zip" -d "${_TMP_IAC}" || _T_STAT_IAC="failed"
-      if [ "$_T_STAT_IAC" != "failed" ]; then
-        mv "${_TMP_IAC}/tflint${_EXE}" "${VENV}/bin/tflint${_EXE}" || _T_STAT_IAC="failed"
-        chmod +x "${VENV}/bin/tflint${_EXE}" 2>/dev/null || true
-        log_summary "Lint Tool" "TFLint" "✅ Installed" "$(get_version "${VENV}/bin/tflint${_EXE}")" "$(($(date +%s) - _T0_IAC))"
-      else
-        log_summary "Lint Tool" "TFLint" "❌ Failed" "-" "0"
-      fi
-    else
-      log_summary "Lint Tool" "TFLint" "❌ Failed" "-" "0"
-    fi
-    rm -rf "${_TMP_IAC}"
+  if has_lang_files "" "*.tf"; then
+    local _STAT_TF="✅ mise"
+    run_quiet mise install tflint || _STAT_TF="❌ Failed"
+    log_summary "Lint Tool" "TFLint" "$_STAT_TF" "$(get_version tflint)" "0"
   else
-    log_summary "Lint Tool" "TFLint" "✅ Exists" "$(get_version "${VENV}/bin/tflint${_EXE}")" "0"
+    log_summary "Lint Tool" "TFLint" "⏭️ Skipped" "-" "0"
   fi
 
   # Kube-Linter
-  if [ ! -x "${VENV}/bin/kube-linter${_EXE}" ]; then
-    local _K_OS_IAC="linux"
-    [ "${OS}" = "darwin" ] && _K_OS_IAC="darwin"
-    local _K_SUFFIX_IAC=""
-    { [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; } && _K_SUFFIX_IAC="_arm64"
-    local _FILE_IAC
-    if [ "${_OS_TAG}" = "windows" ]; then
-      _FILE_IAC="kube-linter${_K_SUFFIX_IAC}.exe"
-    else
-      _FILE_IAC="kube-linter-${_K_OS_IAC}${_K_SUFFIX_IAC}"
-    fi
-    local _URL_KUBE
-    _URL_KUBE="${GITHUB_PROXY}https://github.com/stackrox/kube-linter/releases/download/${KUBE_LINTER_VERSION}/${_FILE_IAC}"
-    if download_url "${_URL_KUBE}" "${VENV}/bin/kube-linter${_EXE}" "kube-linter"; then
-      chmod +x "${VENV}/bin/kube-linter${_EXE}" 2>/dev/null || true
-      log_summary "Lint Tool" "Kube-Linter" "✅ Installed" "$(get_version "${VENV}/bin/kube-linter${_EXE}" "version")" "$(($(date +%s) - _T0_IAC))"
-    else
-      log_summary "Lint Tool" "Kube-Linter" "❌ Failed" "-" "0"
-    fi
+  if has_lang_files "" "*.yaml *.yml"; then
+    local _STAT_KL="✅ mise"
+    run_quiet mise install kube-linter || _STAT_KL="❌ Failed"
+    log_summary "Lint Tool" "Kube-Linter" "$_STAT_KL" "$(get_version kube-linter)" "0"
   else
-    log_summary "Lint Tool" "Kube-Linter" "✅ Exists" "$(get_version "${VENV}/bin/kube-linter${_EXE}" "version")" "0"
+    log_summary "Lint Tool" "Kube-Linter" "⏭️ Skipped" "-" "0"
   fi
 }
 
