@@ -70,10 +70,12 @@ ARCHIVE_DIR="${ARCHIVE_DIR:-.}"
 GITHUB_PROXY="${GITHUB_PROXY:-https://gh-proxy.sn0wdr1am.com/}"
 
 # Network Optimization & Mirror Configuration
+_TEMP_GIT_CONFIG="/tmp/.git_config_$(id -u)"
 ENABLE_MIRROR="${ENABLE_MIRROR:-${MIRROR:-${USE_MIRROR:-0}}}"
 MIRROR_NODEJS="${MIRROR_NODEJS:-https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/}"
-MIRROR_PYTHON="${MIRROR_PYTHON:-https://mirrors.tuna.tsinghua.edu.cn/python-build-standalone/}"
-MIRROR_NPM="${MIRROR_NPM:-https://mirrors.tuna.tsinghua.edu.cn/npm/}"
+MIRROR_PYTHON="${MIRROR_PYTHON:-https://mirrors.tuna.tsinghua.edu.cn/python/}"
+MIRROR_NPM="${MIRROR_NPM:-https://registry.npmmirror.com}"
+MIRROR_PNPM="${MIRROR_PNPM:-https://registry.npmmirror.com/pnpm/}" # pnpm binary mirror
 
 # ── 🔨 SSoT Tool Versions ────────────────────────────────────────────────────
 
@@ -211,41 +213,58 @@ bootstrap_mise() {
 # ── 🌐 Network Optimization ──────────────────────────────────────────────────
 
 # Purpose: Dynamically detects network connectivity and applies mirrors/proxies.
-#          Tests access to GitHub to determine if mirrors are needed.
+#          Tests access to GitHub and handles broken global git/proxy settings.
 # Examples:
 #   optimize_network
 optimize_network() {
   if [ "$_NETWORK_OPTIMIZED" = "true" ]; then return 0; fi
 
-  log_debug "Detecting network connectivity..."
+  log_debug "Detecting network connectivity and global proxy health..."
   local _NEEDS_MIRROR=false
+  local _GIT_INTERFERENCE=false
 
-  # 1. Check if mirror is explicitly enabled or if GitHub is slow/unreachable
-  if [ "${ENABLE_MIRROR}" = "1" ] || [ "${ENABLE_MIRROR}" = "true" ]; then
-    log_info "Mirroring explicitly enabled via ENABLE_MIRROR."
+  # 1. Quick connectivity test to GitHub (2s timeout)
+  if ! curl -Is --connect-timeout 2 --max-time 3 https://github.com >/dev/null 2>&1; then
+    log_warn "Direct GitHub connectivity appears slow or restricted."
     _NEEDS_MIRROR=true
-  else
-    # Quick connectivity test to GitHub (2s timeout)
-    if ! curl -Is --connect-timeout 2 --max-time 3 https://github.com >/dev/null 2>&1; then
-      log_warn "Global connectivity (GitHub) appears slow or restricted. Activating intelligent mirrors."
-      _NEEDS_MIRROR=true
-    fi
   fi
 
-  # 2. Apply Mirror Configurations if needed
+  # 2. Check for manual override
+  if [ "${ENABLE_MIRROR}" = "1" ] || [ "${ENABLE_MIRROR}" = "true" ]; then
+    _NEEDS_MIRROR=true
+  fi
+
+  # 3. Handle Git Interference (Bypass broken global insteadOf or dead proxies)
+  # If we need mirrors OR if we suspect global git config is broken
   if [ "$_NEEDS_MIRROR" = "true" ]; then
+    # Create an intelligent git override that redirects GitHub via GITHUB_PROXY
+    # This prevents 'mise' plugins and other git-based tools from hanging or failing.
+    log_info "Applying intelligent git proxy overrides..."
+    mkdir -p "$(dirname "$_TEMP_GIT_CONFIG")"
+    cat >"$_TEMP_GIT_CONFIG" <<EOF
+[url "${GITHUB_PROXY}https://github.com/"]
+  insteadOf = https://github.com/
+EOF
+    export GIT_CONFIG_GLOBAL="$_TEMP_GIT_CONFIG"
+    export GIT_CONFIG_SYSTEM="/dev/null"
+
+    # 4. Apply standard mirrors
     export ENABLE_MIRROR=1
-    # Node.js Mirror
+
+    # Node/Python/JS Mirrors
     export NODEJS_ORG_MIRROR="${MIRROR_NODEJS}"
-    # Python Mirror (used by python-build/mise)
+    export MISE_NODE_MIRROR_URL="${MIRROR_NODEJS}"
     export PYTHON_BUILD_MIRROR_URL="${MIRROR_PYTHON}"
-    # NPM Registry
     export NPM_CONFIG_REGISTRY="${MIRROR_NPM}"
+    export YARN_REGISTRY="${MIRROR_NPM}"
+
+    # Export for mise and other tools
+    export MISE_GITHUB_RELEASES_PROXY="${GITHUB_PROXY}"
 
     # Configure mise settings if mise is available
     if command -v mise >/dev/null 2>&1; then
-      log_debug "Applying mirror settings to mise..."
-      run_quiet mise settings node.mirror_url="${MIRROR_NODEJS}" || true
+      log_debug "Synchronizing mise mirror settings..."
+      run_quiet mise settings set node.mirror_url "${MIRROR_NODEJS}" || true
     fi
   fi
 
