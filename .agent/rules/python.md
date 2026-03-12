@@ -5,15 +5,11 @@
 
 ## 1. Version, Environment & Project Structure
 
-### Version & Environment
-
-- Target **Python 3.12+** for new projects. Specify the minimum version with `requires-python = ">=3.12"` in `pyproject.toml`.
-- Use **`uv`** (ultrafast Rust-based package manager, preferred) or **`poetry`** for dependency management and virtual environment isolation. Never install project dependencies into the system Python.
-- Pin the Python version in `.python-version` (pyenv/asdf/mise) so all developers and CI use the same interpreter version:
-
-  ```bash
-  echo "3.12.3" > .python-version
-  ```
+- **Package Management Hierarchy**:
+  - **mise**: Manages the `python` and `uv` **executors** (binary runtimes).
+  - **uv**: Manages **project dependencies** (libraries) and **virtual environments** (`.venv`) with O(1) performance.
+- Target **Python 3.12+** for new projects. Specify exact version strictly in `.mise.toml`.
+- Never install project dependencies into the system Python. Always use a virtual environment managed by `uv`.
 
 - **Strict Version Pinning (MANDATORY)**: All dependencies in `pyproject.toml` MUST use **exact version numbers**. Never use range operators (`>=`, `~=`, `^`, `*`). Unpinned versions introduce non-reproducible builds and supply-chain risk.
 - Use **`uv lock`** or **`poetry.lock`** for reproducible installs. Always commit the lock file to version control. Use `uv sync --frozen` or `pip install --require-hashes` in CI to guarantee deterministic installs.
