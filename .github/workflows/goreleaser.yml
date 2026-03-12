@@ -49,6 +49,7 @@ jobs:
           # Required: Fetch all tags and historical context for GoReleaser to accurately determine the next version.
           token: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           fetch-depth: 0
+          persist-credentials: false
 
       - name: "🚀 Distribute Artifacts (GoReleaser)"
         uses: goreleaser/goreleaser-action@v7.0.0

@@ -51,6 +51,7 @@ jobs:
         # Fetches source documentation and site assets for the build process.
         with:
           fetch-depth: 0
+          persist-credentials: false
 
       - name: "📦 Configure pnpm Package Manager"
         uses: pnpm/action-setup@v4.2.0

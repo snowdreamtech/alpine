@@ -41,7 +41,9 @@ jobs:
     steps:
       - name: "📂 Checkout Repository Code"
         uses: actions/checkout@v6.0.2
-        # Fetches source code to perform pre-flight integrity and health checks.
+        with:
+          # Fetches source code to perform pre-flight integrity and health checks.
+          persist-credentials: false
 
       - name: "📦 Configure pnpm Package Manager"
         uses: pnpm/action-setup@v4.2.0

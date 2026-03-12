@@ -71,7 +71,9 @@ jobs:
     steps:
       - name: "📂 Checkout Repository Code"
         uses: actions/checkout@v6.0.2
-        # Required to provide the full source tree for deep semantic analysis.
+        with:
+          # Required to provide the full source tree for deep semantic analysis.
+          persist-credentials: false
 
       - name: "🛡️ Initialize CodeQL Engine"
         uses: github/codeql-action/init@v4.32.5
