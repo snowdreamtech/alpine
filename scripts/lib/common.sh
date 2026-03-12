@@ -81,6 +81,27 @@ export GITLEAKS_VERSION HADOLINT_VERSION GOLANGCI_VERSION CHECKMAKE_VERSION
 export TFLINT_VERSION KUBE_LINTER_VERSION JAVA_FORMAT_VERSION PHP_CS_FIXER_VERSION
 export OSV_SCANNER_VERSION TRIVY_VERSION EDITORCONFIG_CHECKER_VERSION
 
+# ── 🛣️ PATH Augmentation ──────────────────────────────────────────────────────
+
+# Automatically add local bin directories to PATH to ensure orchestrated tools
+# are prioritized over system globals without requiring manual activation.
+_LOCAL_BIN_VENV=$(pwd)/${VENV}/bin
+_LOCAL_BIN_NODE=$(pwd)/node_modules/.bin
+
+if [ -d "$_LOCAL_BIN_VENV" ]; then
+  case ":$PATH:" in
+  *":$_LOCAL_BIN_VENV:"*) ;;
+  *) export PATH="$_LOCAL_BIN_VENV:$PATH" ;;
+  esac
+fi
+
+if [ -d "$_LOCAL_BIN_NODE" ]; then
+  case ":$PATH:" in
+  *":$_LOCAL_BIN_NODE:"*) ;;
+  *) export PATH="$_LOCAL_BIN_NODE:$PATH" ;;
+  esac
+fi
+
 # ── 📢 Standardized Logging ──────────────────────────────────────────────────
 
 # Standardized logging functions for consistent colored output.
