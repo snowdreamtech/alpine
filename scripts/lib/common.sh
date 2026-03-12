@@ -76,6 +76,9 @@ MIRROR_NODEJS="${MIRROR_NODEJS:-https://mirrors.tuna.tsinghua.edu.cn/nodejs-rele
 MIRROR_PYTHON="${MIRROR_PYTHON:-https://mirrors.tuna.tsinghua.edu.cn/python/}"
 MIRROR_NPM="${MIRROR_NPM:-https://registry.npmmirror.com}"
 MIRROR_PNPM="${MIRROR_PNPM:-https://registry.npmmirror.com/pnpm/}" # pnpm binary mirror
+MIRROR_GO="${MIRROR_GO:-https://goproxy.cn,direct}"
+MIRROR_RUST_DIST="${MIRROR_RUST_DIST:-https://mirrors.ustc.edu.cn/rust-static}"
+MIRROR_RUST_UPDATE="${MIRROR_RUST_UPDATE:-https://mirrors.ustc.edu.cn/rust-static/rustup}"
 
 # ── 🔨 SSoT Tool Versions ────────────────────────────────────────────────────
 
@@ -258,13 +261,16 @@ EOF
     export NPM_CONFIG_REGISTRY="${MIRROR_NPM}"
     export YARN_REGISTRY="${MIRROR_NPM}"
 
-    # Export for mise and other tools (used by some plugins/backends)
-    export MISE_GITHUB_RELEASES_PROXY="${GITHUB_PROXY}"
-    export GITHUB_RELEASES_PROXY="${GITHUB_PROXY}"
+    # Go & Rust mirrors (China optimization)
+    export GOPROXY="${MIRROR_GO}"
+    export RUSTUP_DIST_SERVER="${MIRROR_RUST_DIST}"
+    export RUSTUP_UPDATE_ROOT="${MIRROR_RUST_UPDATE}"
 
     # Configure mise settings if mise is available
     if command -v mise >/dev/null 2>&1; then
       log_debug "Synchronizing mise mirror settings..."
+      # Use official url_replacements for GitHub mirroring
+      run_quiet mise settings set "url_replacements.https://github.com/" "${GITHUB_PROXY}https://github.com/" || true
       run_quiet mise settings set node.mirror_url "${MIRROR_NODEJS}" || true
     fi
   fi
