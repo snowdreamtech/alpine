@@ -37,6 +37,23 @@ if [ "$(id -u)" = "0" ]; then
     if [ -d "/home/${USER}" ]; then
       chown -R "${PUID}:${PGID}" "/home/${USER}"
     fi
+
+    # 4. Sudoers & Doas configuration
+    if [ -f "/etc/sudoers" ]; then
+      if [ "$DEBUG" = "true" ]; then
+        echo "→ [EXTENSION] Granting passwordless sudo to: ${USER}"
+      fi
+      echo "${USER} ALL=(ALL) NOPASSWD:ALL" >"/etc/sudoers.d/${USER}"
+      chmod 0440 "/etc/sudoers.d/${USER}"
+    fi
+
+    if [ -f "/etc/doas.conf" ] || [ -d "/etc/doas.d" ]; then
+      if [ "$DEBUG" = "true" ]; then
+        echo "→ [EXTENSION] Granting passwordless doas to: ${USER}"
+      fi
+      mkdir -p /etc/doas.d
+      echo "permit nopass ${USER} as root" >"/etc/doas.d/${USER}.conf"
+    fi
   fi
 else
   if [ "$DEBUG" = "true" ]; then

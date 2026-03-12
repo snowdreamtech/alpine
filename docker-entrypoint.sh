@@ -43,7 +43,15 @@ fi
 if [ "$DEBUG" = "true" ]; then
   echo "→ [ENTRYPOINT] Finalizing environment in ${WORKDIR}"
 fi
-cd "${WORKDIR}"
+
+# We use subshell to test directory access without crashing if set -e is on
+if (cd "${WORKDIR}" 2>/dev/null); then
+  cd "${WORKDIR}"
+else
+  if [ "$DEBUG" = "true" ]; then
+    echo "⚠️  [ENTRYPOINT] Warning: Cannot transition to ${WORKDIR} (Permission Denied). Staying in $(pwd)"
+  fi
+fi
 
 # 3. Persistence logic for background-only or idle containers
 if [ "${KEEPALIVE}" = "1" ]; then
