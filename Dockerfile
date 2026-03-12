@@ -9,6 +9,20 @@
 
 FROM alpine:3.23.3
 
+# Build-time Configuration
+ARG BUILDTIME \
+    VERSION \
+    REVISION \
+    KEEPALIVE=0 \
+    CAP_NET_BIND_SERVICE=0 \
+    LANG=C.UTF-8 \
+    UMASK=022 \
+    DEBUG=false \
+    PGID=0 \
+    PUID=0 \
+    USER=root \
+    WORKDIR=/root
+
 # Standard OCI Metadata (https://github.com/opencontainers/image-spec)
 LABEL org.opencontainers.image.authors="Snowdream Tech" \
     org.opencontainers.image.title="Alpine Base Image" \
@@ -18,19 +32,10 @@ LABEL org.opencontainers.image.authors="Snowdream Tech" \
     org.opencontainers.image.licenses="MIT" \
     org.opencontainers.image.source="https://github.com/snowdreamtech/alpine" \
     org.opencontainers.image.vendor="Snowdream Tech" \
-    org.opencontainers.image.version="3.23.3" \
+    org.opencontainers.image.version="${VERSION:-3.23.3}" \
+    org.opencontainers.image.created="${BUILDTIME}" \
+    org.opencontainers.image.revision="${REVISION}" \
     org.opencontainers.image.url="https://github.com/snowdreamtech/alpine"
-
-# Build-time Configuration
-ARG KEEPALIVE=0 \
-    CAP_NET_BIND_SERVICE=0 \
-    LANG=C.UTF-8 \
-    UMASK=022 \
-    DEBUG=false \
-    PGID=0 \
-    PUID=0 \
-    USER=root \
-    WORKDIR=/root
 
 # Runtime Environment Configuration
 ENV KEEPALIVE=${KEEPALIVE} \
