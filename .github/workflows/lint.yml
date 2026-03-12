@@ -76,16 +76,18 @@ jobs:
 
       - name: "📦 Configure pnpm Package Manager"
         uses: pnpm/action-setup@v4.2.0
+        with:
+          version: "10.5.2"
 
       - name: "🟢 Configure Node.js Runtime"
         uses: actions/setup-node@v6.3.0
         with:
-          node-version: "24.1.0"
+          node-version: "20.18.3"
 
       - name: "🐍 Configure Python Runtime"
         uses: actions/setup-python@v6.2.0
         with:
-          python-version: "3.12"
+          python-version: "3.12.9"
 
       - name: "🚀 Initialize Project Dependencies"
         shell: sh # POSIX compliant
@@ -128,16 +130,18 @@ jobs:
 
       - name: "📦 Configure pnpm Package Manager"
         uses: pnpm/action-setup@v4.2.0
+        with:
+          version: "10.5.2"
 
       - name: "🟢 Configure Node.js Runtime"
         uses: actions/setup-node@v6.3.0
         with:
-          node-version: "24.1.0"
+          node-version: "20.18.3"
 
       - name: "🐍 Configure Python Runtime"
         uses: actions/setup-python@v6.2.0
         with:
-          python-version: "3.12"
+          python-version: "3.12.9"
 
       - name: "🚀 Initialize Project Dependencies"
         shell: sh

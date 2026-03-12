@@ -55,19 +55,21 @@ jobs:
 
       - name: "📦 Configure pnpm Package Manager"
         uses: pnpm/action-setup@v4.2.0
+        with:
+          version: "10.5.2"
         # pnpm is required to manage documentation build-time dependencies efficiently.
 
       - name: "🟢 Configure Node.js Runtime"
         uses: actions/setup-node@v6.3.0
         with:
           # Aligns the Node runtime with the project's supported documentation stable version.
-          node-version: "24.1.0"
+          node-version: "20.18.3"
 
       - name: "🐍 Configure Python Runtime"
         uses: actions/setup-python@v6.2.0
         with:
           # Python is required for specialized doc generation and build-time logic.
-          python-version: "3.12"
+          python-version: "3.12.9"
 
       - name: "🔧 Initialize Build Toolchain"
         shell: sh
