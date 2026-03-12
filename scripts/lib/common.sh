@@ -69,6 +69,12 @@ DOCS_DIR="docs"
 ARCHIVE_DIR="${ARCHIVE_DIR:-.}"
 GITHUB_PROXY="${GITHUB_PROXY:-https://gh-proxy.sn0wdr1am.com/}"
 
+# Network Optimization & Mirror Configuration
+ENABLE_MIRROR="${ENABLE_MIRROR:-${MIRROR:-${USE_MIRROR:-0}}}"
+MIRROR_NODEJS="${MIRROR_NODEJS:-https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/}"
+MIRROR_PYTHON="${MIRROR_PYTHON:-https://mirrors.tuna.tsinghua.edu.cn/python-build-standalone/}"
+MIRROR_NPM="${MIRROR_NPM:-https://mirrors.tuna.tsinghua.edu.cn/npm/}"
+
 # ── 🔨 SSoT Tool Versions ────────────────────────────────────────────────────
 
 PYTHON_VERSION="${PYTHON_VERSION:-3.12.9}"
@@ -172,8 +178,9 @@ bootstrap_mise() {
     _M_URL="https://mise.jdx.dev/mise-latest-${_M_OS}-${_M_ARCH}"
   fi
 
-  # Apply GITHUB_PROXY if it's a github-related resource,
-  # but mise.jdx.dev is their own redirector.
+  # Apply network optimization before downloading
+  optimize_network
+
   # We use our download_url engine which handles proxy fallback if needed.
   if download_url "${_M_URL}" "${_M_BIN}" "mise standalone binary"; then
     chmod +x "${_M_BIN}" 2>/dev/null || true
@@ -194,11 +201,80 @@ bootstrap_mise() {
 
     # Ensure uv is installed globally for bootstrapping subsequent Python environments
     log_info "Deploying uv via mise (cross-platform)..."
-    run_quiet mise install uv --global || log_warn "Warning: Failed to install uv via mise. Falling back to native venv."
+    run_mise install uv --global || log_warn "Warning: Failed to install uv via mise. Falling back to native venv."
   else
     log_error "Failed to bootstrap mise. Toolchain may be incomplete."
     return 1
   fi
+}
+
+# ── 🌐 Network Optimization ──────────────────────────────────────────────────
+
+# Purpose: Dynamically detects network connectivity and applies mirrors/proxies.
+#          Tests access to GitHub to determine if mirrors are needed.
+# Examples:
+#   optimize_network
+optimize_network() {
+  if [ "$_NETWORK_OPTIMIZED" = "true" ]; then return 0; fi
+
+  log_debug "Detecting network connectivity..."
+  local _NEEDS_MIRROR=false
+
+  # 1. Check if mirror is explicitly enabled or if GitHub is slow/unreachable
+  if [ "${ENABLE_MIRROR}" = "1" ] || [ "${ENABLE_MIRROR}" = "true" ]; then
+    log_info "Mirroring explicitly enabled via ENABLE_MIRROR."
+    _NEEDS_MIRROR=true
+  else
+    # Quick connectivity test to GitHub (2s timeout)
+    if ! curl -Is --connect-timeout 2 --max-time 3 https://github.com >/dev/null 2>&1; then
+      log_warn "Global connectivity (GitHub) appears slow or restricted. Activating intelligent mirrors."
+      _NEEDS_MIRROR=true
+    fi
+  fi
+
+  # 2. Apply Mirror Configurations if needed
+  if [ "$_NEEDS_MIRROR" = "true" ]; then
+    export ENABLE_MIRROR=1
+    # Node.js Mirror
+    export NODEJS_ORG_MIRROR="${MIRROR_NODEJS}"
+    # Python Mirror (used by python-build/mise)
+    export PYTHON_BUILD_MIRROR_URL="${MIRROR_PYTHON}"
+    # NPM Registry
+    export NPM_CONFIG_REGISTRY="${MIRROR_NPM}"
+
+    # Configure mise settings if mise is available
+    if command -v mise >/dev/null 2>&1; then
+      log_debug "Applying mirror settings to mise..."
+      run_quiet mise settings node.mirror_url="${MIRROR_NODEJS}" || true
+    fi
+  fi
+
+  export _NETWORK_OPTIMIZED=true
+}
+
+# Purpose: Executes a mise command with built-in retries and auto-proxy/mirror logic.
+# Params:
+#   $@ - Command and arguments for mise
+# Examples:
+#   run_mise install node
+run_mise() {
+  optimize_network
+  local _MAX_RETRIES=3
+  local _RETRY_COUNT=0
+  local _STATUS=1
+
+  while [ $_RETRY_COUNT -lt $_MAX_RETRIES ]; do
+    if run_quiet mise "$@"; then
+      _STATUS=0
+      break
+    else
+      _RETRY_COUNT=$((_RETRY_COUNT + 1))
+      log_warn "mise command failed (attempt $_RETRY_COUNT/$_MAX_RETRIES). Retrying..."
+      sleep 1
+    fi
+  done
+
+  return $_STATUS
 }
 
 # ── 📢 Standardized Logging ──────────────────────────────────────────────────

@@ -136,7 +136,7 @@ setup_node() {
 
   if command -v mise >/dev/null 2>&1; then
     log_debug "Using mise for Node.js..."
-    run_quiet mise install node pnpm
+    run_mise install node pnpm
     eval "$(mise activate bash --shims)"
   elif command -v corepack >/dev/null 2>&1; then
     corepack enable
@@ -187,7 +187,7 @@ setup_python() {
 
   if command -v mise >/dev/null 2>&1; then
     log_debug "Using mise for Python..."
-    run_quiet mise install python uv
+    run_mise install python uv
     eval "$(mise activate bash --shims)"
   fi
 
@@ -232,7 +232,7 @@ install_gitleaks() {
   fi
 
   local _STAT_GITL="✅ mise"
-  run_quiet mise install gitleaks || _STAT_GITL="❌ Failed"
+  run_mise install gitleaks || _STAT_GITL="❌ Failed"
 
   local _DUR_GITL=$(($(date +%s) - _T0_GITL))
   log_summary "Lint Tool" "Gitleaks" "$_STAT_GITL" "$(get_version gitleaks)" "$_DUR_GITL"
@@ -256,7 +256,7 @@ install_hadolint() {
   fi
 
   local _STAT_HADO="✅ mise"
-  run_quiet mise install hadolint || _STAT_HADO="❌ Failed"
+  run_mise install hadolint || _STAT_HADO="❌ Failed"
 
   local _DUR_HADO=$(($(date +%s) - _T0_HADO))
   log_summary "Lint Tool" "Hadolint" "$_STAT_HADO" "$(get_version hadolint)" "$_DUR_HADO"
@@ -280,7 +280,7 @@ install_go_lint() {
   fi
 
   local _STAT_GO="✅ mise"
-  run_quiet mise install golangci-lint || _STAT_GO="❌ Failed"
+  run_mise install golangci-lint || _STAT_GO="❌ Failed"
 
   local _DUR_GO=$(($(date +%s) - _T0_GO))
   log_summary "Lint Tool" "Go Lint" "$_STAT_GO" "$(get_version golangci-lint)" "$_DUR_GO"
@@ -308,7 +308,7 @@ install_checkmake() {
   fi
 
   local _STAT_CM="✅ mise"
-  run_quiet mise install checkmake || _STAT_CM="❌ Failed"
+  run_mise install checkmake || _STAT_CM="❌ Failed"
 
   local _DUR_CM=$(($(date +%s) - _T0_CM))
   log_summary "Lint Tool" "Checkmake" "$_STAT_CM" "$(get_version checkmake)" "$_DUR_CM"
@@ -333,7 +333,7 @@ install_iac_lint() {
   # TFLint
   if has_lang_files "" "*.tf"; then
     local _STAT_TF="✅ mise"
-    run_quiet mise install tflint || _STAT_TF="❌ Failed"
+    run_mise install tflint || _STAT_TF="❌ Failed"
     log_summary "Lint Tool" "TFLint" "$_STAT_TF" "$(get_version tflint)" "0"
   else
     log_summary "Lint Tool" "TFLint" "⏭️ Skipped" "-" "0"
@@ -342,7 +342,7 @@ install_iac_lint() {
   # Kube-Linter
   if has_lang_files "" "*.yaml *.yml"; then
     local _STAT_KL="✅ mise"
-    run_quiet mise install kube-linter || _STAT_KL="❌ Failed"
+    run_mise install kube-linter || _STAT_KL="❌ Failed"
     log_summary "Lint Tool" "Kube-Linter" "$_STAT_KL" "$(get_version kube-linter)" "0"
   else
     log_summary "Lint Tool" "Kube-Linter" "⏭️ Skipped" "-" "0"
@@ -621,7 +621,7 @@ install_osv_scanner() {
   fi
 
   local _STAT_OSV="✅ mise"
-  run_quiet mise install "github:google/osv-scanner" || _STAT_OSV="❌ Failed"
+  run_mise install "github:google/osv-scanner" || _STAT_OSV="❌ Failed"
 
   local _DUR_OSV=$(($(date +%s) - _T0_OSV))
   log_summary "Security Tool" "OSV-Scanner" "$_STAT_OSV" "$(get_version osv-scanner)" "$_DUR_OSV"
@@ -640,7 +640,7 @@ install_trivy() {
   fi
 
   local _STAT_TRIVY="✅ mise"
-  run_quiet mise install "github:aquasecurity/trivy" || _STAT_TRIVY="❌ Failed"
+  run_mise install "github:aquasecurity/trivy" || _STAT_TRIVY="❌ Failed"
 
   local _DUR_TRIVY=$(($(date +%s) - _T0_TRIVY))
   log_summary "Security Tool" "Trivy" "$_STAT_TRIVY" "$(get_version trivy)" "$_DUR_TRIVY"
@@ -659,7 +659,7 @@ install_editorconfig_checker() {
   fi
 
   local _STAT_EC="✅ mise"
-  run_quiet mise install editorconfig-checker || _STAT_EC="❌ Failed"
+  run_mise install editorconfig-checker || _STAT_EC="❌ Failed"
 
   local _DUR_EC=$(($(date +%s) - _T0_EC))
   log_summary "Lint Tool" "EditorConfig" "$_STAT_EC" "$(get_version editorconfig-checker)" "$_DUR_EC"
@@ -672,7 +672,7 @@ install_zizmor() {
   _T0_ZIZ=$(date +%s)
   log_info "── Setting up Zizmor ──"
   local _STAT_ZIZ="✅ mise"
-  run_quiet mise install zizmor || _STAT_ZIZ="❌ Failed"
+  run_mise install zizmor || _STAT_ZIZ="❌ Failed"
   log_summary "Security Tool" "Zizmor" "$_STAT_ZIZ" "$(get_version zizmor)" "$(($(date +%s) - _T0_ZIZ))"
 }
 
@@ -683,7 +683,7 @@ install_shfmt() {
   _T0_SHF=$(date +%s)
   log_info "── Setting up Shfmt ──"
   local _STAT_SHF="✅ mise"
-  run_quiet mise install shfmt || _STAT_SHF="❌ Failed"
+  run_mise install shfmt || _STAT_SHF="❌ Failed"
   log_summary "Lint Tool" "Shfmt" "$_STAT_SHF" "$(get_version shfmt)" "$(($(date +%s) - _T0_SHF))"
 }
 
@@ -694,7 +694,7 @@ install_shellcheck() {
   _T0_SHC=$(date +%s)
   log_info "── Setting up Shellcheck ──"
   local _STAT_SHC="✅ mise"
-  run_quiet mise install shellcheck || _STAT_SHC="❌ Failed"
+  run_mise install shellcheck || _STAT_SHC="❌ Failed"
   log_summary "Lint Tool" "Shellcheck" "$_STAT_SHC" "$(get_version shellcheck)" "$(($(date +%s) - _T0_SHC))"
 }
 
@@ -705,7 +705,7 @@ install_actionlint() {
   _T0_ACT=$(date +%s)
   log_info "── Setting up Actionlint ──"
   local _STAT_ACT="✅ mise"
-  run_quiet mise install "github:rhysd/actionlint" || _STAT_ACT="❌ Failed"
+  run_mise install "github:rhysd/actionlint" || _STAT_ACT="❌ Failed"
   log_summary "Lint Tool" "Actionlint" "$_STAT_ACT" "$(get_version actionlint)" "$(($(date +%s) - _T0_ACT))"
 }
 
@@ -765,6 +765,9 @@ main() {
 
   # 2. Argument Parsing
   parse_common_args "$@"
+
+  # 3. Network Optimization
+  optimize_network
 
   # Re-extract raw args to avoid flags
   local _RAW_ARGS=""
