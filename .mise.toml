@@ -2,6 +2,7 @@
 python = "3.12"
 node = "20"
 pnpm = "latest"
+uv = "latest"
 gitleaks = "8.30.0"
 hadolint = "2.14.0"
 golangci-lint = "1.64.5"

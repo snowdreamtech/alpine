@@ -187,13 +187,18 @@ setup_python() {
 
   if command -v mise >/dev/null 2>&1; then
     log_debug "Using mise for Python..."
-    run_quiet mise install python
+    run_quiet mise install python uv
     eval "$(mise activate bash --shims)"
   fi
 
   local _STAT_PY="✅ Installed"
   if [ ! -d "$VENV" ]; then
-    "$PYTHON" -m venv "$VENV" || _STAT_PY="❌ Failed"
+    if command -v uv >/dev/null 2>&1; then
+      log_info "Creating virtual environment using uv..."
+      uv venv "$VENV" || _STAT_PY="❌ Failed"
+    else
+      "$PYTHON" -m venv "$VENV" || _STAT_PY="❌ Failed"
+    fi
   fi
 
   if [ "$_STAT_PY" = "✅ Installed" ]; then

@@ -69,9 +69,19 @@ install_python_deps() {
     fi
 
     if [ -f "$REQUIREMENTS_TXT" ]; then
-      "$_PIP_INST" install -r "$REQUIREMENTS_TXT"
+      if command -v uv >/dev/null 2>&1; then
+        log_info "Installing dependencies using uv..."
+        uv pip install -r "$REQUIREMENTS_TXT"
+      else
+        "$_PIP_INST" install -r "$REQUIREMENTS_TXT"
+      fi
     elif [ -f "requirements.txt" ]; then
-      "$_PIP_INST" install -r requirements.txt
+      if command -v uv >/dev/null 2>&1; then
+        log_info "Installing dependencies using uv..."
+        uv pip install -r requirements.txt
+      else
+        "$_PIP_INST" install -r requirements.txt
+      fi
     fi
   fi
 }

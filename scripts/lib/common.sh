@@ -165,6 +165,10 @@ bootstrap_mise() {
 
     # Initialize mise environment
     eval "$(mise activate bash --shims)"
+
+    # Ensure uv is installed globally for bootstrapping subsequent Python environments
+    log_info "Deploying uv via mise (cross-platform)..."
+    run_quiet mise install uv --global || log_warn "Warning: Failed to install uv via mise. Falling back to native venv."
   else
     log_error "Failed to bootstrap mise. Toolchain may be incomplete."
     return 1

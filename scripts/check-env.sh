@@ -200,6 +200,11 @@ main() {
   log_info "── Toolchain Manager ──"
   if command -v mise >/dev/null 2>&1; then
     log_summary "Toolchain" "mise" "✅ active" "$(get_version mise)" "0"
+    if command -v uv >/dev/null 2>&1; then
+      log_summary "Toolchain" "uv" "✅ active" "$(get_version uv)" "0"
+    else
+      log_summary "Toolchain" "uv" "⚠️ missing" "-" "0"
+    fi
   else
     log_summary "Toolchain" "mise" "❌ missing" "-" "0"
     HEALTHY_ST=1
