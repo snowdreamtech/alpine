@@ -19,5 +19,5 @@ jobs:
       contents: read
     steps:
       - name: "🛡️ Check DCO Signature"
-        uses: t-richards/dco@v1.4.0
+        uses: tisonkun/actions-dco@v1.1
         # This action fails if any commit in the PR lacks a 'Signed-off-by' line.
