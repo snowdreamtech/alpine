@@ -8,37 +8,29 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+## [3.23.3-1] - 2026-03-12
+
 ### Added
 
-- Initial project template with AI IDE ecosystem support (50+ AI IDEs)
-- Core rule system in `.agent/rules/` as Single Source of Truth
-- SpecKit workflow suite for full feature lifecycle management
-- DevContainer with Docker Compose for reproducible development environments
-- Comprehensive CI/CD pipeline (lint, security scan, CodeQL, GoReleaser, stale)
-- Pre-commit hooks with 50+ quality gate checks
-- VS Code productivity configurations (tasks and launch profiles)
-- Project hydration script (`scripts/init-project.sh`)
-- GitHub community health files (SECURITY, CONTRIBUTING, CODE_OF_CONDUCT)
-- Multi-IDE prompt/command shortcuts for all major AI coding assistants
-
-### Changed
-
-- N/A
-
-### Deprecated
-
-- N/A
-
-### Removed
-
-- N/A
+- **Base Image**: High-performance Alpine 3.23.3 base with multi-arch support.
+- **User Mapping**: Robust `PUID`/`PGID` support with automatic home directory permission repairs.
+- **Initialization**: Modular `entrypoint.d` mechanism for decoupled downstream setup.
+- **Timezone**: Dynamic `TZ` configuration support in entrypoint.
+- **Capabilities**: Support for `CAP_NET_BIND_SERVICE` to allow unprivileged port binding.
+- **Privileges**: Automatic passwordless `sudo` and `doas` configuration for mapped non-root users.
+- **Tooling**: Built-in `bash`, `zsh`, `nano`, `rsync`, `git`, `curl`, `jq`, and more.
+- **CI/CD**: Docker-specific targets in `Makefile` and integration tests in `tests/docker.bats`.
 
 ### Fixed
 
-- N/A
+- **Non-root Compliance**: Guarded root-only operations in entrypoint to prevent crashes when running as non-root.
+- **POSIX Safety**: Patched entrypoint scripts against shell-specific null parameter crashes and formatting issues.
 
 ### Security
 
-- N/A
+- Hardened user/group mapping and hardened su-exec execution patterns.
+- Pre-installed security tools (gnupg, openssl, ca-certificates).
+
+[3.23.3-1]: https://github.com/snowdreamtech/alpine/compare/upstream/dev...dev
 
 [Unreleased]: https://github.com/snowdreamtech/template/commits/main/

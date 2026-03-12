@@ -112,7 +112,12 @@ main() {
     fi
   fi
 
-  log_success "✨ Build completed successfully! Check the 'out/' or 'dist/' directory."
+  # 6. Docker build (Alpine Base Image)
+  if [ -f "Dockerfile" ]; then
+    run_build "make docker-build" "Docker build (Alpine Image)"
+  fi
+
+  log_success "✨ Build completed successfully!"
 
   # 6. Standardized Next Actions
   if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then

@@ -43,6 +43,7 @@ Suites (default: all):
   shell            Run bats tests in tests/
   python           Run pytest (requires .venv)
   powershell       Run Pester tests (requires pwsh)
+  docker           Run container integration tests (requires docker)
   all              Run all detected test suites
 
 EOF
@@ -114,6 +115,20 @@ run_powershell_tests() {
   fi
 }
 
+# Purpose: Executes Docker-specific integration tests using BATS.
+# Examples:
+#   run_docker_tests
+run_docker_tests() {
+  if [ -f "tests/docker.bats" ]; then
+    log_info "── Running Docker Integration Tests (bats) ──"
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
+      log_success "DRY-RUN: Would run bats tests/docker.bats"
+    else
+      make docker-test
+    fi
+  fi
+}
+
 # Purpose: Main entry point for the multi-stack test orchestration engine.
 # Params:
 #   $@ - Command line arguments and optional suite selection
@@ -128,7 +143,7 @@ main() {
   local _arg_tst
   for _arg_tst in "$@"; do
     case "$_arg_tst" in
-    shell | python | powershell | all) _SUITE_TST="$_arg_tst" ;;
+    shell | python | powershell | docker | all) _SUITE_TST="$_arg_tst" ;;
     -q | --quiet | -v | --verbose | --dry-run | -h | --help) ;;
     esac
   done
@@ -140,12 +155,15 @@ main() {
   shell) run_shell_tests ;;
   python) run_python_tests ;;
   powershell) run_powershell_tests ;;
+  docker) run_docker_tests ;;
   all)
     run_shell_tests
     printf "\n"
     run_python_tests
     printf "\n"
     run_powershell_tests
+    printf "\n"
+    run_docker_tests
     ;;
   esac
 

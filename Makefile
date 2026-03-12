@@ -31,7 +31,7 @@ endif
 # =============================================================================
 # Targets
 # =============================================================================
-.PHONY: all help init setup install lint format test build clean commit verify release env update audit health bench docs archive-changelog check-env sync-docs
+.PHONY: all help init setup install lint format test build clean commit verify release env update audit health bench docs archive-changelog check-env sync-docs docker-build docker-test
 
 # Default target: display help
 all: help
@@ -42,26 +42,28 @@ help:
 	@printf "$(YELLOW)Usage:$(NC)\n"
 	@printf "  make <target> [VARIABLE=value ...]\n\n"
 	@printf "$(YELLOW)Targets:$(NC)\n"
-	@printf "  $(GREEN)init$(NC)     Hydrate project from template (rename placeholders)\n"
-	@echo "  $(GREEN)setup$(NC)    Install system-level development tools"
-	@echo "  $(GREEN)install$(NC)  Install project-level dependencies (pip, npm)"
-	@echo "  $(GREEN)lint$(NC)     Run standardized linter (pre-commit)"
-	@echo "  $(GREEN)format$(NC)   Auto-format code (ruff, prettier, shfmt, etc.)"
-	@echo "  $(GREEN)test$(NC)     Run unified test suite"
-	@echo "  $(GREEN)build$(NC)    Build project artifacts"
-	@echo "  $(GREEN)commit$(NC)   Start the interactive Commitizen CLI"
-	@echo "  $(GREEN)verify$(NC)   Run full project verification (env, lint, test)"
-	@echo "  $(GREEN)release$(NC)  Standardized release manager (versioning & tagging)"
-	@echo "  $(GREEN)env$(NC)      Environment configuration manager (.env)"
-	@echo "  $(GREEN)docs$(NC)     Documentation site manager (dev/build/preview)"
+	@printf "  $(GREEN)init$(NC)         Hydrate project from template (rename placeholders)\n"
+	@echo "  $(GREEN)setup$(NC)        Install system-level development tools"
+	@echo "  $(GREEN)install$(NC)      Install project-level dependencies (pip, npm)"
+	@echo "  $(GREEN)lint$(NC)         Run standardized linter (pre-commit)"
+	@echo "  $(GREEN)format$(NC)       Auto-format code (ruff, prettier, shfmt, etc.)"
+	@echo "  $(GREEN)test$(NC)         Run unified test suite"
+	@echo "  $(GREEN)build$(NC)        Build project artifacts"
+	@echo "  $(GREEN)docker-build$(NC) Build Docker image"
+	@echo "  $(GREEN)docker-test$(NC)  Run container integration tests"
+	@echo "  $(GREEN)commit$(NC)       Start the interactive Commitizen CLI"
+	@echo "  $(GREEN)verify$(NC)       Run full project verification (env, lint, test)"
+	@echo "  $(GREEN)release$(NC)      Standardized release manager (versioning & tagging)"
+	@echo "  $(GREEN)env$(NC)          Environment configuration manager (.env)"
+	@echo "  $(GREEN)docs$(NC)         Documentation site manager (dev/build/preview)"
 	@echo "  $(GREEN)archive-changelog$(NC) Archive major-version changelog entries"
-	@echo "  $(GREEN)check-env$(NC) Onboarding environment health check"
-	@echo "  $(GREEN)update$(NC)   Update global/project tools and hooks"
-	@echo "  $(GREEN)audit$(NC)    Run security audit and vulnerability scans"
-	@echo "  $(GREEN)health$(NC)   Generate unified project health dashboard"
-	@echo "  $(GREEN)bench$(NC)    Run performance benchmarks"
-	@echo "  $(GREEN)clean$(NC)    Remove temporary and generated files"
-	@echo "  $(GREEN)help$(NC)     Show this help message"
+	@echo "  $(GREEN)check-env$(NC)     Onboarding environment health check"
+	@echo "  $(GREEN)update$(NC)        Update global/project tools and hooks"
+	@echo "  $(GREEN)audit$(NC)         Run security audit and vulnerability scans"
+	@echo "  $(GREEN)health$(NC)        Generate unified project health dashboard"
+	@echo "  $(GREEN)bench$(NC)         Run performance benchmarks"
+	@echo "  $(GREEN)clean$(NC)         Remove temporary and generated files"
+	@echo "  $(GREEN)help$(NC)          Show this help message"
 
 # Lifecycle Targets
 init:
@@ -196,6 +198,28 @@ ifeq ($(OS_NAME),Windows)
 else
 	@sh scripts/check-env.sh
 endif
+
+# ── Docker Targets ──────────────────────────────────────────────────────────
+
+docker-build:
+	@printf "$(BLUE)── Building Docker Image: snowdreamtech/alpine ──$(NC)\n"
+	@docker build --build-arg BUILDTIME=$(shell date -u +'%Y-%m-%dT%H:%M:%SZ') \
+		--build-arg VERSION=$(shell cat version 2>/dev/null || echo "latest") \
+		--build-arg REVISION=$(shell git rev-parse --short HEAD 2>/dev/null || echo "unknown") \
+		-t snowdreamtech/alpine .
+
+docker-test:
+	@printf "$(BLUE)── Running Docker Tests ──$(NC)\n"
+	@if [ -f "tests/docker.bats" ]; then \
+		BATS_BIN=$$(command -v bats 2>/dev/null || echo "./node_modules/.bin/bats"); \
+		if [ -x "$$BATS_BIN" ] || command -v bats >/dev/null 2>&1; then \
+			$$BATS_BIN tests/docker.bats; \
+		else \
+			printf "$(YELLOW)⚠️  Skipping docker tests (bats not found)$(NC)\n"; \
+		fi \
+	else \
+		printf "$(YELLOW)⚠️  Skipping docker tests (tests/docker.bats not found)$(NC)\n"; \
+	fi
 
 clean:
 ifeq ($(OS_NAME),Windows)
