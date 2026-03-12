@@ -14,7 +14,7 @@
 name: PR Title Check
 
 "on":
-  pull_request_target:
+  pull_request:
     types:
       - opened
       - edited
@@ -31,6 +31,7 @@ jobs:
       cancel-in-progress: true
     permissions:
       pull-requests: read # Required to read the pull request metadata via the GitHub API
+      statuses: write # Required to post status check results
     timeout-minutes: 5 # Title linting is near-instant
     steps:
       - name: "🔍 Validate PR Title Integrity"
