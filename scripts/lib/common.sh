@@ -282,8 +282,15 @@ run_mise() {
   local _RETRY_COUNT=0
   local _STATUS=1
 
+  # Propagate verbosity to mise
+  local _MISE_OPTS=""
+  if [ "${VERBOSE:-1}" -ge 2 ]; then
+    _MISE_OPTS="--verbose"
+  fi
+
   while [ $_RETRY_COUNT -lt $_MAX_RETRIES ]; do
-    if run_quiet mise "$@"; then
+    # shellcheck disable=SC2086
+    if run_quiet mise $_MISE_OPTS "$@"; then
       _STATUS=0
       break
     else
@@ -661,7 +668,7 @@ parse_common_args() {
     -q | --quiet) # shellcheck disable=SC2034
       VERBOSE=0 ;;
     -v | --verbose) # shellcheck disable=SC2034
-      VERBOSE=2 ;;
+      export VERBOSE=2 ;;
     -h | --help)
       # shellcheck disable=SC2317
       if command -v show_help >/dev/null 2>&1; then

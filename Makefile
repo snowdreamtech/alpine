@@ -6,6 +6,24 @@
 #   - "World Class" AI documentation style (English-only technical metadata).
 
 # =============================================================================
+# Global Options
+# =============================================================================
+# Verbosity level: 0 (quiet), 1 (normal), 2 (verbose)
+# Supports: make setup VERBOSE=2 or make setup V=2
+V ?= 1
+VERBOSE ?= $(V)
+export VERBOSE
+
+# Pass flags to sub-scripts
+SCRIPT_ARGS :=
+ifeq ($(shell [ $(VERBOSE) -ge 2 ] && echo 1),1)
+	SCRIPT_ARGS += --verbose
+endif
+ifeq ($(shell [ $(VERBOSE) -eq 0 ] && echo 1),1)
+	SCRIPT_ARGS += --quiet
+endif
+
+# =============================================================================
 # OS Detection
 # =============================================================================
 ifeq ($(OS),Windows_NT)
@@ -66,140 +84,140 @@ help:
 # Lifecycle Targets
 init:
 ifeq ($(OS_NAME),Windows)
-	@scripts/init-project.bat
+	@scripts/init-project.bat $(SCRIPT_ARGS)
 else
-	@sh scripts/init-project.sh
+	@sh scripts/init-project.sh $(SCRIPT_ARGS)
 endif
 
 setup:
 ifeq ($(OS_NAME),Windows)
-	@scripts/setup.bat
+	@scripts/setup.bat $(SCRIPT_ARGS)
 else
-	@sh scripts/setup.sh
+	@sh scripts/setup.sh $(SCRIPT_ARGS)
 endif
 
 install: setup
 ifeq ($(OS_NAME),Windows)
-	@scripts/install.bat
+	@scripts/install.bat $(SCRIPT_ARGS)
 else
-	@sh scripts/install.sh
+	@sh scripts/install.sh $(SCRIPT_ARGS)
 endif
 
 lint:
 ifeq ($(OS_NAME),Windows)
-	@scripts/lint.bat
+	@scripts/lint.bat $(SCRIPT_ARGS)
 else
-	@sh scripts/lint.sh
+	@sh scripts/lint.sh $(SCRIPT_ARGS)
 endif
 
 format:
 ifeq ($(OS_NAME),Windows)
-	@scripts/format.bat
+	@scripts/format.bat $(SCRIPT_ARGS)
 else
-	@sh scripts/format.sh
+	@sh scripts/format.sh $(SCRIPT_ARGS)
 endif
 
 test:
 ifeq ($(OS_NAME),Windows)
-	@scripts/test.bat
+	@scripts/test.bat $(SCRIPT_ARGS)
 else
-	@sh scripts/test.sh
+	@sh scripts/test.sh $(SCRIPT_ARGS)
 endif
 
 build:
 ifeq ($(OS_NAME),Windows)
-	@scripts/build.bat
+	@scripts/build.bat $(SCRIPT_ARGS)
 else
-	@sh scripts/build.sh
+	@sh scripts/build.sh $(SCRIPT_ARGS)
 endif
 
 commit:
 ifeq ($(OS_NAME),Windows)
-	@scripts/commit.bat $(ARGS)
+	@scripts/commit.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/commit.sh $(ARGS)
+	@sh scripts/commit.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 verify:
 ifeq ($(OS_NAME),Windows)
-	@scripts/verify.bat
+	@scripts/verify.bat $(SCRIPT_ARGS)
 else
-	@sh scripts/verify.sh
+	@sh scripts/verify.sh $(SCRIPT_ARGS)
 endif
 
 release:
 ifeq ($(OS_NAME),Windows)
-	@scripts/release.bat
+	@scripts/release.bat $(SCRIPT_ARGS)
 else
-	@sh scripts/release.sh
+	@sh scripts/release.sh $(SCRIPT_ARGS)
 endif
 
 env:
 ifeq ($(OS_NAME),Windows)
-	@scripts/env.bat
+	@scripts/env.bat $(SCRIPT_ARGS)
 else
-	@sh scripts/env.sh
+	@sh scripts/env.sh $(SCRIPT_ARGS)
 endif
 
 update:
 ifeq ($(OS_NAME),Windows)
-	@scripts/update.bat
+	@scripts/update.bat $(SCRIPT_ARGS)
 else
-	@sh scripts/update.sh
+	@sh scripts/update.sh $(SCRIPT_ARGS)
 endif
 
 audit:
 ifeq ($(OS_NAME),Windows)
-	@scripts/audit.bat
+	@scripts/audit.bat $(SCRIPT_ARGS)
 else
-	@sh scripts/audit.sh
+	@sh scripts/audit.sh $(SCRIPT_ARGS)
 endif
 
 health:
 ifeq ($(OS_NAME),Windows)
-	@scripts/health.bat
+	@scripts/health.bat $(SCRIPT_ARGS)
 else
-	@sh scripts/health.sh
+	@sh scripts/health.sh $(SCRIPT_ARGS)
 endif
 
 bench:
 ifeq ($(OS_NAME),Windows)
-	@scripts/bench.bat
+	@scripts/bench.bat $(SCRIPT_ARGS)
 else
-	@sh scripts/bench.sh
+	@sh scripts/bench.sh $(SCRIPT_ARGS)
 endif
 
 sync-docs:
 ifeq ($(OS_NAME),Windows)
-	@scripts/sync-docs.bat
+	@scripts/sync-docs.bat $(SCRIPT_ARGS)
 else
-	@sh scripts/sync-docs.sh
+	@sh scripts/sync-docs.sh $(SCRIPT_ARGS)
 endif
 
 docs:
 ifeq ($(OS_NAME),Windows)
-	@scripts/docs.bat $(ARGS)
+	@scripts/docs.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/docs.sh $(ARGS)
+	@sh scripts/docs.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 archive-changelog:
 ifeq ($(OS_NAME),Windows)
-	@scripts/archive-changelog.bat
+	@scripts/archive-changelog.bat $(SCRIPT_ARGS)
 else
-	@sh scripts/archive-changelog.sh
+	@sh scripts/archive-changelog.sh $(SCRIPT_ARGS)
 endif
 
 check-env:
 ifeq ($(OS_NAME),Windows)
-	@scripts/check-env.bat
+	@scripts/check-env.bat $(SCRIPT_ARGS)
 else
-	@sh scripts/check-env.sh
+	@sh scripts/check-env.sh $(SCRIPT_ARGS)
 endif
 
 clean:
 ifeq ($(OS_NAME),Windows)
-	@scripts/cleanup.bat
+	@scripts/cleanup.bat $(SCRIPT_ARGS)
 else
-	@sh scripts/cleanup.sh
+	@sh scripts/cleanup.sh $(SCRIPT_ARGS)
 endif
