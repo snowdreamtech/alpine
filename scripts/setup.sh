@@ -665,7 +665,51 @@ install_editorconfig_checker() {
   log_summary "Lint Tool" "EditorConfig" "$_STAT_EC" "$(get_version editorconfig-checker)" "$_DUR_EC"
 }
 
-# Purpose: Sets up several security audit tools (OSV-Scanner, Trivy, Govulncheck, etc.).
+# Purpose: Installs zizmor for GitHub Actions auditing.
+# Delegate: Managed by mise (.mise.toml)
+install_zizmor() {
+  local _T0_ZIZ
+  _T0_ZIZ=$(date +%s)
+  log_info "── Setting up Zizmor ──"
+  local _STAT_ZIZ="✅ mise"
+  run_quiet mise install zizmor || _STAT_ZIZ="❌ Failed"
+  log_summary "Security Tool" "Zizmor" "$_STAT_ZIZ" "$(get_version zizmor)" "$(($(date +%s) - _T0_ZIZ))"
+}
+
+# Purpose: Installs shfmt for shell script formatting.
+# Delegate: Managed by mise (.mise.toml)
+install_shfmt() {
+  local _T0_SHF
+  _T0_SHF=$(date +%s)
+  log_info "── Setting up Shfmt ──"
+  local _STAT_SHF="✅ mise"
+  run_quiet mise install shfmt || _STAT_SHF="❌ Failed"
+  log_summary "Lint Tool" "Shfmt" "$_STAT_SHF" "$(get_version shfmt)" "$(($(date +%s) - _T0_SHF))"
+}
+
+# Purpose: Installs shellcheck for shell script linting.
+# Delegate: Managed by mise (.mise.toml)
+install_shellcheck() {
+  local _T0_SHC
+  _T0_SHC=$(date +%s)
+  log_info "── Setting up Shellcheck ──"
+  local _STAT_SHC="✅ mise"
+  run_quiet mise install shellcheck || _STAT_SHC="❌ Failed"
+  log_summary "Lint Tool" "Shellcheck" "$_STAT_SHC" "$(get_version shellcheck)" "$(($(date +%s) - _T0_SHC))"
+}
+
+# Purpose: Installs actionlint for GitHub Actions linting.
+# Delegate: Managed by mise (.mise.toml)
+install_actionlint() {
+  local _T0_ACT
+  _T0_ACT=$(date +%s)
+  log_info "── Setting up Actionlint ──"
+  local _STAT_ACT="✅ mise"
+  run_quiet mise install "github:rhysd/actionlint" || _STAT_ACT="❌ Failed"
+  log_summary "Lint Tool" "Actionlint" "$_STAT_ACT" "$(get_version actionlint)" "$(($(date +%s) - _T0_ACT))"
+}
+
+# Purpose: Sets up several security audit tools (OSV-Scanner, Trivy, Zizmor, etc.).
 # Params:
 #   None
 # Examples:
@@ -674,6 +718,7 @@ setup_security() {
   log_info "── Setting up Security Audit Tools ──"
   install_osv_scanner
   install_trivy
+  install_zizmor
 
   # Install govulncheck if go exists
   if command -v go >/dev/null 2>&1; then
@@ -792,7 +837,7 @@ EOF
   # ── Module Selection ──
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "${_RAW_ARGS# *}" = "all" ]; then
-    _MODULES_LIST="node python gitleaks hadolint go checkmake iac powershell java ruby php dart swift dotnet security editorconfig-checker hooks"
+    _MODULES_LIST="node python gitleaks hadolint go checkmake iac powershell java ruby php dart swift dotnet security editorconfig-checker shfmt shellcheck actionlint hooks"
   else
     _MODULES_LIST="${_RAW_ARGS}"
   fi
@@ -820,6 +865,9 @@ EOF
     dotnet) setup_dotnet ;;
     security) setup_security ;;
     editorconfig-checker) install_editorconfig_checker ;;
+    shfmt) install_shfmt ;;
+    shellcheck) install_shellcheck ;;
+    actionlint) install_actionlint ;;
     hooks) setup_hooks ;;
     *) log_error "Unknown module: $_cur_module" ;;
     esac
