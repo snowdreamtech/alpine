@@ -196,17 +196,16 @@ main() {
     printf "\n"
   fi
 
-  # 6. Toolchain Manager
   log_info "── Toolchain Manager ──"
   if command -v mise >/dev/null 2>&1; then
-    log_summary "Toolchain" "mise" "✅ active" "$(get_version mise)" "0"
+    log_success "✅ mise: Active ($(get_version mise))"
     if command -v uv >/dev/null 2>&1; then
-      log_summary "Toolchain" "uv" "✅ active" "$(get_version uv)" "0"
+      log_success "✅ uv: Active ($(get_version uv))"
     else
-      log_summary "Toolchain" "uv" "⚠️ missing" "-" "0"
+      log_warn "⚠️  uv: Not found. Run 'make setup' to install."
     fi
   else
-    log_summary "Toolchain" "mise" "❌ missing" "-" "0"
+    log_warn "❌ mise: Not found. (Mandatory for toolchain management)"
     HEALTHY_ST=1
   fi
   printf "\n"
