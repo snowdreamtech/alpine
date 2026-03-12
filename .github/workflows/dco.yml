@@ -9,10 +9,14 @@ name: DCO
   pull_request:
     branches: [main, dev]
 
+permissions: {}
+
 jobs:
   dco:
     name: "🛡️ Verify Signed-off-by"
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
       - name: "🛡️ Check DCO Signature"
         uses: t-richards/dco@v1.4.0
