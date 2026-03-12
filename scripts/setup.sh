@@ -609,176 +609,60 @@ setup_dotnet() {
 }
 
 # Purpose: Installs osv-scanner for vulnerability scanning.
-# Params:
-#   None (uses global OSV_SCANNER_VERSION)
-# Examples:
-#   install_osv_scanner
+# Delegate: Managed by mise (.mise.toml)
 install_osv_scanner() {
   local _T0_OSV
   _T0_OSV=$(date +%s)
-  local _BIN_OSV
-  _BIN_OSV="${VENV}/bin/osv-scanner${_EXE}"
-  if [ -x "${_BIN_OSV}" ] && [ "${DRY_RUN:-0}" -eq 0 ]; then
-    log_summary "Security Tool" "OSV-Scanner" "✅ Exists" "$(get_version "$_BIN_OSV")" "0"
-    return 0
-  fi
+  log_info "── Setting up OSV-Scanner ──"
 
-  log_info "── Installing osv-scanner ──"
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Security Tool" "OSV-Scanner" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
-  local _O_OS="${_OS_TAG}"
-  local _O_ARCH="amd64"
-  [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ] && _O_ARCH="arm64"
-  # osv-scanner asset naming: osv-scanner_{os}_{arch}[.exe] (no version in filename)
-  local _FILE_OSV
-  _FILE_OSV="osv-scanner_${_O_OS}_${_O_ARCH}${_EXE}"
-  local _URL_OSV
-  _URL_OSV="${GITHUB_PROXY}https://github.com/google/osv-scanner/releases/download/${OSV_SCANNER_VERSION}/${_FILE_OSV}"
+  local _STAT_OSV="✅ mise"
+  run_quiet mise install "github:google/osv-scanner" || _STAT_OSV="❌ Failed"
 
-  local _STAT_OSV="✅ Installed"
-  if download_url "${_URL_OSV}" "${_BIN_OSV}" "osv-scanner"; then
-    chmod +x "${_BIN_OSV}" 2>/dev/null || true
-  else
-    _STAT_OSV="❌ Failed"
-  fi
-  local _DUR_OSV
-  _DUR_OSV=$(($(date +%s) - _T0_OSV))
-  log_summary "Security Tool" "OSV-Scanner" "$_STAT_OSV" "$(get_version "$_BIN_OSV")" "$_DUR_OSV"
+  local _DUR_OSV=$(($(date +%s) - _T0_OSV))
+  log_summary "Security Tool" "OSV-Scanner" "$_STAT_OSV" "$(get_version osv-scanner)" "$_DUR_OSV"
 }
 
 # Purpose: Installs Trivy for security scanning.
-# Params:
-#   None (uses global TRIVY_VERSION)
-# Examples:
-#   install_trivy
+# Delegate: Managed by mise (.mise.toml)
 install_trivy() {
   local _T0_TRIVY
   _T0_TRIVY=$(date +%s)
-  local _BIN_TRIVY
-  _BIN_TRIVY="${VENV}/bin/trivy${_EXE}"
-  if [ -x "${_BIN_TRIVY}" ] && [ "${DRY_RUN:-0}" -eq 0 ]; then
-    log_summary "Security Tool" "Trivy" "✅ Exists" "$(get_version "$_BIN_TRIVY")" "0"
-    return 0
-  fi
+  log_info "── Setting up Trivy ──"
 
-  log_info "── Installing trivy ──"
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Security Tool" "Trivy" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
-  local _T_OS_TRIVY="Linux"
-  [ "${OS}" = "darwin" ] && _T_OS_TRIVY="macOS"
-  # trivy arch naming: ARM64 for arm64, 64bit for amd64
-  local _T_ARCH_TRIVY="64bit"
-  { [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; } && _T_ARCH_TRIVY="ARM64"
+  local _STAT_TRIVY="✅ mise"
+  run_quiet mise install "github:aquasecurity/trivy" || _STAT_TRIVY="❌ Failed"
 
-  local _TAR_TRIVY
-  if [ "${_OS_TAG}" = "windows" ]; then
-    _TAR_TRIVY="trivy_${TRIVY_VERSION#v}_windows-64bit.zip"
-  else
-    _TAR_TRIVY="trivy_${TRIVY_VERSION#v}_${_T_OS_TRIVY}-${_T_ARCH_TRIVY}.tar.gz"
-  fi
-
-  local _URL_TRIVY
-  _URL_TRIVY="${GITHUB_PROXY}https://github.com/aquasecurity/trivy/releases/download/${TRIVY_VERSION}/${_TAR_TRIVY}"
-  local _TMP_TRIVY
-  _TMP_TRIVY=$(mktemp -d)
-  local _STAT_TRIVY="✅ Installed"
-
-  if download_url "${_URL_TRIVY}" "${_TMP_TRIVY}/trivy_pkg" "trivy"; then
-    if [ "${_OS_TAG}" = "windows" ]; then
-      unzip -q "${_TMP_TRIVY}/trivy_pkg" -d "${_TMP_TRIVY}" || _STAT_TRIVY="❌ Failed"
-      mv "${_TMP_TRIVY}/trivy.exe" "${_BIN_TRIVY}" 2>/dev/null || _STAT_TRIVY="❌ Failed"
-    else
-      tar -xzf "${_TMP_TRIVY}/trivy_pkg" -C "${_TMP_TRIVY}" trivy || _STAT_TRIVY="❌ Failed"
-      mv "${_TMP_TRIVY}/trivy" "${_BIN_TRIVY}" 2>/dev/null || _STAT_TRIVY="❌ Failed"
-    fi
-    chmod +x "${_BIN_TRIVY}" 2>/dev/null || true
-  else
-    _STAT_TRIVY="❌ Failed"
-  fi
-  rm -rf "${_TMP_TRIVY}"
-  local _DUR_TRIVY
-  _DUR_TRIVY=$(($(date +%s) - _T0_TRIVY))
-  log_summary "Security Tool" "Trivy" "$_STAT_TRIVY" "$(get_version "$_BIN_TRIVY")" "$_DUR_TRIVY"
+  local _DUR_TRIVY=$(($(date +%s) - _T0_TRIVY))
+  log_summary "Security Tool" "Trivy" "$_STAT_TRIVY" "$(get_version trivy)" "$_DUR_TRIVY"
 }
 
 # Purpose: Installs editorconfig-checker for compliance validation.
-# Params:
-#   None (uses global EDITORCONFIG_CHECKER_VERSION)
-# Examples:
-#   install_editorconfig_checker
+# Delegate: Managed by mise (.mise.toml)
 install_editorconfig_checker() {
   local _T0_EC
   _T0_EC=$(date +%s)
-  local _BIN_EC
-  _BIN_EC="${VENV}/bin/editorconfig-checker${_EXE}"
-  if [ -x "${_BIN_EC}" ] && [ "${DRY_RUN:-0}" -eq 0 ]; then
-    log_summary "Lint Tool" "EditorConfig" "✅ Exists" "$(get_version "$_BIN_EC")" "0"
-    return 0
-  fi
+  log_info "── Setting up EditorConfig Checker ──"
 
-  log_info "── Installing editorconfig-checker ──"
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "EditorConfig" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
-  local _TMP_EC
-  _TMP_EC=$(mktemp -d)
-  local _STAT_EC="✅ Installed"
+  local _STAT_EC="✅ mise"
+  run_quiet mise install editorconfig-checker || _STAT_EC="❌ Failed"
 
-  local _O_OS="${OS}" # Uses OS detection from previous steps
-  [ "${OS}" = "darwin" ] && _O_OS="darwin"
-  [ "${OS}" = "linux" ] && _O_OS="linux"
-
-  local _O_ARCH="amd64"
-  { [ "${ARCH}" = "arm64" ] || [ "${ARCH}" = "aarch64" ]; } && _O_ARCH="arm64"
-
-  # Asset naming:
-  # Darwin/Windows: ec-{os}-{arch}.tar.gz
-  # Linux: editorconfig-checker-{os}-{arch}.tar.gz
-  local _FILE_EC
-  if [ "${OS}" = "linux" ]; then
-    _FILE_EC="editorconfig-checker-${_O_OS}-${_O_ARCH}.tar.gz"
-  else
-    _FILE_EC="ec-${_O_OS}-${_O_ARCH}.tar.gz"
-  fi
-
-  local _URL_EC="${GITHUB_PROXY}https://github.com/editorconfig-checker/editorconfig-checker/releases/download/${EDITORCONFIG_CHECKER_VERSION}/${_FILE_EC}"
-
-  if download_url "${_URL_EC}" "${_TMP_EC}/ec_pkg" "editorconfig-checker"; then
-    tar -xzf "${_TMP_EC}/ec_pkg" -C "${_TMP_EC}" || _STAT_EC="❌ Failed"
-    if [ "$_STAT_EC" = "✅ Installed" ]; then
-      # Internal structure differs:
-      # Darwin: bin/ec
-      # Linux: bin/editorconfig-checker
-      local _SRC_EC_BIN=""
-      if [ -x "${_TMP_EC}/bin/editorconfig-checker${_EXE}" ]; then
-        _SRC_EC_BIN="${_TMP_EC}/bin/editorconfig-checker${_EXE}"
-      elif [ -x "${_TMP_EC}/bin/ec${_EXE}" ]; then
-        _SRC_EC_BIN="${_TMP_EC}/bin/ec${_EXE}"
-      fi
-
-      if [ -n "$_SRC_EC_BIN" ]; then
-        mv "$_SRC_EC_BIN" "${_BIN_EC}" || _STAT_EC="❌ Failed"
-        chmod +x "${_BIN_EC}" 2>/dev/null || true
-      else
-        _STAT_EC="❌ Failed"
-      fi
-    fi
-  else
-    _STAT_EC="❌ Failed"
-  fi
-
-  rm -rf "${_TMP_EC}"
-  local _DUR_EC
-  _DUR_EC=$(($(date +%s) - _T0_EC))
-  log_summary "Lint Tool" "EditorConfig" "$_STAT_EC" "$(get_version "$_BIN_EC")" "$_DUR_EC"
+  local _DUR_EC=$(($(date +%s) - _T0_EC))
+  log_summary "Lint Tool" "EditorConfig" "$_STAT_EC" "$(get_version editorconfig-checker)" "$_DUR_EC"
 }
 
 # Purpose: Sets up several security audit tools (OSV-Scanner, Trivy, Govulncheck, etc.).
