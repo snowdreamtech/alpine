@@ -152,63 +152,60 @@ bootstrap_mise() {
     return 0
   fi
 
-  log_info "mise not found. Initiating cross-platform bootstrap..."
-
-  local _M_OS
-  local _M_ARCH
-  local _M_URL
-  local _M_BIN="$HOME/.local/bin/mise"
-
-  # OS Detection
-  case "$(uname -s)" in
-  Darwin) _M_OS="macos" ;;
-  Linux) _M_OS="linux" ;;
-  MINGW* | MSYS* | CYGWIN*) _M_OS="windows" ;;
-  *) _M_OS="linux" ;;
-  esac
-
-  # Arch Detection
-  case "$(uname -m)" in
-  x86_64) _M_ARCH="x64" ;;
-  aarch64 | arm64) _M_ARCH="arm64" ;;
-  *) _M_ARCH="x64" ;;
-  esac
-
-  # mise standalone binary URL pattern:
-  # https://mise.jdx.dev/mise-latest-{os}-{arch}
-  if [ "$_M_OS" = "windows" ]; then
-    _M_URL="https://mise.jdx.dev/mise-latest-windows-x64.exe"
-    _M_BIN="${_M_BIN}.exe"
-  else
-    _M_URL="https://mise.jdx.dev/mise-latest-${_M_OS}-${_M_ARCH}"
-  fi
+  log_info "mise not found. Initiating official shell-specific bootstrap..."
 
   # Apply network optimization before downloading
+  # This ensures GITHUB_PROXY is used if curl supports it, and git-based mirrors are ready.
   optimize_network
 
-  # We use our download_url engine which handles proxy fallback if needed.
-  if download_url "${_M_URL}" "${_M_BIN}" "mise standalone binary"; then
-    chmod +x "${_M_BIN}" 2>/dev/null || true
-    log_success "mise successfully bootstrapped to $(sanitize_path "$_M_BIN")"
+  local _M_SHELL="bash"
+  # Detect current shell using ps or $SHELL environment variable
+  # In a script $0 is often the script name, so we check SHELL or the parent process.
+  local _PARENT_SHELL
+  _PARENT_SHELL=$(ps -p "$PPID" -o comm= 2>/dev/null | awk -F/ '{print $NF}' | tr -d '-')
 
-    # Refresh PATH for current session
+  case "$_PARENT_SHELL" in
+  zsh | bash | fish) _M_SHELL="$_PARENT_SHELL" ;;
+  *)
+    case "$SHELL" in
+    *zsh*) _M_SHELL="zsh" ;;
+    *bash*) _M_SHELL="bash" ;;
+    *fish*) _M_SHELL="fish" ;;
+    *) _M_SHELL="bash" ;;
+    esac
+    ;;
+  esac
+
+  log_debug "Detected shell for activation: $_M_SHELL"
+
+  # Official installation method (shell-specific streamer)
+  # curl https://mise.run/zsh | sh
+  local _M_URL="https://mise.run/${_M_SHELL}"
+
+  # Use our download_url engine to pipe to sh or just run directly if we trust the streamer.
+  # Since the streamer handles its own architecture detection, we simplify.
+  log_info "Fetching and executing mise streamer for ${_M_SHELL}..."
+
+  if curl -sS -L "$_M_URL" | sh; then
+    log_success "mise successfully bootstrapped and configured for ${_M_SHELL}"
+
+    # Refresh PATH for current session (streamer installs to ~/.local/bin by default)
     export PATH="$HOME/.local/bin:$PATH"
 
     # Security & Automation: Automatically trust the local project config
-    # This prevents interactive "mise config files are not trusted" prompts.
     if [ -f ".mise.toml" ]; then
       log_info "Trusting local .mise.toml..."
       mise trust ".mise.toml" >/dev/null 2>&1 || true
     fi
 
-    # Initialize mise environment
-    eval "$(mise activate bash --shims)"
+    # Initialize mise environment for current session
+    eval "$(mise activate "$_M_SHELL" --shims)"
 
     # Ensure uv is installed globally for bootstrapping subsequent Python environments
-    log_info "Deploying uv via mise (cross-platform)..."
+    log_info "Deploying uv via mise..."
     run_mise install uv --global || log_warn "Warning: Failed to install uv via mise. Falling back to native venv."
   else
-    log_error "Failed to bootstrap mise. Toolchain may be incomplete."
+    log_error "Failed to bootstrap mise via streamer. Toolchain may be incomplete."
     return 1
   fi
 }
