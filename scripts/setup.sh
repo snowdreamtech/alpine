@@ -136,7 +136,7 @@ setup_node() {
 
   if command -v mise >/dev/null 2>&1; then
     log_debug "Using mise for Node.js..."
-    run_mise install
+    run_mise install node pnpm
     eval "$(mise activate bash --shims)"
   elif command -v corepack >/dev/null 2>&1; then
     corepack enable

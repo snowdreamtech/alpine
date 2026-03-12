@@ -258,8 +258,9 @@ EOF
     export NPM_CONFIG_REGISTRY="${MIRROR_NPM}"
     export YARN_REGISTRY="${MIRROR_NPM}"
 
-    # Export for mise and other tools
+    # Export for mise and other tools (used by some plugins/backends)
     export MISE_GITHUB_RELEASES_PROXY="${GITHUB_PROXY}"
+    export GITHUB_RELEASES_PROXY="${GITHUB_PROXY}"
 
     # Configure mise settings if mise is available
     if command -v mise >/dev/null 2>&1; then
