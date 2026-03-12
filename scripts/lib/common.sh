@@ -87,6 +87,14 @@ export OSV_SCANNER_VERSION TRIVY_VERSION EDITORCONFIG_CHECKER_VERSION
 # are prioritized over system globals without requiring manual activation.
 _LOCAL_BIN_VENV=$(pwd)/${VENV}/bin
 _LOCAL_BIN_NODE=$(pwd)/node_modules/.bin
+_LOCAL_MISE_BIN="$HOME/.local/bin"
+
+if [ -d "$_LOCAL_MISE_BIN" ]; then
+  case ":$PATH:" in
+  *":$_LOCAL_MISE_BIN:"*) ;;
+  *) export PATH="$_LOCAL_MISE_BIN:$PATH" ;;
+  esac
+fi
 
 if [ -d "$_LOCAL_BIN_VENV" ]; then
   case ":$PATH:" in
@@ -101,6 +109,67 @@ if [ -d "$_LOCAL_BIN_NODE" ]; then
   *) export PATH="$_LOCAL_BIN_NODE:$PATH" ;;
   esac
 fi
+
+# ── 🪄 Mise Bootstrap ────────────────────────────────────────────────────────
+
+# Purpose: Ensures mise is installed and available in the environment.
+#          Downloads the standalone binary if missing (cross-platform).
+# Examples:
+#   bootstrap_mise
+bootstrap_mise() {
+  if command -v mise >/dev/null 2>&1; then
+    log_debug "mise is already installed."
+    return 0
+  fi
+
+  log_info "mise not found. Initiating cross-platform bootstrap..."
+
+  local _M_OS
+  local _M_ARCH
+  local _M_URL
+  local _M_BIN="$HOME/.local/bin/mise"
+
+  # OS Detection
+  case "$(uname -s)" in
+  Darwin) _M_OS="macos" ;;
+  Linux) _M_OS="linux" ;;
+  MINGW* | MSYS* | CYGWIN*) _M_OS="windows" ;;
+  *) _M_OS="linux" ;;
+  esac
+
+  # Arch Detection
+  case "$(uname -m)" in
+  x86_64) _M_ARCH="x64" ;;
+  aarch64 | arm64) _M_ARCH="arm64" ;;
+  *) _M_ARCH="x64" ;;
+  esac
+
+  # mise standalone binary URL pattern:
+  # https://mise.jdx.dev/mise-latest-{os}-{arch}
+  if [ "$_M_OS" = "windows" ]; then
+    _M_URL="https://mise.jdx.dev/mise-latest-windows-x64.exe"
+    _M_BIN="${_M_BIN}.exe"
+  else
+    _M_URL="https://mise.jdx.dev/mise-latest-${_M_OS}-${_M_ARCH}"
+  fi
+
+  # Apply GITHUB_PROXY if it's a github-related resource,
+  # but mise.jdx.dev is their own redirector.
+  # We use our download_url engine which handles proxy fallback if needed.
+  if download_url "${_M_URL}" "${_M_BIN}" "mise standalone binary"; then
+    chmod +x "${_M_BIN}" 2>/dev/null || true
+    log_success "mise successfully bootstrapped to $(sanitize_path "$_M_BIN")"
+
+    # Refresh PATH for current session
+    export PATH="$HOME/.local/bin:$PATH"
+
+    # Initialize mise environment
+    eval "$(mise activate bash --shims)"
+  else
+    log_error "Failed to bootstrap mise. Toolchain may be incomplete."
+    return 1
+  fi
+}
 
 # ── 📢 Standardized Logging ──────────────────────────────────────────────────
 

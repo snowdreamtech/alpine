@@ -50,16 +50,13 @@ graph TD
 
 - **Runtime**: Node.js (>= 20.x), Python (>= 3.10.x).
 - **Git**: Global git installation required.
-- **Make**: Required for unified command execution.
 
 ### Quick Start
 
-```bash
-make init     # Initialize project identity
-make setup    # Install system level tools
-make install  # Install dependencies & hooks
-make verify   # Run health check
-```
+1. **Prerequisites**: [mise](https://mise.jdx.dev/) is highly recommended for global tool management (automatically installed during setup).
+2. **Initialize**: `make setup` (bootstraps mise and core tools).
+3. **Install**: `make install` (installs project dependencies).
+4. **Verify**: `make verify` (ensures everything is green).
 
 ### Configuration Reference
 

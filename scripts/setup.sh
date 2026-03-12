@@ -134,7 +134,11 @@ setup_node() {
     return 0
   fi
 
-  if command -v corepack >/dev/null 2>&1; then
+  if command -v mise >/dev/null 2>&1; then
+    log_debug "Using mise for Node.js..."
+    run_quiet mise install node pnpm
+    eval "$(mise activate bash --shims)"
+  elif command -v corepack >/dev/null 2>&1; then
     corepack enable
   fi
 
@@ -181,6 +185,12 @@ setup_python() {
     return 0
   fi
 
+  if command -v mise >/dev/null 2>&1; then
+    log_debug "Using mise for Python..."
+    run_quiet mise install python
+    eval "$(mise activate bash --shims)"
+  fi
+
   local _STAT_PY="✅ Installed"
   if [ ! -d "$VENV" ]; then
     "$PYTHON" -m venv "$VENV" || _STAT_PY="❌ Failed"
@@ -212,12 +222,17 @@ setup_python() {
 install_gitleaks() {
   local _T0_GITL
   _T0_GITL=$(date +%s)
+
+  if command -v mise >/dev/null 2>&1; then
+    log_debug "Using mise for gitleaks..."
+    if run_quiet mise install gitleaks; then
+      log_summary "Lint Tool" "Gitleaks" "✅ mise" "$(get_version gitleaks)" "0"
+      return 0
+    fi
+  fi
+
   local _BIN_GITL
   _BIN_GITL="${VENV}/bin/gitleaks${_EXE}"
-  if [ -x "${_BIN_GITL}" ] && [ "${DRY_RUN:-0}" -eq 0 ]; then
-    log_summary "Lint Tool" "Gitleaks" "✅ Exists" "$(get_version "$_BIN_GITL")" "0"
-    return 0
-  fi
   log_info "── Installing gitleaks ──"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
@@ -1050,6 +1065,10 @@ EOF
     _MODULES_LIST="${_RAW_ARGS}"
   fi
 
+  # 5. Bootstrap Toolchain Manager
+  bootstrap_mise || log_warn "Warning: mise bootstrap failed. Falling back to local tool installation."
+
+  # 6. Execution
   local _cur_module
   for _cur_module in $_MODULES_LIST; do
     case $_cur_module in

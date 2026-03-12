@@ -196,7 +196,17 @@ main() {
     printf "\n"
   fi
 
-  # 6. Group: Security & Quality Tools
+  # 6. Toolchain Manager
+  log_info "── Toolchain Manager ──"
+  if command -v mise >/dev/null 2>&1; then
+    log_summary "Toolchain" "mise" "✅ active" "$(get_version mise)" "0"
+  else
+    log_summary "Toolchain" "mise" "❌ missing" "-" "0"
+    HEALTHY_ST=1
+  fi
+  printf "\n"
+
+  # 7. Group: Security & Quality Tools
   log_info "── Security & Quality Tools ──"
   if command -v gitleaks >/dev/null 2>&1; then log_success "✅ Gitleaks: Installed"; else
     log_warn "⚠️  Gitleaks: Not found. Run 'make setup' to install."

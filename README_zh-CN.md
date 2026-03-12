@@ -63,12 +63,10 @@ graph TD
 
 ### 快速开始
 
-```bash
-make init     # 初始化项目身份
-make setup    # 安装系统级工具
-make install  # 安装依赖与钩子
-make verify   # 运行健康检查
-```
+1. **前提条件**：推荐安装 [mise](https://mise.jdx.dev/) 以实现全局工具管理（脚本会在 setup 阶段自动引导安装）。
+2. **初始化**：`make setup`（引导安装 mise 及核心工具）。
+3. **安装**：`make install`（同步项目依赖）。
+4. **验证**：`make verify`（确保环境健康）。
 
 ### 配置参考
 
