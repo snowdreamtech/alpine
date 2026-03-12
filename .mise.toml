@@ -1,7 +1,7 @@
 [tools]
 python = "3.12.9"
 node = "20.18.3"
-"npm:pnpm" = "10.5.2"
+pnpm = "npm:10.5.2"
 uv = "0.10.9"
 gitleaks = "8.30.0"
 hadolint = "2.14.0"
