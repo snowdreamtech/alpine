@@ -199,11 +199,11 @@ main() {
   # 6. Group: Security & Quality Tools
   log_info "── Security & Quality Tools ──"
   if command -v gitleaks >/dev/null 2>&1; then log_success "✅ Gitleaks: Installed"; else
-    log_warn "⚠️  Gitleaks: Not found."
+    log_warn "⚠️  Gitleaks: Not found. Run 'make setup' to install."
     HEALTHY_ST=1
   fi
-  if command -v osv-scanner >/dev/null 2>&1; then log_success "✅ OSV-scanner: Installed"; else log_warn "⚠️  OSV-scanner: Not found."; fi
-  if command -v trivy >/dev/null 2>&1; then log_success "✅ Trivy: Installed"; else log_warn "⚠️  Trivy: Not found."; fi
+  if command -v osv-scanner >/dev/null 2>&1; then log_success "✅ OSV-scanner: Installed"; else log_warn "⚠️  OSV-scanner: Not found. Run 'make setup' to install."; fi
+  if command -v trivy >/dev/null 2>&1; then log_success "✅ Trivy: Installed"; else log_warn "⚠️  Trivy: Not found. Run 'make setup' to install."; fi
 
   if [ -f "Dockerfile" ] || [ -f "docker-compose.yml" ]; then
     if command -v hadolint >/dev/null 2>&1; then log_success "✅ Hadolint: Installed"; else log_warn "⚠️  Hadolint: Not found."; fi
