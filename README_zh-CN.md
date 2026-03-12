@@ -13,7 +13,7 @@
 
 [English](README.md) | [简体中文](README_zh-CN.md)
 
-Alpine 的 Docker 镜像。支持多平台架构：(amd64, arm32v6, arm32v7, arm64v8, i386, ppc64le,riscv64, s390x)
+Alpine 的 Docker 镜像。支持多平台架构：(amd64, arm32v6, arm32v7, arm64v8, i386, ppc64le, riscv64, s390x)
 
 ## 使用方法
 

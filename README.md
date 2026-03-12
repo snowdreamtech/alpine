@@ -13,7 +13,7 @@
 
 [English](README.md) | [简体中文](README_zh-CN.md)
 
-Docker Image packaging for Alpine. (amd64, arm32v6, arm32v7, arm64v8, i386, ppc64le,riscv64, s390x)
+Docker Image packaging for Alpine. (amd64, arm32v6, arm32v7, arm64v8, i386, ppc64le, riscv64, s390x)
 
 ## Usage
 
