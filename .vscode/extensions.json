@@ -38,6 +38,7 @@
     "vscjava.vscode-java-pack",
     "vscode-icons-team.vscode-icons",
     "wayou.vscode-todo-highlight",
-    "wdhongtw.gpg-indicator"
+    "wdhongtw.gpg-indicator",
+    "hverlin.mise-vscode"
   ]
 }
