@@ -248,13 +248,20 @@ main() {
     log_info "\n── Auditing Containers (trivy) ──"
     if run_quiet command -v trivy; then
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
-        log_success "DRY-RUN: Would run trivy fs ."
+        log_success "DRY-RUN: Would run trivy fs . and trivy license"
         log_summary "DevOps" "trivy" "⚖️ Previewed" "-" "0"
       else
-        if run_quiet trivy fs . && run_quiet trivy config .; then
+        log_info "Running dependency vulnerability scan..."
+        local _TRIVY_OK=0
+        run_quiet trivy fs . && run_quiet trivy config . || _TRIVY_OK=1
+
+        log_info "Running license compliance audit..."
+        run_quiet trivy license . || _TRIVY_OK=1
+
+        if [ "$_TRIVY_OK" -eq 0 ]; then
           log_summary "DevOps" "trivy" "✅ Secure" "$(get_version trivy)" "$(($(date +%s) - _T0_DKR_AUD))"
         else
-          log_summary "DevOps" "trivy" "❌ Vulnerable" "$(get_version trivy)" "$(($(date +%s) - _T0_DKR_AUD))"
+          log_summary "DevOps" "trivy" "❌ Issues Found" "$(get_version trivy)" "$(($(date +%s) - _T0_DKR_AUD))"
           _OVERALL_EXIT_AUDIT=1
         fi
       fi

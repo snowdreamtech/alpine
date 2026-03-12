@@ -1,0 +1,19 @@
+---
+# DCO Check
+# Purpose: Enforces the Developer Certificate of Origin (DCO) by verifying commits include 'Signed-off-by'.
+# Standards: Rule 07 (Git), Industry Best Practices for OSS Governance.
+
+name: DCO
+
+"on":
+  pull_request:
+    branches: [main, dev]
+
+jobs:
+  dco:
+    name: "🛡️ Verify Signed-off-by"
+    runs-on: ubuntu-latest
+    steps:
+      - name: "🛡️ Check DCO Signature"
+        uses: t-richards/dco@v1.4.0
+        # This action fails if any commit in the PR lacks a 'Signed-off-by' line.

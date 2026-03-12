@@ -204,6 +204,7 @@ main() {
   fi
   if command -v osv-scanner >/dev/null 2>&1; then log_success "✅ OSV-scanner: Installed"; else log_warn "⚠️  OSV-scanner: Not found. Run 'make setup' to install."; fi
   if command -v trivy >/dev/null 2>&1; then log_success "✅ Trivy: Installed"; else log_warn "⚠️  Trivy: Not found. Run 'make setup' to install."; fi
+  if command -v zizmor >/dev/null 2>&1; then log_success "✅ Zizmor: Installed"; else log_warn "⚠️  Zizmor: Not found. Run 'make setup' to install."; fi
 
   if [ -f "Dockerfile" ] || [ -f "docker-compose.yml" ]; then
     if command -v hadolint >/dev/null 2>&1; then log_success "✅ Hadolint: Installed"; else log_warn "⚠️  Hadolint: Not found."; fi
