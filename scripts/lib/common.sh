@@ -35,6 +35,13 @@ NC=$(printf '\033[0m')
 VERBOSE=${VERBOSE:-1} # 0: quiet, 1: normal, 2: verbose
 DRY_RUN=${DRY_RUN:-0}
 
+# Enforce Non-Interactive Mode (For CI/CD and Headless Setup)
+# These prevent 'mise' and 'uv' from asking for user confirmation or trust prompts.
+# Ref: Rule 01 (General), Rule 08 (Dev Env)
+export MISE_YES=true
+export MISE_NON_INTERACTIVE=true
+export UV_NON_INTERACTIVE=true
+
 # Orchestration tracking (detect if we are running as a sub-script)
 if [ -z "$_SNOWDREAM_TOP_LEVEL_SCRIPT" ]; then
   _SCRIPT_NAME=$(basename "$0")
@@ -167,6 +174,13 @@ bootstrap_mise() {
 
     # Refresh PATH for current session
     export PATH="$HOME/.local/bin:$PATH"
+
+    # Security & Automation: Automatically trust the local project config
+    # This prevents interactive "mise config files are not trusted" prompts.
+    if [ -f ".mise.toml" ]; then
+      log_info "Trusting local .mise.toml..."
+      mise trust ".mise.toml" >/dev/null 2>&1 || true
+    fi
 
     # Initialize mise environment
     eval "$(mise activate bash --shims)"
