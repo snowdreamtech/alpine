@@ -4,7 +4,9 @@
 
 ## 1. Package Management
 
-- **Package Manager**: Prefer `pnpm` for performance and strict dependency isolation. `npm` and `yarn` are acceptable if already established in the project.
+- **Package Management Hierarchy**:
+  - **mise**: Manages the `node` and `pnpm` **executors** (binary runtimes).
+  - **pnpm**: Manages **project dependencies** (libraries) and Node.js-specific scripts.
 - **Dependency Classification**:
   - `dependencies`: Runtime requirements only.
   - `devDependencies`: Build tools, linters, test frameworks.
@@ -12,19 +14,16 @@
 - **Strict Version Pinning (MANDATORY)**: All dependencies in `package.json` MUST use **exact version numbers**. Never use range operators (`^`, `~`, `>=`, `*`, `latest`). Unpinned versions introduce non-reproducible builds.
 
   ```jsonc
-  // ❌ WRONG — version ranges are non-deterministic
-  { "express": "^4.18.0", "lodash": "~4.17.0" }
-
   // ✅ CORRECT — exact, auditable, reproducible
   { "express": "4.18.2", "lodash": "4.17.21" }
   ```
 
-- **Lockfile**: Always commit `package-lock.json` or `pnpm-lock.yaml`. Use `npm ci` (not `npm install`) in CI for deterministic installs.
+- **Lockfile**: Always commit `pnpm-lock.yaml`. Use `pnpm install --frozen-lockfile` in CI for deterministic installs.
 - **Scripts**: All repeatable actions MUST be defined in `npm scripts` within `package.json`.
 
 ## 2. Environment Setup
 
-- **Node Version**: Specify version in `.node-version` or `engines` field in `package.json`. Use `nvm` or `fnm` for local version management.
+- **Node Version**: Specify version strictly in `.mise.toml`. Use `mise` for local version management.
 - **Environment Variables**: Never commit `.env` files. Use `.env.example` as a documentation template. Validate all required env vars at startup using a schema validator (e.g., `zod`, `envalid`).
 
   ```typescript

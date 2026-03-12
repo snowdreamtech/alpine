@@ -4,23 +4,18 @@
 
 ## 1. Environment Consistency
 
-### Runtime Version Management
-
-- Use a **language/runtime version manager** to pin exact runtime versions. Versions MUST be committed to the repository:
+- Use **`mise`** as the **mandatory polyglot toolchain orchestrator** to pin exact runtime versions and Tool Executors. Versions MUST be committed to the repository in `.mise.toml`.
 
   ```toml
-  # .mise.toml — recommended for polyglot projects
+  # .mise.toml — polyglot version manager (Single Source of Truth)
   [tools]
-  node   = "22.12.0"
-  python = "3.12.8"
-  go     = "1.23.4"
-  java   = "21.0.5"
-
-  [env]
-  NODE_ENV = "development"
+  node   = "20.18.3"
+  python = "3.12.9"
+  pnpm   = "10.5.2"
+  uv     = "0.6.3"
   ```
 
-  Supported managers: `mise` (polyglot, recommended), `nvm`/`fnm` (Node.js), `pyenv` (Python), `asdf` (deprecated but widely used).
+  Other managers (`nvm`, `pyenv`, `asdf`) are **deprecated** in this project to prevent toolchain fragmentation.
 
 - All three of these SHOULD agree to avoid version ambiguity between tools: `.nvmrc` / `.node-version`, `engines` field in `package.json`, and `.mise.toml`.
 
