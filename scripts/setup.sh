@@ -60,6 +60,18 @@ Modules (default: all):
   dotnet             Check .NET SDK
   security           Install security audit tools (osv-scanner, trivy, etc.)
   editorconfig-checker Install editorconfig-checker
+  shfmt              Install shfmt
+  shellcheck         Install shellcheck
+  actionlint         Install actionlint
+  taplo              Install taplo
+  prettier           Install prettier
+  sort-package-json  Install sort-package-json
+  goreleaser         Install goreleaser
+  spectral           Install spectral
+  commitlint         Install commitlint
+  dockerfile-utils   Install dockerfile-utils
+  clang-format       Install clang-format
+  ktlint             Install ktlint
   hooks              Activate Pre-commit Hooks
   all                Run all of the above
 
@@ -624,6 +636,128 @@ install_actionlint() {
   log_summary "Lint Tool" "Actionlint" "$_STAT_ACT" "$(get_version actionlint)" "$(($(date +%s) - _T0_ACT))"
 }
 
+# Purpose: Installs taplo for TOML formatting.
+install_taplo() {
+  local _T0_TAP
+  _T0_TAP=$(date +%s)
+  log_info "── Setting up Taplo ──"
+  if ! has_lang_files "" "*.toml"; then
+    log_summary "Lint Tool" "Taplo" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  local _STAT_TAP="✅ mise"
+  run_mise install taplo || _STAT_TAP="❌ Failed"
+  log_summary "Lint Tool" "Taplo" "$_STAT_TAP" "$(get_version taplo)" "$(($(date +%s) - _T0_TAP))"
+}
+
+# Purpose: Installs prettier for web formatting.
+install_prettier() {
+  local _T0_PRE
+  _T0_PRE=$(date +%s)
+  log_info "── Setting up Prettier ──"
+  if ! has_lang_files "" "*.json *.yaml *.yml *.vue *.js *.ts *.jsx *.tsx"; then
+    log_summary "Lint Tool" "Prettier" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  local _STAT_PRE="✅ mise"
+  run_mise install "npm:prettier" || _STAT_PRE="❌ Failed"
+  log_summary "Lint Tool" "Prettier" "$_STAT_PRE" "$(get_version prettier)" "$(($(date +%s) - _T0_PRE))"
+}
+
+# Purpose: Installs sort-package-json.
+install_sort_package_json() {
+  local _T0_SPJ
+  _T0_SPJ=$(date +%s)
+  log_info "── Setting up sort-package-json ──"
+  if [ ! -f package.json ]; then
+    log_summary "Other" "sort-package-json" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  local _STAT_SPJ="✅ mise"
+  run_mise install "npm:sort-package-json" || _STAT_SPJ="❌ Failed"
+  log_summary "Other" "sort-package-json" "$_STAT_SPJ" "$(get_version sort-package-json)" "$(($(date +%s) - _T0_SPJ))"
+}
+
+# Purpose: Installs goreleaser.
+install_goreleaser() {
+  local _T0_GR
+  _T0_GR=$(date +%s)
+  log_info "── Setting up GoReleaser ──"
+  if ! has_lang_files ".goreleaser.yaml .goreleaser.yml" ""; then
+    log_summary "Other" "GoReleaser" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  local _STAT_GR="✅ mise"
+  run_mise install "github:goreleaser/goreleaser" || _STAT_GR="❌ Failed"
+  log_summary "Other" "GoReleaser" "$_STAT_GR" "$(get_version goreleaser)" "$(($(date +%s) - _T0_GR))"
+}
+
+# Purpose: Installs spectral for API linting.
+install_spectral() {
+  local _T0_SPEC
+  _T0_SPEC=$(date +%s)
+  log_info "── Setting up Spectral ──"
+  if ! has_lang_files "" "*openapi* *swagger* *asyncapi*"; then
+    log_summary "Lint Tool" "Spectral" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  local _STAT_SPEC="✅ mise"
+  run_mise install "npm:@stoplight/spectral-cli" || _STAT_SPEC="❌ Failed"
+  log_summary "Lint Tool" "Spectral" "$_STAT_SPEC" "$(get_version spectral --version)" "$(($(date +%s) - _T0_SPEC))"
+}
+
+# Purpose: Installs commitlint.
+install_commitlint() {
+  local _T0_CL
+  _T0_CL=$(date +%s)
+  log_info "── Setting up Commitlint ──"
+  local _STAT_CL="✅ mise"
+  run_mise install "npm:@commitlint/cli" || _STAT_CL="❌ Failed"
+  log_summary "Other" "Commitlint" "$_STAT_CL" "$(get_version commitlint --version)" "$(($(date +%s) - _T0_CL))"
+}
+
+# Purpose: Installs dockerfile-utils.
+install_dockerfile_utils() {
+  local _T0_DU
+  _T0_DU=$(date +%s)
+  log_info "── Setting up dockerfile-utils ──"
+  if ! has_lang_files "Dockerfile" "*.dockerfile *.Dockerfile"; then
+    log_summary "Lint Tool" "dockerfile-utils" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  local _STAT_DU="✅ mise"
+  run_mise install "npm:dockerfile-utils" || _STAT_DU="❌ Failed"
+  log_summary "Lint Tool" "dockerfile-utils" "$_STAT_DU" "$(get_version dockerfile-utils)" "$(($(date +%s) - _T0_DU))"
+}
+
+# Purpose: Installs clang-format.
+install_clang_format() {
+  local _T0_CF
+  _T0_CF=$(date +%s)
+  log_info "── Setting up clang-format ──"
+  if ! has_lang_files "" "*.c *.cpp *.h *.hpp *.cc *.m *.mm"; then
+    log_summary "Lint Tool" "clang-format" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  local _STAT_CF="✅ mise"
+  run_mise install "npm:clang-format" || _STAT_CF="❌ Failed"
+  log_summary "Lint Tool" "clang-format" "$_STAT_CF" "$(get_version clang-format)" "$(($(date +%s) - _T0_CF))"
+}
+
+# Purpose: Installs ktlint.
+install_ktlint() {
+  local _T0_KT
+  _T0_KT=$(date +%s)
+  log_info "── Setting up ktlint ──"
+  if ! has_lang_files "" "*.kt *.kts"; then
+    log_summary "Lint Tool" "ktlint" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  local _STAT_KT="✅ mise"
+  run_mise install "github:pinterest/ktlint" || _STAT_KT="❌ Failed"
+  log_summary "Lint Tool" "ktlint" "$_STAT_KT" "$(get_version ktlint --version)" "$(($(date +%s) - _T0_KT))"
+}
+
 # Purpose: Sets up several security audit tools (OSV-Scanner, Trivy, Zizmor, etc.).
 # Params:
 #   None
@@ -754,7 +888,7 @@ EOF
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
     # Full list for "On-demand" (default) or "All" (explicit)
-    _MODULES_LIST="node python gitleaks hadolint go checkmake iac powershell java ruby dart swift dotnet security editorconfig-checker shfmt shellcheck actionlint hooks"
+    _MODULES_LIST="node python gitleaks hadolint go checkmake iac powershell java ruby dart swift dotnet security editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint hooks"
   else
     # Specific modules requested (e.g., ./setup.sh node)
     _MODULES_LIST="${_RAW_ARGS}"
@@ -799,6 +933,15 @@ EOF
     shfmt) install_shfmt ;;
     shellcheck) install_shellcheck ;;
     actionlint) install_actionlint ;;
+    taplo) install_taplo ;;
+    prettier) install_prettier ;;
+    sort-package-json) install_sort_package_json ;;
+    goreleaser) install_goreleaser ;;
+    spectral) install_spectral ;;
+    commitlint) install_commitlint ;;
+    dockerfile-utils) install_dockerfile_utils ;;
+    clang-format) install_clang_format ;;
+    ktlint) install_ktlint ;;
     hooks) setup_hooks ;;
     *) log_error "Unknown module: $_cur_module" ;;
     esac
