@@ -53,24 +53,14 @@ fi
 
 # ── 📄 SSoT Constants (Paths and Files) ──────────────────────────────────────
 
-CHANGELOG="CHANGELOG.md"
 PACKAGE_JSON="package.json"
-CARGO_TOML="Cargo.toml"
-PYPROJECT_TOML="pyproject.toml"
-VERSION_FILE="VERSION"
-REQUIREMENTS_TXT="requirements-dev.txt"
 VENV="${VENV:-.venv}"
 PYTHON="${PYTHON:-python3}"
 NPM="${NPM:-pnpm}"
-GORELEASER="${GORELEASER:-goreleaser}"
-LOCK_DIR=".archival_lock"
 DOCS_DIR="docs"
-# shellcheck disable=SC2034
-ARCHIVE_DIR="${ARCHIVE_DIR:-.}"
 GITHUB_PROXY="${GITHUB_PROXY:-https://gh-proxy.sn0wdr1am.com/}"
 
 # Network Optimization & Mirror Configuration
-_TEMP_GIT_CONFIG="/tmp/.git_config_$(id -u)"
 ENABLE_MIRROR="${ENABLE_MIRROR:-${MIRROR:-${USE_MIRROR:-0}}}"
 MIRROR_NODEJS="${MIRROR_NODEJS:-https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/}"
 MIRROR_PYTHON="${MIRROR_PYTHON:-https://mirrors.tuna.tsinghua.edu.cn/python/}"
@@ -493,6 +483,9 @@ bootstrap_mise() {
 optimize_network() {
   if [ "$_NETWORK_OPTIMIZED" = "true" ]; then return 0; fi
 
+  local _TEMP_GIT_CONFIG
+  _TEMP_GIT_CONFIG="/tmp/.git_config_$(id -u)"
+
   log_debug "Detecting network connectivity and global proxy health..."
   local _NEEDS_MIRROR=false
   local _GIT_INTERFERENCE=false
@@ -864,14 +857,14 @@ has_lang_files() {
 # Examples:
 #   VER=$(get_project_version)
 get_project_version() {
-  if [ -f "$PACKAGE_JSON" ]; then
-    grep '"version":' "$PACKAGE_JSON" | head -n 1 | sed 's/.*"version":[[:space:]]*"//;s/".*//'
-  elif [ -f "$CARGO_TOML" ]; then
-    grep '^version =' "$CARGO_TOML" | head -n 1 | sed -e 's/.*"\(.*\)"/\1/' -e "s/.*'\(.*\)'/\1/"
-  elif [ -f "$PYPROJECT_TOML" ]; then
-    grep '^version =' "$PYPROJECT_TOML" | head -n 1 | sed 's/.*"//;s/".*//'
-  elif [ -f "$VERSION_FILE" ]; then
-    cat "$VERSION_FILE" | head -n 1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+  if [ -f "package.json" ]; then
+    grep '"version":' "package.json" | head -n 1 | sed 's/.*"version":[[:space:]]*"//;s/".*//'
+  elif [ -f "Cargo.toml" ]; then
+    grep '^version =' "Cargo.toml" | head -n 1 | sed -e 's/.*"\(.*\)"/\1/' -e "s/.*'\(.*\)'/\1/"
+  elif [ -f "pyproject.toml" ]; then
+    grep '^version =' "pyproject.toml" | head -n 1 | sed 's/.*"//;s/".*//'
+  elif [ -f "VERSION" ]; then
+    cat "VERSION" | head -n 1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
   else
     # Fallback to git tag if available
     if command -v git >/dev/null 2>&1 && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then

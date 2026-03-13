@@ -148,7 +148,7 @@ main() {
   fi
 
   # 6. Dependency Audits (Python)
-  if [ -f "$REQUIREMENTS_TXT" ] || [ -f "requirements.txt" ] || [ -f "$PYPROJECT_TOML" ]; then
+  if [ -f "requirements-dev.txt" ] || [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then
     local _T0_PY_AUD
     _T0_PY_AUD=$(date +%s)
     log_info "\n── Auditing Python dependencies (pip-audit) ──"
