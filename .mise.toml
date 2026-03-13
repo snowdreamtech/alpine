@@ -18,16 +18,14 @@
 "github:rhysd/actionlint" = "1.7.11"
 "github:golangci/golangci-lint" = "1.64.5"
 "go:golang.org/x/vuln/cmd/govulncheck" = "latest"
-# google-java-format: only x86-64 binaries available; ARM64 users need java -jar manually.
-# See: https://github.com/google/google-java-format/releases
-# "github:google/google-java-format" = "1.25.2"
 "github:google/osv-scanner" = "2.3.3"
 "github:goreleaser/goreleaser" = "2.14.3"
 "github:hadolint/hadolint" = "2.14.0"
 "github:pinterest/ktlint" = "1.8.0"
 "github:stackrox/kube-linter" = "0.8.3"
-# cargo-audit: using github: backend for prebuilt binaries (avoids needing cargo toolchain)
-"github:rustsec/rustsec" = "0.20.1"
+# cargo-audit: NOT listed here — installed on-demand by setup.sh only when Cargo.toml exists.
+# The rustsec/rustsec repo uses non-standard release tag format; there's no cross-platform prebuilt.
+# Installation via: cargo install cargo-audit (requires cargo/Rust toolchain)
 "github:terraform-linters/tflint" = "0.61.0"
 "github:aquasecurity/trivy" = "0.69.3"
 "github:woodruffw/zizmor" = "1.23.1"
@@ -39,8 +37,6 @@
 bats = "1.13.0"
 checkmake = "0.3.2"
 clang-format = "19.1.7"
-# dotenv-linter via default backend — supports linux/arm64 (unlike aqua: which is darwin/amd64 only)
-dotenv-linter = "3.3.0"
 editorconfig-checker = "3.6.1"
 gitleaks = "8.30.0"
 node = "20.18.3"
