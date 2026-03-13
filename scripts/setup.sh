@@ -826,8 +826,21 @@ EOF
   # 6. Optimized SSoT: Sync plugins and bulk install tools
   if [ "${DRY_RUN:-0}" -eq 0 ]; then
     log_info "Synchronizing mise plugins and tools..."
-    # Ensure any custom plugins defined in .mise.toml are installed
+
+    # ── Git Protocol Stabilization ──
+    # Force Git protocol v2 and increase buffers to mitigate proxy handshake issues
+    export GIT_PROTOCOL=version=2
+    export MISE_GIT_ALWAYS_USE_GIX=0 # Fallback to system git for better proxy compatibility
+
+    # ── Plugin Synchronization ──
     if grep -q "\[plugins\]" .mise.toml; then
+      # Handle corrupted plugins (folder exists but incomplete)
+      local _plugin_dir="$HOME/.local/share/mise/plugins/php-cs-fixer"
+      if [ -d "$_plugin_dir" ] && [ ! -f "$_plugin_dir/bin/list-all" ]; then
+        log_warn "Detected corrupted php-cs-fixer plugin. Cleaning up..."
+        rm -rf "$_plugin_dir"
+      fi
+
       run_quiet mise plugins install --all
     fi
 
