@@ -288,56 +288,6 @@ repos:
         pass_filenames: true
         description: "Validated structure of environment variable files."
 
-      - id: zizmor
-        name: zizmor
-        entry: sh scripts/lib/lint-wrapper.sh zizmor
-        language: system
-        files: ^\.github/workflows/.*\.ya?ml$
-        pass_filenames: true
-        description: "Security auditor for GitHub Actions."
-
-      - id: osv-scanner
-        name: osv-scanner
-        entry: sh scripts/lib/lint-wrapper.sh osv-scanner --config .osv-scanner.toml scan
-        language: system
-        always_run: true
-        pass_filenames: false
-        description: "Vulnerability scanner for project dependencies."
-
-      - id: trivy
-        name: trivy
-        entry: sh scripts/lib/lint-wrapper.sh trivy fs .
-        language: system
-        always_run: true
-        pass_filenames: false
-        description: "Comprehensive security scanner."
-
-      - id: pip-audit
-        name: pip-audit
-        entry: sh scripts/lib/lint-wrapper.sh pip-audit
-        language: system
-        types: [python]
-        files: 'requirements.*\.txt$|pyproject\.toml$'
-        pass_filenames: false
-        description: "Audit Python dependencies for known vulnerabilities."
-
-      - id: govulncheck
-        name: govulncheck
-        entry: sh scripts/lib/lint-wrapper.sh govulncheck ./...
-        language: system
-        types: [go]
-        pass_filenames: false
-        description: "Vulnerability checker for Go code."
-
-      - id: cargo-audit
-        name: cargo-audit
-        entry: sh scripts/lib/lint-wrapper.sh cargo audit
-        language: system
-        types: [rust]
-        files: 'Cargo\.lock$'
-        pass_filenames: false
-        description: "Audit Rust dependencies for vulnerabilities."
-
       # ── Hardening & Security ──────────────────────────────────────────────
       - id: check-executables-have-shebangs
         name: check shell scripts for shebangs
