@@ -146,21 +146,9 @@ fi
 #          Downloads the standalone binary if missing (cross-platform).
 # Examples:
 #   bootstrap_mise
-bootstrap_mise() {
-  if command -v mise >/dev/null 2>&1; then
-    log_debug "mise is already installed."
-    return 0
-  fi
-
-  log_info "mise not found. Initiating official shell-specific bootstrap..."
-
-  # Apply network optimization before downloading
-  # This ensures GITHUB_PROXY is used if curl supports it, and git-based mirrors are ready.
-  optimize_network
-
+# Internal helper to detect the current user shell.
+_mise_detect_shell() {
   local _M_SHELL="bash"
-  # Detect current shell using ps or $SHELL environment variable
-  # In a script $0 is often the script name, so we check SHELL or the parent process.
   local _PARENT_SHELL
   _PARENT_SHELL=$(ps -p "$PPID" -o comm= 2>/dev/null | awk -F/ '{print $NF}' | tr -d '-')
 
@@ -175,39 +163,295 @@ bootstrap_mise() {
     esac
     ;;
   esac
+  echo "$_M_SHELL"
+}
 
-  log_debug "Detected shell for activation: $_M_SHELL"
+# Internal helper to detect the CPU architecture.
+_mise_detect_arch() {
+  local _ARCH
+  _ARCH=$(uname -m)
+  case "$_ARCH" in
+  x86_64 | amd64) echo "x64" ;;
+  arm64 | aarch64) echo "arm64" ;;
+  armv7*) echo "armv7" ;;
+  *) echo "x64" ;;
+  esac
+}
 
-  # Official installation method (shell-specific streamer)
-  # curl https://mise.run/zsh | sh
-  local _M_URL="https://mise.run/${_M_SHELL}"
+# Internal helper to detect the OS type.
+_mise_detect_os() {
+  case "$(uname -s)" in
+  Darwin) echo "macos" ;;
+  Linux) echo "linux" ;;
+  MINGW* | MSYS* | CYGWIN*) echo "windows" ;;
+  *) echo "linux" ;;
+  esac
+}
 
-  # Use our download_url engine to pipe to sh or just run directly if we trust the streamer.
-  # Since the streamer handles its own architecture detection, we simplify.
-  log_info "Fetching and executing mise streamer for ${_M_SHELL}..."
+# Tier 1: Shell-specific streamers (mise.run) - Includes auto-activation.
+_mise_install_tier1() {
+  local _SHELL="$1"
+  log_info "Tier 1: Trying official shell-specific streamer for ${_SHELL}..."
+  if curl -sS -L "https://mise.run/${_SHELL}" | sh; then
+    return 0
+  fi
+  return 1
+}
 
-  if curl -sS -L "$_M_URL" | sh; then
-    log_success "mise successfully bootstrapped and configured for ${_M_SHELL}"
+# Tier 2: System Package Managers.
+_mise_install_tier2() {
+  log_info "Tier 2: Searching for system package managers..."
+  if command -v brew >/dev/null 2>&1; then
+    log_info "Detected Homebrew. Installing mise..."
+    brew install mise && return 0
+  elif command -v port >/dev/null 2>&1; then
+    log_info "Detected MacPorts. Installing mise..."
+    sudo port install mise && return 0
+  elif command -v apk >/dev/null 2>&1; then
+    log_info "Detected apk. Installing mise..."
+    sudo apk add mise && return 0
+  elif command -v apt-get >/dev/null 2>&1; then
+    log_info "Detected apt. Installing mise..."
+    sudo apt-get update && sudo apt-get install -y mise && return 0
+  elif command -v dnf >/dev/null 2>&1; then
+    log_info "Detected dnf. Installing mise..."
+    sudo dnf install -y mise && return 0
+  elif command -v pacman >/dev/null 2>&1; then
+    log_info "Detected pacman. Installing mise..."
+    sudo pacman -S --noconfirm mise && return 0
+  elif command -v nix-env >/dev/null 2>&1; then
+    log_info "Detected nix. Installing mise..."
+    nix-env -iA mise && return 0
+  elif command -v yum >/dev/null 2>&1; then
+    log_info "Detected yum. Installing mise..."
+    sudo yum install -y mise && return 0
+  elif command -v zypper >/dev/null 2>&1; then
+    log_info "Detected zypper. Installing mise..."
+    sudo zypper install -y mise && return 0
+  fi
+  return 1
+}
 
-    # Refresh PATH for current session (streamer installs to ~/.local/bin by default)
-    export PATH="$HOME/.local/bin:$PATH"
+# Tier 3: Language-specific tools.
+_mise_install_tier3() {
+  log_info "Tier 3: Searching for language-specific tools..."
+  if command -v cargo >/dev/null 2>&1; then
+    log_info "Detected Cargo. Installing mise..."
+    cargo install mise && return 0
+  elif command -v npm >/dev/null 2>&1; then
+    log_info "Detected npm. Installing mise..."
+    # npm install -g might fail due to permissions, but we try.
+    npm install -g @jdxcode/mise && return 0
+  fi
+  return 1
+}
 
-    # Security & Automation: Automatically trust the local project config
-    if [ -f ".mise.toml" ]; then
-      log_info "Trusting local .mise.toml..."
-      mise trust ".mise.toml" >/dev/null 2>&1 || true
-    fi
+# Tier 4: Manual Binary Download (GitHub Releases).
+_mise_install_tier4() {
+  local _OS="$1"
+  local _ARCH="$2"
+  local _VER="$3"
+  log_info "Tier 4: Performing manual binary download for ${_OS}-${_ARCH} (v${_VER})..."
 
-    # Initialize mise environment for current session
-    eval "$(mise activate "$_M_SHELL" --shims)"
+  local _M_BIN_NAME="mise-v${_VER}-${_OS}-${_ARCH}"
+  local _M_URL="https://github.com/jdx/mise/releases/download/v${_VER}/${_M_BIN_NAME}"
+  local _DEST="$HOME/.local/bin/mise"
 
-    # Ensure uv is installed globally for bootstrapping subsequent Python environments
-    log_info "Deploying uv via mise..."
-    run_mise install uv --global || log_warn "Warning: Failed to install uv via mise. Falling back to native venv."
+  mkdir -p "$(dirname "$_DEST")"
+  if download_url "$_M_URL" "$_DEST"; then
+    chmod +x "$_DEST"
+    return 0
+  fi
+  return 1
+}
+
+# Setup shell completions.
+_mise_setup_completions() {
+  local _SHELL="$1"
+  log_info "Setting up mise completions for ${_SHELL}..."
+
+  case "$_SHELL" in
+  zsh)
+    local _DIR="${ZDOTDIR-$HOME}/.zsh/completions"
+    mkdir -p "$_DIR"
+    mise completion zsh >"$_DIR/_mise" 2>/dev/null || true
+    ;;
+  bash)
+    local _DIR="$HOME/.local/share/bash-completion/completions"
+    mkdir -p "$_DIR"
+    mise completion bash >"$_DIR/mise" 2>/dev/null || true
+    ;;
+  fish)
+    local _DIR="$HOME/.config/fish/completions"
+    mkdir -p "$_DIR"
+    mise completion fish >"$_DIR/mise.fish" 2>/dev/null || true
+    ;;
+  esac
+}
+
+# Run mise doctor to verify health.
+_mise_verify_health() {
+  log_info "Verifying mise health..."
+  if ! run_quiet mise doctor; then
+    log_warn "mise doctor reported some issues. Please check 'mise doctor' manually."
   else
-    log_error "Failed to bootstrap mise via streamer. Toolchain may be incomplete."
+    log_success "mise health check passed."
+  fi
+}
+
+# ── 🐚 Shell-Specific Activation Helpers ─────────────────────────────────────
+
+_mise_activate_bash() {
+  local _RC="$HOME/.bashrc"
+  [ -f "$_RC" ] || return 0
+  # shellcheck disable=SC2016
+  grep -q "mise activate bash" "$_RC" || echo 'eval "$(mise activate bash)"' >>"$_RC"
+}
+
+_mise_activate_zsh() {
+  local _RC="${ZDOTDIR-$HOME}/.zshrc"
+  [ -f "$_RC" ] || return 0
+  # shellcheck disable=SC2016
+  grep -q "mise activate zsh" "$_RC" || echo 'eval "$(mise activate zsh)"' >>"$_RC"
+}
+
+_mise_activate_fish() {
+  local _RC="$HOME/.config/fish/config.fish"
+  mkdir -p "$(dirname "$_RC")"
+  grep -q "mise activate fish" "$_RC" || echo 'mise activate fish | source' >>"$_RC"
+}
+
+_mise_activate_pwsh() {
+  # Powershell profile path varies, we use a common heuristic.
+  local _RC="$HOME/Documents/PowerShell/Microsoft.PowerShell_profile.ps1"
+  [ -d "$(dirname "$_RC")" ] || mkdir -p "$(dirname "$_RC")"
+  grep -q "mise activate pwsh" "$_RC" 2>/dev/null || echo '(&mise activate pwsh) | Out-String | Invoke-Expression' >>"$_RC"
+}
+
+_mise_activate_nu() {
+  # Nushell requires env.nu and config.nu updates.
+  local _NU_DIR="$HOME/.config/nushell"
+  [ -d "$_NU_DIR" ] || return 0
+  local _ENV="${_NU_DIR}/env.nu"
+  local _CONF="${_NU_DIR}/config.nu"
+  local _MISE_NU="${_NU_DIR}/mise.nu"
+
+  if [ ! -f "$_MISE_NU" ]; then
+    mise activate nu >"$_MISE_NU" 2>/dev/null || true
+  fi
+
+  # shellcheck disable=SC2016
+  grep -q "mise.nu" "$_ENV" 2>/dev/null || printf "let mise_path = \$nu.default-config-dir | path join mise.nu\n^mise activate nu | save \$mise_path --force\n" >>"$_ENV"
+  # shellcheck disable=SC2016
+  grep -q "mise.nu" "$_CONF" 2>/dev/null || printf "use (\$nu.default-config-dir | path join mise.nu)\n" >>"$_CONF"
+}
+
+_mise_activate_xonsh() {
+  local _RC="$HOME/.config/xonsh/rc.xsh"
+  [ -d "$(dirname "$_RC")" ] || mkdir -p "$(dirname "$_RC")"
+  # shellcheck disable=SC2016
+  grep -q "mise activate xonsh" "$_RC" 2>/dev/null || echo 'execx($(mise activate xonsh))' >>"$_RC"
+}
+
+_mise_activate_elvish() {
+  local _RC="$HOME/.config/elvish/rc.elv"
+  [ -d "$(dirname "$_RC")" ] || mkdir -p "$(dirname "$_RC")"
+  # shellcheck disable=SC2016
+  grep -q "mise activate elvish" "$_RC" 2>/dev/null || echo 'eval (mise activate elvish | slurp)' >>"$_RC"
+}
+
+# Helper to ensure mise is activated in the current session and RC files.
+_mise_apply_activation() {
+  local _SHELL="$1"
+  log_info "Synchronizing mise activation for ${_SHELL}..."
+
+  # 1. Permanent RC File Injection
+  case "$_SHELL" in
+  zsh) _mise_activate_zsh ;;
+  bash) _mise_activate_bash ;;
+  fish) _mise_activate_fish ;;
+  pwsh | powershell) _mise_activate_pwsh ;;
+  nu | nushell) _mise_activate_nu ;;
+  xonsh) _mise_activate_xonsh ;;
+  elvish) _mise_activate_elvish ;;
+  *) _mise_activate_bash ;;
+  esac
+
+  # 2. Ephemeral Session Activation
+  local _M_BIN
+  _M_BIN=$(command -v mise || echo "$HOME/.local/bin/mise")
+  if [ -x "$_M_BIN" ]; then
+    # PowerShell and Nushell activation in POSIX sh is complex/limited to shims.
+    # We focus on the most impactful session update: shims.
+    case "$_SHELL" in
+    pwsh | powershell | nu | nushell)
+      export PATH="$HOME/.local/share/mise/shims:$PATH"
+      ;;
+    *)
+      eval "$("$_M_BIN" activate "$_SHELL" --shims)"
+      ;;
+    esac
+    log_debug "mise environment synchronized for current session."
+  fi
+}
+
+bootstrap_mise() {
+  if command -v mise >/dev/null 2>&1; then
+    log_debug "mise is already installed."
+    _mise_apply_activation "$(_mise_detect_shell)"
+    return 0
+  fi
+
+  log_info "mise not found. Initiating multi-tier prioritized bootstrap..."
+  optimize_network
+
+  local _M_SHELL
+  _M_SHELL=$(_mise_detect_shell)
+  local _M_OS
+  _M_OS=$(_mise_detect_os)
+  local _M_ARCH
+  _M_ARCH=$(_mise_detect_arch)
+
+  # Priority 1: Official Streamer (Includes auto-activation for some methods)
+  if _mise_install_tier1 "$_M_SHELL"; then
+    log_success "mise installed via Tier 1 (Streamer)."
+  # Priority 2: System Package Managers
+  elif _mise_install_tier2; then
+    log_success "mise installed via Tier 2 (Package Manager)."
+  # Priority 3: Language Tools
+  elif _mise_install_tier3; then
+    log_success "mise installed via Tier 3 (Language Tool)."
+  # Priority 4: Manual Binary Fallback
+  elif _mise_install_tier4 "$_M_OS" "$_M_ARCH" "${MISE_VERSION#v}"; then
+    log_success "mise installed via Tier 4 (Manual Binary)."
+  else
+    log_error "All mise installation tiers failed."
     return 1
   fi
+
+  # ── 🏗️ Post-Install Configuration ──
+
+  # Finalize Activation
+  _mise_apply_activation "$_M_SHELL"
+
+  # Path Refresh
+  [ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
+
+  # Setup Completions
+  _mise_setup_completions "$_M_SHELL"
+
+  # Security & Automation: Trust project config
+  if [ -f ".mise.toml" ]; then
+    log_info "Trusting local .mise.toml..."
+    mise trust ".mise.toml" >/dev/null 2>&1 || true
+  fi
+
+  # Verify Health
+  _mise_verify_health
+
+  # Deploy uv as core dependency
+  log_info "Deploying uv via mise..."
+  run_mise install uv --global || log_warn "Warning: Failed to install uv via mise."
 }
 
 # ── 🌐 Network Optimization ──────────────────────────────────────────────────
@@ -266,8 +510,9 @@ EOF
     # Configure mise settings if mise is available
     if command -v mise >/dev/null 2>&1; then
       log_debug "Synchronizing mise mirror settings..."
-      # Use official url_replacements for GitHub mirroring
-      run_quiet mise settings set "url_replacements.https://github.com/" "${GITHUB_PROXY}https://github.com/" || true
+      # 1. mise url_replacements (SSoT for mise network acceleration)
+      run_mise settings set "url_replacements.https://github.com/" "${GITHUB_PROXY}https://github.com/"
+      run_mise settings set "url_replacements.https://api.github.com/" "${GITHUB_PROXY}https://api.github.com/" || true
       run_quiet mise settings set node.mirror_url "${MIRROR_NODEJS}" || true
     fi
   fi
