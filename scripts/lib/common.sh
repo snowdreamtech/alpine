@@ -168,14 +168,23 @@ _mise_detect_shell() {
 
 # Internal helper to detect the CPU architecture.
 _mise_detect_arch() {
+  local _OS="$1"
   local _ARCH
   _ARCH=$(uname -m)
   case "$_ARCH" in
-  x86_64 | amd64) echo "x64" ;;
-  arm64 | aarch64) echo "arm64" ;;
-  armv7*) echo "armv7" ;;
-  *) echo "x64" ;;
+  x86_64 | amd64) _ARCH="x64" ;;
+  arm64 | aarch64) _ARCH="arm64" ;;
+  armv7*) _ARCH="armv7" ;;
+  *) _ARCH="x64" ;;
   esac
+
+  if [ "$_OS" = "linux" ]; then
+    # Detect musl libc (common in Alpine and minimal Docker images)
+    if (ldd "$(command -v ls)" 2>&1 | grep -q "musl") || [ -f /lib/ld-musl-x86_64.so.1 ] || [ -f /lib/ld-musl-aarch64.so.1 ] || [ -f /lib/ld-musl-armhf.so.1 ]; then
+      _ARCH="${_ARCH}-musl"
+    fi
+  fi
+  echo "$_ARCH"
 }
 
 # Internal helper to detect the OS type.
@@ -428,7 +437,7 @@ bootstrap_mise() {
   local _M_OS
   _M_OS=$(_mise_detect_os)
   local _M_ARCH
-  _M_ARCH=$(_mise_detect_arch)
+  _M_ARCH=$(_mise_detect_arch "$_M_OS")
 
   # Priority 1: Official Streamer (Includes auto-activation for some methods)
   if _mise_install_tier1 "$_M_SHELL"; then
