@@ -418,13 +418,23 @@ setup_powershell() {
 
 # Purpose: Installs google-java-format for Java project linting.
 # Delegate: Managed by mise (.mise.toml)
+# WARNING: google-java-format has no prebuilt binary for linux/arm64.
+#          On ARM64 Linux, this step is skipped. Use: java -jar google-java-format.jar
 install_java_lint() {
   local _T0_JAVA
   _T0_JAVA=$(date +%s)
-  log_info "── Setting up Java Linter (google-java-format) ──"
 
   if ! has_lang_files "pom.xml build.gradle" "*.java"; then
     log_summary "Lint Tool" "Java Lint" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  # ARM64 Linux: no prebuilt binary available for google-java-format
+  _ARCH=$(uname -m)
+  _OS=$(uname -s)
+  if [ "$_OS" = "Linux" ] && [ "$_ARCH" = "aarch64" ]; then
+    log_warn "google-java-format has no prebuilt binary for linux/arm64. Skipping."
+    log_summary "Lint Tool" "Java Lint" "⚠️ ARM64 N/A" "-" "0"
     return 0
   fi
 
@@ -433,6 +443,7 @@ install_java_lint() {
     return 0
   fi
 
+  log_info "── Setting up Java Linter (google-java-format) ──"
   local _STAT_JAVA="✅ mise"
   run_mise install "github:google/google-java-format" || _STAT_JAVA="❌ Failed"
 
@@ -635,7 +646,8 @@ install_cargo_audit() {
   fi
 
   local _STAT_CRGO="✅ mise"
-  run_mise install "cargo:cargo-audit" || _STAT_CRGO="❌ Failed"
+  # Use prebuilt binary from github: backend to avoid needing cargo toolchain
+  run_mise install "github:rustsec/rustsec" || _STAT_CRGO="❌ Failed"
   log_summary "Security Tool" "Cargo-Audit" "$_STAT_CRGO" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_CRGO))"
 }
 
@@ -914,7 +926,8 @@ install_dotenv_linter() {
     return 0
   fi
   local _STAT_DOT="✅ mise"
-  run_mise install "github:dotenv-linter/dotenv-linter" || _STAT_DOT="❌ Failed"
+  # Use default backend (supports linux/arm64); github:dotenv-linter/dotenv-linter is darwin/amd64 only
+  run_mise install dotenv-linter || _STAT_DOT="❌ Failed"
   log_summary "Lint Tool" "dotenv-linter" "$_STAT_DOT" "$(get_version dotenv-linter)" "$(($(date +%s) - _T0_DOT))"
 }
 
