@@ -34,7 +34,7 @@ pre-commit install --hook-type commit-msg
 
 ### Other Languages
 
-`rubocop` (Ruby), `php-cs-fixer` (PHP), `psscriptanalyzer` (PowerShell), `swiftformat` / `swiftlint` (Swift), `dart format` (Dart), `dotnet-format` (.NET)
+`rubocop` (Ruby), `psscriptanalyzer` (PowerShell), `swiftformat` / `swiftlint` (Swift), `dart format` (Dart), `dotnet-format` (.NET)
 
 ### Git Hygiene
 

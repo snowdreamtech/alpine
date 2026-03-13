@@ -514,6 +514,11 @@ optimize_network() {
   postBuffer = 524288000
   lowSpeedLimit = 0
   lowSpeedTime = 999999
+  # Forcing basic auth to be handled correctly by proxy if needed,
+  # and ensuring protocol version 2 is used where possible.
+  extraHeader = "Git-Protocol: version=2"
+[protocol]
+  version = 2
 EOF
     export GIT_CONFIG_GLOBAL="$_TEMP_GIT_CONFIG"
     export GIT_CONFIG_SYSTEM="/dev/null"
@@ -595,12 +600,29 @@ run_mise() {
   fi
 
   while [ $_RETRY_COUNT -lt $_MAX_RETRIES ]; do
-    # shellcheck disable=SC2086
-    if run_quiet "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"; then
-      _STATUS=0
-      break
+    # ── Intelligent Fallback ──
+    # If first attempt failed and we have a global git proxy active,
+    # try running with proxy disabled for subsequent attempts.
+    if [ $_RETRY_COUNT -gt 0 ] && [ -n "$GIT_CONFIG_GLOBAL" ]; then
+      log_warn "Retrying without intelligent git proxy (falling back to direct connection)..."
+      if (
+        unset GIT_CONFIG_GLOBAL
+        # shellcheck disable=SC2086
+        run_quiet "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"
+      ); then
+        _STATUS=0
+        break
+      fi
     else
-      _RETRY_COUNT=$((_RETRY_COUNT + 1))
+      # shellcheck disable=SC2086
+      if run_quiet "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"; then
+        _STATUS=0
+        break
+      fi
+    fi
+
+    _RETRY_COUNT=$((_RETRY_COUNT + 1))
+    if [ $_RETRY_COUNT -lt $_MAX_RETRIES ]; then
       log_warn "mise command failed (attempt $_RETRY_COUNT/$_MAX_RETRIES). Retrying..."
       sleep 1
     fi

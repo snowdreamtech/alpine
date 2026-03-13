@@ -22,7 +22,6 @@ pre-commit install --hook-type commit-msg
 | `ruff`                      | Python                  | Linting + formatting         |
 | `gofmt` / `goimports`       | Go                      | Formatting, imports          |
 | `rustfmt`                   | Rust                    | Formatting                   |
-| `php-cs-fixer`              | PHP                     | Formatting                   |
 | `rubocop`                   | Ruby                    | Linting + formatting         |
 | `google-java-format`        | Java                    | Formatting                   |
 | `ktlint`                    | Kotlin                  | Formatting                   |

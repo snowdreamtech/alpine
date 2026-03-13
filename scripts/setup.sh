@@ -55,7 +55,6 @@ Modules (default: all):
   powershell         Setup PSScriptAnalyzer
   java               Install google-java-format
   ruby               Setup Rubocop
-  php                Install php-cs-fixer
   dart               Check Dart SDK
   swift              Install Swift linters (macOS)
   dotnet             Check .NET SDK
@@ -481,30 +480,6 @@ install_ruby_lint() {
   fi
 }
 
-# Purpose: Installs php-cs-fixer for PHP project linting.
-# Delegate: Managed by mise (.mise.toml)
-install_php_lint() {
-  local _T0_PHP
-  _T0_PHP=$(date +%s)
-  log_info "── Setting up PHP Linter (php-cs-fixer) ──"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Lint Tool" "PHP Lint" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "composer.json composer.lock" "*.php"; then
-    log_summary "Lint Tool" "PHP Lint" "⏭️ Skipped" "-" "0"
-    return 0
-  fi
-
-  local _STAT_PHP="✅ mise"
-  run_mise install php-cs-fixer || _STAT_PHP="❌ Failed"
-
-  local _DUR_PHP=$(($(date +%s) - _T0_PHP))
-  log_summary "Lint Tool" "PHP Lint" "$_STAT_PHP" "$(get_version php-cs-fixer)" "$_DUR_PHP"
-}
-
 # Purpose: Verifies Dart SDK availability.
 # Params:
 #   None
@@ -814,7 +789,7 @@ EOF
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
     # Full list for "On-demand" (default) or "All" (explicit)
-    _MODULES_LIST="node python gitleaks hadolint go checkmake iac powershell java ruby php dart swift dotnet security editorconfig-checker shfmt shellcheck actionlint hooks"
+    _MODULES_LIST="node python gitleaks hadolint go checkmake iac powershell java ruby dart swift dotnet security editorconfig-checker shfmt shellcheck actionlint hooks"
   else
     # Specific modules requested (e.g., ./setup.sh node)
     _MODULES_LIST="${_RAW_ARGS}"
@@ -831,18 +806,6 @@ EOF
     # Force Git protocol v2 and increase buffers to mitigate proxy handshake issues
     export GIT_PROTOCOL=version=2
     export MISE_GIT_ALWAYS_USE_GIX=0 # Fallback to system git for better proxy compatibility
-
-    # ── Plugin Synchronization ──
-    if grep -q "\[plugins\]" .mise.toml; then
-      # Handle corrupted plugins (folder exists but incomplete)
-      local _plugin_dir="$HOME/.local/share/mise/plugins/php-cs-fixer"
-      if [ -d "$_plugin_dir" ] && [ ! -f "$_plugin_dir/bin/list-all" ]; then
-        log_warn "Detected corrupted php-cs-fixer plugin. Cleaning up..."
-        rm -rf "$_plugin_dir"
-      fi
-
-      run_quiet mise plugins install --all
-    fi
 
     if [ "$_IS_ALL_MODULES" = "true" ]; then
       log_info "Synchronizing all tools from .mise.toml..."
@@ -864,7 +827,6 @@ EOF
     powershell) setup_powershell ;;
     java) install_java_lint ;;
     ruby) install_ruby_lint ;;
-    php) install_php_lint ;;
     dart) setup_dart ;;
     swift) setup_swift ;;
     dotnet) setup_dotnet ;;

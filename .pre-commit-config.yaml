@@ -326,13 +326,6 @@ repos:
         types: [ruby]
         description: "Ruby community style guide enforcement."
 
-      - id: php-cs-fixer
-        name: php-cs-fixer
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh php-cs-fixer fix --dry-run
-        types: [php]
-        description: "PHP coding standards fixer."
-
       - id: dart-format
         name: dart format
         language: system
