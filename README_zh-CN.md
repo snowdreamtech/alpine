@@ -70,11 +70,11 @@ graph TD
 
 ### 配置参考
 
-| 参数           | 用途       | 位置                    |
-| :------------- | :--------- | :---------------------- |
-| `PROJECT_NAME` | 项目身份   | `init-project.sh`       |
-| `GITHUB_PROXY` | 网络优化   | `scripts/lib/common.sh` |
-| `VERSION`      | 语义化版本 | `package.json`          |
+| 参数           | 用途                                       | 位置                    |
+| :------------- | :----------------------------------------- | :---------------------- |
+| `PROJECT_NAME` | 项目身份                                   | `init-project.sh`       |
+| `GITHUB_PROXY` | 网络优化 (见 [代理使用场](#-代理使用场景)) | `scripts/lib/common.sh` |
+| `VERSION`      | 语义化版本                                 | `package.json`          |
 
 ### 目录结构
 
@@ -154,6 +154,21 @@ make install
 - [完整文档](docs/index.md)
 - [项目术语表](docs/glossary.md)
 - [约定式提交](https://www.conventionalcommits.org/)
+
+### 🚀 代理使用场景
+
+`GITHUB_PROXY` (默认: `https://gh-proxy.sn0wdr1am.com/`) 针对特定的网络加速场景进行了优化。在不支持的协议（如 Git）上误用它会导致错误。
+
+| 场景                   | 是否支持      | 示例 / 说明                                    |
+| :--------------------- | :------------ | :--------------------------------------------- |
+| **Release 文件**       | ✅ 支持       | `.../releases/download/v1.0/tool.zip`          |
+| **源码归档 (Archive)** | ✅ 支持       | `.../archive/master.zip` 或 `.tar.gz`          |
+| **文件直接链接**       | ✅ 支持       | `.../blob/master/filename`                     |
+| **Git Clone**          | ❌ **不支持** | **请勿**用于 `git clone` 或 `insteadOf` 配置。 |
+| **项目文件夹**         | ❌ **不支持** | 不支持通过代理进行项目文件夹的浏览或克隆。     |
+
+> [!IMPORTANT]
+> 为了防止破坏工具链（如 `mise` 或 `asdf`），本模板显式禁用了通过此代理进行的 Git 重定向。请仅在脚本中进行直接 HTTP 下载时使用它。
 
 ---
 

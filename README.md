@@ -60,11 +60,11 @@ graph TD
 
 ### Configuration Reference
 
-| Parameter      | Purpose              | Location                |
-| :------------- | :------------------- | :---------------------- |
-| `PROJECT_NAME` | Project identity     | `init-project.sh`       |
-| `GITHUB_PROXY` | Network optimization | `scripts/lib/common.sh` |
-| `VERSION`      | Semantic versioning  | `package.json`          |
+| Parameter      | Purpose                                                           | Location                |
+| :------------- | :---------------------------------------------------------------- | :---------------------- |
+| `PROJECT_NAME` | Project identity                                                  | `init-project.sh`       |
+| `GITHUB_PROXY` | Network optimization (See [Proxy Usage](#-proxy-usage-scenarios)) | `scripts/lib/common.sh` |
+| `VERSION`      | Semantic versioning                                               | `package.json`          |
 
 ### File Structure
 
@@ -144,6 +144,21 @@ make install
 - [Full Documentation](docs/index.md)
 - [Project Glossary](docs/glossary.md)
 - [Conventional Commits](https://www.conventionalcommits.org/)
+
+### 🚀 Proxy Usage Scenarios
+
+The `GITHUB_PROXY` (default: `https://gh-proxy.sn0wdr1am.com/`) is optimized for specific network acceleration scenarios. Misusing it for unsupported protocols (like Git) will result in errors.
+
+| Scenario              | Supported? | Example / Note                                         |
+| :-------------------- | :--------- | :----------------------------------------------------- |
+| **Release Files**     | ✅ Yes     | `.../releases/download/v1.0/tool.zip`                  |
+| **Source Archives**   | ✅ Yes     | `.../archive/master.zip` or `.tar.gz`                  |
+| **Direct File Links** | ✅ Yes     | `.../blob/master/filename`                             |
+| **Git Clone**         | ❌ **No**  | Do **not** use for `git clone` or `insteadOf` configs. |
+| **Project Folders**   | ❌ **No**  | Browsing/cloning via proxy is not supported.           |
+
+> [!IMPORTANT]
+> To prevent breaking toolchains (like `mise` or `asdf`), this template explicitly disables Git redirection via this proxy. Use it only for direct HTTP downloads in scripts.
 
 ## 📄 License
 
