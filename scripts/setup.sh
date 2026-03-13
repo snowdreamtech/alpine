@@ -651,7 +651,7 @@ install_zizmor() {
 
   log_info "── Setting up Zizmor ──"
   local _STAT_ZIZ="✅ mise"
-  run_mise install "github:woodruffw/zizmor" || _STAT_ZIZ="❌ Failed"
+  run_mise install "pipx:zizmor" || _STAT_ZIZ="❌ Failed"
   log_summary "Security Tool" "Zizmor" "$_STAT_ZIZ" "$(get_version zizmor)" "$(($(date +%s) - _T0_ZIZ))"
 }
 
@@ -718,7 +718,7 @@ install_shfmt() {
     return 0
   fi
   local _STAT_SHF="✅ mise"
-  run_mise install shfmt || _STAT_SHF="❌ Failed"
+  run_mise install "pipx:shfmt-py" || _STAT_SHF="❌ Failed"
   log_summary "Lint Tool" "Shfmt" "$_STAT_SHF" "$(get_version shfmt)" "$(($(date +%s) - _T0_SHF))"
 }
 
@@ -735,7 +735,7 @@ install_shellcheck() {
 
   log_info "── Setting up Shellcheck ──"
   local _STAT_SHC="✅ mise"
-  run_mise install shellcheck || _STAT_SHC="❌ Failed"
+  run_mise install "pipx:shellcheck-py" || _STAT_SHC="❌ Failed"
   log_summary "Lint Tool" "Shellcheck" "$_STAT_SHC" "$(get_version shellcheck)" "$(($(date +%s) - _T0_SHC))"
 }
 
@@ -753,7 +753,7 @@ install_actionlint() {
 
   log_info "── Setting up Actionlint ──"
   local _STAT_ACT="✅ mise"
-  run_mise install "github:rhysd/actionlint" || _STAT_ACT="❌ Failed"
+  run_mise install "pipx:actionlint-py" || _STAT_ACT="❌ Failed"
   log_summary "Lint Tool" "Actionlint" "$_STAT_ACT" "$(get_version actionlint)" "$(($(date +%s) - _T0_ACT))"
 }
 
@@ -875,10 +875,8 @@ install_clang_format() {
     return 0
   fi
 
-  ensure_manager npm
-
   local _STAT_CF="✅ mise"
-  run_mise install "npm:clang-format" || _STAT_CF="❌ Failed"
+  run_mise install "pipx:clang-format" || _STAT_CF="❌ Failed"
   log_summary "Lint Tool" "clang-format" "$_STAT_CF" "$(get_version clang-format)" "$(($(date +%s) - _T0_CF))"
 }
 
@@ -906,7 +904,7 @@ install_ruff() {
     return 0
   fi
   local _STAT_RUF="✅ mise"
-  run_mise install ruff || _STAT_RUF="❌ Failed"
+  run_mise install "pipx:ruff" || _STAT_RUF="❌ Failed"
   log_summary "Lint Tool" "Ruff" "$_STAT_RUF" "$(get_version ruff)" "$(($(date +%s) - _T0_RUF))"
 }
 
@@ -920,7 +918,7 @@ install_yamllint() {
     return 0
   fi
   local _STAT_YL="✅ mise"
-  run_mise install yamllint || _STAT_YL="❌ Failed"
+  run_mise install "pipx:yamllint" || _STAT_YL="❌ Failed"
   log_summary "Lint Tool" "Yamllint" "$_STAT_YL" "$(get_version yamllint)" "$(($(date +%s) - _T0_YL))"
 }
 
@@ -965,8 +963,8 @@ install_dotenv_linter() {
     return 0
   fi
   local _STAT_DOT="✅ mise"
-  # Use default backend (supports linux/arm64); github:dotenv-linter/dotenv-linter is darwin/amd64 only
-  run_mise install dotenv-linter || _STAT_DOT="❌ Failed"
+  # Use pipx:dotenv-linter as requested
+  run_mise install "pipx:dotenv-linter" || _STAT_DOT="❌ Failed"
   log_summary "Lint Tool" "dotenv-linter" "$_STAT_DOT" "$(get_version dotenv-linter)" "$(($(date +%s) - _T0_DOT))"
 }
 
@@ -1123,7 +1121,7 @@ install_pre_commit() {
   _T0_PC=$(date +%s)
   log_info "── Setting up Pre-commit ──"
   local _STAT_PC="✅ mise"
-  run_mise install pre-commit || _STAT_PC="❌ Failed"
+  run_mise install "pipx:pre-commit" || _STAT_PC="❌ Failed"
   log_summary "Other" "Pre-commit" "$_STAT_PC" "$(get_version pre-commit --version)" "$(($(date +%s) - _T0_PC))"
 }
 

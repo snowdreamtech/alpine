@@ -15,7 +15,6 @@
 # GitHub Release-only tools (no npm/pipx alternatives available)
 # These rely on GitHub releases and benefit from proxy acceleration.
 # ------------------------------------------------------------
-"github:rhysd/actionlint" = "1.7.11"
 "github:golangci/golangci-lint" = "1.64.5"
 "go:golang.org/x/vuln/cmd/govulncheck" = "latest"
 "github:google/osv-scanner" = "2.3.3"
@@ -28,7 +27,6 @@
 # Installation via: cargo install cargo-audit (requires cargo/Rust toolchain)
 "github:terraform-linters/tflint" = "0.61.0"
 "github:aquasecurity/trivy" = "0.69.3"
-"github:woodruffw/zizmor" = "1.23.1"
 
 # ------------------------------------------------------------
 # Default provider tools (mise native provider is fastest here)
@@ -36,18 +34,12 @@
 # ------------------------------------------------------------
 bats = "1.13.0"
 checkmake = "0.3.2"
-clang-format = "19.1.7"
 editorconfig-checker = "3.6.1"
 gitleaks = "8.30.0"
 node = "20.18.3"
-pre-commit = "4.5.1"
 prettier = "3.5.2"
 python = "3.12.9"
-ruff = "0.15.6"
-shellcheck = "0.10.0"
-shfmt = "3.12.0"
 taplo = "0.10.0"
-yamllint = "1.38.0"
 
 # ------------------------------------------------------------
 # npm-based tools (best performance under weak networks)
@@ -67,9 +59,18 @@ yamllint = "1.38.0"
 # pipx-based tools (stable and mirror-friendly)
 # pipx benefits from PyPI mirrors (e.g., Tsinghua, Aliyun).
 # ------------------------------------------------------------
-"pipx:ansible-lint" = "26.3.0"
-"pipx:pip-audit" = "2.10.0"
+"pipx:pre-commit" = "4.5.1"
+"pipx:ruff" = "0.15.4"
+"pipx:yamllint" = "1.38.0"
 "pipx:sqlfluff" = "4.0.4"
+"pipx:ansible-lint" = "26.1.1"
+"pipx:shellcheck-py" = "0.11.0.1"
+"pipx:actionlint-py" = "1.7.11.24"
+"pipx:shfmt-py" = "3.12.0.2"
+"pipx:clang-format" = "19.1.7"
+"pipx:dotenv-linter" = "0.7.0"
+"pipx:pip-audit" = "2.8.0"
+"pipx:zizmor" = "1.3.1"
 pipx = "1.7.1"
 
 # ------------------------------------------------------------
