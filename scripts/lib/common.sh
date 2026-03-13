@@ -563,10 +563,12 @@ get_mise_tool_version() {
   _MISE_TOM_PATH=$(get_project_root)/.mise.toml
   [ -f "$_MISE_TOM_PATH" ] || return 0
 
-  # Basic grep/sed parsing for [tools] section
-  # Handles both tool = "version" and "tool:sub" = "version"
+  # Robust regex for [.mise.toml] parsing:
+  # - Matches lines starting with the tool name (optionally quoted)
+  # - Handles prefixes (npm:, cargo:, etc.)
+  # - Extracts the value inside double quotes
   grep -E "^\"?${_TOOL_NAME_MISE}\"?[[:space:]]*=" "$_MISE_TOM_PATH" 2>/dev/null |
-    sed -E 's/.*=[[:space:]]*"([^"]*)".*/\1/' | head -n 1 || true
+    sed -E 's/^[^=]*=[[:space:]]*"([^"]*)".*/\1/' | head -n 1 || true
 }
 
 # Purpose: Executes a mise command with retry logic and intelligent fallback.
@@ -586,17 +588,17 @@ run_mise() {
     local _REQ_VER
     _REQ_VER=$(get_mise_tool_version "$_TOOL_CHECK")
 
-    # 2. Normalize binary name for check (strip prefixes etc)
+    # 2. Normalize binary name for check (strip prefixes and Stoplight scope etc)
     local _TOOL_BASE
-    _TOOL_BASE=$(echo "$_TOOL_CHECK" | sed -E 's/^(github|aqua|cargo|npm|core)://; s/.*\///')
+    _TOOL_BASE=$(echo "$_TOOL_CHECK" | sed -E 's/^([^:]+:)?(@[^/]+\/)?//; s/.*\///')
 
     # 3. Current Version Check
     local _CUR_VER
     _CUR_VER=$(get_version "$_TOOL_BASE")
 
-    # 4. Rigorous Comparison (Software + Version)
+    # 4. Rigorous Comparison (Ensures exact match or prefix)
     if [ "$_CUR_VER" != "-" ] && [ -n "$_REQ_VER" ]; then
-      if [ "$_CUR_VER" = "$_REQ_VER" ] || echo "$_CUR_VER" | grep -q "$_REQ_VER"; then
+      if [ "$_CUR_VER" = "$_REQ_VER" ] || echo "$_CUR_VER" | grep -q "^${_REQ_VER}"; then
         log_debug "Tool $_TOOL_BASE v$_CUR_VER matches .mise.toml v$_REQ_VER. Skipping mise install."
         return 0
       fi
@@ -1134,14 +1136,20 @@ get_version() {
     go)
       "$_CMD_VER" version 2>&1 | head -n 1 | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
       ;;
-    node | python | cargo | dotnet | dart | pwsh)
-      "$_CMD_VER" "$_ARG_VER" 2>&1 | head -n 1 | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
+    node | python | cargo | dotnet | dart | pwsh | trivy | actionlint | tflint | kube-linter | ruff | yamllint | sqlfluff | shellcheck | shfmt | editorconfig-checker | golangci-lint | checkmake)
+      "$_CMD_VER" "$_ARG_VER" 2>&1 | head -n 1 | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -n 1 | cut -c1-15
       ;;
-    pip-audit)
+    pip-audit | govulncheck | zizmor)
       "$_CMD_VER" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
       ;;
-    govulncheck)
-      "$_CMD_VER" -version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
+    spectral)
+      "$_CMD_VER" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
+      ;;
+    OSV-Scanner | osv-scanner)
+      "$_CMD_VER" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
+      ;;
+    markdownlint-cli2 | markdownlint)
+      "$_CMD_VER" --version 2>&1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
       ;;
     swift)
       # Swift version output: "swift-driver version: 1.115 Apple Swift version 6.0.3 (swiftlang-6.0.3.1.10 ...)"
