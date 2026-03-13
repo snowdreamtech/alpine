@@ -510,6 +510,10 @@ optimize_network() {
     cat >"$_TEMP_GIT_CONFIG" <<EOF
 [url "${GITHUB_PROXY}https://github.com/"]
   insteadOf = https://github.com/
+[http]
+  postBuffer = 524288000
+  lowSpeedLimit = 0
+  lowSpeedTime = 999999
 EOF
     export GIT_CONFIG_GLOBAL="$_TEMP_GIT_CONFIG"
     export GIT_CONFIG_SYSTEM="/dev/null"
