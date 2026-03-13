@@ -1,6 +1,7 @@
 [tools]
 python = "3.12.9"
 node = "20.18.3"
+pipx = "1.7.1"
 gitleaks = "8.30.0"
 hadolint = "2.14.0"
 golangci-lint = "1.64.5"
