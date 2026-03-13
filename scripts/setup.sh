@@ -805,25 +805,26 @@ EOF
     fi
   fi
 
-  # ── Module Selection ──
+  # ── Mode & Module Selection ──
+  local _IS_ALL_MODULES=false
+  if echo " ${_RAW_ARGS} " | grep -q " all "; then
+    _IS_ALL_MODULES=true
+  fi
+
   local _MODULES_LIST
-  if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "${_RAW_ARGS# *}" = "all" ]; then
+  if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
+    # Full list for "On-demand" (default) or "All" (explicit)
     _MODULES_LIST="node python gitleaks hadolint go checkmake iac powershell java ruby php dart swift dotnet security editorconfig-checker shfmt shellcheck actionlint hooks"
   else
+    # Specific modules requested (e.g., ./setup.sh node)
     _MODULES_LIST="${_RAW_ARGS}"
   fi
 
   # 5. Bootstrap Toolchain Manager
   bootstrap_mise || log_warn "Warning: mise bootstrap failed. Falling back to local tool installation."
 
-  # 6. Optimized SSoT: Bulk install only if 'all' modules are requested.
-  # This maintains flexibility for individual module setups while providing
-  # performance boosts for the default full setup.
-  local _IS_ALL_MODULES=false
-  if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "${_RAW_ARGS# *}" = "all" ]; then
-    _IS_ALL_MODULES=true
-  fi
-
+  # 6. Optimized SSoT: Bulk install ONLY if 'all' is explicitly requested.
+  # This follows the principle of "On-demand" for the default behavior.
   if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_ALL_MODULES" = "true" ]; then
     log_info "Synchronizing all tools from .mise.toml..."
     run_mise install
