@@ -942,6 +942,45 @@ check_runtime() {
   fi
 }
 
+# Purpose: Detects the current CI platform by inspecting well-known environment variables.
+# Returns: Platform name string, or "local" if not in a CI environment.
+# Examples:
+#   PLATFORM=$(detect_ci_platform)
+detect_ci_platform() {
+  if [ "${FORGEJO_ACTIONS:-}" = "true" ]; then
+    echo "forgejo-actions"
+  elif [ "${GITEA_ACTIONS:-}" = "true" ]; then
+    echo "gitea-actions"
+  elif [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+    echo "github-actions"
+  elif [ "${GITLAB_CI:-}" = "true" ]; then
+    echo "gitlab-ci"
+  elif [ "${DRONE:-}" = "true" ]; then
+    echo "drone"
+  elif [ "${WOODPECKER_CI:-}" = "true" ] || [ "${CI:-}" = "woodpecker" ]; then
+    echo "woodpecker"
+  elif [ "${CIRCLECI:-}" = "true" ]; then
+    echo "circleci"
+  elif [ "${TRAVIS:-}" = "true" ]; then
+    echo "travis"
+  elif [ "${TF_BUILD:-}" = "true" ]; then
+    echo "azure-pipelines"
+  elif [ "${JENKINS_URL:-}" != "" ]; then
+    echo "jenkins"
+  elif [ "${CI:-}" = "true" ]; then
+    echo "ci-unknown"
+  else
+    echo "local"
+  fi
+}
+
+# Purpose: Returns true (0) if running in any CI environment, false (1) if local.
+# Examples:
+#   if is_ci_env; then echo "CI"; fi
+is_ci_env() {
+  [ "$(detect_ci_platform)" != "local" ]
+}
+
 # Purpose: Identifies the primary package manager on macOS.
 # Returns: "brew", "port", or "none"
 # Examples:

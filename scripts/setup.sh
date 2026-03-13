@@ -571,9 +571,16 @@ setup_dotnet() {
 
 # Purpose: Installs osv-scanner for vulnerability scanning.
 # Delegate: Managed by mise (.mise.toml)
+# NOTE: CI-only tool — heavy and slow. Skipped on local environments.
 install_osv_scanner() {
   local _T0_OSV
   _T0_OSV=$(date +%s)
+
+  if ! is_ci_env; then
+    log_summary "Security Tool" "OSV-Scanner" "⏭️ Local skip" "-" "0"
+    return 0
+  fi
+
   log_info "── Setting up OSV-Scanner ──"
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Security Tool" "OSV-Scanner" "⚖️ Previewed" "-" "0"
@@ -586,9 +593,16 @@ install_osv_scanner() {
 
 # Purpose: Installs Trivy for security scanning.
 # Delegate: Managed by mise (.mise.toml)
+# NOTE: CI-only tool — heavy and slow. Skipped on local environments.
 install_trivy() {
   local _T0_TRIVY
   _T0_TRIVY=$(date +%s)
+
+  if ! is_ci_env; then
+    log_summary "Security Tool" "Trivy" "⏭️ Local skip" "-" "0"
+    return 0
+  fi
+
   log_info "── Setting up Trivy ──"
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Security Tool" "Trivy" "⚖️ Previewed" "-" "0"
@@ -620,14 +634,22 @@ install_editorconfig_checker() {
 
 # Purpose: Installs zizmor for GitHub Actions auditing.
 # Delegate: Managed by mise (.mise.toml)
+# NOTE: CI-only tool — security audit. Skipped on local environments.
 install_zizmor() {
   local _T0_ZIZ
   _T0_ZIZ=$(date +%s)
-  log_info "── Setting up Zizmor ──"
-  if ! has_lang_files "" ".github/workflows/*.yml .github/workflows/*.yaml"; then
+
+  if ! is_ci_env; then
+    log_summary "Security Tool" "Zizmor" "⏭️ Local skip" "-" "0"
+    return 0
+  fi
+
+  if [ ! -d ".github/workflows" ]; then
     log_summary "Security Tool" "Zizmor" "⏭️ Skipped" "-" "0"
     return 0
   fi
+
+  log_info "── Setting up Zizmor ──"
   local _STAT_ZIZ="✅ mise"
   run_mise install "github:woodruffw/zizmor" || _STAT_ZIZ="❌ Failed"
   log_summary "Security Tool" "Zizmor" "$_STAT_ZIZ" "$(get_version zizmor)" "$(($(date +%s) - _T0_ZIZ))"
@@ -635,34 +657,51 @@ install_zizmor() {
 
 # Purpose: Installs cargo-audit for Rust projects.
 # Delegate: Managed by mise (.mise.toml)
+# NOTE: CI-only tool — security audit. Skipped on local environments.
 install_cargo_audit() {
   local _T0_CRGO
   _T0_CRGO=$(date +%s)
-  log_info "── Setting up Cargo-Audit ──"
+
+  if ! is_ci_env; then
+    log_summary "Security Tool" "Cargo-Audit" "⏭️ Local skip" "-" "0"
+    return 0
+  fi
 
   if ! has_lang_files "Cargo.toml Cargo.lock" "*.rs"; then
     log_summary "Security Tool" "Cargo-Audit" "⏭️ Skipped" "-" "0"
     return 0
   fi
 
+  log_info "── Setting up Cargo-Audit ──"
+  # cargo-audit requires cargo toolchain
+  if ! command -v cargo >/dev/null 2>&1; then
+    log_warn "cargo not found. Skipping cargo-audit."
+    log_summary "Security Tool" "Cargo-Audit" "⚠️ cargo missing" "-" "0"
+    return 0
+  fi
   local _STAT_CRGO="✅ mise"
-  # Use prebuilt binary from github: backend to avoid needing cargo toolchain
-  run_mise install "github:rustsec/rustsec" || _STAT_CRGO="❌ Failed"
+  run_mise install "cargo:cargo-audit" || _STAT_CRGO="❌ Failed"
   log_summary "Security Tool" "Cargo-Audit" "$_STAT_CRGO" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_CRGO))"
 }
 
 # Purpose: Installs govulncheck for Go projects.
 # Delegate: Managed by mise (.mise.toml)
+# NOTE: CI-only tool — vulnerability scanner. Skipped on local environments.
 install_govulncheck() {
   local _T0_VULN
   _T0_VULN=$(date +%s)
-  log_info "── Setting up Govulncheck ──"
+
+  if ! is_ci_env; then
+    log_summary "Security Tool" "Govulncheck" "⏭️ Local skip" "-" "0"
+    return 0
+  fi
 
   if ! has_lang_files "go.mod go.sum" "*.go"; then
     log_summary "Security Tool" "Govulncheck" "⏭️ Skipped" "-" "0"
     return 0
   fi
 
+  log_info "── Setting up Govulncheck ──"
   local _STAT_VULN="✅ mise"
   run_mise install "go:golang.org/x/vuln/cmd/govulncheck@latest" || _STAT_VULN="❌ Failed"
   log_summary "Security Tool" "Govulncheck" "$_STAT_VULN" "$(get_version govulncheck)" "$(($(date +%s) - _T0_VULN))"
@@ -1053,15 +1092,23 @@ install_commitizen() {
   log_summary "Other" "Commitizen" "$_STAT_CZ" "$(get_version git-cz --version)" "$(($(date +%s) - _T0_CZ))"
 }
 
-# Purpose: Installs pip-audit.
+# Purpose: Installs pip-audit for Python dependency vulnerability scanning.
+# NOTE: CI-only tool — security audit. Skipped on local environments.
 install_pip_audit() {
   local _T0_PA
   _T0_PA=$(date +%s)
-  log_info "── Setting up pip-audit ──"
+
+  if ! is_ci_env; then
+    log_summary "Security Tool" "pip-audit" "⏭️ Local skip" "-" "0"
+    return 0
+  fi
+
   if ! has_lang_files "requirements.txt pyproject.toml" "*.py"; then
     log_summary "Security Tool" "pip-audit" "⏭️ Skipped" "-" "0"
     return 0
   fi
+
+  log_info "── Setting up pip-audit ──"
   # Explicit manager check
   ensure_manager python3
   ensure_manager pipx
