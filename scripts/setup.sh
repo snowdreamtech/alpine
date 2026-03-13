@@ -322,28 +322,35 @@ install_checkmake() {
 }
 
 # Purpose: Installs TFLint.
+# Delegate: Managed by mise (.mise.toml)
 install_tflint() {
   local _T0_TF
   _T0_TF=$(date +%s)
-  log_info "── Setting up TFLint ──"
+
   if ! has_lang_files "" "*.tf"; then
     log_summary "Lint Tool" "TFLint" "⏭️ Skipped" "-" "0"
     return 0
   fi
+
+  log_info "── Setting up TFLint ──"
   local _STAT_TF="✅ mise"
   run_mise install "github:terraform-linters/tflint" || _STAT_TF="❌ Failed"
   log_summary "Lint Tool" "TFLint" "$_STAT_TF" "$(get_version tflint)" "$(($(date +%s) - _T0_TF))"
 }
 
 # Purpose: Installs Kube-Linter.
+# Delegate: Managed by mise (.mise.toml)
 install_kube_linter() {
   local _T0_KL
   _T0_KL=$(date +%s)
-  log_info "── Setting up Kube-Linter ──"
-  if ! has_lang_files "" "*.yaml *.yml"; then
+
+  # Enhanced guard: Detect K8s manifests or Helm charts
+  if ! has_lang_files "" "*.yaml *.yml CHARTS K8S"; then
     log_summary "Lint Tool" "Kube-Linter" "⏭️ Skipped" "-" "0"
     return 0
   fi
+
+  log_info "── Setting up Kube-Linter ──"
   local _STAT_KL="✅ mise"
   run_mise install "github:stackrox/kube-linter" || _STAT_KL="❌ Failed"
   log_summary "Lint Tool" "Kube-Linter" "$_STAT_KL" "$(get_version kube-linter)" "$(($(date +%s) - _T0_KL))"
@@ -669,40 +676,48 @@ install_shfmt() {
 install_shellcheck() {
   local _T0_SHC
   _T0_SHC=$(date +%s)
-  log_info "── Setting up Shellcheck ──"
+
   if ! has_lang_files "" "*.sh *.bash *.bats"; then
     log_summary "Lint Tool" "Shellcheck" "⏭️ Skipped" "-" "0"
     return 0
   fi
+
+  log_info "── Setting up Shellcheck ──"
   local _STAT_SHC="✅ mise"
   run_mise install shellcheck || _STAT_SHC="❌ Failed"
   log_summary "Lint Tool" "Shellcheck" "$_STAT_SHC" "$(get_version shellcheck)" "$(($(date +%s) - _T0_SHC))"
 }
 
-# Purpose: Installs actionlint for GitHub Actions linting.
+# Purpose: Installs actionlint for GitHub Actions.
 # Delegate: Managed by mise (.mise.toml)
 install_actionlint() {
   local _T0_ACT
   _T0_ACT=$(date +%s)
-  log_info "── Setting up Actionlint ──"
+
+  # Guard: Detect GHA workflows
   if ! has_lang_files "" ".github/workflows/*.yml .github/workflows/*.yaml"; then
     log_summary "Lint Tool" "Actionlint" "⏭️ Skipped" "-" "0"
     return 0
   fi
+
+  log_info "── Setting up Actionlint ──"
   local _STAT_ACT="✅ mise"
   run_mise install "github:rhysd/actionlint" || _STAT_ACT="❌ Failed"
   log_summary "Lint Tool" "Actionlint" "$_STAT_ACT" "$(get_version actionlint)" "$(($(date +%s) - _T0_ACT))"
 }
 
 # Purpose: Installs taplo for TOML formatting.
+# Delegate: Managed by mise (.mise.toml)
 install_taplo() {
   local _T0_TAP
   _T0_TAP=$(date +%s)
-  log_info "── Setting up Taplo ──"
+
   if ! has_lang_files "" "*.toml"; then
     log_summary "Lint Tool" "Taplo" "⏭️ Skipped" "-" "0"
     return 0
   fi
+
+  log_info "── Setting up Taplo ──"
   local _STAT_TAP="✅ mise"
   run_mise install taplo || _STAT_TAP="❌ Failed"
   log_summary "Lint Tool" "Taplo" "$_STAT_TAP" "$(get_version taplo)" "$(($(date +%s) - _T0_TAP))"
