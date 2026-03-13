@@ -263,7 +263,7 @@ install_hadolint() {
   fi
 
   local _STAT_HADO="✅ mise"
-  run_mise install hadolint || _STAT_HADO="❌ Failed"
+  run_mise install "aqua:hadolint/hadolint" || _STAT_HADO="❌ Failed"
 
   local _DUR_HADO=$(($(date +%s) - _T0_HADO))
   log_summary "Lint Tool" "Hadolint" "$_STAT_HADO" "$(get_version hadolint)" "$_DUR_HADO"
@@ -331,7 +331,7 @@ install_tflint() {
     return 0
   fi
   local _STAT_TF="✅ mise"
-  run_mise install tflint || _STAT_TF="❌ Failed"
+  run_mise install "aqua:terraform-linters/tflint" || _STAT_TF="❌ Failed"
   log_summary "Lint Tool" "TFLint" "$_STAT_TF" "$(get_version tflint)" "$(($(date +%s) - _T0_TF))"
 }
 
@@ -345,7 +345,7 @@ install_kube_linter() {
     return 0
   fi
   local _STAT_KL="✅ mise"
-  run_mise install kube-linter || _STAT_KL="❌ Failed"
+  run_mise install "aqua:stackrox/kube-linter" || _STAT_KL="❌ Failed"
   log_summary "Lint Tool" "Kube-Linter" "$_STAT_KL" "$(get_version kube-linter)" "$(($(date +%s) - _T0_KL))"
 }
 
@@ -562,7 +562,7 @@ install_osv_scanner() {
     return 0
   fi
   local _STAT_OSV="✅ mise"
-  run_mise install "github:google/osv-scanner" || _STAT_OSV="❌ Failed"
+  run_mise install "aqua:google/osv-scanner" || _STAT_OSV="❌ Failed"
   log_summary "Security Tool" "OSV-Scanner" "$_STAT_OSV" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV))"
 }
 
@@ -577,7 +577,7 @@ install_trivy() {
     return 0
   fi
   local _STAT_TRIVY="✅ mise"
-  run_mise install "github:aquasecurity/trivy" || _STAT_TRIVY="❌ Failed"
+  run_mise install "aqua:aquasecurity/trivy" || _STAT_TRIVY="❌ Failed"
   log_summary "Security Tool" "Trivy" "$_STAT_TRIVY" "$(get_version trivy)" "$(($(date +%s) - _T0_TRIVY))"
 }
 
@@ -611,7 +611,7 @@ install_zizmor() {
     return 0
   fi
   local _STAT_ZIZ="✅ mise"
-  run_mise install zizmor || _STAT_ZIZ="❌ Failed"
+  run_mise install "aqua:zizmorcore/zizmor" || _STAT_ZIZ="❌ Failed"
   log_summary "Security Tool" "Zizmor" "$_STAT_ZIZ" "$(get_version zizmor)" "$(($(date +%s) - _T0_ZIZ))"
 }
 
@@ -690,7 +690,7 @@ install_actionlint() {
     return 0
   fi
   local _STAT_ACT="✅ mise"
-  run_mise install "github:rhysd/actionlint" || _STAT_ACT="❌ Failed"
+  run_mise install "aqua:rhysd/actionlint" || _STAT_ACT="❌ Failed"
   log_summary "Lint Tool" "Actionlint" "$_STAT_ACT" "$(get_version actionlint)" "$(($(date +%s) - _T0_ACT))"
 }
 
@@ -748,7 +748,7 @@ install_goreleaser() {
     return 0
   fi
   local _STAT_GR="✅ mise"
-  run_mise install "github:goreleaser/goreleaser" || _STAT_GR="❌ Failed"
+  run_mise install "aqua:goreleaser/goreleaser" || _STAT_GR="❌ Failed"
   log_summary "Other" "GoReleaser" "$_STAT_GR" "$(get_version goreleaser)" "$(($(date +%s) - _T0_GR))"
 }
 
@@ -915,7 +915,7 @@ install_ansible_lint() {
   # Ansible-lint is often installed via pip/python
   ensure_manager python3
   local _STAT_ANS="✅ mise"
-  run_mise install ansible-lint || _STAT_ANS="❌ Failed"
+  run_mise install "pipx:ansible-lint" || _STAT_ANS="❌ Failed"
   log_summary "Lint Tool" "Ansible-lint" "$_STAT_ANS" "$(get_version ansible-lint)" "$(($(date +%s) - _T0_ANS))"
 }
 

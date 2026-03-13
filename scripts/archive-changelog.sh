@@ -63,7 +63,9 @@ run_archival_cleanup() {
   log_debug "Cleaning up temporary files..."
   rm -f "$_TMP_HEADER_CLN" "$_NEW_CHANGELOG_CLN" "$_TMP_SUMMARY_CLN"
   rm -rf "$_TMP_ARCH_DIR_CLN"
-  [ "${_DRY_RUN_CLN:-0}" -eq 0 ] && rmdir "$LOCK_DIR" 2>/dev/null || true
+  if [ "${_DRY_RUN_CLN:-0}" -eq 0 ]; then
+    rmdir "$LOCK_DIR" 2>/dev/null || true
+  fi
 }
 
 # Purpose: Main entry point for the changelog archival engine.
