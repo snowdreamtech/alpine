@@ -470,7 +470,7 @@ bootstrap_mise() {
   elif _mise_install_tier3; then
     log_success "mise installed via Tier 3 (Language Tool)."
   # Priority 4: Manual Binary Fallback
-  elif _mise_install_tier4 "$_M_OS" "$_M_ARCH" "${MISE_VERSION#v}"; then
+  elif _mise_install_tier4 "$_M_OS" "$_M_ARCH" "${MISE_VERSION#[vV]}"; then
     log_success "mise installed via Tier 4 (Manual Binary)."
   else
     log_error "All mise installation tiers failed."
@@ -582,6 +582,10 @@ run_mise() {
   local _RETRY_COUNT=0
   local _STATUS=1
 
+  # Defensive: Ensure mise is available even if PATH is slightly out of sync
+  local _M_BIN
+  _M_BIN=$(command -v mise || echo "$HOME/.local/bin/mise")
+
   # Propagate verbosity to mise
   local _MISE_OPTS=""
   if [ "${VERBOSE:-1}" -ge 2 ]; then
@@ -590,7 +594,7 @@ run_mise() {
 
   while [ $_RETRY_COUNT -lt $_MAX_RETRIES ]; do
     # shellcheck disable=SC2086
-    if run_quiet mise $_MISE_OPTS "$@"; then
+    if run_quiet "$_M_BIN" $_MISE_OPTS "$@"; then
       _STATUS=0
       break
     else
@@ -1064,7 +1068,8 @@ get_version() {
       ;;
     *)
       # For other binaries, try to get version from the output
-      "$_CMD_VER" "$_ARG_VER" 2>&1 | head -n 1 | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
+      # We strip 'v' or 'V' prefix and focus on the version number
+      "$_CMD_VER" "$_ARG_VER" 2>&1 | head -n 1 | sed 's/^[vV]//' | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
       ;;
     esac
   else
