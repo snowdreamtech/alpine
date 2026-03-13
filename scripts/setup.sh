@@ -770,7 +770,7 @@ install_taplo() {
 
   log_info "── Setting up Taplo ──"
   local _STAT_TAP="✅ mise"
-  run_mise install taplo || _STAT_TAP="❌ Failed"
+  run_mise install "npm:@taplo/cli" || _STAT_TAP="❌ Failed"
   log_summary "Lint Tool" "Taplo" "$_STAT_TAP" "$(get_version taplo)" "$(($(date +%s) - _T0_TAP))"
 }
 
@@ -889,8 +889,9 @@ install_ktlint() {
     log_summary "Lint Tool" "ktlint" "⏭️ Skipped" "-" "0"
     return 0
   fi
+  ensure_manager npm
   local _STAT_KT="✅ mise"
-  run_mise install "github:pinterest/ktlint" || _STAT_KT="❌ Failed"
+  run_mise install "npm:@naturalcycles/ktlint" || _STAT_KT="❌ Failed"
   log_summary "Lint Tool" "ktlint" "$_STAT_KT" "$(get_version ktlint --version)" "$(($(date +%s) - _T0_KT))"
 }
 
@@ -993,8 +994,9 @@ install_bats() {
     log_summary "Test Tool" "Bats" "⏭️ Skipped" "-" "0"
     return 0
   fi
+  ensure_manager npm
   local _STAT_BATS="✅ mise"
-  run_mise install bats || _STAT_BATS="❌ Failed"
+  run_mise install "npm:bats" || _STAT_BATS="❌ Failed"
   log_summary "Test Tool" "Bats" "$_STAT_BATS" "$(get_version bats --version)" "$(($(date +%s) - _T0_BATS))"
 }
 
@@ -1006,6 +1008,11 @@ install_bats_libs() {
 
   if ! has_lang_files "" "*.bats"; then
     log_summary "Test Tool" "Bats-Libs" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Test Tool" "Bats-Libs" "⚖️ Previewed" "-" "0"
     return 0
   fi
 

@@ -20,7 +20,6 @@
 "github:google/osv-scanner" = "2.3.3"
 "github:goreleaser/goreleaser" = "2.14.3"
 "github:hadolint/hadolint" = "2.14.0"
-"github:pinterest/ktlint" = "1.8.0"
 "github:stackrox/kube-linter" = "0.8.3"
 # cargo-audit: NOT listed here — installed on-demand by setup.sh only when Cargo.toml exists.
 # The rustsec/rustsec repo uses non-standard release tag format; there's no cross-platform prebuilt.
@@ -32,27 +31,33 @@
 # Default provider tools (mise native provider is fastest here)
 # These tools have stable binary distributions or cached providers.
 # ------------------------------------------------------------
-bats = "1.13.0"
 checkmake = "0.3.2"
 editorconfig-checker = "3.6.1"
 gitleaks = "8.30.0"
 node = "20.18.3"
-prettier = "3.5.2"
 python = "3.12.9"
-taplo = "0.10.0"
 
 # ------------------------------------------------------------
 # npm-based tools (best performance under weak networks)
 # npm registry can be mirrored (e.g., npmmirror.com) for speed.
 # ------------------------------------------------------------
-"npm:@commitlint/cli" = "20.4.4"
-"npm:@stoplight/spectral-cli" = "6.13.1"
+"npm:@commitlint/cli" = "20.4.3"
+"npm:@commitlint/config-conventional" = "20.4.3"
+"npm:@naturalcycles/ktlint" = "1.16.1"
+"npm:@stoplight/spectral-cli" = "6.11.1"
+"npm:@taplo/cli" = "0.7.0"
+"npm:bats" = "1.13.0"
+"npm:bats-assert" = "2.2.4"
+"npm:bats-support" = "0.3.0"
 "npm:commitizen" = "4.3.1"
+"npm:cz-conventional-changelog" = "3.3.0"
 "npm:dockerfile-utils" = "0.16.3"
-"npm:eslint" = "9.21.0"
-"npm:markdownlint-cli2" = "0.17.2"
+"npm:eslint" = "10.0.3"
+"npm:markdownlint-cli2" = "0.21.0"
+"npm:prettier" = "3.8.1"
 "npm:sort-package-json" = "3.6.1"
-"npm:stylelint" = "16.15.0"
+"npm:stylelint" = "16.26.1"
+"npm:stylelint-config-standard" = "37.0.0"
 "npm:vitepress" = "1.6.4"
 
 # ------------------------------------------------------------
