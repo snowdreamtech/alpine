@@ -83,14 +83,14 @@ main() {
     exit 1
   fi
 
-  # 4. Execute VitePress via NPM
+  # 4. Execute VitePress
   case "$_COMMAND_DOC" in
   dev)
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would start VitePress dev server on $DOCS_DIR"
     else
       log_info "Starting development server..."
-      "$NPM" exec vitepress dev "$DOCS_DIR"
+      vitepress dev "$DOCS_DIR"
     fi
     ;;
   build)
@@ -98,7 +98,7 @@ main() {
       log_success "DRY-RUN: Would build VitePress site from $DOCS_DIR"
     else
       log_info "Building documentation site..."
-      "$NPM" exec vitepress build "$DOCS_DIR"
+      vitepress build "$DOCS_DIR"
       log_success "\n✨ Build complete! Artifacts are in $DOCS_DIR/.vitepress/dist"
     fi
     ;;
@@ -107,7 +107,7 @@ main() {
       log_success "DRY-RUN: Would preview VitePress site in $DOCS_DIR"
     else
       log_info "Previewing production build..."
-      "$NPM" exec vitepress preview "$DOCS_DIR"
+      vitepress preview "$DOCS_DIR"
     fi
     ;;
   esac

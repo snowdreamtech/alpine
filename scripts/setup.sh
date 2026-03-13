@@ -78,6 +78,14 @@ Modules (default: all):
   markdownlint       Install markdownlint
   ansible-lint       Install ansible-lint
   dotenv-linter      Install dotenv-linter
+  bats               Install bats
+  bats-libs          Vendor bats libraries
+  eslint             Install eslint
+  stylelint          Install stylelint
+  vitepress          Install vitepress
+  commitizen         Install commitizen
+  pip-audit          Install pip-audit
+  pre-commit         Install pre-commit
   hooks              Activate Pre-commit Hooks
   all                Run all of the above
 
@@ -910,6 +918,137 @@ install_ansible_lint() {
   log_summary "Lint Tool" "Ansible-lint" "$_STAT_ANS" "$(get_version ansible-lint)" "$(($(date +%s) - _T0_ANS))"
 }
 
+# Purpose: Installs bats.
+install_bats() {
+  local _T0_BATS
+  _T0_BATS=$(date +%s)
+  log_info "── Setting up Bats ──"
+  if ! has_lang_files "" "*.bats"; then
+    log_summary "Test Tool" "Bats" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  local _STAT_BATS="✅ mise"
+  run_mise install bats || _STAT_BATS="❌ Failed"
+  log_summary "Test Tool" "Bats" "$_STAT_BATS" "$(get_version bats --version)" "$(($(date +%s) - _T0_BATS))"
+}
+
+# Purpose: Vendors bats-support and bats-assert for tests.
+install_bats_libs() {
+  local _T0_BL
+  _T0_BL=$(date +%s)
+  log_info "── Vendoring Bats Libraries ──"
+
+  if ! has_lang_files "" "*.bats"; then
+    log_summary "Test Tool" "Bats-Libs" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _VENDOR_DIR="vendor"
+  mkdir -p "$_VENDOR_DIR"
+
+  # SSoT: Download from GitHub via GITHUB_PROXY
+  # bats-support
+  if [ ! -d "$_VENDOR_DIR/bats-support" ]; then
+    log_info "Downloading bats-support..."
+    download_file "${GITHUB_PROXY}https://github.com/bats-core/bats-support/archive/refs/tags/v0.3.0.tar.gz" "$_VENDOR_DIR/bats-support.tar.gz"
+    mkdir -p "$_VENDOR_DIR/bats-support"
+    tar -xzf "$_VENDOR_DIR/bats-support.tar.gz" -C "$_VENDOR_DIR/bats-support" --strip-components=1
+    rm "$_VENDOR_DIR/bats-support.tar.gz"
+  fi
+
+  # bats-assert
+  if [ ! -d "$_VENDOR_DIR/bats-assert" ]; then
+    log_info "Downloading bats-assert..."
+    download_file "${GITHUB_PROXY}https://github.com/bats-core/bats-assert/archive/refs/tags/v2.1.0.tar.gz" "$_VENDOR_DIR/bats-assert.tar.gz"
+    mkdir -p "$_VENDOR_DIR/bats-assert"
+    tar -xzf "$_VENDOR_DIR/bats-assert.tar.gz" -C "$_VENDOR_DIR/bats-assert" --strip-components=1
+    rm "$_VENDOR_DIR/bats-assert.tar.gz"
+  fi
+
+  log_summary "Test Tool" "Bats-Libs" "✅ Vendored" "v0.3.0/v2.1.0" "$(($(date +%s) - _T0_BL))"
+}
+
+# Purpose: Installs eslint.
+install_eslint() {
+  local _T0_ES
+  _T0_ES=$(date +%s)
+  log_info "── Setting up ESLint ──"
+  if ! has_lang_files "package.json" "*.js *.ts *.vue *.jsx *.tsx"; then
+    log_summary "Lint Tool" "ESLint" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  ensure_manager npm
+  local _STAT_ES="✅ mise"
+  run_mise install "npm:eslint" || _STAT_ES="❌ Failed"
+  log_summary "Lint Tool" "ESLint" "$_STAT_ES" "$(get_version eslint --version)" "$(($(date +%s) - _T0_ES))"
+}
+
+# Purpose: Installs stylelint.
+install_stylelint() {
+  local _T0_SL
+  _T0_SL=$(date +%s)
+  log_info "── Setting up Stylelint ──"
+  if ! has_lang_files "" "*.css *.scss *.less *.vue"; then
+    log_summary "Lint Tool" "Stylelint" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  ensure_manager npm
+  local _STAT_SL="✅ mise"
+  run_mise install "npm:stylelint" || _STAT_SL="❌ Failed"
+  log_summary "Lint Tool" "Stylelint" "$_STAT_SL" "$(get_version stylelint --version)" "$(($(date +%s) - _T0_SL))"
+}
+
+# Purpose: Installs vitepress.
+install_vitepress() {
+  local _T0_VP
+  _T0_VP=$(date +%s)
+  log_info "── Setting up VitePress ──"
+  if [ ! -d docs ]; then
+    log_summary "Doc Tool" "VitePress" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  ensure_manager npm
+  local _STAT_VP="✅ mise"
+  run_mise install "npm:vitepress" || _STAT_VP="❌ Failed"
+  log_summary "Doc Tool" "VitePress" "$_STAT_VP" "$(get_version vitepress --version)" "$(($(date +%s) - _T0_VP))"
+}
+
+# Purpose: Installs commitizen.
+install_commitizen() {
+  local _T0_CZ
+  _T0_CZ=$(date +%s)
+  log_info "── Setting up Commitizen ──"
+  ensure_manager npm
+  local _STAT_CZ="✅ mise"
+  run_mise install "npm:commitizen" || _STAT_CZ="❌ Failed"
+  log_summary "Other" "Commitizen" "$_STAT_CZ" "$(get_version git-cz --version)" "$(($(date +%s) - _T0_CZ))"
+}
+
+# Purpose: Installs pip-audit.
+install_pip_audit() {
+  local _T0_PA
+  _T0_PA=$(date +%s)
+  log_info "── Setting up pip-audit ──"
+  if ! has_lang_files "requirements.txt pyproject.toml" "*.py"; then
+    log_summary "Security Tool" "pip-audit" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  ensure_manager pipx
+  local _STAT_PA="✅ mise"
+  run_mise install "pipx:pip-audit" || _STAT_PA="❌ Failed"
+  log_summary "Security Tool" "pip-audit" "$_STAT_PA" "$(get_version pip-audit --version)" "$(($(date +%s) - _T0_PA))"
+}
+
+# Purpose: Installs pre-commit.
+install_pre_commit() {
+  local _T0_PC
+  _T0_PC=$(date +%s)
+  log_info "── Setting up Pre-commit ──"
+  local _STAT_PC="✅ mise"
+  run_mise install pre-commit || _STAT_PC="❌ Failed"
+  log_summary "Other" "Pre-commit" "$_STAT_PC" "$(get_version pre-commit --version)" "$(($(date +%s) - _T0_PC))"
+}
+
 # Purpose: Sets up several security audit tools (OSV-Scanner, Trivy, Zizmor, etc.).
 # Params:
 #   None
@@ -1017,7 +1156,7 @@ EOF
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
     # Full list for "On-demand" (default) or "All" (explicit)
-    _MODULES_LIST="node python gitleaks hadolint go checkmake iac powershell java ruby dart swift dotnet security editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter hooks"
+    _MODULES_LIST="node python gitleaks hadolint go checkmake iac powershell java ruby dart swift dotnet security editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit pre-commit hooks"
   else
     # Specific modules requested (e.g., ./setup.sh node)
     _MODULES_LIST="${_RAW_ARGS}"
@@ -1077,6 +1216,14 @@ EOF
     markdownlint) install_markdownlint ;;
     ansible-lint) install_ansible_lint ;;
     dotenv-linter) install_dotenv_linter ;;
+    bats) install_bats ;;
+    bats-libs) install_bats_libs ;;
+    eslint) install_eslint ;;
+    stylelint) install_stylelint ;;
+    vitepress) install_vitepress ;;
+    commitizen) install_commitizen ;;
+    pip-audit) install_pip_audit ;;
+    pre-commit) install_pre_commit ;;
     hooks) setup_hooks ;;
     *) log_error "Unknown module: $_cur_module" ;;
     esac

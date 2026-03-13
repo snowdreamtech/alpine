@@ -967,15 +967,17 @@ has_lang_files() {
 # Returns: Version string (detected) or "0.0.0" (fallback).
 # Examples:
 #   VER=$(get_project_version)
+VERSION_FILE="VERSION"
+
 get_project_version() {
-  if [ -f "package.json" ]; then
+  if [ -f "$VERSION_FILE" ]; then
+    head -n 1 "$VERSION_FILE" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+  elif [ -f "package.json" ]; then
     grep '"version":' "package.json" | head -n 1 | sed 's/.*"version":[[:space:]]*"//;s/".*//'
   elif [ -f "Cargo.toml" ]; then
     grep '^version =' "Cargo.toml" | head -n 1 | sed -e 's/.*"\(.*\)"/\1/' -e "s/.*'\(.*\)'/\1/"
   elif [ -f "pyproject.toml" ]; then
     grep '^version =' "pyproject.toml" | head -n 1 | sed 's/.*"//;s/".*//'
-  elif [ -f "VERSION" ]; then
-    head -n 1 "VERSION" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
   else
     # Fallback to git tag if available
     if command -v git >/dev/null 2>&1 && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
