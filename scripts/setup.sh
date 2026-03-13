@@ -344,8 +344,8 @@ install_kube_linter() {
   local _T0_KL
   _T0_KL=$(date +%s)
 
-  # Enhanced guard: Detect K8s manifests or Helm charts
-  if ! has_lang_files "" "*.yaml *.yml CHARTS K8S"; then
+  # Enhanced guard: Detect K8s manifests or Helm charts ONLY
+  if ! has_lang_files "" "CHARTS K8S"; then
     log_summary "Lint Tool" "Kube-Linter" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -694,8 +694,8 @@ install_actionlint() {
   local _T0_ACT
   _T0_ACT=$(date +%s)
 
-  # Guard: Detect GHA workflows
-  if ! has_lang_files "" ".github/workflows/*.yml .github/workflows/*.yaml"; then
+  # Guard: Detect GHA workflows folder only
+  if [ ! -d ".github/workflows" ]; then
     log_summary "Lint Tool" "Actionlint" "⏭️ Skipped" "-" "0"
     return 0
   fi
