@@ -624,8 +624,16 @@ run_mise() {
       ;;
     pipx:*)
       if ! command -v pipx >/dev/null 2>&1; then
-        log_error "Cannot install '$_TOOL_CHECK': 'pipx' is missing. Please run 'make setup' or install pipx first."
-        return 1
+        log_info "pipx not found — bootstrapping via mise..."
+        local _M_BIN_PIPX
+        _M_BIN_PIPX=$(command -v mise 2>/dev/null || echo "$HOME/.local/bin/mise")
+        "$_M_BIN_PIPX" install pipx >/dev/null 2>&1 || true
+        # Refresh PATH for mise shims
+        export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
+        if ! command -v pipx >/dev/null 2>&1; then
+          log_error "Cannot install '$_TOOL_CHECK': 'pipx' is missing even after bootstrap. Please run 'make setup' or install pipx first."
+          return 1
+        fi
       fi
       ;;
     npm:*)
