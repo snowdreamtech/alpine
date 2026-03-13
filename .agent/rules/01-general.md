@@ -17,6 +17,9 @@
 - Prefer **declarative** over imperative configuration (e.g., desired-state IaC like Terraform/Ansible over ad-hoc shell scripts). Declarative configs are self-documenting and inherently idempotent when applied correctly.
 - Avoid side effects in initialization code. Setup scripts must be safe to re-run without human intervention.
 - **Objective Truth over Subjective Assumption**: All technical decisions, including version pinning, configuration defaults, and feature availability, MUST be based on objective facts verified through documentation, search, or direct testing. NEVER assume or "guess" a version number or a tool's behavior based on similar tools. If uncertainty exists, it MUST be explicitly stated and resolved through verification before implementation.
+- **Robustness Principle (输入宽容、输出严谨)**: All components, scripts, and APIs MUST be tolerant of variations in input while remaining strict and standardized in their output.
+  - **Input Tolerance**: Support variations such as case-insensitive version prefixes (`v`, `V`), trailing slashes in URLs, or flexible boolean strings (`true`, `1`, `yes`).
+  - **Output Strictness**: Guarantee consistent, predictable, and standardized output formats (e.g., pure numeric version strings, canonicalized paths, strictly formatted JSON).
 - **CLI-First Efficiency**: When performing research, validation, or environment inspection, command-line tools (CLI) MUST be prioritized over browser-based methods. Browser interaction should only be used as a secondary fallback when CLI tools are unavailable or insufficient for the task, to minimize latency and improve execution speed.
 - When a non-idempotent operation is unavoidable, guard it explicitly:
 

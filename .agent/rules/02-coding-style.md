@@ -43,6 +43,7 @@
 - **DRY (Don't Repeat Yourself)**: Extract shared logic into reusable functions, modules, or helpers. Duplicated code is a bug waiting to diverge — every copy needs to be kept in sync.
 - **KISS (Keep It Simple, Stupid)**: Prefer simple, readable solutions over clever or overly abstract ones. Complexity must earn its keep with measurable benefit.
 - **YAGNI (You Aren't Gonna Need It)**: Do not implement features speculatively. Build only what is needed now. Premature abstractions are technical debt.
+- **Robustness Principle (Postel's Law)**: Be conservative in what you send, and liberal in what you accept. Handle input variations gracefully (e.g., `v` prefixes in versions) but enforce strict internal standards for data consistency.
 - **Single Responsibility**: Functions and classes should do one thing and do it well. If a function needs a conjunction ("and", "or") in its name, split it into two functions.
 - **Cyclomatic Complexity**: Keep per-function cyclomatic complexity ≤ 15. Functions exceeding this threshold are strong candidates for decomposition. Most linters (`eslint complexity`, `pylint`, `gocyclo`) can enforce this automatically.
 - **SOLID** (for OOP contexts):
