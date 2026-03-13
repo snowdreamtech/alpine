@@ -1,5 +1,6 @@
-[tools]
 python = "3.12.9"
+go = "1.23.6"
+rust = "1.85.0"
 node = "20.18.3"
 pnpm = "10.5.2"
 yarn = "1.22.22"
@@ -29,6 +30,13 @@ taplo = "0.9.3"
 "npm:dockerfile-utils" = "0.7.1"
 "npm:clang-format" = "1.8.0"
 "github:pinterest/ktlint" = "1.5.0"
+"github:dotenv-linter/dotenv-linter" = "3.3.0"
+ruff = "0.9.9"
+yamllint = "1.35.1"
+sqlfluff = "3.3.1"
+"npm:markdownlint-cli2" = "0.17.2"
+ansible-lint = "26.1.1"
+"go:golang.org/x/vuln/cmd/govulncheck" = "latest"
 
 [settings]
 experimental = true
