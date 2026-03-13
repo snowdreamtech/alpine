@@ -85,7 +85,6 @@ MIRROR_RUST_UPDATE="${MIRROR_RUST_UPDATE:-https://mirrors.ustc.edu.cn/rust-stati
 # Runtime versions (Managed via .mise.toml, but some logic might still reference these for bootstrap purposes)
 # Only MISE and UV are hardcoded here to facilitate the zero-dependency bootstrap phase.
 MISE_VERSION="${MISE_VERSION:-2026.3.8}"
-UV_VERSION="${UV_VERSION:-0.10.9}"
 
 # Note: All other tools (Gitleaks, Shellcheck, Shfmt, Java Format, etc.) are purely managed
 # by the project's .mise.toml file. Do not add hardcoded version variables here.
