@@ -128,42 +128,34 @@ setup_node() {
   local _T0_NODE
   _T0_NODE=$(date +%s)
   log_info "── Setting up Node.js & pnpm ──"
+
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Node.js" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
-  if command -v mise >/dev/null 2>&1; then
-    log_debug "Using mise for Node.js..."
-    run_mise install node pnpm
-    eval "$(mise activate bash --shims)"
-  elif command -v corepack >/dev/null 2>&1; then
-    corepack enable
-  fi
+  # 1. Smart Installation via mise (SSoT: .mise.toml)
+  run_mise install node pnpm yarn bun
 
+  # 2. Activate environment for subsequent steps
+  eval "$(mise activate bash --shims)"
+
+  # 3. Project dependencies
   if [ -f package.json ]; then
     local _STAT_NODE="✅ Installed"
+    # shellcheck disable=SC2154
     run_quiet "$NPM" install || _STAT_NODE="❌ Failed"
-    local _VER_NODE
-    _VER_NODE=$(get_version node)
+
     local _DUR_NODE
     _DUR_NODE=$(($(date +%s) - _T0_NODE))
-    log_summary "Runtime" "Node.js" "$_STAT_NODE" "$_VER_NODE" "$_DUR_NODE"
+    log_summary "Runtime" "Node.js" "$_STAT_NODE" "$(get_version node)" "$_DUR_NODE"
 
     if [ "$_STAT_NODE" = "✅ Installed" ]; then
-      # Detect Frameworks from package.json
-      if grep -q '"vitepress"' package.json; then
-        log_summary "Framework" "VitePress" "✅ Detected" "$(get_version "$NPM" "exec vitepress --version")" "0"
-      fi
-      if grep -q '"vue"' package.json; then
-        log_summary "Framework" "Vue" "✅ Detected" "-" "0"
-      fi
-      if grep -q '"react"' package.json; then
-        log_summary "Framework" "React" "✅ Detected" "-" "0"
-      fi
-      if grep -q '"tailwindcss"' package.json; then
-        log_summary "Framework" "Tailwind" "✅ Detected" "-" "0"
-      fi
+      # Detect Frameworks from package.json for summary
+      if grep -q '"vitepress"' package.json; then log_summary "Framework" "VitePress" "✅ Detected" "$(get_version node "exec vitepress --version")" "0"; fi
+      if grep -q '"vue"' package.json; then log_summary "Framework" "Vue" "✅ Detected" "-" "0"; fi
+      if grep -q '"react"' package.json; then log_summary "Framework" "React" "✅ Detected" "-" "0"; fi
+      if grep -q '"tailwindcss"' package.json; then log_summary "Framework" "Tailwind" "✅ Detected" "-" "0"; fi
     fi
   else
     log_summary "Runtime" "Node.js" "⏭️ Skipped" "-" "0"
@@ -179,43 +171,33 @@ setup_python() {
   local _T0_PY
   _T0_PY=$(date +%s)
   log_info "── Setting up Python Virtual Environment ──"
+
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Python" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
-  if command -v mise >/dev/null 2>&1; then
-    log_debug "Using mise for Python..."
-    run_mise install python uv
-    eval "$(mise activate bash --shims)"
-  fi
+  # 1. Smart Installation via mise (SSoT: .mise.toml)
+  run_mise install python uv
+  eval "$(mise activate bash --shims)"
 
+  # 2. Venv check
   local _STAT_PY="✅ Installed"
   if [ ! -d "$VENV" ]; then
-    if command -v uv >/dev/null 2>&1; then
-      log_info "Creating virtual environment using uv..."
-      uv venv "$VENV" || _STAT_PY="❌ Failed"
-    else
-      "$PYTHON" -m venv "$VENV" || _STAT_PY="❌ Failed"
-    fi
+    log_info "Creating virtual environment using uv..."
+    # shellcheck disable=SC2154
+    run_quiet uv venv "$VENV" || _STAT_PY="❌ Failed"
   fi
 
-  if [ "$_STAT_PY" = "✅ Installed" ]; then
-    run_quiet "$VENV/bin/pip" install --upgrade pip || _STAT_PY="⚠️ Warning"
+  # 3. Dependencies
+  if [ "$_STAT_PY" = "✅ Installed" ] && [ -d "$VENV" ]; then
     if [ -f requirements-dev.txt ]; then
-      run_quiet "$VENV/bin/pip" install -r requirements-dev.txt || _STAT_PY="❌ Failed"
+      run_quiet "$VENV/bin/pip" install -r requirements-dev.txt || _STAT_PY="⚠️ Warning"
     fi
   fi
 
-  if [ -d "$VENV" ]; then
-    local _VER_PY
-    _VER_PY=$(get_version "$VENV/bin/python")
-    local _DUR_PY
-    _DUR_PY=$(($(date +%s) - _T0_PY))
-    log_summary "Runtime" "Python" "$_STAT_PY" "$_VER_PY" "$_DUR_PY"
-  else
-    log_summary "Runtime" "Python" "❌ Failed" "-" "0"
-  fi
+  local _DUR_PY=$(($(date +%s) - _T0_PY))
+  log_summary "Runtime" "Python" "$_STAT_PY" "$(get_version "$VENV/bin/python")" "$_DUR_PY"
 }
 
 # Purpose: Installs Gitleaks for secrets scanning.
@@ -224,7 +206,6 @@ install_gitleaks() {
   local _T0_GITL
   _T0_GITL=$(date +%s)
   log_info "── Setting up Gitleaks ──"
-
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "Gitleaks" "⚖️ Previewed" "-" "0"
     return 0
@@ -415,19 +396,18 @@ install_java_lint() {
   _T0_JAVA=$(date +%s)
   log_info "── Setting up Java Linter (google-java-format) ──"
 
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Lint Tool" "Java Lint" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files "pom.xml build.gradle" "*.java"; then
     log_summary "Lint Tool" "Java Lint" "⏭️ Skipped" "-" "0"
     return 0
   fi
 
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "Java Lint" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
   local _STAT_JAVA="✅ mise"
-  # google-java-format is available via mise (usually via an asdf plugin or github source)
-  run_mise install google-java-format || _STAT_JAVA="❌ Failed"
+  run_mise install "github:google/google-java-format" || _STAT_JAVA="❌ Failed"
 
   local _DUR_JAVA=$(($(date +%s) - _T0_JAVA))
   log_summary "Lint Tool" "Java Lint" "$_STAT_JAVA" "$(get_version google-java-format)" "$_DUR_JAVA"
@@ -557,17 +537,13 @@ install_osv_scanner() {
   local _T0_OSV
   _T0_OSV=$(date +%s)
   log_info "── Setting up OSV-Scanner ──"
-
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Security Tool" "OSV-Scanner" "⚖️ Previewed" "-" "0"
     return 0
   fi
-
   local _STAT_OSV="✅ mise"
   run_mise install "github:google/osv-scanner" || _STAT_OSV="❌ Failed"
-
-  local _DUR_OSV=$(($(date +%s) - _T0_OSV))
-  log_summary "Security Tool" "OSV-Scanner" "$_STAT_OSV" "$(get_version osv-scanner)" "$_DUR_OSV"
+  log_summary "Security Tool" "OSV-Scanner" "$_STAT_OSV" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV))"
 }
 
 # Purpose: Installs Trivy for security scanning.
@@ -576,17 +552,13 @@ install_trivy() {
   local _T0_TRIVY
   _T0_TRIVY=$(date +%s)
   log_info "── Setting up Trivy ──"
-
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Security Tool" "Trivy" "⚖️ Previewed" "-" "0"
     return 0
   fi
-
   local _STAT_TRIVY="✅ mise"
   run_mise install "github:aquasecurity/trivy" || _STAT_TRIVY="❌ Failed"
-
-  local _DUR_TRIVY=$(($(date +%s) - _T0_TRIVY))
-  log_summary "Security Tool" "Trivy" "$_STAT_TRIVY" "$(get_version trivy)" "$_DUR_TRIVY"
+  log_summary "Security Tool" "Trivy" "$_STAT_TRIVY" "$(get_version trivy)" "$(($(date +%s) - _T0_TRIVY))"
 }
 
 # Purpose: Installs editorconfig-checker for compliance validation.
@@ -615,7 +587,7 @@ install_zizmor() {
   _T0_ZIZ=$(date +%s)
   log_info "── Setting up Zizmor ──"
   local _STAT_ZIZ="✅ mise"
-  run_mise install zizmor || _STAT_ZIZ="❌ Failed"
+  run_mise install "cargo:zizmor" || _STAT_ZIZ="❌ Failed"
   log_summary "Security Tool" "Zizmor" "$_STAT_ZIZ" "$(get_version zizmor)" "$(($(date +%s) - _T0_ZIZ))"
 }
 
@@ -683,16 +655,9 @@ setup_security() {
   if command -v cargo >/dev/null 2>&1; then
     local _T0_CRGO
     _T0_CRGO=$(date +%s)
-    if command -v cargo-audit >/dev/null 2>&1; then
-      log_summary "Security Tool" "Cargo-Audit" "✅ Exists" "$(get_version cargo-audit)" "0"
-    else
-      log_info "Installing cargo-audit..."
-      if run_quiet cargo install cargo-audit; then
-        log_summary "Security Tool" "Cargo-Audit" "✅ Installed" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_CRGO))"
-      else
-        log_summary "Security Tool" "Cargo-Audit" "❌ Failed" "-" "0"
-      fi
-    fi
+    local _STAT_CRGO="✅ mise"
+    run_mise install "cargo:cargo-audit" || _STAT_CRGO="❌ Failed"
+    log_summary "Security Tool" "Cargo-Audit" "$_STAT_CRGO" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_CRGO))"
   fi
 }
 
@@ -798,18 +763,17 @@ EOF
   # 5. Bootstrap Toolchain Manager
   bootstrap_mise || log_warn "Warning: mise bootstrap failed. Falling back to local tool installation."
 
-  # 6. Optimized SSoT: Sync plugins and bulk install tools
+  # 6. Toolchain Manager Strategy
   if [ "${DRY_RUN:-0}" -eq 0 ]; then
-    log_info "Synchronizing mise plugins and tools..."
-
     # ── Git Protocol Stabilization ──
-    # Force Git protocol v2 and increase buffers to mitigate proxy handshake issues
     export GIT_PROTOCOL=version=2
-    export MISE_GIT_ALWAYS_USE_GIX=0 # Fallback to system git for better proxy compatibility
+    export MISE_GIT_ALWAYS_USE_GIX=0
 
     if [ "$_IS_ALL_MODULES" = "true" ]; then
-      log_info "Synchronizing all tools from .mise.toml..."
+      log_info "Performing full toolchain synchronization via mise..."
       run_mise install
+    else
+      log_info "Performing on-demand module installation..."
     fi
   fi
 
