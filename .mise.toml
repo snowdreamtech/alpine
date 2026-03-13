@@ -79,20 +79,15 @@ pipx = "1.7.1"
 experimental = true
 asdf_compat = true
 
-# GitHub proxy acceleration for weak networks.
-# This replacement applies only to GitHub-hosted downloads.
+# Registry mirrors only (for npm, PyPI, Node.js, Python).
+# GitHub URL replacements intentionally EXCLUDED here — your local proxy
+# (e.g. Clash at 127.0.0.1:8889) already handles GitHub traffic including
+# git protocol. Overriding with gh-proxy.sn0wdr1am.com breaks `mise ls-remote`
+# because that endpoint only supports HTTP file downloads, not git smart protocol.
 [settings.url_replacements]
-"https://github.com" = "https://gh-proxy.sn0wdr1am.com/https://github.com"
-"https://objects.githubusercontent.com" = "https://gh-proxy.sn0wdr1am.com/https://objects.githubusercontent.com"
-"https://raw.githubusercontent.com" = "https://gh-proxy.sn0wdr1am.com/https://raw.githubusercontent.com"
 "https://registry.npmjs.org" = "https://registry.npmmirror.com"
 "https://pypi.org/simple" = "https://pypi.tuna.tsinghua.edu.cn/simple"
 "https://pypi.python.org/simple" = "https://pypi.tuna.tsinghua.edu.cn/simple"
 "https://nodejs.org/dist" = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release"
 "https://python.org/ftp/python" = "https://mirrors.tuna.tsinghua.edu.cn/python"
 "https://repo.anaconda.com/miniconda" = "https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda"
-
-# NOTE: If you have a local proxy (e.g. Clash at 127.0.0.1:8889),
-# url_replacements for github.com may cause "Proxy over Proxy" redundancy.
-# Recommend bypassing sn0wdr1am.com in your local proxy (DIRECT)
-# or disabling url_replacements if your local proxy handles GitHub well.
