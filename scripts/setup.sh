@@ -15,7 +15,7 @@
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
-#   - Delta-based installation (cooldown 24h).
+#   - Modularized toolchain installation.
 #   - Multi-language support (Node, Python, Go, Rust, Java, etc.).
 #   - JIT security toolchain (Trivy, OSV-Scanner).
 
@@ -816,7 +816,20 @@ EOF
   # 5. Bootstrap Toolchain Manager
   bootstrap_mise || log_warn "Warning: mise bootstrap failed. Falling back to local tool installation."
 
-  # 6. Execution
+  # 6. Optimized SSoT: Bulk install only if 'all' modules are requested.
+  # This maintains flexibility for individual module setups while providing
+  # performance boosts for the default full setup.
+  local _IS_ALL_MODULES=false
+  if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "${_RAW_ARGS# *}" = "all" ]; then
+    _IS_ALL_MODULES=true
+  fi
+
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_ALL_MODULES" = "true" ]; then
+    log_info "Synchronizing all tools from .mise.toml..."
+    run_mise install
+  fi
+
+  # 7. Execution
   local _cur_module
   for _cur_module in $_MODULES_LIST; do
     case $_cur_module in

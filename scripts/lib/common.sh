@@ -13,7 +13,6 @@
 # Features:
 #   - Standardized colored logging (info, success, warn, error).
 #   - Robust downloading with retry and proxy logic.
-#   - Operation throttling (24h cooldown for heavy tasks).
 #   - Build-then-Swap atomic file operations.
 #   - Dual-Sentinel (双重哨兵) pattern for CI reporting.
 #
@@ -549,6 +548,33 @@ EOF
 # Examples:
 #   run_mise install node
 run_mise() {
+  local _CMD="$1"
+  shift
+
+  # Special handling for 'install' to avoid redundant process forks
+  # If we are installing a specific tool, check if it's already active
+  if [ "$_CMD" = "install" ] && [ $# -eq 1 ]; then
+    local _TOOL="$1"
+    # If the tool is already in path and managed by mise (i.e. not a system global), skip.
+    # Exception: If tool is a github reference, we still run it to ensure latest/exists.
+    case "$_TOOL" in
+    github:* | http:* | https:*) ;;
+    *)
+      if command -v "$_TOOL" >/dev/null 2>&1; then
+        local _WHICH
+        _WHICH=$(command -v "$_TOOL")
+        # If it's a mise shim, it's already "installed"
+        case "$_WHICH" in
+        *"/mise/shims/"*)
+          log_debug "Tool '$_TOOL' is already managed by mise. Skipping redundant install."
+          return 0
+          ;;
+        esac
+      fi
+      ;;
+    esac
+  fi
+
   optimize_network
   local _MAX_RETRIES=3
   local _RETRY_COUNT=0
@@ -566,7 +592,7 @@ run_mise() {
 
   while [ $_RETRY_COUNT -lt $_MAX_RETRIES ]; do
     # shellcheck disable=SC2086
-    if run_quiet "$_M_BIN" $_MISE_OPTS "$@"; then
+    if run_quiet "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"; then
       _STATUS=0
       break
     else

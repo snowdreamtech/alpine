@@ -15,7 +15,6 @@
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
-#   - Operation throttling with 24h cooldown to minimize disruption.
 #   - Unified reporting for multi-stack toolchain maintenance.
 
 set -e

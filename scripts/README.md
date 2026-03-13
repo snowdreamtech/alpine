@@ -113,8 +113,7 @@ sh scripts/verify.sh
 
 ### Performance Considerations
 
-- **Parallelism**: Scripts run sequentially to ensure deterministic log ordering.
-- **Throttling**: `update.sh` uses a 24-hour cooldown period to prevent network abuse.
+- **Unified Dashboard**: Displays a comprehensive summary of version statuses and installation durations.
 - **Caching**: Virtualenvs (`.venv`) and `node_modules` are reused across runs.
 
 ### Troubleshooting
