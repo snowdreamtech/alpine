@@ -40,6 +40,10 @@ DRY_RUN=${DRY_RUN:-0}
 export MISE_YES=true
 export MISE_NON_INTERACTIVE=true
 export UV_NON_INTERACTIVE=true
+# Force mise to use system git for better proxy/config compatibility
+export MISE_GIT_ALWAYS_USE_GIX=0
+export MISE_GIX=0
+export MISE_USE_GIX=0
 
 # Orchestration tracking (detect if we are running as a sub-script)
 if [ -z "$_SNOWDREAM_TOP_LEVEL_SCRIPT" ]; then
@@ -60,6 +64,8 @@ DOCS_DIR="docs"
 GITHUB_PROXY="${GITHUB_PROXY:-https://gh-proxy.sn0wdr1am.com/}"
 
 # Network Optimization & Mirror Configuration
+# NOTE: GITHUB_PROXY is optimized for Release/Archive/File downloads.
+# It does NOT support project folder clones (git clone).
 ENABLE_MIRROR="${ENABLE_MIRROR:-${MIRROR:-${USE_MIRROR:-0}}}"
 MIRROR_NODEJS="${MIRROR_NODEJS:-https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/}"
 MIRROR_PYTHON="${MIRROR_PYTHON:-https://mirrors.tuna.tsinghua.edu.cn/python/}"
@@ -500,30 +506,25 @@ optimize_network() {
     _NEEDS_MIRROR=true
   fi
 
-  # 3. Handle Git Interference (Bypass broken global insteadOf or dead proxies)
-  # If we need mirrors OR if we suspect global git config is broken
+  # 3. Handle Git Protocols & Proxies
+  # NOTE: Current GITHUB_PROXY does NOT support project folder clones (Method Not Allowed).
+  # We bypass the user's global Git config to avoid broken "insteadOf" redirects (e.g., ghproxy.cn).
   if [ "$_NEEDS_MIRROR" = "true" ]; then
-    # Create an intelligent git override that redirects GitHub via GITHUB_PROXY
-    # This prevents 'mise' plugins and other git-based tools from hanging or failing.
-    log_info "Applying intelligent git proxy overrides..."
+    log_info "Bypassing broken global git proxies and applying network optimization..."
+
     mkdir -p "$(dirname "$_TEMP_GIT_CONFIG")"
     cat >"$_TEMP_GIT_CONFIG" <<EOF
-[url "${GITHUB_PROXY}https://github.com/"]
-  insteadOf = https://github.com/
 [http]
   postBuffer = 524288000
   lowSpeedLimit = 0
   lowSpeedTime = 999999
-  # Forcing basic auth to be handled correctly by proxy if needed,
-  # and ensuring protocol version 2 is used where possible.
-  extraHeader = "Git-Protocol: version=2"
 [protocol]
   version = 2
 EOF
     export GIT_CONFIG_GLOBAL="$_TEMP_GIT_CONFIG"
     export GIT_CONFIG_SYSTEM="/dev/null"
 
-    # 4. Apply standard mirrors
+    # Standard mirrors for binaries/packages
     export ENABLE_MIRROR=1
 
     # Node/Python/JS Mirrors
@@ -541,9 +542,7 @@ EOF
     # Configure mise settings if mise is available
     if command -v mise >/dev/null 2>&1; then
       log_debug "Synchronizing mise mirror settings..."
-      # 1. mise url_replacements (SSoT for mise network acceleration)
-      run_mise settings set "url_replacements.https://github.com/" "${GITHUB_PROXY}https://github.com/"
-      run_mise settings set "url_replacements.https://api.github.com/" "${GITHUB_PROXY}https://api.github.com/" || true
+      # NOTE: url_replacements is NOT used for GitHub here to avoid breaking git clones.
       run_quiet mise settings set node.mirror_url "${MIRROR_NODEJS}" || true
     fi
   fi
@@ -603,10 +602,11 @@ run_mise() {
     # ── Intelligent Fallback ──
     # If first attempt failed and we have a global git proxy active,
     # try running with proxy disabled for subsequent attempts.
-    if [ $_RETRY_COUNT -gt 0 ] && [ -n "$GIT_CONFIG_GLOBAL" ]; then
-      log_warn "Retrying without intelligent git proxy (falling back to direct connection)..."
+    if [ $_RETRY_COUNT -gt 0 ]; then
+      log_warn "Retrying with direct connection (bypassing all git proxies)..."
       if (
-        unset GIT_CONFIG_GLOBAL
+        export GIT_CONFIG_GLOBAL=/dev/null
+        export GIT_CONFIG_SYSTEM=/dev/null
         # shellcheck disable=SC2086
         run_quiet "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"
       ); then
