@@ -1,20 +1,58 @@
+# ------------------------------------------------------------
+# mise.toml — Optimized for fast installation and weak networks
+# ------------------------------------------------------------
+# Strategy:
+# 1. Prefer npm and pipx providers for tools available on registries
+#    because they are faster and more stable under weak networks.
+# 2. Use GitHub provider only for tools that are GitHub‑release‑only.
+# 3. Apply GitHub proxy via url_replacements to accelerate downloads.
+# 4. Keep all configuration explicit, auditable, and reproducible.
+# ------------------------------------------------------------
+
 [tools]
+
+# ------------------------------------------------------------
+# GitHub Release-only tools (no npm/pipx alternatives available)
+# These rely on GitHub releases and benefit from proxy acceleration.
+# ------------------------------------------------------------
 "github:rhysd/actionlint" = "1.7.11"
-"github:golang/vuln/govulncheck" = "latest"
-"github:rustsec/rustsec/cargo-audit" = "0.20.1"
-bats = "1.13.0"
-checkmake = "0.3.2"
-"clang-format" = "19.1.7"
-dotenv-linter = "3.3.0"
-editorconfig-checker = "3.6.1"
-gitleaks = "8.30.0"
-golangci-lint = "1.64.5"
+"github:golangci/golangci-lint" = "1.64.5"
+"go:golang.org/x/vuln/cmd/govulncheck" = "latest"
 "github:google/google-java-format" = "1.25.2"
+"github:google/osv-scanner" = "2.3.3"
 "github:goreleaser/goreleaser" = "2.14.3"
 "github:hadolint/hadolint" = "2.14.0"
 "github:pinterest/ktlint" = "1.8.0"
 "github:stackrox/kube-linter" = "0.8.3"
+"cargo:cargo-audit" = "0.20.1"
+"github:terraform-linters/tflint" = "0.61.0"
+"github:aquasecurity/trivy" = "0.69.3"
+"github:woodruffw/zizmor" = "1.23.1"
+
+# ------------------------------------------------------------
+# Default provider tools (mise native provider is fastest here)
+# These tools have stable binary distributions or cached providers.
+# ------------------------------------------------------------
+bats = "1.13.0"
+checkmake = "0.3.2"
+clang-format = "19.1.7"
+dotenv-linter = "3.3.0"
+editorconfig-checker = "3.6.1"
+gitleaks = "8.30.0"
 node = "20.18.3"
+pre-commit = "4.5.1"
+prettier = "3.5.2"
+python = "3.12.9"
+ruff = "0.15.6"
+shellcheck = "0.10.0"
+shfmt = "3.12.0"
+taplo = "0.10.0"
+yamllint = "1.38.0"
+
+# ------------------------------------------------------------
+# npm-based tools (best performance under weak networks)
+# npm registry can be mirrored (e.g., npmmirror.com) for speed.
+# ------------------------------------------------------------
 "npm:@commitlint/cli" = "20.0.1"
 "npm:@stoplight/spectral-cli" = "6.13.1"
 "npm:commitizen" = "4.4.1"
@@ -24,24 +62,37 @@ node = "20.18.3"
 "npm:sort-package-json" = "3.6.1"
 "npm:stylelint" = "16.15.0"
 "npm:vitepress" = "1.6.4"
-"github:google/osv-scanner" = "2.3.3"
-pipx = "1.7.1"
+
+# ------------------------------------------------------------
+# pipx-based tools (stable and mirror-friendly)
+# pipx benefits from PyPI mirrors (e.g., Tsinghua, Aliyun).
+# ------------------------------------------------------------
 "pipx:ansible-lint" = "26.3.0"
 "pipx:pip-audit" = "2.10.0"
 "pipx:sqlfluff" = "4.0.4"
-pre-commit = "4.5.1"
-prettier = "3.5.2"
-python = "3.12.9"
-ruff = "0.15.6"
-shellcheck = "0.10.0"
-shfmt = "3.12.0"
-taplo = "0.10.0"
-"github:terraform-linters/tflint" = "0.61.0"
-"github:githubsecurity/trivy" = "0.69.3"
-yamllint = "1.38.0"
-"github:zizmorcore/zizmor" = "1.23.1"
+pipx = "1.7.1"
 
+# ------------------------------------------------------------
+# Global settings
+# ------------------------------------------------------------
 [settings]
 experimental = true
 asdf_compat = true
-# Use GITHUB_PROXY only for direct file/release/archive downloads in scripts.
+
+# GitHub proxy acceleration for weak networks.
+# This replacement applies only to GitHub-hosted downloads.
+[settings.url_replacements]
+"https://github.com" = "https://gh-proxy.sn0wdr1am.com/https://github.com"
+"https://objects.githubusercontent.com" = "https://gh-proxy.sn0wdr1am.com/https://objects.githubusercontent.com"
+"https://raw.githubusercontent.com" = "https://gh-proxy.sn0wdr1am.com/https://raw.githubusercontent.com"
+"https://registry.npmjs.org" = "https://registry.npmmirror.com"
+"https://pypi.org/simple" = "https://pypi.tuna.tsinghua.edu.cn/simple"
+"https://pypi.python.org/simple" = "https://pypi.tuna.tsinghua.edu.cn/simple"
+"https://nodejs.org/dist" = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release"
+"https://python.org/ftp/python" = "https://mirrors.tuna.tsinghua.edu.cn/python"
+"https://repo.anaconda.com/miniconda" = "https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda"
+
+# NOTE: If you have a local proxy (e.g. Clash at 127.0.0.1:8889),
+# url_replacements for github.com may cause "Proxy over Proxy" redundancy.
+# Recommend bypassing sn0wdr1am.com in your local proxy (DIRECT)
+# or disabling url_replacements if your local proxy handles GitHub well.

@@ -598,10 +598,38 @@ run_mise() {
     # 4. Rigorous Comparison (Ensures exact match or prefix)
     if [ "$_CUR_VER" != "-" ] && [ -n "$_REQ_VER" ]; then
       if [ "$_CUR_VER" = "$_REQ_VER" ] || echo "$_CUR_VER" | grep -q "^${_REQ_VER}"; then
-        log_debug "Tool $_TOOL_BASE v$_CUR_VER matches .mise.toml v$_REQ_VER. Skipping mise install."
+        # Skip if version matches
         return 0
       fi
     fi
+
+    # 5. Backend-aware Manager Existence Check
+    case "$_TOOL_CHECK" in
+    cargo:*)
+      if ! command -v cargo >/dev/null 2>&1; then
+        log_error "Cannot install '$_TOOL_CHECK': 'cargo' (Rust) is missing. Please install Rust first."
+        return 1
+      fi
+      ;;
+    go:*)
+      if ! command -v go >/dev/null 2>&1; then
+        log_error "Cannot install '$_TOOL_CHECK': 'go' (Golang) is missing. Please install Go first."
+        return 1
+      fi
+      ;;
+    pipx:*)
+      if ! command -v pipx >/dev/null 2>&1; then
+        log_error "Cannot install '$_TOOL_CHECK': 'pipx' is missing. Please run 'make setup' or install pipx first."
+        return 1
+      fi
+      ;;
+    npm:*)
+      if ! command -v npm >/dev/null 2>&1; then
+        log_error "Cannot install '$_TOOL_CHECK': 'npm' (Node.js) is missing. Please install Node.js first."
+        return 1
+      fi
+      ;;
+    esac
 
     log_debug "Tool $_TOOL_BASE (current: $_CUR_VER, required: $_REQ_VER) needs initialization/update."
   fi
@@ -953,9 +981,21 @@ has_lang_files() {
 
   local _ext_lang
   for _ext_lang in $_EXTS_LANG; do
+    # Specialty cases for common multi-file structures
+    case "$_ext_lang" in
+    CHARTS)
+      [ -f "Chart.yaml" ] && return 0
+      [ -d "charts" ] && return 0
+      ;;
+    K8S)
+      # Check for common Kubernetes folder or specific schemas
+      [ -d "kubernetes" ] && return 0
+      [ -d "k8s" ] && return 0
+      [ -d "manifests" ] && return 0
+      ;;
+    esac
+
     # Use find for POSIX compatibility and performance
-    # Pattern: find . (Exclusions) -prune ... is one way, but -name with ! -path is also POSIX
-    # Using -prune for maximum efficiency to stop descending into ignored folders
     if [ "$(find . \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify -o -name .tmp -o -name tmp \) -prune -o -maxdepth 5 -name "$_ext_lang" -print -quit 2>/dev/null)" ]; then
       return 0
     fi
