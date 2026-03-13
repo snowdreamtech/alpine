@@ -1018,7 +1018,7 @@ install_bats_libs() {
   # bats-support
   if [ ! -d "$_VENDOR_DIR/bats-support" ]; then
     log_info "Downloading bats-support..."
-    download_file "${GITHUB_PROXY}https://github.com/bats-core/bats-support/archive/refs/tags/v0.3.0.tar.gz" "$_VENDOR_DIR/bats-support.tar.gz"
+    download_url "${GITHUB_PROXY}https://github.com/bats-core/bats-support/archive/refs/tags/v0.3.0.tar.gz" "$_VENDOR_DIR/bats-support.tar.gz" "bats-support"
     mkdir -p "$_VENDOR_DIR/bats-support"
     tar -xzf "$_VENDOR_DIR/bats-support.tar.gz" -C "$_VENDOR_DIR/bats-support" --strip-components=1
     rm "$_VENDOR_DIR/bats-support.tar.gz"
@@ -1027,7 +1027,7 @@ install_bats_libs() {
   # bats-assert
   if [ ! -d "$_VENDOR_DIR/bats-assert" ]; then
     log_info "Downloading bats-assert..."
-    download_file "${GITHUB_PROXY}https://github.com/bats-core/bats-assert/archive/refs/tags/v2.1.0.tar.gz" "$_VENDOR_DIR/bats-assert.tar.gz"
+    download_url "${GITHUB_PROXY}https://github.com/bats-core/bats-assert/archive/refs/tags/v2.1.0.tar.gz" "$_VENDOR_DIR/bats-assert.tar.gz" "bats-assert"
     mkdir -p "$_VENDOR_DIR/bats-assert"
     tar -xzf "$_VENDOR_DIR/bats-assert.tar.gz" -C "$_VENDOR_DIR/bats-assert" --strip-components=1
     rm "$_VENDOR_DIR/bats-assert.tar.gz"
