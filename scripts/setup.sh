@@ -154,7 +154,7 @@ sanitize_path() {
 setup_node() {
   local _T0_NODE
   _T0_NODE=$(date +%s)
-  log_info "── Setting up Node.js & pnpm ──"
+  log_info "── Setting up Node.js ──"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Node.js" "⚖️ Previewed" "-" "0"
@@ -162,7 +162,7 @@ setup_node() {
   fi
 
   # 1. Smart Installation via mise (SSoT: .mise.toml)
-  run_mise install node pnpm yarn bun
+  run_mise install node
 
   # 2. Activate environment for subsequent steps
   eval "$(mise activate bash --shims)"
@@ -205,15 +205,15 @@ setup_python() {
   fi
 
   # 1. Smart Installation via mise (SSoT: .mise.toml)
-  run_mise install python uv
+  run_mise install python
   eval "$(mise activate bash --shims)"
 
   # 2. Venv check
   local _STAT_PY="✅ Installed"
   if [ ! -d "$VENV" ]; then
-    log_info "Creating virtual environment using uv..."
-    # shellcheck disable=SC2154
-    run_quiet uv venv "$VENV" || _STAT_PY="❌ Failed"
+    log_info "Creating virtual environment..."
+    # Fallback to standard python venv if uv is missing
+    run_quiet python3 -m venv "$VENV" || _STAT_PY="❌ Failed"
   fi
 
   # 3. Dependencies
@@ -627,9 +627,6 @@ install_cargo_audit() {
     return 0
   fi
 
-  # Explicit manager check (SSoT: cargo: prefix requires cargo)
-  ensure_manager cargo
-
   local _STAT_CRGO="✅ mise"
   run_mise install "cargo:cargo-audit" || _STAT_CRGO="❌ Failed"
   log_summary "Security Tool" "Cargo-Audit" "$_STAT_CRGO" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_CRGO))"
@@ -646,9 +643,6 @@ install_govulncheck() {
     log_summary "Security Tool" "Govulncheck" "⏭️ Skipped" "-" "0"
     return 0
   fi
-
-  # Explicit manager check (SSoT: go: prefix requires go)
-  ensure_manager go
 
   local _STAT_VULN="✅ mise"
   run_mise install "go:golang.org/x/vuln/cmd/govulncheck" || _STAT_VULN="❌ Failed"
