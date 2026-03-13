@@ -599,7 +599,7 @@ install_zizmor() {
   _T0_ZIZ=$(date +%s)
   log_info "── Setting up Zizmor ──"
   local _STAT_ZIZ="✅ mise"
-  run_mise install "cargo:zizmor" || _STAT_ZIZ="❌ Failed"
+  run_mise install zizmor || _STAT_ZIZ="❌ Failed"
   log_summary "Security Tool" "Zizmor" "$_STAT_ZIZ" "$(get_version zizmor)" "$(($(date +%s) - _T0_ZIZ))"
 }
 
