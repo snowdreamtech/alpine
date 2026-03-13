@@ -51,7 +51,8 @@ Modules (default: all):
   hadolint           Install Hadolint (Docker linting)
   go                 Install golangci-lint
   checkmake          Install checkmake (Makefile linting)
-  iac                Install IaC tools (tflint, kube-linter)
+  tflint             Install TFLint
+  kube-linter        Install Kube-Linter
   powershell         Setup PSScriptAnalyzer
   java               Install google-java-format
   ruby               Setup Rubocop
@@ -320,39 +321,32 @@ install_checkmake() {
   log_summary "Lint Tool" "Checkmake" "$_STAT_CM" "$(get_version checkmake)" "$_DUR_CM"
 }
 
-# Purpose: Installs IaC linting tools (TFLint and Kube-Linter).
-# Params:
-#   None (uses global TFLINT_VERSION and KUBE_LINTER_VERSION)
-# Examples:
-# Purpose: Installs IaC linting tools (TFLint and Kube-Linter).
-# Delegate: Managed by mise (.mise.toml)
-install_iac_lint() {
-  local _T0_IAC
-  _T0_IAC=$(date +%s)
-  log_info "── Setting up IaC Linters ──"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Lint Tool" "IaC Linters" "⚖️ Previewed" "-" "0"
+# Purpose: Installs TFLint.
+install_tflint() {
+  local _T0_TF
+  _T0_TF=$(date +%s)
+  log_info "── Setting up TFLint ──"
+  if ! has_lang_files "" "*.tf"; then
+    log_summary "Lint Tool" "TFLint" "⏭️ Skipped" "-" "0"
     return 0
   fi
+  local _STAT_TF="✅ mise"
+  run_mise install tflint || _STAT_TF="❌ Failed"
+  log_summary "Lint Tool" "TFLint" "$_STAT_TF" "$(get_version tflint)" "$(($(date +%s) - _T0_TF))"
+}
 
-  # TFLint
-  if has_lang_files "" "*.tf"; then
-    local _STAT_TF="✅ mise"
-    run_mise install tflint || _STAT_TF="❌ Failed"
-    log_summary "Lint Tool" "TFLint" "$_STAT_TF" "$(get_version tflint)" "0"
-  else
-    log_summary "Lint Tool" "TFLint" "⏭️ Skipped" "-" "0"
-  fi
-
-  # Kube-Linter
-  if has_lang_files "" "*.yaml *.yml"; then
-    local _STAT_KL="✅ mise"
-    run_mise install kube-linter || _STAT_KL="❌ Failed"
-    log_summary "Lint Tool" "Kube-Linter" "$_STAT_KL" "$(get_version kube-linter)" "0"
-  else
+# Purpose: Installs Kube-Linter.
+install_kube_linter() {
+  local _T0_KL
+  _T0_KL=$(date +%s)
+  log_info "── Setting up Kube-Linter ──"
+  if ! has_lang_files "" "*.yaml *.yml"; then
     log_summary "Lint Tool" "Kube-Linter" "⏭️ Skipped" "-" "0"
+    return 0
   fi
+  local _STAT_KL="✅ mise"
+  run_mise install kube-linter || _STAT_KL="❌ Failed"
+  log_summary "Lint Tool" "Kube-Linter" "$_STAT_KL" "$(get_version kube-linter)" "$(($(date +%s) - _T0_KL))"
 }
 
 # Purpose: Activates git pre-commit hooks.
@@ -612,6 +606,10 @@ install_zizmor() {
   local _T0_ZIZ
   _T0_ZIZ=$(date +%s)
   log_info "── Setting up Zizmor ──"
+  if ! has_lang_files "" ".github/workflows/*.yml .github/workflows/*.yaml"; then
+    log_summary "Security Tool" "Zizmor" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
   local _STAT_ZIZ="✅ mise"
   run_mise install zizmor || _STAT_ZIZ="❌ Failed"
   log_summary "Security Tool" "Zizmor" "$_STAT_ZIZ" "$(get_version zizmor)" "$(($(date +%s) - _T0_ZIZ))"
@@ -663,6 +661,10 @@ install_shfmt() {
   local _T0_SHF
   _T0_SHF=$(date +%s)
   log_info "── Setting up Shfmt ──"
+  if ! has_lang_files "" "*.sh *.bash *.bats"; then
+    log_summary "Lint Tool" "Shfmt" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
   local _STAT_SHF="✅ mise"
   run_mise install shfmt || _STAT_SHF="❌ Failed"
   log_summary "Lint Tool" "Shfmt" "$_STAT_SHF" "$(get_version shfmt)" "$(($(date +%s) - _T0_SHF))"
@@ -674,6 +676,10 @@ install_shellcheck() {
   local _T0_SHC
   _T0_SHC=$(date +%s)
   log_info "── Setting up Shellcheck ──"
+  if ! has_lang_files "" "*.sh *.bash *.bats"; then
+    log_summary "Lint Tool" "Shellcheck" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
   local _STAT_SHC="✅ mise"
   run_mise install shellcheck || _STAT_SHC="❌ Failed"
   log_summary "Lint Tool" "Shellcheck" "$_STAT_SHC" "$(get_version shellcheck)" "$(($(date +%s) - _T0_SHC))"
@@ -685,6 +691,10 @@ install_actionlint() {
   local _T0_ACT
   _T0_ACT=$(date +%s)
   log_info "── Setting up Actionlint ──"
+  if ! has_lang_files "" ".github/workflows/*.yml .github/workflows/*.yaml"; then
+    log_summary "Lint Tool" "Actionlint" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
   local _STAT_ACT="✅ mise"
   run_mise install "github:rhysd/actionlint" || _STAT_ACT="❌ Failed"
   log_summary "Lint Tool" "Actionlint" "$_STAT_ACT" "$(get_version actionlint)" "$(($(date +%s) - _T0_ACT))"
@@ -713,10 +723,7 @@ install_prettier() {
     log_summary "Lint Tool" "Prettier" "⏭️ Skipped" "-" "0"
     return 0
   fi
-
-  # Explicit manager check (SSoT: npm: prefix requires npm)
   ensure_manager npm
-
   local _STAT_PRE="✅ mise"
   run_mise install "npm:prettier" || _STAT_PRE="❌ Failed"
   log_summary "Lint Tool" "Prettier" "$_STAT_PRE" "$(get_version prettier)" "$(($(date +%s) - _T0_PRE))"
@@ -727,13 +734,11 @@ install_sort_package_json() {
   local _T0_SPJ
   _T0_SPJ=$(date +%s)
   log_info "── Setting up sort-package-json ──"
-  if [ ! -f package.json ]; then
+  if [ ! -f "package.json" ]; then
     log_summary "Other" "sort-package-json" "⏭️ Skipped" "-" "0"
     return 0
   fi
-
   ensure_manager npm
-
   local _STAT_SPJ="✅ mise"
   run_mise install "npm:sort-package-json" || _STAT_SPJ="❌ Failed"
   log_summary "Other" "sort-package-json" "$_STAT_SPJ" "$(get_version sort-package-json)" "$(($(date +%s) - _T0_SPJ))"
@@ -909,10 +914,12 @@ install_ansible_lint() {
   local _T0_ANS
   _T0_ANS=$(date +%s)
   log_info "── Setting up Ansible-lint ──"
-  if ! has_lang_files "" "*.yml *.yaml"; then
+  if ! has_lang_files "" "ansible.cfg playbook.yml roles/ tasks/"; then
     log_summary "Lint Tool" "Ansible-lint" "⏭️ Skipped" "-" "0"
     return 0
   fi
+  # Ansible-lint is often installed via pip/python
+  ensure_manager python3
   local _STAT_ANS="✅ mise"
   run_mise install ansible-lint || _STAT_ANS="❌ Failed"
   log_summary "Lint Tool" "Ansible-lint" "$_STAT_ANS" "$(get_version ansible-lint)" "$(($(date +%s) - _T0_ANS))"
@@ -1033,6 +1040,8 @@ install_pip_audit() {
     log_summary "Security Tool" "pip-audit" "⏭️ Skipped" "-" "0"
     return 0
   fi
+  # Explicit manager check
+  ensure_manager python3
   ensure_manager pipx
   local _STAT_PA="✅ mise"
   run_mise install "pipx:pip-audit" || _STAT_PA="❌ Failed"
@@ -1156,7 +1165,7 @@ EOF
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
     # Full list for "On-demand" (default) or "All" (explicit)
-    _MODULES_LIST="node python gitleaks hadolint go checkmake iac powershell java ruby dart swift dotnet security editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit pre-commit hooks"
+    _MODULES_LIST="node python gitleaks hadolint go checkmake tflint kube-linter powershell java ruby dart swift dotnet security editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit pre-commit hooks"
   else
     # Specific modules requested (e.g., ./setup.sh node)
     _MODULES_LIST="${_RAW_ARGS}"
@@ -1189,7 +1198,8 @@ EOF
     checkmake) install_checkmake ;;
     hadolint) install_hadolint ;;
     go) install_go_lint ;;
-    iac) install_iac_lint ;;
+    tflint) install_tflint ;;
+    kube-linter) install_kube_linter ;;
     powershell) setup_powershell ;;
     java) install_java_lint ;;
     ruby) install_ruby_lint ;;
