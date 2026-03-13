@@ -25,7 +25,6 @@ bats = "1.13.0"
 "github:google/google-java-format" = "1.25.2"
 "github:pinterest/ktlint" = "1.5.0"
 "github:dotenv-linter/dotenv-linter" = "3.3.0"
-taplo = "0.9.3"
 "npm:prettier" = "3.8.1"
 "npm:sort-package-json" = "3.6.1"
 "npm:eslint" = "10.0.3"
@@ -40,6 +39,7 @@ taplo = "0.9.3"
 "github:goreleaser/goreleaser" = "2.7.0"
 "go:golang.org/x/vuln/cmd/govulncheck" = "latest"
 "cargo:cargo-audit" = "0.20.1"
+"cargo:taplo" = "0.9.3"
 
 [settings]
 experimental = true
