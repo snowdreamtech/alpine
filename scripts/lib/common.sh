@@ -564,10 +564,9 @@ get_mise_tool_version() {
   [ -f "$_MISE_TOM_PATH" ] || return 0
 
   # Robust regex for [.mise.toml] parsing:
-  # - Matches lines starting with the tool name (optionally quoted)
-  # - Handles prefixes (npm:, cargo:, etc.)
+  # - Matches lines starting with the tool name (optionally quoted and prefixed)
   # - Extracts the value inside double quotes
-  grep -E "^\"?${_TOOL_NAME_MISE}\"?[[:space:]]*=" "$_MISE_TOM_PATH" 2>/dev/null |
+  grep -E "^\"?([^:]+:)?${_TOOL_NAME_MISE}\"?[[:space:]]*=" "$_MISE_TOM_PATH" 2>/dev/null |
     sed -E 's/^[^=]*=[[:space:]]*"([^"]*)".*/\1/' | head -n 1 || true
 }
 
