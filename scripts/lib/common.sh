@@ -272,17 +272,23 @@ _mise_install_tier4() {
   mkdir -p "$(dirname "$_DEST")"
 
   if [ "$_OS" = "windows" ]; then
-    local _TMP_ZIP="/tmp/mise_win.zip"
-    local _TMP_DIR="/tmp/mise_win_extract"
+    if ! command -v unzip >/dev/null 2>&1; then
+      log_error "Error: 'unzip' is required for Windows manual bootstrap."
+      return 1
+    fi
+    local _TMP_DIR
+    _TMP_DIR=$(mktemp -d 2>/dev/null || echo "/tmp/mise_win_extract")
+    local _TMP_ZIP="${_TMP_DIR}/mise.zip"
+
     if download_url "$_M_URL" "$_TMP_ZIP"; then
-      rm -rf "$_TMP_DIR" && mkdir -p "$_TMP_DIR"
       if unzip -q "$_TMP_ZIP" -d "$_TMP_DIR"; then
-        mv "$_TMP_DIR/mise/bin/mise.exe" "$_DEST"
-        mv "$_TMP_DIR/mise/bin/mise-shim.exe" "$(dirname "$_DEST")/mise-shim.exe" 2>/dev/null || true
-        rm -rf "$_TMP_DIR" "$_TMP_ZIP"
+        mv "${_TMP_DIR}/mise/bin/mise.exe" "$_DEST"
+        mv "${_TMP_DIR}/mise/bin/mise-shim.exe" "$(dirname "$_DEST")/mise-shim.exe" 2>/dev/null || true
+        rm -rf "$_TMP_DIR"
         return 0
       fi
     fi
+    rm -rf "$_TMP_DIR"
   else
     if download_url "$_M_URL" "$_DEST"; then
       chmod +x "$_DEST"
@@ -297,9 +303,12 @@ _mise_setup_completions() {
   local _SHELL="$1"
   log_info "Setting up mise completions for ${_SHELL}..."
 
+  # mise completion performs better when 'usage' is installed.
+  run_mise use --global usage >/dev/null 2>&1 || true
+
   case "$_SHELL" in
   zsh)
-    local _DIR="${ZDOTDIR-$HOME}/.zsh/completions"
+    local _DIR="${ZDOTDIR:-$HOME}/.zsh/completions"
     mkdir -p "$_DIR"
     mise completion zsh >"$_DIR/_mise" 2>/dev/null || true
     ;;
@@ -455,6 +464,9 @@ bootstrap_mise() {
     log_error "All mise installation tiers failed."
     return 1
   fi
+
+  # Path Refresh: Ensure MISE is available for immediate setup
+  [ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
 
   # ── 🏗️ Post-Install Configuration ──
 
