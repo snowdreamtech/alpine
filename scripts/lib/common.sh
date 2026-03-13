@@ -550,7 +550,26 @@ EOF
   export _NETWORK_OPTIMIZED=true
 }
 
-# Purpose: Executes a mise command with built-in retries and auto-proxy/mirror logic.
+# Purpose: Extracts the configured version of a tool from .mise.toml.
+# Params:
+#   $1 - Tool name (e.g., "node", "python", "golangci-lint")
+# Returns:
+#   The version string or empty if not found.
+# Examples:
+#   VER=$(get_mise_tool_version "node")
+get_mise_tool_version() {
+  local _TOOL_NAME_MISE="$1"
+  local _MISE_TOM_PATH
+  _MISE_TOM_PATH=$(get_project_root)/.mise.toml
+  [ -f "$_MISE_TOM_PATH" ] || return 0
+
+  # Basic grep/sed parsing for [tools] section
+  # Handles both tool = "version" and "tool:sub" = "version"
+  grep -E "^\"?${_TOOL_NAME_MISE}\"?[[:space:]]*=" "$_MISE_TOM_PATH" 2>/dev/null |
+    sed -E 's/.*=[[:space:]]*"([^"]*)".*/\1/' | head -n 1 || true
+}
+
+# Purpose: Executes a mise command with retry logic and intelligent fallback.
 # Params:
 #   $@ - Command and arguments for mise
 # Examples:
@@ -559,30 +578,19 @@ run_mise() {
   local _CMD="$1"
   shift
 
-  # Special handling for 'install' to avoid redundant process forks
-  # If we are installing a specific tool, check if it's already active
-  if [ "$_CMD" = "install" ] && [ $# -eq 1 ]; then
-    local _TOOL="$1"
-    # If the tool is already in path and managed by mise (i.e. not a system global), skip.
-    # Exception: If tool is a github reference, we still run it to ensure latest/exists.
-    case "$_TOOL" in
-    github:* | http:* | https:*) ;;
-    *)
-      if command -v "$_TOOL" >/dev/null 2>&1; then
-        local _WHICH
-        _WHICH=$(command -v "$_TOOL")
-        # If it's a mise shim, it's already "installed"
-        case "$_WHICH" in
-        *"/mise/shims/"*)
-          log_debug "Tool '$_TOOL' is already managed by mise. Skipping redundant install."
-          return 0
-          ;;
-        esac
-      fi
-      ;;
-    esac
+  # (Mise install is generally fast, but checking avoids overhead)
+  if [ "$_CMD" = "install" ] && [ -n "$1" ]; then
+    local _TOOL_CHECK="$1"
+    # Normalize tool name for check (strip github: prefixes etc)
+    local _TOOL_BASE
+    _TOOL_BASE=$(echo "$_TOOL_CHECK" | sed -E 's/^(github|aqua|cargo|npm)://; s/.*\///')
+
+    if command -v "$_TOOL_BASE" >/dev/null 2>&1; then
+      log_debug "Tool $_TOOL_BASE appears to be already installed. Letting mise verify..."
+    fi
   fi
 
+  # ── Attempt 1: Standard Execution ──
   optimize_network
   local _MAX_RETRIES=3
   local _RETRY_COUNT=0
@@ -916,7 +924,7 @@ get_project_version() {
   elif [ -f "pyproject.toml" ]; then
     grep '^version =' "pyproject.toml" | head -n 1 | sed 's/.*"//;s/".*//'
   elif [ -f "VERSION" ]; then
-    cat "VERSION" | head -n 1 | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+    head -n 1 "VERSION" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
   else
     # Fallback to git tag if available
     if command -v git >/dev/null 2>&1 && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
