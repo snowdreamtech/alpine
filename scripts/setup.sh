@@ -410,19 +410,14 @@ setup_powershell() {
 }
 
 # Purpose: Installs google-java-format for Java project linting.
-# Params:
-#   None (uses global JAVA_FORMAT_VERSION)
-# Examples:
-#   install_java_lint
+# Delegate: Managed by mise (.mise.toml)
 install_java_lint() {
   local _T0_JAVA
   _T0_JAVA=$(date +%s)
-  local _JAR_JAVA
-  _JAR_JAVA="${VENV}/bin/google-java-format.jar"
-  local _BIN_JAVA
-  _BIN_JAVA="${VENV}/bin/google-java-format"
-  if [ -f "${_JAR_JAVA}" ] && [ "${DRY_RUN:-0}" -eq 0 ]; then
-    log_summary "Lint Tool" "Java Lint" "✅ Exists" "$JAVA_FORMAT_VERSION" "0"
+  log_info "── Setting up Java Linter (google-java-format) ──"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "Java Lint" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
@@ -430,25 +425,13 @@ install_java_lint() {
     log_summary "Lint Tool" "Java Lint" "⏭️ Skipped" "-" "0"
     return 0
   fi
-  log_info "── Installing google-java-format ──"
 
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Lint Tool" "Java Lint" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
+  local _STAT_JAVA="✅ mise"
+  # google-java-format is available via mise (usually via an asdf plugin or github source)
+  run_mise install google-java-format || _STAT_JAVA="❌ Failed"
 
-  local _URL_JAVA
-  _URL_JAVA="${GITHUB_PROXY}https://github.com/google/google-java-format/releases/download/v${JAVA_FORMAT_VERSION}/google-java-format-${JAVA_FORMAT_VERSION}-all-deps.jar"
-  local _STAT_JAVA="✅ Installed"
-  if download_url "${_URL_JAVA}" "${_JAR_JAVA}" "google-java-format"; then
-    printf "#!/bin/sh\njava -jar \"%s\" \"\$@\"\n" "${_JAR_JAVA}" >"${_BIN_JAVA}" || _STAT_JAVA="❌ Failed"
-    chmod +x "${_BIN_JAVA}" 2>/dev/null || true
-  else
-    _STAT_JAVA="❌ Failed"
-  fi
-  local _DUR_JAVA
-  _DUR_JAVA=$(($(date +%s) - _T0_JAVA))
-  log_summary "Lint Tool" "Java Lint" "$_STAT_JAVA" "$JAVA_FORMAT_VERSION" "$_DUR_JAVA"
+  local _DUR_JAVA=$(($(date +%s) - _T0_JAVA))
+  log_summary "Lint Tool" "Java Lint" "$_STAT_JAVA" "$(get_version google-java-format)" "$_DUR_JAVA"
 }
 
 # Purpose: Sets up Rubocop for Ruby project linting.
@@ -499,17 +482,14 @@ install_ruby_lint() {
 }
 
 # Purpose: Installs php-cs-fixer for PHP project linting.
-# Params:
-#   None (uses global PHP_CS_FIXER_VERSION)
-# Examples:
-#   install_php_lint
+# Delegate: Managed by mise (.mise.toml)
 install_php_lint() {
   local _T0_PHP
   _T0_PHP=$(date +%s)
-  local _BIN_PHP
-  _BIN_PHP="${VENV}/bin/php-cs-fixer"
-  if [ -x "${_BIN_PHP}" ] && [ "${DRY_RUN:-0}" -eq 0 ]; then
-    log_summary "Lint Tool" "PHP Lint" "✅ Exists" "$PHP_CS_FIXER_VERSION" "0"
+  log_info "── Setting up PHP Linter (php-cs-fixer) ──"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "PHP Lint" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
@@ -517,24 +497,12 @@ install_php_lint() {
     log_summary "Lint Tool" "PHP Lint" "⏭️ Skipped" "-" "0"
     return 0
   fi
-  log_info "── Installing php-cs-fixer ──"
 
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Lint Tool" "PHP Lint" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
+  local _STAT_PHP="✅ mise"
+  run_mise install php-cs-fixer || _STAT_PHP="❌ Failed"
 
-  local _URL_PHP
-  _URL_PHP="${GITHUB_PROXY}https://github.com/PHP-CS-Fixer/PHP-CS-Fixer/releases/download/${PHP_CS_FIXER_VERSION}/php-cs-fixer.phar"
-  local _STAT_PHP="✅ Installed"
-  if download_url "${_URL_PHP}" "${_BIN_PHP}" "php-cs-fixer"; then
-    chmod +x "${_BIN_PHP}" 2>/dev/null || true
-  else
-    _STAT_PHP="❌ Failed"
-  fi
-  local _DUR_PHP
-  _DUR_PHP=$(($(date +%s) - _T0_PHP))
-  log_summary "Lint Tool" "PHP Lint" "$_STAT_PHP" "$PHP_CS_FIXER_VERSION" "$_DUR_PHP"
+  local _DUR_PHP=$(($(date +%s) - _T0_PHP))
+  log_summary "Lint Tool" "PHP Lint" "$_STAT_PHP" "$(get_version php-cs-fixer)" "$_DUR_PHP"
 }
 
 # Purpose: Verifies Dart SDK availability.

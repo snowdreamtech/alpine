@@ -82,34 +82,14 @@ MIRROR_RUST_UPDATE="${MIRROR_RUST_UPDATE:-https://mirrors.ustc.edu.cn/rust-stati
 
 # ── 🔨 SSoT Tool Versions ────────────────────────────────────────────────────
 
-PYTHON_VERSION="${PYTHON_VERSION:-3.12.9}"
-NODE_VERSION="${NODE_VERSION:-20.18.3}"
-NPM_VERSION="${NPM_VERSION:-10.5.2}"
-# Tool chain management
+# Runtime versions (Managed via .mise.toml, but some logic might still reference these for bootstrap purposes)
+# Only MISE and UV are hardcoded here to facilitate the zero-dependency bootstrap phase.
 MISE_VERSION="${MISE_VERSION:-2026.3.8}"
 UV_VERSION="${UV_VERSION:-0.10.9}"
-GITLEAKS_VERSION="${GITLEAKS_VERSION:-8.30.0}"
-HADOLINT_VERSION="${HADOLINT_VERSION:-2.14.0}"
-GOLANGCI_VERSION="${GOLANGCI_VERSION:-1.64.5}"
-CHECKMAKE_VERSION="${CHECKMAKE_VERSION:-0.3.2}"
-TFLINT_VERSION="${TFLINT_VERSION:-0.61.0}"
-KUBE_LINTER_VERSION="${KUBE_LINTER_VERSION:-0.8.1}"
-SHFMT_VERSION="${SHFMT_VERSION:-3.12.0}"
-SHELLCHECK_VERSION="${SHELLCHECK_VERSION:-0.10.0}"
-ZIZMOR_VERSION="${ZIZMOR_VERSION:-1.3.1}"
-ACTIONLINT_VERSION="${ACTIONLINT_VERSION:-1.7.11}"
-JAVA_FORMAT_VERSION="${JAVA_FORMAT_VERSION:-1.34.1}"
-PHP_CS_FIXER_VERSION="${PHP_CS_FIXER_VERSION:-3.94.2}"
-OSV_SCANNER_VERSION="${OSV_SCANNER_VERSION:-2.3.2}"
-TRIVY_VERSION="${TRIVY_VERSION:-0.69.3}"
-EDITORCONFIG_CHECKER_VERSION="${EDITORCONFIG_CHECKER_VERSION:-3.6.1}"
-GHT_VERSION="${GHT_VERSION:-1.2.0}"
 
-# Export versions for sub-shells
-export GITLEAKS_VERSION HADOLINT_VERSION GOLANGCI_VERSION CHECKMAKE_VERSION
-export TFLINT_VERSION KUBE_LINTER_VERSION SHFMT_VERSION SHELLCHECK_VERSION
-export ZIZMOR_VERSION ACTIONLINT_VERSION JAVA_FORMAT_VERSION PHP_CS_FIXER_VERSION
-export OSV_SCANNER_VERSION TRIVY_VERSION EDITORCONFIG_CHECKER_VERSION
+# Note: All other tools (Gitleaks, Shellcheck, Shfmt, Java Format, etc.) are purely managed
+# by the project's .mise.toml file. Do not add hardcoded version variables here.
+# Any tool added below MUST have a corresponding entry in .mise.toml Tools section.
 
 # ── 🛣️ PATH Augmentation ──────────────────────────────────────────────────────
 
