@@ -1165,7 +1165,7 @@ EOF
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
     # Full list for "On-demand" (default) or "All" (explicit)
-    _MODULES_LIST="node python gitleaks hadolint go checkmake tflint kube-linter powershell java ruby dart swift dotnet security editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit pre-commit hooks"
+    _MODULES_LIST="node python gitleaks hadolint go checkmake tflint kube-linter powershell java ruby dart swift dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit pre-commit hooks"
   else
     # Specific modules requested (e.g., ./setup.sh node)
     _MODULES_LIST="${_RAW_ARGS}"
@@ -1206,6 +1206,11 @@ EOF
     dart) setup_dart ;;
     swift) setup_swift ;;
     dotnet) setup_dotnet ;;
+    osv-scanner) install_osv_scanner ;;
+    trivy) install_trivy ;;
+    zizmor) install_zizmor ;;
+    govulncheck) install_govulncheck ;;
+    cargo-audit) install_cargo_audit ;;
     security) setup_security ;;
     editorconfig-checker) install_editorconfig_checker ;;
     shfmt) install_shfmt ;;
