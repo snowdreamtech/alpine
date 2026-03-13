@@ -1,7 +1,8 @@
 [tools]
+"php-cs-fixer" = "latest"
 python = "3.12.9"
-node = "24.1.0"
-pnpm = "10.28.0"
+node = "20.18.3"
+pnpm = "10.5.2"
 yarn = "1.22.22"
 bun = "1.2.4"
 uv = "0.10.9"
@@ -25,3 +26,6 @@ zizmor = "1.3.1"
 experimental = true
 asdf_compat = true
 url_replacements = { "https://github.com/" = "https://gh-proxy.sn0wdr1am.com/https://github.com/" }
+
+[plugins]
+"php-cs-fixer" = "https://github.com/oliviermilla/asdf-php-cs-fixer.git"

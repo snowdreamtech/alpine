@@ -823,11 +823,18 @@ EOF
   # 5. Bootstrap Toolchain Manager
   bootstrap_mise || log_warn "Warning: mise bootstrap failed. Falling back to local tool installation."
 
-  # 6. Optimized SSoT: Bulk install ONLY if 'all' is explicitly requested.
-  # This follows the principle of "On-demand" for the default behavior.
-  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_ALL_MODULES" = "true" ]; then
-    log_info "Synchronizing all tools from .mise.toml..."
-    run_mise install
+  # 6. Optimized SSoT: Sync plugins and bulk install tools
+  if [ "${DRY_RUN:-0}" -eq 0 ]; then
+    log_info "Synchronizing mise plugins and tools..."
+    # Ensure any custom plugins defined in .mise.toml are installed
+    if grep -q "\[plugins\]" .mise.toml; then
+      run_quiet mise plugins install --all
+    fi
+
+    if [ "$_IS_ALL_MODULES" = "true" ]; then
+      log_info "Synchronizing all tools from .mise.toml..."
+      run_mise install
+    fi
   fi
 
   # 7. Execution
