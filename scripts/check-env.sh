@@ -77,6 +77,12 @@ check_tool_version() {
   _LV_CURRENT_VER=$(get_version "$_LV_CMD")
   [ "$_LV_CURRENT_VER" = "-" ] && _LV_CURRENT_VER="0.0"
 
+  # If requirement is empty or -, allow anything
+  if [ -z "$_LV_MIN_VER" ] || [ "$_LV_MIN_VER" = "-" ]; then
+    log_success "✅ $_LV_NAME: v$_LV_CURRENT_VER (detected)"
+    return 0
+  fi
+
   local _LV_LOWER_VER
   _LV_LOWER_VER=$(printf "%s\n%s" "$_LV_MIN_VER" "$_LV_CURRENT_VER" | sort -n -t. -k1,1 -k2,2 -k3,3 | head -n1)
 
@@ -127,15 +133,15 @@ main() {
 
   # Node.js
   if [ -f "$PACKAGE_JSON" ]; then
-    check_tool_version "Node.js" "node" "24.1.0" "node -v" 1
-    check_tool_version "pnpm" "pnpm" "9.0.0" "pnpm -v" 1
+    check_tool_version "Node.js" "node" "$(get_mise_tool_version node)" "node -v" 1
+    check_tool_version "pnpm" "pnpm" "$(get_mise_tool_version pnpm)" "pnpm -v" 1
   else
     log_info "⏭️  Node.js/pnpm: Skipped (no package.json)"
   fi
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
-    check_tool_version "Python" "$PYTHON" "3.10.0" "$PYTHON --version" 1
+    check_tool_version "Python" "$PYTHON" "$(get_mise_tool_version python)" "$PYTHON --version" 1
   else
     log_info "⏭️  Python: Skipped (no python files)"
   fi
@@ -212,30 +218,25 @@ main() {
 
   # 7. Group: Security & Quality Tools
   log_info "── Security & Quality Tools ──"
-  if command -v gitleaks >/dev/null 2>&1; then log_success "✅ Gitleaks: Installed"; else
-    log_warn "⚠️  Gitleaks: Not found. Run 'make setup' to install."
-    HEALTHY_ST=1
-  fi
-  if command -v osv-scanner >/dev/null 2>&1; then log_success "✅ OSV-scanner: Installed"; else log_warn "⚠️  OSV-scanner: Not found. Run 'make setup' to install."; fi
-  if command -v trivy >/dev/null 2>&1; then log_success "✅ Trivy: Installed"; else log_warn "⚠️  Trivy: Not found. Run 'make setup' to install."; fi
-  if command -v zizmor >/dev/null 2>&1; then log_success "✅ Zizmor: Installed"; else log_warn "⚠️  Zizmor: Not found. Run 'make setup' to install."; fi
+  check_tool_version "Gitleaks" "gitleaks" "$(get_mise_tool_version gitleaks)" "gitleaks version" 0
+  check_tool_version "OSV-scanner" "osv-scanner" "$(get_mise_tool_version osv-scanner)" "osv-scanner --version" 0
+  check_tool_version "Trivy" "trivy" "$(get_mise_tool_version trivy)" "trivy --version" 0
+  check_tool_version "Zizmor" "zizmor" "$(get_mise_tool_version zizmor)" "zizmor --version" 0
 
   log_info "── Lint & Quality Tools ──"
-  if command -v shfmt >/dev/null 2>&1; then log_success "✅ Shfmt: Installed"; else log_warn "⚠️  Shfmt: Not found."; fi
-  if command -v shellcheck >/dev/null 2>&1; then log_success "✅ Shellcheck: Installed"; else log_warn "⚠️  Shellcheck: Not found."; fi
-  if command -v actionlint >/dev/null 2>&1; then log_success "✅ Actionlint: Installed"; else log_warn "⚠️  Actionlint: Not found."; fi
-  if command -v editorconfig-checker >/dev/null 2>&1; then log_success "✅ EditorConfig: Installed"; else log_warn "⚠️  EditorConfig: Not found."; fi
+  check_tool_version "Shfmt" "shfmt" "$(get_mise_tool_version shfmt)" "shfmt --version" 0
+  check_tool_version "Shellcheck" "shellcheck" "$(get_mise_tool_version shellcheck)" "shellcheck --version" 0
+  check_tool_version "Actionlint" "actionlint" "$(get_mise_tool_version actionlint)" "actionlint --version" 0
+  check_tool_version "EditorConfig" "editorconfig-checker" "$(get_mise_tool_version editorconfig-checker)" "editorconfig-checker --version" 0
 
   if [ -f "Dockerfile" ] || [ -f "docker-compose.yml" ]; then
-    if command -v hadolint >/dev/null 2>&1; then log_success "✅ Hadolint: Installed"; else log_warn "⚠️  Hadolint: Not found."; fi
+    check_tool_version "Hadolint" "hadolint" "$(get_mise_tool_version hadolint)" "hadolint --version" 0
   fi
   if has_lang_files "go.mod" "*.go"; then
-    if command -v golangci-lint >/dev/null 2>&1; then
-      log_success "✅ golangci-lint: Installed"
-    else log_warn "⚠️  golangci-lint: Not found."; fi
+    check_tool_version "golangci-lint" "golangci-lint" "$(get_mise_tool_version golangci-lint)" "golangci-lint --version" 0
   fi
   if has_lang_files "Makefile" "*.make"; then
-    if command -v checkmake >/dev/null 2>&1; then log_success "✅ Checkmake: Installed"; else log_warn "⚠️  Checkmake: Not found."; fi
+    check_tool_version "Checkmake" "checkmake" "$(get_mise_tool_version checkmake)" "checkmake --version" 0
   fi
   printf "\n"
 
