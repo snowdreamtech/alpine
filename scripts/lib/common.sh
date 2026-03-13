@@ -708,6 +708,24 @@ log_debug() {
   if [ "${VERBOSE:-1}" -ge 2 ]; then printf "[DEBUG] %b\n" "$_msg_dbg"; fi
 }
 
+# Purpose: Returns the absolute path to the project root directory.
+# Returns:
+#   Absolute path string.
+# Examples:
+#   ROOT=$(get_project_root)
+get_project_root() {
+  local _DIR
+  _DIR=$(pwd)
+  while [ "$_DIR" != "/" ]; do
+    if [ -f "$_DIR/Makefile" ] || [ -f "$_DIR/package.json" ] || [ -d "$_DIR/.git" ] || [ -f "$_DIR/.mise.toml" ]; then
+      echo "$_DIR"
+      return 0
+    fi
+    _DIR=$(dirname "$_DIR")
+  done
+  pwd
+}
+
 # Purpose: Verifies that the current working directory is the project root.
 #          Exit 1 if critical root files (Makefile or package.json) are missing.
 # Examples:
