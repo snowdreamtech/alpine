@@ -418,6 +418,11 @@ _mise_apply_activation() {
 }
 
 bootstrap_mise() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_info "Dry-run: Skipping mise bootstrap."
+    return 0
+  fi
+
   if command -v mise >/dev/null 2>&1; then
     log_debug "mise is already installed."
     _mise_apply_activation "$(_mise_detect_shell)"
@@ -1215,7 +1220,7 @@ get_version() {
       "$_CMD_VER" version 2>&1 | head -n 1 | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
       ;;
     node | python | cargo | dotnet | dart | pwsh | trivy | actionlint | tflint | kube-linter | ruff | yamllint | sqlfluff | shellcheck | shfmt | editorconfig-checker | golangci-lint | checkmake)
-      "$_CMD_VER" "$_ARG_VER" 2>&1 | head -n 1 | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+)?' | head -n 1 | cut -c1-15
+      "$_CMD_VER" "$_ARG_VER" 2>&1 | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+(\.[0-9]+)?)?' | head -n 1 | cut -c1-15
       ;;
     pip-audit | govulncheck | zizmor)
       "$_CMD_VER" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1

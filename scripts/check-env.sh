@@ -18,7 +18,7 @@
 #   - Language-aware runtime detection (Node, Go, Python, etc.).
 #   - High-performance, non-destructive validation scans.
 
-set -e
+# set -e removed to allow full diagnostic reporting
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)

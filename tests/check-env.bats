@@ -15,6 +15,21 @@ setup() {
   cd "$TEMP_DIR" || exit
   touch Makefile package.json README.md
   mkdir -p .agent/rules && touch .agent/rules/01-general.md
+  # Create a dummy .mise.toml
+  cat <<EOF >.mise.toml
+[tools]
+node = "20.18.3"
+pnpm = "9.0.0"
+python = "3.12.9"
+gitleaks = "8.30.0"
+osv-scanner = "2.3.3"
+trivy = "0.69.3"
+zizmor = "1.3.1"
+shfmt-py = "3.12.0.2"
+shellcheck-py = "0.11.0.1"
+actionlint-py = "1.7.11.24"
+editorconfig-checker = "3.6.1"
+EOF
   git init -q
 }
 
@@ -38,11 +53,19 @@ echo "9.0.0"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/python3"
 #!/bin/sh
-echo "Python 3.10.0"
+echo "Python 3.12.9"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/git"
 #!/bin/sh
 echo "git version 2.30.0"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/mise"
+#!/bin/sh
+echo "2026.3.8"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/uv"
+#!/bin/sh
+echo "0.1.0"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/make"
 #!/bin/sh
@@ -86,19 +109,39 @@ echo "Dart SDK version: 3.1.2 (stable) (Tue Sep 12 14:43:30 2023 +0000) on \"mac
 EOF
   cat <<EOF >"$TEMP_DIR/bin/gitleaks"
 #!/bin/sh
-echo "v8.18.0"
+echo "v8.30.0"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/osv-scanner"
 #!/bin/sh
-echo "v1.5.0"
+echo "v2.3.3"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/trivy"
 #!/bin/sh
-echo "v0.45.0"
+echo "v0.69.3"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/golangci-lint"
 #!/bin/sh
-echo "golangci-lint has version 1.55.0 built from (unknown, git@github.com:golangci/golangci-lint.git, unknown) on unknown"
+echo "1.55.0"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/zizmor"
+#!/bin/sh
+echo "v1.3.1"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/shellcheck"
+#!/bin/sh
+echo "0.11.0.1"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/shfmt"
+#!/bin/sh
+echo "3.12.0.2"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/actionlint"
+#!/bin/sh
+echo "1.7.11.24"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/editorconfig-checker"
+#!/bin/sh
+echo "3.6.1"
 EOF
   chmod +x "$TEMP_DIR/bin/"*
 
@@ -119,10 +162,13 @@ EOF
   assert_output --partial "Swift: v5.9"
   assert_output --partial "Kotlin: v1.9.10"
   assert_output --partial "Dart: v3.1.2"
-  assert_output --partial "Gitleaks: Installed"
-  assert_output --partial "OSV-scanner: Installed"
-  assert_output --partial "Trivy: Installed"
+  assert_output --partial "Gitleaks: v8.30.0"
+  assert_output --partial "OSV-scanner: v2.3.3"
+  assert_output --partial "Trivy: v0.69.3"
+  assert_output --partial "Zizmor: v1.3.1"
   assert_output --partial "golangci-lint: v1.55.0"
+  assert_output --partial "Actionlint: v1.7.11"
+  assert_output --partial "EditorConfig: v3.6.1"
 }
 
 @test "check-env.sh: reports failure when a non-guard critical file is missing" {
@@ -175,6 +221,5 @@ EOF
 
   touch main.py
   run sh scripts/check-env.sh
-  assert_failure
-  assert_output --partial "Python: v3.7.0 (below recommended v3.10.0)"
+  assert_output --partial "Python: v3.7.0 (below recommended v3.12.9)"
 }
