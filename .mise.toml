@@ -20,6 +20,15 @@ editorconfig-checker = "3.6.1"
 "github:google/osv-scanner" = "2.3.2"
 "github:aquasecurity/trivy" = "0.69.3"
 "github:google/google-java-format" = "1.25.2"
+taplo = "0.9.3"
+"npm:prettier" = "3.5.2"
+"npm:sort-package-json" = "2.14.0"
+"github:goreleaser/goreleaser" = "2.7.0"
+"npm:@stoplight/spectral-cli" = "6.11.1"
+"npm:@commitlint/cli" = "19.7.1"
+"npm:dockerfile-utils" = "0.7.1"
+"npm:clang-format" = "1.8.0"
+"github:pinterest/ktlint" = "1.5.0"
 
 [settings]
 experimental = true
