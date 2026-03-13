@@ -72,6 +72,12 @@ Modules (default: all):
   dockerfile-utils   Install dockerfile-utils
   clang-format       Install clang-format
   ktlint             Install ktlint
+  ruff               Install ruff
+  yamllint           Install yamllint
+  sqlfluff           Install sqlfluff
+  markdownlint       Install markdownlint
+  ansible-lint       Install ansible-lint
+  dotenv-linter      Install dotenv-linter
   hooks              Activate Pre-commit Hooks
   all                Run all of the above
 
@@ -603,6 +609,46 @@ install_zizmor() {
   log_summary "Security Tool" "Zizmor" "$_STAT_ZIZ" "$(get_version zizmor)" "$(($(date +%s) - _T0_ZIZ))"
 }
 
+# Purpose: Installs cargo-audit for Rust projects.
+# Delegate: Managed by mise (.mise.toml)
+install_cargo_audit() {
+  local _T0_CRGO
+  _T0_CRGO=$(date +%s)
+  log_info "── Setting up Cargo-Audit ──"
+
+  if ! has_lang_files "Cargo.toml Cargo.lock" "*.rs"; then
+    log_summary "Security Tool" "Cargo-Audit" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  # Explicit manager check (SSoT: cargo: prefix requires cargo)
+  ensure_manager cargo
+
+  local _STAT_CRGO="✅ mise"
+  run_mise install "cargo:cargo-audit" || _STAT_CRGO="❌ Failed"
+  log_summary "Security Tool" "Cargo-Audit" "$_STAT_CRGO" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_CRGO))"
+}
+
+# Purpose: Installs govulncheck for Go projects.
+# Delegate: Managed by mise (.mise.toml)
+install_govulncheck() {
+  local _T0_VULN
+  _T0_VULN=$(date +%s)
+  log_info "── Setting up Govulncheck ──"
+
+  if ! has_lang_files "go.mod go.sum" "*.go"; then
+    log_summary "Security Tool" "Govulncheck" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  # Explicit manager check (SSoT: go: prefix requires go)
+  ensure_manager go
+
+  local _STAT_VULN="✅ mise"
+  run_mise install "go:golang.org/x/vuln/cmd/govulncheck" || _STAT_VULN="❌ Failed"
+  log_summary "Security Tool" "Govulncheck" "$_STAT_VULN" "$(get_version govulncheck)" "$(($(date +%s) - _T0_VULN))"
+}
+
 # Purpose: Installs shfmt for shell script formatting.
 # Delegate: Managed by mise (.mise.toml)
 install_shfmt() {
@@ -659,6 +705,10 @@ install_prettier() {
     log_summary "Lint Tool" "Prettier" "⏭️ Skipped" "-" "0"
     return 0
   fi
+
+  # Explicit manager check (SSoT: npm: prefix requires npm)
+  ensure_manager npm
+
   local _STAT_PRE="✅ mise"
   run_mise install "npm:prettier" || _STAT_PRE="❌ Failed"
   log_summary "Lint Tool" "Prettier" "$_STAT_PRE" "$(get_version prettier)" "$(($(date +%s) - _T0_PRE))"
@@ -673,6 +723,9 @@ install_sort_package_json() {
     log_summary "Other" "sort-package-json" "⏭️ Skipped" "-" "0"
     return 0
   fi
+
+  ensure_manager npm
+
   local _STAT_SPJ="✅ mise"
   run_mise install "npm:sort-package-json" || _STAT_SPJ="❌ Failed"
   log_summary "Other" "sort-package-json" "$_STAT_SPJ" "$(get_version sort-package-json)" "$(($(date +%s) - _T0_SPJ))"
@@ -701,6 +754,9 @@ install_spectral() {
     log_summary "Lint Tool" "Spectral" "⏭️ Skipped" "-" "0"
     return 0
   fi
+
+  ensure_manager npm
+
   local _STAT_SPEC="✅ mise"
   run_mise install "npm:@stoplight/spectral-cli" || _STAT_SPEC="❌ Failed"
   log_summary "Lint Tool" "Spectral" "$_STAT_SPEC" "$(get_version spectral --version)" "$(($(date +%s) - _T0_SPEC))"
@@ -711,6 +767,9 @@ install_commitlint() {
   local _T0_CL
   _T0_CL=$(date +%s)
   log_info "── Setting up Commitlint ──"
+
+  ensure_manager npm
+
   local _STAT_CL="✅ mise"
   run_mise install "npm:@commitlint/cli" || _STAT_CL="❌ Failed"
   log_summary "Other" "Commitlint" "$_STAT_CL" "$(get_version commitlint --version)" "$(($(date +%s) - _T0_CL))"
@@ -725,6 +784,9 @@ install_dockerfile_utils() {
     log_summary "Lint Tool" "dockerfile-utils" "⏭️ Skipped" "-" "0"
     return 0
   fi
+
+  ensure_manager npm
+
   local _STAT_DU="✅ mise"
   run_mise install "npm:dockerfile-utils" || _STAT_DU="❌ Failed"
   log_summary "Lint Tool" "dockerfile-utils" "$_STAT_DU" "$(get_version dockerfile-utils)" "$(($(date +%s) - _T0_DU))"
@@ -739,6 +801,9 @@ install_clang_format() {
     log_summary "Lint Tool" "clang-format" "⏭️ Skipped" "-" "0"
     return 0
   fi
+
+  ensure_manager npm
+
   local _STAT_CF="✅ mise"
   run_mise install "npm:clang-format" || _STAT_CF="❌ Failed"
   log_summary "Lint Tool" "clang-format" "$_STAT_CF" "$(get_version clang-format)" "$(($(date +%s) - _T0_CF))"
@@ -758,6 +823,93 @@ install_ktlint() {
   log_summary "Lint Tool" "ktlint" "$_STAT_KT" "$(get_version ktlint --version)" "$(($(date +%s) - _T0_KT))"
 }
 
+# Purpose: Installs ruff.
+install_ruff() {
+  local _T0_RUF
+  _T0_RUF=$(date +%s)
+  log_info "── Setting up Ruff ──"
+  if ! has_lang_files "requirements.txt pyproject.toml" "*.py"; then
+    log_summary "Lint Tool" "Ruff" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  local _STAT_RUF="✅ mise"
+  run_mise install ruff || _STAT_RUF="❌ Failed"
+  log_summary "Lint Tool" "Ruff" "$_STAT_RUF" "$(get_version ruff)" "$(($(date +%s) - _T0_RUF))"
+}
+
+# Purpose: Installs yamllint.
+install_yamllint() {
+  local _T0_YL
+  _T0_YL=$(date +%s)
+  log_info "── Setting up Yamllint ──"
+  if ! has_lang_files ".yamllint .yamllint.yml" "*.yaml *.yml"; then
+    log_summary "Lint Tool" "Yamllint" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  local _STAT_YL="✅ mise"
+  run_mise install yamllint || _STAT_YL="❌ Failed"
+  log_summary "Lint Tool" "Yamllint" "$_STAT_YL" "$(get_version yamllint)" "$(($(date +%s) - _T0_YL))"
+}
+
+# Purpose: Installs sqlfluff.
+install_sqlfluff() {
+  local _T0_SQL
+  _T0_SQL=$(date +%s)
+  log_info "── Setting up Sqlfluff ──"
+  if ! has_lang_files ".sqlfluff" "*.sql"; then
+    log_summary "Lint Tool" "Sqlfluff" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  local _STAT_SQL="✅ mise"
+  run_mise install sqlfluff || _STAT_SQL="❌ Failed"
+  log_summary "Lint Tool" "Sqlfluff" "$_STAT_SQL" "$(get_version sqlfluff)" "$(($(date +%s) - _T0_SQL))"
+}
+
+# Purpose: Installs markdownlint-cli2.
+install_markdownlint() {
+  local _T0_MD
+  _T0_MD=$(date +%s)
+  log_info "── Setting up Markdownlint ──"
+  if ! has_lang_files "" "*.md"; then
+    log_summary "Lint Tool" "Markdownlint" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  ensure_manager npm
+
+  local _STAT_MD="✅ mise"
+  run_mise install "npm:markdownlint-cli2" || _STAT_MD="❌ Failed"
+  log_summary "Lint Tool" "Markdownlint" "$_STAT_MD" "$(get_version markdownlint-cli2)" "$(($(date +%s) - _T0_MD))"
+}
+
+# Purpose: Installs dotenv-linter.
+install_dotenv_linter() {
+  local _T0_DOT
+  _T0_DOT=$(date +%s)
+  log_info "── Setting up dotenv-linter ──"
+  if ! has_lang_files ".env .env.example" "*.env"; then
+    log_summary "Lint Tool" "dotenv-linter" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  local _STAT_DOT="✅ mise"
+  run_mise install "github:dotenv-linter/dotenv-linter" || _STAT_DOT="❌ Failed"
+  log_summary "Lint Tool" "dotenv-linter" "$_STAT_DOT" "$(get_version dotenv-linter)" "$(($(date +%s) - _T0_DOT))"
+}
+
+# Purpose: Installs ansible-lint.
+install_ansible_lint() {
+  local _T0_ANS
+  _T0_ANS=$(date +%s)
+  log_info "── Setting up Ansible-lint ──"
+  if ! has_lang_files "" "*.yml *.yaml"; then
+    log_summary "Lint Tool" "Ansible-lint" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  local _STAT_ANS="✅ mise"
+  run_mise install ansible-lint || _STAT_ANS="❌ Failed"
+  log_summary "Lint Tool" "Ansible-lint" "$_STAT_ANS" "$(get_version ansible-lint)" "$(($(date +%s) - _T0_ANS))"
+}
+
 # Purpose: Sets up several security audit tools (OSV-Scanner, Trivy, Zizmor, etc.).
 # Params:
 #   None
@@ -768,31 +920,8 @@ setup_security() {
   install_osv_scanner
   install_trivy
   install_zizmor
-
-  # Install govulncheck if go exists
-  if command -v go >/dev/null 2>&1; then
-    local _T0_VULN
-    _T0_VULN=$(date +%s)
-    if command -v govulncheck >/dev/null 2>&1; then
-      log_summary "Security Tool" "Govulncheck" "✅ Exists" "$(get_version govulncheck)" "0"
-    else
-      log_info "Installing govulncheck..."
-      if run_quiet go install golang.org/x/vuln/cmd/govulncheck@latest; then
-        log_summary "Security Tool" "Govulncheck" "✅ Installed" "$(get_version govulncheck)" "$(($(date +%s) - _T0_VULN))"
-      else
-        log_summary "Security Tool" "Govulncheck" "❌ Failed" "-" "0"
-      fi
-    fi
-  fi
-
-  # Install cargo-audit if cargo exists
-  if command -v cargo >/dev/null 2>&1; then
-    local _T0_CRGO
-    _T0_CRGO=$(date +%s)
-    local _STAT_CRGO="✅ mise"
-    run_mise install "cargo:cargo-audit" || _STAT_CRGO="❌ Failed"
-    log_summary "Security Tool" "Cargo-Audit" "$_STAT_CRGO" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_CRGO))"
-  fi
+  install_govulncheck
+  install_cargo_audit
 }
 
 # Purpose: Main entry point for the setup engine.
@@ -888,7 +1017,7 @@ EOF
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
     # Full list for "On-demand" (default) or "All" (explicit)
-    _MODULES_LIST="node python gitleaks hadolint go checkmake iac powershell java ruby dart swift dotnet security editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint hooks"
+    _MODULES_LIST="node python gitleaks hadolint go checkmake iac powershell java ruby dart swift dotnet security editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter hooks"
   else
     # Specific modules requested (e.g., ./setup.sh node)
     _MODULES_LIST="${_RAW_ARGS}"
@@ -942,6 +1071,12 @@ EOF
     dockerfile-utils) install_dockerfile_utils ;;
     clang-format) install_clang_format ;;
     ktlint) install_ktlint ;;
+    ruff) install_ruff ;;
+    yamllint) install_yamllint ;;
+    sqlfluff) install_sqlfluff ;;
+    markdownlint) install_markdownlint ;;
+    ansible-lint) install_ansible_lint ;;
+    dotenv-linter) install_dotenv_linter ;;
     hooks) setup_hooks ;;
     *) log_error "Unknown module: $_cur_module" ;;
     esac

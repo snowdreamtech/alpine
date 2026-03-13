@@ -703,6 +703,19 @@ log_error() {
 #   $1 - Message to log
 # Examples:
 #   log_debug "Temporary path: /tmp/build-123"
+# Purpose: Verifies that a required toolchain manager (e.g., cargo, npm, go) is available.
+# Params:
+#   $1 - Manager command name
+# Examples:
+#   ensure_manager cargo
+ensure_manager() {
+  local _MGR="$1"
+  if ! command -v "$_MGR" >/dev/null 2>&1; then
+    log_error "Error: Toolchain manager '$_MGR' is missing but required for this installation."
+    exit 1
+  fi
+}
+
 log_debug() {
   local _msg_dbg="$1"
   if [ "${VERBOSE:-1}" -ge 2 ]; then printf "[DEBUG] %b\n" "$_msg_dbg"; fi
