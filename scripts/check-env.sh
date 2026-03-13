@@ -55,6 +55,7 @@ EOF
 #   $3 - Minimum required version
 #   $4 - Version check command
 #   $5 - Critical flag (1 for core, 0 for optional)
+#   $6 - CI-only flag (1 to skip locally with info, 0 to always check)
 # Examples:
 #   check_tool_version "Git" "git" "2.30.0" "git --version" 1
 check_tool_version() {
@@ -63,10 +64,15 @@ check_tool_version() {
   local _LV_MIN_VER="$3"
   local _LV_VER_CMD="$4"
   local _LV_CRITICAL="${5:-0}"
+  local _LV_CI_ONLY="${6:-0}"
 
   log_debug "Checking $_LV_NAME (min: $_LV_MIN_VER)..."
 
   if ! command -v "$_LV_CMD" >/dev/null 2>&1; then
+    if [ "$_LV_CI_ONLY" -eq 1 ] && ! is_ci_env; then
+      log_info "⏭️  $_LV_NAME: CI-only (skipped locally)"
+      return 0
+    fi
     log_warn "❌ $_LV_NAME: Not found."
     HEALTHY_ST=1
     [ "${_LV_CRITICAL:-0}" -eq 1 ] && CORE_HEALTHY_ST=1
@@ -218,25 +224,32 @@ main() {
 
   # 7. Group: Security & Quality Tools
   log_info "── Security & Quality Tools ──"
-  check_tool_version "Gitleaks" "gitleaks" "$(get_mise_tool_version gitleaks)" "gitleaks version" 0
-  check_tool_version "OSV-scanner" "osv-scanner" "$(get_mise_tool_version osv-scanner)" "osv-scanner --version" 0
-  check_tool_version "Trivy" "trivy" "$(get_mise_tool_version trivy)" "trivy --version" 0
-  check_tool_version "Zizmor" "zizmor" "$(get_mise_tool_version zizmor)" "zizmor --version" 0
+  check_tool_version "Gitleaks" "gitleaks" "$(get_mise_tool_version gitleaks)" "gitleaks version" 0 0
+  check_tool_version "OSV-scanner" "osv-scanner" "$(get_mise_tool_version osv-scanner)" "osv-scanner --version" 0 1
+  check_tool_version "Trivy" "trivy" "$(get_mise_tool_version trivy)" "trivy --version" 0 1
+  check_tool_version "Zizmor" "zizmor" "$(get_mise_tool_version zizmor)" "zizmor --version" 0 1
 
   log_info "── Lint & Quality Tools ──"
-  check_tool_version "Shfmt" "shfmt" "$(get_mise_tool_version shfmt)" "shfmt --version" 0
-  check_tool_version "Shellcheck" "shellcheck" "$(get_mise_tool_version shellcheck)" "shellcheck --version" 0
-  check_tool_version "Actionlint" "actionlint" "$(get_mise_tool_version actionlint)" "actionlint --version" 0
-  check_tool_version "EditorConfig" "editorconfig-checker" "$(get_mise_tool_version editorconfig-checker)" "editorconfig-checker --version" 0
+  check_tool_version "Shfmt" "shfmt" "$(get_mise_tool_version shfmt-py)" "shfmt --version" 0 0
+  check_tool_version "Shellcheck" "shellcheck" "$(get_mise_tool_version shellcheck-py)" "shellcheck --version" 0 0
+  check_tool_version "Actionlint" "actionlint" "$(get_mise_tool_version actionlint-py)" "actionlint --version" 0 0
+  check_tool_version "EditorConfig" "editorconfig-checker" "$(get_mise_tool_version editorconfig-checker)" "editorconfig-checker --version" 0 0
 
   if [ -f "Dockerfile" ] || [ -f "docker-compose.yml" ]; then
-    check_tool_version "Hadolint" "hadolint" "$(get_mise_tool_version hadolint)" "hadolint --version" 0
+    check_tool_version "Hadolint" "hadolint" "$(get_mise_tool_version hadolint)" "hadolint --version" 0 0
   fi
   if has_lang_files "go.mod" "*.go"; then
-    check_tool_version "golangci-lint" "golangci-lint" "$(get_mise_tool_version golangci-lint)" "golangci-lint --version" 0
+    check_tool_version "golangci-lint" "golangci-lint" "$(get_mise_tool_version golangci-lint)" "golangci-lint --version" 0 0
+    check_tool_version "Govulncheck" "govulncheck" "latest" "govulncheck ./..." 0 1
   fi
   if has_lang_files "Makefile" "*.make"; then
-    check_tool_version "Checkmake" "checkmake" "$(get_mise_tool_version checkmake)" "checkmake --version" 0
+    check_tool_version "Checkmake" "checkmake" "$(get_mise_tool_version checkmake)" "checkmake --version" 0 0
+  fi
+  if has_lang_files "Cargo.toml" "*.rs"; then
+    check_tool_version "Cargo-audit" "cargo-audit" "latest" "cargo-audit --version" 0 1
+  fi
+  if has_lang_files "requirements.txt pyproject.toml" "*.py"; then
+    check_tool_version "Pip-audit" "pip-audit" "$(get_mise_tool_version pip-audit)" "pip-audit --version" 0 1
   fi
   printf "\n"
 
