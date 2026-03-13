@@ -1,5 +1,5 @@
 [tools]
-"php-cs-fixer" = "latest"
+"php-cs-fixer" = "3.94.2"
 python = "3.12.9"
 node = "20.18.3"
 pnpm = "10.5.2"
@@ -20,7 +20,6 @@ zizmor = "1.3.1"
 "github:google/osv-scanner" = "2.3.2"
 "github:aquasecurity/trivy" = "0.69.3"
 "github:google/google-java-format" = "1.25.2"
-"github:PHP-CS-Fixer/PHP-CS-Fixer" = "3.68.5"
 
 [settings]
 experimental = true
