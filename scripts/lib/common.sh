@@ -254,13 +254,31 @@ _mise_install_tier4() {
   log_info "Tier 4: Performing manual binary download for ${_OS}-${_ARCH} (v${_VER})..."
 
   local _M_BIN_NAME="mise-v${_VER}-${_OS}-${_ARCH}"
-  local _M_URL="https://github.com/jdx/mise/releases/download/v${_VER}/${_M_BIN_NAME}"
+  local _EXT=""
+  [ "$_OS" = "windows" ] && _EXT=".zip"
+  local _M_URL="https://github.com/jdx/mise/releases/download/v${_VER}/${_M_BIN_NAME}${_EXT}"
   local _DEST="$HOME/.local/bin/mise"
+  [ "$_OS" = "windows" ] && _DEST="${_DEST}.exe"
 
   mkdir -p "$(dirname "$_DEST")"
-  if download_url "$_M_URL" "$_DEST"; then
-    chmod +x "$_DEST"
-    return 0
+
+  if [ "$_OS" = "windows" ]; then
+    local _TMP_ZIP="/tmp/mise_win.zip"
+    local _TMP_DIR="/tmp/mise_win_extract"
+    if download_url "$_M_URL" "$_TMP_ZIP"; then
+      rm -rf "$_TMP_DIR" && mkdir -p "$_TMP_DIR"
+      if unzip -q "$_TMP_ZIP" -d "$_TMP_DIR"; then
+        mv "$_TMP_DIR/mise/bin/mise.exe" "$_DEST"
+        mv "$_TMP_DIR/mise/bin/mise-shim.exe" "$(dirname "$_DEST")/mise-shim.exe" 2>/dev/null || true
+        rm -rf "$_TMP_DIR" "$_TMP_ZIP"
+        return 0
+      fi
+    fi
+  else
+    if download_url "$_M_URL" "$_DEST"; then
+      chmod +x "$_DEST"
+      return 0
+    fi
   fi
   return 1
 }
