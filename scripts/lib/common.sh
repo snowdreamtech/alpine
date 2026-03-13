@@ -153,12 +153,18 @@ _mise_detect_shell() {
   _PARENT_SHELL=$(ps -p "$PPID" -o comm= 2>/dev/null | awk -F/ '{print $NF}' | tr -d '-')
 
   case "$_PARENT_SHELL" in
-  zsh | bash | fish) _M_SHELL="$_PARENT_SHELL" ;;
+  zsh | bash | fish | pwsh | powershell | nu | xonsh | elvish)
+    _M_SHELL="$_PARENT_SHELL"
+    ;;
   *)
     case "$SHELL" in
     *zsh*) _M_SHELL="zsh" ;;
     *bash*) _M_SHELL="bash" ;;
     *fish*) _M_SHELL="fish" ;;
+    *pwsh*) _M_SHELL="pwsh" ;;
+    *nu*) _M_SHELL="nu" ;;
+    *xonsh*) _M_SHELL="xonsh" ;;
+    *elvish*) _M_SHELL="elvish" ;;
     *) _M_SHELL="bash" ;;
     esac
     ;;
@@ -321,6 +327,16 @@ _mise_setup_completions() {
     local _DIR="$HOME/.config/fish/completions"
     mkdir -p "$_DIR"
     mise completion fish >"$_DIR/mise.fish" 2>/dev/null || true
+    ;;
+  pwsh | powershell)
+    local _DIR="$HOME/Documents/PowerShell/Completions"
+    mkdir -p "$_DIR"
+    mise completion pwsh >"$_DIR/mise-completion.ps1" 2>/dev/null || true
+    ;;
+  nu | nushell)
+    local _DIR="$HOME/.config/nushell/completions"
+    mkdir -p "$_DIR"
+    mise completion nu >"$_DIR/mise-completion.nu" 2>/dev/null || true
     ;;
   esac
 }
