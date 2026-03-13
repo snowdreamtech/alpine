@@ -331,12 +331,8 @@ _mise_setup_completions() {
   pwsh | powershell)
     local _DIR="$HOME/Documents/PowerShell/Completions"
     mkdir -p "$_DIR"
-    mise completion pwsh >"$_DIR/mise-completion.ps1" 2>/dev/null || true
-    ;;
-  nu | nushell)
-    local _DIR="$HOME/.config/nushell/completions"
-    mkdir -p "$_DIR"
-    mise completion nu >"$_DIR/mise-completion.nu" 2>/dev/null || true
+    # mise completion supports 'powershell' (or 'pwsh' as alias in newer versions)
+    mise completion powershell >"$_DIR/mise-completion.ps1" 2>/dev/null || true
     ;;
   esac
 }
@@ -748,21 +744,29 @@ download_url() {
   _DIR_DL=$(dirname "$_OUT_DL")
   mkdir -p "$_DIR_DL"
 
+  # Proactive Proxy Optimization (Rule 01)
+  local _TARGET_URL_DL="$_URL_DL"
+  if [ "${ENABLE_MIRROR:-0}" = "1" ] || [ "${ENABLE_MIRROR:-0}" = "true" ]; then
+    if echo "$_URL_DL" | grep -q "^https://github.com/"; then
+      _TARGET_URL_DL="${GITHUB_PROXY}${_URL_DL}"
+      log_debug "Redirecting via GitHub proxy: $_TARGET_URL_DL"
+    fi
+  fi
+
   log_info "Downloading $_DESC_DL..."
   # curl with retry flags as per rules
   if curl --retry 5 --retry-delay 2 --retry-connrefused --fail \
-    --connect-timeout 10 --max-time 60 \
-    -fsSL "${_URL_DL}" -o "${_OUT_DL}"; then
+    --connect-timeout 10 --max-time 120 \
+    -fsSL "${_TARGET_URL_DL}" -o "${_OUT_DL}"; then
     return 0
   fi
 
-  # Fallback if proxy failed and it was a proxied URL
-  if [ -n "${GITHUB_PROXY}" ] && echo "${_URL_DL}" | grep -q "^${GITHUB_PROXY}"; then
-    local _FALLBACK_URL_DL="${_URL_DL#"$GITHUB_PROXY"}"
-    log_warn "Proxy download failed for ${_DESC_DL}, retrying directly from ${_FALLBACK_URL_DL}..."
-    if curl --retry 5 --retry-delay 2 --retry-connrefused --fail \
-      --connect-timeout 10 --max-time 60 \
-      -fsSL "${_FALLBACK_URL_DL}" -o "${_OUT_DL}"; then
+  # Fallback if proxy failed (if we used it)
+  if [ "$_TARGET_URL_DL" != "$_URL_DL" ]; then
+    log_warn "Proxy download failed for ${_DESC_DL}, falling back to direct download..."
+    if curl --retry 2 --retry-delay 2 --retry-connrefused --fail \
+      --connect-timeout 10 --max-time 120 \
+      -fsSL "${_URL_DL}" -o "${_OUT_DL}"; then
       return 0
     fi
   fi
