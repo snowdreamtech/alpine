@@ -581,13 +581,28 @@ run_mise() {
   # (Mise install is generally fast, but checking avoids overhead)
   if [ "$_CMD" = "install" ] && [ -n "$1" ]; then
     local _TOOL_CHECK="$1"
-    # Normalize tool name for check (strip github: prefixes etc)
-    local _TOOL_BASE
-    _TOOL_BASE=$(echo "$_TOOL_CHECK" | sed -E 's/^(github|aqua|cargo|npm)://; s/.*\///')
 
-    if command -v "$_TOOL_BASE" >/dev/null 2>&1; then
-      log_debug "Tool $_TOOL_BASE appears to be already installed. Letting mise verify..."
+    # 1. Required Version from .mise.toml (SSoT)
+    local _REQ_VER
+    _REQ_VER=$(get_mise_tool_version "$_TOOL_CHECK")
+
+    # 2. Normalize binary name for check (strip prefixes etc)
+    local _TOOL_BASE
+    _TOOL_BASE=$(echo "$_TOOL_CHECK" | sed -E 's/^(github|aqua|cargo|npm|core)://; s/.*\///')
+
+    # 3. Current Version Check
+    local _CUR_VER
+    _CUR_VER=$(get_version "$_TOOL_BASE")
+
+    # 4. Rigorous Comparison (Software + Version)
+    if [ "$_CUR_VER" != "-" ] && [ -n "$_REQ_VER" ]; then
+      if [ "$_CUR_VER" = "$_REQ_VER" ] || echo "$_CUR_VER" | grep -q "$_REQ_VER"; then
+        log_debug "Tool $_TOOL_BASE v$_CUR_VER matches .mise.toml v$_REQ_VER. Skipping mise install."
+        return 0
+      fi
     fi
+
+    log_debug "Tool $_TOOL_BASE (current: $_CUR_VER, required: $_REQ_VER) needs initialization/update."
   fi
 
   # ── Attempt 1: Standard Execution ──
@@ -900,11 +915,16 @@ has_lang_files() {
     [ -f "$_f_lang" ] && return 0
   done
 
-  # 2. Check for file extensions (recursive, maxdepth 3 for performance)
+  # 2. Check for file extensions (recursive, maxdepth 5 for performance)
+  # Exclude common build/dependency/cache directories to avoid false positives and improve speed
+  local _FIND_EXCL="\! \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify -o -name .tmp -o -name tmp \)"
+
   local _ext_lang
   for _ext_lang in $_EXTS_LANG; do
     # Use find for POSIX compatibility and performance
-    if [ "$(find . -maxdepth 3 -name "$_ext_lang" -print -quit 2>/dev/null)" ]; then
+    # Pattern: find . (Exclusions) -prune ... is one way, but -name with ! -path is also POSIX
+    # Using -prune for maximum efficiency to stop descending into ignored folders
+    if [ "$(find . \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify -o -name .tmp -o -name tmp \) -prune -o -maxdepth 5 -name "$_ext_lang" -print -quit 2>/dev/null)" ]; then
       return 0
     fi
   done
