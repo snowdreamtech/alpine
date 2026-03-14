@@ -380,11 +380,19 @@ setup_hooks() {
     return 0
   fi
 
+  # Support both venv-local and mise/global pre-commit
+  local _PC_BIN=""
   if [ -x "$VENV/bin/pre-commit" ]; then
+    _PC_BIN="$VENV/bin/pre-commit"
+  elif command -v pre-commit >/dev/null 2>&1; then
+    _PC_BIN="pre-commit"
+  fi
+
+  if [ -n "$_PC_BIN" ]; then
     local _STAT_HOOK="✅ Activated"
-    run_quiet "$VENV/bin/pre-commit" install --hook-type pre-commit --hook-type pre-merge-commit --hook-type commit-msg || _STAT_HOOK="❌ Failed"
+    run_quiet "$_PC_BIN" install --hook-type pre-commit --hook-type pre-merge-commit --hook-type commit-msg || _STAT_HOOK="❌ Failed"
     local _V_HOOK
-    _V_HOOK=$(get_version "$VENV/bin/pre-commit")
+    _V_HOOK=$(get_version "$_PC_BIN")
     local _D_HOOK
     _D_HOOK=$(($(date +%s) - _T0_HOOK))
     log_summary "Other" "Hooks" "$_STAT_HOOK" "$_V_HOOK" "$_D_HOOK"
