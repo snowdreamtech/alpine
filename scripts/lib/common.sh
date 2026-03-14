@@ -66,6 +66,8 @@ DOCS_DIR="docs"
 PACKAGE_JSON="${PACKAGE_JSON:-package.json}"
 REQUIREMENTS_TXT="${REQUIREMENTS_TXT:-requirements.txt}"
 PYPROJECT_TOML="${PYPROJECT_TOML:-pyproject.toml}"
+CARGO_TOML="${CARGO_TOML:-Cargo.toml}"
+VERSION_FILE="${VERSION_FILE:-VERSION}"
 
 # Network Optimization & Mirror Configuration
 # NOTE: GITHUB_PROXY is optimized for Release/Archive/File downloads.
@@ -1058,6 +1060,24 @@ resolve_bin() {
   fi
 
   return 1
+}
+
+# Purpose: Dynamically extracts the project version from manifest files.
+# Returns: Version string (detected) or "0.0.0" (fallback).
+# Examples:
+#   VER=$(get_project_version)
+get_project_version() {
+  if [ -f "$PACKAGE_JSON" ]; then
+    grep '"version":' "$PACKAGE_JSON" | head -n 1 | sed 's/.*"version":[[:space:]]*"//;s/".*//'
+  elif [ -f "$CARGO_TOML" ]; then
+    grep '^version =' "$CARGO_TOML" | head -n 1 | sed -e 's/.*"\(.*\)"/\1/' -e "s/.*'\(.*\)'/\1/"
+  elif [ -f "$PYPROJECT_TOML" ]; then
+    grep '^version =' "$PYPROJECT_TOML" | head -n 1 | sed 's/.*"//;s/".*//'
+  elif [ -f "$VERSION_FILE" ]; then
+    awk 'NR==1' "$VERSION_FILE" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+  else
+    echo "0.0.0"
+  fi
 }
 
 # Purpose: Verifies if a required runtime or tool is available in the environment.
