@@ -784,11 +784,6 @@ check_ci_summary() {
   [ -n "$GITHUB_STEP_SUMMARY" ] && [ -f "$GITHUB_STEP_SUMMARY" ] && grep -qF "$1" "$GITHUB_STEP_SUMMARY"
 }
 
-
-
-
-
-
 # Purpose: Detects the current CI platform by inspecting well-known environment variables.
 # Returns: Platform name string, or "local" if not in a CI environment.
 # Examples:
@@ -827,7 +822,6 @@ detect_ci_platform() {
 is_ci_env() {
   [ "$(detect_ci_platform)" != "local" ]
 }
-
 
 # Purpose: Detects project language affiliation based on manifests or extensions.
 # Params:
@@ -876,8 +870,6 @@ has_lang_files() {
 
   return 1
 }
-
-
 
 # Purpose: Executes a command while suppressing its output in quiet mode.
 # Params:
@@ -992,39 +984,33 @@ log_summary() {
 get_version() {
   local _CMD_VER="$1"
   local _ARG_VER="${2:---version}"
+  [ -z "$_CMD_VER" ] && {
+    echo "-"
+    return 0
+  }
+
+  # 1. Try Mise First (Fast & Reliable for JIT tools)
+  if command -v mise >/dev/null 2>&1; then
+    local _MISE_VER_OUT
+    # We search for the tool name with potential prefixes (npm:, github:, cargo:, pipx:)
+    _MISE_VER_OUT=$(mise ls --json | jq -r "to_entries[] | select(.key == \"$_CMD_VER\" or .key == \"npm:$_CMD_VER\" or .key == \"github:$_CMD_VER\" or .key == \"cargo:$_CMD_VER\" or .key == \"pipx:$_CMD_VER\" or .key == \"github:goreleaser/$_CMD_VER\") | .value[] | select(.active==true) | .version" | head -n 1)
+    if [ -n "$_MISE_VER_OUT" ]; then
+      echo "$_MISE_VER_OUT"
+      return 0
+    fi
+  fi
+
+  # 2. Fallback to binary execution
   if command -v "$_CMD_VER" >/dev/null 2>&1; then
-    # Standard version extraction: find the first sequence starting with a digit
     case "$_CMD_VER" in
+    python | python3)
+      "$_CMD_VER" --version 2>&1 | cut -d' ' -f2
+      ;;
+    node)
+      "$_CMD_VER" --version 2>&1 | sed 's/^v//'
+      ;;
     go)
-      "$_CMD_VER" version 2>&1 | head -n 1 | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
-      ;;
-    node | python | cargo | dotnet | dart | pwsh | trivy | actionlint | tflint | kube-linter | ruff | yamllint | sqlfluff | shellcheck | shfmt | editorconfig-checker | golangci-lint | checkmake)
-      "$_CMD_VER" "$_ARG_VER" 2>&1 | grep -oE '[0-9]+\.[0-9]+(\.[0-9]+(\.[0-9]+)?)?' | head -n 1 | cut -c1-15
-      ;;
-    pip-audit | govulncheck | zizmor)
-      "$_CMD_VER" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
-      ;;
-    commitizen | git-cz | cz)
-      # git-cz can hang if it triggers git help pager or update-notifier.
-      # Prefer getting version from mise directly to avoid executing the tool.
-      if command -v mise >/dev/null 2>&1; then
-        mise ls -j 2>/dev/null | grep -E '"name": "(npm:)?commitizen"' -A 5 | grep '"version":' | head -n 1 | sed -E 's/.*"version": "([^"]*)".*/\1/' || echo "-"
-      else
-        env PAGER="cat" NO_UPDATE_NOTIFIER=1 "$_CZ_BIN" --version 2>&1 | head -n 1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1 || echo "-"
-      fi
-      ;;
-    spectral)
-      "$_CMD_VER" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
-      ;;
-    OSV-Scanner | osv-scanner)
-      "$_CMD_VER" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
-      ;;
-    markdownlint-cli2 | markdownlint)
-      "$_CMD_VER" --version 2>&1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
-      ;;
-    swift)
-      # Swift version output: "swift-driver version: 1.115 Apple Swift version 6.0.3 (swiftlang-6.0.3.1.10 ...)"
-      "$_CMD_VER" "$_ARG_VER" 2>&1 | sed -n 's/.*Swift version \([0-9][0-9.]*\).*/\1/p' | head -n 1
+      "$_CMD_VER" version 2>&1 | awk '{print $3}' | sed 's/^go//'
       ;;
     java)
       # java -version outputs to stderr and puts version in quotes
@@ -1036,6 +1022,7 @@ get_version() {
       "$_CMD_VER" "$_ARG_VER" 2>&1 | head -n 1 | sed 's/^[vV]//' | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
       ;;
     esac
+  else
     echo "-"
   fi
 }
@@ -1129,7 +1116,8 @@ init_summary_table() {
     export SETUP_SUMMARY_FILE
   fi
 
-  local _SENTINEL_TABLE="_SUMMARY_TABLE_INITIALIZED_$(echo "$_TITLE_TABLE" | tr ' ' '_')"
+  local _SENTINEL_TABLE
+  _SENTINEL_TABLE="_SUMMARY_TABLE_INITIALIZED_$(echo "$_TITLE_TABLE" | tr ' ' '_')"
   if [ "$(eval echo "\$$_SENTINEL_TABLE")" = "true" ]; then
     return 0
   fi

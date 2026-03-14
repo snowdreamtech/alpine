@@ -844,10 +844,9 @@ install_spectral() {
     return 0
   fi
 
-
   local _STAT_SPEC="✅ mise"
   run_mise install "npm:@stoplight/spectral-cli" || _STAT_SPEC="❌ Failed"
-  log_summary "Lint Tool" "Spectral" "$_STAT_SPEC" "$(get_version spectral --version)" "$(($(date +%s) - _T0_SPEC))"
+  log_summary "Lint Tool" "Spectral" "$_STAT_SPEC" "$(get_version spectral)" "$(($(date +%s) - _T0_SPEC))"
 }
 
 # Purpose: Installs commitlint.
@@ -856,10 +855,9 @@ install_commitlint() {
   _T0_CL=$(date +%s)
   log_info "── Setting up Commitlint ──"
 
-
   local _STAT_CL="✅ mise"
   run_mise install "npm:@commitlint/cli" || _STAT_CL="❌ Failed"
-  log_summary "Other" "Commitlint" "$_STAT_CL" "$(get_version commitlint --version)" "$(($(date +%s) - _T0_CL))"
+  log_summary "Other" "Commitlint" "$_STAT_CL" "$(get_version commitlint)" "$(($(date +%s) - _T0_CL))"
 }
 
 # Purpose: Installs dockerfile-utils.
@@ -871,7 +869,6 @@ install_dockerfile_utils() {
     log_summary "Lint Tool" "dockerfile-utils" "⏭️ Skipped" "-" "0"
     return 0
   fi
-
 
   local _STAT_DU="✅ mise"
   run_mise install "npm:dockerfile-utils" || _STAT_DU="❌ Failed"
@@ -958,7 +955,6 @@ install_markdownlint() {
     log_summary "Lint Tool" "Markdownlint" "⏭️ Skipped" "-" "0"
     return 0
   fi
-
 
   local _STAT_MD="✅ mise"
   run_mise install "npm:markdownlint-cli2" || _STAT_MD="❌ Failed"
@@ -1061,7 +1057,7 @@ install_eslint() {
   fi
   local _STAT_ES="✅ mise"
   run_mise install "npm:eslint" || _STAT_ES="❌ Failed"
-  log_summary "Lint Tool" "ESLint" "$_STAT_ES" "$(get_version eslint --version)" "$(($(date +%s) - _T0_ES))"
+  log_summary "Lint Tool" "ESLint" "$_STAT_ES" "$(get_version eslint)" "$(($(date +%s) - _T0_ES))"
 }
 
 # Purpose: Installs stylelint.
@@ -1075,7 +1071,7 @@ install_stylelint() {
   fi
   local _STAT_SL="✅ mise"
   run_mise install "npm:stylelint" || _STAT_SL="❌ Failed"
-  log_summary "Lint Tool" "Stylelint" "$_STAT_SL" "$(get_version stylelint --version)" "$(($(date +%s) - _T0_SL))"
+  log_summary "Lint Tool" "Stylelint" "$_STAT_SL" "$(get_version stylelint)" "$(($(date +%s) - _T0_SL))"
 }
 
 # Purpose: Installs vitepress.
@@ -1089,7 +1085,7 @@ install_vitepress() {
   fi
   local _STAT_VP="✅ mise"
   run_mise install "npm:vitepress" || _STAT_VP="❌ Failed"
-  log_summary "Doc Tool" "VitePress" "$_STAT_VP" "$(get_version vitepress --version)" "$(($(date +%s) - _T0_VP))"
+  log_summary "Doc Tool" "VitePress" "$_STAT_VP" "$(get_version vitepress)" "$(($(date +%s) - _T0_VP))"
 }
 
 # Purpose: Installs commitizen.
@@ -1099,7 +1095,7 @@ install_commitizen() {
   log_info "── Setting up Commitizen ──"
   local _STAT_CZ="✅ mise"
   run_mise install "npm:commitizen" || _STAT_CZ="❌ Failed"
-  log_summary "Other" "Commitizen" "$_STAT_CZ" "$(get_version git-cz --version)" "$(($(date +%s) - _T0_CZ))"
+  log_summary "Other" "Commitizen" "$_STAT_CZ" "$(get_version commitizen)" "$(($(date +%s) - _T0_CZ))"
 }
 
 # Purpose: Installs pip-audit for Python dependency vulnerability scanning.
@@ -1181,11 +1177,11 @@ main() {
 
   init_summary_table "Setup Execution Summary"
 
-    # Initialize Summary Legend (Only once per CI Job or first call)
-    if [ "$_SETUP_SUMMARY_INITIALIZED" != "true" ] && ! check_ci_summary "Status Legend:"; then
-      {
-        printf "### Setup Execution Summary\n\n"
-        cat <<EOF
+  # Initialize Summary Legend (Only once per CI Job or first call)
+  if [ "$_SETUP_SUMMARY_INITIALIZED" != "true" ] && ! check_ci_summary "Status Legend:"; then
+    {
+      printf "### Setup Execution Summary\n\n"
+      cat <<EOF
 > **Status Legend:**
 > ⚖️ **Previewed**: Running in \`--dry-run\` mode.
 > ✅ **Active/Detected/Available**: System/Shell active or Runtime detected.
@@ -1197,37 +1193,37 @@ main() {
 > ❌ **Failed**: An error occurred during installation or setup.
 
 EOF
-        # Add Global Environment Detections immediately after the legend
-        log_summary "Environment" "System" "✅ Active" "$(uname -s)/$(uname -m)" "0"
-        log_summary "Environment" "Shell" "✅ Active" "$(basename "$SHELL")" "0"
+      # Add Global Environment Detections immediately after the legend
+      log_summary "Environment" "System" "✅ Active" "$(uname -s)/$(uname -m)" "0"
+      log_summary "Environment" "Shell" "✅ Active" "$(basename "$SHELL")" "0"
 
-        # Detect Go/Rust even if not explicitly setup
-        if command -v go >/dev/null 2>&1; then
-          log_summary "Runtime" "Go" "✅ Detected" "$(get_version go)" "0"
-        fi
-        if command -v cargo >/dev/null 2>&1; then
-          log_summary "Runtime" "Rust" "✅ Detected" "$(get_version cargo)" "0"
-        fi
-      } >"$SETUP_SUMMARY_FILE"
-
-      # Set master sentinel for subsequent steps in CI
-      if [ -n "$GITHUB_ENV" ]; then
-        echo "_SETUP_SUMMARY_INITIALIZED=true" >>"$GITHUB_ENV"
+      # Detect Go/Rust even if not explicitly setup
+      if command -v go >/dev/null 2>&1; then
+        log_summary "Runtime" "Go" "✅ Detected" "$(get_version go)" "0"
       fi
-      export _SETUP_SUMMARY_INITIALIZED=true
-    else
-      touch "$SETUP_SUMMARY_FILE"
-    fi
+      if command -v cargo >/dev/null 2>&1; then
+        log_summary "Runtime" "Rust" "✅ Detected" "$(get_version cargo)" "0"
+      fi
+    } >"$SETUP_SUMMARY_FILE"
 
-    # Provide table header if not already present in the summary
-    if [ "$_SUMMARY_TABLE_HEADER_SENTINEL" != "true" ] && ! check_ci_summary "| Category | Module | Status |"; then
-      {
-        printf "| Category | Module | Status | Version | Time |\n"
-        printf "| :--- | :--- | :--- | :--- | :--- |\n"
-      } >>"$SETUP_SUMMARY_FILE"
-      [ -n "$GITHUB_ENV" ] && echo "_SUMMARY_TABLE_HEADER_SENTINEL=true" >>"$GITHUB_ENV"
-      export _SUMMARY_TABLE_HEADER_SENTINEL=true
+    # Set master sentinel for subsequent steps in CI
+    if [ -n "$GITHUB_ENV" ]; then
+      echo "_SETUP_SUMMARY_INITIALIZED=true" >>"$GITHUB_ENV"
     fi
+    export _SETUP_SUMMARY_INITIALIZED=true
+  else
+    touch "$SETUP_SUMMARY_FILE"
+  fi
+
+  # Provide table header if not already present in the summary
+  if [ "$_SUMMARY_TABLE_HEADER_SENTINEL" != "true" ] && ! check_ci_summary "| Category | Module | Status |"; then
+    {
+      printf "| Category | Module | Status | Version | Time |\n"
+      printf "| :--- | :--- | :--- | :--- | :--- |\n"
+    } >>"$SETUP_SUMMARY_FILE"
+    [ -n "$GITHUB_ENV" ] && echo "_SUMMARY_TABLE_HEADER_SENTINEL=true" >>"$GITHUB_ENV"
+    export _SUMMARY_TABLE_HEADER_SENTINEL=true
+  fi
 
   # ── Mode & Module Selection ──
   local _IS_ALL_MODULES=false
