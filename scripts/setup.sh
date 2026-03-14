@@ -1028,13 +1028,13 @@ install_bats_libs() {
   # bats-support
   if [ ! -d "$_VENDOR_DIR/bats-support" ]; then
     log_info "Cloning bats-support..."
-    run_quiet git clone --depth 1 -b v0.3.0 "${GITHUB_PROXY}https://github.com/bats-core/bats-support.git" "$_VENDOR_DIR/bats-support"
+    run_quiet git clone --depth 1 -b v0.3.0 "https://github.com/bats-core/bats-support.git" "$_VENDOR_DIR/bats-support"
   fi
 
   # bats-assert
   if [ ! -d "$_VENDOR_DIR/bats-assert" ]; then
     log_info "Cloning bats-assert..."
-    run_quiet git clone --depth 1 -b v2.1.0 "${GITHUB_PROXY}https://github.com/bats-core/bats-assert.git" "$_VENDOR_DIR/bats-assert"
+    run_quiet git clone --depth 1 -b v2.1.0 "https://github.com/bats-core/bats-assert.git" "$_VENDOR_DIR/bats-assert"
   fi
 
   log_summary "Test Tool" "Bats-Libs" "✅ Vendored" "v0.3.0/v2.1.0" "$(($(date +%s) - _T0_BL))"

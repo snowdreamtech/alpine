@@ -248,10 +248,24 @@ _mise_install_tier4() {
   local _EXT=""
   [ "$_OS" = "windows" ] && _EXT=".zip"
   local _M_URL="https://github.com/jdx/mise/releases/download/v${_VER}/${_M_BIN_NAME}${_EXT}"
+  if [ "${ENABLE_GITHUB_PROXY}" = "1" ] || [ "${ENABLE_GITHUB_PROXY}" = "true" ]; then
+    _M_URL="${GITHUB_PROXY}${_M_URL}"
+  fi
   local _DEST="$HOME/.local/bin/mise"
   [ "$_OS" = "windows" ] && _DEST="${_DEST}.exe"
 
   mkdir -p "$(dirname "$_DEST")"
+
+  _download() {
+    if command -v curl >/dev/null 2>&1; then
+      run_quiet curl -fSL --connect-timeout 15 -o "$2" "$1"
+    elif command -v wget >/dev/null 2>&1; then
+      run_quiet wget -q --timeout=15 -O "$2" "$1"
+    else
+      log_error "Neither curl nor wget is available for manual download."
+      return 1
+    fi
+  }
 
   if [ "$_OS" = "windows" ]; then
     if ! command -v unzip >/dev/null 2>&1; then
@@ -262,7 +276,7 @@ _mise_install_tier4() {
     _TMP_DIR=$(mktemp -d 2>/dev/null || echo "/tmp/mise_win_extract")
     local _TMP_ZIP="${_TMP_DIR}/mise.zip"
 
-    if download_url "$_M_URL" "$_TMP_ZIP"; then
+    if _download "$_M_URL" "$_TMP_ZIP"; then
       if unzip -q "$_TMP_ZIP" -d "$_TMP_DIR"; then
         mv "${_TMP_DIR}/mise/bin/mise.exe" "$_DEST"
         mv "${_TMP_DIR}/mise/bin/mise-shim.exe" "$(dirname "$_DEST")/mise-shim.exe" 2>/dev/null || true
@@ -272,7 +286,7 @@ _mise_install_tier4() {
     fi
     rm -rf "$_TMP_DIR"
   else
-    if download_url "$_M_URL" "$_DEST"; then
+    if _download "$_M_URL" "$_DEST"; then
       chmod +x "$_DEST"
       return 0
     fi
