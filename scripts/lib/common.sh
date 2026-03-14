@@ -18,6 +18,9 @@
 #
 # shellcheck disable=SC2034
 export PAGER="cat"
+export MISE_LOCKFILE=0
+export MISE_LOCKED=0
+export NO_UPDATE_NOTIFIER=1
 
 # ── 🎨 Visual Assets ─────────────────────────────────────────────────────────
 
@@ -1260,11 +1263,13 @@ get_version() {
       "$_CMD_VER" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
       ;;
     commitizen | git-cz | cz)
-      # git-cz can hang if it triggers git help pager. Force non-interactive.
-      # Use 'cz' direct binary if possible.
-      local _CZ_BIN
-      _CZ_BIN=$(command -v cz || echo "git-cz")
-      env PAGER="cat" "$_CZ_BIN" --version 2>&1 | head -n 1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1 || echo "-"
+      # git-cz can hang if it triggers git help pager or update-notifier.
+      # Prefer getting version from mise directly to avoid executing the tool.
+      if command -v mise >/dev/null 2>&1; then
+        mise ls -j 2>/dev/null | grep -E '"name": "(npm:)?commitizen"' -A 5 | grep '"version":' | head -n 1 | sed -E 's/.*"version": "([^"]*)".*/\1/' || echo "-"
+      else
+        env PAGER="cat" NO_UPDATE_NOTIFIER=1 "$_CZ_BIN" --version 2>&1 | head -n 1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1 || echo "-"
+      fi
       ;;
     spectral)
       "$_CMD_VER" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
