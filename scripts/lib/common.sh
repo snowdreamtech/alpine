@@ -94,11 +94,19 @@ MISE_VERSION="${MISE_VERSION:-2026.3.8}"
 _LOCAL_BIN_VENV=$(pwd)/${VENV}/bin
 _LOCAL_BIN_NODE=$(pwd)/node_modules/.bin
 _LOCAL_MISE_BIN="$HOME/.local/bin"
+_LOCAL_MISE_SHIMS="$HOME/.local/share/mise/shims"
 
 if [ -d "$_LOCAL_MISE_BIN" ]; then
   case ":$PATH:" in
   *":$_LOCAL_MISE_BIN:"*) ;;
   *) export PATH="$_LOCAL_MISE_BIN:$PATH" ;;
+  esac
+fi
+
+if [ -d "$_LOCAL_MISE_SHIMS" ]; then
+  case ":$PATH:" in
+  *":$_LOCAL_MISE_SHIMS:"*) ;;
+  *) export PATH="$_LOCAL_MISE_SHIMS:$PATH" ;;
   esac
 fi
 
@@ -1191,7 +1199,10 @@ install_runtime_hooks() {
   local _PRE_COMMIT_BIN
   _PRE_COMMIT_BIN=$(resolve_bin "pre-commit")
   if [ -n "$_PRE_COMMIT_BIN" ]; then
+    log_info "Running pre-commit install..."
     run_quiet "$_PRE_COMMIT_BIN" install
+  else
+    log_warn "pre-commit binary not found. Skipping hook installation."
   fi
 }
 
