@@ -801,7 +801,6 @@ install_prettier() {
     log_summary "Lint Tool" "Prettier" "⏭️ Skipped" "-" "0"
     return 0
   fi
-  ensure_manager npm
   local _STAT_PRE="✅ mise"
   run_mise install "npm:prettier" || _STAT_PRE="❌ Failed"
   log_summary "Lint Tool" "Prettier" "$_STAT_PRE" "$(get_version prettier)" "$(($(date +%s) - _T0_PRE))"
@@ -816,7 +815,6 @@ install_sort_package_json() {
     log_summary "Other" "sort-package-json" "⏭️ Skipped" "-" "0"
     return 0
   fi
-  ensure_manager npm
   local _STAT_SPJ="✅ mise"
   run_mise install "npm:sort-package-json" || _STAT_SPJ="❌ Failed"
   log_summary "Other" "sort-package-json" "$_STAT_SPJ" "$(get_version sort-package-json)" "$(($(date +%s) - _T0_SPJ))"
@@ -846,7 +844,6 @@ install_spectral() {
     return 0
   fi
 
-  ensure_manager npm
 
   local _STAT_SPEC="✅ mise"
   run_mise install "npm:@stoplight/spectral-cli" || _STAT_SPEC="❌ Failed"
@@ -859,7 +856,6 @@ install_commitlint() {
   _T0_CL=$(date +%s)
   log_info "── Setting up Commitlint ──"
 
-  ensure_manager npm
 
   local _STAT_CL="✅ mise"
   run_mise install "npm:@commitlint/cli" || _STAT_CL="❌ Failed"
@@ -876,7 +872,6 @@ install_dockerfile_utils() {
     return 0
   fi
 
-  ensure_manager npm
 
   local _STAT_DU="✅ mise"
   run_mise install "npm:dockerfile-utils" || _STAT_DU="❌ Failed"
@@ -907,7 +902,6 @@ install_ktlint() {
     log_summary "Lint Tool" "ktlint" "⏭️ Skipped" "-" "0"
     return 0
   fi
-  ensure_manager npm
   local _STAT_KT="✅ mise"
   run_mise install "npm:@naturalcycles/ktlint" || _STAT_KT="❌ Failed"
   log_summary "Lint Tool" "ktlint" "$_STAT_KT" "$(get_version ktlint --version)" "$(($(date +%s) - _T0_KT))"
@@ -965,7 +959,6 @@ install_markdownlint() {
     return 0
   fi
 
-  ensure_manager npm
 
   local _STAT_MD="✅ mise"
   run_mise install "npm:markdownlint-cli2" || _STAT_MD="❌ Failed"
@@ -997,7 +990,6 @@ install_ansible_lint() {
     return 0
   fi
   # Ansible-lint is often installed via pip/python
-  ensure_manager python3
   local _STAT_ANS="✅ mise"
   run_mise install "pipx:ansible-lint" || _STAT_ANS="❌ Failed"
   log_summary "Lint Tool" "Ansible-lint" "$_STAT_ANS" "$(get_version ansible-lint)" "$(($(date +%s) - _T0_ANS))"
@@ -1012,7 +1004,6 @@ install_bats() {
     log_summary "Test Tool" "Bats" "⏭️ Skipped" "-" "0"
     return 0
   fi
-  ensure_manager npm
   local _STAT_BATS="✅ mise"
   run_mise install "npm:bats" || _STAT_BATS="❌ Failed"
   log_summary "Test Tool" "Bats" "$_STAT_BATS" "$(get_version bats --version)" "$(($(date +%s) - _T0_BATS))"
@@ -1068,7 +1059,6 @@ install_eslint() {
     log_summary "Lint Tool" "ESLint" "⏭️ Skipped" "-" "0"
     return 0
   fi
-  ensure_manager npm
   local _STAT_ES="✅ mise"
   run_mise install "npm:eslint" || _STAT_ES="❌ Failed"
   log_summary "Lint Tool" "ESLint" "$_STAT_ES" "$(get_version eslint --version)" "$(($(date +%s) - _T0_ES))"
@@ -1083,7 +1073,6 @@ install_stylelint() {
     log_summary "Lint Tool" "Stylelint" "⏭️ Skipped" "-" "0"
     return 0
   fi
-  ensure_manager npm
   local _STAT_SL="✅ mise"
   run_mise install "npm:stylelint" || _STAT_SL="❌ Failed"
   log_summary "Lint Tool" "Stylelint" "$_STAT_SL" "$(get_version stylelint --version)" "$(($(date +%s) - _T0_SL))"
@@ -1098,7 +1087,6 @@ install_vitepress() {
     log_summary "Doc Tool" "VitePress" "⏭️ Skipped" "-" "0"
     return 0
   fi
-  ensure_manager npm
   local _STAT_VP="✅ mise"
   run_mise install "npm:vitepress" || _STAT_VP="❌ Failed"
   log_summary "Doc Tool" "VitePress" "$_STAT_VP" "$(get_version vitepress --version)" "$(($(date +%s) - _T0_VP))"
@@ -1109,7 +1097,6 @@ install_commitizen() {
   local _T0_CZ
   _T0_CZ=$(date +%s)
   log_info "── Setting up Commitizen ──"
-  ensure_manager npm
   local _STAT_CZ="✅ mise"
   run_mise install "npm:commitizen" || _STAT_CZ="❌ Failed"
   log_summary "Other" "Commitizen" "$_STAT_CZ" "$(get_version git-cz --version)" "$(($(date +%s) - _T0_CZ))"
@@ -1133,8 +1120,6 @@ install_pip_audit() {
 
   log_info "── Setting up pip-audit ──"
   # Explicit manager check
-  ensure_manager python3
-  ensure_manager pipx
   local _STAT_PA="✅ mise"
   run_mise install "pipx:pip-audit" || _STAT_PA="❌ Failed"
   log_summary "Security Tool" "pip-audit" "$_STAT_PA" "$(get_version pip-audit --version)" "$(($(date +%s) - _T0_PA))"
