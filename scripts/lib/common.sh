@@ -70,12 +70,6 @@ GITHUB_PROXY="${GITHUB_PROXY:-https://gh-proxy.sn0wdr1am.com/}"
 # NOTE: GITHUB_PROXY is optimized for Release/Archive/File downloads.
 # It does NOT support project folder clones (git clone).
 ENABLE_MIRROR="${ENABLE_MIRROR:-${MIRROR:-${USE_MIRROR:-0}}}"
-MIRROR_NODEJS="${MIRROR_NODEJS:-https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/}"
-MIRROR_PYTHON="${MIRROR_PYTHON:-https://mirrors.tuna.tsinghua.edu.cn/python/}"
-MIRROR_NPM="${MIRROR_NPM:-https://registry.npmmirror.com}"
-MIRROR_GO="${MIRROR_GO:-https://goproxy.cn,direct}"
-MIRROR_RUST_DIST="${MIRROR_RUST_DIST:-https://mirrors.ustc.edu.cn/rust-static}"
-MIRROR_RUST_UPDATE="${MIRROR_RUST_UPDATE:-https://mirrors.ustc.edu.cn/rust-static/rustup}"
 
 # ── 🔨 SSoT Tool Versions ────────────────────────────────────────────────────
 
@@ -537,26 +531,9 @@ EOF
     # Standard mirrors for binaries/packages
     export ENABLE_MIRROR=1
 
-    # Node/Python/JS Mirrors
-    export NODEJS_ORG_MIRROR="${MIRROR_NODEJS}"
-    export MISE_NODE_MIRROR_URL="${MIRROR_NODEJS}"
-    export PYTHON_BUILD_MIRROR_URL="${MIRROR_PYTHON}"
-    export NPM_CONFIG_REGISTRY="${MIRROR_NPM}"
-    export YARN_REGISTRY="${MIRROR_NPM}"
-    export PIP_INDEX_URL="https://pypi.tuna.tsinghua.edu.cn/simple"
-    export PIP_TRUSTED_HOST="pypi.tuna.tsinghua.edu.cn"
-
-    # Go & Rust mirrors (China optimization)
-    export GOPROXY="${MIRROR_GO}"
-    export RUSTUP_DIST_SERVER="${MIRROR_RUST_DIST}"
-    export RUSTUP_UPDATE_ROOT="${MIRROR_RUST_UPDATE}"
-
-    # Configure mise settings if mise is available
-    if command -v mise >/dev/null 2>&1; then
-      log_debug "Synchronizing mise mirror settings..."
-      # NOTE: url_replacements is NOT used for GitHub here to avoid breaking git clones.
-      run_quiet mise settings set node.mirror_url "${MIRROR_NODEJS}" || true
-    fi
+    # NOTE: Mirror settings (NPM_CONFIG_REGISTRY, PIP_INDEX_URL, etc.)
+    # are now centralized in .mise.toml [env] section.
+    # We rely on mise to inject these project-wide.
   fi
 
   export _NETWORK_OPTIMIZED=true
