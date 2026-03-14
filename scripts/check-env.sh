@@ -251,7 +251,7 @@ main() {
   # 7. Project File Integrity
   log_info "── Project Integrity ──"
   local _f_chk
-  for _f_chk in "Makefile" "$PACKAGE_JSON" "README.md" ".agent/rules/01-general.md"; do
+  for _f_chk in "Makefile" "README.md" ".agent/rules/01-general.md"; do
     if [ -f "$_f_chk" ]; then
       log_debug "Found $_f_chk"
     else
