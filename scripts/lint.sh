@@ -50,22 +50,17 @@ EOF
 run_pre_commit_lint() {
   local _LV_FIX="$1"
   log_info "── Running pre-commit hooks (Pass 1/1) ──"
-  local _VENV_LNT
-  _VENV_LNT=${VENV:-.venv}
-  local _PRE_COMMIT_LNT=""
+  local _PRE_COMMIT_LNT
+  _PRE_COMMIT_LNT=$(resolve_bin "pre-commit")
 
-  if [ -x "$_VENV_LNT/bin/pre-commit" ]; then
-    _PRE_COMMIT_LNT="$_VENV_LNT/bin/pre-commit"
-  elif [ -x "$_VENV_LNT/Scripts/pre-commit.exe" ]; then
-    _PRE_COMMIT_LNT="$_VENV_LNT/Scripts/pre-commit.exe"
-  elif command -v pre-commit >/dev/null 2>&1; then
-    _PRE_COMMIT_LNT="pre-commit"
-  elif [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_warn "DRY-RUN: pre-commit not found. Using placeholder for preview."
-    _PRE_COMMIT_LNT="pre-commit"
-  else
-    log_error "Error: pre-commit not found. Please run 'make setup' first."
-    exit 1
+  if [ -z "$_PRE_COMMIT_LNT" ]; then
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
+      log_warn "DRY-RUN: pre-commit not found. Using placeholder for preview."
+      _PRE_COMMIT_LNT="pre-commit"
+    else
+      log_error "Error: pre-commit not found. Please run 'make setup' first."
+      exit 1
+    fi
   fi
 
   # Run on all files
