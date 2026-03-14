@@ -69,12 +69,12 @@ GITHUB_PROXY="${GITHUB_PROXY:-https://gh-proxy.sn0wdr1am.com/}"
 # Network Optimization & Mirror Configuration
 # NOTE: GITHUB_PROXY is optimized for Release/Archive/File downloads.
 # It does NOT support project folder clones (git clone).
-ENABLE_MIRROR="${ENABLE_MIRROR:-${MIRROR:-${USE_MIRROR:-0}}}"
+ENABLE_MIRROR="${ENABLE_MIRROR:-0}"
 
 # ── 🔨 SSoT Tool Versions ────────────────────────────────────────────────────
 
 # Runtime versions (Managed via .mise.toml, but some logic might still reference these for bootstrap purposes)
-# Only MISE and UV are hardcoded here to facilitate the zero-dependency bootstrap phase.
+# Only MISE is hardcoded here to facilitate the zero-dependency bootstrap phase.
 MISE_VERSION="${MISE_VERSION:-2026.3.8}"
 
 # Note: All other tools (Gitleaks, Shellcheck, Shfmt, Java Format, etc.) are purely managed
