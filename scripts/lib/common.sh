@@ -458,8 +458,6 @@ bootstrap_mise() {
   # Finalize Activation
   _mise_apply_activation "$_M_SHELL"
 
-  # Path Refresh
-  [ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
 
   # Setup Completions
   _mise_setup_completions "$_M_SHELL"
