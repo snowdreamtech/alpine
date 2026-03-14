@@ -35,9 +35,11 @@ install_node_deps() {
       log_debug "Skipping recursive pnpm install call."
     else
       log_info "── Installing Node.js dependencies ($NPM) ──"
-      if command -v "$NPM" >/dev/null 2>&1; then
+      local _NPM_BIN
+      _NPM_BIN=$(resolve_bin "$NPM")
+      if [ -n "$_NPM_BIN" ]; then
         export IN_INSTALL_SCRIPT=1
-        run_quiet "$NPM" install
+        run_quiet "$_NPM_BIN" install
       else
         log_warn "Warning: $NPM not found. Skipping Node.js dependencies."
       fi
@@ -59,11 +61,8 @@ install_python_deps() {
     fi
 
     local _PIP_INST
-    if [ -x "$VENV/bin/pip" ]; then
-      _PIP_INST="$VENV/bin/pip"
-    elif [ -x "$VENV/Scripts/pip.exe" ]; then
-      _PIP_INST="$VENV/Scripts/pip.exe"
-    else
+    _PIP_INST=$(resolve_bin "pip")
+    if [ -z "$_PIP_INST" ]; then
       log_error "Error: pip not found in $VENV."
       exit 1
     fi
@@ -81,14 +80,8 @@ install_python_deps() {
 #   install_git_hooks
 install_git_hooks() {
   if [ -d ".git/hooks" ]; then
-    local _PRE_COMMIT_BIN=""
-    if [ -x "$VENV/bin/pre-commit" ]; then
-      _PRE_COMMIT_BIN="$VENV/bin/pre-commit"
-    elif [ -x "$VENV/Scripts/pre-commit.exe" ]; then
-      _PRE_COMMIT_BIN="$VENV/Scripts/pre-commit.exe"
-    elif command -v pre-commit >/dev/null 2>&1; then
-      _PRE_COMMIT_BIN="pre-commit"
-    fi
+    local _PRE_COMMIT_BIN
+    _PRE_COMMIT_BIN=$(resolve_bin "pre-commit")
 
     if [ -n "$_PRE_COMMIT_BIN" ]; then
       printf "\n"
