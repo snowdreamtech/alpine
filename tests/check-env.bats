@@ -6,6 +6,7 @@ setup() {
 
   # Create a temporary workspace
   export TEMP_DIR
+  unset _SNOWDREAM_TOP_LEVEL_SCRIPT
   TEMP_DIR="$(mktemp -d)"
   mkdir -p "$TEMP_DIR/scripts/lib"
   cp "scripts/check-env.sh" "$TEMP_DIR/scripts/"

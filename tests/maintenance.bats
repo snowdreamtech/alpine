@@ -6,8 +6,12 @@ setup() {
 
   # Create a temporary workspace
   export TEMP_DIR
+  unset _SNOWDREAM_TOP_LEVEL_SCRIPT
   TEMP_DIR="$(mktemp -d)"
   mkdir -p "$TEMP_DIR/scripts/lib"
+
+  # Prevent parent orchestration scripts (like test.sh) from turning off logs
+  unset _SNOWDREAM_TOP_LEVEL_SCRIPT
 
   # Copy functional scripts
   for f in archive-changelog.sh audit.sh cleanup.sh commit.sh release.sh update.sh verify.sh check-env.sh lint.sh test.sh; do

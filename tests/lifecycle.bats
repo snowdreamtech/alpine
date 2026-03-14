@@ -6,6 +6,7 @@ setup() {
 
   # Create a temporary workspace
   export TEMP_DIR
+  unset _SNOWDREAM_TOP_LEVEL_SCRIPT
   TEMP_DIR="$(mktemp -d)"
   mkdir -p "$TEMP_DIR/scripts/lib"
 
@@ -53,7 +54,7 @@ teardown() {
   run sh scripts/setup.sh --dry-run
   assert_success
   assert_output --partial "Running in DRY-RUN mode"
-  assert_output --partial "Setting up Node.js & pnpm"
+  assert_output --partial "Setting up Node.js"
   assert_output --partial "Setting up Python Virtual Environment"
   assert_output --partial "Setting up Pre-commit Hooks"
 }
