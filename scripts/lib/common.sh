@@ -481,9 +481,6 @@ bootstrap_mise() {
 
   # Verify Health
   _mise_verify_health
-
-  # Verify Health
-  _mise_verify_health
 }
 
 # ── 🌐 Network Optimization ──────────────────────────────────────────────────
