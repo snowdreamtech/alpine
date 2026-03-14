@@ -49,11 +49,14 @@ EOF
 #   run_shfmt_format
 run_shfmt_format() {
   log_info "── Formatting Shell Scripts (shfmt) ──"
-  if command -v shfmt >/dev/null 2>&1; then
+  local _SHFMT_BIN
+  _SHFMT_BIN=$(resolve_bin "shfmt")
+
+  if [ -n "$_SHFMT_BIN" ]; then
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
-      shfmt -d -s -i 2 scripts/*.sh tests/*.bats 2>/dev/null || true
+      "$_SHFMT_BIN" -d -s -i 2 scripts/*.sh tests/*.bats 2>/dev/null || true
     else
-      shfmt -w -s -i 2 scripts/*.sh tests/*.bats 2>/dev/null || true
+      "$_SHFMT_BIN" -w -s -i 2 scripts/*.sh tests/*.bats 2>/dev/null || true
     fi
   else
     log_warn "Warning: shfmt not found. Skipping shell formatting."
@@ -65,12 +68,10 @@ run_shfmt_format() {
 #   run_prettier_format
 run_prettier_format() {
   log_info "── Formatting Web/General Files (Prettier) ──"
-  local _PRETTIER_BIN=""
-  if [ -f "node_modules/.bin/prettier" ]; then
-    _PRETTIER_BIN="./node_modules/.bin/prettier"
-  elif command -v prettier >/dev/null 2>&1; then
-    _PRETTIER_BIN="prettier"
-  else
+  local _PRETTIER_BIN
+  _PRETTIER_BIN=$(resolve_bin "prettier")
+
+  if [ -z "$_PRETTIER_BIN" ]; then
     log_warn "Warning: prettier not found. Skipping web/general formatting."
     return
   fi
@@ -87,14 +88,10 @@ run_prettier_format() {
 #   run_ruff_format
 run_ruff_format() {
   log_info "── Formatting Python Files (Ruff) ──"
-  local _VENV_FMT
-  _VENV_FMT=${VENV:-.venv}
-  local _RUFF_FMT_BIN=""
-  if [ -x "$_VENV_FMT/bin/ruff" ]; then
-    _RUFF_FMT_BIN="$_VENV_FMT/bin/ruff"
-  elif command -v ruff >/dev/null 2>&1; then
-    _RUFF_FMT_BIN="ruff"
-  else
+  local _RUFF_FMT_BIN
+  _RUFF_FMT_BIN=$(resolve_bin "ruff")
+
+  if [ -z "$_RUFF_FMT_BIN" ]; then
     log_warn "Warning: ruff not found. Skipping python formatting."
     return
   fi
