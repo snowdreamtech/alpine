@@ -84,6 +84,7 @@ pipx = "1.7.1"
 [settings]
 experimental = true
 asdf_compat = true
+status.missing_tools = "never"
 
 # Registry mirrors only (for npm, PyPI, Node.js, Python).
 # GitHub URL replacements intentionally EXCLUDED here — your local proxy
