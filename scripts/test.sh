@@ -55,12 +55,13 @@ EOF
 run_shell_tests() {
   if [ -d "tests" ] && find tests -name "*.bats" | grep -q .; then
     log_info "── Running Shell Tests (bats) ──"
+    local _BATS_BIN
+    _BATS_BIN=$(resolve_bin "bats")
+
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would run bats tests in tests/"
-    elif command -v bats >/dev/null 2>&1; then
-      bats tests/
-    elif [ -f "node_modules/.bin/bats" ]; then
-      ./node_modules/.bin/bats tests/
+    elif [ -n "$_BATS_BIN" ]; then
+      "$_BATS_BIN" tests/
     else
       log_warn "Warning: bats not found. Skipping shell tests."
     fi
@@ -79,15 +80,20 @@ run_python_tests() {
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would run pytest on tests/"
     else
-      # shellcheck disable=SC2030
-      local _VENV_PATH_TST
-      _VENV_PATH_TST="${VENV:-.venv}"
-      if [ -x "$_VENV_PATH_TST/bin/python3" ]; then
-        "$_VENV_PATH_TST/bin/python3" -m pytest --tb=short
-      elif command -v pytest >/dev/null 2>&1; then
-        pytest --tb=short
+      local _PYTEST_BIN
+      # We check for 'pytest' or 'python3 -m pytest'
+      _PYTEST_BIN=$(resolve_bin "pytest")
+
+      if [ -n "$_PYTEST_BIN" ]; then
+        "$_PYTEST_BIN" --tb=short
       else
-        log_warn "Warning: pytest not found. Skipping python tests."
+        local _PY_BIN
+        _PY_BIN=$(resolve_bin "python3")
+        if [ -n "$_PY_BIN" ]; then
+          "$_PY_BIN" -m pytest --tb=short 2>/dev/null || log_warn "Warning: pytest not found. Skipping python tests."
+        else
+          log_warn "Warning: pytest not found. Skipping python tests."
+        fi
       fi
     fi
   else
