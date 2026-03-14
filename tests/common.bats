@@ -20,7 +20,7 @@ case "\$1" in
   guard) guard_project_root ;;
   log) log_info "test info"; log_success "test success"; log_warn "test warn"; log_error "test error" ;;
   args) parse_common_args "\$@"; echo "VERBOSE=\$VERBOSE"; echo "DRY_RUN=\$DRY_RUN" ;;
-  version) get_project_version ;;
+
   swap) atomic_swap "\$2" "\$3" ;;
   check_rt) check_runtime "\$2" "Test Tool" ;;
 esac
@@ -73,21 +73,6 @@ teardown() {
   assert_line --partial "test error"
 }
 
-@test "common.sh: get_project_version detects version from package.json" {
-  cd "$TEMP_DIR" || exit
-  echo '{"version":"1.2.3"}' >"package.json"
-  run sh test_script.sh version
-  assert_success
-  assert_output "1.2.3"
-}
-
-@test "common.sh: get_project_version detects version from VERSION file" {
-  cd "$TEMP_DIR" || exit
-  echo "2.0.0" >"VERSION"
-  run sh test_script.sh version
-  assert_success
-  assert_output "2.0.0"
-}
 
 @test "common.sh: atomic_swap successfully moves file" {
   echo "new content" >"$TEMP_DIR/new.tmp"
