@@ -86,24 +86,27 @@ experimental = true
 asdf_compat = true
 status.missing_tools = "never"
 
-# Registry mirrors only (for npm, PyPI, Node.js, Python).
-# GitHub URL replacements intentionally EXCLUDED here — your local proxy
-# (e.g. Clash at 127.0.0.1:8889) already handles GitHub traffic including
-# git protocol. Overriding with gh-proxy.sn0wdr1am.com breaks `mise ls-remote`
-# because that endpoint only supports HTTP file downloads, not git smart protocol.
-[settings.url_replacements]
-"https://registry.npmjs.org" = "https://registry.npmmirror.com"
-"https://pypi.org/simple" = "https://pypi.tuna.tsinghua.edu.cn/simple"
-"https://pypi.python.org/simple" = "https://pypi.tuna.tsinghua.edu.cn/simple"
-"https://nodejs.org/dist" = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release"
-"https://python.org/ftp/python" = "https://mirrors.tuna.tsinghua.edu.cn/python"
-"https://repo.anaconda.com/miniconda" = "https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda"
-
-# Global Environment Variables
-# These ensure that npm and pip always use mirrors, even outside of scripts.
+# Environment variables for performance acceleration in weak networks.
+# Centralized SSoT for mirroring and registry configuration.
 [env]
+ENABLE_MIRROR = "1"
+
+# Node.js & npm acceleration
 NPM_CONFIG_REGISTRY = "https://registry.npmmirror.com"
+NODEJS_ORG_MIRROR = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/"
+MISE_NODE_MIRROR_URL = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/"
+
+# Python & pip acceleration
 PIP_INDEX_URL = "https://pypi.tuna.tsinghua.edu.cn/simple"
 PIP_TRUSTED_HOST = "pypi.tuna.tsinghua.edu.cn"
-NODEJS_ORG_MIRROR = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/"
 PYTHON_BUILD_MIRROR_URL = "https://mirrors.tuna.tsinghua.edu.cn/python/"
+
+# Go acceleration (China optimization)
+GOPROXY = "https://goproxy.cn,direct"
+
+# Rust & Cargo acceleration
+RUSTUP_DIST_SERVER = "https://mirrors.ustc.edu.cn/rust-static"
+RUSTUP_UPDATE_ROOT = "https://mirrors.ustc.edu.cn/rust-static/rustup"
+
+# Optional: Yarn support
+YARN_REGISTRY = "https://registry.npmmirror.com"
