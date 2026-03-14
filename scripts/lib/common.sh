@@ -1036,7 +1036,109 @@ get_version() {
       "$_CMD_VER" "$_ARG_VER" 2>&1 | head -n 1 | sed 's/^[vV]//' | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
       ;;
     esac
-  else
     echo "-"
   fi
+}
+
+# Purpose: Resolves a binary path by checking local virtualenvs, node_modules, and PATH.
+# Params:
+#   $1 - Binary name (e.g., "eslint", "pytest")
+# Returns:
+#   Absolute or relative path to the resolved binary, or empty if not found.
+# Examples:
+#   BIN=$(resolve_bin "eslint")
+resolve_bin() {
+  local _BIN_RES="$1"
+  [ -z "$_BIN_RES" ] && return 1
+
+  # 1. Check Python Venv
+  local _VENV_RES="${VENV:-.venv}"
+  if [ -x "$_VENV_RES/bin/$_BIN_RES" ]; then
+    echo "$_VENV_RES/bin/$_BIN_RES"
+    return 0
+  fi
+
+  # 2. Check Node Modules
+  if [ -x "node_modules/.bin/$_BIN_RES" ]; then
+    echo "node_modules/.bin/$_BIN_RES"
+    return 0
+  fi
+
+  # 3. Check System PATH
+  if command -v "$_BIN_RES" >/dev/null 2>&1; then
+    command -v "$_BIN_RES"
+    return 0
+  fi
+
+  return 1
+}
+
+# Purpose: Verifies if a required runtime or tool is available in the environment.
+#          Silently EXITS the script (skip) if missing, assuming optionality.
+# Params:
+#   $1 - Command/Binary name to check
+#   $2 - Human-readable tool name (for logging)
+# Examples:
+#   check_runtime "go" "Golang Builder"
+check_runtime() {
+  local _RT_NAME="$1"
+  local _TOOL_DESC="${2:-Tool}"
+  if ! command -v "$_RT_NAME" >/dev/null 2>&1; then
+    log_warn "Required runtime '$_RT_NAME' for $_TOOL_DESC is missing. Skipping."
+    exit 0
+  fi
+}
+
+# Purpose: Executes an npm/pnpm script with infinite-recursion detection.
+# Params:
+#   $1 - Name of the npm script (e.g., "test")
+# Examples:
+#   run_npm_script "test"
+run_npm_script() {
+  local _SCRIPT_NAME_NPM="$1"
+  local _CURRENT_BASENAME_NPM
+  _CURRENT_BASENAME_NPM=$(basename "$0")
+
+  if [ -f "package.json" ]; then
+    local _CMD_NPM
+    _CMD_NPM=$(grep "\"$_SCRIPT_NAME_NPM\":" "package.json" | sed "s/.*\"$_SCRIPT_NAME_NPM\":[[:space:]]*\"//;s/\".*//" || true)
+    if [ -n "$_CMD_NPM" ]; then
+      # Avoid infinite loop if the command points back to this script
+      if echo "$_CMD_NPM" | grep -q "$_CURRENT_BASENAME_NPM"; then
+        log_debug "npm script '$_SCRIPT_NAME_NPM' is a self-reference to '$_CURRENT_BASENAME_NPM'. Skipping."
+        return 0
+      fi
+      log_info "── Running Node.js script: $NPM $_SCRIPT_NAME_NPM ──"
+      "$NPM" run "$_SCRIPT_NAME_NPM"
+      return 0
+    fi
+  fi
+  return 0
+}
+
+# Purpose: Initializes the execution summary table file.
+# Params:
+#   $1 - Header title (e.g., "Execution Summary")
+# Examples:
+#   init_summary_table "Setup Execution Summary"
+init_summary_table() {
+  local _TITLE_TABLE="${1:-Execution Summary}"
+
+  if [ -z "$SETUP_SUMMARY_FILE" ]; then
+    SETUP_SUMMARY_FILE=$(mktemp)
+    export SETUP_SUMMARY_FILE
+  fi
+
+  local _SENTINEL_TABLE="_SUMMARY_TABLE_INITIALIZED_$(echo "$_TITLE_TABLE" | tr ' ' '_')"
+  if [ "$(eval echo "\$$_SENTINEL_TABLE")" = "true" ]; then
+    return 0
+  fi
+
+  {
+    printf "### %s\n\n" "$_TITLE_TABLE"
+    printf "| Category | Module | Status | Version | Time |\n"
+    printf "| :--- | :--- | :--- | :--- | :--- |\n"
+  } >>"$SETUP_SUMMARY_FILE"
+
+  eval "export $_SENTINEL_TABLE=true"
 }
