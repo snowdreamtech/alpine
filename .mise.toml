@@ -89,7 +89,8 @@ status.missing_tools = "never"
 # Environment variables for performance acceleration in weak networks.
 # Centralized SSoT for mirroring and registry configuration.
 [env]
-ENABLE_MIRROR = "1"
+# Performance Toggles: set to "1" or "true" to activate
+ENABLE_GITHUB_PROXY = "1"
 
 # Node.js & npm acceleration
 NPM_CONFIG_REGISTRY = "https://registry.npmmirror.com"
@@ -108,8 +109,9 @@ GOPROXY = "https://goproxy.cn,direct"
 RUSTUP_DIST_SERVER = "https://mirrors.tuna.tsinghua.edu.cn/rustup"
 RUSTUP_UPDATE_ROOT = "https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup"
 
+# GitHub Proxy (SSoT)
+# Used specifically for direct GitHub binary/asset downloads
+GITHUB_PROXY = "https://gh-proxy.sn0wdr1am.com/"
+
 # Optional: Yarn support
 YARN_REGISTRY = "https://registry.npmmirror.com"
-
-# GitHub Proxy (SSoT)
-GITHUB_PROXY = "https://gh-proxy.sn0wdr1am.com/"
