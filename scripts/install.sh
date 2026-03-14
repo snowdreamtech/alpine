@@ -51,7 +51,7 @@ install_node_deps() {
 # Examples:
 #   install_python_deps
 install_python_deps() {
-  if [ -f "$REQUIREMENTS_TXT" ] || [ -f "requirements.txt" ] || [ -f "$PYPROJECT_TOML" ]; then
+  if [ -f "$REQUIREMENTS_TXT" ] || [ -f "$PYPROJECT_TOML" ]; then
     printf "\n"
     log_info "── Installing Python dependencies ──"
 
@@ -69,8 +69,6 @@ install_python_deps() {
 
     if [ -f "$REQUIREMENTS_TXT" ]; then
       "$_PIP_INST" install -r "$REQUIREMENTS_TXT"
-    elif [ -f "requirements.txt" ]; then
-      "$_PIP_INST" install -r "requirements.txt"
     fi
   fi
 }

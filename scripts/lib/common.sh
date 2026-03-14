@@ -63,6 +63,9 @@ VENV="${VENV:-.venv}"
 PYTHON="${PYTHON:-python3}"
 NPM="${NPM:-npm}"
 DOCS_DIR="docs"
+PACKAGE_JSON="${PACKAGE_JSON:-package.json}"
+REQUIREMENTS_TXT="${REQUIREMENTS_TXT:-requirements.txt}"
+PYPROJECT_TOML="${PYPROJECT_TOML:-pyproject.toml}"
 
 # Network Optimization & Mirror Configuration
 # NOTE: GITHUB_PROXY is optimized for Release/Archive/File downloads.
