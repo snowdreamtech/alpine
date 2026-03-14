@@ -58,33 +58,8 @@ main() {
   local _START_TIME_AUDIT
   _START_TIME_AUDIT=$(date +%s)
 
-  # Initialize Summary File if not already done
-  local _CREATED_SUMMARY_AUDIT=false
-  if [ -z "$SETUP_SUMMARY_FILE" ]; then
-    SETUP_SUMMARY_FILE=$(mktemp)
-    export SETUP_SUMMARY_FILE
-    _CREATED_SUMMARY_AUDIT=true
-
-    if [ "$_AUDIT_SUMMARY_INITIALIZED" != "true" ] && ! check_ci_summary "### Security Audit Execution Summary"; then
-      {
-        printf "### Security Audit Execution Summary\n\n"
-      } >"$SETUP_SUMMARY_FILE"
-      [ -n "$GITHUB_ENV" ] && echo "_AUDIT_SUMMARY_INITIALIZED=true" >>"$GITHUB_ENV"
-      export _AUDIT_SUMMARY_INITIALIZED=true
-    else
-      touch "$SETUP_SUMMARY_FILE"
-    fi
-
-    # Provide table header if not already present
-    if [ "$_SUMMARY_TABLE_HEADER_SENTINEL" != "true" ] && ! check_ci_summary "| Category | Module | Status |"; then
-      {
-        printf "| Category | Module | Status | Version | Time |\n"
-        printf "| :--- | :--- | :--- | :--- | :--- |\n"
-      } >>"$SETUP_SUMMARY_FILE"
-      [ -n "$GITHUB_ENV" ] && echo "_SUMMARY_TABLE_HEADER_SENTINEL=true" >>"$GITHUB_ENV"
-      export _SUMMARY_TABLE_HEADER_SENTINEL=true
-    fi
-  fi
+  # Initialize Summary File correctly
+  init_summary_table "Security Audit Execution Summary"
 
   # 3. Secrets Scanning
   if run_quiet command -v gitleaks; then
@@ -108,8 +83,9 @@ main() {
   if [ -d ".github/workflows" ]; then
     local _T0_ZM
     _T0_ZM=$(date +%s)
-    log_info "\n── Auditing GitHub Actions (zizmor) ──"
-    if run_quiet command -v zizmor; then
+    local _ZIZMOR_BIN
+    _ZIZMOR_BIN=$(resolve_bin "zizmor")
+    if [ -n "$_ZIZMOR_BIN" ]; then
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_success "DRY-RUN: Would run zizmor"
         log_summary "GitHub" "zizmor" "⚖️ Previewed" "-" "0"
@@ -152,12 +128,8 @@ main() {
     local _T0_PY_AUD
     _T0_PY_AUD=$(date +%s)
     log_info "\n── Auditing Python dependencies (pip-audit) ──"
-    local _PIPAUDIT_BIN=""
-    if [ -x "$VENV/bin/pip-audit" ]; then
-      _PIPAUDIT_BIN="$VENV/bin/pip-audit"
-    elif command -v pip-audit >/dev/null 2>&1; then
-      _PIPAUDIT_BIN="pip-audit"
-    fi
+    local _PIPAUDIT_BIN
+    _PIPAUDIT_BIN=$(resolve_bin "pip-audit")
 
     if [ -n "$_PIPAUDIT_BIN" ]; then
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
@@ -273,7 +245,7 @@ main() {
 
   # ── Final Report ─────────────────────────────────────────────────────────────
 
-  if [ "$_CREATED_SUMMARY_AUDIT" = "true" ]; then
+  if [ "$_IS_TOP_LEVEL" = "true" ] && [ -n "$SETUP_SUMMARY_FILE" ] && [ -f "$SETUP_SUMMARY_FILE" ]; then
     local _TOTAL_DUR_AUD
     _TOTAL_DUR_AUD=$(($(date +%s) - _START_TIME_AUDIT))
     printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR_AUD" >>"$SETUP_SUMMARY_FILE"
