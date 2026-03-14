@@ -672,35 +672,6 @@ install_trivy() {
   log_summary "Security Tool" "Trivy" "$_STAT_TRVY" "$(get_version trivy)" "$(($(date +%s) - _T0_TRVY))"
 }
 
-# Purpose: Installs editorconfig-checker for compliance validation.
-# Delegate: Managed by mise (.mise.toml)
-# install_editorconfig_checker is already defined above in modular section.
-# Removing redundant definition to fix SC2329.
-
-# Purpose: Installs google-java-format for Java linting.
-# Delegate: Managed by mise (.mise.toml)
-install_google_java_format() {
-  local _T0_GJF
-  _T0_GJF=$(date +%s)
-  local _TITLE="Google Java Format"
-  local _PROVIDER="npm:google-java-format"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Lint Tool" "Java Lint" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "pom.xml build.gradle" "*.java"; then
-    log_summary "Lint Tool" "Java Lint" "⏭️ Skipped" "-" "0"
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-  local _STAT_GJF="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_GJF="❌ Failed"
-  log_summary "Lint Tool" "Java Lint" "$_STAT_GJF" "$(get_version google-java-format)" "$(($(date +%s) - _T0_GJF))"
-}
-
 # Purpose: Installs swiftformat for Swift linting.
 # Delegate: Managed by mise (.mise.toml)
 install_swiftformat() {
@@ -1064,6 +1035,11 @@ install_commitlint() {
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Other" "Commitlint" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if [ ! -d ".git" ]; then
+    log_summary "Other" "Commitlint" "⏭️ Skipped (no .git)" "-" "0"
     return 0
   fi
 
