@@ -98,3 +98,12 @@ status.missing_tools = "never"
 "https://nodejs.org/dist" = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release"
 "https://python.org/ftp/python" = "https://mirrors.tuna.tsinghua.edu.cn/python"
 "https://repo.anaconda.com/miniconda" = "https://mirrors.tuna.tsinghua.edu.cn/anaconda/miniconda"
+
+# Global Environment Variables
+# These ensure that npm and pip always use mirrors, even outside of scripts.
+[env]
+NPM_CONFIG_REGISTRY = "https://registry.npmmirror.com"
+PIP_INDEX_URL = "https://pypi.tuna.tsinghua.edu.cn/simple"
+PIP_TRUSTED_HOST = "pypi.tuna.tsinghua.edu.cn"
+NODEJS_ORG_MIRROR = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/"
+PYTHON_BUILD_MIRROR_URL = "https://mirrors.tuna.tsinghua.edu.cn/python/"
