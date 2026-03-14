@@ -551,7 +551,7 @@ install_example_tool() {
 
 ### Core Requirements
 
-1.  **Idempotency**: Every function MUST be safe to run multiple times. Use `DRY_RUN` checks to mock the result without state changes.
-2.  **Performance (Lazy Loading)**: Never install a language-specific tool unless the corresponding files are detected.
-3.  **Strict Error Handling**: Use `|| _STAT="❌ Failed"` pattern to ensure the summary table accurately reflects failures without crashing the entire setup sequence.
-4.  **SSoT Versioning**: Always use `get_version` or `get_mise_tool_version` to pull versions from `.mise.toml` for the summary table.
+1. **Idempotency**: Every function MUST be safe to run multiple times. Use `DRY_RUN` checks to mock the result without state changes.
+2. **Performance (Lazy Loading)**: Never install a language-specific tool unless the corresponding files are detected.
+3. **Strict Error Handling**: Use `|| _STAT="❌ Failed"` pattern to ensure the summary table accurately reflects failures without crashing the entire setup sequence.
+4. **SSoT Versioning**: Always use `get_version` or `get_mise_tool_version` to pull versions from `.mise.toml` for the summary table.
