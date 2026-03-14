@@ -48,31 +48,21 @@ EOF
 #   $1 - Manager/Category name (e.g., "Manager", "Project", "Lint Tool")
 #   $2 - Tool name (e.g., "pnpm", "Homebrew")
 #   $3 - Command to execute (e.g., "brew update")
-#   $4 - Cooldown key (optional, e.g., "homebrew"). If '-', cooldown is skipped.
-#   $5 - Version command (optional, e.g., "$(get_version brew)")
+#   $4 - Version command (optional, e.g., "$(get_version brew)")
 _execute_update() {
   local _CATEGORY="$1"
   local _TOOL="$2"
   local _CMD="$3"
-  local _COOLDOWN_KEY="$4"
-  local _VERSION_CMD="$5"
+  local _VERSION_CMD="$4"
 
   local _T0
   _T0=$(date +%s)
-
-  if [ -n "$_COOLDOWN_KEY" ] && [ "$_COOLDOWN_KEY" != "-" ]; then
-    if ! check_update_cooldown "$_COOLDOWN_KEY"; then
-      log_summary "$_CATEGORY" "$_TOOL" "✅ Up-to-date (Cooldown)" "${_VERSION_CMD:-"-"}" "0"
-      return 0
-    fi
-  fi
 
   log_info "Updating $_TOOL..."
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "$_CATEGORY" "$_TOOL" "⚖️ Previewed" "-" "0"
   else
     if run_quiet eval "$_CMD"; then
-      [ -n "$_COOLDOWN_KEY" ] && [ "$_COOLDOWN_KEY" != "-" ] && save_update_timestamp "$_COOLDOWN_KEY"
       log_summary "$_CATEGORY" "$_TOOL" "✅ Updated" "${_VERSION_CMD:-"-"}" "$(($(date +%s) - _T0))"
     else
       log_summary "$_CATEGORY" "$_TOOL" "❌ Failed" "-" "$(($(date +%s) - _T0))"
@@ -89,9 +79,9 @@ update_pnpm_global() {
   if command -v pnpm >/dev/null 2>&1; then
     # Intelligent pnpm update: detects if managed by corepack
     if command -v corepack >/dev/null 2>&1 && pnpm self-update --help 2>&1 | grep -q "corepack" >/dev/null 2>&1; then
-      _execute_update "Manager" "pnpm" "corepack prepare pnpm@latest --activate" "pnpm-global" "$(get_version pnpm)"
+      _execute_update "Manager" "pnpm" "corepack prepare pnpm@latest --activate" "$(get_version pnpm)"
     else
-      _execute_update "Manager" "pnpm" "pnpm self-update" "pnpm-global" "$(get_version pnpm)"
+      _execute_update "Manager" "pnpm" "pnpm self-update" "$(get_version pnpm)"
     fi
   fi
 }
@@ -101,7 +91,7 @@ update_pnpm_global() {
 #   update_pnpm_project
 update_pnpm_project() {
   if [ -f "pnpm-lock.yaml" ] && command -v pnpm >/dev/null 2>&1; then
-    _execute_update "Project" "pnpm-deps" "pnpm update" "-" ""
+    _execute_update "Project" "pnpm-deps" "pnpm update" ""
   fi
 }
 
@@ -114,7 +104,7 @@ update_python_venv() {
     if [ -f "$REQUIREMENTS_TXT" ]; then
       _CMD_PY="$_CMD_PY && \"$VENV/bin/pip\" install -r \"$REQUIREMENTS_TXT\" --upgrade"
     fi
-    _execute_update "Project" "Python-Venv" "$_CMD_PY" "-" "\$(get_version \"$VENV/bin/pip\")"
+    _execute_update "Project" "Python-Venv" "$_CMD_PY" "\$(get_version \"$VENV/bin/pip\")"
   fi
 }
 
@@ -123,7 +113,7 @@ update_python_venv() {
 #   update_homebrew
 update_homebrew() {
   if command -v brew >/dev/null 2>&1; then
-    _execute_update "Manager" "Homebrew" "brew update" "homebrew" ""
+    _execute_update "Manager" "Homebrew" "brew update" ""
   fi
 }
 
@@ -132,7 +122,7 @@ update_homebrew() {
 #   update_macports
 update_macports() {
   if command -v port >/dev/null 2>&1; then
-    _execute_update "Manager" "MacPorts" "sudo port selfupdate && sudo port -N upgrade outdated" "macports" ""
+    _execute_update "Manager" "MacPorts" "sudo port selfupdate && sudo port -N upgrade outdated" ""
   fi
 }
 
@@ -141,7 +131,7 @@ update_macports() {
 #   update_ruby_gems
 update_ruby_gems() {
   if command -v gem >/dev/null 2>&1 && gem list rubocop -i >/dev/null 2>&1; then
-    _execute_update "Lint Tool" "Rubocop" "gem update rubocop --user-install --no-document --quiet" "rubocop" "$(get_version rubocop)"
+    _execute_update "Lint Tool" "Rubocop" "gem update rubocop --user-install --no-document --quiet" "$(get_version rubocop)"
   fi
 }
 
@@ -155,7 +145,7 @@ update_pre_commit() {
   elif command -v pre-commit >/dev/null 2>&1; then _BIN_PC="pre-commit"; fi
 
   if [ -n "$_BIN_PC" ] && [ -f ".pre-commit-config.yaml" ]; then
-    _execute_update "Other" "Hooks" "\"$_BIN_PC\" autoupdate" "pre-commit" "\$(get_version \"$_BIN_PC\")"
+    _execute_update "Other" "Hooks" "\"$_BIN_PC\" autoupdate" "\$(get_version \"$_BIN_PC\")"
   fi
 }
 
@@ -165,7 +155,7 @@ update_pre_commit() {
 update_go_mod() {
   if [ -f "go.mod" ]; then
     if command -v go >/dev/null 2>&1; then
-      _execute_update "Project" "Go-Mod" "go get -u ./... && go mod tidy" "-" "$(get_version go)"
+      _execute_update "Project" "Go-Mod" "go get -u ./... && go mod tidy" "$(get_version go)"
     else
       log_warn "go.mod found but go command is missing. Skipping."
       log_summary "Project" "Go-Mod" "⚠️ Missing" "-" "0"
@@ -179,7 +169,7 @@ update_go_mod() {
 update_cargo_deps() {
   if [ -f "Cargo.toml" ]; then
     if command -v cargo >/dev/null 2>&1; then
-      _execute_update "Project" "Cargo-Deps" "cargo update" "-" "$(get_version cargo)"
+      _execute_update "Project" "Cargo-Deps" "cargo update" "$(get_version cargo)"
     else
       log_warn "Cargo.toml found but cargo command is missing. Skipping."
       log_summary "Project" "Cargo-Deps" "⚠️ Missing" "-" "0"
