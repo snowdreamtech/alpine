@@ -63,7 +63,7 @@ fi
 PACKAGE_JSON="package.json"
 VENV="${VENV:-.venv}"
 PYTHON="${PYTHON:-python3}"
-NPM="${NPM:-pnpm}"
+NPM="${NPM:-npm}"
 DOCS_DIR="docs"
 GITHUB_PROXY="${GITHUB_PROXY:-https://gh-proxy.sn0wdr1am.com/}"
 
@@ -74,7 +74,6 @@ ENABLE_MIRROR="${ENABLE_MIRROR:-${MIRROR:-${USE_MIRROR:-0}}}"
 MIRROR_NODEJS="${MIRROR_NODEJS:-https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/}"
 MIRROR_PYTHON="${MIRROR_PYTHON:-https://mirrors.tuna.tsinghua.edu.cn/python/}"
 MIRROR_NPM="${MIRROR_NPM:-https://registry.npmmirror.com}"
-MIRROR_PNPM="${MIRROR_PNPM:-https://registry.npmmirror.com/pnpm/}" # pnpm binary mirror
 MIRROR_GO="${MIRROR_GO:-https://goproxy.cn,direct}"
 MIRROR_RUST_DIST="${MIRROR_RUST_DIST:-https://mirrors.ustc.edu.cn/rust-static}"
 MIRROR_RUST_UPDATE="${MIRROR_RUST_UPDATE:-https://mirrors.ustc.edu.cn/rust-static/rustup}"
