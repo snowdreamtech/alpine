@@ -844,7 +844,6 @@ has_lang_files() {
 
   # 2. Check for file extensions (recursive, maxdepth 5 for performance)
   # Exclude common build/dependency/cache directories to avoid false positives and improve speed
-  local _FIND_EXCL="\! \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify -o -name .tmp -o -name tmp \)"
 
   local _ext_lang
   for _ext_lang in $_EXTS_LANG; do
