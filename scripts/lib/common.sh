@@ -59,17 +59,15 @@ fi
 
 # ── 📄 SSoT Constants (Paths and Files) ──────────────────────────────────────
 
-PACKAGE_JSON="package.json"
 VENV="${VENV:-.venv}"
 PYTHON="${PYTHON:-python3}"
 NPM="${NPM:-npm}"
 DOCS_DIR="docs"
-GITHUB_PROXY="${GITHUB_PROXY:-https://gh-proxy.sn0wdr1am.com/}"
 
 # Network Optimization & Mirror Configuration
 # NOTE: GITHUB_PROXY is optimized for Release/Archive/File downloads.
 # It does NOT support project folder clones (git clone).
-ENABLE_MIRROR="${ENABLE_MIRROR:-0}"
+ENABLE_GITHUB_PROXY="${ENABLE_GITHUB_PROXY:-0}"
 
 # ── 🔨 SSoT Tool Versions ────────────────────────────────────────────────────
 
@@ -489,21 +487,8 @@ optimize_network() {
   _TEMP_GIT_CONFIG="/tmp/.git_config_$(id -u)"
 
   log_debug "Detecting network connectivity and global proxy health..."
-  local _NEEDS_MIRROR=false
-  local _GIT_INTERFERENCE=false
 
-  # 1. Quick connectivity test to GitHub (2s timeout)
-  if ! curl -Is --connect-timeout 2 --max-time 3 https://github.com >/dev/null 2>&1; then
-    log_warn "Direct GitHub connectivity appears slow or restricted."
-    _NEEDS_MIRROR=true
-  fi
-
-  # 2. Check for manual override
-  if [ "${ENABLE_MIRROR}" = "1" ] || [ "${ENABLE_MIRROR}" = "true" ]; then
-    _NEEDS_MIRROR=true
-  fi
-
-  # 3. Handle Git Protocols & Proxies
+  # 1. Handle Git Protocols & Proxies
   # Guard: If GITHUB_TOKEN is set, verify it's not broken (avoid 401 errors).
   if [ -n "$GITHUB_TOKEN" ]; then
     if ! curl -Is --connect-timeout 2 -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/user >/dev/null 2>&1; then
@@ -511,9 +496,10 @@ optimize_network() {
       unset GITHUB_TOKEN
     fi
   fi
-  # NOTE: Current GITHUB_PROXY does NOT support project folder clones (Method Not Allowed).
-  # We bypass the user's global Git config to avoid broken "insteadOf" redirects (e.g., ghproxy.cn).
-  if [ "$_NEEDS_MIRROR" = "true" ]; then
+
+  # Apply Git optimization and GitHub Proxy if ENABLE_GITHUB_PROXY is active.
+  # Registry mirrors (npm, pip, etc.) are now always active via .mise.toml [env].
+  if [ "${ENABLE_GITHUB_PROXY}" = "1" ] || [ "${ENABLE_GITHUB_PROXY}" = "true" ]; then
     log_info "Bypassing broken global git proxies and applying network optimization..."
 
     mkdir -p "$(dirname "$_TEMP_GIT_CONFIG")"
@@ -527,13 +513,6 @@ optimize_network() {
 EOF
     export GIT_CONFIG_GLOBAL="$_TEMP_GIT_CONFIG"
     export GIT_CONFIG_SYSTEM="/dev/null"
-
-    # Standard mirrors for binaries/packages
-    export ENABLE_MIRROR=1
-
-    # NOTE: Mirror settings (NPM_CONFIG_REGISTRY, PIP_INDEX_URL, etc.)
-    # are now centralized in .mise.toml [env] section.
-    # We rely on mise to inject these project-wide.
   fi
 
   export _NETWORK_OPTIMIZED=true
@@ -870,7 +849,7 @@ download_url() {
 
   # Proactive Proxy Optimization (Rule 01)
   local _TARGET_URL_DL="$_URL_DL"
-  if [ "${ENABLE_MIRROR:-0}" = "1" ] || [ "${ENABLE_MIRROR:-0}" = "true" ]; then
+  if [ "${ENABLE_GITHUB_PROXY:-0}" = "1" ] || [ "${ENABLE_GITHUB_PROXY:-0}" = "true" ]; then
     if echo "$_URL_DL" | grep -q "^https://github.com/"; then
       _TARGET_URL_DL="${GITHUB_PROXY}${_URL_DL}"
       log_debug "Redirecting via GitHub proxy: $_TARGET_URL_DL"
