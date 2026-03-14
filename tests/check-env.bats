@@ -61,7 +61,11 @@ echo "git version 2.30.0"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/mise"
 #!/bin/sh
-echo "2026.3.8"
+if [ "\$1" = "ls" ]; then
+  echo "{}"
+else
+  echo "2026.3.8"
+fi
 EOF
   cat <<EOF >"$TEMP_DIR/bin/make"
 #!/bin/sh
@@ -93,7 +97,7 @@ echo "cargo 1.72.1 (103487372 2023-09-19)"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/swift"
 #!/bin/sh
-echo "swift-driver version: 1.82.2 Apple Swift version 5.9 (swiftlang-5.9.0.128.108 clang-1500.0.40.1)"
+echo "Apple Swift version 5.9 (swiftlang-5.9.0.128.108 clang-1500.0.40.1)"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/kotlin"
 #!/bin/sh
@@ -148,7 +152,7 @@ EOF
   assert_success
   assert_output --partial "Environment is HEALTHY"
   assert_output --partial "Go: v1.21.0"
-  assert_output --partial "Python: v3.10.0"
+  assert_output --partial "Python: v3.12.9"
   assert_output --partial "Ruby: v3.2.2"
   assert_output --partial "Java: v17.0.8"
   assert_output --partial "PHP: v8.2.10"
@@ -163,7 +167,7 @@ EOF
   assert_output --partial "Trivy: v0.69.3"
   assert_output --partial "Zizmor: v1.3.1"
   assert_output --partial "golangci-lint: v1.55.0"
-  assert_output --partial "Actionlint: v1.7.11"
+  assert_output --partial "Actionlint: v1.7.11.24"
   assert_output --partial "EditorConfig: v3.6.1"
 }
 
