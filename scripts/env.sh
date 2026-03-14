@@ -71,6 +71,62 @@ run_env_setup() {
   fi
 }
 
+# Purpose: Internal helper to parse .env.example and execute an action (check or sync) for missing keys.
+_process_env_template() {
+  local _MODE="$1" # "check" or "sync"
+  local _MISSING_COUNT=0
+  local _ADDED_COUNT=0
+
+  while IFS= read -r line_parsed || [ -n "$line_parsed" ]; do
+    case "$line_parsed" in
+    \#* | '') continue ;;
+    esac
+
+    local _KEY_PARSED
+    _KEY_PARSED=$(echo "$line_parsed" | cut -d'=' -f1 | sed 's/[[:space:]]*$//')
+
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
+      if [ "$_MODE" = "check" ]; then
+        log_debug "DRY-RUN: Would check if $_KEY_PARSED exists in .env"
+      else
+        log_info "DRY-RUN: Would add $_KEY_PARSED to .env"
+      fi
+      continue
+    fi
+
+    if ! grep -q "^${_KEY_PARSED}=" ".env" && ! grep -q "^${_KEY_PARSED} =" ".env"; then
+      if [ "$_MODE" = "check" ]; then
+        log_warn "Missing key: $_KEY_PARSED"
+        _MISSING_COUNT=$((_MISSING_COUNT + 1))
+      elif [ "$_MODE" = "sync" ]; then
+        printf "Missing key found: %b%s%b. Add to .env? (y/N): " "${YELLOW}" "$_KEY_PARSED" "${NC}"
+        local _CONFIRM_SYNC
+        read -r _CONFIRM_SYNC
+        case "$_CONFIRM_SYNC" in
+        [yY]*)
+          echo "$line_parsed" >>.env
+          log_success "Added $_KEY_PARSED"
+          _ADDED_COUNT=$((_ADDED_COUNT + 1))
+          ;;
+        *) log_info "Skipped $_KEY_PARSED" ;;
+        esac
+      fi
+    fi
+  done <".env.example"
+
+  if [ "$_MODE" = "check" ]; then
+    if [ "$_MISSING_COUNT" -eq 0 ]; then
+      log_success "All environment keys are present."
+    else
+      log_error "Validation failed: $_MISSING_COUNT keys missing from .env"
+      log_info "💡 Run 'scripts/env.sh sync' to add missing keys (interactive)."
+      exit 1
+    fi
+  elif [ "$_MODE" = "sync" ]; then
+    log_success "Sync complete. $_ADDED_COUNT keys added."
+  fi
+}
+
 # Purpose: Validates that all keys in .env.example are present in .env.
 # Examples:
 #   run_env_check
@@ -86,31 +142,7 @@ run_env_check() {
   fi
 
   log_info "Checking .env for missing keys from .env.example..."
-  local _MISSING_ENV=0
-  while IFS= read -r line_env || [ -n "$line_env" ]; do
-    case "$line_env" in
-    \#* | '') continue ;;
-    esac
-
-    local _KEY_ENV
-    _KEY_ENV=$(echo "$line_env" | cut -d'=' -f1 | sed 's/[[:space:]]*$//')
-    if [ "${DRY_RUN:-0}" -eq 1 ]; then
-      log_debug "DRY-RUN: Would check if $_KEY_ENV exists in .env"
-    else
-      if ! grep -q "^$_KEY_ENV=" ".env" && ! grep -q "^$_KEY_ENV =" ".env"; then
-        log_warn "Missing key: $_KEY_ENV"
-        _MISSING_ENV=$((_MISSING_ENV + 1))
-      fi
-    fi
-  done <".env.example"
-
-  if [ "$_MISSING_ENV" -eq 0 ]; then
-    log_success "All environment keys are present."
-  else
-    log_error "Validation failed: $_MISSING_ENV keys missing from .env"
-    log_info "💡 Run 'scripts/env.sh sync' to add missing keys (interactive)."
-    exit 1
-  fi
+  _process_env_template "check"
 }
 
 # Purpose: Interactively synchronizes missing keys from .env.example to .env.
@@ -127,33 +159,7 @@ run_env_sync() {
   fi
 
   log_info "Syncing missing keys from .env.example to .env..."
-  local _ADDED_ENV=0
-  while IFS= read -r line_sync || [ -n "$line_sync" ]; do
-    case "$line_sync" in
-    \#* | '') continue ;;
-    esac
-
-    local _KEY_SYNC
-    _KEY_SYNC=$(echo "$line_sync" | cut -d'=' -f1 | sed 's/[[:space:]]*$//')
-    if ! grep -q "^$_KEY_SYNC=" ".env" && ! grep -q "^$_KEY_SYNC =" ".env"; then
-      if [ "${DRY_RUN:-0}" -eq 1 ]; then
-        log_info "DRY-RUN: Would add $_KEY_SYNC to .env"
-      else
-        printf "Missing key found: %b%s%b. Add to .env? (y/N): " "${YELLOW}" "$_KEY_SYNC" "${NC}"
-        local _CONFIRM_SYNC
-        read -r _CONFIRM_SYNC
-        case "$_CONFIRM_SYNC" in
-        [yY]*)
-          echo "$line_sync" >>.env
-          log_success "Added $_KEY_SYNC"
-          _ADDED_ENV=$((_ADDED_ENV + 1))
-          ;;
-        *) log_info "Skipped $_KEY_SYNC" ;;
-        esac
-      fi
-    fi
-  done <".env.example"
-  log_success "Sync complete. $_ADDED_ENV keys added."
+  _process_env_template "sync"
 }
 
 # Purpose: Main entry point for the environment configuration orchestrator.
