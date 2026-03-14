@@ -227,6 +227,17 @@ setup_python() {
   log_summary "Runtime" "Python" "$_STAT_PY" "$(get_version "$VENV/bin/python")" "$_DUR_PY"
 }
 
+# Purpose: Installs pipx for scoped Python tool management.
+# Delegate: Managed by mise (.mise.toml)
+install_pipx() {
+  local _T0_PIPX
+  _T0_PIPX=$(date +%s)
+  log_info "── Setting up Pipx ──"
+  local _STAT_PIPX="✅ mise"
+  run_mise install pipx || _STAT_PIPX="❌ Failed"
+  log_summary "Toolchain Manager" "Pipx" "$_STAT_PIPX" "$(get_version pipx)" "$(($(date +%s) - _T0_PIPX))"
+}
+
 # Purpose: Installs Gitleaks for secrets scanning.
 # Delegate: Managed by mise (.mise.toml)
 install_gitleaks() {
@@ -1239,7 +1250,7 @@ EOF
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
     # Full list for "On-demand" (default) or "All" (explicit)
-    _MODULES_LIST="node python gitleaks hadolint go checkmake tflint kube-linter powershell java ruby dart swift dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit pre-commit hooks"
+    _MODULES_LIST="node python pipx gitleaks hadolint go checkmake tflint kube-linter powershell java ruby dart swift dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit pre-commit hooks"
   else
     # Specific modules requested (e.g., ./setup.sh node)
     _MODULES_LIST="${_RAW_ARGS}"
@@ -1268,6 +1279,7 @@ EOF
     case $_cur_module in
     node) setup_node ;;
     python) setup_python ;;
+    pipx) install_pipx ;;
     gitleaks) install_gitleaks ;;
     checkmake) install_checkmake ;;
     hadolint) install_hadolint ;;

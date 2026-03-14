@@ -512,6 +512,13 @@ optimize_network() {
   fi
 
   # 3. Handle Git Protocols & Proxies
+  # Guard: If GITHUB_TOKEN is set, verify it's not broken (avoid 401 errors).
+  if [ -n "$GITHUB_TOKEN" ]; then
+    if ! curl -Is --connect-timeout 2 -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/user >/dev/null 2>&1; then
+      log_warn "Current GITHUB_TOKEN appears invalid or unauthorized (401). Unsetting for this session..."
+      unset GITHUB_TOKEN
+    fi
+  fi
   # NOTE: Current GITHUB_PROXY does NOT support project folder clones (Method Not Allowed).
   # We bypass the user's global Git config to avoid broken "insteadOf" redirects (e.g., ghproxy.cn).
   if [ "$_NEEDS_MIRROR" = "true" ]; then
@@ -538,6 +545,8 @@ EOF
     export PYTHON_BUILD_MIRROR_URL="${MIRROR_PYTHON}"
     export NPM_CONFIG_REGISTRY="${MIRROR_NPM}"
     export YARN_REGISTRY="${MIRROR_NPM}"
+    export PIP_INDEX_URL="https://pypi.tuna.tsinghua.edu.cn/simple"
+    export PIP_TRUSTED_HOST="pypi.tuna.tsinghua.edu.cn"
 
     # Go & Rust mirrors (China optimization)
     export GOPROXY="${MIRROR_GO}"
@@ -584,6 +593,11 @@ run_mise() {
   local _CMD="$1"
   shift
 
+  # Guard: Unset potentially invalid GITHUB_TOKEN to avoid 401 errors for GitHub-based tools.
+  # This is safe because our mirrors and global proxy handle connectivity.
+  local _OLD_GITHUB_TOKEN="$GITHUB_TOKEN"
+  unset GITHUB_TOKEN
+
   # (Mise install is generally fast, but checking avoids overhead)
   if [ "$_CMD" = "install" ] && [ -n "$1" ]; then
     local _TOOL_CHECK="$1"
@@ -627,11 +641,13 @@ run_mise() {
         log_info "pipx not found — bootstrapping via mise..."
         local _M_BIN_PIPX
         _M_BIN_PIPX=$(command -v mise 2>/dev/null || echo "$HOME/.local/bin/mise")
+        # Install pipx without GITHUB_TOKEN
         "$_M_BIN_PIPX" install pipx >/dev/null 2>&1 || true
-        # Refresh PATH for mise shims
+        # Ensure mise shims are available
         export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
         if ! command -v pipx >/dev/null 2>&1; then
           log_error "Cannot install '$_TOOL_CHECK': 'pipx' is missing even after bootstrap. Please run 'make setup' or install pipx first."
+          export GITHUB_TOKEN="$_OLD_GITHUB_TOKEN"
           return 1
         fi
       fi
@@ -692,6 +708,13 @@ run_mise() {
       sleep 1
     fi
   done
+
+  # Restore GITHUB_TOKEN
+  if [ -n "$_OLD_GITHUB_TOKEN" ]; then
+    export GITHUB_TOKEN="$_OLD_GITHUB_TOKEN"
+  else
+    unset GITHUB_TOKEN
+  fi
 
   return $_STATUS
 }
@@ -1232,6 +1255,10 @@ get_version() {
       ;;
     pip-audit | govulncheck | zizmor)
       "$_CMD_VER" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
+      ;;
+    commitizen | git-cz | cz)
+      # commitizen version is in the first line of --version or via npm list
+      "$_CMD_VER" --version 2>&1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1 || echo "-"
       ;;
     spectral)
       "$_CMD_VER" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
