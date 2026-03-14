@@ -63,10 +63,6 @@ EOF
 #!/bin/sh
 echo "2026.3.8"
 EOF
-  cat <<EOF >"$TEMP_DIR/bin/uv"
-#!/bin/sh
-echo "0.1.0"
-EOF
   cat <<EOF >"$TEMP_DIR/bin/make"
 #!/bin/sh
 echo "GNU Make 3.81"

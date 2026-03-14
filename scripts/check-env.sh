@@ -211,11 +211,6 @@ main() {
   log_info "── Toolchain Manager ──"
   if command -v mise >/dev/null 2>&1; then
     log_success "✅ mise: Active ($(get_version mise))"
-    if command -v uv >/dev/null 2>&1; then
-      log_success "✅ uv: Active ($(get_version uv))"
-    else
-      log_warn "⚠️  uv: Not found. Run 'make setup' to install."
-    fi
   else
     log_warn "❌ mise: Not found. (Mandatory for toolchain management)"
     HEALTHY_ST=1

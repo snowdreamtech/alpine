@@ -211,8 +211,7 @@ setup_python() {
   # 2. Venv check
   local _STAT_PY="✅ Installed"
   if [ ! -d "$VENV" ]; then
-    log_info "Creating virtual environment..."
-    # Fallback to standard python venv if uv is missing
+    # Create virtual environment if missing
     run_quiet python3 -m venv "$VENV" || _STAT_PY="❌ Failed"
   fi
 

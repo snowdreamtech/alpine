@@ -39,7 +39,7 @@ VERBOSE=${VERBOSE:-1} # 0: quiet, 1: normal, 2: verbose
 DRY_RUN=${DRY_RUN:-0}
 
 # Enforce Non-Interactive Mode (For CI/CD and Headless Setup)
-# These prevent 'mise' and 'uv' from asking for user confirmation or trust prompts.
+# These prevent 'mise' from asking for user confirmation or trust prompts.
 # Ref: Rule 01 (General), Rule 08 (Dev Env)
 export MISE_YES=true
 export MISE_NON_INTERACTIVE=true
@@ -482,9 +482,8 @@ bootstrap_mise() {
   # Verify Health
   _mise_verify_health
 
-  # Deploy uv as core dependency
-  log_info "Deploying uv via mise..."
-  run_mise install uv --global || log_warn "Warning: Failed to install uv via mise."
+  # Verify Health
+  _mise_verify_health
 }
 
 # ── 🌐 Network Optimization ──────────────────────────────────────────────────
