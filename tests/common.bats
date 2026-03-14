@@ -73,7 +73,6 @@ teardown() {
   assert_line --partial "test error"
 }
 
-
 @test "common.sh: atomic_swap successfully moves file" {
   echo "new content" >"$TEMP_DIR/new.tmp"
   touch "$TEMP_DIR/old.txt"

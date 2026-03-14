@@ -68,6 +68,9 @@ REQUIREMENTS_TXT="${REQUIREMENTS_TXT:-requirements.txt}"
 PYPROJECT_TOML="${PYPROJECT_TOML:-pyproject.toml}"
 CARGO_TOML="${CARGO_TOML:-Cargo.toml}"
 VERSION_FILE="${VERSION_FILE:-VERSION}"
+CHANGELOG="${CHANGELOG:-CHANGELOG.md}"
+LOCK_DIR="${LOCK_DIR:-.archival_lock}"
+ARCHIVE_DIR="${ARCHIVE_DIR:-.}"
 
 # Network Optimization & Mirror Configuration
 # NOTE: GITHUB_PROXY is optimized for Release/Archive/File downloads.
@@ -462,7 +465,6 @@ bootstrap_mise() {
 
   # Finalize Activation
   _mise_apply_activation "$_M_SHELL"
-
 
   # Setup Completions
   _mise_setup_completions "$_M_SHELL"
