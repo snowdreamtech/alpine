@@ -1179,13 +1179,10 @@ main() {
   local _START_TIME_MAIN
   _START_TIME_MAIN=$(date +%s)
 
-  if [ -z "$SETUP_SUMMARY_FILE" ]; then
-    SETUP_SUMMARY_FILE=$(mktemp)
-    export SETUP_SUMMARY_FILE
-    local _CREATED_SUMMARY_MAIN=true
+  init_summary_table "Setup Execution Summary"
 
-    # Initialize Summary (Only once per CI Job or first call)
-    if [ "$_SETUP_SUMMARY_INITIALIZED" != "true" ] && ! check_ci_summary "### Setup Execution Summary"; then
+    # Initialize Summary Legend (Only once per CI Job or first call)
+    if [ "$_SETUP_SUMMARY_INITIALIZED" != "true" ] && ! check_ci_summary "Status Legend:"; then
       {
         printf "### Setup Execution Summary\n\n"
         cat <<EOF
@@ -1323,7 +1320,7 @@ EOF
   done
 
   # ── Final Output Management ──
-  if [ "$_CREATED_SUMMARY_MAIN" = "true" ]; then
+  if [ "$_IS_TOP_LEVEL" = "true" ] && [ -n "$SETUP_SUMMARY_FILE" ] && [ -f "$SETUP_SUMMARY_FILE" ]; then
     local _TOTAL_DUR_MAIN
     _TOTAL_DUR_MAIN=$(($(date +%s) - _START_TIME_MAIN))
     printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR_MAIN" >>"$SETUP_SUMMARY_FILE"
