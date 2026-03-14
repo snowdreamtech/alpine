@@ -784,155 +784,10 @@ check_ci_summary() {
   [ -n "$GITHUB_STEP_SUMMARY" ] && [ -f "$GITHUB_STEP_SUMMARY" ] && grep -qF "$1" "$GITHUB_STEP_SUMMARY"
 }
 
-# Purpose: Checks if a task is within its cooldown period.
-# Params:
-#   $1 - Task name (used for marker filename)
-#   $2 - Cooldown duration in seconds (default: 86400 / 24h)
-# Returns:
-#   0 - Cooldown expired (update needed)
-#   1 - Within cooldown (skip update)
-# Examples:
-#   if check_update_cooldown "brew" 86400; then update_brew; fi
-check_update_cooldown() {
-  local _NAME_COOL="$1"
-  local _DURATION_COOL="${2:-86400}" # Default: 24h
-  local _MARKER_COOL="${VENV}/.last_update_${_NAME_COOL}"
 
-  if [ ! -f "$_MARKER_COOL" ]; then return 0; fi
 
-  local _NOW_COOL
-  local _LAST_COOL
-  _NOW_COOL=$(date +%s)
-  _LAST_COOL=$(cat "$_MARKER_COOL")
-  if [ $((_NOW_COOL - _LAST_COOL)) -ge "$_DURATION_COOL" ]; then
-    return 0
-  fi
-  return 1
-}
 
-# Purpose: Persists the current timestamp for a specific task marker.
-# Params:
-#   $1 - Task name
-# Examples:
-#   save_update_timestamp "brew"
-save_update_timestamp() {
-  local _NAME_TS="$1"
-  local _MARKER_TS="${VENV}/.last_update_${_NAME_TS}"
-  mkdir -p "$(dirname "$_MARKER_TS")"
-  date +%s >"$_MARKER_TS"
-}
 
-# Purpose: Downloads a file from a URL with built-in retries and proxy fallback.
-# Params:
-#   $1 - Source URL
-#   $2 - Target destination path
-#   $3 - Description of the item (for logging)
-# Returns:
-#   0 - Success
-#   1 - Fatal failure
-# Examples:
-#   download_url "https://example.com/tool.tar.gz" "/tmp/tool.tar.gz" "Awesome Tool"
-download_url() {
-  local _URL_DL="$1"
-  local _OUT_DL="$2"
-  local _DESC_DL="$3"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_debug "DRY-RUN: Would download $_URL_DL to $_OUT_DL"
-    return 0
-  fi
-
-  # Ensure output directory exists
-  local _DIR_DL
-  _DIR_DL=$(dirname "$_OUT_DL")
-  mkdir -p "$_DIR_DL"
-
-  # Proactive Proxy Optimization (Rule 01)
-  local _TARGET_URL_DL="$_URL_DL"
-  if [ "${ENABLE_GITHUB_PROXY:-0}" = "1" ] || [ "${ENABLE_GITHUB_PROXY:-0}" = "true" ]; then
-    if echo "$_URL_DL" | grep -q "^https://github.com/"; then
-      _TARGET_URL_DL="${GITHUB_PROXY}${_URL_DL}"
-      log_debug "Redirecting via GitHub proxy: $_TARGET_URL_DL"
-    fi
-  fi
-
-  log_info "Downloading $_DESC_DL..."
-  # curl with retry flags as per rules
-  if curl --retry 5 --retry-delay 2 --retry-connrefused --fail \
-    --connect-timeout 10 --max-time 120 \
-    -fsSL "${_TARGET_URL_DL}" -o "${_OUT_DL}"; then
-    return 0
-  fi
-
-  # Fallback if proxy failed (if we used it)
-  if [ "$_TARGET_URL_DL" != "$_URL_DL" ]; then
-    log_warn "Proxy download failed for ${_DESC_DL}, falling back to direct download..."
-    if curl --retry 2 --retry-delay 2 --retry-connrefused --fail \
-      --connect-timeout 10 --max-time 120 \
-      -fsSL "${_URL_DL}" -o "${_OUT_DL}"; then
-      return 0
-    fi
-  fi
-
-  log_error "Failed to download $_DESC_DL from $_URL_DL"
-  return 1
-}
-
-# Purpose: Verifies the SHA256 checksum of a file.
-# Params:
-#   $1 - Path to the file
-#   $2 - Expected SHA256 hash
-# Returns:
-#   0 - Verified
-#   1 - Mismatch
-# Examples:
-#   verify_checksum "/tmp/tool.tar.gz" "abc123def..."
-verify_checksum() {
-  local _FILE_CS="$1"
-  local _EXPECTED_SHA_CS="$2"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_debug "DRY-RUN: Would verify checksum for $_FILE_CS"
-    return 0
-  fi
-
-  log_info "Verifying checksum for $(basename "$_FILE_CS")..."
-  local _ACTUAL_SHA_CS
-  if command -v sha256sum >/dev/null 2>&1; then
-    _ACTUAL_SHA_CS=$(sha256sum "$_FILE_CS" | awk '{print $1}')
-  elif command -v shasum >/dev/null 2>&1; then
-    _ACTUAL_SHA_CS=$(shasum -a 256 "$_FILE_CS" | awk '{print $1}')
-  else
-    log_warn "sha256sum/shasum not found. Skipping checksum verification."
-    return 0
-  fi
-
-  if [ "$_ACTUAL_SHA_CS" != "$_EXPECTED_SHA_CS" ]; then
-    log_error "Checksum mismatch for $_FILE_CS!"
-    log_error "Expected: $_EXPECTED_SHA_CS"
-    log_error "Actual:   $_ACTUAL_SHA_CS"
-    return 1
-  fi
-
-  log_success "Checksum verified."
-  return 0
-}
-
-# Purpose: Verifies if a required runtime or tool is available in the environment.
-#          Silently EXITS the script (skip) if missing, assuming optionality.
-# Params:
-#   $1 - Command/Binary name to check
-#   $2 - Human-readable tool name (for logging)
-# Examples:
-#   check_runtime "go" "Golang Builder"
-check_runtime() {
-  local _RT_NAME="$1"
-  local _TOOL_DESC="${2:-Tool}"
-  if ! command -v "$_RT_NAME" >/dev/null 2>&1; then
-    log_warn "⏭️  Required runtime '$_RT_NAME' for $_TOOL_DESC is missing. Skipping."
-    exit 0
-  fi
-}
 
 # Purpose: Detects the current CI platform by inspecting well-known environment variables.
 # Returns: Platform name string, or "local" if not in a CI environment.
@@ -973,19 +828,6 @@ is_ci_env() {
   [ "$(detect_ci_platform)" != "local" ]
 }
 
-# Purpose: Identifies the primary package manager on macOS.
-# Returns: "brew", "port", or "none"
-# Examples:
-#   MGR=$(get_macos_pkg_mgr)
-get_macos_pkg_mgr() {
-  if command -v brew >/dev/null 2>&1; then
-    echo "brew"
-  elif command -v port >/dev/null 2>&1; then
-    echo "port"
-  else
-    echo "none"
-  fi
-}
 
 # Purpose: Detects project language affiliation based on manifests or extensions.
 # Params:
@@ -1035,57 +877,7 @@ has_lang_files() {
   return 1
 }
 
-# Purpose: Dynamically extracts the project version from manifest files.
-# Returns: Version string (detected) or "0.0.0" (fallback).
-# Examples:
-#   VER=$(get_project_version)
-VERSION_FILE="VERSION"
 
-get_project_version() {
-  if [ -f "$VERSION_FILE" ]; then
-    head -n 1 "$VERSION_FILE" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
-  elif [ -f "package.json" ]; then
-    grep '"version":' "package.json" | head -n 1 | sed 's/.*"version":[[:space:]]*"//;s/".*//'
-  elif [ -f "Cargo.toml" ]; then
-    grep '^version =' "Cargo.toml" | head -n 1 | sed -e 's/.*"\(.*\)"/\1/' -e "s/.*'\(.*\)'/\1/"
-  elif [ -f "pyproject.toml" ]; then
-    grep '^version =' "pyproject.toml" | head -n 1 | sed 's/.*"//;s/".*//'
-  else
-    # Fallback to git tag if available
-    if command -v git >/dev/null 2>&1 && git rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-      git describe --tags --abbrev=0 2>/dev/null || echo "0.0.0"
-    else
-      echo "0.0.0"
-    fi
-  fi
-}
-
-# Purpose: Executes an npm/pnpm script with infinite-recursion detection.
-# Params:
-#   $1 - Name of the npm script (e.g., "test")
-# Examples:
-#   run_npm_script "test"
-run_npm_script() {
-  local _SCRIPT_NAME_NPM="$1"
-  local _CURRENT_BASENAME_NPM
-  _CURRENT_BASENAME_NPM=$(basename "$0")
-
-  if [ -f "$PACKAGE_JSON" ]; then
-    local _CMD_NPM
-    _CMD_NPM=$(grep "\"$_SCRIPT_NAME_NPM\":" "$PACKAGE_JSON" | sed "s/.*\"$_SCRIPT_NAME_NPM\":[[:space:]]*\"//;s/\".*//" || true)
-    if [ -n "$_CMD_NPM" ]; then
-      # Avoid infinite loop if the command points back to this script
-      if echo "$_CMD_NPM" | grep -q "$_CURRENT_BASENAME_NPM"; then
-        log_debug "npm script '$_SCRIPT_NAME_NPM' is a self-reference to '$_CURRENT_BASENAME_NPM'. Skipping."
-        return 0
-      fi
-      log_info "── Running Node.js script: $NPM $_SCRIPT_NAME_NPM ──"
-      "$NPM" run "$_SCRIPT_NAME_NPM"
-      return 0
-    fi
-  fi
-  return 0
-}
 
 # Purpose: Executes a command while suppressing its output in quiet mode.
 # Params:
