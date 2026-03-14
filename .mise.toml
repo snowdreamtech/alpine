@@ -110,3 +110,6 @@ RUSTUP_UPDATE_ROOT = "https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup"
 
 # Optional: Yarn support
 YARN_REGISTRY = "https://registry.npmmirror.com"
+
+# GitHub Proxy (SSoT)
+GITHUB_PROXY = "https://gh-proxy.sn0wdr1am.com/"
