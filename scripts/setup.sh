@@ -100,6 +100,23 @@ EOF
 
 # ── Functions ────────────────────────────────────────────────────────────────
 
+# Purpose: Internal helper to display a consistent setup header with version info.
+# Params:
+#   $1 - Human-readable description
+#   $2 - Mise tool name (optional, for version lookup)
+_log_setup() {
+  local _TITLE="$1"
+  local _LOOKUP="$2"
+  local _VER=""
+  [ -n "$_LOOKUP" ] && _VER=$(get_mise_tool_version "$_LOOKUP")
+
+  if [ -n "$_VER" ]; then
+    log_info "── Setting up $_TITLE ($_VER) ──"
+  else
+    log_info "── Setting up $_TITLE ──"
+  fi
+}
+
 # Purpose: Internal logging wrapper for informational output.
 #          Delegates to log_info in the common library.
 # Params:
@@ -154,38 +171,25 @@ sanitize_path() {
 setup_node() {
   local _T0_NODE
   _T0_NODE=$(date +%s)
-  log_info "── Setting up Node.js ──"
+  _log_setup "Node.js" "node"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Node.js" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
-  # 1. Smart Installation via mise (SSoT: .mise.toml)
-  run_mise install node
+  local _STAT_NODE="✅ Installed"
+  install_runtime_node || _STAT_NODE="❌ Failed"
 
-  # 2. Activate environment for subsequent steps
-  eval "$(mise activate bash --shims)"
+  local _DUR_NODE=$(($(date +%s) - _T0_NODE))
+  log_summary "Runtime" "Node.js" "$_STAT_NODE" "$(get_version node)" "$_DUR_NODE"
 
-  # 3. Project dependencies
-  if [ -f package.json ]; then
-    local _STAT_NODE="✅ Installed"
-    # shellcheck disable=SC2154
-    run_quiet "$NPM" install || _STAT_NODE="❌ Failed"
-
-    local _DUR_NODE
-    _DUR_NODE=$(($(date +%s) - _T0_NODE))
-    log_summary "Runtime" "Node.js" "$_STAT_NODE" "$(get_version node)" "$_DUR_NODE"
-
-    if [ "$_STAT_NODE" = "✅ Installed" ]; then
-      # Detect Frameworks from package.json for summary
-      if grep -q '"vitepress"' package.json; then log_summary "Framework" "VitePress" "✅ Detected" "$(get_version node "exec vitepress --version")" "0"; fi
-      if grep -q '"vue"' package.json; then log_summary "Framework" "Vue" "✅ Detected" "-" "0"; fi
-      if grep -q '"react"' package.json; then log_summary "Framework" "React" "✅ Detected" "-" "0"; fi
-      if grep -q '"tailwindcss"' package.json; then log_summary "Framework" "Tailwind" "✅ Detected" "-" "0"; fi
-    fi
-  else
-    log_summary "Runtime" "Node.js" "⏭️ Skipped" "-" "0"
+  if [ "$_STAT_NODE" = "✅ Installed" ] && [ -f "$PACKAGE_JSON" ]; then
+    # Detect Frameworks from package.json for summary
+    if grep -q '"vitepress"' "$PACKAGE_JSON"; then log_summary "Framework" "VitePress" "✅ Detected" "$(get_version node "exec vitepress --version")" "0"; fi
+    if grep -q '"vue"' "$PACKAGE_JSON"; then log_summary "Framework" "Vue" "✅ Detected" "-" "0"; fi
+    if grep -q '"react"' "$PACKAGE_JSON"; then log_summary "Framework" "React" "✅ Detected" "-" "0"; fi
+    if grep -q '"tailwindcss"' "$PACKAGE_JSON"; then log_summary "Framework" "Tailwind" "✅ Detected" "-" "0"; fi
   fi
 }
 
@@ -197,30 +201,15 @@ setup_node() {
 setup_python() {
   local _T0_PY
   _T0_PY=$(date +%s)
-  log_info "── Setting up Python Virtual Environment ──"
+  _log_setup "Python Virtual Environment" "python"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Python" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
-  # 1. Smart Installation via mise (SSoT: .mise.toml)
-  run_mise install python
-  eval "$(mise activate bash --shims)"
-
-  # 2. Venv check
   local _STAT_PY="✅ Installed"
-  if [ ! -d "$VENV" ]; then
-    # Create virtual environment if missing
-    run_quiet python3 -m venv "$VENV" || _STAT_PY="❌ Failed"
-  fi
-
-  # 3. Dependencies
-  if [ "$_STAT_PY" = "✅ Installed" ] && [ -d "$VENV" ]; then
-    if [ -f requirements-dev.txt ]; then
-      run_quiet "$VENV/bin/pip" install -r requirements-dev.txt || _STAT_PY="⚠️ Warning"
-    fi
-  fi
+  install_runtime_python || _STAT_PY="❌ Failed"
 
   local _DUR_PY=$(($(date +%s) - _T0_PY))
   log_summary "Runtime" "Python" "$_STAT_PY" "$(get_version "$VENV/bin/python")" "$_DUR_PY"
@@ -231,7 +220,11 @@ setup_python() {
 install_pipx() {
   local _T0_PIPX
   _T0_PIPX=$(date +%s)
-  log_info "── Setting up Pipx ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Toolchain Manager" "Pipx" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "Pipx" "pipx"
   local _STAT_PIPX="✅ mise"
   run_mise install pipx || _STAT_PIPX="❌ Failed"
   log_summary "Toolchain Manager" "Pipx" "$_STAT_PIPX" "$(get_version pipx)" "$(($(date +%s) - _T0_PIPX))"
@@ -242,7 +235,7 @@ install_pipx() {
 install_gitleaks() {
   local _T0_GITL
   _T0_GITL=$(date +%s)
-  log_info "── Setting up Gitleaks ──"
+  _log_setup "Gitleaks" "gitleaks"
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "Gitleaks" "⚖️ Previewed" "-" "0"
     return 0
@@ -260,7 +253,7 @@ install_gitleaks() {
 install_hadolint() {
   local _T0_HADO
   _T0_HADO=$(date +%s)
-  log_info "── Setting up Hadolint ──"
+  _log_setup "Hadolint" "github:hadolint/hadolint"
 
   if ! has_lang_files "Dockerfile docker-compose.yml" "*.dockerfile *.Dockerfile"; then
     log_summary "Lint Tool" "Hadolint" "⏭️ Skipped" "-" "0"
@@ -284,7 +277,7 @@ install_hadolint() {
 install_go_lint() {
   local _T0_GO
   _T0_GO=$(date +%s)
-  log_info "── Setting up Go Lint ──"
+  _log_setup "Go Lint" "github:golangci/golangci-lint"
 
   if ! has_lang_files "go.mod go.sum" "*.go"; then
     log_summary "Lint Tool" "Go Lint" "⏭️ Skipped" "-" "0"
@@ -312,7 +305,7 @@ install_go_lint() {
 install_checkmake() {
   local _T0_CM
   _T0_CM=$(date +%s)
-  log_info "── Setting up Checkmake ──"
+  _log_setup "Checkmake" "checkmake"
 
   if ! has_lang_files "Makefile" "*.make"; then
     log_summary "Lint Tool" "Checkmake" "⏭️ Skipped" "-" "0"
@@ -331,18 +324,48 @@ install_checkmake() {
   log_summary "Lint Tool" "Checkmake" "$_STAT_CM" "$(get_version checkmake)" "$_DUR_CM"
 }
 
+# Purpose: Activates git pre-commit hooks.
+# Params:
+#   None
+# Examples:
+#   setup_hooks
+setup_hooks() {
+  local _T0_HOOK
+  _T0_HOOK=$(date +%s)
+  _log_setup "Pre-commit Hooks" "pipx:pre-commit"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Other" "Hooks" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  # 1. Dependency: pre-commit must be installed
+  install_pre_commit
+
+  # 2. Activation
+  local _STAT_HOOK="✅ Activated"
+  install_runtime_hooks || _STAT_HOOK="❌ Failed"
+
+  local _DUR_HOOK=$(($(date +%s) - _T0_HOOK))
+  log_summary "Other" "Hooks" "$_STAT_HOOK" "$(get_version pre-commit --version)" "$_DUR_HOOK"
+}
+
 # Purpose: Installs TFLint.
 # Delegate: Managed by mise (.mise.toml)
 install_tflint() {
   local _T0_TF
   _T0_TF=$(date +%s)
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "TFLint" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
 
   if ! has_lang_files "" "*.tf"; then
     log_summary "Lint Tool" "TFLint" "⏭️ Skipped" "-" "0"
     return 0
   fi
 
-  log_info "── Setting up TFLint ──"
+  _log_setup "TFLint" "github:terraform-linters/tflint"
   local _STAT_TF="✅ mise"
   run_mise install "github:terraform-linters/tflint" || _STAT_TF="❌ Failed"
   log_summary "Lint Tool" "TFLint" "$_STAT_TF" "$(get_version tflint)" "$(($(date +%s) - _T0_TF))"
@@ -353,6 +376,10 @@ install_tflint() {
 install_kube_linter() {
   local _T0_KL
   _T0_KL=$(date +%s)
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "Kube-Linter" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
 
   # Enhanced guard: Detect K8s manifests or Helm charts ONLY
   if ! has_lang_files "" "CHARTS K8S"; then
@@ -360,45 +387,10 @@ install_kube_linter() {
     return 0
   fi
 
-  log_info "── Setting up Kube-Linter ──"
+  _log_setup "Kube-Linter" "github:stackrox/kube-linter"
   local _STAT_KL="✅ mise"
   run_mise install "github:stackrox/kube-linter" || _STAT_KL="❌ Failed"
   log_summary "Lint Tool" "Kube-Linter" "$_STAT_KL" "$(get_version kube-linter)" "$(($(date +%s) - _T0_KL))"
-}
-
-# Purpose: Activates git pre-commit hooks.
-# Params:
-#   None
-# Examples:
-#   setup_hooks
-setup_hooks() {
-  local _T0_HOOK
-  _T0_HOOK=$(date +%s)
-  log_info "── Setting up Pre-commit Hooks ──"
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Other" "Hooks" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Support both venv-local and mise/global pre-commit
-  local _PC_BIN=""
-  if [ -x "$VENV/bin/pre-commit" ]; then
-    _PC_BIN="$VENV/bin/pre-commit"
-  elif command -v pre-commit >/dev/null 2>&1; then
-    _PC_BIN="pre-commit"
-  fi
-
-  if [ -n "$_PC_BIN" ]; then
-    local _STAT_HOOK="✅ Activated"
-    run_quiet "$_PC_BIN" install --hook-type pre-commit --hook-type pre-merge-commit --hook-type commit-msg || _STAT_HOOK="❌ Failed"
-    local _V_HOOK
-    _V_HOOK=$(get_version "$_PC_BIN")
-    local _D_HOOK
-    _D_HOOK=$(($(date +%s) - _T0_HOOK))
-    log_summary "Other" "Hooks" "$_STAT_HOOK" "$_V_HOOK" "$_D_HOOK"
-  else
-    log_summary "Other" "Hooks" "❌ Failed (missing pre-commit)" "-" "0"
-  fi
 }
 
 # Purpose: Configures PSScriptAnalyzer for PowerShell linting.
@@ -413,7 +405,7 @@ setup_powershell() {
     log_summary "Lint Tool" "PowerShell" "⏭️ Skipped" "-" "0"
     return 0
   fi
-  log_info "── Setting up PowerShell Linter ──"
+  _log_setup "PowerShell Linter" "PSScriptAnalyzer"
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "PowerShell" "⚖️ Previewed" "-" "0"
     return 0
@@ -461,7 +453,7 @@ install_java_lint() {
     return 0
   fi
 
-  log_info "── Setting up Java Linter (google-java-format) ──"
+  _log_setup "Java Linter (google-java-format)" "google-java-format"
   local _STAT_JAVA="✅ mise"
   run_mise install "github:google/google-java-format" || _STAT_JAVA="❌ Failed"
 
@@ -481,7 +473,7 @@ install_ruby_lint() {
     log_summary "Lint Tool" "Rubocop" "⏭️ Skipped" "-" "0"
     return 0
   fi
-  log_info "── Setting up Rubocop ──"
+  _log_setup "Rubocop" "rubocop"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "Rubocop" "⚖️ Previewed" "-" "0"
@@ -522,7 +514,7 @@ install_ruby_lint() {
 # Examples:
 #   setup_dart
 setup_dart() {
-  log_info "── Checking Dart SDK ──"
+  _log_setup "Dart SDK" "dart"
   if command -v dart >/dev/null 2>&1; then
     log_summary "Runtime" "Dart" "✅ Available" "$(get_version dart)" "0"
   else
@@ -542,31 +534,13 @@ setup_swift() {
     log_summary "Lint Tool" "Swift" "⏭️ Skipped" "-" "0"
     return 0
   fi
-  if [ "${OS}" = "darwin" ]; then
-    log_info "── Setting up Swift Linters (macOS) ──"
 
-    local _PKG_MGR_SWIFT
-    _PKG_MGR_SWIFT=$(get_macos_pkg_mgr)
-    local _STAT_SWIFT="✅ Installed"
-    if [ "$_PKG_MGR_SWIFT" = "brew" ]; then
-      brew list swiftformat >/dev/null 2>&1 || brew install swiftformat >/dev/null 2>&1 || _STAT_SWIFT="⚠️ Partial"
-      brew list swiftlint >/dev/null 2>&1 || brew install swiftlint >/dev/null 2>&1 || _STAT_SWIFT="❌ Failed"
-      local _DUR_SWIFT
-      _DUR_SWIFT=$(($(date +%s) - _T0_SWIFT))
-      log_summary "Lint Tool" "Swift" "$_STAT_SWIFT" "$(get_version swiftlint lint --version)" "$_DUR_SWIFT"
-    elif [ "$_PKG_MGR_SWIFT" = "port" ]; then
-      log_info "Installing Swift formatters via MacPorts (requires sudo)..."
-      port installed swiftformat 2>/dev/null | grep -q active || sudo port install swiftformat || _STAT_SWIFT="⚠️ Partial"
-      port installed swiftlint 2>/dev/null | grep -q active || sudo port install swiftlint || _STAT_SWIFT="❌ Failed"
-      local _DUR_SWIFT
-      _DUR_SWIFT=$(($(date +%s) - _T0_SWIFT))
-      log_summary "Lint Tool" "Swift" "$_STAT_SWIFT" "$(get_version swiftlint lint --version)" "$_DUR_SWIFT"
-    else
-      log_summary "Lint Tool" "Swift" "⏭️ Skipped (brew/port missing)" "-" "0"
-    fi
-  else
-    log_summary "Lint Tool" "Swift" "⏭️ Skipped" "-" "0"
-  fi
+  # Transition: Prefer cross-platform installer (pipx-based in mise) over brew/port
+  install_swiftformat
+  install_swiftlint
+
+  local _DUR_SWIFT=$(($(date +%s) - _T0_SWIFT))
+  log_summary "Lint Tool" "Swift" "✅ Sync" "$(get_version swiftlint lint --version)" "$_DUR_SWIFT"
 }
 
 # Purpose: Verifies .NET SDK availability.
@@ -579,12 +553,15 @@ setup_dotnet() {
     log_summary "Runtime" ".NET" "⏭️ Skipped" "-" "0"
     return 0
   fi
-  log_info "── Checking .NET SDK ──"
+  _log_setup ".NET SDK Check" "dotnet"
   if command -v dotnet >/dev/null 2>&1; then
     log_summary "Runtime" ".NET" "✅ Available" "$(get_version dotnet)" "0"
   else
     log_summary "Runtime" ".NET" "⏭️ Missing" "-" "0"
   fi
+
+  # Install .NET specific tools (managed via mise)
+  install_dotnet_format
 }
 
 # Purpose: Installs osv-scanner for vulnerability scanning.
@@ -599,7 +576,7 @@ install_osv_scanner() {
     return 0
   fi
 
-  log_info "── Setting up OSV-Scanner ──"
+  _log_setup "OSV-Scanner" "github:google/osv-scanner"
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Security Tool" "OSV-Scanner" "⚖️ Previewed" "-" "0"
     return 0
@@ -607,6 +584,28 @@ install_osv_scanner() {
   local _STAT_OSV="✅ mise"
   run_mise install "github:google/osv-scanner" || _STAT_OSV="❌ Failed"
   log_summary "Security Tool" "OSV-Scanner" "$_STAT_OSV" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV))"
+}
+
+# Purpose: Installs lychee for broken link checking.
+# Delegate: Managed by mise (.mise.toml)
+# NOTE: CI-only tool — network intensive. Skipped on local environments.
+install_lychee() {
+  local _T0_LYCHEE
+  _T0_LYCHEE=$(date +%s)
+
+  if ! is_ci_env; then
+    log_summary "Security Tool" "Lychee" "⏭️ Local skip" "-" "0"
+    return 0
+  fi
+
+  _log_setup "Lychee" "npm:@lycheeverse/lychee"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Security Tool" "Lychee" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  local _STAT_LYCHEE="✅ mise"
+  run_mise install "npm:@lycheeverse/lychee" || _STAT_LYCHEE="❌ Failed"
+  log_summary "Security Tool" "Lychee" "$_STAT_LYCHEE" "$(get_version lychee)" "$(($(date +%s) - _T0_LYCHEE))"
 }
 
 # Purpose: Installs Trivy for security scanning.
@@ -621,7 +620,7 @@ install_trivy() {
     return 0
   fi
 
-  log_info "── Setting up Trivy ──"
+  _log_setup "Trivy" "github:aquasecurity/trivy"
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Security Tool" "Trivy" "⚖️ Previewed" "-" "0"
     return 0
@@ -636,7 +635,7 @@ install_trivy() {
 install_editorconfig_checker() {
   local _T0_EC
   _T0_EC=$(date +%s)
-  log_info "── Setting up EditorConfig Checker ──"
+  _log_setup "EditorConfig Checker" "editorconfig-checker"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "EditorConfig" "⚖️ Previewed" "-" "0"
@@ -650,12 +649,85 @@ install_editorconfig_checker() {
   log_summary "Lint Tool" "EditorConfig" "$_STAT_EC" "$(get_version editorconfig-checker)" "$_DUR_EC"
 }
 
+# Purpose: Installs google-java-format for Java linting.
+# Delegate: Managed by mise (.mise.toml)
+install_google_java_format() {
+  local _T0_GJF
+  _T0_GJF=$(date +%s)
+  _log_setup "Google Java Format" "npm:google-java-format"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "Java Lint" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  local _STAT_GJF="✅ mise"
+  run_mise install "npm:google-java-format" || _STAT_GJF="❌ Failed"
+  log_summary "Lint Tool" "Java Lint" "$_STAT_GJF" "$(get_version google-java-format)" "$(($(date +%s) - _T0_GJF))"
+}
+
+# Purpose: Installs swiftformat for Swift linting.
+# Delegate: Managed by mise (.mise.toml)
+install_swiftformat() {
+  local _T0_SF
+  _T0_SF=$(date +%s)
+  _log_setup "SwiftFormat" "pipx:swiftformat-py"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "Swift" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  local _STAT_SF="✅ mise"
+  run_mise install "pipx:swiftformat-py" || _STAT_SF="❌ Failed"
+  log_summary "Lint Tool" "Swift" "$_STAT_SF" "$(get_version swiftformat)" "$(($(date +%s) - _T0_SF))"
+}
+
+# Purpose: Installs swiftlint for Swift linting.
+# Delegate: Managed by mise (.mise.toml)
+install_swiftlint() {
+  local _T0_SL
+  _T0_SL=$(date +%s)
+  _log_setup "SwiftLint" "pipx:swiftlint-py"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "Swift" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  local _STAT_SL="✅ mise"
+  run_mise install "pipx:swiftlint-py" || _STAT_SL="❌ Failed"
+  log_summary "Lint Tool" "Swift" "$_STAT_SL" "$(get_version swiftlint)" "$(($(date +%s) - _T0_SL))"
+}
+
+# Purpose: Installs dotnet-format for .NET linting.
+# Delegate: Managed by mise (.mise.toml)
+install_dotnet_format() {
+  local _T0_DNF
+  _T0_DNF=$(date +%s)
+  _log_setup "Dotnet Format" "pipx:dotnet-format"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" ".NET" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  local _STAT_DNF="✅ mise"
+  run_mise install "pipx:dotnet-format" || _STAT_DNF="❌ Failed"
+  log_summary "Lint Tool" ".NET" "$_STAT_DNF" "$(get_version dotnet-format)" "$(($(date +%s) - _T0_DNF))"
+}
+
 # Purpose: Installs zizmor for GitHub Actions auditing.
 # Delegate: Managed by mise (.mise.toml)
 # NOTE: CI-only tool — security audit. Skipped on local environments.
 install_zizmor() {
   local _T0_ZIZ
   _T0_ZIZ=$(date +%s)
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Security Tool" "Zizmor" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "Zizmor" "pipx:zizmor"
 
   if ! is_ci_env; then
     log_summary "Security Tool" "Zizmor" "⏭️ Local skip" "-" "0"
@@ -667,7 +739,6 @@ install_zizmor() {
     return 0
   fi
 
-  log_info "── Setting up Zizmor ──"
   local _STAT_ZIZ="✅ mise"
   run_mise install "pipx:zizmor" || _STAT_ZIZ="❌ Failed"
   log_summary "Security Tool" "Zizmor" "$_STAT_ZIZ" "$(get_version zizmor)" "$(($(date +%s) - _T0_ZIZ))"
@@ -679,6 +750,10 @@ install_zizmor() {
 install_cargo_audit() {
   local _T0_CRGO
   _T0_CRGO=$(date +%s)
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Security Tool" "Cargo-Audit" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
 
   if ! is_ci_env; then
     log_summary "Security Tool" "Cargo-Audit" "⏭️ Local skip" "-" "0"
@@ -690,7 +765,7 @@ install_cargo_audit() {
     return 0
   fi
 
-  log_info "── Setting up Cargo-Audit ──"
+  _log_setup "Cargo-Audit" "cargo:cargo-audit"
   # cargo-audit requires cargo toolchain
   if ! command -v cargo >/dev/null 2>&1; then
     log_warn "cargo not found. Skipping cargo-audit."
@@ -708,6 +783,11 @@ install_cargo_audit() {
 install_govulncheck() {
   local _T0_VULN
   _T0_VULN=$(date +%s)
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Security Tool" "Govulncheck" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "Govulncheck" "go:golang.org/x/vuln/cmd/govulncheck@latest"
 
   if ! is_ci_env; then
     log_summary "Security Tool" "Govulncheck" "⏭️ Local skip" "-" "0"
@@ -719,7 +799,6 @@ install_govulncheck() {
     return 0
   fi
 
-  log_info "── Setting up Govulncheck ──"
   local _STAT_VULN="✅ mise"
   run_mise install "go:golang.org/x/vuln/cmd/govulncheck@latest" || _STAT_VULN="❌ Failed"
   log_summary "Security Tool" "Govulncheck" "$_STAT_VULN" "$(get_version govulncheck)" "$(($(date +%s) - _T0_VULN))"
@@ -730,7 +809,11 @@ install_govulncheck() {
 install_shfmt() {
   local _T0_SHF
   _T0_SHF=$(date +%s)
-  log_info "── Setting up Shfmt ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "Shfmt" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "Shfmt" "pipx:shfmt-py"
   if ! has_lang_files "" "*.sh *.bash *.bats"; then
     log_summary "Lint Tool" "Shfmt" "⏭️ Skipped" "-" "0"
     return 0
@@ -745,13 +828,17 @@ install_shfmt() {
 install_shellcheck() {
   local _T0_SHC
   _T0_SHC=$(date +%s)
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "Shellcheck" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "Shellcheck" "pipx:shellcheck-py"
 
   if ! has_lang_files "" "*.sh *.bash *.bats"; then
     log_summary "Lint Tool" "Shellcheck" "⏭️ Skipped" "-" "0"
     return 0
   fi
 
-  log_info "── Setting up Shellcheck ──"
   local _STAT_SHC="✅ mise"
   run_mise install "pipx:shellcheck-py" || _STAT_SHC="❌ Failed"
   log_summary "Lint Tool" "Shellcheck" "$_STAT_SHC" "$(get_version shellcheck)" "$(($(date +%s) - _T0_SHC))"
@@ -762,6 +849,11 @@ install_shellcheck() {
 install_actionlint() {
   local _T0_ACT
   _T0_ACT=$(date +%s)
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "Actionlint" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "Actionlint" "pipx:actionlint-py"
 
   # Guard: Detect GHA workflows folder only
   if [ ! -d ".github/workflows" ]; then
@@ -769,7 +861,6 @@ install_actionlint() {
     return 0
   fi
 
-  log_info "── Setting up Actionlint ──"
   local _STAT_ACT="✅ mise"
   run_mise install "pipx:actionlint-py" || _STAT_ACT="❌ Failed"
   log_summary "Lint Tool" "Actionlint" "$_STAT_ACT" "$(get_version actionlint)" "$(($(date +%s) - _T0_ACT))"
@@ -780,13 +871,17 @@ install_actionlint() {
 install_taplo() {
   local _T0_TAP
   _T0_TAP=$(date +%s)
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "Taplo" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "Taplo" "npm:@taplo/cli"
 
   if ! has_lang_files "" "*.toml"; then
     log_summary "Lint Tool" "Taplo" "⏭️ Skipped" "-" "0"
     return 0
   fi
 
-  log_info "── Setting up Taplo ──"
   local _STAT_TAP="✅ mise"
   run_mise install "npm:@taplo/cli" || _STAT_TAP="❌ Failed"
   log_summary "Lint Tool" "Taplo" "$_STAT_TAP" "$(get_version taplo)" "$(($(date +%s) - _T0_TAP))"
@@ -796,7 +891,11 @@ install_taplo() {
 install_prettier() {
   local _T0_PRE
   _T0_PRE=$(date +%s)
-  log_info "── Setting up Prettier ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "Prettier" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "Prettier" "npm:prettier"
   if ! has_lang_files "" "*.json *.yaml *.yml *.vue *.js *.ts *.jsx *.tsx"; then
     log_summary "Lint Tool" "Prettier" "⏭️ Skipped" "-" "0"
     return 0
@@ -807,10 +906,15 @@ install_prettier() {
 }
 
 # Purpose: Installs sort-package-json.
+# Delegate: Managed by mise (.mise.toml)
 install_sort_package_json() {
   local _T0_SPJ
   _T0_SPJ=$(date +%s)
-  log_info "── Setting up sort-package-json ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Other" "sort-package-json" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "sort-package-json" "npm:sort-package-json"
   if [ ! -f "package.json" ]; then
     log_summary "Other" "sort-package-json" "⏭️ Skipped" "-" "0"
     return 0
@@ -821,10 +925,15 @@ install_sort_package_json() {
 }
 
 # Purpose: Installs goreleaser.
+# Delegate: Managed by mise (.mise.toml)
 install_goreleaser() {
   local _T0_GR
   _T0_GR=$(date +%s)
-  log_info "── Setting up GoReleaser ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Other" "GoReleaser" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "GoReleaser" "github:goreleaser/goreleaser"
   if ! has_lang_files ".goreleaser.yaml .goreleaser.yml" ""; then
     log_summary "Other" "GoReleaser" "⏭️ Skipped" "-" "0"
     return 0
@@ -835,10 +944,15 @@ install_goreleaser() {
 }
 
 # Purpose: Installs spectral for API linting.
+# Delegate: Managed by mise (.mise.toml)
 install_spectral() {
   local _T0_SPEC
   _T0_SPEC=$(date +%s)
-  log_info "── Setting up Spectral ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "Spectral" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "Spectral" "npm:@stoplight/spectral-cli"
   if ! has_lang_files "" "*openapi* *swagger* *asyncapi*"; then
     log_summary "Lint Tool" "Spectral" "⏭️ Skipped" "-" "0"
     return 0
@@ -850,10 +964,15 @@ install_spectral() {
 }
 
 # Purpose: Installs commitlint.
+# Delegate: Managed by mise (.mise.toml)
 install_commitlint() {
   local _T0_CL
   _T0_CL=$(date +%s)
-  log_info "── Setting up Commitlint ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Other" "Commitlint" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "Commitlint" "npm:@commitlint/cli"
 
   local _STAT_CL="✅ mise"
   run_mise install "npm:@commitlint/cli" || _STAT_CL="❌ Failed"
@@ -861,10 +980,15 @@ install_commitlint() {
 }
 
 # Purpose: Installs dockerfile-utils.
+# Delegate: Managed by mise (.mise.toml)
 install_dockerfile_utils() {
   local _T0_DU
   _T0_DU=$(date +%s)
-  log_info "── Setting up dockerfile-utils ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "dockerfile-utils" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "dockerfile-utils" "npm:dockerfile-utils"
   if ! has_lang_files "Dockerfile" "*.dockerfile *.Dockerfile"; then
     log_summary "Lint Tool" "dockerfile-utils" "⏭️ Skipped" "-" "0"
     return 0
@@ -876,10 +1000,15 @@ install_dockerfile_utils() {
 }
 
 # Purpose: Installs clang-format.
+# Delegate: Managed by mise (.mise.toml)
 install_clang_format() {
   local _T0_CF
   _T0_CF=$(date +%s)
-  log_info "── Setting up clang-format ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "clang-format" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "clang-format" "pipx:clang-format"
   if ! has_lang_files "" "*.c *.cpp *.h *.hpp *.cc *.m *.mm"; then
     log_summary "Lint Tool" "clang-format" "⏭️ Skipped" "-" "0"
     return 0
@@ -891,10 +1020,15 @@ install_clang_format() {
 }
 
 # Purpose: Installs ktlint.
+# Delegate: Managed by mise (.mise.toml)
 install_ktlint() {
   local _T0_KT
   _T0_KT=$(date +%s)
-  log_info "── Setting up ktlint ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "ktlint" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "ktlint" "npm:@naturalcycles/ktlint"
   if ! has_lang_files "" "*.kt *.kts"; then
     log_summary "Lint Tool" "ktlint" "⏭️ Skipped" "-" "0"
     return 0
@@ -905,10 +1039,15 @@ install_ktlint() {
 }
 
 # Purpose: Installs ruff.
+# Delegate: Managed by mise (.mise.toml)
 install_ruff() {
   local _T0_RUF
   _T0_RUF=$(date +%s)
-  log_info "── Setting up Ruff ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "Ruff" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "Ruff" "pipx:ruff"
   if ! has_lang_files "requirements.txt pyproject.toml" "*.py"; then
     log_summary "Lint Tool" "Ruff" "⏭️ Skipped" "-" "0"
     return 0
@@ -919,10 +1058,15 @@ install_ruff() {
 }
 
 # Purpose: Installs yamllint.
+# Delegate: Managed by mise (.mise.toml)
 install_yamllint() {
   local _T0_YL
   _T0_YL=$(date +%s)
-  log_info "── Setting up Yamllint ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "Yamllint" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "Yamllint" "pipx:yamllint"
   if ! has_lang_files ".yamllint .yamllint.yml" "*.yaml *.yml"; then
     log_summary "Lint Tool" "Yamllint" "⏭️ Skipped" "-" "0"
     return 0
@@ -933,10 +1077,15 @@ install_yamllint() {
 }
 
 # Purpose: Installs sqlfluff.
+# Delegate: Managed by mise (.mise.toml)
 install_sqlfluff() {
   local _T0_SQL
   _T0_SQL=$(date +%s)
-  log_info "── Setting up Sqlfluff ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "Sqlfluff" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "Sqlfluff" "sqlfluff"
   if ! has_lang_files ".sqlfluff" "*.sql"; then
     log_summary "Lint Tool" "Sqlfluff" "⏭️ Skipped" "-" "0"
     return 0
@@ -947,10 +1096,15 @@ install_sqlfluff() {
 }
 
 # Purpose: Installs markdownlint-cli2.
+# Delegate: Managed by mise (.mise.toml)
 install_markdownlint() {
   local _T0_MD
   _T0_MD=$(date +%s)
-  log_info "── Setting up Markdownlint ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "Markdownlint" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "Markdownlint" "npm:markdownlint-cli2"
   if ! has_lang_files "" "*.md"; then
     log_summary "Lint Tool" "Markdownlint" "⏭️ Skipped" "-" "0"
     return 0
@@ -962,10 +1116,15 @@ install_markdownlint() {
 }
 
 # Purpose: Installs dotenv-linter.
+# Delegate: Managed by mise (.mise.toml)
 install_dotenv_linter() {
   local _T0_DOT
   _T0_DOT=$(date +%s)
-  log_info "── Setting up dotenv-linter ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "dotenv-linter" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "dotenv-linter" "pipx:dotenv-linter"
   if ! has_lang_files ".env .env.example" "*.env"; then
     log_summary "Lint Tool" "dotenv-linter" "⏭️ Skipped" "-" "0"
     return 0
@@ -977,10 +1136,15 @@ install_dotenv_linter() {
 }
 
 # Purpose: Installs ansible-lint.
+# Delegate: Managed by mise (.mise.toml)
 install_ansible_lint() {
   local _T0_ANS
   _T0_ANS=$(date +%s)
-  log_info "── Setting up Ansible-lint ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "Ansible-lint" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "Ansible-lint" "pipx:ansible-lint"
   if ! has_lang_files "" "ansible.cfg playbook.yml roles/ tasks/"; then
     log_summary "Lint Tool" "Ansible-lint" "⏭️ Skipped" "-" "0"
     return 0
@@ -992,10 +1156,15 @@ install_ansible_lint() {
 }
 
 # Purpose: Installs bats.
+# Delegate: Managed by mise (.mise.toml)
 install_bats() {
   local _T0_BATS
   _T0_BATS=$(date +%s)
-  log_info "── Setting up Bats ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Test Tool" "Bats" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "Bats" "npm:bats"
   if ! has_lang_files "" "*.bats"; then
     log_summary "Test Tool" "Bats" "⏭️ Skipped" "-" "0"
     return 0
@@ -1009,7 +1178,7 @@ install_bats() {
 install_bats_libs() {
   local _T0_BL
   _T0_BL=$(date +%s)
-  log_info "── Vendoring Bats Libraries ──"
+  _log_setup "Bats Libraries" "bats-support"
 
   if ! has_lang_files "" "*.bats"; then
     log_summary "Test Tool" "Bats-Libs" "⏭️ Skipped" "-" "0"
@@ -1041,10 +1210,15 @@ install_bats_libs() {
 }
 
 # Purpose: Installs eslint.
+# Delegate: Managed by mise (.mise.toml)
 install_eslint() {
   local _T0_ES
   _T0_ES=$(date +%s)
-  log_info "── Setting up ESLint ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "ESLint" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "ESLint" "eslint"
   if ! has_lang_files "package.json" "*.js *.ts *.vue *.jsx *.tsx"; then
     log_summary "Lint Tool" "ESLint" "⏭️ Skipped" "-" "0"
     return 0
@@ -1055,10 +1229,15 @@ install_eslint() {
 }
 
 # Purpose: Installs stylelint.
+# Delegate: Managed by mise (.mise.toml)
 install_stylelint() {
   local _T0_SL
   _T0_SL=$(date +%s)
-  log_info "── Setting up Stylelint ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "Stylelint" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "Stylelint" "npm:stylelint"
   if ! has_lang_files "" "*.css *.scss *.less *.vue"; then
     log_summary "Lint Tool" "Stylelint" "⏭️ Skipped" "-" "0"
     return 0
@@ -1069,10 +1248,15 @@ install_stylelint() {
 }
 
 # Purpose: Installs vitepress.
+# Delegate: Managed by mise (.mise.toml)
 install_vitepress() {
   local _T0_VP
   _T0_VP=$(date +%s)
-  log_info "── Setting up VitePress ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Doc Tool" "VitePress" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "VitePress" "npm:vitepress"
   if [ ! -d docs ]; then
     log_summary "Doc Tool" "VitePress" "⏭️ Skipped" "-" "0"
     return 0
@@ -1083,10 +1267,15 @@ install_vitepress() {
 }
 
 # Purpose: Installs commitizen.
+# Delegate: Managed by mise (.mise.toml)
 install_commitizen() {
   local _T0_CZ
   _T0_CZ=$(date +%s)
-  log_info "── Setting up Commitizen ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Other" "Commitizen" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "Commitizen" "npm:commitizen"
   local _STAT_CZ="✅ mise"
   run_mise install "npm:commitizen" || _STAT_CZ="❌ Failed"
   log_summary "Other" "Commitizen" "$_STAT_CZ" "$(get_version commitizen)" "$(($(date +%s) - _T0_CZ))"
@@ -1097,6 +1286,10 @@ install_commitizen() {
 install_pip_audit() {
   local _T0_PA
   _T0_PA=$(date +%s)
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Security Tool" "pip-audit" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
 
   if ! is_ci_env; then
     log_summary "Security Tool" "pip-audit" "⏭️ Local skip" "-" "0"
@@ -1108,7 +1301,7 @@ install_pip_audit() {
     return 0
   fi
 
-  log_info "── Setting up pip-audit ──"
+  _log_setup "pip-audit" "pipx:pip-audit"
   # Explicit manager check
   local _STAT_PA="✅ mise"
   run_mise install "pipx:pip-audit" || _STAT_PA="❌ Failed"
@@ -1116,10 +1309,15 @@ install_pip_audit() {
 }
 
 # Purpose: Installs pre-commit.
+# Delegate: Managed by mise (.mise.toml)
 install_pre_commit() {
   local _T0_PC
   _T0_PC=$(date +%s)
-  log_info "── Setting up Pre-commit ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Other" "Pre-commit" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  _log_setup "Pre-commit" "pipx:pre-commit"
   local _STAT_PC="✅ mise"
   run_mise install "pipx:pre-commit" || _STAT_PC="❌ Failed"
   log_summary "Other" "Pre-commit" "$_STAT_PC" "$(get_version pre-commit --version)" "$(($(date +%s) - _T0_PC))"
@@ -1137,6 +1335,7 @@ setup_security() {
   install_zizmor
   install_govulncheck
   install_cargo_audit
+  install_lychee
 }
 
 # Purpose: Main entry point for the setup engine.

@@ -661,18 +661,27 @@ run_mise() {
       if (
         export GIT_CONFIG_GLOBAL=/dev/null
         export GIT_CONFIG_SYSTEM=/dev/null
-        # shellcheck disable=SC2086
-        run_quiet "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"
+        if [ "${VERBOSE:-1}" -le 1 ]; then
+          # shellcheck disable=SC2086
+          MISE_QUIET=1 "$_M_BIN" $_MISE_OPTS "$_CMD" "$@" >/dev/null 2>&1
+        else
+          # shellcheck disable=SC2086
+          MISE_QUIET=1 "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"
+        fi
       ); then
         _STATUS=0
         break
       fi
     else
-      # shellcheck disable=SC2086
-      if run_quiet "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"; then
-        _STATUS=0
-        break
+      if [ "${VERBOSE:-1}" -le 1 ]; then
+        # shellcheck disable=SC2086
+        MISE_QUIET=1 "$_M_BIN" $_MISE_OPTS "$_CMD" "$@" >/dev/null 2>&1
+      else
+        # shellcheck disable=SC2086
+        MISE_QUIET=1 "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"
       fi
+      _STATUS=$?
+      [ $_STATUS -eq 0 ] && break
     fi
 
     _RETRY_COUNT=$((_RETRY_COUNT + 1))
@@ -1112,6 +1121,80 @@ check_runtime() {
   fi
 }
 
+# Purpose: Installs the Node.js runtime and project dependencies.
+# Delegate: Managed via mise (.mise.toml) and pnpm.
+# Examples:
+#   install_runtime_node
+install_runtime_node() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Node.js runtime and project dependencies."
+    return 0
+  fi
+
+  # 1. Runtime initialization
+  run_mise install node
+  eval "$(mise activate bash --shims)"
+
+  # 2. Dependency resolution
+  if [ -f "$PACKAGE_JSON" ]; then
+    run_npm_script install
+  fi
+}
+
+# Purpose: Installs the Python runtime, creates a venv, and installs dependencies.
+# Delegate: Managed via mise (.mise.toml) and pip.
+# Examples:
+#   install_runtime_python
+install_runtime_python() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Python runtime and virtual environment."
+    return 0
+  fi
+
+  # 1. Runtime initialization
+  run_mise install python
+  eval "$(mise activate bash --shims)"
+
+  # 2. Virtualenv management
+  if [ ! -d "$VENV" ]; then
+    run_quiet "$PYTHON" -m venv "$VENV"
+  fi
+
+  # 3. Dependency resolution
+  if [ -d "$VENV" ]; then
+    # Standard requirements
+    if [ -f "$REQUIREMENTS_TXT" ]; then
+      run_quiet "$VENV/bin/pip" install -r "$REQUIREMENTS_TXT"
+    fi
+    # Dev requirements (setup.sh specific but safe here)
+    if [ -f "requirements-dev.txt" ]; then
+      run_quiet "$VENV/bin/pip" install -r "requirements-dev.txt"
+    fi
+  fi
+}
+
+# Purpose: Installs git hooks using pre-commit.
+# Delegate: Managed via pipx (pre-commit).
+# Examples:
+#   install_runtime_hooks
+install_runtime_hooks() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would active pre-commit hooks."
+    return 0
+  fi
+
+  if [ ! -d ".git" ]; then
+    log_debug "Not a git repository. Skipping hook installation."
+    return 0
+  fi
+
+  local _PRE_COMMIT_BIN
+  _PRE_COMMIT_BIN=$(resolve_bin "pre-commit")
+  if [ -n "$_PRE_COMMIT_BIN" ]; then
+    run_quiet "$_PRE_COMMIT_BIN" install
+  fi
+}
+
 # Purpose: Executes an npm/pnpm script with infinite-recursion detection.
 # Params:
 #   $1 - Name of the npm script (e.g., "test")
@@ -1123,8 +1206,22 @@ run_npm_script() {
   _CURRENT_BASENAME_NPM=$(basename "$0")
 
   if [ -f "package.json" ]; then
+    # 1. Binary Presence Guard
+    if ! command -v "$NPM" >/dev/null 2>&1; then
+      log_warn "Warning: $NPM command not found. Skipping Node.js task: $_SCRIPT_NAME_NPM."
+      return 0
+    fi
+
+    # 2. Package.json Integrity check (Avoid empty/invalid JSON crashes)
+    if [ ! -s "package.json" ] || ! grep -q "{" "package.json"; then
+      log_debug "package.json is empty or invalid. Skipping Node.js task: $_SCRIPT_NAME_NPM."
+      return 0
+    fi
+
+    # 3. Check for script in package.json
     local _CMD_NPM
     _CMD_NPM=$(grep "\"$_SCRIPT_NAME_NPM\":" "package.json" | sed "s/.*\"$_SCRIPT_NAME_NPM\":[[:space:]]*\"//;s/\".*//" || true)
+
     if [ -n "$_CMD_NPM" ]; then
       # Avoid infinite loop if the command points back to this script
       if echo "$_CMD_NPM" | grep -q "$_CURRENT_BASENAME_NPM"; then
@@ -1133,7 +1230,10 @@ run_npm_script() {
       fi
       log_info "── Running Node.js script: $NPM $_SCRIPT_NAME_NPM ──"
       "$NPM" run "$_SCRIPT_NAME_NPM"
-      return 0
+    elif [ "$_SCRIPT_NAME_NPM" = "install" ] || [ "$_SCRIPT_NAME_NPM" = "update" ]; then
+      # 4. Special Fallback for native commands if not defined in package.json scripts
+      log_info "── Node.js standard command: $NPM $_SCRIPT_NAME_NPM ──"
+      run_quiet "$NPM" "$_SCRIPT_NAME_NPM"
     fi
   fi
   return 0

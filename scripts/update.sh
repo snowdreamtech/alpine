@@ -43,53 +43,55 @@ Options:
 EOF
 }
 
+# Purpose: Internal helper to execute and report a standard update workflow.
+# Params:
+#   $1 - Manager/Category name (e.g., "Manager", "Project", "Lint Tool")
+#   $2 - Tool name (e.g., "pnpm", "Homebrew")
+#   $3 - Command to execute (e.g., "brew update")
+#   $4 - Cooldown key (optional, e.g., "homebrew"). If '-', cooldown is skipped.
+#   $5 - Version command (optional, e.g., "$(get_version brew)")
+_execute_update() {
+  local _CATEGORY="$1"
+  local _TOOL="$2"
+  local _CMD="$3"
+  local _COOLDOWN_KEY="$4"
+  local _VERSION_CMD="$5"
+
+  local _T0
+  _T0=$(date +%s)
+
+  if [ -n "$_COOLDOWN_KEY" ] && [ "$_COOLDOWN_KEY" != "-" ]; then
+    if ! check_update_cooldown "$_COOLDOWN_KEY"; then
+      log_summary "$_CATEGORY" "$_TOOL" "✅ Up-to-date (Cooldown)" "${_VERSION_CMD:-"-"}" "0"
+      return 0
+    fi
+  fi
+
+  log_info "Updating $_TOOL..."
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "$_CATEGORY" "$_TOOL" "⚖️ Previewed" "-" "0"
+  else
+    if run_quiet eval "$_CMD"; then
+      [ -n "$_COOLDOWN_KEY" ] && [ "$_COOLDOWN_KEY" != "-" ] && save_update_timestamp "$_COOLDOWN_KEY"
+      log_summary "$_CATEGORY" "$_TOOL" "✅ Updated" "${_VERSION_CMD:-"-"}" "$(($(date +%s) - _T0))"
+    else
+      log_summary "$_CATEGORY" "$_TOOL" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+    fi
+  fi
+}
+
 # ── Functions ────────────────────────────────────────────────────────────────
 
 # Purpose: Updates global pnpm installation via corepack or self-update.
 # Examples:
 #   update_pnpm_global
 update_pnpm_global() {
-  local _T0_PNPM_G
-  _T0_PNPM_G=$(date +%s)
   if command -v pnpm >/dev/null 2>&1; then
-    if check_update_cooldown "pnpm-global"; then
-      # Intelligent pnpm update: detects if managed by corepack
-      if command -v corepack >/dev/null 2>&1 && pnpm self-update --help 2>&1 | grep -q "corepack" >/dev/null 2>&1; then
-        log_info "Updating pnpm (via corepack)..."
-        if [ "${DRY_RUN:-0}" -eq 1 ]; then
-          log_summary "Manager" "pnpm" "⚖️ Previewed" "-" "0"
-        else
-          if run_quiet corepack prepare pnpm@latest --activate; then
-            save_update_timestamp "pnpm-global"
-            log_summary "Manager" "pnpm" "✅ Updated" "$(get_version pnpm)" "$(($(date +%s) - _T0_PNPM_G))"
-          else
-            log_summary "Manager" "pnpm" "❌ Failed" "-" "$(($(date +%s) - _T0_PNPM_G))"
-          fi
-        fi
-      else
-        if [ "${DRY_RUN:-0}" -eq 1 ]; then
-          log_summary "Manager" "pnpm" "⚖️ Previewed" "-" "0"
-        else
-          log_info "Updating pnpm (self-update)..."
-          local _OUT_PNPM_G
-          if _OUT_PNPM_G=$(run_quiet pnpm self-update 2>&1); then
-            save_update_timestamp "pnpm-global"
-            log_summary "Manager" "pnpm" "✅ Updated" "$(get_version pnpm)" "$(($(date +%s) - _T0_PNPM_G))"
-          elif echo "$_OUT_PNPM_G" | grep -q "ERR_PNPM_CANT_SELF_UPDATE_IN_COREPACK"; then
-            log_warn "pnpm is managed by corepack. Switching to corepack update..."
-            if run_quiet corepack prepare pnpm@latest --activate; then
-              save_update_timestamp "pnpm-global"
-              log_summary "Manager" "pnpm" "✅ Updated" "$(get_version pnpm)" "$(($(date +%s) - _T0_PNPM_G))"
-            else
-              log_summary "Manager" "pnpm" "❌ Failed" "-" "$(($(date +%s) - _T0_PNPM_G))"
-            fi
-          else
-            log_summary "Manager" "pnpm" "❌ Failed" "-" "$(($(date +%s) - _T0_PNPM_G))"
-          fi
-        fi
-      fi
+    # Intelligent pnpm update: detects if managed by corepack
+    if command -v corepack >/dev/null 2>&1 && pnpm self-update --help 2>&1 | grep -q "corepack" >/dev/null 2>&1; then
+      _execute_update "Manager" "pnpm" "corepack prepare pnpm@latest --activate" "pnpm-global" "$(get_version pnpm)"
     else
-      log_summary "Manager" "pnpm" "✅ Up-to-date (Cooldown)" "$(get_version pnpm)" "0"
+      _execute_update "Manager" "pnpm" "pnpm self-update" "pnpm-global" "$(get_version pnpm)"
     fi
   fi
 }
@@ -98,24 +100,8 @@ update_pnpm_global() {
 # Examples:
 #   update_pnpm_project
 update_pnpm_project() {
-  local _T0_PNPM_P
-  _T0_PNPM_P=$(date +%s)
-  if [ -f "pnpm-lock.yaml" ]; then
-    if command -v pnpm >/dev/null 2>&1; then
-      log_info "Updating project dependencies (pnpm update)..."
-      if [ "${DRY_RUN:-0}" -eq 1 ]; then
-        log_summary "Project" "pnpm-deps" "⚖️ Previewed" "-" "0"
-      else
-        if run_quiet pnpm update; then
-          log_summary "Project" "pnpm-deps" "✅ Updated" "-" "$(($(date +%s) - _T0_PNPM_P))"
-        else
-          log_summary "Project" "pnpm-deps" "❌ Failed" "-" "$(($(date +%s) - _T0_PNPM_P))"
-        fi
-      fi
-    else
-      log_warn "pnpm-lock.yaml found but pnpm command is missing. Skipping."
-      log_summary "Project" "pnpm-deps" "⚠️ Missing" "-" "0"
-    fi
+  if [ -f "pnpm-lock.yaml" ] && command -v pnpm >/dev/null 2>&1; then
+    _execute_update "Project" "pnpm-deps" "pnpm update" "-" ""
   fi
 }
 
@@ -123,25 +109,12 @@ update_pnpm_project() {
 # Examples:
 #   update_python_venv
 update_python_venv() {
-  local _T0_PY
-  _T0_PY=$(date +%s)
-  if [ -d "$VENV" ]; then
-    if [ -x "$VENV/bin/pip" ]; then
-      log_info "Updating Python environment ($VENV)..."
-      if [ "${DRY_RUN:-0}" -eq 1 ]; then
-        log_summary "Project" "Python-Venv" "⚖️ Previewed" "-" "0"
-      else
-        local _STAT_PY="✅ Updated"
-        run_quiet "$VENV/bin/pip" install --upgrade pip || _STAT_PY="⚠️ Warning"
-        if [ -f "$REQUIREMENTS_TXT" ]; then
-          run_quiet "$VENV/bin/pip" install -r "$REQUIREMENTS_TXT" --upgrade || _STAT_PY="❌ Failed"
-        fi
-        log_summary "Project" "Python-Venv" "$_STAT_PY" "$(get_version "$VENV/bin/pip")" "$(($(date +%s) - _T0_PY))"
-      fi
-    else
-      log_warn "Virtualenv directory $VENV exists but pip is missing/not executable. Skipping."
-      log_summary "Project" "Python-Venv" "⚠️ Missing" "-" "0"
+  if [ -d "$VENV" ] && [ -x "$VENV/bin/pip" ]; then
+    local _CMD_PY="\"$VENV/bin/pip\" install --upgrade pip"
+    if [ -f "$REQUIREMENTS_TXT" ]; then
+      _CMD_PY="$_CMD_PY && \"$VENV/bin/pip\" install -r \"$REQUIREMENTS_TXT\" --upgrade"
     fi
+    _execute_update "Project" "Python-Venv" "$_CMD_PY" "-" "\$(get_version \"$VENV/bin/pip\")"
   fi
 }
 
@@ -149,24 +122,8 @@ update_python_venv() {
 # Examples:
 #   update_homebrew
 update_homebrew() {
-  local _T0_BREW
-  _T0_BREW=$(date +%s)
   if command -v brew >/dev/null 2>&1; then
-    if check_update_cooldown "homebrew"; then
-      log_info "Updating Homebrew..."
-      if [ "${DRY_RUN:-0}" -eq 1 ]; then
-        log_summary "Manager" "Homebrew" "⚖️ Previewed" "-" "0"
-      else
-        if run_quiet brew update; then
-          save_update_timestamp "homebrew"
-          log_summary "Manager" "Homebrew" "✅ Updated" "-" "$(($(date +%s) - _T0_BREW))"
-        else
-          log_summary "Manager" "Homebrew" "❌ Failed" "-" "$(($(date +%s) - _T0_BREW))"
-        fi
-      fi
-    else
-      log_summary "Manager" "Homebrew" "✅ Up-to-date (Cooldown)" "-" "0"
-    fi
+    _execute_update "Manager" "Homebrew" "brew update" "homebrew" ""
   fi
 }
 
@@ -174,24 +131,8 @@ update_homebrew() {
 # Examples:
 #   update_macports
 update_macports() {
-  local _T0_PORT
-  _T0_PORT=$(date +%s)
   if command -v port >/dev/null 2>&1; then
-    if check_update_cooldown "macports"; then
-      log_info "Updating MacPorts (requires sudo)..."
-      if [ "${DRY_RUN:-0}" -eq 1 ]; then
-        log_summary "Manager" "MacPorts" "⚖️ Previewed" "-" "0"
-      else
-        if sudo port selfupdate && sudo port -N upgrade outdated; then
-          save_update_timestamp "macports"
-          log_summary "Manager" "MacPorts" "✅ Updated" "-" "$(($(date +%s) - _T0_PORT))"
-        else
-          log_summary "Manager" "MacPorts" "❌ Failed" "-" "$(($(date +%s) - _T0_PORT))"
-        fi
-      fi
-    else
-      log_summary "Manager" "MacPorts" "✅ Up-to-date (Cooldown)" "-" "0"
-    fi
+    _execute_update "Manager" "MacPorts" "sudo port selfupdate && sudo port -N upgrade outdated" "macports" ""
   fi
 }
 
@@ -199,26 +140,8 @@ update_macports() {
 # Examples:
 #   update_ruby_gems
 update_ruby_gems() {
-  local _T0_RUBY
-  _T0_RUBY=$(date +%s)
-  if command -v gem >/dev/null 2>&1; then
-    if gem list rubocop -i >/dev/null 2>&1; then
-      if check_update_cooldown "rubocop"; then
-        log_info "Updating Rubocop gem..."
-        if [ "${DRY_RUN:-0}" -eq 1 ]; then
-          log_summary "Lint Tool" "Rubocop" "⚖️ Previewed" "-" "0"
-        else
-          if run_quiet gem update rubocop --user-install --no-document --quiet; then
-            save_update_timestamp "rubocop"
-            log_summary "Lint Tool" "Rubocop" "✅ Updated" "$(get_version rubocop)" "$(($(date +%s) - _T0_RUBY))"
-          else
-            log_summary "Lint Tool" "Rubocop" "❌ Failed" "-" "$(($(date +%s) - _T0_RUBY))"
-          fi
-        fi
-      else
-        log_summary "Lint Tool" "Rubocop" "✅ Up-to-date (Cooldown)" "$(get_version rubocop)" "0"
-      fi
-    fi
+  if command -v gem >/dev/null 2>&1 && gem list rubocop -i >/dev/null 2>&1; then
+    _execute_update "Lint Tool" "Rubocop" "gem update rubocop --user-install --no-document --quiet" "rubocop" "$(get_version rubocop)"
   fi
 }
 
@@ -226,29 +149,13 @@ update_ruby_gems() {
 # Examples:
 #   update_pre_commit
 update_pre_commit() {
-  local _T0_PC
-  _T0_PC=$(date +%s)
   local _BIN_PC=""
   if [ -x "$VENV/bin/pre-commit" ]; then
     _BIN_PC="$VENV/bin/pre-commit"
   elif command -v pre-commit >/dev/null 2>&1; then _BIN_PC="pre-commit"; fi
 
   if [ -n "$_BIN_PC" ] && [ -f ".pre-commit-config.yaml" ]; then
-    if check_update_cooldown "pre-commit"; then
-      log_info "Updating pre-commit hooks..."
-      if [ "${DRY_RUN:-0}" -eq 1 ]; then
-        log_summary "Other" "Hooks" "⚖️ Previewed" "-" "0"
-      else
-        if run_quiet "$_BIN_PC" autoupdate; then
-          save_update_timestamp "pre-commit"
-          log_summary "Other" "Hooks" "✅ Updated" "$(get_version "$_BIN_PC")" "$(($(date +%s) - _T0_PC))"
-        else
-          log_summary "Other" "Hooks" "❌ Failed" "-" "$(($(date +%s) - _T0_PC))"
-        fi
-      fi
-    else
-      log_summary "Other" "Hooks" "✅ Up-to-date (Cooldown)" "$(get_version "$_BIN_PC")" "0"
-    fi
+    _execute_update "Other" "Hooks" "\"$_BIN_PC\" autoupdate" "pre-commit" "\$(get_version \"$_BIN_PC\")"
   fi
 }
 
@@ -256,20 +163,9 @@ update_pre_commit() {
 # Examples:
 #   update_go_mod
 update_go_mod() {
-  local _T0_GO
-  _T0_GO=$(date +%s)
   if [ -f "go.mod" ]; then
     if command -v go >/dev/null 2>&1; then
-      log_info "Updating Go workspace (go get -u)..."
-      if [ "${DRY_RUN:-0}" -eq 1 ]; then
-        log_summary "Project" "Go-Mod" "⚖️ Previewed" "-" "0"
-      else
-        if run_quiet go get -u ./... && run_quiet go mod tidy; then
-          log_summary "Project" "Go-Mod" "✅ Updated" "$(get_version go)" "$(($(date +%s) - _T0_GO))"
-        else
-          log_summary "Project" "Go-Mod" "❌ Failed" "-" "$(($(date +%s) - _T0_GO))"
-        fi
-      fi
+      _execute_update "Project" "Go-Mod" "go get -u ./... && go mod tidy" "-" "$(get_version go)"
     else
       log_warn "go.mod found but go command is missing. Skipping."
       log_summary "Project" "Go-Mod" "⚠️ Missing" "-" "0"
@@ -281,20 +177,9 @@ update_go_mod() {
 # Examples:
 #   update_cargo_deps
 update_cargo_deps() {
-  local _T0_CARGO
-  _T0_CARGO=$(date +%s)
   if [ -f "Cargo.toml" ]; then
     if command -v cargo >/dev/null 2>&1; then
-      log_info "Updating Rust dependencies (cargo update)..."
-      if [ "${DRY_RUN:-0}" -eq 1 ]; then
-        log_summary "Project" "Cargo-Deps" "⚖️ Previewed" "-" "0"
-      else
-        if run_quiet cargo update; then
-          log_summary "Project" "Cargo-Deps" "✅ Updated" "$(get_version cargo)" "$(($(date +%s) - _T0_CARGO))"
-        else
-          log_summary "Project" "Cargo-Deps" "❌ Failed" "-" "$(($(date +%s) - _T0_CARGO))"
-        fi
-      fi
+      _execute_update "Project" "Cargo-Deps" "cargo update" "-" "$(get_version cargo)"
     else
       log_warn "Cargo.toml found but cargo command is missing. Skipping."
       log_summary "Project" "Cargo-Deps" "⚠️ Missing" "-" "0"

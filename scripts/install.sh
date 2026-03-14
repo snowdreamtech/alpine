@@ -31,13 +31,8 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 #   install_node_deps
 install_node_deps() {
   if [ -f "$PACKAGE_JSON" ]; then
-    if [ "$IN_INSTALL_SCRIPT" = "1" ]; then
-      log_debug "Skipping recursive pnpm install call."
-    else
-      log_info "── Installing Node.js dependencies ($NPM) ──"
-      export IN_INSTALL_SCRIPT=1
-      run_npm_script install
-    fi
+    log_info "── Installing Node.js dependencies ──"
+    install_runtime_node
   fi
 }
 
@@ -48,22 +43,7 @@ install_python_deps() {
   if [ -f "$REQUIREMENTS_TXT" ] || [ -f "$PYPROJECT_TOML" ]; then
     printf "\n"
     log_info "── Installing Python dependencies ──"
-
-    if [ ! -d "$VENV" ]; then
-      log_info "Creating virtual environment in $VENV..."
-      "$PYTHON" -m venv "$VENV"
-    fi
-
-    local _PIP_INST
-    _PIP_INST=$(resolve_bin "pip")
-    if [ -z "$_PIP_INST" ]; then
-      log_error "Error: pip not found in $VENV."
-      exit 1
-    fi
-
-    if [ -f "$REQUIREMENTS_TXT" ]; then
-      "$_PIP_INST" install -r "$REQUIREMENTS_TXT"
-    fi
+    install_runtime_python
   fi
 }
 
@@ -71,15 +51,10 @@ install_python_deps() {
 # Examples:
 #   install_git_hooks
 install_git_hooks() {
-  if [ -d ".git/hooks" ]; then
-    local _PRE_COMMIT_BIN
-    _PRE_COMMIT_BIN=$(resolve_bin "pre-commit")
-
-    if [ -n "$_PRE_COMMIT_BIN" ]; then
-      printf "\n"
-      log_info "── Installing pre-commit hooks ──"
-      run_quiet "$_PRE_COMMIT_BIN" install
-    fi
+  if [ -d ".git" ]; then
+    printf "\n"
+    log_info "── Installing pre-commit hooks ──"
+    install_runtime_hooks
   fi
 }
 
