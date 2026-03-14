@@ -17,6 +17,7 @@
 #   - Dual-Sentinel (双重哨兵) pattern for CI reporting.
 #
 # shellcheck disable=SC2034
+export PAGER="cat"
 
 # ── 🎨 Visual Assets ─────────────────────────────────────────────────────────
 
@@ -786,6 +787,8 @@ log_debug() {
   if [ "${VERBOSE:-1}" -ge 2 ]; then printf "[DEBUG] %b\n" "$_msg_dbg"; fi
 }
 
+log_debug "common.sh (v2026.03.14.01) loaded"
+
 # Purpose: Returns the absolute path to the project root directory.
 # Returns:
 #   Absolute path string.
@@ -1257,8 +1260,11 @@ get_version() {
       "$_CMD_VER" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
       ;;
     commitizen | git-cz | cz)
-      # commitizen version is in the first line of --version or via npm list
-      "$_CMD_VER" --version 2>&1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1 || echo "-"
+      # git-cz can hang if it triggers git help pager. Force non-interactive.
+      # Use 'cz' direct binary if possible.
+      local _CZ_BIN
+      _CZ_BIN=$(command -v cz || echo "git-cz")
+      env PAGER="cat" "$_CZ_BIN" --version 2>&1 | head -n 1 | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1 || echo "-"
       ;;
     spectral)
       "$_CMD_VER" --version 2>/dev/null | grep -oE '[0-9]+\.[0-9]+\.[0-9]+' | head -n 1
