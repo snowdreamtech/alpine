@@ -83,14 +83,23 @@ main() {
     exit 1
   fi
 
-  # 4. Execute VitePress
+  # 4. Resolve VitePress
+  local _VITEPRESS_BIN
+  _VITEPRESS_BIN=$(resolve_bin "vitepress")
+
+  if [ -z "$_VITEPRESS_BIN" ]; then
+    log_error "Error: vitepress not found. Please run 'make setup' first."
+    exit 1
+  fi
+
+  # 5. Execute VitePress
   case "$_COMMAND_DOC" in
   dev)
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would start VitePress dev server on $DOCS_DIR"
     else
       log_info "Starting development server..."
-      vitepress dev "$DOCS_DIR"
+      "$_VITEPRESS_BIN" dev "$DOCS_DIR"
     fi
     ;;
   build)
@@ -98,7 +107,7 @@ main() {
       log_success "DRY-RUN: Would build VitePress site from $DOCS_DIR"
     else
       log_info "Building documentation site..."
-      vitepress build "$DOCS_DIR"
+      "$_VITEPRESS_BIN" build "$DOCS_DIR"
       log_success "\n✨ Build complete! Artifacts are in $DOCS_DIR/.vitepress/dist"
     fi
     ;;
@@ -107,7 +116,7 @@ main() {
       log_success "DRY-RUN: Would preview VitePress site in $DOCS_DIR"
     else
       log_info "Previewing production build..."
-      vitepress preview "$DOCS_DIR"
+      "$_VITEPRESS_BIN" preview "$DOCS_DIR"
     fi
     ;;
   esac
