@@ -717,11 +717,6 @@ log_error() {
   printf "%s%b%s\n" "$RED" "$_msg_err" "$NC" >&2
 }
 
-# Purpose: Log a debug message if verbose level is 2 or higher.
-# Params:
-#   $1 - Message to log
-# Examples:
-#   log_debug "Temporary path: /tmp/build-123"
 # Purpose: Verifies that a required toolchain manager (e.g., cargo, npm, go) is available.
 # Params:
 #   $1 - Manager command name
@@ -735,6 +730,11 @@ ensure_manager() {
   fi
 }
 
+# Purpose: Log a debug message if verbose level is 2 or higher.
+# Params:
+#   $1 - Message to log
+# Examples:
+#   log_debug "Temporary path: /tmp/build-123"
 log_debug() {
   local _msg_dbg="$1"
   if [ "${VERBOSE:-1}" -ge 2 ]; then printf "[DEBUG] %b\n" "$_msg_dbg"; fi
