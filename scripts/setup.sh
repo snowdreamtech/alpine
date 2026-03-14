@@ -247,6 +247,11 @@ install_gitleaks() {
     return 0
   fi
 
+  if [ ! -d ".git" ]; then
+    log_summary "Lint Tool" "Gitleaks" "⏭️ Skipped (no .git)" "-" "0"
+    return 0
+  fi
+
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_GITL="✅ mise"
   run_mise install gitleaks || _STAT_GITL="❌ Failed"
@@ -677,15 +682,22 @@ install_trivy() {
 install_google_java_format() {
   local _T0_GJF
   _T0_GJF=$(date +%s)
-  _log_setup "Google Java Format" "npm:google-java-format"
+  local _TITLE="Google Java Format"
+  local _PROVIDER="npm:google-java-format"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "Java Lint" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
+  if ! has_lang_files "pom.xml build.gradle" "*.java"; then
+    log_summary "Lint Tool" "Java Lint" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_GJF="✅ mise"
-  run_mise install "npm:google-java-format" || _STAT_GJF="❌ Failed"
+  run_mise install "$_PROVIDER" || _STAT_GJF="❌ Failed"
   log_summary "Lint Tool" "Java Lint" "$_STAT_GJF" "$(get_version google-java-format)" "$(($(date +%s) - _T0_GJF))"
 }
 
@@ -694,15 +706,22 @@ install_google_java_format() {
 install_swiftformat() {
   local _T0_SF
   _T0_SF=$(date +%s)
-  _log_setup "SwiftFormat" "pipx:swiftformat-py"
+  local _TITLE="SwiftFormat"
+  local _PROVIDER="pipx:swiftformat-py"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "Swift" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
+  if ! has_lang_files "Package.swift" "*.swift"; then
+    log_summary "Lint Tool" "Swift" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_SF="✅ mise"
-  run_mise install "pipx:swiftformat-py" || _STAT_SF="❌ Failed"
+  run_mise install "$_PROVIDER" || _STAT_SF="❌ Failed"
   log_summary "Lint Tool" "Swift" "$_STAT_SF" "$(get_version swiftformat)" "$(($(date +%s) - _T0_SF))"
 }
 
@@ -711,15 +730,22 @@ install_swiftformat() {
 install_swiftlint() {
   local _T0_SL
   _T0_SL=$(date +%s)
-  _log_setup "SwiftLint" "pipx:swiftlint-py"
+  local _TITLE="SwiftLint"
+  local _PROVIDER="pipx:swiftlint-py"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "Swift" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
+  if ! has_lang_files "Package.swift" "*.swift"; then
+    log_summary "Lint Tool" "Swift" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_SL="✅ mise"
-  run_mise install "pipx:swiftlint-py" || _STAT_SL="❌ Failed"
+  run_mise install "$_PROVIDER" || _STAT_SL="❌ Failed"
   log_summary "Lint Tool" "Swift" "$_STAT_SL" "$(get_version swiftlint)" "$(($(date +%s) - _T0_SL))"
 }
 
@@ -728,15 +754,22 @@ install_swiftlint() {
 install_dotnet_format() {
   local _T0_DNF
   _T0_DNF=$(date +%s)
-  _log_setup "Dotnet Format" "pipx:dotnet-format"
+  local _TITLE="Dotnet Format"
+  local _PROVIDER="pipx:dotnet-format"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" ".NET" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
+  if ! has_lang_files "global.json" "*.csproj *.sln *.cs"; then
+    log_summary "Lint Tool" ".NET" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_DNF="✅ mise"
-  run_mise install "pipx:dotnet-format" || _STAT_DNF="❌ Failed"
+  run_mise install "$_PROVIDER" || _STAT_DNF="❌ Failed"
   log_summary "Lint Tool" ".NET" "$_STAT_DNF" "$(get_version dotnet-format)" "$(($(date +%s) - _T0_DNF))"
 }
 
@@ -1390,6 +1423,11 @@ install_commitizen() {
     return 0
   fi
 
+  if [ ! -f "package.json" ]; then
+    log_summary "Other" "Commitizen" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_CZ="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_CZ="❌ Failed"
@@ -1435,6 +1473,11 @@ install_pre_commit() {
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Other" "Pre-commit" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if [ ! -f ".pre-commit-config.yaml" ]; then
+    log_summary "Other" "Pre-commit" "⏭️ Skipped" "-" "0"
     return 0
   fi
 
