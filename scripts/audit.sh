@@ -51,6 +51,9 @@ EOF
 # Examples:
 #   main --verbose
 main() {
+  # 1. Execution Context Guard
+  guard_project_root
+
   # 2. Argument Parsing
   parse_common_args "$@"
 
