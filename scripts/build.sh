@@ -87,8 +87,10 @@ main() {
   # 3. Go build (GoReleaser or native)
   if [ -f ".goreleaser.yaml" ] || [ -f ".goreleaser.yml" ]; then
     local _GORELEASER_BIN
-    _GORELEASER_BIN=${GORELEASER:-goreleaser}
-    run_build "$_GORELEASER_BIN build --snapshot --clean" "GoReleaser snapshot build"
+    _GORELEASER_BIN=$(resolve_bin "${GORELEASER:-goreleaser}")
+    if [ -n "$_GORELEASER_BIN" ]; then
+      run_build "$_GORELEASER_BIN build --snapshot --clean" "GoReleaser snapshot build"
+    fi
   elif [ -f "go.mod" ]; then
     run_build "go build ./..." "Go build (native)"
   fi
@@ -98,14 +100,8 @@ main() {
 
   # 5. Python build
   if [ -f "pyproject.toml" ]; then
-    local _VENV_BLD
-    _VENV_BLD=${VENV:-.venv}
-    local _PYTHON_BLD_BIN=""
-    if [ -x "$_VENV_BLD/bin/python3" ]; then
-      _PYTHON_BLD_BIN="$_VENV_BLD/bin/python3"
-    elif command -v python3 >/dev/null 2>&1; then
-      _PYTHON_BLD_BIN="python3"
-    fi
+    local _PYTHON_BLD_BIN
+    _PYTHON_BLD_BIN=$(resolve_bin "python3")
 
     if [ -n "$_PYTHON_BLD_BIN" ]; then
       run_build "$_PYTHON_BLD_BIN -m build" "Python build"
