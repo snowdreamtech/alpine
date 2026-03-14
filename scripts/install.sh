@@ -35,14 +35,8 @@ install_node_deps() {
       log_debug "Skipping recursive pnpm install call."
     else
       log_info "── Installing Node.js dependencies ($NPM) ──"
-      local _NPM_BIN
-      _NPM_BIN=$(resolve_bin "$NPM")
-      if [ -n "$_NPM_BIN" ]; then
-        export IN_INSTALL_SCRIPT=1
-        run_quiet "$_NPM_BIN" install
-      else
-        log_warn "Warning: $NPM not found. Skipping Node.js dependencies."
-      fi
+      export IN_INSTALL_SCRIPT=1
+      run_npm_script install
     fi
   fi
 }
