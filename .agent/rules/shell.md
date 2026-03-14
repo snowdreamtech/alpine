@@ -501,3 +501,57 @@ fi
 1. **Context Sensitivity**: Do not fail or warn about missing tools that the project doesn't use.
 2. **Explicit Skips**: For major backend/frontend languages, explicitly log `⏭️  Skipped` to affirm the check was considered but bypassed.
 3. **Clean Signal**: Hide entire groups (e.g., Mobile, Security) if no triggers are found, ensuring developers only see what matters to them.
+
+## 9. Defensive Tool Installation Pattern (MANDATORY)
+
+To ensure "World-Class" stability and performance in polyglot environments, all tool installation functions (e.g., in `setup.sh`) MUST follow the **Defensive & Lazy-Loading** pattern. This prevents "Setup Fatigue" and fragile installations.
+
+### Implementation Template
+
+```sh
+install_example_tool() {
+  local _T0=$(date +%s)
+  local _TITLE="Example Tool"
+  local _PROVIDER="npm:@example/cli"
+
+  # 1. Dry Run Guard (Idempotency)
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "$_TITLE" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  # 2. Context Sentinel (Environment Isolation)
+  if is_heavy_tool && ! is_ci_env; then
+    log_summary "Tool Group" "$_TITLE" "⏭️ Local skip" "-" "0"
+    return 0
+  fi
+
+  # 3. File Sentinel (Lazy Loading)
+  # Only install if project actually needs it
+  if ! has_lang_files "manifest.json" "*.ext"; then
+    log_summary "Tool Group" "$_TITLE" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+
+  # 4. Runtime Prerequisite (Dependency Safety)
+  # Verify cargo/npm/go exists before using provider
+  if ! command -v npm >/dev/null 2>&1; then
+    log_summary "Tool Group" "$_TITLE" "⚠️ npm missing" "-" "0"
+    return 0
+  fi
+
+  # 5. Execution & Reporting
+  local _STAT="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT="❌ Failed"
+  log_summary "Tool Group" "$_TITLE" "$_STAT" "$(get_version example-tool)" "$(($(date +%s) - _T0))"
+}
+```
+
+### Core Requirements
+
+1.  **Idempotency**: Every function MUST be safe to run multiple times. Use `DRY_RUN` checks to mock the result without state changes.
+2.  **Performance (Lazy Loading)**: Never install a language-specific tool unless the corresponding files are detected.
+3.  **Strict Error Handling**: Use `|| _STAT="❌ Failed"` pattern to ensure the summary table accurately reflects failures without crashing the entire setup sequence.
+4.  **SSoT Versioning**: Always use `get_version` or `get_mise_tool_version` to pull versions from `.mise.toml` for the summary table.
