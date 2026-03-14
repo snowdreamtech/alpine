@@ -37,31 +37,8 @@ main() {
   shift
 
   # 1. Resolve Binary Path
-  # Check .venv/bin (POSIX), .venv/Scripts (Windows), node_modules/.bin, and PATH
-  local _VENV_BIN_PATH=".venv/bin/${_LINTER_WRAP}"
-  local _VENV_SCRIPTS_PATH=".venv/Scripts/${_LINTER_WRAP}"
-  local _VENV_EXE_BIN_PATH=".venv/bin/${_LINTER_WRAP}.exe"
-  local _VENV_EXE_SCRIPTS_PATH=".venv/Scripts/${_LINTER_WRAP}.exe"
-  local _NODE_BIN_PATH="node_modules/.bin/${_LINTER_WRAP}"
-  local _NODE_CMD_PATH="node_modules/.bin/${_LINTER_WRAP}.cmd"
-
-  local _RESOLVED_BIN_WRAP=""
-
-  if [ -x "$_VENV_BIN_PATH" ]; then
-    _RESOLVED_BIN_WRAP="$_VENV_BIN_PATH"
-  elif [ -x "$_VENV_EXE_BIN_PATH" ]; then
-    _RESOLVED_BIN_WRAP="$_VENV_EXE_BIN_PATH"
-  elif [ -x "$_VENV_SCRIPTS_PATH" ]; then
-    _RESOLVED_BIN_WRAP="$_VENV_SCRIPTS_PATH"
-  elif [ -x "$_VENV_EXE_SCRIPTS_PATH" ]; then
-    _RESOLVED_BIN_WRAP="$_VENV_EXE_SCRIPTS_PATH"
-  elif [ -x "$_NODE_BIN_PATH" ]; then
-    _RESOLVED_BIN_WRAP="$_NODE_BIN_PATH"
-  elif [ -x "$_NODE_CMD_PATH" ]; then
-    _RESOLVED_BIN_WRAP="$_NODE_CMD_PATH"
-  elif command -v "$_LINTER_WRAP" >/dev/null 2>&1; then
-    _RESOLVED_BIN_WRAP="$_LINTER_WRAP"
-  fi
+  local _RESOLVED_BIN_WRAP
+  _RESOLVED_BIN_WRAP=$(resolve_bin "$_LINTER_WRAP")
 
   # 2. Check Existence
   if [ -z "$_RESOLVED_BIN_WRAP" ]; then

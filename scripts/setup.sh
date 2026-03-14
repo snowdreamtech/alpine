@@ -1228,7 +1228,6 @@ EOF
       [ -n "$GITHUB_ENV" ] && echo "_SUMMARY_TABLE_HEADER_SENTINEL=true" >>"$GITHUB_ENV"
       export _SUMMARY_TABLE_HEADER_SENTINEL=true
     fi
-  fi
 
   # ── Mode & Module Selection ──
   local _IS_ALL_MODULES=false
