@@ -58,6 +58,7 @@ python = "3.12.9"
 "npm:stylelint" = "16.26.1"
 "npm:stylelint-config-standard" = "37.0.0"
 "npm:vitepress" = "1.6.4"
+"npm:@taplo/cli" = "0.7.0"
 
 # ------------------------------------------------------------
 # pipx-based tools (stable and mirror-friendly)
