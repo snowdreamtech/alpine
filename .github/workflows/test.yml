@@ -42,6 +42,9 @@ name: Test
 
 permissions: {}
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   test:
     name: "🧪 Automated Testing Suite (${{ matrix.os }})"
