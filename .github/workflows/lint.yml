@@ -92,6 +92,7 @@ jobs:
           make install
         env:
           VENV: ${{ env.VENV }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "🔍 Inspect Code Quality (Lint)"
         shell: sh
@@ -142,6 +143,7 @@ jobs:
           make install
         env:
           VENV: ${{ env.VENV }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "📝 Validate Commit Convention (Commitlint)"
         shell: sh
