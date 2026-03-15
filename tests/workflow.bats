@@ -23,6 +23,23 @@ setup() {
   echo "repos: []" >.pre-commit-config.yaml
   git init -q
 
+  # Create a dummy .mise.toml for get_mise_tool_version
+  cat <<EOF >.mise.toml
+[tools]
+node = "20.18.3"
+pnpm = "9.0.0"
+python = "3.12.9"
+gitleaks = "8.30.0"
+osv-scanner = "2.3.3"
+trivy = "0.69.3"
+zizmor = "1.3.1"
+shfmt-py = "3.12.0.2"
+shellcheck-py = "0.11.0.1"
+actionlint-py = "1.7.11.24"
+editorconfig-checker = "3.6.1"
+checkmake = "0.3.2"
+EOF
+
   # Mock tools for check-env.sh (called by orchestration scripts)
   mkdir -p "$TEMP_DIR/bin"
   export PATH="$TEMP_DIR/bin:$PATH"
@@ -33,6 +50,14 @@ setup() {
   printf '#!/bin/sh\necho "GNU Make 3.81"\n' >"$TEMP_DIR/bin/make"
   printf '#!/bin/sh\necho "3.6.1"\n' >"$TEMP_DIR/bin/editorconfig-checker"
   printf '#!/bin/sh\necho "v2026.3.8"\n' >"$TEMP_DIR/bin/mise"
+  printf '#!/bin/sh\necho "v8.30.0"\n' >"$TEMP_DIR/bin/gitleaks"
+  printf '#!/bin/sh\necho "v2.3.3"\n' >"$TEMP_DIR/bin/osv-scanner"
+  printf '#!/bin/sh\necho "v0.69.3"\n' >"$TEMP_DIR/bin/trivy"
+  printf '#!/bin/sh\necho "0.3.2"\n' >"$TEMP_DIR/bin/checkmake"
+  printf '#!/bin/sh\necho "v1.3.1"\n' >"$TEMP_DIR/bin/zizmor"
+  printf '#!/bin/sh\necho "3.12.0.2"\n' >"$TEMP_DIR/bin/shfmt"
+  printf '#!/bin/sh\necho "0.11.0.1"\n' >"$TEMP_DIR/bin/shellcheck"
+  printf '#!/bin/sh\necho "1.7.11.24"\n' >"$TEMP_DIR/bin/actionlint"
   chmod +x "$TEMP_DIR/bin/"*
 }
 
