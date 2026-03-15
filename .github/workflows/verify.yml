@@ -45,6 +45,18 @@ jobs:
           # Fetches source code to perform pre-flight integrity and health checks.
           persist-credentials: false
 
+      - name: "⚡ Cache Mise Tools"
+        uses: actions/cache@v5.0.3
+        with:
+          path: |
+            ~/.local/share/mise
+            ~/Library/Application Support/mise
+            ~/AppData/Local/mise
+          key: ${{ runner.os }}-mise-${{ hashFiles('.mise.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-mise-
+            ${{ runner.os }}-
+
       - name: "🚀 Initialize Development Environment"
         shell: sh # POSIX compliant
         run: |
