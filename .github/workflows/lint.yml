@@ -67,6 +67,7 @@ jobs:
     timeout-minutes: 15 # Portability check for linters
     env:
       VENV: ${{ github.event.inputs.venv || inputs.venv || '.venv' }}
+      PYTHONUTF8: 1
 
     steps:
       - name: "📂 Checkout Repository Code"
@@ -115,6 +116,7 @@ jobs:
     timeout-minutes: 20 # Full scan including Trivy
     env:
       VENV: ${{ github.event.inputs.venv || inputs.venv || '.venv' }}
+      PYTHONUTF8: 1
 
     steps:
       - name: "📂 Checkout Repository Code"
