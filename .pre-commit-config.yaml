@@ -40,7 +40,7 @@ repos:
       # ── Git Hygiene (Incremental) ──────────────────────────────────────────
       - id: trailing-whitespace
         name: trim trailing whitespace
-        entry: "python3 -c 'import sys, re; [(lambda f, c: open(f, \"w\").write(re.sub(r\"[ \\t]+(?=\\n|$)\", \"\", c)))(f, open(f).read()) for f in sys.argv[1:]]'"
+        entry: "python3 -c 'import sys, re; [(lambda f, c: open(f, \"w\", newline=\"\").write(re.sub(r\"[ \\t]+(?=\\r?\\n|$)\", \"\", c)))(f, open(f, newline=\"\").read()) for f in sys.argv[1:]]'"
         language: system
         types: [text]
         exclude: '\.(bat|cmd|ps1)$'
@@ -49,7 +49,7 @@ repos:
 
       - id: end-of-file-fixer
         name: fix end of files
-        entry: python3 -c 'import sys; f=sys.argv[1]; c=open(f,"rb").read(); open(f,"wb").write(c.rstrip()+b"\n") if c and not c.endswith(b"\n") else None'
+        entry: "python3 -c 'import sys; [(lambda f, c: (lambda e: open(f, \"w\", newline=\"\").write(c.rstrip(\"\\r\\n\")+e) if c and c != c.rstrip(\"\\r\\n\")+e else None)(\"\\r\\n\" if \"\\r\\n\" in c else \"\\n\"))(f, open(f, newline=\"\").read()) for f in sys.argv[1:]]'"
         language: system
         types: [text]
         exclude: '\.(bat|cmd|ps1)$'
