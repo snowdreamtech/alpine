@@ -31,7 +31,7 @@ main() {
   elif command -v python >/dev/null 2>&1; then
     python "$SCRIPT_DIR/sync-docs.py"
   else
-    log_err "Error: Python 3 not found."
+    log_error "Error: Python 3 not found."
     exit 1
   fi
 
