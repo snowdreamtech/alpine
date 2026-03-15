@@ -136,6 +136,26 @@ if [ -d "$_LOCAL_BIN_NODE" ]; then
   esac
 fi
 
+# ── 🛣️ CI Persistence (GitHub Actions) ───────────────────────────────────────
+
+if [ "${GITHUB_ACTIONS:-}" = "true" ] && [ -n "${GITHUB_PATH:-}" ]; then
+  # Proactively add mise paths to GITHUB_PATH using absolute references.
+  # This ensures tools like 'commitlint' and 'vitepress' are available in subsequent steps.
+  # Note: GitHub Actions reads these at the end of the step to update PATH for the next.
+  _M_BIN_CI="$HOME/.local/bin"
+  _M_SHIMS_CI="$HOME/.local/share/mise/shims"
+
+  case ":$PATH:" in
+  *":$_M_BIN_CI:"*) ;;
+  *) echo "$_M_BIN_CI" >>"$GITHUB_PATH" ;;
+  esac
+
+  case ":$PATH:" in
+  *":$_M_SHIMS_CI:"*) ;;
+  *) echo "$_M_SHIMS_CI" >>"$GITHUB_PATH" ;;
+  esac
+fi
+
 # ── 🪄 Mise Bootstrap ────────────────────────────────────────────────────────
 
 # Purpose: Ensures mise is installed and available in the environment.
@@ -450,17 +470,6 @@ _mise_apply_activation() {
       ;;
     esac
     log_debug "mise environment synchronized for current session."
-
-    # 3. Persistence for GitHub Actions
-    if [ "${GITHUB_ACTIONS:-}" = "true" ] && [ -n "${GITHUB_PATH:-}" ]; then
-      local _MISE_SHIMS="$HOME/.local/share/mise/shims"
-      if [ -d "$_MISE_SHIMS" ]; then
-        case ":$PATH:" in
-        *":$_MISE_SHIMS:"*) ;;
-        *) echo "$_MISE_SHIMS" >>"$GITHUB_PATH" ;;
-        esac
-      fi
-    fi
   fi
 }
 
