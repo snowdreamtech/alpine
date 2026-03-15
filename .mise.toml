@@ -90,6 +90,7 @@ status.missing_tools = "never"
 [env]
 # Performance Toggles: set to "1" or "true" to activate
 ENABLE_GITHUB_PROXY = "1"
+PYTHONUTF8 = "1"
 
 # Node.js & npm acceleration
 NPM_CONFIG_REGISTRY = "https://registry.npmmirror.com"
