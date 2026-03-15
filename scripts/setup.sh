@@ -206,6 +206,11 @@ setup_go() {
     return 0
   fi
 
+  if ! has_lang_files "go.mod go.sum" "*.go"; then
+    log_summary "Runtime" "Go" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
   local _STAT_GO_RT="✅ Installed"
   install_runtime_go || _STAT_GO_RT="❌ Failed"
 

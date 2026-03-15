@@ -222,10 +222,10 @@
 
   | Priority Class | Tools / Runtimes | Health Check Behavior |
   | :--- | :--- | :--- |
-  | **Lifeline (Critical)** | Node, Python, Git, Make | **Strict**: Exit with `1` (BROKEN) if missing or version too low. |
-  | **Enhanced (Optional)** | Go, PHP, Java, Rust, Docker | **Robust**: Print `⚠️ Warning` but exit with `0` (FUNCTIONAL). |
+  | **Primary (First-Class)** | Node, Python, Git, Make | **Strict**: Exit with `1` (BROKEN) if missing or version too low. |
+  | **Secondary (On-Demand)** | Go, PHP, Java, Rust, Docker, etc. | **Robust**: Skip with `⏭️` or warn but exit with `0` (FUNCTIONAL). |
 
-- **Language-Aware Detection**: Health checks MUST be context-sensitive. Tools and runtimes (e.g., `golangci-lint`, `Ruby`) SHOULD only be checked if corresponding source files or manifests (e.g., `go.mod`, `Gemfile`) are detected in the repository. This minimizes "Setup Noise" for single-language or focused contributors.
+- **Language-Aware Detection**: Health checks MUST be context-sensitive. Secondary tools and runtimes (e.g., `golangci-lint`, `Ruby`) MUST only be checked/installed if corresponding source files or manifests (e.g., `go.mod`, `Gemfile`) are detected in the repository. This minimizes "Setup Noise" for single-language or focused contributors.
 
 - **Grouped UX & Selective Display**:
   - Output MUST be organized into logical groups (e.g., Core Infrastructure, Language Runtimes, Mobile Support).

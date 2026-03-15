@@ -29,13 +29,16 @@
   "express": "4.18.3"
   ```
 
-- Pin tool and runtime versions in version manager config files committed to the repository. The project follows a **strict orchestration role model**:
+- Pin tool and runtime versions in version manager config files committed to the repository. The project follows a **strict orchestration role model** based on runtime priority:
 
-  | Tool | Role | Scope |
-  | :--- | :--- | :--- |
-  | **mise** | **Toolchain Orchestrator** | Installation and version switching of all **Tool Executors** (Node, Python, pnpm, uv, and binary tools). |
-  | **pnpm** | **Node.js Package Manager** | Dedicated management of **Node.js business libraries** and project dependencies. |
-  | **uv** | **Python Package Manager** | Dedicated management of **Python business libraries** and virtual environments. |
+  | Tool | Role | Priority | Scope |
+  | :--- | :--- | :--- | :--- |
+  | **mise** | **Toolchain Orchestrator** | - | Installation and version switching of all runtimes and Tool Executors. |
+  | **Node.js** | **Primary Runtime** | **High** | Host for the majority of CLI tools and JS/TS business logic. |
+  | **Python** | **Primary Runtime** | **High** | Host for `pipx`-based tools and Python business logic. |
+  | **pnpm** | **Node.js Manager** | - | Dedicated management of **Node.js business libraries**. |
+  | **uv** | **Python Manager** | - | Dedicated management of **Python business libraries** and venvs. |
+  | **Go/Rust/etc.**| **Secondary Runtime** | **On-Demand**| Installed only if project source code requires it. |
 
   ```toml
   # .mise.toml — polyglot version manager (Single Source of Truth)
@@ -44,6 +47,8 @@
   pnpm   = "10.5.2"
   python = "3.12.9"
   uv     = "0.6.3"
+  # Secondary runtimes are listed for version pinning but handled on-demand by setup scripts.
+  go     = "1.23.6"
   ```
 
 - Do not upgrade dependencies speculatively. Use automated tools (Dependabot, Renovate) with a scheduled review cadence:
