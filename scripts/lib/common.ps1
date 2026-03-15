@@ -39,7 +39,7 @@ function Invoke-ShellDelegation {
         [string[]]$Arguments
     )
 
-    $ScriptPath = Join-Path $PSScriptRoot "..\" $ScriptName
+    $ScriptPath = Join-Path (Split-Path $PSScriptRoot -Parent) $ScriptName
 
     if (Get-Command 'sh' -ErrorAction SilentlyContinue) {
         sh "$ScriptPath" @Arguments
