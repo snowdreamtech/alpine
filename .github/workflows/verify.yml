@@ -64,6 +64,7 @@ jobs:
           make install
         env:
           VENV: ${{ env.VENV }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "🧪 Validate Project Health (Verify)"
         shell: sh
