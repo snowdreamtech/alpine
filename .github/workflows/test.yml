@@ -60,6 +60,7 @@ jobs:
     timeout-minutes: 30 # Matrix tests can be time-consuming
     env:
       VENV: ${{ github.event.inputs.venv || '.venv' }}
+      PYTHONUTF8: 1
 
     steps:
       - name: "📂 Checkout Repository Code"
