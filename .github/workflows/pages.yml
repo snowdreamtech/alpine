@@ -32,6 +32,9 @@ name: Deploy Docs to GitHub Pages
 
 permissions: {}
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   build:
     name: "🏗️ Documentation Compilation"
@@ -70,7 +73,6 @@ jobs:
           make install
         env:
           VENV: ${{ env.VENV }}
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "🚀 Compile Documentation Artifacts"
         shell: sh
