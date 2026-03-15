@@ -692,13 +692,22 @@ run_mise() {
       ;;
     pipx:*)
       if ! command -v pipx >/dev/null 2>&1; then
-        log_info "pipx not found — bootstrapping via mise..."
+        log_info "pipx not found — bootstrapping..."
         local _M_BIN_PIPX
         _M_BIN_PIPX=$(command -v mise 2>/dev/null || echo "$_G_MISE_BIN_BASE/mise")
         [ "$_G_OS" = "windows" ] && [ ! -x "$_M_BIN_PIPX" ] && _M_BIN_PIPX="${_M_BIN_PIPX}.exe"
-        # Install pipx without GITHUB_TOKEN
-        "$_M_BIN_PIPX" install pipx >/dev/null 2>&1 || true
-        # Ensure mise shims are available
+
+        if [ "$_G_OS" = "windows" ]; then
+          # On Windows, pipx via mise (aqua) often fails. Use pip fallback.
+          python -m pip install --user pipx >/dev/null 2>&1 || true
+        else
+          # Install pipx without GITHUB_TOKEN
+          "$_M_BIN_PIPX" install pipx >/dev/null 2>&1 || true
+        fi
+
+        # Ensure mise shims and pipx paths are available
+        # pipx on windows typically installs to USERPROFILE/AppData/Local/pipx/pipx/bin or similar,
+        # but the shim is usually in the python scripts folder if installed via pip --user.
         export PATH="$_G_MISE_SHIMS_BASE:$_G_MISE_BIN_BASE:$PATH"
         if ! command -v pipx >/dev/null 2>&1; then
           log_error "Cannot install '$_TOOL_CHECK': 'pipx' is missing even after bootstrap. Please run 'make setup' or install pipx first."

@@ -26,6 +26,7 @@
 # Installation via: cargo install cargo-audit (requires cargo/Rust toolchain)
 "github:terraform-linters/tflint" = "0.61.0"
 "github:aquasecurity/trivy" = "0.69.3"
+"github:lycheeverse/lychee" = "0.18.1"
 
 # ------------------------------------------------------------
 # Default provider tools (mise native provider is fastest here)
@@ -44,7 +45,6 @@ python = "3.12.9"
 "npm:@commitlint/cli" = "20.4.3"
 "npm:@commitlint/config-conventional" = "20.4.3"
 "npm:google-java-format" = "1.25.2"
-"npm:@lycheeverse/lychee" = "0.18.1"
 "npm:bats" = "1.13.0"
 "npm:bats-assert" = "2.2.4"
 "npm:bats-support" = "0.3.0"
@@ -79,7 +79,7 @@ python = "3.12.9"
 "pipx:dotenv-linter" = "0.7.0"
 "pipx:pip-audit" = "2.8.0"
 "pipx:zizmor" = "1.3.1"
-pipx = "1.7.1"
+"pip:pipx" = "1.7.1"
 
 # ------------------------------------------------------------
 # Global settings
