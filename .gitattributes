@@ -45,6 +45,10 @@
 *.xml text eol=lf
 *.yml text eol=lf
 *.yaml text eol=lf
+.ansible-lint text eol=lf
+.yamllint.yml text eol=lf
+.devcontainer/*.yaml text eol=lf
+.devcontainer/*.yml text eol=lf
 *.toml text eol=lf
 *.vue text eol=lf
 *.rs text eol=lf
