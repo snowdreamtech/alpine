@@ -1243,6 +1243,19 @@ install_runtime_node() {
   fi
 }
 
+# Purpose: Installs Go runtime via mise.
+# Delegate: Managed by mise (.mise.toml)
+install_runtime_go() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Go runtime."
+    return 0
+  fi
+
+  # Runtime initialization
+  run_mise install go
+  eval "$(mise activate bash --shims)"
+}
+
 # Purpose: Dynamically detects the best available Node.js package manager.
 # Priority: bun -> pnpm -> yarn -> npm
 # Returns: Binary name string.

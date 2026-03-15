@@ -194,6 +194,26 @@ setup_node() {
   fi
 }
 
+# Purpose: Sets up Go runtime for project.
+# Delegate: Managed by mise (.mise.toml)
+setup_go() {
+  local _T0_GO_RT
+  _T0_GO_RT=$(date +%s)
+  _log_setup "Go Runtime" "go"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Go" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  local _STAT_GO_RT="✅ Installed"
+  install_runtime_go || _STAT_GO_RT="❌ Failed"
+
+  local _DUR_GO_RT
+  _DUR_GO_RT=$(($(date +%s) - _T0_GO_RT))
+  log_summary "Runtime" "Go" "$_STAT_GO_RT" "$(get_version go)" "$_DUR_GO_RT"
+}
+
 # Purpose: Initializes a Python virtual environment and installs development dependencies.
 # Params:
 #   None (uses global SSoT variables)
@@ -1597,7 +1617,10 @@ EOF
     gitleaks) install_gitleaks ;;
     checkmake) install_checkmake ;;
     hadolint) install_hadolint ;;
-    go) install_go_lint ;;
+    go)
+      setup_go
+      install_go_lint
+      ;;
     tflint) install_tflint ;;
     kube-linter) install_kube_linter ;;
     powershell) setup_powershell ;;

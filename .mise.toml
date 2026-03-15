@@ -36,6 +36,7 @@ editorconfig-checker = "3.6.1"
 gitleaks = "8.30.0"
 node = "20.18.3"
 python = "3.12.9"
+go = "1.23.6"
 
 # ------------------------------------------------------------
 # npm-based tools (best performance under weak networks)
