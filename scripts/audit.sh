@@ -163,8 +163,16 @@ main() {
       log_success "DRY-RUN: Would run osv-scanner"
       log_summary "Security" "osv-scanner" "⚖️ Previewed" "-" "0"
     else
-      if run_quiet osv-scanner -r .; then
+      # Capture output to detect "No package sources found" which should be a skip/pass, not an error.
+      local _OSV_OUT
+      _OSV_OUT=$(osv-scanner -r . 2>&1)
+      local _OSV_EXIT=$?
+
+      if [ $_OSV_EXIT -eq 0 ]; then
         log_summary "Security" "osv-scanner" "✅ Secure" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV_AUD))"
+      elif echo "$_OSV_OUT" | grep -q "No package sources found"; then
+        log_info "osv-scanner: No package sources found. Skipping."
+        log_summary "Security" "osv-scanner" "⏭️  Skipped" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV_AUD))"
       else
         log_summary "Security" "osv-scanner" "❌ Vulnerable" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV_AUD))"
         _OVERALL_EXIT_AUDIT=1

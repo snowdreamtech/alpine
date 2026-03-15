@@ -27,7 +27,6 @@ jobs:
     uses: ./.github/workflows/verify.yml
     permissions:
       contents: read
-    secrets: inherit
 
   goreleaser:
     needs: [verify]
