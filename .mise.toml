@@ -15,22 +15,18 @@
 # GitHub Release-only tools (no npm/pipx alternatives available)
 # These rely on GitHub releases and benefit from proxy acceleration.
 # ------------------------------------------------------------
-"github:golangci/golangci-lint" = "1.64.5"
-"go:golang.org/x/vuln/cmd/govulncheck" = "latest"
+"github:golangci/golangci-lint" = "2.11.3"
+"go:golang.org/x/vuln/cmd/govulncheck" = "v1.1.4"
 "github:google/osv-scanner" = "2.3.3"
-"github:goreleaser/goreleaser" = "2.14.3"
+"github:goreleaser/goreleaser" = "2.14.1"
 "github:hadolint/hadolint" = "2.14.0"
-"github:stackrox/kube-linter" = "0.8.3"
-# cargo-audit: NOT listed here — installed on-demand by setup.sh only when Cargo.toml exists.
-# The rustsec/rustsec repo uses non-standard release tag format; there's no cross-platform prebuilt.
-# Installation via: cargo install cargo-audit (requires cargo/Rust toolchain)
+"github:stackrox/kube-linter" = "0.8.1"
 "github:terraform-linters/tflint" = "0.61.0"
 "github:aquasecurity/trivy" = "0.69.3"
 "github:lycheeverse/lychee" = "lychee-v0.23.0"
-"github:nicklockwood/SwiftFormat" = "0.55.4"
-"github:realm/SwiftLint" = "0.58.2"
-"github:google/google-java-format" = "1.25.2"
-
+"github:nicklockwood/SwiftFormat" = "0.60.0"
+"github:realm/SwiftLint" = "0.63.2"
+"github:google/google-java-format" = "v1.35.0"
 # ------------------------------------------------------------
 # Default provider tools (mise native provider is fastest here)
 # These tools have stable binary distributions or cached providers.
