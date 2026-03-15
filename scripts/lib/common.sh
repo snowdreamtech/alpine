@@ -179,18 +179,22 @@ fi
 
 if [ "${GITHUB_ACTIONS:-}" = "true" ] && [ -n "${GITHUB_PATH:-}" ]; then
   # Proactively add mise paths to GITHUB_PATH using absolute references.
-  # This ensures tools like 'commitlint' and 'vitepress' are available in subsequent steps.
-  # Note: GitHub Actions reads these at the end of the step to update PATH for the next.
+  # Note: GitHub Actions expects the runner's native path format.
   _M_BIN_CI="$_G_MISE_BIN_BASE"
   _M_SHIMS_CI="$_G_MISE_SHIMS_BASE"
 
+  if [ "$_G_OS" = "windows" ] && command -v cygpath >/dev/null 2>&1; then
+    _M_BIN_CI=$(cygpath -w "$_M_BIN_CI")
+    _M_SHIMS_CI=$(cygpath -w "$_M_SHIMS_CI")
+  fi
+
   case ":$PATH:" in
-  *":$_M_BIN_CI:"*) ;;
+  *":$_G_MISE_BIN_BASE:"*) ;;
   *) echo "$_M_BIN_CI" >>"$GITHUB_PATH" ;;
   esac
 
   case ":$PATH:" in
-  *":$_M_SHIMS_CI:"*) ;;
+  *":$_G_MISE_SHIMS_BASE:"*) ;;
   *) echo "$_M_SHIMS_CI" >>"$GITHUB_PATH" ;;
   esac
 fi
