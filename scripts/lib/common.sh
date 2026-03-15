@@ -625,7 +625,7 @@ run_mise() {
 
     # 3. Current Version Check
     local _CUR_VER
-    _CUR_VER=$(get_version "$_TOOL_BASE")
+    _CUR_VER=$(get_version "$_TOOL_BASE" | tr -d '\r')
 
     # 4. Rigorous Comparison (Ensures exact match or prefix)
     if [ "$_CUR_VER" != "-" ] && [ -n "$_REQ_VER" ]; then

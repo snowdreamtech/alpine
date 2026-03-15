@@ -80,7 +80,7 @@ check_tool_version() {
   fi
 
   local _LV_CURRENT_VER
-  _LV_CURRENT_VER=$(get_version "$_LV_CMD")
+  _LV_CURRENT_VER=$(get_version "$_LV_CMD" | tr -d '\r')
   [ "$_LV_CURRENT_VER" = "-" ] && _LV_CURRENT_VER="0.0"
 
   # If requirement is empty or -, allow anything

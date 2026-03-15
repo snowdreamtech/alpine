@@ -27,18 +27,31 @@ endif
 # OS Detection
 # =============================================================================
 ifeq ($(OS),Windows_NT)
-	OS_NAME := Windows
-	SHELL   := powershell.exe
-	.SHELLFLAGS := -NoProfile -Command
-	# Colors for Windows (PowerShell handles this differently, but for echo)
-	BLUE   :=
-	GREEN  :=
-	YELLOW :=
-	RED    :=
-	NC     :=
+	# Detect if we are running in a POSIX-like environment (Git Bash, WSL, etc.)
+	# We check if 'sh' works and returns expected output.
+	IS_POSIX := $(shell sh -c 'echo 1' 2>/dev/null)
+	ifeq ($(IS_POSIX),1)
+		OS_NAME := POSIX_WINDOWS
+		# Colors for POSIX
+		BLUE   := $(shell printf '\033[0;34m')
+		GREEN  := $(shell printf '\033[0;32m')
+		YELLOW := $(shell printf '\033[1;33m')
+		RED    := $(shell printf '\033[0;31m')
+		NC     := $(shell printf '\033[0m')
+	else
+		OS_NAME := Windows
+		SHELL   := powershell.exe
+		.SHELLFLAGS := -NoProfile -Command
+		# Colors for native Windows (PowerShell handles this, but for make echo)
+		BLUE   :=
+		GREEN  :=
+		YELLOW :=
+		RED    :=
+		NC     :=
+	endif
 else
 	OS_NAME := $(shell uname -s)
-	# Colors for POSIX (using shell printf for literal escapes)
+	# Colors for POSIX
 	BLUE   := $(shell printf '\033[0;34m')
 	GREEN  := $(shell printf '\033[0;32m')
 	YELLOW := $(shell printf '\033[1;33m')
