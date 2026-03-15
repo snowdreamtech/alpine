@@ -39,16 +39,27 @@ function Invoke-ShellDelegation {
         [string[]]$Arguments
     )
 
-    $ScriptPath = Join-Path (Split-Path $PSScriptRoot -Parent) $ScriptName
+    # 1. Environment Hardening
+    # Ensure errors fail fast in CI without interactive prompts
+    $ErrorActionPreference = 'Stop'
+    $ProgressPreference = 'SilentlyContinue'
 
+    # 2. Path Resolution (SSoT)
+    # Move one level up from lib/ to scripts/ to find the core .sh script.
+    $ParentDir = Split-Path $PSScriptRoot -Parent
+    $ScriptPath = Join-Path $ParentDir $ScriptName
+
+    # 3. Execution Delegation
     if (Get-Command 'sh' -ErrorAction SilentlyContinue) {
+        # POSIX shell found (typical for Git for Windows)
         sh "$ScriptPath" @Arguments
     }
     elseif (Get-Command 'bash' -ErrorAction SilentlyContinue) {
+        # Alternative shell detection
         bash "$ScriptPath" @Arguments
     }
     else {
-        Write-Output "Error: 'sh' or 'bash' not found. Please install Git for Windows or ensure a POSIX shell is in your PATH."
+        Write-Error "Error: 'sh' or 'bash' not found. Please install Git for Windows or ensure a POSIX shell is in your PATH."
         exit 1
     }
 }
