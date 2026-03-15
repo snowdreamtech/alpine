@@ -44,6 +44,7 @@ jobs:
     timeout-minutes: 15
     env:
       VENV: ${{ github.event.inputs.venv || '.venv' }}
+      PYTHONUTF8: 1
 
     steps:
       - name: "📂 Checkout Repository Code"
