@@ -542,12 +542,12 @@ bootstrap_mise() {
   # Priority 2: System Package Managers
   elif _mise_install_tier2; then
     log_success "mise installed via Tier 2 (Package Manager)."
-  # Priority 3: Language Tools
-  elif _mise_install_tier3; then
-    log_success "mise installed via Tier 3 (Language Tool)."
-  # Priority 4: Manual Binary Fallback
+  # Priority 3: Manual Binary (Fast & cross-platform)
   elif _mise_install_tier4 "$_M_OS" "$_M_ARCH" "${MISE_VERSION#[vV]}"; then
-    log_success "mise installed via Tier 4 (Manual Binary)."
+    log_success "mise installed via Tier 3 (Manual Binary)."
+  # Priority 4: Language Tools (Slowest fallback)
+  elif _mise_install_tier3; then
+    log_success "mise installed via Tier 4 (Language Tool)."
   else
     log_error "All mise installation tiers failed."
     return 1
@@ -555,6 +555,8 @@ bootstrap_mise() {
 
   # Path Refresh: Ensure MISE is available for immediate setup
   [ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
+  [ -d "$_G_MISE_BIN_BASE" ] && export PATH="$_G_MISE_BIN_BASE:$PATH"
+  [ -d "$_G_MISE_SHIMS_BASE" ] && export PATH="$_G_MISE_SHIMS_BASE:$PATH"
 
   # ── 🏗️ Post-Install Configuration ──
 

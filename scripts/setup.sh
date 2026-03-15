@@ -678,7 +678,7 @@ install_swiftformat() {
   local _T0_SF
   _T0_SF=$(date +%s)
   local _TITLE="SwiftFormat"
-  local _PROVIDER="pipx:swiftformat-py"
+  local _PROVIDER="github:nicklockwood/SwiftFormat"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "Swift" "⚖️ Previewed" "-" "0"
@@ -702,7 +702,7 @@ install_swiftlint() {
   local _T0_SL
   _T0_SL=$(date +%s)
   local _TITLE="SwiftLint"
-  local _PROVIDER="pipx:swiftlint-py"
+  local _PROVIDER="github:realm/SwiftLint"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lint Tool" "Swift" "⚖️ Previewed" "-" "0"
@@ -725,23 +725,13 @@ install_swiftlint() {
 install_dotnet_format() {
   local _T0_DNF
   _T0_DNF=$(date +%s)
-  local _TITLE="Dotnet Format"
-  local _PROVIDER="pipx:dotnet-format"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Lint Tool" ".NET" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "global.json" "*.csproj *.sln *.cs"; then
-    log_summary "Lint Tool" ".NET" "⏭️ Skipped" "-" "0"
-    return 0
-  fi
-
   _log_setup "$_TITLE" "$_PROVIDER"
-  local _STAT_DNF="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_DNF="❌ Failed"
-  log_summary "Lint Tool" ".NET" "$_STAT_DNF" "$(get_version dotnet-format)" "$(($(date +%s) - _T0_DNF))"
+  local _STAT_DNF="✅ Available"
+  # dotnet-format is now built-in as 'dotnet format'
+  if ! dotnet format --version >/dev/null 2>&1; then
+    _STAT_DNF="❌ Missing"
+  fi
+  log_summary "Lint Tool" ".NET" "$_STAT_DNF" "$(dotnet format --version 2>/dev/null || echo "-")" "$(($(date +%s) - _T0_DNF))"
 }
 
 # Purpose: Installs zizmor for GitHub Actions auditing.
