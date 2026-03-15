@@ -357,10 +357,17 @@ _mise_install_tier4() {
 
     if _download "$_M_URL" "$_TMP_ZIP"; then
       if unzip -q "$_TMP_ZIP" -d "$_TMP_DIR"; then
-        mv "${_TMP_DIR}/mise/bin/mise.exe" "$_DEST"
-        mv "${_TMP_DIR}/mise/bin/mise-shim.exe" "$(dirname "$_DEST")/mise-shim.exe" 2>/dev/null || true
-        rm -rf "$_TMP_DIR"
-        return 0
+        # Robustly find mise.exe and mise-shim.exe in any extracted path
+        local _FOUND_BIN
+        _FOUND_BIN=$(find "$_TMP_DIR" -maxdepth 3 -name "mise.exe" | head -n 1)
+        if [ -n "$_FOUND_BIN" ]; then
+          mv "$_FOUND_BIN" "$_DEST"
+          local _FOUND_SHIM
+          _FOUND_SHIM=$(find "$_TMP_DIR" -maxdepth 3 -name "mise-shim.exe" | head -n 1)
+          [ -n "$_FOUND_SHIM" ] && mv "$_FOUND_SHIM" "$(dirname "$_DEST")/mise-shim.exe"
+          rm -rf "$_TMP_DIR"
+          return 0
+        fi
       fi
     fi
     rm -rf "$_TMP_DIR"

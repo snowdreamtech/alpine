@@ -151,9 +151,9 @@ jobs:
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
           if [ "$EVENT_NAME" = "pull_request" ]; then
-            commitlint --from "$BASE_SHA" --to "$HEAD_SHA" --verbose
+            mise exec -- commitlint --from "$BASE_SHA" --to "$HEAD_SHA" --verbose
           else
-            commitlint --last --verbose
+            mise exec -- commitlint --last --verbose
           fi
 
       - name: "🛡️ Perform Security Audit"

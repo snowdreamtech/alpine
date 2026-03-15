@@ -1034,14 +1034,8 @@ install_commitlint() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
-  local _STAT_CL="✅ mise"
-
-  # Ensure both packages are installed in the same global context so they can find each other.
-  # We use npm install -g which, when running under a mise-managed node,
-  # installs into that node's local global directory, keeping it isolated.
-  # Total safety: Use 'mise exec' to be explicit.
-  log_info "Installing commitlint + convention config into mise global scope..."
-  run_quiet mise exec node -- npm install -g "@commitlint/cli" "@commitlint/config-conventional" || _STAT_CL="❌ Failed"
+  log_info "Installing commitlint + convention config via mise..."
+  run_mise install "$_PROVIDER" "$_CONFIG_PROVIDER" || _STAT_CL="❌ Failed"
 
   log_summary "Other" "Commitlint" "$_STAT_CL" "$(get_version commitlint)" "$(($(date +%s) - _T0_CL))"
 }
