@@ -1690,6 +1690,15 @@ EOF
 
     # Next Actions
     if [ "${DRY_RUN:-0}" -eq 0 ]; then
+      # Pathing Diagnostic
+      if ! command -v mise >/dev/null 2>&1; then
+        log_warn "Warning: mise binary not found on PATH. You may need to restart your shell."
+      fi
+      case ":$PATH:" in
+      *":$_G_MISE_SHIMS_BASE:"*) ;;
+      *) log_warn "Warning: mise shims are not on your PATH. Run 'eval \"\$(mise activate bash)\"' to fix." ;;
+      esac
+
       printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
       printf "  - Run %bmake install%b to install project dependencies.\n" "${GREEN}" "${NC}"
       printf "  - Run %bmake verify%b to ensure environment health.\n" "${GREEN}" "${NC}"
