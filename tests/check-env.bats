@@ -144,6 +144,26 @@ EOF
 #!/bin/sh
 echo "3.6.1"
 EOF
+  cat <<EOF >"$TEMP_DIR/bin/govulncheck"
+#!/bin/sh
+echo "v0.1.0"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/cargo-audit"
+#!/bin/sh
+echo "cargo-audit 0.17.0"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/pip-audit"
+#!/bin/sh
+echo "2.8.0"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/checkmake"
+#!/bin/sh
+echo "0.3.2"
+EOF
+  cat <<EOF >"$TEMP_DIR/bin/hadolint"
+#!/bin/sh
+echo "2.12.0"
+EOF
   chmod +x "$TEMP_DIR/bin/"*
 
   # Create files to trigger language checks

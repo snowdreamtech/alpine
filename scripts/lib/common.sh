@@ -61,7 +61,19 @@ fi
 
 VENV="${VENV:-.venv}"
 PYTHON="${PYTHON:-python3}"
-NPM="${NPM:-}" # Dynamic detection in run_npm_script
+# Dynamically detect Node.js package manager if not explicitly set
+if [ -z "$NPM" ]; then
+  if command -v bun >/dev/null 2>&1; then
+    NPM="bun"
+  elif command -v pnpm >/dev/null 2>&1; then
+    NPM="pnpm"
+  elif command -v yarn >/dev/null 2>&1; then
+    NPM="yarn"
+  else
+    NPM="npm"
+  fi
+fi
+export NPM
 DOCS_DIR="docs"
 PACKAGE_JSON="${PACKAGE_JSON:-package.json}"
 REQUIREMENTS_TXT="${REQUIREMENTS_TXT:-requirements.txt}"
@@ -438,6 +450,17 @@ _mise_apply_activation() {
       ;;
     esac
     log_debug "mise environment synchronized for current session."
+
+    # 3. Persistence for GitHub Actions
+    if [ "${GITHUB_ACTIONS:-}" = "true" ] && [ -n "${GITHUB_PATH:-}" ]; then
+      local _MISE_SHIMS="$HOME/.local/share/mise/shims"
+      if [ -d "$_MISE_SHIMS" ]; then
+        case ":$PATH:" in
+        *":$_MISE_SHIMS:"*) ;;
+        *) echo "$_MISE_SHIMS" >>"$GITHUB_PATH" ;;
+        esac
+      fi
+    fi
   fi
 }
 
