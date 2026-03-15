@@ -61,7 +61,7 @@ fi
 
 VENV="${VENV:-.venv}"
 PYTHON="${PYTHON:-python3}"
-NPM="${NPM:-npm}"
+NPM="${NPM:-}" # Dynamic detection in run_npm_script
 DOCS_DIR="docs"
 PACKAGE_JSON="${PACKAGE_JSON:-package.json}"
 REQUIREMENTS_TXT="${REQUIREMENTS_TXT:-requirements.txt}"
@@ -1130,7 +1130,7 @@ check_runtime() {
 }
 
 # Purpose: Installs the Node.js runtime and project dependencies.
-# Delegate: Managed via mise (.mise.toml) and pnpm.
+# Delegate: Managed via mise (.mise.toml) and the best available manager.
 # Examples:
 #   install_runtime_node
 install_runtime_node() {
@@ -1145,7 +1145,24 @@ install_runtime_node() {
 
   # 2. Dependency resolution
   if [ -f "$PACKAGE_JSON" ]; then
+    # We use 'install' explicitly to bypass manager detection overhead for bootstrap
+    # but still use run_npm_script to leverage its guards.
     run_npm_script install
+  fi
+}
+
+# Purpose: Dynamically detects the best available Node.js package manager.
+# Priority: bun -> pnpm -> yarn -> npm
+# Returns: Binary name string.
+_detect_node_manager() {
+  if command -v bun >/dev/null 2>&1; then
+    echo "bun"
+  elif command -v pnpm >/dev/null 2>&1; then
+    echo "pnpm"
+  elif command -v yarn >/dev/null 2>&1; then
+    echo "yarn"
+  else
+    echo "npm"
   fi
 }
 
@@ -1217,9 +1234,16 @@ run_npm_script() {
   _CURRENT_BASENAME_NPM=$(basename "$0")
 
   if [ -f "package.json" ]; then
-    # 1. Binary Presence Guard
-    if ! command -v "$NPM" >/dev/null 2>&1; then
-      log_warn "Warning: $NPM command not found. Skipping Node.js task: $_SCRIPT_NAME_NPM."
+    # 1. Manager Detection & Guard
+    local _NODE_MGR
+    if [ -n "$NPM" ]; then
+      _NODE_MGR="$NPM"
+    else
+      _NODE_MGR=$(_detect_node_manager)
+    fi
+
+    if ! command -v "$_NODE_MGR" >/dev/null 2>&1; then
+      log_warn "Warning: $_NODE_MGR command not found and no fallback available. Skipping Node.js task: $_SCRIPT_NAME_NPM."
       return 0
     fi
 
@@ -1236,15 +1260,15 @@ run_npm_script() {
     if [ -n "$_CMD_NPM" ]; then
       # Avoid infinite loop if the command points back to this script
       if echo "$_CMD_NPM" | grep -q "$_CURRENT_BASENAME_NPM"; then
-        log_debug "npm script '$_SCRIPT_NAME_NPM' is a self-reference to '$_CURRENT_BASENAME_NPM'. Skipping."
+        log_debug "Node script '$_SCRIPT_NAME_NPM' is a self-reference to '$_CURRENT_BASENAME_NPM'. Skipping."
         return 0
       fi
-      log_info "── Running Node.js script: $NPM $_SCRIPT_NAME_NPM ──"
-      "$NPM" run "$_SCRIPT_NAME_NPM"
+      log_info "── Running Node.js script: $_NODE_MGR $_SCRIPT_NAME_NPM ──"
+      "$_NODE_MGR" run "$_SCRIPT_NAME_NPM"
     elif [ "$_SCRIPT_NAME_NPM" = "install" ] || [ "$_SCRIPT_NAME_NPM" = "update" ]; then
       # 4. Special Fallback for native commands if not defined in package.json scripts
-      log_info "── Node.js standard command: $NPM $_SCRIPT_NAME_NPM ──"
-      run_quiet "$NPM" "$_SCRIPT_NAME_NPM"
+      log_info "── Node.js standard command: $_NODE_MGR $_SCRIPT_NAME_NPM ──"
+      run_quiet "$_NODE_MGR" "$_SCRIPT_NAME_NPM"
     fi
   fi
   return 0
