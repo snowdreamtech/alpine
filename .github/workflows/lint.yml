@@ -51,6 +51,9 @@ name: Quality & Audit
 
 permissions: {}
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   lint:
     name: "🛡️ Quality Assurance Gate (${{ matrix.os }})"
