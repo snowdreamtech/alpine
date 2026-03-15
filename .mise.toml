@@ -26,7 +26,7 @@
 # Installation via: cargo install cargo-audit (requires cargo/Rust toolchain)
 "github:terraform-linters/tflint" = "0.61.0"
 "github:aquasecurity/trivy" = "0.69.3"
-"github:lycheeverse/lychee" = "0.18.1"
+"github:lycheeverse/lychee" = "lychee-v0.23.0"
 "github:nicklockwood/SwiftFormat" = "0.55.4"
 "github:realm/SwiftLint" = "0.58.2"
 
