@@ -31,6 +31,45 @@ YELLOW=$(printf '\033[1;33m')
 RED=$(printf '\033[0;31m')
 NC=$(printf '\033[0m')
 
+# ── 🎭 Global Environment Detection ──────────────────────────────────────────
+
+# Detect OS and set pathing conventions dynamically to ensure absolute parity
+# between Linux, macOS, and Windows (via POSIX shells like Git Bash).
+_G_UNAME=$(uname -s)
+case "$_G_UNAME" in
+Darwin)
+  _G_OS="macos"
+  _G_VENV_BIN="bin"
+  _G_MISE_BIN_BASE="$HOME/.local/bin"
+  _G_MISE_SHIMS_BASE="$HOME/.local/share/mise/shims"
+  ;;
+Linux)
+  _G_OS="linux"
+  _G_VENV_BIN="bin"
+  _G_MISE_BIN_BASE="$HOME/.local/bin"
+  _G_MISE_SHIMS_BASE="$HOME/.local/share/mise/shims"
+  ;;
+MINGW* | MSYS* | CYGWIN*)
+  _G_OS="windows"
+  _G_VENV_BIN="Scripts"
+  # In Windows-based POSIX shells, AppData/Local is the standard base for mise data
+  if command -v cygpath >/dev/null 2>&1; then
+    _G_APP_DATA_LOCAL=$(cygpath -u "$LOCALAPPDATA")
+  else
+    # Fallback to manual path translation if cygpath is missing
+    _G_APP_DATA_LOCAL=$(echo "$LOCALAPPDATA" | sed 's/\\/\//g; s/:\(.*\)/\/\1/; s/^\([A-Za-z]\)\//\/\L\1\//')
+  fi
+  _G_MISE_BIN_BASE="$HOME/.local/bin" # Mise installer usually puts bin here in Git Bash
+  _G_MISE_SHIMS_BASE="${_G_APP_DATA_LOCAL:-$HOME/AppData/Local}/mise/shims"
+  ;;
+*)
+  _G_OS="linux"
+  _G_VENV_BIN="bin"
+  _G_MISE_BIN_BASE="$HOME/.local/bin"
+  _G_MISE_SHIMS_BASE="$HOME/.local/share/mise/shims"
+  ;;
+esac
+
 # ── ⚙️ Global Configuration ──────────────────────────────────────────────────
 
 # Default verbosity
@@ -103,10 +142,10 @@ MISE_VERSION="${MISE_VERSION:-2026.3.8}"
 
 # Automatically add local bin directories to PATH to ensure orchestrated tools
 # are prioritized over system globals without requiring manual activation.
-_LOCAL_BIN_VENV=$(pwd)/${VENV}/bin
+_LOCAL_BIN_VENV=$(pwd)/${VENV}/${_G_VENV_BIN}
 _LOCAL_BIN_NODE=$(pwd)/node_modules/.bin
-_LOCAL_MISE_BIN="$HOME/.local/bin"
-_LOCAL_MISE_SHIMS="$HOME/.local/share/mise/shims"
+_LOCAL_MISE_BIN="$_G_MISE_BIN_BASE"
+_LOCAL_MISE_SHIMS="$_G_MISE_SHIMS_BASE"
 
 if [ -d "$_LOCAL_MISE_BIN" ]; then
   case ":$PATH:" in
@@ -142,8 +181,8 @@ if [ "${GITHUB_ACTIONS:-}" = "true" ] && [ -n "${GITHUB_PATH:-}" ]; then
   # Proactively add mise paths to GITHUB_PATH using absolute references.
   # This ensures tools like 'commitlint' and 'vitepress' are available in subsequent steps.
   # Note: GitHub Actions reads these at the end of the step to update PATH for the next.
-  _M_BIN_CI="$HOME/.local/bin"
-  _M_SHIMS_CI="$HOME/.local/share/mise/shims"
+  _M_BIN_CI="$_G_MISE_BIN_BASE"
+  _M_SHIMS_CI="$_G_MISE_SHIMS_BASE"
 
   case ":$PATH:" in
   *":$_M_BIN_CI:"*) ;;
@@ -457,13 +496,15 @@ _mise_apply_activation() {
 
   # 2. Ephemeral Session Activation
   local _M_BIN
-  _M_BIN=$(command -v mise || echo "$HOME/.local/bin/mise")
+  _M_BIN=$(command -v mise || echo "$_G_MISE_BIN_BASE/mise")
+  [ "$_G_OS" = "windows" ] && [ ! -x "$_M_BIN" ] && _M_BIN="${_M_BIN}.exe"
+
   if [ -x "$_M_BIN" ]; then
     # PowerShell and Nushell activation in POSIX sh is complex/limited to shims.
     # We focus on the most impactful session update: shims.
     case "$_SHELL" in
     pwsh | powershell | nu | nushell)
-      export PATH="$HOME/.local/share/mise/shims:$PATH"
+      export PATH="$_G_MISE_SHIMS_BASE:$PATH"
       ;;
     *)
       eval "$("$_M_BIN" activate "$_SHELL" --shims)"
@@ -653,11 +694,12 @@ run_mise() {
       if ! command -v pipx >/dev/null 2>&1; then
         log_info "pipx not found — bootstrapping via mise..."
         local _M_BIN_PIPX
-        _M_BIN_PIPX=$(command -v mise 2>/dev/null || echo "$HOME/.local/bin/mise")
+        _M_BIN_PIPX=$(command -v mise 2>/dev/null || echo "$_G_MISE_BIN_BASE/mise")
+        [ "$_G_OS" = "windows" ] && [ ! -x "$_M_BIN_PIPX" ] && _M_BIN_PIPX="${_M_BIN_PIPX}.exe"
         # Install pipx without GITHUB_TOKEN
         "$_M_BIN_PIPX" install pipx >/dev/null 2>&1 || true
         # Ensure mise shims are available
-        export PATH="$HOME/.local/share/mise/shims:$HOME/.local/bin:$PATH"
+        export PATH="$_G_MISE_SHIMS_BASE:$_G_MISE_BIN_BASE:$PATH"
         if ! command -v pipx >/dev/null 2>&1; then
           log_error "Cannot install '$_TOOL_CHECK': 'pipx' is missing even after bootstrap. Please run 'make setup' or install pipx first."
           export GITHUB_TOKEN="$_OLD_GITHUB_TOKEN"
@@ -1107,8 +1149,8 @@ resolve_bin() {
 
   # 1. Check Python Venv
   local _VENV_RES="${VENV:-.venv}"
-  if [ -x "$_VENV_RES/bin/$_BIN_RES" ]; then
-    echo "$_VENV_RES/bin/$_BIN_RES"
+  if [ -x "$_VENV_RES/$_G_VENV_BIN/$_BIN_RES" ]; then
+    echo "$_VENV_RES/$_G_VENV_BIN/$_BIN_RES"
     return 0
   fi
 
@@ -1221,11 +1263,11 @@ install_runtime_python() {
   if [ -d "$VENV" ]; then
     # Standard requirements
     if [ -f "$REQUIREMENTS_TXT" ]; then
-      run_quiet "$VENV/bin/pip" install -r "$REQUIREMENTS_TXT"
+      run_quiet "$VENV/$_G_VENV_BIN/pip" install -r "$REQUIREMENTS_TXT"
     fi
     # Dev requirements (setup.sh specific but safe here)
     if [ -f "requirements-dev.txt" ]; then
-      run_quiet "$VENV/bin/pip" install -r "requirements-dev.txt"
+      run_quiet "$VENV/$_G_VENV_BIN/pip" install -r "requirements-dev.txt"
     fi
   fi
 }
