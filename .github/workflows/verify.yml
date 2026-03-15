@@ -38,6 +38,8 @@ jobs:
     permissions:
       contents: read # Required for repository inspection
     timeout-minutes: 15 # Lightweight check that should finish fast
+    env:
+      PYTHONUTF8: 1
     steps:
       - name: "📂 Checkout Repository Code"
         uses: actions/checkout@v6.0.2
