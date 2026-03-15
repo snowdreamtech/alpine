@@ -22,6 +22,18 @@ setup() {
   mkdir -p docs tests .agent/rules && touch .agent/rules/01-general.md
   echo "repos: []" >.pre-commit-config.yaml
   git init -q
+
+  # Mock tools for check-env.sh (called by orchestration scripts)
+  mkdir -p "$TEMP_DIR/bin"
+  export PATH="$TEMP_DIR/bin:$PATH"
+
+  printf '#!/bin/sh\necho "v20.18.3"\n' >"$TEMP_DIR/bin/node"
+  printf '#!/bin/sh\necho "9.0.0"\n' >"$TEMP_DIR/bin/pnpm"
+  printf '#!/bin/sh\necho "git version 2.30.0"\n' >"$TEMP_DIR/bin/git"
+  printf '#!/bin/sh\necho "GNU Make 3.81"\n' >"$TEMP_DIR/bin/make"
+  printf '#!/bin/sh\necho "3.6.1"\n' >"$TEMP_DIR/bin/editorconfig-checker"
+  printf '#!/bin/sh\necho "v2026.3.8"\n' >"$TEMP_DIR/bin/mise"
+  chmod +x "$TEMP_DIR/bin/"*
 }
 
 teardown() {

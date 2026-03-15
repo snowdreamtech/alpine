@@ -31,6 +31,18 @@ setup() {
   git init -q
   git config user.email "test@example.com"
   git config user.name "Test User"
+
+  # Mock tools for check-env.sh (called by release.sh and verify.sh)
+  mkdir -p "$TEMP_DIR/bin"
+  export PATH="$TEMP_DIR/bin:$PATH"
+
+  printf '#!/bin/sh\necho "v20.18.3"\n' >"$TEMP_DIR/bin/node"
+  printf '#!/bin/sh\necho "9.0.0"\n' >"$TEMP_DIR/bin/pnpm"
+  printf '#!/bin/sh\necho "git version 2.30.0"\n' >"$TEMP_DIR/bin/git"
+  printf '#!/bin/sh\necho "GNU Make 3.81"\n' >"$TEMP_DIR/bin/make"
+  printf '#!/bin/sh\necho "3.6.1"\n' >"$TEMP_DIR/bin/editorconfig-checker"
+  printf '#!/bin/sh\necho "v2026.3.8"\n' >"$TEMP_DIR/bin/mise"
+  chmod +x "$TEMP_DIR/bin/"*
 }
 
 teardown() {
