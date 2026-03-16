@@ -138,6 +138,20 @@ repos:
         pass_filenames: false
         description: "Format Rust code using cargo toolchain."
 
+      - id: check-xml
+        name: check xml
+        entry: "python3 -c 'import sys, os, xml.etree.ElementTree as ET; exit_code = 0; [ (lambda f: (exec(\"try: ET.parse(f)\\nexcept Exception as e: print(f\\\"Malformed XML: {f} ({e})\\\"); sys.exit(1)\")) ) (f) for f in sys.argv[1:] if os.path.isfile(f) ]; sys.exit(exit_code)'"
+        language: system
+        types: [xml]
+        description: "Verify that XML files are well-formed."
+
+      - id: detect-private-key
+        name: detect private key
+        entry: 'python3 -c ''import sys, os, re; pattern = re.compile(r"-----BEGIN (RSA|DSA|EC|OPENSSH|PRIVATE) KEY-----"); found = [f for f in sys.argv[1:] if os.path.isfile(f) and pattern.search(open(f, "r", errors="ignore").read())]; [print(f"Private key detected: {f}") for f in found]; sys.exit(1) if found else sys.exit(0)'''
+        language: system
+        types: [text]
+        description: "Detect presence of private keys."
+
       # ── Secret Scanning ────────────────────────────────────────────────────
       - id: gitleaks
         name: gitleaks
