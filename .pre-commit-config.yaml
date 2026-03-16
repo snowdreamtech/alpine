@@ -294,14 +294,14 @@ repos:
       # ── Hardening & Security ──────────────────────────────────────────────
       - id: check-executables-have-shebangs
         name: check shell scripts for shebangs
-        entry: 'python3 -c ''import sys, os; missing = [f for f in sys.argv[1:] if os.access(f, os.X_OK) and not open(f, "rb").read(2) == b"#!" and not os.path.isdir(f)]; [print(f"Executable lacks shebang: {f}") for f in missing]; sys.exit(1) if missing else sys.exit(0)'''
+        entry: 'python3 -c ''import sys, os; missing = [f for f in sys.argv[1:] if os.path.isfile(f) and os.access(f, os.X_OK) and not open(f, "rb").read(2) == b"#!" and not os.path.isdir(f)]; [print(f"Executable lacks shebang: {f}") for f in missing]; sys.exit(1) if missing else sys.exit(0)'''
         language: system
         types: [shell]
         description: "Executable scripts MUST start with a shebang (!#)."
 
       - id: check-shebang-scripts-are-executable
         name: check shebang scripts are executable
-        entry: 'python3 -c ''import sys, os; not_exec = [f for f in sys.argv[1:] if open(f, "rb").read(2) == b"#!" and not os.access(f, os.X_OK)]; [print(f"Shebang script not executable: {f}") for f in not_exec]; sys.exit(1) if not_exec else sys.exit(0)'''
+        entry: 'python3 -c ''import sys, os; not_exec = [f for f in sys.argv[1:] if os.path.isfile(f) and open(f, "rb").read(2) == b"#!" and not os.access(f, os.X_OK)]; [print(f"Shebang script not executable: {f}") for f in not_exec]; sys.exit(1) if not_exec else sys.exit(0)'''
         language: system
         types: [shell]
         description: "Scripts with shebangs MUST have the executable bit set."
