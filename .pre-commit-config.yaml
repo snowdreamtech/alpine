@@ -40,7 +40,7 @@ repos:
       # ── Git Hygiene (Incremental) ──────────────────────────────────────────
       - id: trailing-whitespace
         name: trim trailing whitespace
-        entry: "python3 -c 'import sys, re; [(lambda f, c: (lambda n: open(f, \"wb\").write(n) if n != c else None)(re.sub(b\"[ \\t]+(?=\\r?\\n|$)\", b\"\", c)))(f, open(f, \"rb\").read()) for f in sys.argv[1:]]'"
+        entry: "python3 -c 'import sys, re; modified = []; [ (lambda f, c, n: c != n and (modified.append(f) or open(f, \"wb\").write(n)))(f, open(f, \"rb\").read(), re.sub(b\"[ \\t]+(?=\\r?\\n|$)\", b\"\", open(f, \"rb\").read())) for f in sys.argv[1:] ]; [ print(f\"Fixing trailing whitespace in: {f}\") for f in modified ]; sys.exit(1) if modified else sys.exit(0)'"
         language: system
         types: [text]
         exclude: '\.(bat|cmd|ps1)$'
@@ -49,7 +49,7 @@ repos:
 
       - id: end-of-file-fixer
         name: fix end of files
-        entry: "python3 -c 'import sys; [(lambda f, c: (lambda e: open(f, \"wb\").write(c.rstrip(b\"\\r\\n\")+e) if c and c != c.rstrip(b\"\\r\\n\")+e else None)(b\"\\r\\n\" if b\"\\r\\n\" in c else b\"\\n\"))(f, open(f, \"rb\").read()) for f in sys.argv[1:]]'"
+        entry: "python3 -c 'import sys, os; modified = []; [ (lambda f, c, n: c != n and (modified.append(f) or open(f, \"wb\").write(n)))(f, open(f, \"rb\").read(), open(f, \"rb\").read().rstrip(b\"\\r\\n\") + (b\"\\r\\n\" if b\"\\r\\n\" in open(f, \"rb\").read() else b\"\\n\") if open(f, \"rb\").read() else b\"\") for f in sys.argv[1:] if os.path.isfile(f) ]; [ print(f\"Fixing end of file in: {f}\") for f in modified ]; sys.exit(1) if modified else sys.exit(0)'"
         language: system
         types: [text]
         exclude: '\.(bat|cmd|ps1)$'
