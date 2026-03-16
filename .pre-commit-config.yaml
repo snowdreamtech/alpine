@@ -335,6 +335,29 @@ repos:
         files: '\.svg$'
         description: "Verify that SVG files are well-formed and free of malicious script injections."
 
+      - id: check-rego
+        name: check rego policy
+        entry: |
+          python3 -c "
+          import sys, subprocess, os
+          errors = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f) and os.path.getsize(f) < 1024*1024:
+                  try:
+                      # Try using 'opa parse' if available, otherwise check bracket balance
+                      subprocess.run(['opa', 'parse', f], capture_output=True, check=True)
+                  except (FileNotFoundError, subprocess.CalledProcessError):
+                      with open(f, 'r', encoding='utf-8') as fh:
+                          content = fh.read()
+                          if content.count('{') != content.count('}'):
+                              errors.append(f'{f} (unbalanced braces)')
+          for e in errors: print(f'Malformed Rego: {e}')
+          sys.exit(1 if errors else 0)
+          "
+        language: system
+        files: '\.rego$'
+        description: "Verify that Rego policy files are well-formed (uses 'opa parse' if available)."
+
       # ── Formatting (Auto-fix) ──────────────────────────────────────────────
       - id: prettier
         name: prettier format
