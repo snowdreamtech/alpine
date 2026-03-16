@@ -770,6 +770,16 @@ repos:
           sys.exit(1 if missing else 0)
           "
         language: system
+        types: [text]
+        exclude: |
+          (?x)^(
+            .*\.bat|.*\.ps1|.*\.batch|.*\.cmd|.*\.exe|
+            .*\.md|.*\.markdown|.*\.txt|.*\.pdf|.*\.docx?|
+            .*\.css|.*\.scss|.*\.less|.*\.html|.*\.jsx?|.*\.tsx?|.*\.vue|.*\.astro|.*\.svelte|.*\.mjs|
+            .*\.json[c5]?|.*\.ya?ml|.*\.toml|.*\.xml|.*\.ini|.*\.editorconfig|.*\.properties|.*\.env.*|
+            .*\.png|.*\.jpg|.*\.jpeg|.*\.gif|.*\.ico|.*\.svg|.*\.lock|.*\.lockb|.*\.sum|.*\.resolved|
+            \.gitignore|\.gitattributes|Makefile|ruff\.toml|eslint\.config\.mjs|commitlint\.config\.js|LICENSE
+          )$
         description: "Executable scripts MUST start with a shebang (!#)."
 
       - id: check-shebang-scripts-are-executable
@@ -786,6 +796,16 @@ repos:
           sys.exit(1 if not_exec else 0)
           "
         language: system
+        types: [text]
+        exclude: |
+          (?x)^(
+            .*\.bat|.*\.ps1|.*\.batch|.*\.cmd|.*\.exe|
+            .*\.md|.*\.markdown|.*\.txt|.*\.pdf|.*\.docx?|
+            .*\.css|.*\.scss|.*\.less|.*\.html|.*\.jsx?|.*\.tsx?|.*\.vue|.*\.astro|.*\.svelte|.*\.mjs|
+            .*\.json[c5]?|.*\.ya?ml|.*\.toml|.*\.xml|.*\.ini|.*\.editorconfig|.*\.properties|.*\.env.*|
+            .*\.png|.*\.jpg|.*\.jpeg|.*\.gif|.*\.ico|.*\.svg|.*\.lock|.*\.lockb|.*\.sum|.*\.resolved|
+            \.gitignore|\.gitattributes|Makefile|ruff\.toml|eslint\.config\.mjs|commitlint\.config\.js|LICENSE
+          )$
         description: "Scripts with shebangs MUST have the executable bit set."
 
       - id: forbidden-files
