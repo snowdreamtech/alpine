@@ -58,7 +58,7 @@ repos:
 
       - id: check-added-large-files
         name: check for added large files
-        entry: python3 -c 'import sys, os; [sys.exit(1) for f in sys.argv[1:] if os.path.getsize(f) > 500*1024]'
+        entry: 'python3 -c ''import sys, os; [print(f"File too large (>500KB): {f}") or sys.exit(1) for f in sys.argv[1:] if os.path.getsize(f) > 500*1024]'''
         language: system
         stages: [pre-commit, pre-merge-commit]
         description: "Prevent large files (>500KB) from being committed."
