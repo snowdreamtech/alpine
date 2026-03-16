@@ -65,7 +65,7 @@ repos:
 
       - id: check-merge-conflict
         name: check for merge conflicts
-        entry: sh -c '! grep -qE "^(<<<<<<<|=======|>>>>>>>)" "$@"' --
+        entry: 'python3 -c ''import sys, re; [print(f"Merge conflict markers found in: {f}") or sys.exit(1) for f in sys.argv[1:] if re.search(r"^(<<<<<<<|=======|>>>>>>>)", open(f, "r", errors="ignore").read(), re.MULTILINE)]'''
         language: system
         stages: [pre-commit, pre-merge-commit]
         description: "Intercept files containing git merge conflict markers."
