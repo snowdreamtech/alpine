@@ -205,6 +205,7 @@ repos:
           "
         language: system
         types: [json]
+        exclude: '\.vscode/.*\.json$'
         description: "Verify that JSON files are well-formed."
 
       - id: check-toml
@@ -247,6 +248,7 @@ repos:
           "
         language: system
         files: '\.(ini|editorconfig|properties)$'
+        exclude: '\.(editorconfig|\.vscode/.*\.json)$'
         description: "Verify that INI and property files are well-formed."
 
       - id: check-plist
@@ -304,14 +306,16 @@ repos:
                   try:
                       with open(f, 'r', encoding='utf-8') as fh:
                           content = fh.read()
-                          content = re.sub(r'//.*?\n|/\*.*?\*/', '', content, flags=re.S)
+                          content = re.sub(r'(?<![:])//.*', '', content)
+                          content = re.sub(r'/\*.*?\*/', '', content, flags=re.S)
+                          content = re.sub(r',([ \t\r\n]*[}\]])', r'\1', content)
                           json.loads(content)
                   except Exception as e: errors.append(f'{f} ({e})')
           for e in errors: print(f'Malformed JSONC: {e}')
           sys.exit(1 if errors else 0)
           "
         language: system
-        files: '\.(jsonc|json5)$|tsconfig.*\.json$|devcontainer\.json$'
+        files: '\.(jsonc|json5)$|tsconfig.*\.json$|devcontainer\.json$|\.vscode/.*\.json$'
         description: "Verify that JSON with Comments (JSONC/JSON5) files are well-formed."
 
       - id: check-svg-safety
