@@ -580,7 +580,7 @@ repos:
                       for i, line in enumerate(fh, 1):
                           if '=' in line and not line.strip().startswith('#'):
                               val = line.split('=', 1)[1].strip()
-                              if val and (SECRET_REGEX.search(line) or any(k in val.lower() for k in ['pk_', 'sk_', 'key_', 'token_', 'secret_', 'passwd_'])):
+                              if val and (SECRET_REGEX.search(line) or any(k in val.lower() for k in ['pk_', 'sk_', 'key_', 'token_', 'secret_', 'passwd_', 'api_key', 'access_token', 'refresh_token'])):
                                   if 'your_' not in val.lower() and '<' not in val:
                                       errors.append(f'{f}:{i} (potential real secret detected)')
           for e in errors: print(f'Unsafe Env File: {e}')
@@ -598,6 +598,13 @@ repos:
         args: [--write]
         types_or: [json, yaml, vue, javascript, jsx, ts, tsx, graphql, sql, html, css, markdown, astro, svelte]
         description: "Format web-standard file types using Prettier (including Astro/Svelte)."
+
+      - id: typos
+        name: typos check
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh typos
+        args: [--write-changes]
+        description: "極速拼写检查工具 (Source code spell checker)."
 
       - id: zizmor
         name: zizmor security audit
