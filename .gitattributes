@@ -178,13 +178,6 @@ target/ linguist-vendored=true
 /.zed/** linguist-vendored=true
 /.zencoder/** linguist-vendored=true
 
-# Mark standalone AI rule files as vendored
-/.replit.agent.md linguist-vendored=true
-/AGENTS.md linguist-vendored=true
-/CLAUDE.md linguist-vendored=true
-/CONVENTIONS.md linguist-vendored=true
-/codex.md linguist-vendored=true
-
 # -----------------------------------------------------------------------------
 # 5. Tool-specific and Meta-configuration (Explicit non-executable text)
 # -----------------------------------------------------------------------------
@@ -202,3 +195,53 @@ VERSION text eol=lf
 .goose/.goosehints text eol=lf
 .shellcheckrc text eol=lf
 docs/.vitepress/config.mts text eol=lf
+
+# -----------------------------------------------------------------------------
+# 6. Source Code & Scripts (LF Normalization)
+# -----------------------------------------------------------------------------
+*.sh text eol=lf
+*.bash text eol=lf
+*.zsh text eol=lf
+*.py text eol=lf
+*.rb text eol=lf
+*.pl text eol=lf
+*.php text eol=lf
+*.swift text eol=lf
+*.dart text eol=lf
+*.go text eol=lf
+*.rs text eol=lf
+*.c text eol=lf
+*.cpp text eol=lf
+*.h text eol=lf
+*.java text eol=lf
+*.js text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.jsx text eol=lf
+*.mjs text eol=lf
+*.cjs text eol=lf
+*.json text eol=lf
+*.toml text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+*.md text eol=lf
+*.txt text eol=lf
+Makefile text eol=lf
+Taskfile.yml text eol=lf
+docker-compose.yml text eol=lf
+
+# -----------------------------------------------------------------------------
+# 7. Shell-specific scripts (May require +x bit on Unix)
+# -----------------------------------------------------------------------------
+scripts/*.sh text eol=lf
+scripts/*.bash text eol=lf
+scripts/lib/*.sh text eol=lf
+
+# -----------------------------------------------------------------------------
+# 8. Windows-specific scripts (Explicit CRLF)
+# -----------------------------------------------------------------------------
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
+scripts/*.bat text eol=crlf
+scripts/*.ps1 text eol=crlf
