@@ -1601,6 +1601,72 @@ install_runtime_tofu() {
   eval "$(mise activate bash --shims)"
 }
 
+# Purpose: Installs Swift runtime via mise.
+install_runtime_swift() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Swift runtime."
+    return 0
+  fi
+  # shellcheck disable=SC2154
+  run_mise install "swift@${MISE_TOOL_VERSION_SWIFT}"
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Installs Lua runtime via mise.
+install_runtime_lua() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Lua runtime."
+    return 0
+  fi
+  # shellcheck disable=SC2154
+  run_mise install "lua@${MISE_TOOL_VERSION_LUA}"
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Installs Perl runtime via mise.
+install_runtime_perl() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Perl runtime."
+    return 0
+  fi
+  # shellcheck disable=SC2154
+  run_mise install "perl@${MISE_TOOL_VERSION_PERL}"
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Installs R runtime via mise.
+install_runtime_r() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install R runtime."
+    return 0
+  fi
+  # shellcheck disable=SC2154
+  run_mise install "R@${MISE_TOOL_VERSION_R}"
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Installs Julia runtime via mise.
+install_runtime_julia() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Julia runtime."
+    return 0
+  fi
+  # shellcheck disable=SC2154
+  run_mise install "julia@${MISE_TOOL_VERSION_JULIA}"
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Installs Groovy runtime via mise.
+install_runtime_groovy() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Groovy runtime."
+    return 0
+  fi
+  # shellcheck disable=SC2154
+  run_mise install "groovy@${MISE_TOOL_VERSION_GROOVY}"
+  eval "$(mise activate bash --shims)"
+}
+
 # Purpose: Installs git hooks using pre-commit.
 # Delegate: Managed via pipx (pre-commit).
 # Examples:
@@ -1684,7 +1750,6 @@ run_npm_script() {
 #   init_summary_table "Setup Execution Summary"
 init_summary_table() {
   local _TITLE_TABLE="${1:-Execution Summary}"
-
   if [ -z "$SETUP_SUMMARY_FILE" ]; then
     SETUP_SUMMARY_FILE=$(mktemp)
     export SETUP_SUMMARY_FILE

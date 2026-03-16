@@ -122,8 +122,12 @@ Modules (default: all):
   kotlin             Setup Kotlin & Ktlint
   dart               Setup Dart
   zig                Setup Zig
-  pulumi             Setup Pulumi
-  tofu               Setup OpenTofu
+  julia              Setup Julia
+  r                  Setup R
+  perl               Setup Perl
+  lua                Setup Lua
+  groovy             Setup Groovy
+  swift              Setup Swift & SwiftLint
   pre-commit         Install pre-commit
   hooks              Activate Pre-commit Hooks
   all                Run all of the above
@@ -767,6 +771,157 @@ setup_tofu() {
   local _DUR_TO_RT
   _DUR_TO_RT=$(($(date +%s) - _T0_TO_RT))
   log_summary "IaC" "OpenTofu" "$_STAT_TO_RT" "$(get_version tofu)" "$_DUR_TO_RT"
+}
+
+# Purpose: Sets up Swift runtime and mandatory linting tools.
+# shellcheck disable=SC2329
+setup_swift() {
+  local _T0_SWIFT_RT
+  _T0_SWIFT_RT=$(date +%s)
+  _log_setup "Swift Runtime" "swift"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Swift" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "Package.swift" "*.swift"; then
+    log_summary "Runtime" "Swift" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_SWIFT_RT="✅ Installed"
+  install_runtime_swift || _STAT_SWIFT_RT="❌ Failed"
+
+  local _DUR_SWIFT_RT
+  _DUR_SWIFT_RT=$(($(date +%s) - _T0_SWIFT_RT))
+  log_summary "Runtime" "Swift" "$_STAT_SWIFT_RT" "$(get_version swift --version | head -n 1)" "$_DUR_SWIFT_RT"
+
+  # Also ensure linting tools are present
+  install_swift_lint
+}
+
+# Purpose: Sets up Lua runtime and mandatory linting tools.
+setup_lua() {
+  local _T0_LUA_RT
+  _T0_LUA_RT=$(date +%s)
+  _log_setup "Lua Runtime" "lua"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Lua" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "" "*.lua"; then
+    log_summary "Runtime" "Lua" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_LUA_RT="✅ Installed"
+  install_runtime_lua || _STAT_LUA_RT="❌ Failed"
+
+  local _DUR_LUA_RT
+  _DUR_LUA_RT=$(($(date +%s) - _T0_LUA_RT))
+  log_summary "Runtime" "Lua" "$_STAT_LUA_RT" "$(get_version lua -v | head -n 1)" "$_DUR_LUA_RT"
+
+  # Also ensure linting tools are present
+  install_stylua
+}
+
+# Purpose: Sets up Perl runtime.
+setup_perl() {
+  local _T0_PERL_RT
+  _T0_PERL_RT=$(date +%s)
+  _log_setup "Perl Runtime" "perl"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Perl" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "Makefile.PL Build.PL" "*.pl *.pm"; then
+    log_summary "Runtime" "Perl" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_PERL_RT="✅ Installed"
+  install_runtime_perl || _STAT_PERL_RT="❌ Failed"
+
+  local _DUR_PERL_RT
+  _DUR_PERL_RT=$(($(date +%s) - _T0_PERL_RT))
+  log_summary "Runtime" "Perl" "$_STAT_PERL_RT" "$(get_version perl -v | grep 'v[0-9]' | head -n 1)" "$_DUR_PERL_RT"
+}
+
+# Purpose: Sets up R runtime.
+setup_r() {
+  local _T0_R_RT
+  _T0_R_RT=$(date +%s)
+  _log_setup "R Runtime" "R"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "R" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "DESCRIPTION" "*.R *.Rmd"; then
+    log_summary "Runtime" "R" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_R_RT="✅ Installed"
+  install_runtime_r || _STAT_R_RT="❌ Failed"
+
+  local _DUR_R_RT
+  _DUR_R_RT=$(($(date +%s) - _T0_R_RT))
+  log_summary "Runtime" "R" "$_STAT_R_RT" "$(get_version R --version | head -n 1)" "$_DUR_R_RT"
+}
+
+# Purpose: Sets up Julia runtime.
+setup_julia() {
+  local _T0_JULIA_RT
+  _T0_JULIA_RT=$(date +%s)
+  _log_setup "Julia Runtime" "julia"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Julia" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "Project.toml" "*.jl"; then
+    log_summary "Runtime" "Julia" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_JULIA_RT="✅ Installed"
+  install_runtime_julia || _STAT_JULIA_RT="❌ Failed"
+
+  local _DUR_JULIA_RT
+  _DUR_JULIA_RT=$(($(date +%s) - _T0_JULIA_RT))
+  log_summary "Runtime" "Julia" "$_STAT_JULIA_RT" "$(get_version julia -v)" "$_DUR_JULIA_RT"
+}
+
+# Purpose: Sets up Groovy runtime.
+setup_groovy() {
+  local _T0_GROOVY_RT
+  _T0_GROOVY_RT=$(date +%s)
+  _log_setup "Groovy Runtime" "groovy"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Groovy" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "" "*.groovy *.gradle"; then
+    log_summary "Runtime" "Groovy" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_GROOVY_RT="✅ Installed"
+  install_runtime_groovy || _STAT_GROOVY_RT="❌ Failed"
+
+  local _DUR_GROOVY_RT
+  _DUR_GROOVY_RT=$(($(date +%s) - _T0_GROOVY_RT))
+  log_summary "Runtime" "Groovy" "$_STAT_GROOVY_RT" "$(get_version groovy -v | grep 'Groovy Version' | head -n 1)" "$_DUR_GROOVY_RT"
 }
 
 # Purpose: Activates git pre-commit hooks.
@@ -2257,7 +2412,7 @@ EOF
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
     # Full list for "On-demand" (default) or "All" (explicit)
-    _MODULES_LIST="node python deno bun pipx gitleaks hadolint go checkmake tflint kube-linter powershell java ruby kotlin dart swift dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit stylua buf tofu just task nix zig cue rego server edge flutter rn pulumi crossplane playwright cypress vitest docusaurus mkdocs sphinx jupyter dvc elixir haskell scala pre-commit hooks"
+    _MODULES_LIST="node python deno bun pipx gitleaks hadolint go checkmake tflint kube-linter powershell java ruby kotlin dart swift lua perl julia r groovy dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit stylua buf tofu just task nix zig cue rego server edge flutter rn pulumi crossplane playwright cypress vitest docusaurus mkdocs sphinx jupyter dvc elixir haskell scala pre-commit hooks"
   else
     # Specific modules requested (e.g., ./setup.sh node)
     _MODULES_LIST="${_RAW_ARGS}"
@@ -2310,6 +2465,11 @@ EOF
     kotlin) setup_kotlin ;;
     dart) setup_dart ;;
     swift) setup_swift ;;
+    lua) setup_lua ;;
+    perl) setup_perl ;;
+    julia) setup_julia ;;
+    r) setup_r ;;
+    groovy) setup_groovy ;;
     dotnet) setup_dotnet ;;
     osv-scanner) install_osv_scanner ;;
     trivy) install_trivy ;;
