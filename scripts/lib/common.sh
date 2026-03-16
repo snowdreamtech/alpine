@@ -1483,6 +1483,124 @@ install_runtime_ruby() {
   eval "$(mise activate bash --shims)"
 }
 
+# Purpose: Installs Deno runtime via mise.
+install_runtime_deno() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Deno runtime."
+    return 0
+  fi
+  run_mise install deno
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Installs Bun runtime via mise.
+install_runtime_bun() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Bun runtime."
+    return 0
+  fi
+  run_mise install bun
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Installs Kotlin runtime via mise.
+install_runtime_kotlin() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Kotlin runtime."
+    return 0
+  fi
+  run_mise install kotlin
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Installs Dart runtime via mise.
+install_runtime_dart() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Dart runtime."
+    return 0
+  fi
+  run_mise install dart
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Installs Zig runtime via mise.
+install_runtime_zig() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Zig runtime."
+    return 0
+  fi
+  run_mise install zig
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Installs Elixir/Erlang runtime via mise.
+install_runtime_elixir() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Elixir/Erlang runtime."
+    return 0
+  fi
+  # shellcheck disable=SC2154
+  run_mise install "erlang@${MISE_TOOL_VERSION_ERLANG}"
+  # shellcheck disable=SC2154
+  run_mise install "elixir@${MISE_TOOL_VERSION_ELIXIR}"
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Installs Haskell (GHC) runtime via mise.
+install_runtime_haskell() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Haskell runtime."
+    return 0
+  fi
+  # shellcheck disable=SC2154
+  run_mise install "ghc@${MISE_TOOL_VERSION_GHC}"
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Installs Scala runtime via mise.
+install_runtime_scala() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Scala runtime."
+    return 0
+  fi
+  # shellcheck disable=SC2154
+  run_mise install "scala@${MISE_TOOL_VERSION_SCALA}"
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Installs Flutter runtime via mise.
+install_runtime_flutter() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Flutter runtime."
+    return 0
+  fi
+  # shellcheck disable=SC2154
+  run_mise install "flutter@${MISE_TOOL_VERSION_FLUTTER}"
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Installs Pulumi CLI via mise.
+install_runtime_pulumi() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Pulumi CLI."
+    return 0
+  fi
+  # shellcheck disable=SC2154
+  run_mise install "pulumi@${MISE_TOOL_VERSION_PULUMI}"
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Installs OpenTofu via mise.
+install_runtime_tofu() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install OpenTofu."
+    return 0
+  fi
+  # shellcheck disable=SC2154
+  run_mise install "opentofu@${MISE_TOOL_VERSION_OPENTOFU}"
+  eval "$(mise activate bash --shims)"
+}
+
 # Purpose: Installs git hooks using pre-commit.
 # Delegate: Managed via pipx (pre-commit).
 # Examples:

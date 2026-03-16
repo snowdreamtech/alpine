@@ -117,6 +117,13 @@ Modules (default: all):
   ruby               Setup Ruby & Rubocop
   java               Setup Java & Google-Java-Format
   dotnet             Setup .NET SDK
+  deno               Setup Deno
+  bun                Setup Bun
+  kotlin             Setup Kotlin & Ktlint
+  dart               Setup Dart
+  zig                Setup Zig
+  pulumi             Setup Pulumi
+  tofu               Setup OpenTofu
   pre-commit         Install pre-commit
   hooks              Activate Pre-commit Hooks
   all                Run all of the above
@@ -506,6 +513,260 @@ install_checkmake() {
   local _STAT_CM="✅ mise"
   run_mise install checkmake || _STAT_CM="❌ Failed"
   log_summary "Lint Tool" "Checkmake" "$_STAT_CM" "$(get_version checkmake)" "$(($(date +%s) - _T0_CM))"
+}
+
+# Purpose: Sets up Deno runtime.
+setup_deno() {
+  local _T0_DENO_RT
+  _T0_DENO_RT=$(date +%s)
+  _log_setup "Deno Runtime" "deno"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Deno" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "deno.json deno.jsonc" "*.ts *.js"; then
+    log_summary "Runtime" "Deno" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_DENO_RT="✅ Installed"
+  install_runtime_deno || _STAT_DENO_RT="❌ Failed"
+
+  local _DUR_DENO_RT
+  _DUR_DENO_RT=$(($(date +%s) - _T0_DENO_RT))
+  log_summary "Runtime" "Deno" "$_STAT_DENO_RT" "$(get_version deno)" "$_DUR_DENO_RT"
+}
+
+# Purpose: Sets up Bun runtime.
+setup_bun() {
+  local _T0_BUN_RT
+  _T0_BUN_RT=$(date +%s)
+  _log_setup "Bun Runtime" "bun"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Bun" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "bun.lockb" ""; then
+    log_summary "Runtime" "Bun" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_BUN_RT="✅ Installed"
+  install_runtime_bun || _STAT_BUN_RT="❌ Failed"
+
+  local _DUR_BUN_RT
+  _DUR_BUN_RT=$(($(date +%s) - _T0_BUN_RT))
+  log_summary "Runtime" "Bun" "$_STAT_BUN_RT" "$(get_version bun)" "$_DUR_BUN_RT"
+}
+
+# Purpose: Sets up Kotlin runtime and linter.
+setup_kotlin() {
+  local _T0_KT_RT
+  _T0_KT_RT=$(date +%s)
+  _log_setup "Kotlin Runtime" "kotlin"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Kotlin" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "build.gradle.kts" "*.kt *.kts"; then
+    log_summary "Runtime" "Kotlin" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_KT_RT="✅ Installed"
+  install_runtime_kotlin || _STAT_KT_RT="❌ Failed"
+
+  local _DUR_KT_RT
+  _DUR_KT_RT=$(($(date +%s) - _T0_KT_RT))
+  log_summary "Runtime" "Kotlin" "$_STAT_KT_RT" "$(get_version kotlinc)" "$_DUR_KT_RT"
+
+  install_ktlint
+}
+
+# Purpose: Sets up Zig runtime.
+setup_zig() {
+  local _T0_ZIG_RT
+  _T0_ZIG_RT=$(date +%s)
+  _log_setup "Zig Runtime" "zig"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Zig" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "build.zig" "*.zig"; then
+    log_summary "Runtime" "Zig" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_ZIG_RT="✅ Installed"
+  install_runtime_zig || _STAT_ZIG_RT="❌ Failed"
+
+  local _DUR_ZIG_RT
+  _DUR_ZIG_RT=$(($(date +%s) - _T0_ZIG_RT))
+  log_summary "Runtime" "Zig" "$_STAT_ZIG_RT" "$(get_version zig)" "$_DUR_ZIG_RT"
+}
+
+# Purpose: Sets up Elixir/Erlang runtime.
+setup_elixir() {
+  local _T0_EX_RT
+  _T0_EX_RT=$(date +%s)
+  _log_setup "Elixir Runtime" "elixir"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Elixir" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "mix.exs" "*.ex *.exs"; then
+    log_summary "Runtime" "Elixir" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_EX_RT="✅ Installed"
+  install_runtime_elixir || _STAT_EX_RT="❌ Failed"
+
+  local _DUR_EX_RT
+  _DUR_EX_RT=$(($(date +%s) - _T0_EX_RT))
+  log_summary "Runtime" "Elixir" "$_STAT_EX_RT" "$(get_version elixir)" "$_DUR_EX_RT"
+}
+
+# Purpose: Sets up Haskell (GHC) runtime.
+setup_haskell() {
+  local _T0_HS_RT
+  _T0_HS_RT=$(date +%s)
+  _log_setup "Haskell Runtime" "ghc"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Haskell" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "stack.yaml package.yaml" "*.hs *.cabal"; then
+    log_summary "Runtime" "Haskell" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_HS_RT="✅ Installed"
+  install_runtime_haskell || _STAT_HS_RT="❌ Failed"
+
+  local _DUR_HS_RT
+  _DUR_HS_RT=$(($(date +%s) - _T0_HS_RT))
+  log_summary "Runtime" "Haskell" "$_STAT_HS_RT" "$(get_version ghc)" "$_DUR_HS_RT"
+}
+
+# Purpose: Sets up Scala runtime.
+setup_scala() {
+  local _T0_SC_RT
+  _T0_SC_RT=$(date +%s)
+  _log_setup "Scala Runtime" "scala"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Scala" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "build.sbt" "*.scala"; then
+    log_summary "Runtime" "Scala" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_SC_RT="✅ Installed"
+  install_runtime_scala || _STAT_SC_RT="❌ Failed"
+
+  local _DUR_SC_RT
+  _DUR_SC_RT=$(($(date +%s) - _T0_SC_RT))
+  log_summary "Runtime" "Scala" "$_STAT_SC_RT" "$(get_version scala)" "$_DUR_SC_RT"
+}
+
+# Purpose: Sets up Flutter SDK.
+setup_flutter() {
+  local _T0_FL_RT
+  _T0_FL_RT=$(date +%s)
+  _log_setup "Flutter SDK" "flutter"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Flutter" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "pubspec.yaml" "*.dart"; then
+    log_summary "Runtime" "Flutter" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  if [ "$_G_OS" = "windows" ]; then
+    log_warn "⚠️  Flutter installation is currently skipped on Windows CI due to backend candidate availability."
+    log_summary "Runtime" "Flutter" "⚠️ Windows Skip" "-" "0"
+    return 0
+  fi
+
+  local _STAT_FL_RT="✅ Installed"
+  install_runtime_flutter || _STAT_FL_RT="❌ Failed"
+
+  local _DUR_FL_RT
+  _DUR_FL_RT=$(($(date +%s) - _T0_FL_RT))
+  log_summary "Runtime" "Flutter" "$_STAT_FL_RT" "$(get_version flutter)" "$_DUR_FL_RT"
+}
+
+# Purpose: Sets up Pulumi CLI.
+setup_pulumi() {
+  local _T0_PU_RT
+  _T0_PU_RT=$(date +%s)
+  _log_setup "Pulumi CLI" "pulumi"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Other" "Pulumi" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "Pulumi.yaml" ""; then
+    log_summary "IaC" "Pulumi" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  if [ "$_G_OS" = "windows" ]; then
+    log_warn "⚠️  Pulumi installation is currently skipped on Windows CI due to backend candidate availability."
+    log_summary "Other" "Pulumi" "⚠️ Windows Skip" "-" "0"
+    return 0
+  fi
+
+  local _STAT_PU_RT="✅ Installed"
+  install_runtime_pulumi || _STAT_PU_RT="❌ Failed"
+
+  local _DUR_PU_RT
+  _DUR_PU_RT=$(($(date +%s) - _T0_PU_RT))
+  log_summary "Other" "Pulumi" "$_STAT_PU_RT" "$(get_version pulumi)" "$_DUR_PU_RT"
+}
+
+# Purpose: Sets up OpenTofu.
+setup_tofu() {
+  local _T0_TO_RT
+  _T0_TO_RT=$(date +%s)
+  _log_setup "OpenTofu" "opentofu"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "IaC" "OpenTofu" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "" "*.tf"; then
+    log_summary "IaC" "OpenTofu" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_TO_RT="✅ Installed"
+  install_runtime_tofu || _STAT_TO_RT="❌ Failed"
+
+  local _DUR_TO_RT
+  _DUR_TO_RT=$(($(date +%s) - _T0_TO_RT))
+  log_summary "IaC" "OpenTofu" "$_STAT_TO_RT" "$(get_version tofu)" "$_DUR_TO_RT"
 }
 
 # Purpose: Activates git pre-commit hooks.
@@ -1705,31 +1966,6 @@ install_buf() {
   log_summary "Lint Tool" "Buf" "$_STAT_BUF" "$(get_version buf --version)" "$(($(date +%s) - _T0_BUF))"
 }
 
-# Purpose: Installs opentofu for HCL/IaC management.
-# Delegate: Managed by mise (.mise.toml)
-install_tofu() {
-  local _T0_TOFU
-  _T0_TOFU=$(date +%s)
-  local _TITLE="OpenTofu"
-  local _PROVIDER="opentofu"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "IaC" "OpenTofu" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "" "*.tf"; then
-    log_summary "IaC" "OpenTofu" "⏭️ Skipped" "-" "0"
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-  local _STAT_TOFU="✅ mise"
-  # shellcheck disable=SC2154
-  run_mise install "opentofu@${MISE_TOOL_VERSION_OPENTOFU}" || _STAT_TOFU="❌ Failed"
-  log_summary "IaC" "OpenTofu" "$_STAT_TOFU" "$(get_version tofu)" "$(($(date +%s) - _T0_TOFU))"
-}
-
 # Purpose: Installs Just (modern runner).
 # Delegate: Managed by mise (.mise.toml)
 install_just() {
@@ -1790,25 +2026,6 @@ install_nix() {
   else
     log_summary "Runtime" "Nix" "⏭️ Missing" "-" "0"
   fi
-}
-
-# Purpose: Installs Zig runtime.
-# Delegate: Managed by mise (.mise.toml)
-install_zig() {
-  if ! has_lang_files "build.zig" "*.zig"; then
-    log_summary "Runtime" "Zig" "⏭️ Skipped" "-" "0"
-    return 0
-  fi
-  _log_setup "Zig Runtime" "zig"
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Runtime" "Zig" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-  local _T0_ZIG
-  _T0_ZIG=$(date +%s)
-  # shellcheck disable=SC2154
-  run_mise install "zig@${MISE_TOOL_VERSION_ZIG}"
-  log_summary "Runtime" "Zig" "✅ Installed" "$(get_mise_tool_version zig)" "$(($(date +%s) - _T0_ZIG))"
 }
 
 # Purpose: Installs CUE and Jsonnet.
@@ -1877,56 +2094,12 @@ install_edge() {
   log_summary "Config" "Edge" "✅ Detected" "-" "0"
 }
 
-install_flutter() {
-  if ! has_lang_files "" "FLUTTER"; then
-    log_summary "Mobile" "Flutter" "⏭️ Skipped" "-" "0"
-    return 0
-  fi
-  _log_setup "Flutter SDK" "flutter"
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Runtime" "Flutter" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-  if [ "$_G_OS" = "windows" ]; then
-    log_warn "⚠️  Flutter installation is currently skipped on Windows CI due to backend candidate availability."
-    log_summary "Runtime" "Flutter" "⚠️ Windows Skip" "-" "0"
-    return 0
-  fi
-  local _T0_FLUTTER
-  _T0_FLUTTER=$(date +%s)
-  # shellcheck disable=SC2154
-  run_mise install "flutter@${MISE_TOOL_VERSION_FLUTTER}"
-  log_summary "Runtime" "Flutter" "✅ Installed" "$(get_mise_tool_version flutter)" "$(($(date +%s) - _T0_FLUTTER))"
-}
-
 install_rn() {
   if ! has_lang_files "" "RN"; then
     log_summary "Mobile" "React Native" "⏭️ Skipped" "-" "0"
     return 0
   fi
   log_summary "Mobile" "React Native" "✅ Detected" "-" "0"
-}
-
-install_pulumi() {
-  if ! has_lang_files "" "PULUMI"; then
-    log_summary "IaC" "Pulumi" "⏭️ Skipped" "-" "0"
-    return 0
-  fi
-  _log_setup "Pulumi CLI" "pulumi"
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Other" "Pulumi" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-  if [ "$_G_OS" = "windows" ]; then
-    log_warn "⚠️  Pulumi installation is currently skipped on Windows CI due to backend candidate availability."
-    log_summary "Other" "Pulumi" "⚠️ Windows Skip" "-" "0"
-    return 0
-  fi
-  local _T0_PULUMI
-  _T0_PULUMI=$(date +%s)
-  # shellcheck disable=SC2154
-  run_mise install "pulumi@${MISE_TOOL_VERSION_PULUMI}"
-  log_summary "Other" "Pulumi" "✅ Installed" "$(get_mise_tool_version pulumi)" "$(($(date +%s) - _T0_PULUMI))"
 }
 
 install_crossplane() {
@@ -1999,71 +2172,6 @@ install_dvc() {
     return 0
   fi
   log_summary "AI/Data" "DVC" "✅ Detected" "-" "0"
-}
-
-install_elixir() {
-  if ! has_lang_files "mix.exs" "*.ex *.exs"; then
-    log_summary "Runtime" "Elixir" "⏭️ Skipped" "-" "0"
-    return 0
-  fi
-  _log_setup "Elixir/Erlang" "elixir"
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Runtime" "Elixir" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-  if [ "$_G_OS" = "windows" ]; then
-    log_warn "⚠️  Elixir/Erlang installation is currently skipped on Windows CI due to backend candidate availability."
-    log_summary "Runtime" "Elixir" "⚠️ Windows Skip" "-" "0"
-    return 0
-  fi
-  local _T0_ELIXIR
-  _T0_ELIXIR=$(date +%s)
-  # shellcheck disable=SC2154
-  run_mise install "erlang@${MISE_TOOL_VERSION_ERLANG}"
-  # shellcheck disable=SC2154
-  run_mise install "elixir@${MISE_TOOL_VERSION_ELIXIR}"
-  log_summary "Runtime" "Elixir" "✅ Installed" "$(get_mise_tool_version elixir)" "$(($(date +%s) - _T0_ELIXIR))"
-}
-
-install_haskell() {
-  if ! has_lang_files "" "HASKELL"; then
-    log_summary "Runtime" "Haskell" "⏭️ Skipped" "-" "0"
-    return 0
-  fi
-  _log_setup "Haskell (GHC)" "ghc"
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Runtime" "Haskell" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if [ "$_G_OS" = "windows" ]; then
-    log_warn "⚠️  GHC installation is currently skipped on Windows CI due to backend candidate availability."
-    log_summary "Runtime" "Haskell" "⚠️ Windows Skip" "-" "0"
-    return 0
-  fi
-
-  local _T0_HASKELL
-  _T0_HASKELL=$(date +%s)
-  # shellcheck disable=SC2154
-  run_mise install "ghc@${MISE_TOOL_VERSION_GHC}"
-  log_summary "Runtime" "Haskell" "✅ Installed" "$(get_mise_tool_version ghc)" "$(($(date +%s) - _T0_HASKELL))"
-}
-
-install_scala() {
-  if ! has_lang_files "" "SCALA"; then
-    log_summary "Runtime" "Scala" "⏭️ Skipped" "-" "0"
-    return 0
-  fi
-  _log_setup "Scala/SBT" "scala"
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Runtime" "Scala" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-  local _T0_SCALA
-  _T0_SCALA=$(date +%s)
-  # shellcheck disable=SC2154
-  run_mise install "scala@${MISE_TOOL_VERSION_SCALA}"
-  log_summary "Runtime" "Scala" "✅ Installed" "$(get_mise_tool_version scala)" "$(($(date +%s) - _T0_SCALA))"
 }
 
 main() {
@@ -2149,7 +2257,7 @@ EOF
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
     # Full list for "On-demand" (default) or "All" (explicit)
-    _MODULES_LIST="node python pipx gitleaks hadolint go checkmake tflint kube-linter powershell java ruby dart swift dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit stylua buf tofu just task nix zig cue rego server edge flutter rn pulumi crossplane playwright cypress vitest docusaurus mkdocs sphinx jupyter dvc elixir haskell scala pre-commit hooks"
+    _MODULES_LIST="node python deno bun pipx gitleaks hadolint go checkmake tflint kube-linter powershell java ruby kotlin dart swift dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit stylua buf tofu just task nix zig cue rego server edge flutter rn pulumi crossplane playwright cypress vitest docusaurus mkdocs sphinx jupyter dvc elixir haskell scala pre-commit hooks"
   else
     # Specific modules requested (e.g., ./setup.sh node)
     _MODULES_LIST="${_RAW_ARGS}"
@@ -2182,6 +2290,8 @@ EOF
     case $_cur_module in
     node) setup_node ;;
     python) setup_python ;;
+    deno) setup_deno ;;
+    bun) setup_bun ;;
     pipx) install_pipx ;;
     gitleaks) install_gitleaks ;;
     checkmake) install_checkmake ;;
@@ -2197,6 +2307,7 @@ EOF
     rust) setup_rust ;;
     java) setup_java ;;
     ruby) setup_ruby ;;
+    kotlin) setup_kotlin ;;
     dart) setup_dart ;;
     swift) setup_swift ;;
     dotnet) setup_dotnet ;;
@@ -2234,18 +2345,18 @@ EOF
     pip-audit) install_pip_audit ;;
     stylua) install_stylua ;;
     buf) install_buf ;;
-    tofu) install_tofu ;;
+    tofu) setup_tofu ;;
     just) install_just ;;
     task) install_task ;;
     nix) install_nix ;;
-    zig) install_zig ;;
+    zig) setup_zig ;;
     cue) install_cue ;;
     rego) install_rego ;;
     server) install_server ;;
     edge) install_edge ;;
-    flutter) install_flutter ;;
+    flutter) setup_flutter ;;
     rn) install_rn ;;
-    pulumi) install_pulumi ;;
+    pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
     playwright) install_playwright ;;
     cypress) install_cypress ;;
@@ -2255,9 +2366,9 @@ EOF
     sphinx) install_sphinx ;;
     jupyter) install_jupyter ;;
     dvc) install_dvc ;;
-    elixir) install_elixir ;;
-    haskell) install_haskell ;;
-    scala) install_scala ;;
+    elixir) setup_elixir ;;
+    haskell) setup_haskell ;;
+    scala) setup_scala ;;
     pre-commit) install_pre_commit ;;
     hooks) setup_hooks ;;
     *) log_error "Unknown module: $_cur_module" ;;
