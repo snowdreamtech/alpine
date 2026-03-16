@@ -45,7 +45,7 @@ repos:
           import sys, re, os
           modified = []
           for f in sys.argv[1:]:
-              if os.path.isfile(f):
+              if os.path.isfile(f) and os.path.getsize(f) < 2*1024*1024:
                   with open(f, 'rb') as fh: content = fh.read()
                   new_content = re.sub(b'[ \t]+(?=\r?\n|$)', b'', content)
                   if content != new_content:
@@ -67,7 +67,7 @@ repos:
           import sys, os
           modified = []
           for f in sys.argv[1:]:
-              if os.path.isfile(f):
+              if os.path.isfile(f) and os.path.getsize(f) < 2*1024*1024:
                   with open(f, 'rb') as fh: content = fh.read()
                   if not content: continue
                   stripped = content.rstrip(b'\r\n')
@@ -437,7 +437,7 @@ repos:
         entry: |
           python3 -c "
           import sys, os, re
-          pattern = re.compile(r'(test\.txt|tmp\.json|debug\.log|\.DS_Store|Thumbs\.db|\.swp|\.bak|\\.orig|\\.rej)$')
+          pattern = re.compile(r'(test\.txt|tmp\.json|debug\.log|\.DS_Store|Thumbs\.db|\.swp|\.bak|\\.orig|\\.rej|\\.coverage|\\.map|npm-debug\.log)$')
           forbidden = [f for f in sys.argv[1:] if os.path.isfile(f) and pattern.search(f)]
           for f in forbidden: print(f'Forbidden file detected: {f}')
           sys.exit(1 if forbidden else 0)
@@ -454,58 +454,58 @@ repos:
         entry: sh scripts/lib/lint-wrapper.sh sqlfluff lint
         args: [--dialect, postgres]
         types_or: [sql]
-        description: "SQL dialect linting."
+        description: "Lint SQL dialects for syntax and style."
 
       - id: ktlint
-        name: ktlint
+        name: check kotlin style
         language: system
         entry: sh scripts/lib/lint-wrapper.sh ktlint
         types_or: [kotlin]
-        description: "Kotlin linting and formatting."
+        description: "Verify Kotlin code against community style guides."
 
       - id: google-java-format
-        name: google-java-format
+        name: check java style
         language: system
         entry: sh scripts/lib/lint-wrapper.sh google-java-format --set-exit-if-changed --dry-run
         types: [java]
-        description: "Google Java Style guide validation."
+        description: "Verify Java code against Google Style Guide."
 
       - id: rubocop
-        name: rubocop
+        name: check ruby style
         language: system
         entry: sh scripts/lib/lint-wrapper.sh rubocop
         types: [ruby]
-        description: "Ruby community style guide enforcement."
+        description: "Verify Ruby code against community style guides."
 
       - id: dart-format
-        name: dart format
+        name: check dart style
         language: system
         entry: sh scripts/lib/lint-wrapper.sh dart format --output=none --set-exit-if-changed
         types_or: [dart]
-        description: "Dart SDK formatting check."
+        description: "Verify Dart code with the official SDK formatter."
 
       - id: swiftformat
-        name: swiftformat
+        name: check swift style
         language: system
         entry: sh scripts/lib/lint-wrapper.sh swiftformat --lint
         types: [swift]
-        description: "Swift formatting audit (macOS only)."
+        description: "Verify Swift code formatting (macOS only)."
 
       - id: swiftlint
-        name: swiftlint
+        name: swiftlint quality check
         language: system
         entry: sh scripts/lib/lint-wrapper.sh swiftlint lint --strict
         types: [swift]
         pass_filenames: false
-        description: "Swift code quality enforcement (macOS only)."
+        description: "Audit Swift code quality and best practices (macOS only)."
 
       - id: dotnet-format
-        name: dotnet format
+        name: check .net style
         language: system
         entry: sh scripts/lib/lint-wrapper.sh dotnet format --verify-no-changes
         files: '\.(cs|vb|fs)$'
         pass_filenames: false
-        description: ".NET SDK code formatting audit."
+        description: "Verify .NET code compliance with SDK formatting rules."
 
       # ── Git Commit Message Flow ──────────────────────────────────────────
       - id: commitlint
