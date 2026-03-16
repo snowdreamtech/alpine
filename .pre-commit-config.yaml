@@ -154,6 +154,23 @@ repos:
         stages: [pre-commit, pre-merge-commit]
         description: "Ensure symlinks point to existing locations."
 
+      - id: check-utf8-bom
+        name: check for utf8 bom
+        entry: |
+          python3 -c "
+          import sys, os
+          found = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f) and os.path.getsize(f) > 3:
+                  with open(f, 'rb') as fh:
+                      if fh.read(3) == b'\xef\xbb\xbf': found.append(f)
+          for f in found: print(f'Illegal UTF-8 BOM detected: {f}')
+          sys.exit(1 if found else 0)
+          "
+        language: system
+        types: [text]
+        description: "Prevent illegal Byte Order Mark (BOM) in UTF-8 files."
+
       # ── Data & Configuration Hygiene ───────────────────────────────────────
       - id: check-xml
         name: check xml well-formedness
