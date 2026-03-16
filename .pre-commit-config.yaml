@@ -1,8 +1,8 @@
 ---
-# .pre-commit-config.yaml — Second Line of Defense (第二道防线)
+# .pre-commit-config.yaml — Second Line of Defense
 #
-# ── Triple Guarantee (三重保证) ──────────────────────────────────────────────
-# This configuration implements the "Incremental Shift-Left" (增量左移) philosophy.
+# ── Triple Guarantee ──────────────────────────────────────────────
+# This configuration implements the "Incremental Shift-Left" philosophy.
 # It ensures that all staged changes meet the project's quality standards BEFORE
 # they are committed to the repository.
 #
@@ -604,7 +604,7 @@ repos:
         language: system
         entry: sh scripts/lib/lint-wrapper.sh typos
         args: [--write-changes]
-        description: "極速拼写检查工具 (Source code spell checker)."
+        description: "Source code spell checker."
 
       - id: zizmor
         name: zizmor security audit
