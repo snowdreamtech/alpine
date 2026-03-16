@@ -452,6 +452,25 @@ repos:
         files: "justfile$"
         description: "Verify that justfile (Task runner) files are well-formed."
 
+      - id: check-webserver-config
+        name: check web server config
+        entry: |
+          python3 -c "
+          import sys, os
+          errors = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f) and os.path.getsize(f) < 1024*1024:
+                  with open(f, 'r', encoding='utf-8') as fh:
+                      content = fh.read()
+                      if content.count('{') != content.count('}'):
+                          errors.append(f'{f} (unbalanced braces)')
+          for e in errors: print(f'Malformed Config: {e}')
+          sys.exit(1 if errors else 0)
+          "
+        language: system
+        files: '(Caddyfile$|\.conf$)'
+        description: "Verify that Caddyfile and Nginx/Web server configurations are well-formed."
+
       # ── Formatting (Auto-fix) ──────────────────────────────────────────────
       - id: prettier
         name: prettier format
