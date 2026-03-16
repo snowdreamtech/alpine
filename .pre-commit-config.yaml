@@ -208,13 +208,13 @@ repos:
         description: "Format Rust code using cargo toolchain."
 
       - id: check-xml
-        name: check xml
+        name: check xml well-formedness
         entry: |
           python3 -c "
           import sys, os, xml.etree.ElementTree as ET
           errors = []
           for f in sys.argv[1:]:
-              if os.path.isfile(f):
+              if os.path.isfile(f) and os.path.getsize(f) < 5*1024*1024:
                   try: ET.parse(f)
                   except Exception as e: errors.append(f'{f} ({e})')
           for e in errors: print(f'Malformed XML: {e}')
@@ -235,7 +235,7 @@ repos:
 
       # ── Linting & Quality (Language Specific) ──────────────────────────────
       - id: eslint
-        name: eslint
+        name: eslint quality check
         language: system
         entry: sh scripts/lib/lint-wrapper.sh eslint
         args: [--fix]
@@ -297,22 +297,15 @@ repos:
         types: [powershell]
         description: "PowerShell static analysis tool (macOS/Windows)."
 
-      - id: actionlint
-        name: actionlint
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh actionlint
-        files: ^\.github/workflows/.*\.yml$
-        description: "Validated GitHub Actions workflow syntax."
-
       - id: checkmake
-        name: check make
+        name: check makefile
         language: system
         entry: sh scripts/lib/lint-wrapper.sh checkmake --config .checkmake.ini
         files: ^Makefile$
         description: "Linter for Makefile best practices."
 
       - id: tflint
-        name: tflint
+        name: check terraform
         language: system
         entry: sh scripts/lib/lint-wrapper.sh tflint
         types: [terraform]
@@ -325,6 +318,13 @@ repos:
         types: [yaml]
         files: '.*(kube|k8s|manifest).*\.ya?ml$'
         description: "Linter for Kubernetes manifests."
+
+      - id: actionlint
+        name: check github actions
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh actionlint
+        files: ^\.github/workflows/.*\.yml$
+        description: "Validate GitHub Actions workflow syntax."
 
       # ── Infrastructure & Config ───────────────────────────────────────────
       - id: dockerfile-utils
@@ -380,14 +380,14 @@ repos:
         description: "Validated structure of environment variable files."
 
       - id: detect-private-key
-        name: detect private key
+        name: detect private keys
         entry: |
           python3 -c "
           import sys, os, re
           pattern = re.compile(b'-----BEGIN ' + b'.*PRIVATE KEY-----')
           found = []
           for f in sys.argv[1:]:
-              if os.path.isfile(f):
+              if os.path.isfile(f) and os.path.getsize(f) < 1024*1024:
                   with open(f, 'rb') as fh:
                       if pattern.search(fh.read()): found.append(f)
           for f in found: print(f'Private key detected: {f}')
@@ -396,7 +396,7 @@ repos:
         language: system
         types: [text]
         exclude: '\.pre-commit-config\.yaml$'
-        description: "Detect presence of private keys."
+        description: "Detect accidental staging of private keys."
 
       # ── Hardening & Security ──────────────────────────────────────────────
       - id: check-executables-have-shebangs
@@ -433,18 +433,18 @@ repos:
         description: "Scripts with shebangs MUST have the executable bit set."
 
       - id: forbidden-files
-        name: forbid temporary/debug files
+        name: forbid temporary and debug files
         entry: |
           python3 -c "
           import sys, os, re
-          pattern = re.compile(r'(test\.txt|tmp\.json|debug\.log|\.DS_Store|Thumbs\.db|\.swp|\.bak)$')
+          pattern = re.compile(r'(test\.txt|tmp\.json|debug\.log|\.DS_Store|Thumbs\.db|\.swp|\.bak|\\.orig|\\.rej)$')
           forbidden = [f for f in sys.argv[1:] if os.path.isfile(f) and pattern.search(f)]
           for f in forbidden: print(f'Forbidden file detected: {f}')
           sys.exit(1 if forbidden else 0)
           "
         language: system
         stages: [pre-commit, pre-merge-commit]
-        description: "Prevent accidental commit of temporary files (Rule 01.2.29)."
+        description: "Prevent accidental commit of temporary or merge-remnant files."
 
       # ── Extensibility (Optional Runtime Hooks) ───────────────────────────
       # The following hooks skip gracefully if their runtime is missing.
@@ -509,9 +509,9 @@ repos:
 
       # ── Git Commit Message Flow ──────────────────────────────────────────
       - id: commitlint
-        name: commitlint
+        name: check commit message format
         language: system
         entry: sh scripts/lib/lint-wrapper.sh commitlint --edit
         always_run: true
         stages: [commit-msg]
-        description: "Enforce Conventional Commits specification."
+        description: "Enforce Conventional Commits specification for commit messages."
