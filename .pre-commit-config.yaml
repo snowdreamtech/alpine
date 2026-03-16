@@ -58,7 +58,7 @@ repos:
 
       - id: check-added-large-files
         name: check for added large files
-        entry: 'python3 -c ''import sys, os; large_files = [f for f in sys.argv[1:] if os.path.getsize(f) > 500*1024]; [print(f"File too large (>500KB): {f}") for f in large_files]; sys.exit(1) if large_files else sys.exit(0)'''
+        entry: 'python3 -c ''import sys, os; large_files = [f for f in sys.argv[1:] if os.path.isfile(f) and os.path.getsize(f) > 500*1024]; [print(f"File too large (>500KB): {f}") for f in large_files]; sys.exit(1) if large_files else sys.exit(0)'''
         language: system
         stages: [pre-commit, pre-merge-commit]
         description: "Prevent large files (>500KB) from being committed."
@@ -308,7 +308,7 @@ repos:
 
       - id: forbidden-files
         name: forbid temporary/debug files
-        entry: "python3 -c 'import sys, re; forbidden = [f for f in sys.argv[1:] if re.search(r\"(test\\.txt|tmp\\.json|debug\\.log)$\", f)]; [print(f\"Forbidden file detected: {f}\") for f in forbidden]; sys.exit(1) if forbidden else sys.exit(0)'"
+        entry: "python3 -c 'import sys, os, re; forbidden = [f for f in sys.argv[1:] if os.path.isfile(f) and re.search(r\"(test\\.txt|tmp\\.json|debug\\.log|\\.DS_Store|Thumbs\\.db|\\.swp|\\.bak)$\", f)]; [print(f\"Forbidden file detected: {f}\") for f in forbidden]; sys.exit(1) if forbidden else sys.exit(0)'"
         language: system
         stages: [pre-commit, pre-merge-commit]
         description: "Prevent accidental commit of temporary files (Rule 01.2.29)."
