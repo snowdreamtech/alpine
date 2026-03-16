@@ -1601,19 +1601,20 @@ install_tofu() {
   local _PROVIDER="opentofu"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Runtime" "OpenTofu" "⚖️ Previewed" "-" "0"
+    log_summary "IaC" "OpenTofu" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
-  if ! has_lang_files "" "HCL"; then
-    log_summary "Runtime" "OpenTofu" "⏭️ Skipped" "-" "0"
+  if ! has_lang_files "" "*.tf"; then
+    log_summary "IaC" "OpenTofu" "⏭️ Skipped" "-" "0"
     return 0
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_TOFU="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_TOFU="❌ Failed"
-  log_summary "Runtime" "OpenTofu" "$_STAT_TOFU" "$(get_version tofu --version | head -n 1)" "$(($(date +%s) - _T0_TOFU))"
+  # shellcheck disable=SC2154
+  run_mise install "opentofu@${MISE_TOOL_VERSION_OPENTOFU}" || _STAT_TOFU="❌ Failed"
+  log_summary "IaC" "OpenTofu" "$_STAT_TOFU" "$(get_version tofu)" "$(($(date +%s) - _T0_TOFU))"
 }
 
 # Purpose: Installs Just (modern runner).
@@ -1681,25 +1682,20 @@ install_nix() {
 # Purpose: Installs Zig runtime.
 # Delegate: Managed by mise (.mise.toml)
 install_zig() {
-  local _T0_ZIG
-  _T0_ZIG=$(date +%s)
-  local _TITLE="Zig"
-  local _PROVIDER="zig"
-
+  if ! has_lang_files "build.zig" "*.zig"; then
+    log_summary "Runtime" "Zig" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  _log_setup "Zig Runtime" "zig"
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Zig" "⚖️ Previewed" "-" "0"
     return 0
   fi
-
-  if ! has_lang_files "" "ZIG"; then
-    log_summary "Runtime" "Zig" "⏭️ Skipped" "-" "0"
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-  local _STAT_ZIG="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_ZIG="❌ Failed"
-  log_summary "Runtime" "Zig" "$_STAT_ZIG" "$(get_version zig version)" "$(($(date +%s) - _T0_ZIG))"
+  local _T0_ZIG
+  _T0_ZIG=$(date +%s)
+  # shellcheck disable=SC2154
+  run_mise install "zig@${MISE_TOOL_VERSION_ZIG}"
+  log_summary "Runtime" "Zig" "✅ Installed" "$(get_mise_tool_version zig)" "$(($(date +%s) - _T0_ZIG))"
 }
 
 # Purpose: Installs CUE and Jsonnet.

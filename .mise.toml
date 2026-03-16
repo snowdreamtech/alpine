@@ -44,9 +44,7 @@ editorconfig-checker = "3.6.1"
 gitleaks = "8.30.0"
 node = "20.18.3"
 python = "3.12.9"
-go = "1.23.6"
-opentofu = "1.9.0"
-zig = "0.14.0"
+
 # These are managed via scripts/setup.sh to allow platform-aware
 # and versioned installations without forcing CI failures.
 
@@ -134,3 +132,6 @@ MISE_TOOL_VERSION_ERLANG = "27.2.2"
 MISE_TOOL_VERSION_FLUTTER = "3.29.0"
 MISE_TOOL_VERSION_GHC = "9.10.1"
 MISE_TOOL_VERSION_SCALA = "3.6.3"
+MISE_TOOL_VERSION_GO = "1.23.6"
+MISE_TOOL_VERSION_OPENTOFU = "1.9.0"
+MISE_TOOL_VERSION_ZIG = "0.14.0"
