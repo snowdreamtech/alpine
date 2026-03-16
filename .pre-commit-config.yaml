@@ -895,8 +895,6 @@ repos:
         entry: sh scripts/lib/lint-wrapper.sh markdownlint-cli2
         args: [--fix]
         types: [markdown]
-        exclude: |
-          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
         description: "Ensure Markdown follows project style guides."
 
       - id: shellcheck
@@ -904,8 +902,6 @@ repos:
         language: system
         entry: sh scripts/lib/lint-wrapper.sh shellcheck
         types: [shell]
-        exclude: |
-          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
         description: "Posix-compliant ShellCheck for shell code quality."
 
       - id: shellcheck-posix
@@ -913,8 +909,6 @@ repos:
         language: system
         entry: sh scripts/lib/lint-wrapper.sh shellcheck --shell=sh
         types: [shell]
-        exclude: |
-          (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
         description: "Enforce strict POSIX compliance for shell scripts (Rule 01.3.39)."
 
       - id: psscriptanalyzer
