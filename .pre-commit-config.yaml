@@ -242,6 +242,92 @@ repos:
         types: [json]
         description: "Verify that JSON files are well-formed."
 
+      - id: check-toml
+        name: check toml well-formedness
+        entry: |
+          python3 -c "
+          import sys, os
+          try:
+              import tomllib as toml
+          except ImportError:
+              try: import tomli as toml
+              except ImportError: sys.exit(0)
+          errors = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f) and os.path.getsize(f) < 2*1024*1024:
+                  try:
+                      with open(f, 'rb') as fh: toml.load(fh)
+                  except Exception as e: errors.append(f'{f} ({e})')
+          for e in errors: print(f'Malformed TOML: {e}')
+          sys.exit(1 if errors else 0)
+          "
+        language: system
+        files: '\.toml$'
+        description: "Verify that TOML files are well-formed (requires Python 3.11+ or tomllib)."
+
+      - id: check-ini
+        name: check ini well-formedness
+        entry: |
+          python3 -c "
+          import sys, os, configparser
+          errors = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f) and os.path.getsize(f) < 1024*1024:
+                  try:
+                      cp = configparser.ConfigParser()
+                      cp.read(f, encoding='utf-8')
+                  except Exception as e: errors.append(f'{f} ({e})')
+          for e in errors: print(f'Malformed INI: {e}')
+          sys.exit(1 if errors else 0)
+          "
+        language: system
+        files: '\.(ini|editorconfig|properties)$'
+        description: "Verify that INI and property files are well-formed."
+
+      - id: check-plist
+        name: check plist well-formedness
+        entry: |
+          python3 -c "
+          import sys, os, plistlib
+          errors = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f) and os.path.getsize(f) < 2*1024*1024:
+                  try:
+                      with open(f, 'rb') as fh: plistlib.load(fh)
+                  except Exception as e: errors.append(f'{f} ({e})')
+          for e in errors: print(f'Malformed Plist: {e}')
+          sys.exit(1 if errors else 0)
+          "
+        language: system
+        files: '\.plist$'
+        description: "Verify that Apple Plist files (XML or Binary) are well-formed."
+
+      - id: check-csv
+        name: check csv consistency
+        entry: |
+          python3 -c "
+          import sys, os, csv
+          errors = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f) and os.path.getsize(f) < 5*1024*1024:
+                  try:
+                      with open(f, 'r', encoding='utf-8', newline='') as fh:
+                          reader = csv.reader(fh)
+                          header = next(reader, None)
+                          if header:
+                              cols = len(header)
+                              for i, row in enumerate(reader, 2):
+                                  if len(row) != cols:
+                                      errors.append(f'{f}:{i} (expected {cols} columns, got {len(row)})')
+                                      break
+                  except Exception as e: errors.append(f'{f} ({e})')
+          for e in errors: print(f'CSV/TSV inconsistency: {e}')
+          sys.exit(1 if errors else 0)
+          "
+        language: system
+        files: '\.(csv|tsv)$'
+        description: "Verify that CSV/TSV files have consistent column counts across all rows."
+
       # ── Secret Scanning ────────────────────────────────────────────────────
       - id: gitleaks
         name: gitleaks quality check
