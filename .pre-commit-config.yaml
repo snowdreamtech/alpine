@@ -40,7 +40,7 @@ repos:
       # ── Git Hygiene (Incremental) ──────────────────────────────────────────
       - id: trailing-whitespace
         name: trim trailing whitespace
-        entry: "python3 -c 'import sys, re; [(lambda f, c: (lambda n: open(f, \"w\", newline=\"\").write(n) if n != c else None)(re.sub(r\"[ \\t]+(?=\\r?\\n|$)\", \"\", c)))(f, open(f, newline=\"\").read()) for f in sys.argv[1:]]'"
+        entry: "python3 -c 'import sys, re; [(lambda f, c: (lambda n: open(f, \"wb\").write(n) if n != c else None)(re.sub(b\"[ \\t]+(?=\\r?\\n|$)\", b\"\", c)))(f, open(f, \"rb\").read()) for f in sys.argv[1:]]'"
         language: system
         types: [text]
         exclude: '\.(bat|cmd|ps1)$'
@@ -49,7 +49,7 @@ repos:
 
       - id: end-of-file-fixer
         name: fix end of files
-        entry: "python3 -c 'import sys; [(lambda f, c: (lambda e: open(f, \"w\", newline=\"\").write(c.rstrip(\"\\r\\n\")+e) if c and c != c.rstrip(\"\\r\\n\")+e else None)(\"\\r\\n\" if \"\\r\\n\" in c else \"\\n\"))(f, open(f, newline=\"\").read()) for f in sys.argv[1:]]'"
+        entry: "python3 -c 'import sys; [(lambda f, c: (lambda e: open(f, \"wb\").write(c.rstrip(b\"\\r\\n\")+e) if c and c != c.rstrip(b\"\\r\\n\")+e else None)(b\"\\r\\n\" if b\"\\r\\n\" in c else b\"\\n\"))(f, open(f, \"rb\").read()) for f in sys.argv[1:]]'"
         language: system
         types: [text]
         exclude: '\.(bat|cmd|ps1)$'
