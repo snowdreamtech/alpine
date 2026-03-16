@@ -31,7 +31,9 @@ exclude: |
     \.next/|\.nuxt/|\.output/|
     __pycache__/|
     \.specify/|
-    \.tmp/|tmp/
+    \.tmp/|tmp/|
+    \.(venv|github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*|
+    \.aider\.conf\.yml
   )
 
 repos:
@@ -612,6 +614,34 @@ repos:
             svelte,
           ]
         description: "Format web-standard file types using Prettier (including Astro/Svelte)."
+
+      - id: zizmor
+        name: zizmor security audit
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh zizmor
+        files: ^\.github/workflows/.*\.yml$
+        description: "Audit GitHub Actions workflows for security vulnerabilities."
+
+      - id: check-taskfile
+        name: check taskfile
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh task --list --taskfile
+        files: 'Taskfile\.ya?ml$'
+        description: "Verify that Taskfile (Task runner) files are well-formed."
+
+      - id: check-dvc
+        name: check dvc pipeline
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh dvc dag
+        files: 'dvc\.yaml$'
+        description: "Verify that DVC pipeline files are valid and the DAG is correct."
+
+      - id: check-nix-fmt
+        name: check nix style
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh nixpkgs-fmt --check
+        files: '\.nix$'
+        description: "Verify Nix code compliance with nixpkgs-fmt."
 
       - id: shfmt
         name: shfmt format
