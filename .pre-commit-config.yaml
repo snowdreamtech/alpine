@@ -40,7 +40,7 @@ repos:
       # ── Git Hygiene (Incremental) ──────────────────────────────────────────
       - id: trailing-whitespace
         name: trim trailing whitespace
-        entry: "python3 -c 'import sys, re; [(lambda f, c: open(f, \"w\", newline=\"\").write(re.sub(r\"[ \\t]+(?=\\r?\\n|$)\", \"\", c)))(f, open(f, newline=\"\").read()) for f in sys.argv[1:]]'"
+        entry: "python3 -c 'import sys, re; [(lambda f, c: (lambda n: open(f, \"w\", newline=\"\").write(n) if n != c else None)(re.sub(r\"[ \\t]+(?=\\r?\\n|$)\", \"\", c)))(f, open(f, newline=\"\").read()) for f in sys.argv[1:]]'"
         language: system
         types: [text]
         exclude: '\.(bat|cmd|ps1)$'
