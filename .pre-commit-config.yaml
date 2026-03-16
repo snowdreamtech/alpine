@@ -406,6 +406,28 @@ repos:
         files: '\.(j2|jinja2|gotmpl|tmpl)$'
         description: "Verify that Jinja2/Template files have valid syntax (uses 'jinja2' if available)."
 
+      - id: check-nix
+        name: check nix well-formedness
+        entry: |
+          python3 -c "
+          import sys, os
+          errors = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f) and os.path.getsize(f) < 1024*1024:
+                  with open(f, 'r', encoding='utf-8') as fh:
+                      content = fh.read()
+                      if content.count('{') != content.count('}') or content.count('[') != content.count(']'):
+                          errors.append(f'{f} (unbalanced braces/brackets)')
+                      # Simple check for missing semicolons in common patterns
+                      if '=' in content and ';' not in content and '{' not in content:
+                          errors.append(f'{f} (potential missing semicolon)')
+          for e in errors: print(f'Malformed Nix: {e}')
+          sys.exit(1 if errors else 0)
+          "
+        language: system
+        files: '\.nix$'
+        description: "Verify that Nix files are well-formed (basic structural check)."
+
       # ── Formatting (Auto-fix) ──────────────────────────────────────────────
       - id: prettier
         name: prettier format
