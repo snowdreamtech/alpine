@@ -138,7 +138,32 @@ MISE_VERSION="${MISE_VERSION:-2026.3.8}"
 # by the project's .mise.toml file. Do not add hardcoded version variables here.
 # Any tool added below MUST have a corresponding entry in .mise.toml Tools section.
 
-# ── 🛣️ PATH Augmentation ──────────────────────────────────────────────────────
+# ── � Project Context Detection ──────────────────────────────────────────────
+
+# Robustly identify the project root directory
+if [ -z "$_G_PROJECT_ROOT" ]; then
+  _G_PROJECT_ROOT=$(pwd)
+  # Basic verification: Ensure we are in a project-like directory
+  if [ ! -f "$_G_PROJECT_ROOT/package.json" ] && [ ! -d "$_G_PROJECT_ROOT/.git" ]; then
+    # Fallback: if we are deeper in the tree, try to find the root
+    _cur_check_dir="$_G_PROJECT_ROOT"
+    while [ "$_cur_check_dir" != "/" ] && [ "$_cur_check_dir" != "." ]; do
+      if [ -f "$_cur_check_dir/package.json" ] || [ -d "$_cur_check_dir/.git" ]; then
+        _G_PROJECT_ROOT="$_cur_check_dir"
+        break
+      fi
+      _cur_check_dir=$(dirname "$_cur_check_dir")
+    done
+    unset _cur_check_dir
+  fi
+  export _G_PROJECT_ROOT
+fi
+
+# Standardized library directory reference
+_G_LIB_DIR="${_G_PROJECT_ROOT}/scripts/lib"
+export _G_LIB_DIR
+
+# ── �🛣️ PATH Augmentation ──────────────────────────────────────────────────────
 
 # Automatically add local bin directories to PATH to ensure orchestrated tools
 # are prioritized over system globals without requiring manual activation.
@@ -1337,26 +1362,7 @@ check_runtime() {
 }
 
 # Purpose: Installs the Node.js runtime and project dependencies.
-# Delegate: Managed via mise (.mise.toml) and the best available manager.
-# Examples:
-#   install_runtime_node
-install_runtime_node() {
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_debug "DRY_RUN: Would install Node.js runtime and project dependencies."
-    return 0
-  fi
-
-  # 1. Runtime initialization
-  run_mise install node
-  eval "$(mise activate bash --shims)"
-
-  # 2. Dependency resolution
-  if [ -f "$PACKAGE_JSON" ]; then
-    # We use 'install' explicitly to bypass manager detection overhead for bootstrap
-    # but still use run_npm_script to leverage its guards.
-    run_npm_script install
-  fi
-}
+# language-specific modules will be loaded dynamically below
 
 # Purpose: Installs Go runtime via mise.
 # Delegate: Managed by mise (.mise.toml)
@@ -1769,3 +1775,14 @@ init_summary_table() {
 
   eval "export $_SENTINEL_TABLE=true"
 }
+
+# ── Extension Modules Sourcing ──
+# Dynamically load all language-specific setup modules.
+# shellcheck source=/dev/null
+for _lang_mod in "${_G_LIB_DIR}/langs"/*.sh; do
+  if [ -f "$_lang_mod" ]; then
+    # shellcheck disable=SC1090
+    . "$_lang_mod"
+  fi
+done
+unset _lang_mod
