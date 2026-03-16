@@ -105,7 +105,7 @@ repos:
           import sys, os, re
           conflicts = []
           for f in sys.argv[1:]:
-              if os.path.isfile(f):
+              if os.path.isfile(f) and os.path.getsize(f) < 2*1024*1024:
                   with open(f, 'r', errors='ignore') as fh:
                       for line in fh:
                           if re.match(r'^(<<<<<<<|=======|>>>>>>>|\|\|\|\|\|\|\|)', line):
@@ -115,6 +115,7 @@ repos:
           sys.exit(1 if conflicts else 0)
           "
         language: system
+        types: [text]
         stages: [pre-commit, pre-merge-commit]
         description: "Intercept files containing git merge conflict markers."
 
@@ -153,60 +154,7 @@ repos:
         stages: [pre-commit, pre-merge-commit]
         description: "Ensure symlinks point to existing locations."
 
-      # ── Formatting (Auto-fix) ──────────────────────────────────────────────
-      - id: prettier
-        name: prettier format
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh prettier
-        args: [--write]
-        types_or: [json, yaml, vue, javascript, jsx, ts, tsx]
-        description: "Format web-standard file types using Prettier."
-
-      - id: shfmt
-        name: shfmt format
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh shfmt
-        args: [-w, -s, -i, "2"]
-        types: [shell]
-        description: "Format shell scripts according to POSIX standards."
-
-      - id: taplo
-        name: taplo format
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh taplo format
-        types: [toml]
-        description: "Format TOML files using Taplo."
-
-      - id: ruff-format
-        name: ruff format
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh ruff format
-        types_or: [python, pyi]
-        description: "Fast Python code formatter."
-
-      - id: clang-format
-        name: clang-format
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh clang-format
-        args: [-i]
-        types_or: [objective-c, c, c++]
-        description: "Format C/C++ family source files."
-
-      - id: gofmt
-        name: gofmt
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh gofmt -w
-        types: [go]
-        description: "Canonical Go code formatting."
-
-      - id: cargo-fmt
-        name: cargo format
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh cargo fmt --all --
-        types: [rust]
-        pass_filenames: false
-        description: "Format Rust code using the official Cargo toolchain."
-
+      # ── Data & Configuration Hygiene ───────────────────────────────────────
       - id: check-xml
         name: check xml well-formedness
         entry: |
@@ -328,6 +276,60 @@ repos:
         files: '\.(csv|tsv)$'
         description: "Verify that CSV/TSV files have consistent column counts across all rows."
 
+      # ── Formatting (Auto-fix) ──────────────────────────────────────────────
+      - id: prettier
+        name: prettier format
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh prettier
+        args: [--write]
+        types_or: [json, yaml, vue, javascript, jsx, ts, tsx]
+        description: "Format web-standard file types using Prettier."
+
+      - id: shfmt
+        name: shfmt format
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh shfmt
+        args: [-w, -s, -i, "2"]
+        types: [shell]
+        description: "Format shell scripts according to POSIX standards."
+
+      - id: taplo
+        name: taplo format
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh taplo format
+        types: [toml]
+        description: "Format TOML files using Taplo."
+
+      - id: ruff-format
+        name: ruff format
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh ruff format
+        types_or: [python, pyi]
+        description: "Fast Python code formatter."
+
+      - id: clang-format
+        name: clang-format
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh clang-format
+        args: [-i]
+        types_or: [objective-c, c, c++]
+        description: "Format C/C++ family source files."
+
+      - id: gofmt
+        name: gofmt
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh gofmt -w
+        types: [go]
+        description: "Canonical Go code formatting."
+
+      - id: cargo-fmt
+        name: cargo format
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh cargo fmt --all --
+        types: [rust]
+        pass_filenames: false
+        description: "Format Rust code using the official Cargo toolchain."
+
       # ── Secret Scanning ────────────────────────────────────────────────────
       - id: gitleaks
         name: gitleaks quality check
@@ -336,6 +338,73 @@ repos:
         always_run: true
         pass_filenames: false
         description: "Prevent secret leaks using Gitleaks."
+
+      - id: detect-private-key
+        name: detect private keys
+        entry: |
+          python3 -c "
+          import sys, os, re
+          pattern = re.compile(b'-----BEGIN ' + b'.*PRIVATE KEY-----')
+          found = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f) and os.path.getsize(f) < 1024*1024:
+                  with open(f, 'rb') as fh:
+                      if pattern.search(fh.read()): found.append(f)
+          for f in found: print(f'Private key detected: {f}')
+          sys.exit(1 if found else 0)
+          "
+        language: system
+        types: [text]
+        exclude: '\.pre-commit-config\.yaml$'
+        description: "Prevent accidental staging of sensitive private keys."
+
+      # ── Hardening & Security ──────────────────────────────────────────────
+      - id: check-executables-have-shebangs
+        name: check shell scripts for shebangs
+        entry: |
+          python3 -c "
+          import sys, os
+          missing = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f) and os.access(f, os.X_OK):
+                  with open(f, 'rb') as fh:
+                      head = fh.read(2)
+                      if head != b'#!': missing.append(f)
+          for f in missing: print(f'Executable lacks shebang: {f}')
+          sys.exit(1 if missing else 0)
+          "
+        language: system
+        description: "Executable scripts MUST start with a shebang (!#)."
+
+      - id: check-shebang-scripts-are-executable
+        name: check shebang scripts are executable
+        entry: |
+          python3 -c "
+          import sys, os
+          not_exec = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f) and not os.access(f, os.X_OK):
+                  with open(f, 'rb') as fh:
+                      if fh.read(2) == b'#!': not_exec.append(f)
+          for f in not_exec: print(f'Shebang script not executable: {f}')
+          sys.exit(1 if not_exec else 0)
+          "
+        language: system
+        description: "Scripts with shebangs MUST have the executable bit set."
+
+      - id: forbidden-files
+        name: check forbidden files
+        entry: |
+          python3 -c "
+          import sys, os, re
+          pattern = re.compile(r'(test\.txt|tmp\.json|debug\.log|\.DS_Store|Thumbs\.db|\.swp|\.bak|\\.orig|\\.rej|\\.coverage|\\.map|npm-debug\.log)$')
+          forbidden = [f for f in sys.argv[1:] if os.path.isfile(f) and pattern.search(f)]
+          for f in forbidden: print(f'Forbidden file detected: {f}')
+          sys.exit(1 if forbidden else 0)
+          "
+        language: system
+        stages: [pre-commit, pre-merge-commit]
+        description: "Prevent accidental commit of temporary or merge-remnant files."
 
       # ── Linting & Quality (Language Specific) ──────────────────────────────
       - id: eslint
@@ -482,73 +551,6 @@ repos:
         files: '(\.env|\.env\.example|\.env\.sample)$'
         pass_filenames: true
         description: "Validate the structure of environment variable files."
-
-      - id: detect-private-key
-        name: detect private keys
-        entry: |
-          python3 -c "
-          import sys, os, re
-          pattern = re.compile(b'-----BEGIN ' + b'.*PRIVATE KEY-----')
-          found = []
-          for f in sys.argv[1:]:
-              if os.path.isfile(f) and os.path.getsize(f) < 1024*1024:
-                  with open(f, 'rb') as fh:
-                      if pattern.search(fh.read()): found.append(f)
-          for f in found: print(f'Private key detected: {f}')
-          sys.exit(1 if found else 0)
-          "
-        language: system
-        types: [text]
-        exclude: '\.pre-commit-config\.yaml$'
-        description: "Prevent accidental staging of sensitive private keys."
-
-      # ── Hardening & Security ──────────────────────────────────────────────
-      - id: check-executables-have-shebangs
-        name: check shell scripts for shebangs
-        entry: |
-          python3 -c "
-          import sys, os
-          missing = []
-          for f in sys.argv[1:]:
-              if os.path.isfile(f) and os.access(f, os.X_OK):
-                  with open(f, 'rb') as fh:
-                      head = fh.read(2)
-                      if head != b'#!': missing.append(f)
-          for f in missing: print(f'Executable lacks shebang: {f}')
-          sys.exit(1 if missing else 0)
-          "
-        language: system
-        description: "Executable scripts MUST start with a shebang (!#)."
-
-      - id: check-shebang-scripts-are-executable
-        name: check shebang scripts are executable
-        entry: |
-          python3 -c "
-          import sys, os
-          not_exec = []
-          for f in sys.argv[1:]:
-              if os.path.isfile(f) and not os.access(f, os.X_OK):
-                  with open(f, 'rb') as fh:
-                      if fh.read(2) == b'#!': not_exec.append(f)
-          for f in not_exec: print(f'Shebang script not executable: {f}')
-          sys.exit(1 if not_exec else 0)
-          "
-        language: system
-        description: "Scripts with shebangs MUST have the executable bit set."
-
-      - id: forbidden-files
-        name: check forbidden files
-        entry: |
-          python3 -c "
-          import sys, os, re
-          pattern = re.compile(r'(test\.txt|tmp\.json|debug\.log|\.DS_Store|Thumbs\.db|\.swp|\.bak|\\.orig|\\.rej|\\.coverage|\\.map|npm-debug\.log)$')
-          forbidden = [f for f in sys.argv[1:] if os.path.isfile(f) and pattern.search(f)]
-          for f in forbidden: print(f'Forbidden file detected: {f}')
-          sys.exit(1 if forbidden else 0)
-          "
-        language: system
-        stages: [pre-commit, pre-merge-commit]
-        description: "Prevent accidental commit of temporary or merge-remnant files."
 
       # ── Extensibility (Optional Runtime Hooks) ───────────────────────────
       # The following hooks skip gracefully if their runtime is missing.
