@@ -58,7 +58,7 @@ repos:
         types: [text]
         exclude: '\.(bat|cmd|ps1)$'
         stages: [pre-commit, pre-merge-commit]
-        description: "Automatically remove trailing whitespace at the end of lines."
+        description: "Standardize text hygiene by removing trailing whitespace."
 
       - id: end-of-file-fixer
         name: fix end of files
@@ -155,15 +155,15 @@ repos:
 
       # ── Formatting (Auto-fix) ──────────────────────────────────────────────
       - id: prettier
-        name: prettier
+        name: prettier format
         language: system
         entry: sh scripts/lib/lint-wrapper.sh prettier
         args: [--write]
         types_or: [json, yaml, vue, javascript, jsx, ts, tsx]
-        description: "Standardize formatting for web-standard file types."
+        description: "Format web-standard file types using Prettier."
 
       - id: shfmt
-        name: shfmt
+        name: shfmt format
         language: system
         entry: sh scripts/lib/lint-wrapper.sh shfmt
         args: [-w, -s, -i, "2"]
@@ -171,11 +171,11 @@ repos:
         description: "Format shell scripts according to POSIX standards."
 
       - id: taplo
-        name: taplo
+        name: taplo format
         language: system
         entry: sh scripts/lib/lint-wrapper.sh taplo format
         types: [toml]
-        description: "Consistent TOML formatting."
+        description: "Format TOML files using Taplo."
 
       - id: ruff-format
         name: ruff format
@@ -200,12 +200,12 @@ repos:
         description: "Canonical Go code formatting."
 
       - id: cargo-fmt
-        name: cargo fmt
+        name: cargo format
         language: system
         entry: sh scripts/lib/lint-wrapper.sh cargo fmt --all --
         types: [rust]
         pass_filenames: false
-        description: "Format Rust code using cargo toolchain."
+        description: "Format Rust code using the official Cargo toolchain."
 
       - id: check-xml
         name: check xml well-formedness
@@ -244,12 +244,12 @@ repos:
 
       # ── Secret Scanning ────────────────────────────────────────────────────
       - id: gitleaks
-        name: gitleaks
+        name: gitleaks quality check
         language: system
         entry: sh scripts/lib/lint-wrapper.sh gitleaks protect --verbose --redact --staged --config .gitleaks.toml
         always_run: true
         pass_filenames: false
-        description: "Prevent secrets leakage. Requires .gitleaks.toml configuration."
+        description: "Prevent secret leaks using Gitleaks."
 
       # ── Linting & Quality (Language Specific) ──────────────────────────────
       - id: eslint
@@ -261,11 +261,11 @@ repos:
         description: "Find and fix problems in JavaScript/TypeScript/Vue code."
 
       - id: stylelint
-        name: stylelint
+        name: stylelint quality check
         language: system
         entry: sh scripts/lib/lint-wrapper.sh stylelint --fix
         types_or: [css, scss, less]
-        description: "Linter for style sheets."
+        description: "Lint style sheets for CSS/SCSS/Less quality."
 
       - id: ruff
         name: ruff check
@@ -330,12 +330,12 @@ repos:
         description: "Linter for Terraform code."
 
       - id: kube-linter
-        name: kube-linter
+        name: kube-linter quality check
         language: system
         entry: sh scripts/lib/lint-wrapper.sh kube-linter lint
         types: [yaml]
         files: '.*(kube|k8s|manifest).*\.ya?ml$'
-        description: "Linter for Kubernetes manifests."
+        description: "Lint Kubernetes manifests for security and best practices."
 
       - id: actionlint
         name: check github actions
@@ -346,14 +346,14 @@ repos:
 
       # ── Infrastructure & Config ───────────────────────────────────────────
       - id: dockerfile-utils
-        name: dockerfile-utils lint
+        name: dockerfile quality check
         language: system
         entry: sh scripts/lib/lint-wrapper.sh dockerfile-utils lint
         files: Dockerfile
-        description: "Lightweight Dockerfile syntax validation."
+        description: "Validate Dockerfile syntax and best practices."
 
       - id: editorconfig-checker
-        name: editorconfig-checker
+        name: editorconfig quality check
         language: system
         entry: sh scripts/lib/lint-wrapper.sh editorconfig-checker
         exclude: |
@@ -362,7 +362,7 @@ repos:
             node_modules/|venv/|env/|dist/|build/|out/|target/|vendor/|__pycache__/|\.specify/|
             \.aider\.conf\.yml
           )
-        description: "Validate compliance with .editorconfig rules."
+        description: "Ensure compliance with .editorconfig rules across the project."
 
       - id: goreleaser-check
         name: goreleaser check
@@ -373,29 +373,29 @@ repos:
         description: "Check GoReleaser configuration."
 
       - id: spectral
-        name: spectral
+        name: spectral quality check
         language: system
         entry: sh scripts/lib/lint-wrapper.sh spectral lint
         types_or: [json, yaml]
         files: '(?i)(openapi|swagger|asyncapi).*\.(json|yaml|yml)$'
         pass_filenames: true
-        description: "Linter for API contracts (OpenAPI/Swagger/AsyncAPI)."
+        description: "Lint API contracts using Spectral (OpenAPI/Swagger/AsyncAPI)."
 
       - id: sort-package-json
-        name: sort-package-json
+        name: sort package-json
         language: system
         entry: sh scripts/lib/lint-wrapper.sh sort-package-json
         files: ^package\.json$
         pass_filenames: true
-        description: "Maintain a deterministic order in package.json."
+        description: "Maintain a deterministic property order in package.json."
 
       - id: dotenv-linter
-        name: dotenv-linter
+        name: dotenv quality check
         language: system
         entry: sh scripts/lib/lint-wrapper.sh dotenv-linter
         files: '(\.env|\.env\.example|\.env\.sample)$'
         pass_filenames: true
-        description: "Validated structure of environment variable files."
+        description: "Validate the structure of environment variable files."
 
       - id: detect-private-key
         name: detect private keys
@@ -414,7 +414,7 @@ repos:
         language: system
         types: [text]
         exclude: '\.pre-commit-config\.yaml$'
-        description: "Detect accidental staging of private keys."
+        description: "Prevent accidental staging of sensitive private keys."
 
       # ── Hardening & Security ──────────────────────────────────────────────
       - id: check-executables-have-shebangs
@@ -451,7 +451,7 @@ repos:
         description: "Scripts with shebangs MUST have the executable bit set."
 
       - id: forbidden-files
-        name: forbid temporary and debug files
+        name: check forbidden files
         entry: |
           python3 -c "
           import sys, os, re
