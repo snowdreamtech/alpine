@@ -1042,6 +1042,66 @@ has_lang_files() {
       [ -f "vercel.json" ] && return 0
       [ -f "netlify.toml" ] && return 0
       ;;
+    FLUTTER)
+      [ -f "pubspec.yaml" ] && return 0
+      _ext_lang="*.dart"
+      ;;
+    RN)
+      [ -f "metro.config.js" ] && return 0
+      [ -f "metro.config.ts" ] && return 0
+      ;;
+    PULUMI)
+      [ -f "Pulumi.yaml" ] && return 0
+      [ -f "Pulumi.stack.yaml" ] && return 0
+      ;;
+    CROSSPLANE)
+      _ext_lang="*.crossplane.yaml"
+      ;;
+    PLAYWRIGHT)
+      [ -f "playwright.config.ts" ] && return 0
+      [ -f "playwright.config.js" ] && return 0
+      ;;
+    CYPRESS)
+      [ -f "cypress.config.ts" ] && return 0
+      [ -f "cypress.config.js" ] && return 0
+      [ -f "cypress.json" ] && return 0
+      ;;
+    VITEST)
+      [ -f "vitest.config.ts" ] && return 0
+      [ -f "vitest.config.js" ] && return 0
+      ;;
+    DOCUSAURUS)
+      [ -f "docusaurus.config.js" ] && return 0
+      [ -f "docusaurus.config.ts" ] && return 0
+      ;;
+    MKDOCS)
+      [ -f "mkdocs.yml" ] && return 0
+      [ -f "mkdocs.yaml" ] && return 0
+      ;;
+    SPHINX)
+      [ -f "conf.py" ] && return 0
+      [ -d "docs/source" ] && return 0
+      ;;
+    JUPYTER)
+      _ext_lang="*.ipynb"
+      ;;
+    DVC)
+      [ -d ".dvc" ] && return 0
+      [ -f "dvc.yaml" ] && return 0
+      ;;
+    ELIXIR)
+      [ -f "mix.exs" ] && return 0
+      _ext_lang="*.ex *.exs"
+      ;;
+    HASKELL)
+      [ -f "stack.yaml" ] && return 0
+      [ -f "package.yaml" ] && return 0
+      _ext_lang="*.hs *.cabal"
+      ;;
+    SCALA)
+      [ -f "build.sbt" ] && return 0
+      _ext_lang="*.scala"
+      ;;
     esac
 
     # Use find for POSIX compatibility and performance
