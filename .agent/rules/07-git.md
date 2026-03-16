@@ -166,7 +166,28 @@ git commit --amend -m "type(scope): correct commit message"
 - Authors MUST respond to all review comments and resolve them before requesting re-review. Do not force-push to a branch under active review without notifying reviewers.
 - **AI-assisted review**: treat AI suggestions as a first-pass only. Human reviewers remain accountable for all approved changes. Never merge based solely on an AI tool's approval.
 
-## 5. History Hygiene
+## 5. Workspace Hygiene & Forbidden Files
+
+To maintain a performant repository and a clean development environment, certain file types are strictly prohibited from being staged or committed. These rules are enforced by native pre-commit hooks and must be followed manually if hooks are not present.
+
+- **Temporary/Debug Files**: Never commit files used for local testing or debugging (e.g., `test.txt`, `tmp.json`, `debug.log`).
+- **Build Artifacts & Caches**: Binary outputs (`dist/`, `build/`, `out/`), dependency caches (`node_modules/`, `.venv/`), and compiler artifacts (`__pycache__/`, `.pytest_cache/`) must stay out of Git.
+- **Merge Remnants**: Always clean up `*.orig`, `*.rej`, or other remnants from `git merge` or `git rebase` before committing.
+- **OS/Editor Noise**: Exclude system-specific metadata like `.DS_Store` (macOS), `Thumbs.db` (Windows), or swap files (`.swp`, `.swo`).
+- **Git Markers in Text**: Specifically for large lockfiles (e.g., `package-lock.json`), always ensure no unresolved merge conflict markers (`<<<<<<<`, `=======`, `>>>>>>>`) exist, even if the file size exceeds normal linting limits.
+- **Encoding Standards**: All text files must be clean UTF-8. The Byte Order Mark (BOM: `\xef\xbb\xbf`) is considered an illegal character and will be blocked.
+
+```bash
+# ✅ CORRECT: Clean workspace, precise staging
+git add src/ models/
+git status # Review to ensure no "test.txt" or ".DS_Store" is listed
+
+# ❌ WRONG: Staging everything indiscriminately
+git add .
+git commit -m "update everything" # High risk of committing illegal/temp files
+```
+
+## 6. History Hygiene
 
 - Use **`rebase`** (not merge commits) to integrate upstream changes into feature branches to maintain a linear, readable history:
 
