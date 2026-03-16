@@ -195,6 +195,11 @@ setup_node() {
     if grep -q '"react"' "$PACKAGE_JSON"; then log_summary "Framework" "React" "✅ Detected" "-" "0"; fi
     if grep -q '"tailwindcss"' "$PACKAGE_JSON"; then log_summary "Framework" "Tailwind" "✅ Detected" "-" "0"; fi
   fi
+
+  # Detect Bun if bun.lockb exists
+  if [ -f "bun.lockb" ]; then
+    log_summary "Runtime" "Bun" "✅ Detected" "$(bun --version 2>/dev/null || echo "exists")" "0"
+  fi
 }
 
 # Purpose: Sets up Go runtime for project.
