@@ -184,3 +184,21 @@ target/ linguist-vendored=true
 /CLAUDE.md linguist-vendored=true
 /CONVENTIONS.md linguist-vendored=true
 /codex.md linguist-vendored=true
+
+# -----------------------------------------------------------------------------
+# 5. Tool-specific and Meta-configuration (Explicit non-executable text)
+# -----------------------------------------------------------------------------
+.github/CODEOWNERS text eol=lf
+.sqlfluffignore text eol=lf
+.gitleaksignore text eol=lf
+.ansible-lint text eol=lf
+.cursor/rules/rules.mdc text eol=lf
+.prettierrc text eol=lf
+PSScriptAnalyzerSettings.psd1 text eol=crlf
+.stylelintignore text eol=lf
+VERSION text eol=lf
+.prettierignore text eol=lf
+.devcontainer/Dockerfile text eol=lf
+.goose/.goosehints text eol=lf
+.shellcheckrc text eol=lf
+docs/.vitepress/config.mts text eol=lf
