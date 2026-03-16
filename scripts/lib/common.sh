@@ -991,6 +991,23 @@ has_lang_files() {
       [ -d "k8s" ] && return 0
       [ -d "manifests" ] && return 0
       ;;
+    HCL)
+      [ -f ".terraform.lock.hcl" ] && return 0
+      [ -f "terragrunt.hcl" ] && return 0
+      # HCL is generic, so we also check for .tf files via the find loop later
+      ;;
+    PROTOC)
+      [ -f "buf.yaml" ] && return 0
+      # Also check for .proto files via find loop
+      _ext_lang="*.proto"
+      ;;
+    GRAPHQL)
+      [ -f "codegen.yml" ] && return 0
+      _ext_lang="*.graphql *.gql"
+      ;;
+    LUA)
+      _ext_lang="*.lua"
+      ;;
     esac
 
     # Use find for POSIX compatibility and performance
