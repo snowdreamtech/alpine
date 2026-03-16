@@ -38,3 +38,14 @@ setup_lua() {
   # Also ensure linting tools are present
   install_stylua
 }
+# Purpose: Checks if Lua runtime is available.
+# Examples:
+#   check_runtime_lua "Linter"
+check_runtime_lua() {
+  local _TOOL_DESC_LUA="${1:-Lua}"
+  if ! command -v lua >/dev/null 2>&1; then
+    log_warn "Required runtime 'lua' for $_TOOL_DESC_LUA is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

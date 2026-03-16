@@ -967,11 +967,27 @@ get_project_version() {
 # Params:
 #   $1 - Command/Binary name to check
 #   $2 - Human-readable tool name (for logging)
+# Purpose: Verifies that a required runtime is available.
+#          Gracefully skips (exit 0) if missing, for linter wrappers.
+# Params:
+#   $1 - Runtime name (e.g., "go", "python")
+#   $2 - Tool description (e.g., "Golang Builder")
 # Examples:
 #   check_runtime "go" "Golang Builder"
 check_runtime() {
   local _RT_NAME="$1"
   local _TOOL_DESC="${2:-Tool}"
+
+  # Priority 1: Modular Check Delegation
+  # If check_runtime_<name> exists in the environment, delegate to it.
+  if command -v "check_runtime_${_RT_NAME}" >/dev/null 2>&1; then
+    if ! "check_runtime_${_RT_NAME}" "$_TOOL_DESC"; then
+      exit 0 # Graceful skip for pre-commit
+    fi
+    return 0
+  fi
+
+  # Priority 2: Standard Command Check (Fallback)
   if ! command -v "$_RT_NAME" >/dev/null 2>&1; then
     log_warn "Required runtime '$_RT_NAME' for $_TOOL_DESC is missing. Skipping."
     exit 0

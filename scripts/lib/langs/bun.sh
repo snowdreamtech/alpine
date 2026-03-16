@@ -34,3 +34,14 @@ setup_bun() {
   _DUR_BUN_RT=$(($(date +%s) - _T0_BUN_RT))
   log_summary "Runtime" "Bun" "$_STAT_BUN_RT" "$(get_version bun --version)" "$_DUR_BUN_RT"
 }
+# Purpose: Checks if Bun runtime is available.
+# Examples:
+#   check_runtime_bun "Linter"
+check_runtime_bun() {
+  local _TOOL_DESC_BUN="${1:-Bun}"
+  if ! command -v bun >/dev/null 2>&1; then
+    log_warn "Required runtime 'bun' for $_TOOL_DESC_BUN is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

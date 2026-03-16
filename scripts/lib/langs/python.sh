@@ -49,3 +49,14 @@ setup_python() {
   _DUR_PY=$(($(date +%s) - _T0_PY))
   log_summary "Runtime" "Python" "$_STAT_PY" "$(get_version "$VENV/bin/python")" "$_DUR_PY"
 }
+# Purpose: Checks if Python runtime is available.
+# Examples:
+#   check_runtime_python "Linter"
+check_runtime_python() {
+  local _TOOL_DESC_PY="${1:-Python}"
+  if ! command -v "$PYTHON" >/dev/null 2>&1; then
+    log_warn "Required runtime 'python' for $_TOOL_DESC_PY is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

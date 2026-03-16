@@ -34,3 +34,14 @@ setup_zig() {
   _DUR_ZIG_RT=$(($(date +%s) - _T0_ZIG_RT))
   log_summary "Runtime" "Zig" "$_STAT_ZIG_RT" "$(get_version zig version)" "$_DUR_ZIG_RT"
 }
+# Purpose: Checks if Zig runtime is available.
+# Examples:
+#   check_runtime_zig "Linter"
+check_runtime_zig() {
+  local _TOOL_DESC_ZIG="${1:-Zig}"
+  if ! command -v zig >/dev/null 2>&1; then
+    log_warn "Required runtime 'zig' for $_TOOL_DESC_ZIG is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

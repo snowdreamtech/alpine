@@ -35,3 +35,14 @@ setup_tofu() {
   _DUR_TO_RT=$(($(date +%s) - _T0_TO_RT))
   log_summary "IaC" "OpenTofu" "$_STAT_TO_RT" "$(get_version tofu version)" "$_DUR_TO_RT"
 }
+# Purpose: Checks if OpenTofu is available.
+# Examples:
+#   check_runtime_tofu "Linter"
+check_runtime_tofu() {
+  local _TOOL_DESC_TOFU="${1:-OpenTofu}"
+  if ! command -v tofu >/dev/null 2>&1; then
+    log_warn "Required runtime 'tofu' for $_TOOL_DESC_TOFU is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

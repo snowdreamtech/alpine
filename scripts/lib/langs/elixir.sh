@@ -37,3 +37,14 @@ setup_elixir() {
   _DUR_ELIXIR_RT=$(($(date +%s) - _T0_ELIXIR_RT))
   log_summary "Runtime" "Elixir" "$_STAT_ELIXIR_RT" "$(get_version elixir --version | grep 'Elixir' | head -n 1)" "$_DUR_ELIXIR_RT"
 }
+# Purpose: Checks if Elixir runtime is available.
+# Examples:
+#   check_runtime_elixir "Linter"
+check_runtime_elixir() {
+  local _TOOL_DESC_ELIXIR="${1:-Elixir}"
+  if ! command -v elixir >/dev/null 2>&1; then
+    log_warn "Required runtime 'elixir' for $_TOOL_DESC_ELIXIR is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

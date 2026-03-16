@@ -43,3 +43,14 @@ setup_php() {
   _DUR_PHP_RT=$(($(date +%s) - _T0_PHP_RT))
   log_summary "Runtime" "PHP" "$_STAT_PHP_RT" "$(get_version php)" "$_DUR_PHP_RT"
 }
+# Purpose: Checks if PHP runtime is available.
+# Examples:
+#   check_runtime_php "Linter"
+check_runtime_php() {
+  local _TOOL_DESC_PHP="${1:-PHP}"
+  if ! command -v php >/dev/null 2>&1; then
+    log_warn "Required runtime 'php' for $_TOOL_DESC_PHP is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

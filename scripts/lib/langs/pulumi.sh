@@ -35,3 +35,14 @@ setup_pulumi() {
   _DUR_PULUMI_RT=$(($(date +%s) - _T0_PULUMI_RT))
   log_summary "IaC" "Pulumi" "$_STAT_PULUMI_RT" "$(get_version pulumi version)" "$_DUR_PULUMI_RT"
 }
+# Purpose: Checks if Pulumi CLI is available.
+# Examples:
+#   check_runtime_pulumi "Linter"
+check_runtime_pulumi() {
+  local _TOOL_DESC_PULUMI="${1:-Pulumi}"
+  if ! command -v pulumi >/dev/null 2>&1; then
+    log_warn "Required runtime 'pulumi' for $_TOOL_DESC_PULUMI is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

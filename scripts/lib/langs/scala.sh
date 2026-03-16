@@ -35,3 +35,14 @@ setup_scala() {
   _DUR_SCALA_RT=$(($(date +%s) - _T0_SCALA_RT))
   log_summary "Runtime" "Scala" "$_STAT_SCALA_RT" "$(get_version scala -version | head -n 1)" "$_DUR_SCALA_RT"
 }
+# Purpose: Checks if Scala runtime is available.
+# Examples:
+#   check_runtime_scala "Linter"
+check_runtime_scala() {
+  local _TOOL_DESC_SCALA="${1:-Scala}"
+  if ! command -v scala >/dev/null 2>&1; then
+    log_warn "Required runtime 'scala' for $_TOOL_DESC_SCALA is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

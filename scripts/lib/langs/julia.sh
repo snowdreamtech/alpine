@@ -35,3 +35,14 @@ setup_julia() {
   _DUR_JULIA_RT=$(($(date +%s) - _T0_JULIA_RT))
   log_summary "Runtime" "Julia" "$_STAT_JULIA_RT" "$(get_version julia -v)" "$_DUR_JULIA_RT"
 }
+# Purpose: Checks if Julia runtime is available.
+# Examples:
+#   check_runtime_julia "Linter"
+check_runtime_julia() {
+  local _TOOL_DESC_JULIA="${1:-Julia}"
+  if ! command -v julia >/dev/null 2>&1; then
+    log_warn "Required runtime 'julia' for $_TOOL_DESC_JULIA is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

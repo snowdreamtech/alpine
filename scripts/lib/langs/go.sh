@@ -38,3 +38,14 @@ setup_go() {
   _DUR_GO_RT=$(($(date +%s) - _T0_GO_RT))
   log_summary "Runtime" "Go" "$_STAT_GO_RT" "$(get_version go)" "$_DUR_GO_RT"
 }
+# Purpose: Checks if Go runtime is available.
+# Examples:
+#   check_runtime_go "Linter"
+check_runtime_go() {
+  local _TOOL_DESC_GO="${1:-Go}"
+  if ! command -v go >/dev/null 2>&1; then
+    log_warn "Required runtime 'go' for $_TOOL_DESC_GO is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

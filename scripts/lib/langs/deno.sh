@@ -34,3 +34,14 @@ setup_deno() {
   _DUR_DENO_RT=$(($(date +%s) - _T0_DENO_RT))
   log_summary "Runtime" "Deno" "$_STAT_DENO_RT" "$(get_version deno --version | head -n 1 | awk '{print $2}')" "$_DUR_DENO_RT"
 }
+# Purpose: Checks if Deno runtime is available.
+# Examples:
+#   check_runtime_deno "Linter"
+check_runtime_deno() {
+  local _TOOL_DESC_DENO="${1:-Deno}"
+  if ! command -v deno >/dev/null 2>&1; then
+    log_warn "Required runtime 'deno' for $_TOOL_DESC_DENO is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

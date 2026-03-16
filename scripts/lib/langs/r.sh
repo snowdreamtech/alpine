@@ -35,3 +35,14 @@ setup_r() {
   _DUR_R_RT=$(($(date +%s) - _T0_R_RT))
   log_summary "Runtime" "R" "$_STAT_R_RT" "$(get_version R --version | head -n 1)" "$_DUR_R_RT"
 }
+# Purpose: Checks if R runtime is available.
+# Examples:
+#   check_runtime_r "Linter"
+check_runtime_r() {
+  local _TOOL_DESC_R="${1:-R}"
+  if ! command -v R >/dev/null 2>&1; then
+    log_warn "Required runtime 'R' for $_TOOL_DESC_R is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

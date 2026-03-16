@@ -134,13 +134,14 @@ main() {
   fi
   printf "\n"
 
-  # 4. Group: Language Runtimes (Dynamic Detection)
+  # 4. Group: Language Runtimes (Dynamic Modular Verification)
   log_info "── Language Runtimes ──"
 
   # Node.js
   if [ -f "$PACKAGE_JSON" ]; then
     check_tool_version "Node.js" "node" "$(get_mise_tool_version node)" "node -v" 1
     check_tool_version "pnpm" "pnpm" "$(get_mise_tool_version pnpm)" "pnpm -v" 1
+    check_runtime "node" "Node.js (Modular)"
   else
     log_info "⏭️  Node.js/pnpm: Skipped (no package.json)"
   fi
@@ -148,6 +149,7 @@ main() {
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
     check_tool_version "Python" "$PYTHON" "$(get_mise_tool_version python)" "$PYTHON --version" 1
+    check_runtime "python" "Python (Modular)"
   else
     log_info "⏭️  Python: Skipped (no python files)"
   fi
@@ -155,6 +157,7 @@ main() {
   # Go
   if has_lang_files "go.mod" "*.go"; then
     check_tool_version "Go" "go" "1.21.0" "go version" 0
+    check_runtime "go" "Go (Modular)"
   else
     log_info "⏭️  Go: Skipped (no go files)"
   fi
@@ -162,6 +165,7 @@ main() {
   # Ruby
   if has_lang_files "Gemfile .ruby-version package.json" "*.rb"; then
     check_tool_version "Ruby" "ruby" "3.0.0" "ruby -v" 0
+    check_runtime "ruby" "Ruby (Modular)"
   else
     log_info "⏭️  Ruby: Skipped (no ruby files)"
   fi
@@ -169,6 +173,7 @@ main() {
   # Java
   if has_lang_files "pom.xml build.gradle" "*.java"; then
     check_tool_version "Java" "java" "17" "java -version" 0
+    check_runtime "java" "Java (Modular)"
   else
     log_info "⏭️  Java: Skipped (no java files)"
   fi
@@ -176,6 +181,7 @@ main() {
   # PHP
   if has_lang_files "composer.json" "*.php"; then
     check_tool_version "PHP" "php" "8.0.0" "php -v" 0
+    check_runtime "php" "PHP (Modular)"
   else
     log_info "⏭️  PHP: Skipped (no php files)"
   fi
@@ -183,6 +189,7 @@ main() {
   # .NET
   if has_lang_files "global.json" "*.csproj *.sln *.cs"; then
     check_tool_version ".NET" "dotnet" "6.0.0" "dotnet --version" 0
+    check_runtime "dotnet" "Dotnet (Modular)"
   else
     log_info "⏭️  .NET: Skipped (no dotnet files)"
   fi
@@ -190,6 +197,7 @@ main() {
   # Rust
   if has_lang_files "Cargo.toml" "*.rs"; then
     check_tool_version "Rust" "cargo" "1.70.0" "cargo --version" 0
+    check_runtime "rust" "Rust (Modular)"
   else
     log_info "⏭️  Rust: Skipped (no rust files)"
   fi

@@ -35,3 +35,14 @@ setup_perl() {
   _DUR_PERL_RT=$(($(date +%s) - _T0_PERL_RT))
   log_summary "Runtime" "Perl" "$_STAT_PERL_RT" "$(get_version perl -v | grep 'v[0-9]' | head -n 1)" "$_DUR_PERL_RT"
 }
+# Purpose: Checks if Perl runtime is available.
+# Examples:
+#   check_runtime_perl "Linter"
+check_runtime_perl() {
+  local _TOOL_DESC_PERL="${1:-Perl}"
+  if ! command -v perl >/dev/null 2>&1; then
+    log_warn "Required runtime 'perl' for $_TOOL_DESC_PERL is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

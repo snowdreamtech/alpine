@@ -54,28 +54,8 @@ main() {
 
   # 3. Special Runtime Checks (Fail-Fast for missing language foundations)
   case "$_LINTER_WRAP" in
-  rubocop) check_runtime gem "$_LINTER_WRAP" ;;
+  rubocop) check_runtime ruby "$_LINTER_WRAP" ;;
   dart) check_runtime dart "$_LINTER_WRAP" ;;
-  gofmt | cargo | goreleaser | actionlint | yamllint | typos | zig | cue | jsonnetfmt | buf | deno | hadolint | zizmor | task | dvc)
-    # Binary tools delegated to lint-wrapper for path resolution and runtime guards.
-    local _RT_CHECK="${_LINTER_WRAP}"
-    [ "$_LINTER_WRAP" = "cargo" ] && _RT_CHECK="cargo"
-    [ "$_LINTER_WRAP" = "gofmt" ] && _RT_CHECK="go"
-    [ "$_LINTER_WRAP" = "goreleaser" ] && _RT_CHECK="goreleaser"
-    [ "$_LINTER_WRAP" = "zig" ] && _RT_CHECK="zig"
-    [ "$_LINTER_WRAP" = "cue" ] && _RT_CHECK="cue"
-    [ "$_LINTER_WRAP" = "jsonnetfmt" ] && _RT_CHECK="jsonnet"
-    [ "$_LINTER_WRAP" = "buf" ] && _RT_CHECK="buf"
-    [ "$_LINTER_WRAP" = "deno" ] && _RT_CHECK="deno"
-    [ "$_LINTER_WRAP" = "hadolint" ] && _RT_CHECK="hadolint"
-    [ "$_LINTER_WRAP" = "zizmor" ] && _RT_CHECK="zizmor"
-    [ "$_LINTER_WRAP" = "actionlint" ] && _RT_CHECK="actionlint"
-    [ "$_LINTER_WRAP" = "yamllint" ] && _RT_CHECK="yamllint"
-    [ "$_LINTER_WRAP" = "typos" ] && _RT_CHECK="typos"
-    [ "$_LINTER_WRAP" = "task" ] && _RT_CHECK="task"
-    [ "$_LINTER_WRAP" = "dvc" ] && _RT_CHECK="dvc"
-    check_runtime "$_RT_CHECK" "$_LINTER_WRAP"
-    ;;
   mix) check_runtime elixir "$_LINTER_WRAP" ;;
   scalafmt | google-java-format | ktlint) check_runtime java "$_LINTER_WRAP" ;;
   ormolu)
@@ -83,12 +63,13 @@ main() {
       log_info "⏭️  ormolu (Haskell) is skipped on Windows CI due to GHC candidate availability. Skipping."
       exit 0
     fi
-    check_runtime ghc "$_LINTER_WRAP"
+    check_runtime haskell "$_LINTER_WRAP"
     ;;
   eslint | prettier | stylelint | spectral | sort-package-json | markdownlint-cli2 | taplo | dockerfile-utils | commitlint)
     check_runtime node "$_LINTER_WRAP"
     ;;
   psscriptanalyzer)
+    # Binary is pwsh, but check_runtime can use pwsh direct or a module if we had one
     check_runtime pwsh "$_LINTER_WRAP"
     ;;
   swiftformat | swiftlint)
@@ -96,8 +77,16 @@ main() {
       log_info "⏭️  ${_LINTER_WRAP} is only supported on macOS. Skipping."
       exit 0
     fi
+    check_runtime swift "$_LINTER_WRAP"
     ;;
   dotnet) check_runtime dotnet "$_LINTER_WRAP" ;;
+  gofmt) check_runtime go "$_LINTER_WRAP" ;;
+  cargo) check_runtime rust "$_LINTER_WRAP" ;;
+  *)
+    # Generic fallback for other binary tools (typos, yamllint, etc.)
+    # If a module exists for the tool name, it will be used.
+    check_runtime "$_LINTER_WRAP" "$_LINTER_WRAP"
+    ;;
   esac
 
   # 4. Execute Linter

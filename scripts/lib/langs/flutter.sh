@@ -41,3 +41,14 @@ setup_flutter() {
   _DUR_FLUTTER_RT=$(($(date +%s) - _T0_FLUTTER_RT))
   log_summary "Runtime" "Flutter" "$_STAT_FLUTTER_RT" "$(get_version flutter --version | head -n 1)" "$_DUR_FLUTTER_RT"
 }
+# Purpose: Checks if Flutter runtime is available.
+# Examples:
+#   check_runtime_flutter "Linter"
+check_runtime_flutter() {
+  local _TOOL_DESC_FLUTTER="${1:-Flutter}"
+  if ! command -v flutter >/dev/null 2>&1; then
+    log_warn "Required runtime 'flutter' for $_TOOL_DESC_FLUTTER is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

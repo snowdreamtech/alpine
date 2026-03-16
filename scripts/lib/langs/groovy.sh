@@ -35,3 +35,14 @@ setup_groovy() {
   _DUR_GROOVY_RT=$(($(date +%s) - _T0_GROOVY_RT))
   log_summary "Runtime" "Groovy" "$_STAT_GROOVY_RT" "$(get_version groovy -v | grep 'Groovy Version' | head -n 1)" "$_DUR_GROOVY_RT"
 }
+# Purpose: Checks if Groovy runtime is available.
+# Examples:
+#   check_runtime_groovy "Linter"
+check_runtime_groovy() {
+  local _TOOL_DESC_GROOVY="${1:-Groovy}"
+  if ! command -v groovy >/dev/null 2>&1; then
+    log_warn "Required runtime 'groovy' for $_TOOL_DESC_GROOVY is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

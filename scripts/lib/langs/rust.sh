@@ -38,3 +38,14 @@ setup_rust() {
   _DUR_RUST_RT=$(($(date +%s) - _T0_RUST_RT))
   log_summary "Runtime" "Rust" "$_STAT_RUST_RT" "$(get_version rustc)" "$_DUR_RUST_RT"
 }
+# Purpose: Checks if Rust runtime is available.
+# Examples:
+#   check_runtime_rust "Linter"
+check_runtime_rust() {
+  local _TOOL_DESC_RUST="${1:-Rust}"
+  if ! command -v cargo >/dev/null 2>&1; then
+    log_warn "Required runtime 'rust' for $_TOOL_DESC_RUST is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

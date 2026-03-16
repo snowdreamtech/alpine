@@ -37,3 +37,14 @@ setup_dotnet() {
   _DUR_DOTNET_RT=$(($(date +%s) - _T0_DOTNET_RT))
   log_summary "Runtime" ".NET" "$_STAT_DOTNET_RT" "$(get_version dotnet --version)" "$_DUR_DOTNET_RT"
 }
+# Purpose: Checks if .NET runtime is available.
+# Examples:
+#   check_runtime_dotnet "Linter"
+check_runtime_dotnet() {
+  local _TOOL_DESC_DOTNET="${1:-.NET}"
+  if ! command -v dotnet >/dev/null 2>&1; then
+    log_warn "Required runtime 'dotnet' for $_TOOL_DESC_DOTNET is missing. Skipping."
+    return 1
+  fi
+  return 0
+}
