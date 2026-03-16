@@ -72,7 +72,22 @@ repos:
 
       - id: check-case-conflict
         name: check for case conflicts
-        entry: 'python3 -c ''import sys, os; dirs = set(os.path.dirname(f) or "." for f in sys.argv[1:]); clashing = []; [ (lambda d, files: [clashing.append(os.path.join(d, f)) for f in os.listdir(d) if f.lower() in [x.lower() for x in files] and len([y for y in files if y.lower() == f.lower()]) > 1])(d, os.listdir(d)) for d in dirs ]; [print(f"Case collision: {f}") for f in sorted(set(clashing))]; sys.exit(1) if clashing else sys.exit(0)'''
+        entry: |
+          python3 -c "
+          import sys, os
+          dirs = set(os.path.dirname(f) or '.' for f in sys.argv[1:])
+          clashing = []
+          for d in dirs:
+              files = os.listdir(d)
+              freq = {}
+              for f in files:
+                  low = f.lower()
+                  freq[low] = freq.get(low, 0) + 1
+              for f in files:
+                  if freq[f.lower()] > 1: clashing.append(os.path.join(d, f))
+          for f in sorted(set(clashing)): print(f'Case collision: {f}')
+          sys.exit(1 if clashing else 0)
+          "
         language: system
         stages: [pre-commit, pre-merge-commit]
         description: "Verify that filenames are unique across case-insensitive filesystems."
@@ -140,18 +155,20 @@ repos:
 
       - id: check-xml
         name: check xml
-        entry: "python3 -c 'import sys, os, xml.etree.ElementTree as ET; exit_code = 0; [ (lambda f: (exec(\"try: ET.parse(f)\\nexcept Exception as e: print(f\\\"Malformed XML: {f} ({e})\\\"); sys.exit(1)\")) ) (f) for f in sys.argv[1:] if os.path.isfile(f) ]; sys.exit(exit_code)'"
+        entry: |
+          python3 -c "
+          import sys, os, xml.etree.ElementTree as ET
+          errors = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f):
+                  try: ET.parse(f)
+                  except Exception as e: errors.append(f'{f} ({e})')
+          for e in errors: print(f'Malformed XML: {e}')
+          sys.exit(1 if errors else 0)
+          "
         language: system
         types: [xml]
         description: "Verify that XML files are well-formed."
-
-      - id: detect-private-key
-        name: detect private key
-        entry: 'python3 -c ''import sys, os, re; pattern = re.compile(b"-----BEGIN " + b".*PRIVATE KEY-----"); found = [f for f in sys.argv[1:] if os.path.isfile(f) and pattern.search(open(f, "rb").read())]; [print(f"Private key detected: {f}") for f in found]; sys.exit(1) if found else sys.exit(0)'''
-        language: system
-        types: [text]
-        exclude: '\.pre-commit-config\.yaml$'
-        description: "Detect presence of private keys."
 
       # ── Secret Scanning ────────────────────────────────────────────────────
       - id: gitleaks
@@ -218,9 +235,11 @@ repos:
       - id: psscriptanalyzer
         name: PSScriptAnalyzer
         language: system
-        entry: >-
-          pwsh -NoProfile -Command
-          "& { if (!(Get-Command Invoke-ScriptAnalyzer -ErrorAction SilentlyContinue)) { exit 0 }; $r = $args | ForEach-Object { Invoke-ScriptAnalyzer -Path $_ -Severity Error,Warning }; if ($r) { $r | Format-Table -AutoSize; exit 1 } }"
+        entry: sh scripts/lib/lint-wrapper.sh psscriptanalyzer
+        args:
+          - NoProfile
+          - -Command
+          - "& { if (!(Get-Command Invoke-ScriptAnalyzer -ErrorAction SilentlyContinue)) { exit 0 }; $r = $args | ForEach-Object { Invoke-ScriptAnalyzer -Path $_ -Severity Error,Warning }; if ($r) { $r | Format-Table -AutoSize; exit 1 } }"
         types: [powershell]
         description: "PowerShell static analysis tool (macOS/Windows)."
 
@@ -232,7 +251,7 @@ repos:
         description: "Validated GitHub Actions workflow syntax."
 
       - id: checkmake
-        name: checkmake
+        name: check make
         language: system
         entry: sh scripts/lib/lint-wrapper.sh checkmake --config .checkmake.ini
         files: ^Makefile$
@@ -292,19 +311,27 @@ repos:
 
       - id: sort-package-json
         name: sort-package-json
-        entry: sh scripts/lib/lint-wrapper.sh sort-package-json
         language: system
+        entry: sh scripts/lib/lint-wrapper.sh sort-package-json
         files: ^package\.json$
         pass_filenames: true
         description: "Maintain a deterministic order in package.json."
 
       - id: dotenv-linter
         name: dotenv-linter
-        entry: sh scripts/lib/lint-wrapper.sh dotenv-linter
         language: system
+        entry: sh scripts/lib/lint-wrapper.sh dotenv-linter
         files: '(\.env|\.env\.example|\.env\.sample)$'
         pass_filenames: true
         description: "Validated structure of environment variable files."
+
+      - id: detect-private-key
+        name: detect private key
+        entry: 'python3 -c ''import sys, os, re; pattern = re.compile(b"-----BEGIN " + b".*PRIVATE KEY-----"); found = [f for f in sys.argv[1:] if os.path.isfile(f) and pattern.search(open(f, "rb").read())]; [print(f"Private key detected: {f}") for f in found]; sys.exit(1) if found else sys.exit(0)'''
+        language: system
+        types: [text]
+        exclude: '\.pre-commit-config\.yaml$'
+        description: "Detect presence of private keys."
 
       # ── Hardening & Security ──────────────────────────────────────────────
       - id: check-executables-have-shebangs
