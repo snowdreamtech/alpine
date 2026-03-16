@@ -379,6 +379,33 @@ repos:
         files: '\.proto$'
         description: "Verify that Protobuf files are well-formed (basic structural check)."
 
+      - id: check-jinja2
+        name: check jinja2 syntax
+        entry: |
+          python3 -c "
+          import sys, os
+          try:
+              from jinja2 import Environment
+              env = Environment()
+          except ImportError: env = None
+          errors = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f) and os.path.getsize(f) < 1024*1024:
+                  with open(f, 'r', encoding='utf-8') as fh:
+                      content = fh.read()
+                      if env:
+                          try: env.parse(content)
+                          except Exception as e: errors.append(f'{f} ({e})')
+                      else:
+                          if content.count('{{') != content.count('}}') or content.count('{%') != content.count('%}'):
+                              errors.append(f'{f} (unbalanced delimiters)')
+          for e in errors: print(f'Malformed Jinja2: {e}')
+          sys.exit(1 if errors else 0)
+          "
+        language: system
+        files: '\.(j2|jinja2|gotmpl|tmpl)$'
+        description: "Verify that Jinja2/Template files have valid syntax (uses 'jinja2' if available)."
+
       # ── Formatting (Auto-fix) ──────────────────────────────────────────────
       - id: prettier
         name: prettier format
