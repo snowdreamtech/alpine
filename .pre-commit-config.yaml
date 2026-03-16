@@ -341,47 +341,24 @@ repos:
 
       - id: check-rego
         name: check rego policy
-        entry: |
-          python3 -c "
-          import sys, subprocess, os
-          errors = []
-          for f in sys.argv[1:]:
-              if os.path.isfile(f) and os.path.getsize(f) < 1024*1024:
-                  try:
-                      # Try using 'opa parse' if available, otherwise check bracket balance
-                      subprocess.run(['opa', 'parse', f], capture_output=True, check=True)
-                  except (FileNotFoundError, subprocess.CalledProcessError):
-                      with open(f, 'r', encoding='utf-8') as fh:
-                          content = fh.read()
-                          if content.count('{') != content.count('}'):
-                              errors.append(f'{f} (unbalanced braces)')
-          for e in errors: print(f'Malformed Rego: {e}')
-          sys.exit(1 if errors else 0)
-          "
         language: system
+        entry: sh scripts/lib/lint-wrapper.sh opa parse
         files: '\.rego$'
-        description: "Verify that Rego policy files are well-formed (uses 'opa parse' if available)."
+        description: "Verify that Rego policy files are well-formed (uses 'opa parse')."
 
-      - id: check-protobuf
-        name: check protobuf schema
-        entry: |
-          python3 -c "
-          import sys, os
-          errors = []
-          for f in sys.argv[1:]:
-              if os.path.isfile(f) and os.path.getsize(f) < 2*1024*1024:
-                  with open(f, 'r', encoding='utf-8') as fh:
-                      content = fh.read()
-                      if content.count('{') != content.count('}'):
-                          errors.append(f'{f} (unbalanced braces)')
-                      if 'package' in content and ';' not in content:
-                          errors.append(f'{f} (missing semicolon in package definition)')
-          for e in errors: print(f'Malformed Protobuf: {e}')
-          sys.exit(1 if errors else 0)
-          "
+      - id: buf-lint
+        name: buf lint
         language: system
-        files: '\.proto$'
-        description: "Verify that Protobuf files are well-formed (basic structural check)."
+        entry: sh scripts/lib/lint-wrapper.sh buf lint
+        types: [protobuf]
+        description: "Lint Protobuf files using Buf."
+
+      - id: buf-format
+        name: buf format
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh buf format -d --exit-code
+        types: [protobuf]
+        description: "Verify Protobuf file formatting using Buf."
 
       - id: check-jinja2
         name: check jinja2 syntax
@@ -422,7 +399,6 @@ repos:
                       content = fh.read()
                       if content.count('{') != content.count('}') or content.count('[') != content.count(']'):
                           errors.append(f'{f} (unbalanced braces/brackets)')
-                      # Simple check for missing semicolons in common patterns
                       if '=' in content and ';' not in content and '{' not in content:
                           errors.append(f'{f} (potential missing semicolon)')
           for e in errors: print(f'Malformed Nix: {e}')
@@ -432,29 +408,33 @@ repos:
         files: '\.nix$'
         description: "Verify that Nix files are well-formed (basic structural check)."
 
+      - id: zig-fmt
+        name: check zig style
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh zig fmt --check
+        files: '\.zig$'
+        description: "Verify Zig code formatting using 'zig fmt'."
+
       - id: check-justfile
         name: check justfile well-formedness
-        entry: |
-          python3 -c "
-          import sys, os
-          errors = []
-          for f in sys.argv[1:]:
-              if os.path.isfile(f) and os.path.getsize(f) < 1024*1024:
-                  with open(f, 'r', encoding='utf-8') as fh:
-                      content = fh.read()
-                      if content.count('`') % 2 != 0:
-                          errors.append(f'{f} (unbalanced backticks)')
-                      # Check for recipe colon balance
-                      for line in content.splitlines():
-                          if line.strip() and not line.startswith((' ', '\t', '#')) and ':' in line and line.count(':') > 1:
-                              if 'set' not in line and 'alias' not in line:
-                                  errors.append(f'{f} (potential malformed recipe: {line.strip()})')
-          for e in errors: print(f'Malformed Justfile: {e}')
-          sys.exit(1 if errors else 0)
-          "
         language: system
+        entry: sh scripts/lib/lint-wrapper.sh just --check --justfile
         files: "justfile$"
         description: "Verify that justfile (Task runner) files are well-formed."
+
+      - id: cue-fmt
+        name: check cue style
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh cue fmt
+        files: '\.cue$'
+        description: "Verify CUE configuration formatting."
+
+      - id: jsonnet-fmt
+        name: check jsonnet style
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh jsonnetfmt -i
+        files: '\.jsonnet$'
+        description: "Verify Jsonnet configuration formatting."
 
       - id: check-webserver-config
         name: check web server config
@@ -519,45 +499,13 @@ repos:
         files: '\.prisma$'
         description: "Verify that Prisma schema files are well-formed (basic structural check)."
 
-      - id: check-sql
-        name: check sql syntax
-        entry: |
-          python3 -c "
-          import sys, os
-          errors = []
-          for f in sys.argv[1:]:
-              if os.path.isfile(f) and os.path.getsize(f) < 2*1024*1024:
-                  with open(f, 'r', encoding='utf-8') as fh:
-                      content = fh.read()
-                      if content.count(\"'\") % 2 != 0 or content.count('\"') % 2 != 0:
-                          errors.append(f'{f} (unbalanced quotes)')
-                      if content.strip() and not content.strip().endswith(';'):
-                          errors.append(f'{f} (missing terminating semicolon)')
-          for e in errors: print(f'Malformed SQL: {e}')
-          sys.exit(1 if errors else 0)
-          "
+      - id: sqlfluff
+        name: sqlfluff lint
         language: system
-        files: '\.sql$'
-        description: "Verify that SQL files are well-formed (basic syntax check)."
-
-      - id: check-graphql
-        name: check graphql schema
-        entry: |
-          python3 -c "
-          import sys, os
-          errors = []
-          for f in sys.argv[1:]:
-              if os.path.isfile(f) and os.path.getsize(f) < 1024*1024:
-                  with open(f, 'r', encoding='utf-8') as fh:
-                      content = fh.read()
-                      if content.count('{') != content.count('}'):
-                          errors.append(f'{f} (unbalanced braces)')
-          for e in errors: print(f'Malformed GraphQL: {e}')
-          sys.exit(1 if errors else 0)
-          "
-        language: system
-        files: '\.(graphql|gql)$'
-        description: "Verify that GraphQL schema files are well-formed (basic structural check)."
+        entry: sh scripts/lib/lint-wrapper.sh sqlfluff lint
+        args: [--dialect, postgres]
+        types_or: [sql]
+        description: "Lint SQL dialects for syntax and style."
 
       - id: check-env-safety
         name: check environment safety
@@ -910,12 +858,26 @@ repos:
         types: [ruby]
         description: "Verify Ruby code against community style guides."
 
-      - id: dart-format
-        name: check dart style
+      - id: mix-format
+        name: check elixir style
         language: system
-        entry: sh scripts/lib/lint-wrapper.sh dart format --output=none --set-exit-if-changed
-        types_or: [dart]
-        description: "Verify Dart code with the official SDK formatter."
+        entry: sh scripts/lib/lint-wrapper.sh mix format --check-formatted
+        files: '\.(ex|exs)$'
+        description: "Verify Elixir code compliance with official formatter."
+
+      - id: scalafmt
+        name: check scala style
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh scalafmt --check
+        types_or: [scala]
+        description: "Verify Scala code compliance with scalafmt."
+
+      - id: haskell-format
+        name: check haskell style
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh ormolu --mode check
+        types_or: [haskell]
+        description: "Verify Haskell code compliance with ormolu."
 
       - id: swiftformat
         name: check swift style

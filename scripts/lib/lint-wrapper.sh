@@ -54,7 +54,6 @@ main() {
 
   # 3. Special Runtime Checks (Fail-Fast for missing language foundations)
   case "$_LINTER_WRAP" in
-  google-java-format | ktlint) check_runtime java "$_LINTER_WRAP" ;;
   rubocop) check_runtime gem "$_LINTER_WRAP" ;;
   dart) check_runtime dart "$_LINTER_WRAP" ;;
   gofmt | cargo | goreleaser)
@@ -63,8 +62,15 @@ main() {
     [ "$_LINTER_WRAP" = "cargo" ] && _RT_CHECK="cargo"
     [ "$_LINTER_WRAP" = "gofmt" ] && _RT_CHECK="go"
     [ "$_LINTER_WRAP" = "goreleaser" ] && _RT_CHECK="goreleaser"
+    [ "$_LINTER_WRAP" = "zig" ] && _RT_CHECK="zig"
+    [ "$_LINTER_WRAP" = "cue" ] && _RT_CHECK="cue"
+    [ "$_LINTER_WRAP" = "jsonnetfmt" ] && _RT_CHECK="jsonnet"
+    [ "$_LINTER_WRAP" = "buf" ] && _RT_CHECK="buf"
     check_runtime "$_RT_CHECK" "$_LINTER_WRAP"
     ;;
+  mix) check_runtime elixir "$_LINTER_WRAP" ;;
+  scalafmt | google-java-format | ktlint) check_runtime java "$_LINTER_WRAP" ;;
+  ormolu) check_runtime haskell "$_LINTER_WRAP" ;;
   eslint | prettier | stylelint | spectral | sort-package-json | markdownlint-cli2 | taplo | dockerfile-utils | commitlint)
     check_runtime node "$_LINTER_WRAP"
     ;;
