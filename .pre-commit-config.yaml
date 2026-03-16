@@ -555,8 +555,8 @@ repos:
         files: '\.(graphql|gql)$'
         description: "Verify that GraphQL schema files are well-formed (basic structural check)."
 
-      - id: check-env-example-safety
-        name: check environment template safety
+      - id: check-env-safety
+        name: check environment safety
         entry: |
           python3 -c "
           import sys, os, re
@@ -565,19 +565,19 @@ repos:
           SECRET_REGEX = re.compile(r'=[a-zA-Z0-9/\+]{20,}')
           for f in sys.argv[1:]:
               if os.path.isfile(f):
-                  with open(f, 'r', encoding='utf-8') as fh:
+                  with open(f, 'r', encoding='utf-8', errors='ignore') as fh:
                       for i, line in enumerate(fh, 1):
                           if '=' in line and not line.strip().startswith('#'):
                               val = line.split('=', 1)[1].strip()
-                              if val and (SECRET_REGEX.search(line) or any(k in val.lower() for k in ['pk_', 'sk_', 'key_', 'token_'])):
+                              if val and (SECRET_REGEX.search(line) or any(k in val.lower() for k in ['pk_', 'sk_', 'key_', 'token_', 'secret_', 'passwd_'])):
                                   if 'your_' not in val.lower() and '<' not in val:
                                       errors.append(f'{f}:{i} (potential real secret detected)')
-          for e in errors: print(f'Unsafe Env Template: {e}')
+          for e in errors: print(f'Unsafe Env File: {e}')
           sys.exit(1 if errors else 0)
           "
         language: system
-        files: '\.env\.example$'
-        description: "Verify that .env.example files do not contain real secrets or high-entropy values."
+        files: '\.env(\..+)?$'
+        description: "Verify that .env files and templates do not contain real secrets or high-entropy values."
 
       # ── Formatting (Auto-fix) ──────────────────────────────────────────────
       - id: prettier
@@ -700,7 +700,7 @@ repos:
         entry: |
           python3 -c "
           import sys, os, re
-          pattern = re.compile(r'(test\.txt|tmp\.json|debug\.log|\.DS_Store|Thumbs\.db|\.swp|\.bak|\\.orig|\\.rej|\\.coverage|\\.map|npm-debug\.log)$')
+          pattern = re.compile(r'(test\.txt|tmp\.json|debug\.log|\.DS_Store|Thumbs\.db|\.swp|\.bak|\\.orig|\\.rej|\\.coverage|\\.map|npm-debug\.log|\\.env)$')
           forbidden = [f for f in sys.argv[1:] if os.path.isfile(f) and pattern.search(f)]
           for f in forbidden: print(f'Forbidden file detected: {f}')
           sys.exit(1 if forbidden else 0)
