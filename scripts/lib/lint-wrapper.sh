@@ -56,8 +56,8 @@ main() {
   case "$_LINTER_WRAP" in
   rubocop) check_runtime gem "$_LINTER_WRAP" ;;
   dart) check_runtime dart "$_LINTER_WRAP" ;;
-  gofmt | cargo | goreleaser)
-    # cargo and gofmt require their respective toolchains
+  gofmt | cargo | goreleaser | actionlint | yamllint | typos | zig | cue | jsonnetfmt | buf | deno | hadolint | zizmor | task | dvc)
+    # Binary tools delegated to lint-wrapper for path resolution and runtime guards.
     local _RT_CHECK="${_LINTER_WRAP}"
     [ "$_LINTER_WRAP" = "cargo" ] && _RT_CHECK="cargo"
     [ "$_LINTER_WRAP" = "gofmt" ] && _RT_CHECK="go"
