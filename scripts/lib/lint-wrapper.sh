@@ -78,7 +78,13 @@ main() {
     ;;
   mix) check_runtime elixir "$_LINTER_WRAP" ;;
   scalafmt | google-java-format | ktlint) check_runtime java "$_LINTER_WRAP" ;;
-  ormolu) check_runtime ghc "$_LINTER_WRAP" ;;
+  ormolu)
+    if [ "$_G_OS" = "windows" ]; then
+      log_info "⏭️  ormolu (Haskell) is skipped on Windows CI due to GHC candidate availability. Skipping."
+      exit 0
+    fi
+    check_runtime ghc "$_LINTER_WRAP"
+    ;;
   eslint | prettier | stylelint | spectral | sort-package-json | markdownlint-cli2 | taplo | dockerfile-utils | commitlint)
     check_runtime node "$_LINTER_WRAP"
     ;;
