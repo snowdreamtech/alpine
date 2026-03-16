@@ -63,6 +63,9 @@ main() {
   eslint | prettier | stylelint | spectral | sort-package-json | markdownlint-cli2 | taplo | dockerfile-utils | commitlint)
     check_runtime node "$_LINTER_WRAP"
     ;;
+  psscriptanalyzer)
+    check_runtime pwsh "$_LINTER_WRAP"
+    ;;
   swiftformat | swiftlint)
     if [ "$(uname -s)" != "Darwin" ]; then
       log_info "⏭️  ${_LINTER_WRAP} is only supported on macOS. Skipping."
