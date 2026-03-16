@@ -1604,7 +1604,8 @@ install_tofu() {
 # Purpose: Installs Just (modern runner).
 # Delegate: Managed by mise (.mise.toml)
 install_just() {
-  local _T0_JUST=$(date +%s)
+  local _T0_JUST
+  _T0_JUST=$(date +%s)
   local _TITLE="Just"
   local _PROVIDER="github:casey/just"
 
@@ -1627,7 +1628,8 @@ install_just() {
 # Purpose: Installs Task (modern runner).
 # Delegate: Managed by mise (.mise.toml)
 install_task() {
-  local _T0_TASK=$(date +%s)
+  local _T0_TASK
+  _T0_TASK=$(date +%s)
   local _TITLE="Task"
   local _PROVIDER="github:go-task/task"
 
@@ -1664,7 +1666,8 @@ install_nix() {
 # Purpose: Installs Zig runtime.
 # Delegate: Managed by mise (.mise.toml)
 install_zig() {
-  local _T0_ZIG=$(date +%s)
+  local _T0_ZIG
+  _T0_ZIG=$(date +%s)
   local _TITLE="Zig"
   local _PROVIDER="zig"
 
@@ -1687,7 +1690,8 @@ install_zig() {
 # Purpose: Installs CUE and Jsonnet.
 # Delegate: Managed by mise (.mise.toml)
 install_cue() {
-  local _T0_CUE=$(date +%s)
+  local _T0_CUE
+  _T0_CUE=$(date +%s)
   local _TITLE="CUE/Jsonnet"
   local _PROVIDER="github:cue-lang/cue"
 
@@ -1710,7 +1714,8 @@ install_cue() {
 # Purpose: Installs OPA/Rego.
 # Delegate: Managed by mise (.mise.toml)
 install_rego() {
-  local _T0_REGO=$(date +%s)
+  local _T0_REGO
+  _T0_REGO=$(date +%s)
   local _TITLE="Rego (OPA)"
   local _PROVIDER="github:open-policy-agent/opa"
 
