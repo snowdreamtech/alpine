@@ -515,6 +515,27 @@ repos:
         files: '\.prisma$'
         description: "Verify that Prisma schema files are well-formed (basic structural check)."
 
+      - id: check-sql
+        name: check sql syntax
+        entry: |
+          python3 -c "
+          import sys, os
+          errors = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f) and os.path.getsize(f) < 2*1024*1024:
+                  with open(f, 'r', encoding='utf-8') as fh:
+                      content = fh.read()
+                      if content.count(\"'\") % 2 != 0 or content.count('\"') % 2 != 0:
+                          errors.append(f'{f} (unbalanced quotes)')
+                      if content.strip() and not content.strip().endswith(';'):
+                          errors.append(f'{f} (missing terminating semicolon)')
+          for e in errors: print(f'Malformed SQL: {e}')
+          sys.exit(1 if errors else 0)
+          "
+        language: system
+        files: '\.sql$'
+        description: "Verify that SQL files are well-formed (basic syntax check)."
+
       # ── Formatting (Auto-fix) ──────────────────────────────────────────────
       - id: prettier
         name: prettier format
