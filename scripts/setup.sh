@@ -89,6 +89,14 @@ Modules (default: all):
   stylua             Install stylua
   buf                Install buf
   tofu               Install opentofu
+  just               Install Just
+  task               Install Task
+  nix                Check Nix
+  zig                Install Zig
+  cue                Install CUE/Jsonnet
+  rego               Install OPA/Rego
+  server             Check Server Configs
+  edge               Check Edge Configs
   pre-commit         Install pre-commit
   hooks              Activate Pre-commit Hooks
   all                Run all of the above
@@ -1586,6 +1594,153 @@ install_tofu() {
   log_summary "Runtime" "OpenTofu" "$_STAT_TOFU" "$(get_version tofu --version | head -n 1)" "$(($(date +%s) - _T0_TOFU))"
 }
 
+# Purpose: Installs Just (modern runner).
+# Delegate: Managed by mise (.mise.toml)
+install_just() {
+  local _T0_JUST=$(date +%s)
+  local _TITLE="Just"
+  local _PROVIDER="github:casey/just"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Toolchain" "Just" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "" "JUST"; then
+    log_summary "Toolchain" "Just" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+  local _STAT_JUST="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_JUST="❌ Failed"
+  log_summary "Toolchain" "Just" "$_STAT_JUST" "$(get_version just --version)" "$(($(date +%s) - _T0_JUST))"
+}
+
+# Purpose: Installs Task (modern runner).
+# Delegate: Managed by mise (.mise.toml)
+install_task() {
+  local _T0_TASK=$(date +%s)
+  local _TITLE="Task"
+  local _PROVIDER="github:go-task/task"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Toolchain" "Task" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "" "TASK"; then
+    log_summary "Toolchain" "Task" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+  local _STAT_TASK="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_TASK="❌ Failed"
+  log_summary "Toolchain" "Task" "$_STAT_TASK" "$(get_version task --version)" "$(($(date +%s) - _T0_TASK))"
+}
+
+# Purpose: Verifies Nix availability.
+install_nix() {
+  _log_setup "Nix Check" "nix"
+  if ! has_lang_files "" "NIX"; then
+    log_summary "Runtime" "Nix" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  if command -v nix >/dev/null 2>&1; then
+    log_summary "Runtime" "Nix" "✅ Available" "$(nix --version | awk '{print $3}')" "0"
+  else
+    log_summary "Runtime" "Nix" "⏭️ Missing" "-" "0"
+  fi
+}
+
+# Purpose: Installs Zig runtime.
+# Delegate: Managed by mise (.mise.toml)
+install_zig() {
+  local _T0_ZIG=$(date +%s)
+  local _TITLE="Zig"
+  local _PROVIDER="zig"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Zig" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "" "ZIG"; then
+    log_summary "Runtime" "Zig" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+  local _STAT_ZIG="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_ZIG="❌ Failed"
+  log_summary "Runtime" "Zig" "$_STAT_ZIG" "$(get_version zig version)" "$(($(date +%s) - _T0_ZIG))"
+}
+
+# Purpose: Installs CUE and Jsonnet.
+# Delegate: Managed by mise (.mise.toml)
+install_cue() {
+  local _T0_CUE=$(date +%s)
+  local _TITLE="CUE/Jsonnet"
+  local _PROVIDER="github:cue-lang/cue"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "CUE" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "" "CUES"; then
+    log_summary "Lint Tool" "CUE" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "cue/jsonnet"
+  local _STAT_CUE="✅ mise"
+  run_mise install "$_PROVIDER" "github:google/go-jsonnet" || _STAT_CUE="❌ Failed"
+  log_summary "Lint Tool" "CUE/Jsonnet" "$_STAT_CUE" "$(get_version cue version | head -n 1)" "$(($(date +%s) - _T0_CUE))"
+}
+
+# Purpose: Installs OPA/Rego.
+# Delegate: Managed by mise (.mise.toml)
+install_rego() {
+  local _T0_REGO=$(date +%s)
+  local _TITLE="Rego (OPA)"
+  local _PROVIDER="github:open-policy-agent/opa"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Security Tool" "Rego" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "" "REGO"; then
+    log_summary "Security Tool" "Rego" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+  local _STAT_REGO="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_REGO="❌ Failed"
+  log_summary "Security Tool" "Rego" "$_STAT_REGO" "$(get_version opa version | grep Version | awk '{print $NF}')" "$(($(date +%s) - _T0_REGO))"
+}
+
+# Purpose: Checks for Server configurations.
+install_server() {
+  if ! has_lang_files "" "SERVER"; then
+    log_summary "Config" "Server" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  log_summary "Config" "Server" "✅ Detected" "-" "0"
+}
+
+# Purpose: Checks for Edge deployment configurations.
+install_edge() {
+  if ! has_lang_files "" "EDGE"; then
+    log_summary "Config" "Edge" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  log_summary "Config" "Edge" "✅ Detected" "-" "0"
+}
+
 main() {
   # 1. Execution Context Guard
   guard_project_root
@@ -1669,7 +1824,7 @@ EOF
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
     # Full list for "On-demand" (default) or "All" (explicit)
-    _MODULES_LIST="node python pipx gitleaks hadolint go checkmake tflint kube-linter powershell java ruby dart swift dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit stylua buf tofu pre-commit hooks"
+    _MODULES_LIST="node python pipx gitleaks hadolint go checkmake tflint kube-linter powershell java ruby dart swift dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit stylua buf tofu just task nix zig cue rego server edge pre-commit hooks"
   else
     # Specific modules requested (e.g., ./setup.sh node)
     _MODULES_LIST="${_RAW_ARGS}"
@@ -1749,6 +1904,14 @@ EOF
     stylua) install_stylua ;;
     buf) install_buf ;;
     tofu) install_tofu ;;
+    just) install_just ;;
+    task) install_task ;;
+    nix) install_nix ;;
+    zig) install_zig ;;
+    cue) install_cue ;;
+    rego) install_rego ;;
+    server) install_server ;;
+    edge) install_edge ;;
     pre-commit) install_pre_commit ;;
     hooks) setup_hooks ;;
     *) log_error "Unknown module: $_cur_module" ;;
