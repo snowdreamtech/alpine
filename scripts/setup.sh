@@ -2052,8 +2052,12 @@ EOF
     export MISE_GIT_ALWAYS_USE_GIX=0
 
     if [ "$_IS_ALL_MODULES" = "true" ]; then
-      log_info "Performing full toolchain synchronization via mise..."
-      run_mise install
+      if [ "$_G_OS" = "windows" ]; then
+        log_info "Skipping bulk toolchain installation on Windows..."
+      else
+        log_info "Performing full toolchain synchronization via mise..."
+        run_mise install
+      fi
     else
       log_info "Performing on-demand module installation..."
     fi
