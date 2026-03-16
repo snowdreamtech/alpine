@@ -97,6 +97,21 @@ Modules (default: all):
   rego               Install OPA/Rego
   server             Check Server Configs
   edge               Check Edge Configs
+  flutter            Install Flutter SDK
+  rn                 Check React Native Config
+  pulumi             Install Pulumi CLI
+  crossplane         Check Crossplane Manifests
+  playwright         Check Playwright Config
+  cypress            Check Cypress Config
+  vitest             Check Vitest Config
+  docusaurus         Check Docusaurus Config
+  mkdocs             Check MkDocs Config
+  sphinx             Check Sphinx Config
+  jupyter            Check Jupyter Notebooks
+  dvc                Check DVC Config
+  elixir             Install Elixir/Erlang
+  haskell            Install Haskell/Stack
+  scala              Install Scala/SBT
   pre-commit         Install pre-commit
   hooks              Activate Pre-commit Hooks
   all                Run all of the above
@@ -1753,6 +1768,167 @@ install_edge() {
   log_summary "Config" "Edge" "✅ Detected" "-" "0"
 }
 
+install_flutter() {
+  if ! has_lang_files "" "FLUTTER"; then
+    log_summary "Mobile" "Flutter" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  _log_setup "Flutter SDK" "flutter"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Mobile" "Flutter" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  local _T0_FLUTTER
+  _T0_FLUTTER=$(date +%s)
+  run_mise install flutter
+  log_summary "Mobile" "Flutter" "✅ Installed" "$(get_mise_tool_version flutter)" "$(( $(date +%s) - _T0_FLUTTER ))"
+}
+
+install_rn() {
+  if ! has_lang_files "" "RN"; then
+    log_summary "Mobile" "React Native" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  log_summary "Mobile" "React Native" "✅ Detected" "-" "0"
+}
+
+install_pulumi() {
+  if ! has_lang_files "" "PULUMI"; then
+    log_summary "IaC" "Pulumi" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  _log_setup "Pulumi CLI" "pulumi"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "IaC" "Pulumi" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  local _T0_PULUMI
+  _T0_PULUMI=$(date +%s)
+  run_mise install pulumi
+  log_summary "IaC" "Pulumi" "✅ Installed" "$(get_mise_tool_version pulumi)" "$(( $(date +%s) - _T0_PULUMI ))"
+}
+
+install_crossplane() {
+  if ! has_lang_files "" "CROSSPLANE"; then
+    log_summary "IaC" "Crossplane" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  log_summary "IaC" "Crossplane" "✅ Detected" "-" "0"
+}
+
+install_playwright() {
+  if ! has_lang_files "" "PLAYWRIGHT"; then
+    log_summary "Testing" "Playwright" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  log_summary "Testing" "Playwright" "✅ Detected" "-" "0"
+}
+
+install_cypress() {
+  if ! has_lang_files "" "CYPRESS"; then
+    log_summary "Testing" "Cypress" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  log_summary "Testing" "Cypress" "✅ Detected" "-" "0"
+}
+
+install_vitest() {
+  if ! has_lang_files "" "VITEST"; then
+    log_summary "Testing" "Vitest" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  log_summary "Testing" "Vitest" "✅ Detected" "-" "0"
+}
+
+install_docusaurus() {
+  if ! has_lang_files "" "DOCUSAURUS"; then
+    log_summary "Docs" "Docusaurus" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  log_summary "Docs" "Docusaurus" "✅ Detected" "-" "0"
+}
+
+install_mkdocs() {
+  if ! has_lang_files "" "MKDOCS"; then
+    log_summary "Docs" "MkDocs" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  log_summary "Docs" "MkDocs" "✅ Detected" "-" "0"
+}
+
+install_sphinx() {
+  if ! has_lang_files "" "SPHINX"; then
+    log_summary "Docs" "Sphinx" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  log_summary "Docs" "Sphinx" "✅ Detected" "-" "0"
+}
+
+install_jupyter() {
+  if ! has_lang_files "" "JUPYTER"; then
+    log_summary "AI/Data" "Jupyter" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  log_summary "AI/Data" "Jupyter" "✅ Detected" "-" "0"
+}
+
+install_dvc() {
+  if ! has_lang_files "" "DVC"; then
+    log_summary "AI/Data" "DVC" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  log_summary "AI/Data" "DVC" "✅ Detected" "-" "0"
+}
+
+install_elixir() {
+  if ! has_lang_files "" "ELIXIR"; then
+    log_summary "Runtime" "Elixir" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  _log_setup "Elixir/Erlang" "elixir"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Elixir" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  local _T0_ELIXIR
+  _T0_ELIXIR=$(date +%s)
+  run_mise install erlang
+  run_mise install elixir
+  log_summary "Runtime" "Elixir" "✅ Installed" "$(get_mise_tool_version elixir)" "$(( $(date +%s) - _T0_ELIXIR ))"
+}
+
+install_haskell() {
+  if ! has_lang_files "" "HASKELL"; then
+    log_summary "Runtime" "Haskell" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  _log_setup "Haskell/Stack" "haskell"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Haskell" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  local _T0_HASKELL
+  _T0_HASKELL=$(date +%s)
+  run_mise install haskell
+  log_summary "Runtime" "Haskell" "✅ Installed" "$(get_mise_tool_version haskell)" "$(( $(date +%s) - _T0_HASKELL ))"
+}
+
+install_scala() {
+  if ! has_lang_files "" "SCALA"; then
+    log_summary "Runtime" "Scala" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+  _log_setup "Scala/SBT" "scala"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Scala" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  local _T0_SCALA
+  _T0_SCALA=$(date +%s)
+  run_mise install scala
+  log_summary "Runtime" "Scala" "✅ Installed" "$(get_mise_tool_version scala)" "$(( $(date +%s) - _T0_SCALA ))"
+}
+
 main() {
   # 1. Execution Context Guard
   guard_project_root
@@ -1836,7 +2012,7 @@ EOF
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
     # Full list for "On-demand" (default) or "All" (explicit)
-    _MODULES_LIST="node python pipx gitleaks hadolint go checkmake tflint kube-linter powershell java ruby dart swift dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit stylua buf tofu just task nix zig cue rego server edge pre-commit hooks"
+    _MODULES_LIST="node python pipx gitleaks hadolint go checkmake tflint kube-linter powershell java ruby dart swift dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit stylua buf tofu just task nix zig cue rego server edge flutter rn pulumi crossplane playwright cypress vitest docusaurus mkdocs sphinx jupyter dvc elixir haskell scala pre-commit hooks"
   else
     # Specific modules requested (e.g., ./setup.sh node)
     _MODULES_LIST="${_RAW_ARGS}"
@@ -1924,6 +2100,21 @@ EOF
     rego) install_rego ;;
     server) install_server ;;
     edge) install_edge ;;
+    flutter) install_flutter ;;
+    rn) install_rn ;;
+    pulumi) install_pulumi ;;
+    crossplane) install_crossplane ;;
+    playwright) install_playwright ;;
+    cypress) install_cypress ;;
+    vitest) install_vitest ;;
+    docusaurus) install_docusaurus ;;
+    mkdocs) install_mkdocs ;;
+    sphinx) install_sphinx ;;
+    jupyter) install_jupyter ;;
+    dvc) install_dvc ;;
+    elixir) install_elixir ;;
+    haskell) install_haskell ;;
+    scala) install_scala ;;
     pre-commit) install_pre_commit ;;
     hooks) setup_hooks ;;
     *) log_error "Unknown module: $_cur_module" ;;
