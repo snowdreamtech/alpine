@@ -201,12 +201,19 @@ setup_node() {
     if grep -q '"vitepress"' "$PACKAGE_JSON"; then log_summary "Framework" "VitePress" "✅ Detected" "$(get_version node "exec vitepress --version")" "0"; fi
     if grep -q '"vue"' "$PACKAGE_JSON"; then log_summary "Framework" "Vue" "✅ Detected" "-" "0"; fi
     if grep -q '"react"' "$PACKAGE_JSON"; then log_summary "Framework" "React" "✅ Detected" "-" "0"; fi
+    if grep -q '"astro"' "$PACKAGE_JSON"; then log_summary "Framework" "Astro" "✅ Detected" "-" "0"; fi
+    if grep -q '"svelte"' "$PACKAGE_JSON"; then log_summary "Framework" "Svelte" "✅ Detected" "-" "0"; fi
     if grep -q '"tailwindcss"' "$PACKAGE_JSON"; then log_summary "Framework" "Tailwind" "✅ Detected" "-" "0"; fi
   fi
 
   # Detect Bun if bun.lockb exists
   if [ -f "bun.lockb" ]; then
     log_summary "Runtime" "Bun" "✅ Detected" "$(bun --version 2>/dev/null || echo "exists")" "0"
+  fi
+
+  # Detect Deno if deno.json exists
+  if [ -f "deno.json" ] || [ -f "deno.jsonc" ]; then
+    log_summary "Runtime" "Deno" "✅ Detected" "$(deno --version 2>/dev/null | head -n 1 | awk '{print $2}')" "0"
   fi
 }
 
