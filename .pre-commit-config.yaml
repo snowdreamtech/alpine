@@ -358,6 +358,27 @@ repos:
         files: '\.rego$'
         description: "Verify that Rego policy files are well-formed (uses 'opa parse' if available)."
 
+      - id: check-protobuf
+        name: check protobuf schema
+        entry: |
+          python3 -c "
+          import sys, os
+          errors = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f) and os.path.getsize(f) < 2*1024*1024:
+                  with open(f, 'r', encoding='utf-8') as fh:
+                      content = fh.read()
+                      if content.count('{') != content.count('}'):
+                          errors.append(f'{f} (unbalanced braces)')
+                      if 'package' in content and ';' not in content:
+                          errors.append(f'{f} (missing semicolon in package definition)')
+          for e in errors: print(f'Malformed Protobuf: {e}')
+          sys.exit(1 if errors else 0)
+          "
+        language: system
+        files: '\.proto$'
+        description: "Verify that Protobuf files are well-formed (basic structural check)."
+
       # ── Formatting (Auto-fix) ──────────────────────────────────────────────
       - id: prettier
         name: prettier format
