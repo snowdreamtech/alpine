@@ -147,9 +147,10 @@ repos:
 
       - id: detect-private-key
         name: detect private key
-        entry: 'python3 -c ''import sys, os, re; pattern = re.compile(r"-----BEGIN (RSA|DSA|EC|OPENSSH|PRIVATE) KEY-----"); found = [f for f in sys.argv[1:] if os.path.isfile(f) and pattern.search(open(f, "r", errors="ignore").read())]; [print(f"Private key detected: {f}") for f in found]; sys.exit(1) if found else sys.exit(0)'''
+        entry: 'python3 -c ''import sys, os, re; pattern = re.compile(b"-----BEGIN " + b".*PRIVATE KEY-----"); found = [f for f in sys.argv[1:] if os.path.isfile(f) and pattern.search(open(f, "rb").read())]; [print(f"Private key detected: {f}") for f in found]; sys.exit(1) if found else sys.exit(0)'''
         language: system
         types: [text]
+        exclude: '\.pre-commit-config\.yaml$'
         description: "Detect presence of private keys."
 
       # ── Secret Scanning ────────────────────────────────────────────────────
