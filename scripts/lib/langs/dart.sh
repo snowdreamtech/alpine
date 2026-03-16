@@ -1,0 +1,36 @@
+#!/usr/bin/env bash
+# Dart Logic Module
+
+# Purpose: Installs Dart runtime via mise.
+install_runtime_dart() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Dart runtime."
+    return 0
+  fi
+  run_mise install dart
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Sets up Dart runtime.
+setup_dart() {
+  local _T0_DART_RT
+  _T0_DART_RT=$(date +%s)
+  _log_setup "Dart Runtime" "dart"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Dart" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "pubspec.yaml" "*.dart"; then
+    log_summary "Runtime" "Dart" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_DART_RT="✅ Installed"
+  install_runtime_dart || _STAT_DART_RT="❌ Failed"
+
+  local _DUR_DART_RT
+  _DUR_DART_RT=$(($(date +%s) - _T0_DART_RT))
+  log_summary "Runtime" "Dart" "$_STAT_DART_RT" "$(get_version dart --version | head -n 1)" "$_DUR_DART_RT"
+}

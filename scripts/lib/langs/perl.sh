@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# Perl Logic Module
+
+# Purpose: Installs Perl runtime via mise.
+install_runtime_perl() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Perl runtime."
+    return 0
+  fi
+  # shellcheck disable=SC2154
+  run_mise install "perl@${MISE_TOOL_VERSION_PERL}"
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Sets up Perl runtime.
+setup_perl() {
+  local _T0_PERL_RT
+  _T0_PERL_RT=$(date +%s)
+  _log_setup "Perl Runtime" "perl"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Perl" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "Makefile.PL Build.PL" "*.pl *.pm"; then
+    log_summary "Runtime" "Perl" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_PERL_RT="✅ Installed"
+  install_runtime_perl || _STAT_PERL_RT="❌ Failed"
+
+  local _DUR_PERL_RT
+  _DUR_PERL_RT=$(($(date +%s) - _T0_PERL_RT))
+  log_summary "Runtime" "Perl" "$_STAT_PERL_RT" "$(get_version perl -v | grep 'v[0-9]' | head -n 1)" "$_DUR_PERL_RT"
+}
