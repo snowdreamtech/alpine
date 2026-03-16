@@ -1775,13 +1775,19 @@ install_flutter() {
   fi
   _log_setup "Flutter SDK" "flutter"
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Mobile" "Flutter" "⚖️ Previewed" "-" "0"
+    log_summary "Runtime" "Flutter" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  if [ "$_G_OS" = "windows" ]; then
+    log_warn "⚠️  Flutter installation is currently skipped on Windows CI due to backend candidate availability."
+    log_summary "Runtime" "Flutter" "⚠️ Windows Skip" "-" "0"
     return 0
   fi
   local _T0_FLUTTER
   _T0_FLUTTER=$(date +%s)
-  run_mise install flutter
-  log_summary "Mobile" "Flutter" "✅ Installed" "$(get_mise_tool_version flutter)" "$(($(date +%s) - _T0_FLUTTER))"
+  # shellcheck disable=SC2154
+  run_mise install "flutter@${MISE_TOOL_VERSION_FLUTTER}"
+  log_summary "Runtime" "Flutter" "✅ Installed" "$(get_mise_tool_version flutter)" "$(($(date +%s) - _T0_FLUTTER))"
 }
 
 install_rn() {
@@ -1799,13 +1805,19 @@ install_pulumi() {
   fi
   _log_setup "Pulumi CLI" "pulumi"
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "IaC" "Pulumi" "⚖️ Previewed" "-" "0"
+    log_summary "Other" "Pulumi" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+  if [ "$_G_OS" = "windows" ]; then
+    log_warn "⚠️  Pulumi installation is currently skipped on Windows CI due to backend candidate availability."
+    log_summary "Other" "Pulumi" "⚠️ Windows Skip" "-" "0"
     return 0
   fi
   local _T0_PULUMI
   _T0_PULUMI=$(date +%s)
-  run_mise install pulumi
-  log_summary "IaC" "Pulumi" "✅ Installed" "$(get_mise_tool_version pulumi)" "$(($(date +%s) - _T0_PULUMI))"
+  # shellcheck disable=SC2154
+  run_mise install "pulumi@${MISE_TOOL_VERSION_PULUMI}"
+  log_summary "Other" "Pulumi" "✅ Installed" "$(get_mise_tool_version pulumi)" "$(($(date +%s) - _T0_PULUMI))"
 }
 
 install_crossplane() {
@@ -1881,7 +1893,7 @@ install_dvc() {
 }
 
 install_elixir() {
-  if ! has_lang_files "" "ELIXIR"; then
+  if ! has_lang_files "mix.exs" "*.ex *.exs"; then
     log_summary "Runtime" "Elixir" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -1890,10 +1902,17 @@ install_elixir() {
     log_summary "Runtime" "Elixir" "⚖️ Previewed" "-" "0"
     return 0
   fi
+  if [ "$_G_OS" = "windows" ]; then
+    log_warn "⚠️  Elixir/Erlang installation is currently skipped on Windows CI due to backend candidate availability."
+    log_summary "Runtime" "Elixir" "⚠️ Windows Skip" "-" "0"
+    return 0
+  fi
   local _T0_ELIXIR
   _T0_ELIXIR=$(date +%s)
-  run_mise install erlang
-  run_mise install elixir
+  # shellcheck disable=SC2154
+  run_mise install "erlang@${MISE_TOOL_VERSION_ERLANG}"
+  # shellcheck disable=SC2154
+  run_mise install "elixir@${MISE_TOOL_VERSION_ELIXIR}"
   log_summary "Runtime" "Elixir" "✅ Installed" "$(get_mise_tool_version elixir)" "$(($(date +%s) - _T0_ELIXIR))"
 }
 
@@ -1902,15 +1921,23 @@ install_haskell() {
     log_summary "Runtime" "Haskell" "⏭️ Skipped" "-" "0"
     return 0
   fi
-  _log_setup "Haskell/Stack" "haskell"
+  _log_setup "Haskell (GHC)" "ghc"
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Haskell" "⚖️ Previewed" "-" "0"
     return 0
   fi
+
+  if [ "$_G_OS" = "windows" ]; then
+    log_warn "⚠️  GHC installation is currently skipped on Windows CI due to backend candidate availability."
+    log_summary "Runtime" "Haskell" "⚠️ Windows Skip" "-" "0"
+    return 0
+  fi
+
   local _T0_HASKELL
   _T0_HASKELL=$(date +%s)
-  run_mise install haskell
-  log_summary "Runtime" "Haskell" "✅ Installed" "$(get_mise_tool_version haskell)" "$(($(date +%s) - _T0_HASKELL))"
+  # shellcheck disable=SC2154
+  run_mise install "ghc@${MISE_TOOL_VERSION_GHC}"
+  log_summary "Runtime" "Haskell" "✅ Installed" "$(get_mise_tool_version ghc)" "$(($(date +%s) - _T0_HASKELL))"
 }
 
 install_scala() {
@@ -1925,7 +1952,8 @@ install_scala() {
   fi
   local _T0_SCALA
   _T0_SCALA=$(date +%s)
-  run_mise install scala
+  # shellcheck disable=SC2154
+  run_mise install "scala@${MISE_TOOL_VERSION_SCALA}"
   log_summary "Runtime" "Scala" "✅ Installed" "$(get_mise_tool_version scala)" "$(($(date +%s) - _T0_SCALA))"
 }
 

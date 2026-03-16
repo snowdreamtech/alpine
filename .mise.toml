@@ -47,12 +47,9 @@ python = "3.12.9"
 go = "1.23.6"
 opentofu = "1.9.0"
 zig = "0.14.0"
-pulumi = "3.153.1"
-elixir = "1.18.2-otp-27"
-erlang = "27.2.2"
-flutter = "3.29.0"
-ghc = "9.10.1"
-scala = "3.6.3"
+# These are managed via scripts/setup.sh to allow platform-aware
+# and versioned installations without forcing CI failures.
+
 
 # ------------------------------------------------------------
 # npm-based tools (best performance under weak networks)
@@ -130,3 +127,10 @@ GITHUB_PROXY = "https://gh-proxy.sn0wdr1am.com/"
 
 # Optional: Yarn support
 YARN_REGISTRY = "https://registry.npmmirror.com"
+# Tool Version SSoT (Managed via scripts/setup.sh)
+MISE_TOOL_VERSION_PULUMI = "3.153.1"
+MISE_TOOL_VERSION_ELIXIR = "1.18.2-otp-27"
+MISE_TOOL_VERSION_ERLANG = "27.2.2"
+MISE_TOOL_VERSION_FLUTTER = "3.29.0"
+MISE_TOOL_VERSION_GHC = "9.10.1"
+MISE_TOOL_VERSION_SCALA = "3.6.3"
