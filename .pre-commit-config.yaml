@@ -1,7 +1,7 @@
 ---
-# .pre-commit-config.yaml — Second Line of Defense
+# .pre-commit-config.yaml - Second Line of Defense
 #
-# ── Triple Guarantee ──────────────────────────────────────────────
+# -- Triple Guarantee ----------------------------------------------
 # This configuration implements the "Incremental Shift-Left" philosophy.
 # It ensures that all staged changes meet the project's quality standards BEFORE
 # they are committed to the repository.
@@ -17,7 +17,7 @@
 # Manual Run:
 #   pre-commit run --all-files
 #
-# ──────────────────────────────────────────────────────────────────────────────
+# ------------------------------------------------------------------------------
 
 fail_fast: false
 default_stages: [pre-commit, pre-merge-commit]
@@ -39,7 +39,7 @@ exclude: |
 repos:
   - repo: local
     hooks:
-      # ── Git Hygiene (Incremental) ──────────────────────────────────────────
+      # -- Git Hygiene (Incremental) ------------------------------------------
       - id: trailing-whitespace
         name: trim trailing whitespace
         entry: |
@@ -173,7 +173,7 @@ repos:
         types: [text]
         description: "Prevent illegal Byte Order Mark (BOM) in UTF-8 files."
 
-      # ── Data & Configuration Hygiene ───────────────────────────────────────
+      # -- Data & Configuration Hygiene ---------------------------------------
       - id: check-xml
         name: check xml well-formedness
         entry: |
@@ -590,7 +590,7 @@ repos:
         files: '\.env(\..+)?$'
         description: "Verify that .env files and templates do not contain real secrets or high-entropy values."
 
-      # ── Formatting (Auto-fix) ──────────────────────────────────────────────
+      # -- Formatting (Auto-fix) ----------------------------------------------
       - id: prettier
         name: prettier format
         language: system
@@ -679,7 +679,7 @@ repos:
         pass_filenames: false
         description: "Format Rust code using the official Cargo toolchain."
 
-      # ── Secret Scanning ────────────────────────────────────────────────────
+      # -- Secret Scanning ----------------------------------------------------
       - id: gitleaks
         name: gitleaks quality check
         language: system
@@ -722,7 +722,7 @@ repos:
         exclude: '(node_modules/|package\.json|package-lock\.json|tsconfig\.json)'
         description: "Verify Deno code compliance with native formatter."
 
-      # ── Hardening & Security ──────────────────────────────────────────────
+      # -- Hardening & Security ----------------------------------------------
       - id: check-executables-have-shebangs
         name: check shell scripts for shebangs
         entry: |
@@ -812,7 +812,7 @@ repos:
         files: '(package-lock\.json|pnpm-lock\.yaml|yarn\.lock)$'
         description: "Prevent accidental coexistence of multiple Node.js package manager lockfiles."
 
-      # ── Linting & Quality (Language Specific) ──────────────────────────────
+      # -- Linting & Quality (Language Specific) ------------------------------
       - id: eslint
         name: eslint quality check
         language: system
@@ -905,7 +905,7 @@ repos:
         files: ^\.github/workflows/.*\.yml$
         description: "Validate GitHub Actions workflow syntax."
 
-      # ── Infrastructure & Config ───────────────────────────────────────────
+      # -- Infrastructure & Config -------------------------------------------
       - id: dockerfile-utils
         name: dockerfile quality check
         language: system
@@ -958,7 +958,7 @@ repos:
         pass_filenames: true
         description: "Validate the structure of environment variable files."
 
-      # ── Extensibility (Optional Runtime Hooks) ───────────────────────────
+      # -- Extensibility (Optional Runtime Hooks) ---------------------------
       # The following hooks skip gracefully if their runtime is missing.
       - id: sqlfluff
         name: sqlfluff lint
@@ -1040,7 +1040,7 @@ repos:
         pass_filenames: false
         description: "Verify .NET code compliance with SDK formatting rules."
 
-      # ── Git Commit Message Flow ──────────────────────────────────────────
+      # -- Git Message Flow --------------------------------------------------
       - id: commitlint
         name: check commit message format
         language: system
