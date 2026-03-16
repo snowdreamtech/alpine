@@ -1781,7 +1781,7 @@ install_flutter() {
   local _T0_FLUTTER
   _T0_FLUTTER=$(date +%s)
   run_mise install flutter
-  log_summary "Mobile" "Flutter" "✅ Installed" "$(get_mise_tool_version flutter)" "$(( $(date +%s) - _T0_FLUTTER ))"
+  log_summary "Mobile" "Flutter" "✅ Installed" "$(get_mise_tool_version flutter)" "$(($(date +%s) - _T0_FLUTTER))"
 }
 
 install_rn() {
@@ -1805,7 +1805,7 @@ install_pulumi() {
   local _T0_PULUMI
   _T0_PULUMI=$(date +%s)
   run_mise install pulumi
-  log_summary "IaC" "Pulumi" "✅ Installed" "$(get_mise_tool_version pulumi)" "$(( $(date +%s) - _T0_PULUMI ))"
+  log_summary "IaC" "Pulumi" "✅ Installed" "$(get_mise_tool_version pulumi)" "$(($(date +%s) - _T0_PULUMI))"
 }
 
 install_crossplane() {
@@ -1894,7 +1894,7 @@ install_elixir() {
   _T0_ELIXIR=$(date +%s)
   run_mise install erlang
   run_mise install elixir
-  log_summary "Runtime" "Elixir" "✅ Installed" "$(get_mise_tool_version elixir)" "$(( $(date +%s) - _T0_ELIXIR ))"
+  log_summary "Runtime" "Elixir" "✅ Installed" "$(get_mise_tool_version elixir)" "$(($(date +%s) - _T0_ELIXIR))"
 }
 
 install_haskell() {
@@ -1910,7 +1910,7 @@ install_haskell() {
   local _T0_HASKELL
   _T0_HASKELL=$(date +%s)
   run_mise install haskell
-  log_summary "Runtime" "Haskell" "✅ Installed" "$(get_mise_tool_version haskell)" "$(( $(date +%s) - _T0_HASKELL ))"
+  log_summary "Runtime" "Haskell" "✅ Installed" "$(get_mise_tool_version haskell)" "$(($(date +%s) - _T0_HASKELL))"
 }
 
 install_scala() {
@@ -1926,7 +1926,7 @@ install_scala() {
   local _T0_SCALA
   _T0_SCALA=$(date +%s)
   run_mise install scala
-  log_summary "Runtime" "Scala" "✅ Installed" "$(get_mise_tool_version scala)" "$(( $(date +%s) - _T0_SCALA ))"
+  log_summary "Runtime" "Scala" "✅ Installed" "$(get_mise_tool_version scala)" "$(($(date +%s) - _T0_SCALA))"
 }
 
 main() {
