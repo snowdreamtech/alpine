@@ -27,6 +27,8 @@
 "github:nicklockwood/SwiftFormat" = "0.60.0"
 "github:realm/SwiftLint" = "0.63.2"
 "github:google/google-java-format" = "1.22.0"
+"github:JohnnyMorganz/StyLua" = "2.0.2"
+"github:bufbuild/buf" = "1.50.0"
 
 # ------------------------------------------------------------
 # Default provider tools (mise native provider is fastest here)
@@ -38,6 +40,7 @@ gitleaks = "8.30.0"
 node = "20.18.3"
 python = "3.12.9"
 go = "1.23.6"
+opentofu = "1.9.0"
 
 # ------------------------------------------------------------
 # npm-based tools (best performance under weak networks)

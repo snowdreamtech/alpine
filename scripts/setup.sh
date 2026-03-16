@@ -86,6 +86,9 @@ Modules (default: all):
   vitepress          Install vitepress
   commitizen         Install commitizen
   pip-audit          Install pip-audit
+  stylua             Install stylua
+  buf                Install buf
+  tofu               Install opentofu
   pre-commit         Install pre-commit
   hooks              Activate Pre-commit Hooks
   all                Run all of the above
@@ -1506,6 +1509,78 @@ install_editorconfig_checker() {
   log_summary "Lint Tool" "editorconfig-checker" "$_STAT_ECC" "$(get_version editorconfig-checker)" "$(($(date +%s) - _T0_ECC))"
 }
 
+# Purpose: Installs stylua for Lua linting.
+# Delegate: Managed by mise (.mise.toml)
+install_stylua() {
+  local _T0_SL
+  _T0_SL=$(date +%s)
+  local _TITLE="StyLua"
+  local _PROVIDER="github:JohnnyMorganz/StyLua"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "StyLua" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "" "LUA"; then
+    log_summary "Lint Tool" "StyLua" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+  local _STAT_SL="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_SL="❌ Failed"
+  log_summary "Lint Tool" "StyLua" "$_STAT_SL" "$(get_version stylua)" "$(($(date +%s) - _T0_SL))"
+}
+
+# Purpose: Installs buf for Protobuf linting/management.
+# Delegate: Managed by mise (.mise.toml)
+install_buf() {
+  local _T0_BUF
+  _T0_BUF=$(date +%s)
+  local _TITLE="Buf"
+  local _PROVIDER="github:bufbuild/buf"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lint Tool" "Buf" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "" "PROTOC"; then
+    log_summary "Lint Tool" "Buf" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+  local _STAT_BUF="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_BUF="❌ Failed"
+  log_summary "Lint Tool" "Buf" "$_STAT_BUF" "$(get_version buf --version)" "$(($(date +%s) - _T0_BUF))"
+}
+
+# Purpose: Installs opentofu for HCL/IaC management.
+# Delegate: Managed by mise (.mise.toml)
+install_tofu() {
+  local _T0_TOFU
+  _T0_TOFU=$(date +%s)
+  local _TITLE="OpenTofu"
+  local _PROVIDER="opentofu"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "OpenTofu" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "" "HCL"; then
+    log_summary "Runtime" "OpenTofu" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+  local _STAT_TOFU="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_TOFU="❌ Failed"
+  log_summary "Runtime" "OpenTofu" "$_STAT_TOFU" "$(get_version tofu --version | head -n 1)" "$(($(date +%s) - _T0_TOFU))"
+}
+
 main() {
   # 1. Execution Context Guard
   guard_project_root
@@ -1589,7 +1664,7 @@ EOF
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
     # Full list for "On-demand" (default) or "All" (explicit)
-    _MODULES_LIST="node python pipx gitleaks hadolint go checkmake tflint kube-linter powershell java ruby dart swift dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit pre-commit hooks"
+    _MODULES_LIST="node python pipx gitleaks hadolint go checkmake tflint kube-linter powershell java ruby dart swift dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit stylua buf tofu pre-commit hooks"
   else
     # Specific modules requested (e.g., ./setup.sh node)
     _MODULES_LIST="${_RAW_ARGS}"
@@ -1666,6 +1741,9 @@ EOF
     vitepress) install_vitepress ;;
     commitizen) install_commitizen ;;
     pip-audit) install_pip_audit ;;
+    stylua) install_stylua ;;
+    buf) install_buf ;;
+    tofu) install_tofu ;;
     pre-commit) install_pre_commit ;;
     hooks) setup_hooks ;;
     *) log_error "Unknown module: $_cur_module" ;;
