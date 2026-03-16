@@ -428,6 +428,30 @@ repos:
         files: '\.nix$'
         description: "Verify that Nix files are well-formed (basic structural check)."
 
+      - id: check-justfile
+        name: check justfile well-formedness
+        entry: |
+          python3 -c "
+          import sys, os
+          errors = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f) and os.path.getsize(f) < 1024*1024:
+                  with open(f, 'r', encoding='utf-8') as fh:
+                      content = fh.read()
+                      if content.count('`') % 2 != 0:
+                          errors.append(f'{f} (unbalanced backticks)')
+                      # Check for recipe colon balance
+                      for line in content.splitlines():
+                          if line.strip() and not line.startswith((' ', '\t', '#')) and ':' in line and line.count(':') > 1:
+                              if 'set' not in line and 'alias' not in line:
+                                  errors.append(f'{f} (potential malformed recipe: {line.strip()})')
+          for e in errors: print(f'Malformed Justfile: {e}')
+          sys.exit(1 if errors else 0)
+          "
+        language: system
+        files: "justfile$"
+        description: "Verify that justfile (Task runner) files are well-formed."
+
       # ── Formatting (Auto-fix) ──────────────────────────────────────────────
       - id: prettier
         name: prettier format
