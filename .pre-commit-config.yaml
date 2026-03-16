@@ -250,9 +250,12 @@ repos:
         name: editorconfig-checker
         language: system
         entry: sh scripts/lib/lint-wrapper.sh editorconfig-checker
-        args:
-          - -exclude
-          - '(\.(venv|git|github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|specify|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml|tabnine|supermaven|vibe|void|zed)/.*)|((node_modules|venv|env|dist|build|out|target|vendor|__pycache__|\.specify)/.*|(\.aider\.conf\.yml))'
+        exclude: |
+          (?x)^(
+            \.(venv|git|github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|specify|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*|
+            node_modules/|venv/|env/|dist/|build/|out/|target/|vendor/|__pycache__/|\.specify/|
+            \.aider\.conf\.yml
+          )
         description: "Validate compliance with .editorconfig rules."
 
       - id: goreleaser-check
