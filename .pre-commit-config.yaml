@@ -507,6 +507,71 @@ repos:
         types_or: [sql]
         description: "Lint SQL dialects for syntax and style."
 
+      - id: check-jupyter
+        name: check jupyter notebooks
+        entry: |
+          python3 -c "
+          import sys, os, json
+          errors = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f) and os.path.getsize(f) < 10*1024*1024:
+                  try:
+                      with open(f, 'r', encoding='utf-8') as fh:
+                          nb = json.load(fh)
+                          if 'cells' not in nb: errors.append(f'{f} (missing cells)')
+                          for i, cell in enumerate(nb.get('cells', [])):
+                              if len(str(cell.get('outputs', []))) > 100000:
+                                  errors.append(f'{f}:cell {i} (output too large, please strip)')
+                  except Exception as e: errors.append(f'{f} ({e})')
+          for e in errors: print(f'Malformed/Heavy Jupyter Notebook: {e}')
+          sys.exit(1 if errors else 0)
+          "
+        language: system
+        files: '\.ipynb$'
+        description: "Verify that Jupyter Notebooks are well-formed and don't contain excessive output data."
+
+      - id: check-pulumi
+        name: check pulumi config
+        entry: |
+          python3 -c "
+          import sys, os, yaml
+          errors = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f):
+                  try:
+                      with open(f, 'r') as fh:
+                          cfg = yaml.safe_load(fh)
+                          if 'name' not in cfg or 'runtime' not in cfg:
+                              errors.append(f'{f} (missing name or runtime)')
+                  except Exception as e: errors.append(f'{f} ({e})')
+          for e in errors: print(f'Malformed Pulumi Config: {e}')
+          sys.exit(1 if errors else 0)
+          "
+        language: system
+        files: 'Pulumi\.yaml$'
+        description: "Verify that Pulumi configuration files are well-formed."
+
+      - id: check-crossplane
+        name: check crossplane manifests
+        entry: |
+          python3 -c "
+          import sys, os, yaml
+          errors = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f):
+                  try:
+                      with open(f, 'r') as fh:
+                          for doc in yaml.safe_load_all(fh):
+                              if doc and 'apiVersion' in doc and 'crossplane.io' in doc['apiVersion']:
+                                  if 'kind' not in doc: errors.append(f'{f} (metadata incomplete)')
+                  except Exception as e: errors.append(f'{f} ({e})')
+          for e in errors: print(f'Malformed Crossplane Manifest: {e}')
+          sys.exit(1 if errors else 0)
+          "
+        language: system
+        files: '.*crossplane.*\.ya?ml$'
+        description: "Verify that Crossplane manifests follow basic Kubernetes/Crossplane structure."
+
       - id: check-env-safety
         name: check environment safety
         entry: |
@@ -537,8 +602,24 @@ repos:
         language: system
         entry: sh scripts/lib/lint-wrapper.sh prettier
         args: [--write]
-        types_or: [json, yaml, vue, javascript, jsx, ts, tsx]
-        description: "Format web-standard file types using Prettier."
+        types_or:
+          [
+            json,
+            yaml,
+            vue,
+            javascript,
+            jsx,
+            ts,
+            tsx,
+            graphql,
+            sql,
+            html,
+            css,
+            markdown,
+            astro,
+            svelte,
+          ]
+        description: "Format web-standard file types using Prettier (including Astro/Svelte)."
 
       - id: shfmt
         name: shfmt format
@@ -612,6 +693,21 @@ repos:
         types: [text]
         exclude: '\.pre-commit-config\.yaml$'
         description: "Prevent accidental staging of sensitive private keys."
+
+      - id: hadolint
+        name: hadolint quality check
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh hadolint
+        files: "Dockerfile.*"
+        description: "Audit Dockerfiles for best practices and security vulnerabilities."
+
+      - id: deno-fmt
+        name: check deno style
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh deno fmt --check
+        files: '\.(ts|js|json|jsonc|md)$'
+        exclude: '(node_modules/|package\.json|package-lock\.json|tsconfig\.json)'
+        description: "Verify Deno code compliance with native formatter."
 
       # ── Hardening & Security ──────────────────────────────────────────────
       - id: check-executables-have-shebangs

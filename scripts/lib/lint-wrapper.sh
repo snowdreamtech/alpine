@@ -66,6 +66,8 @@ main() {
     [ "$_LINTER_WRAP" = "cue" ] && _RT_CHECK="cue"
     [ "$_LINTER_WRAP" = "jsonnetfmt" ] && _RT_CHECK="jsonnet"
     [ "$_LINTER_WRAP" = "buf" ] && _RT_CHECK="buf"
+    [ "$_LINTER_WRAP" = "deno" ] && _RT_CHECK="deno"
+    [ "$_LINTER_WRAP" = "hadolint" ] && _RT_CHECK="hadolint"
     check_runtime "$_RT_CHECK" "$_LINTER_WRAP"
     ;;
   mix) check_runtime elixir "$_LINTER_WRAP" ;;
