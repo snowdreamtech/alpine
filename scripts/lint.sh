@@ -31,7 +31,7 @@ show_help() {
   cat <<EOF
 Usage: $0 [OPTIONS]
 
-Unified project linter for Shell, Python, Node.js, and more.
+Unified project linter for Shell, Python, Node.js, Go, Rust, and more (20+ stacks).
 
 Options:
   --fix            Try to auto-fix linting issues.

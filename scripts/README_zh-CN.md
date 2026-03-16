@@ -27,8 +27,8 @@
     /    |      \
    /     |       \
   /      |        \
-[lib/common.sh] [lib/lint-wrapper.sh] [Windows 包装器]
-(工具库/SSoT)   (钩子中间层)          (.bat, .ps1)
+[lib/common.sh] [lib/langs/*.sh] [Windows 包装器]
+(工具库/SSoT)   (语言模块)            (.bat, .ps1)
 ```
 
 ### 设计原则
@@ -99,7 +99,8 @@ sh scripts/verify.sh
 ### 目录结构
 
 - `scripts/`: 主自动化入口。
-- `scripts/lib/`: 内部库文件 (`common.sh` 提供逻辑，`common.ps1` 提供转发)。
+- `scripts/lib/`: 内部核心库 (`common.sh`)。
+- `scripts/lib/langs/`: 模块化语言逻辑 (由 `common.sh` 自动加载)。
 - `scripts/*.ps1` & `scripts/*.bat`: Windows 平台包装器。
 
 ## 3. 运维指南

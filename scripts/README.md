@@ -27,8 +27,8 @@ This component provides a suite of cross-platform scripts to manage the developm
     /    |      \
    /     |       \
   /      |        \
-[lib/common.sh] [lib/lint-wrapper.sh] [Windows Wrappers]
-(Utils/SSoT)    (Hook Mediation)      (.ps1, .bat)
+[lib/common.sh] [lib/langs/*.sh] [Windows Wrappers]
+(Utils/SSoT)    (Lang Modules)    (.ps1, .bat)
 ```
 
 ### Design Principles
@@ -71,14 +71,14 @@ sh scripts/verify.sh
 
 | Script                 | Purpose                       | Key Modules                   |
 | :--------------------- | :---------------------------- | :---------------------------- |
-| `setup.sh`             | Install system-level tools    | node, python, go, rust, etc.  |
+| `setup.sh`             | Install system-level tools    | 20+ languages (via lib/langs) |
 | `install.sh`           | Install project dependencies  | pnpm, pip, pre-commit         |
 | `check-env.sh`         | Validate tool versions        | Runtimes, Quality Tools       |
 | `verify.sh`            | Full project verification     | env, test, lint, audit        |
 | `update.sh`            | Update all tooling            | managers, hooks, deps         |
 | `build.sh`             | Build project artifacts       | goreleaser, tsc, pyproject    |
 | `lint.sh`              | Run linters and fixers        | pre-commit, auto-fix          |
-| `test.sh`              | Execute test suites           | bats, pytest, vitest, pester  |
+| `test.sh`              | Execute test suites           | bats, pytest, vitest, vitest  |
 | `bench.sh`             | Run performance benchmarks    | pytest-benchmark, k6          |
 | `audit.sh`             | Security & vulnerability scan | gitleaks, trivy, osv-scanner  |
 | `commit.sh`            | Guided conventional commit    | commitizen (cz)               |
@@ -99,7 +99,8 @@ sh scripts/verify.sh
 ### Directory Structure
 
 - `scripts/`: Primary automation entry points.
-- `scripts/lib/`: Internal libraries (`common.sh` for logic, `common.ps1` for delegation).
+- `scripts/lib/`: Internal core library (`common.sh`).
+- `scripts/lib/langs/`: Modular language-specific logic (Sourced by `common.sh`).
 - `scripts/*.ps1` & `scripts/*.bat`: Windows entry wrappers.
 
 ## 3. Operations Guide

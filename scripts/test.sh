@@ -31,7 +31,7 @@ show_help() {
   cat <<EOF
 Usage: $0 [OPTIONS] [SUITE_TYPE]
 
-Unified project test runner for Shell, Python, PowerShell, and more.
+Unified project test runner for Shell, Python, Node.js, Go, Rust, and more.
 
 Options:
   --dry-run        Preview test suites that will be executed.
@@ -43,6 +43,7 @@ Suites (default: all):
   shell            Run bats tests in tests/
   python           Run pytest (requires .venv)
   powershell       Run Pester tests (requires pwsh)
+  node             Run vitest (requires node_modules)
   all              Run all detected test suites
 
 EOF
