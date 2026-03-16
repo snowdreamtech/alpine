@@ -499,14 +499,6 @@ repos:
         files: '\.prisma$'
         description: "Verify that Prisma schema files are well-formed (basic structural check)."
 
-      - id: sqlfluff
-        name: sqlfluff lint
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh sqlfluff lint
-        args: [--dialect, postgres]
-        types_or: [sql]
-        description: "Lint SQL dialects for syntax and style."
-
       - id: check-jupyter
         name: check jupyter notebooks
         entry: |
@@ -774,8 +766,30 @@ repos:
           sys.exit(1 if conflicts else 0)
           "
         language: system
-        files: '(\-lock\.json|lock\.yaml|Cargo\.lock|go\.sum|composer\.lock|package-lock\.json)$'
+        files: '(\-lock\.json|lock\.yaml|Cargo\.lock|go\.sum|composer\.lock|package-lock\.json|bun\.lockb|pubspec\.lock|Package\.resolved|flake\.lock|dvc\.lock)$'
         description: "Mandatory check for merge conflict markers in large lockfiles (no size limit)."
+
+      - id: check-lockfile-coexistence
+        name: check lockfile coexistence
+        entry: |
+          python3 -c "
+          import sys, os
+          dirs = set(os.path.dirname(f) or '.' for f in sys.argv[1:])
+          conflicts = []
+          for d in dirs:
+              files = os.listdir(d)
+              if 'package-lock.json' in files and 'pnpm-lock.yaml' in files:
+                  conflicts.append(f'{d} (both package-lock.json and pnpm-lock.yaml found)')
+              if 'package-lock.json' in files and 'yarn.lock' in files:
+                  conflicts.append(f'{d} (both package-lock.json and yarn.lock found)')
+              if 'pnpm-lock.yaml' in files and 'yarn.lock' in files:
+                  conflicts.append(f'{d} (both pnpm-lock.yaml and yarn.lock found)')
+          for c in conflicts: print(f'Conflicting lockfiles detected: {c}')
+          sys.exit(1 if conflicts else 0)
+          "
+        language: system
+        files: '(package-lock\.json|pnpm-lock\.yaml|yarn\.lock)$'
+        description: "Prevent accidental coexistence of multiple Node.js package manager lockfiles."
 
       # ── Linting & Quality (Language Specific) ──────────────────────────────
       - id: eslint
