@@ -51,7 +51,7 @@ pulumi = "latest"
 elixir = "latest"
 erlang = "latest"
 flutter = "latest"
-haskell = "latest"
+ghc = "latest"
 scala = "latest"
 
 # ------------------------------------------------------------

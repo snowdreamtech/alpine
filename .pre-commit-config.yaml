@@ -352,14 +352,14 @@ repos:
         name: buf lint
         language: system
         entry: sh scripts/lib/lint-wrapper.sh buf lint
-        types: [protobuf]
+        files: \.proto$
         description: "Lint Protobuf files using Buf."
 
       - id: buf-format
         name: buf format
         language: system
         entry: sh scripts/lib/lint-wrapper.sh buf format -d --exit-code
-        types: [protobuf]
+        files: \.proto$
         description: "Verify Protobuf file formatting using Buf."
 
       - id: check-jinja2
@@ -596,23 +596,7 @@ repos:
         language: system
         entry: sh scripts/lib/lint-wrapper.sh prettier
         args: [--write]
-        types_or:
-          [
-            json,
-            yaml,
-            vue,
-            javascript,
-            jsx,
-            ts,
-            tsx,
-            graphql,
-            sql,
-            html,
-            css,
-            markdown,
-            astro,
-            svelte,
-          ]
+        types_or: [json, yaml, vue, javascript, jsx, ts, tsx, graphql, sql, html, css, markdown, astro, svelte]
         description: "Format web-standard file types using Prettier (including Astro/Svelte)."
 
       - id: zizmor
@@ -981,28 +965,28 @@ repos:
         name: check kotlin style
         language: system
         entry: sh scripts/lib/lint-wrapper.sh ktlint
-        types_or: [kotlin]
+        files: '\.kts?$'
         description: "Verify Kotlin code against community style guides."
 
       - id: google-java-format
         name: check java style
         language: system
         entry: sh scripts/lib/lint-wrapper.sh google-java-format --set-exit-if-changed --dry-run
-        types: [java]
+        files: '\.java$'
         description: "Verify Java code against Google Style Guide."
 
       - id: rubocop
         name: check ruby style
         language: system
         entry: sh scripts/lib/lint-wrapper.sh rubocop
-        types: [ruby]
+        files: '\.rb$'
         description: "Verify Ruby code against community style guides."
 
       - id: dart-format
         name: check dart style
         language: system
         entry: sh scripts/lib/lint-wrapper.sh dart format --output=none --set-exit-if-changed
-        types_or: [dart]
+        files: '\.dart$'
         description: "Verify Dart code with the official SDK formatter."
 
       - id: mix-format
@@ -1016,28 +1000,28 @@ repos:
         name: check scala style
         language: system
         entry: sh scripts/lib/lint-wrapper.sh scalafmt --check
-        types_or: [scala]
+        files: '\.scala$'
         description: "Verify Scala code compliance with scalafmt."
 
       - id: haskell-format
         name: check haskell style
         language: system
         entry: sh scripts/lib/lint-wrapper.sh ormolu --mode check
-        types_or: [haskell]
+        files: '\.lhs?$'
         description: "Verify Haskell code compliance with ormolu."
 
       - id: swiftformat
         name: check swift style
         language: system
         entry: sh scripts/lib/lint-wrapper.sh swiftformat --lint
-        types: [swift]
+        files: '\.swift$'
         description: "Verify Swift code formatting (macOS only)."
 
       - id: swiftlint
         name: swiftlint quality check
         language: system
         entry: sh scripts/lib/lint-wrapper.sh swiftlint lint --strict
-        types: [swift]
+        files: '\.swift$'
         pass_filenames: false
         description: "Audit Swift code quality and best practices (macOS only)."
 
