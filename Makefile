@@ -62,7 +62,7 @@ endif
 # =============================================================================
 # Targets
 # =============================================================================
-.PHONY: all help init setup install lint format test build clean commit verify release env update audit health bench docs archive-changelog check-env sync-docs
+.PHONY: all help init setup install lint format test build clean commit verify release env update audit health bench docs archive-changelog check-env sync-docs precommit
 
 # Default target: display help
 all: help
@@ -81,6 +81,7 @@ help:
 	@echo "  $(GREEN)test$(NC)     Run unified test suite"
 	@echo "  $(GREEN)build$(NC)    Build project artifacts"
 	@echo "  $(GREEN)commit$(NC)   Start the interactive Commitizen CLI"
+	@echo "  $(GREEN)precommit$(NC) Alias for lint (Run pre-commit hooks)"
 	@echo "  $(GREEN)verify$(NC)   Run full project verification (env, lint, test)"
 	@echo "  $(GREEN)release$(NC)  Standardized release manager (versioning & tagging)"
 	@echo "  $(GREEN)env$(NC)      Environment configuration manager (.env)"
@@ -97,51 +98,53 @@ help:
 # Lifecycle Targets
 init:
 ifeq ($(OS_NAME),Windows)
-	@scripts/init-project.bat $(SCRIPT_ARGS)
+	@scripts/init-project.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/init-project.sh $(SCRIPT_ARGS)
+	@sh scripts/init-project.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 setup:
 ifeq ($(OS_NAME),Windows)
-	@scripts/setup.bat $(SCRIPT_ARGS)
+	@scripts/setup.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/setup.sh $(SCRIPT_ARGS)
+	@sh scripts/setup.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 install: setup
 ifeq ($(OS_NAME),Windows)
-	@scripts/install.bat $(SCRIPT_ARGS)
+	@scripts/install.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/install.sh $(SCRIPT_ARGS)
+	@sh scripts/install.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 lint:
 ifeq ($(OS_NAME),Windows)
-	@scripts/lint.bat $(SCRIPT_ARGS)
+	@scripts/lint.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/lint.sh $(SCRIPT_ARGS)
+	@sh scripts/lint.sh $(SCRIPT_ARGS) $(ARGS)
 endif
+
+precommit: lint
 
 format:
 ifeq ($(OS_NAME),Windows)
-	@scripts/format.bat $(SCRIPT_ARGS)
+	@scripts/format.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/format.sh $(SCRIPT_ARGS)
+	@sh scripts/format.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 test:
 ifeq ($(OS_NAME),Windows)
-	@scripts/test.bat $(SCRIPT_ARGS)
+	@scripts/test.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/test.sh $(SCRIPT_ARGS)
+	@sh scripts/test.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 build:
 ifeq ($(OS_NAME),Windows)
-	@scripts/build.bat $(SCRIPT_ARGS)
+	@scripts/build.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/build.sh $(SCRIPT_ARGS)
+	@sh scripts/build.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 commit:
@@ -153,58 +156,58 @@ endif
 
 verify:
 ifeq ($(OS_NAME),Windows)
-	@scripts/verify.bat $(SCRIPT_ARGS)
+	@scripts/verify.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/verify.sh $(SCRIPT_ARGS)
+	@sh scripts/verify.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 release:
 ifeq ($(OS_NAME),Windows)
-	@scripts/release.bat $(SCRIPT_ARGS)
+	@scripts/release.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/release.sh $(SCRIPT_ARGS)
+	@sh scripts/release.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 env:
 ifeq ($(OS_NAME),Windows)
-	@scripts/env.bat $(SCRIPT_ARGS)
+	@scripts/env.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/env.sh $(SCRIPT_ARGS)
+	@sh scripts/env.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 update:
 ifeq ($(OS_NAME),Windows)
-	@scripts/update.bat $(SCRIPT_ARGS)
+	@scripts/update.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/update.sh $(SCRIPT_ARGS)
+	@sh scripts/update.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 audit:
 ifeq ($(OS_NAME),Windows)
-	@scripts/audit.bat $(SCRIPT_ARGS)
+	@scripts/audit.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/audit.sh $(SCRIPT_ARGS)
+	@sh scripts/audit.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 health:
 ifeq ($(OS_NAME),Windows)
-	@scripts/health.bat $(SCRIPT_ARGS)
+	@scripts/health.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/health.sh $(SCRIPT_ARGS)
+	@sh scripts/health.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 bench:
 ifeq ($(OS_NAME),Windows)
-	@scripts/bench.bat $(SCRIPT_ARGS)
+	@scripts/bench.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/bench.sh $(SCRIPT_ARGS)
+	@sh scripts/bench.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 sync-docs:
 ifeq ($(OS_NAME),Windows)
-	@scripts/sync-docs.bat $(SCRIPT_ARGS)
+	@scripts/sync-docs.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/sync-docs.sh $(SCRIPT_ARGS)
+	@sh scripts/sync-docs.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 docs:
@@ -216,21 +219,21 @@ endif
 
 archive-changelog:
 ifeq ($(OS_NAME),Windows)
-	@scripts/archive-changelog.bat $(SCRIPT_ARGS)
+	@scripts/archive-changelog.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/archive-changelog.sh $(SCRIPT_ARGS)
+	@sh scripts/archive-changelog.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 check-env:
 ifeq ($(OS_NAME),Windows)
-	@scripts/check-env.bat $(SCRIPT_ARGS)
+	@scripts/check-env.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/check-env.sh $(SCRIPT_ARGS)
+	@sh scripts/check-env.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 clean:
 ifeq ($(OS_NAME),Windows)
-	@scripts/cleanup.bat $(SCRIPT_ARGS)
+	@scripts/cleanup.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/cleanup.sh $(SCRIPT_ARGS)
+	@sh scripts/cleanup.sh $(SCRIPT_ARGS) $(ARGS)
 endif
