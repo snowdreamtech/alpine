@@ -72,14 +72,14 @@ repos:
 
       - id: check-case-conflict
         name: check for case conflicts
-        entry: python3 -c 'import sys, os; [sys.exit(1) for d in set(os.path.dirname(f) or "." for f in sys.argv[1:]) for files in [[f.lower() for f in os.listdir(d)]] if len(files) != len(set(files))]'
+        entry: 'python3 -c ''import sys, os; [print(f"Case collision in: {d}") or sys.exit(1) for d in set(os.path.dirname(f) or "." for f in sys.argv[1:]) for files in [[f.lower() for f in os.listdir(d)]] if len(files) != len(set(files))]'''
         language: system
         stages: [pre-commit, pre-merge-commit]
         description: "Verify that filenames are unique across case-insensitive filesystems."
 
       - id: check-symlinks
         name: check for broken symlinks
-        entry: python3 -c 'import sys, os; [sys.exit(1) for f in sys.argv[1:] if os.path.islink(f) and not os.path.exists(f)]'
+        entry: 'python3 -c ''import sys, os; [print(f"Broken symlink: {f}") or sys.exit(1) for f in sys.argv[1:] if os.path.islink(f) and not os.path.exists(f)]'''
         language: system
         stages: [pre-commit, pre-merge-commit]
         description: "Ensure symlinks point to existing locations."
