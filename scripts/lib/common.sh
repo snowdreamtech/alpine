@@ -1418,6 +1418,71 @@ install_runtime_python() {
   fi
 }
 
+# Purpose: Installs Java runtime via mise.
+# Delegate: Managed by mise (.mise.toml)
+install_runtime_java() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Java runtime."
+    return 0
+  fi
+
+  # Runtime initialization
+  run_mise install java
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Installs PHP runtime via mise.
+# Delegate: Managed by mise (.mise.toml)
+install_runtime_php() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install PHP runtime."
+    return 0
+  fi
+
+  # Runtime initialization
+  run_mise install php
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Installs Rust runtime via mise.
+# Delegate: Managed by mise (.mise.toml)
+install_runtime_rust() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Rust runtime."
+    return 0
+  fi
+
+  # Runtime initialization
+  run_mise install rust
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Installs .NET runtime via mise.
+# Delegate: Managed by mise (.mise.toml)
+install_runtime_dotnet() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install .NET runtime."
+    return 0
+  fi
+
+  # Runtime initialization
+  run_mise install dotnet
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Installs Ruby runtime via mise.
+# Delegate: Managed by mise (.mise.toml)
+install_runtime_ruby() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Ruby runtime."
+    return 0
+  fi
+
+  # Runtime initialization
+  run_mise install ruby
+  eval "$(mise activate bash --shims)"
+}
+
 # Purpose: Installs git hooks using pre-commit.
 # Delegate: Managed via pipx (pre-commit).
 # Examples:

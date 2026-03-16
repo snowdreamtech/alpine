@@ -112,6 +112,11 @@ Modules (default: all):
   elixir             Install Elixir/Erlang
   haskell            Install Haskell/Stack
   scala              Install Scala/SBT
+  php                Install PHP Runtime
+  rust               Install Rust Runtime
+  ruby               Setup Ruby & Rubocop
+  java               Setup Java & Google-Java-Format
+  dotnet             Setup .NET SDK
   pre-commit         Install pre-commit
   hooks              Activate Pre-commit Hooks
   all                Run all of the above
@@ -278,6 +283,112 @@ setup_python() {
   local _DUR_PY
   _DUR_PY=$(($(date +%s) - _T0_PY))
   log_summary "Runtime" "Python" "$_STAT_PY" "$(get_version "$VENV/bin/python")" "$_DUR_PY"
+}
+
+# Purpose: Sets up Java runtime and mandatory linting tools.
+# Delegate: Managed by mise (.mise.toml)
+setup_java() {
+  local _T0_JAVA_RT
+  _T0_JAVA_RT=$(date +%s)
+  _log_setup "Java Runtime" "java"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Java" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "pom.xml build.gradle" "*.java"; then
+    log_summary "Runtime" "Java" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_JAVA_RT="✅ Installed"
+  install_runtime_java || _STAT_JAVA_RT="❌ Failed"
+
+  local _DUR_JAVA_RT
+  _DUR_JAVA_RT=$(($(date +%s) - _T0_JAVA_RT))
+  log_summary "Runtime" "Java" "$_STAT_JAVA_RT" "$(get_version java)" "$_DUR_JAVA_RT"
+
+  # Also ensure linting tools are present
+  install_java_lint
+}
+
+# Purpose: Sets up PHP runtime.
+# Delegate: Managed by mise (.mise.toml)
+setup_php() {
+  local _T0_PHP_RT
+  _T0_PHP_RT=$(date +%s)
+  _log_setup "PHP Runtime" "php"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "PHP" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "composer.json" "*.php"; then
+    log_summary "Runtime" "PHP" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_PHP_RT="✅ Installed"
+  install_runtime_php || _STAT_PHP_RT="❌ Failed"
+
+  local _DUR_PHP_RT
+  _DUR_PHP_RT=$(($(date +%s) - _T0_PHP_RT))
+  log_summary "Runtime" "PHP" "$_STAT_PHP_RT" "$(get_version php)" "$_DUR_PHP_RT"
+}
+
+# Purpose: Sets up Rust runtime.
+# Delegate: Managed by mise (.mise.toml)
+setup_rust() {
+  local _T0_RUST_RT
+  _T0_RUST_RT=$(date +%s)
+  _log_setup "Rust Runtime" "rust"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Rust" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "Cargo.toml" "*.rs"; then
+    log_summary "Runtime" "Rust" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_RUST_RT="✅ Installed"
+  install_runtime_rust || _STAT_RUST_RT="❌ Failed"
+
+  local _DUR_RUST_RT
+  _DUR_RUST_RT=$(($(date +%s) - _T0_RUST_RT))
+  log_summary "Runtime" "Rust" "$_STAT_RUST_RT" "$(get_version rustc)" "$_DUR_RUST_RT"
+}
+
+# Purpose: Sets up Ruby runtime and mandatory linting tools.
+# Delegate: Managed by mise (.mise.toml)
+setup_ruby() {
+  local _T0_RUBY_RT
+  _T0_RUBY_RT=$(date +%s)
+  _log_setup "Ruby Runtime" "ruby"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Ruby" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  if ! has_lang_files "Gemfile Gemfile.lock" "*.rb"; then
+    log_summary "Runtime" "Ruby" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_RUBY_RT="✅ Installed"
+  install_runtime_ruby || _STAT_RUBY_RT="❌ Failed"
+
+  local _DUR_RUBY_RT
+  _DUR_RUBY_RT=$(($(date +%s) - _T0_RUBY_RT))
+  log_summary "Runtime" "Ruby" "$_STAT_RUBY_RT" "$(get_version ruby)" "$_DUR_RUBY_RT"
+
+  # Also ensure linting tools are present
+  install_ruby_lint
 }
 
 install_pipx() {
@@ -645,11 +756,13 @@ setup_dotnet() {
   fi
 
   _log_setup ".NET SDK Check" "dotnet"
-  if command -v dotnet >/dev/null 2>&1; then
-    log_summary "Runtime" ".NET" "✅ Available" "$(get_version dotnet)" "0"
-  else
-    log_summary "Runtime" ".NET" "⏭️ Missing" "-" "0"
-  fi
+
+  local _STAT_DOTNET="✅ Installed"
+  install_runtime_dotnet || _STAT_DOTNET="❌ Failed"
+
+  local _DUR_DOTNET
+  _DUR_DOTNET=$(($(date +%s) - _T0_DOT))
+  log_summary "Runtime" ".NET" "$_STAT_DOTNET" "$(get_version dotnet)" "$_DUR_DOTNET"
 
   # Install .NET specific tools (managed via mise)
   install_dotnet_format
@@ -2080,8 +2193,10 @@ EOF
     tflint) install_tflint ;;
     kube-linter) install_kube_linter ;;
     powershell) setup_powershell ;;
-    java) install_java_lint ;;
-    ruby) install_ruby_lint ;;
+    php) setup_php ;;
+    rust) setup_rust ;;
+    java) setup_java ;;
+    ruby) setup_ruby ;;
     dart) setup_dart ;;
     swift) setup_swift ;;
     dotnet) setup_dotnet ;;
