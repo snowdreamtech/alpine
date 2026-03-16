@@ -67,7 +67,7 @@ main() {
     [ "$_LINTER_WRAP" = "jsonnetfmt" ] && _RT_CHECK="jsonnet"
     [ "$_LINTER_WRAP" = "buf" ] && _RT_CHECK="buf"
     [ "$_LINTER_WRAP" = "deno" ] && _RT_CHECK="deno"
-    [ "$_LINTER_WRAP" = "Hadolint" ] && _RT_CHECK="hadolint"
+    [ "$_LINTER_WRAP" = "hadolint" ] && _RT_CHECK="hadolint"
     [ "$_LINTER_WRAP" = "zizmor" ] && _RT_CHECK="zizmor"
     [ "$_LINTER_WRAP" = "task" ] && _RT_CHECK="task"
     [ "$_LINTER_WRAP" = "dvc" ] && _RT_CHECK="dvc"
