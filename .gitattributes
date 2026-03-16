@@ -1,64 +1,82 @@
 # -----------------------------------------------------------------------------
-# 1. Auto detect text files and perform LF normalization
+# 1. Global Defaults
 # -----------------------------------------------------------------------------
 * text=auto eol=lf
 
 # -----------------------------------------------------------------------------
-# 2. Explicitly declare text files to be normalized and converted to LF
-#    This guarantees that standard text files are treated correctly,
-#    regardless of the auto detection.
+# 2. Source Code (All LF)
 # -----------------------------------------------------------------------------
+*.bash text eol=lf
 *.c text eol=lf
+*.cjs text eol=lf
 *.cpp text eol=lf
 *.cs text eol=lf
 *.css text eol=lf
+*.dart text eol=lf
 *.go text eol=lf
-*.csv text eol=lf
 *.h text eol=lf
 *.html text eol=lf
 *.java text eol=lf
 *.js text eol=lf
-*.mjs text eol=lf
-*.cjs text eol=lf
-*.ts text eol=lf
-*.tsx text eol=lf
 *.jsx text eol=lf
-*.json text eol=lf
-*.json5 text eol=lf
-*.jsonc text eol=lf
 *.less text eol=lf
 *.m text eol=lf
-*.md text eol=lf
+*.mjs text eol=lf
 *.php text eol=lf
 *.pl text eol=lf
 *.py text eol=lf
 *.rb text eol=lf
+*.rs text eol=lf
 *.scss text eol=lf
 *.sh text eol=lf
-*.bash text eol=lf
-*.zsh text eol=lf
-*.ps1 text eol=crlf
-*.bat text eol=crlf
-*.cmd text eol=crlf
 *.sql text eol=lf
-*.txt text eol=lf
-*.xml text eol=lf
-*.yml text eol=lf
-*.yaml text eol=lf
-.ansible-lint text eol=lf
-.yamllint.yml text eol=lf
-.devcontainer/*.yaml text eol=lf
-.devcontainer/*.yml text eol=lf
-*.toml text eol=lf
-*.vue text eol=lf
-*.rs text eol=lf
 *.svelte text eol=lf
-*.ini text eol=lf
-*.conf text eol=lf
+*.swift text eol=lf
+*.ts text eol=lf
+*.tsx text eol=lf
+*.vue text eol=lf
+*.zsh text eol=lf
 
 # -----------------------------------------------------------------------------
-# 3. Denote all files that are truly binary and should not be modified.
-#    This prevents git from corrupting binary files on commit/checkout.
+# 3. Documentation & Configuration (All LF)
+# -----------------------------------------------------------------------------
+*.conf text eol=lf
+*.csv text eol=lf
+*.ini text eol=lf
+*.json text eol=lf
+*.json5 text eol=lf
+*.jsonc text eol=lf
+*.md text eol=lf
+*.toml text eol=lf
+*.txt text eol=lf
+*.xml text eol=lf
+*.yaml text eol=lf
+*.yml text eol=lf
+.ansible-lint text eol=lf
+.cursor/rules/rules.mdc text eol=lf
+.github/CODEOWNERS text eol=lf
+.gitleaksignore text eol=lf
+.goose/.goosehints text eol=lf
+.prettierignore text eol=lf
+.prettierrc text eol=lf
+.shellcheckrc text eol=lf
+.sqlfluffignore text eol=lf
+.stylelintignore text eol=lf
+.yamllint.yml text eol=lf
+docker-compose.yml text eol=lf
+Makefile text eol=lf
+Taskfile.yml text eol=lf
+VERSION text eol=lf
+
+# -----------------------------------------------------------------------------
+# 4. Windows Scripts (Unified to LF per user request)
+# -----------------------------------------------------------------------------
+*.bat text eol=lf
+*.cmd text eol=lf
+*.ps1 text eol=lf
+
+# -----------------------------------------------------------------------------
+# 5. Static Assets & Binary Files
 # -----------------------------------------------------------------------------
 # Archives
 *.7z binary
@@ -104,8 +122,7 @@
 *.woff2 binary
 
 # -----------------------------------------------------------------------------
-# 4. Linguist overrides to keep GitHub language stats clean
-#    (linguist-vendored=true ignores files when calculating project stats)
+# 6. Linguist / GitHub Overrides
 # -----------------------------------------------------------------------------
 # Standard build/dependency directories
 node_modules/ linguist-vendored=true
@@ -122,8 +139,7 @@ target/ linguist-vendored=true
 .next/ linguist-vendored=true
 .nuxt/ linguist-vendored=true
 
-# Mark all AI IDE and agent config directories as vendored to exclude them
-# from GitHub language statistics and prevent them from showing up in diffs by default.
+# AI Agent & IDE Configurations
 /.adal/** linguist-vendored=true
 /.agent/** linguist-vendored=true
 /.agents/** linguist-vendored=true
@@ -177,71 +193,3 @@ target/ linguist-vendored=true
 /.windsurf/** linguist-vendored=true
 /.zed/** linguist-vendored=true
 /.zencoder/** linguist-vendored=true
-
-# -----------------------------------------------------------------------------
-# 5. Tool-specific and Meta-configuration (Explicit non-executable text)
-# -----------------------------------------------------------------------------
-.github/CODEOWNERS text eol=lf
-.sqlfluffignore text eol=lf
-.gitleaksignore text eol=lf
-.ansible-lint text eol=lf
-.cursor/rules/rules.mdc text eol=lf
-.prettierrc text eol=lf
-PSScriptAnalyzerSettings.psd1 text eol=crlf
-.stylelintignore text eol=lf
-VERSION text eol=lf
-.prettierignore text eol=lf
-.devcontainer/Dockerfile text eol=lf
-.goose/.goosehints text eol=lf
-.shellcheckrc text eol=lf
-docs/.vitepress/config.mts text eol=lf
-
-# -----------------------------------------------------------------------------
-# 6. Source Code & Scripts (LF Normalization)
-# -----------------------------------------------------------------------------
-*.sh text eol=lf
-*.bash text eol=lf
-*.zsh text eol=lf
-*.py text eol=lf
-*.rb text eol=lf
-*.pl text eol=lf
-*.php text eol=lf
-*.swift text eol=lf
-*.dart text eol=lf
-*.go text eol=lf
-*.rs text eol=lf
-*.c text eol=lf
-*.cpp text eol=lf
-*.h text eol=lf
-*.java text eol=lf
-*.js text eol=lf
-*.ts text eol=lf
-*.tsx text eol=lf
-*.jsx text eol=lf
-*.mjs text eol=lf
-*.cjs text eol=lf
-*.json text eol=lf
-*.toml text eol=lf
-*.yaml text eol=lf
-*.yml text eol=lf
-*.md text eol=lf
-*.txt text eol=lf
-Makefile text eol=lf
-Taskfile.yml text eol=lf
-docker-compose.yml text eol=lf
-
-# -----------------------------------------------------------------------------
-# 7. Shell-specific scripts (May require +x bit on Unix)
-# -----------------------------------------------------------------------------
-scripts/*.sh text eol=lf
-scripts/*.bash text eol=lf
-scripts/lib/*.sh text eol=lf
-
-# -----------------------------------------------------------------------------
-# 8. Windows-specific scripts (Explicit CRLF)
-# -----------------------------------------------------------------------------
-*.bat text eol=crlf
-*.cmd text eol=crlf
-*.ps1 text eol=crlf
-scripts/*.bat text eol=crlf
-scripts/*.ps1 text eol=crlf
