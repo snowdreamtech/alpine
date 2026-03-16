@@ -58,28 +58,28 @@ repos:
 
       - id: check-added-large-files
         name: check for added large files
-        entry: 'python3 -c ''import sys, os; [print(f"File too large (>500KB): {f}") or sys.exit(1) for f in sys.argv[1:] if os.path.getsize(f) > 500*1024]'''
+        entry: 'python3 -c ''import sys, os; large_files = [f for f in sys.argv[1:] if os.path.getsize(f) > 500*1024]; [print(f"File too large (>500KB): {f}") for f in large_files]; sys.exit(1) if large_files else sys.exit(0)'''
         language: system
         stages: [pre-commit, pre-merge-commit]
         description: "Prevent large files (>500KB) from being committed."
 
       - id: check-merge-conflict
         name: check for merge conflicts
-        entry: 'python3 -c ''import sys, re; [print(f"Merge conflict markers found in: {f}") or sys.exit(1) for f in sys.argv[1:] if re.search(r"^(<<<<<<<|=======|>>>>>>>)", open(f, "r", errors="ignore").read(), re.MULTILINE)]'''
+        entry: 'python3 -c ''import sys, re; conflicts = [f for f in sys.argv[1:] if re.search(r"^(<<<<<<<|=======|>>>>>>>)", open(f, "r", errors="ignore").read(), re.MULTILINE)]; [print(f"Merge conflict markers found in: {f}") for f in conflicts]; sys.exit(1) if conflicts else sys.exit(0)'''
         language: system
         stages: [pre-commit, pre-merge-commit]
         description: "Intercept files containing git merge conflict markers."
 
       - id: check-case-conflict
         name: check for case conflicts
-        entry: 'python3 -c ''import sys, os; [print(f"Case collision in: {d}") or sys.exit(1) for d in set(os.path.dirname(f) or "." for f in sys.argv[1:]) for files in [[f.lower() for f in os.listdir(d)]] if len(files) != len(set(files))]'''
+        entry: 'python3 -c ''import sys, os; collisions = [d for d in set(os.path.dirname(f) or "." for f in sys.argv[1:]) if (lambda files: len(files) != len(set(files)))([f.lower() for f in os.listdir(d)])]; [print(f"Case collision in: {d}") for d in collisions]; sys.exit(1) if collisions else sys.exit(0)'''
         language: system
         stages: [pre-commit, pre-merge-commit]
         description: "Verify that filenames are unique across case-insensitive filesystems."
 
       - id: check-symlinks
         name: check for broken symlinks
-        entry: 'python3 -c ''import sys, os; [print(f"Broken symlink: {f}") or sys.exit(1) for f in sys.argv[1:] if os.path.islink(f) and not os.path.exists(f)]'''
+        entry: 'python3 -c ''import sys, os; broken = [f for f in sys.argv[1:] if os.path.islink(f) and not os.path.exists(f)]; [print(f"Broken symlink: {f}") for f in broken]; sys.exit(1) if broken else sys.exit(0)'''
         language: system
         stages: [pre-commit, pre-merge-commit]
         description: "Ensure symlinks point to existing locations."
