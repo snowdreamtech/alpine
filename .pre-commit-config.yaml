@@ -19,7 +19,7 @@
 #
 # ──────────────────────────────────────────────────────────────────────────────
 
-fail_fast: true
+fail_fast: false
 default_stages: [pre-commit, pre-merge-commit]
 exclude: |
   (?x)^(
@@ -40,7 +40,20 @@ repos:
       # ── Git Hygiene (Incremental) ──────────────────────────────────────────
       - id: trailing-whitespace
         name: trim trailing whitespace
-        entry: "python3 -c 'import sys, re; modified = []; [ (lambda f, c, n: c != n and (modified.append(f) or open(f, \"wb\").write(n)))(f, open(f, \"rb\").read(), re.sub(b\"[ \\t]+(?=\\r?\\n|$)\", b\"\", open(f, \"rb\").read())) for f in sys.argv[1:] ]; [ print(f\"Fixing trailing whitespace in: {f}\") for f in modified ]; sys.exit(1) if modified else sys.exit(0)'"
+        entry: |
+          python3 -c "
+          import sys, re, os
+          modified = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f):
+                  with open(f, 'rb') as fh: content = fh.read()
+                  new_content = re.sub(b'[ \t]+(?=\r?\n|$)', b'', content)
+                  if content != new_content:
+                      with open(f, 'wb') as fh: fh.write(new_content)
+                      modified.append(f)
+          for f in modified: print(f'Fixing trailing whitespace in: {f}')
+          sys.exit(1 if modified else 0)
+          "
         language: system
         types: [text]
         exclude: '\.(bat|cmd|ps1)$'
@@ -49,7 +62,23 @@ repos:
 
       - id: end-of-file-fixer
         name: fix end of files
-        entry: "python3 -c 'import sys, os; modified = []; [ (lambda f, c, n: c != n and (modified.append(f) or open(f, \"wb\").write(n)))(f, open(f, \"rb\").read(), open(f, \"rb\").read().rstrip(b\"\\r\\n\") + (b\"\\r\\n\" if b\"\\r\\n\" in open(f, \"rb\").read() else b\"\\n\") if open(f, \"rb\").read() else b\"\") for f in sys.argv[1:] if os.path.isfile(f) ]; [ print(f\"Fixing end of file in: {f}\") for f in modified ]; sys.exit(1) if modified else sys.exit(0)'"
+        entry: |
+          python3 -c "
+          import sys, os
+          modified = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f):
+                  with open(f, 'rb') as fh: content = fh.read()
+                  if not content: continue
+                  stripped = content.rstrip(b'\r\n')
+                  newline = b'\r\n' if b'\r\n' in content else b'\n'
+                  new_content = stripped + newline
+                  if content != new_content:
+                      with open(f, 'wb') as fh: fh.write(new_content)
+                      modified.append(f)
+          for f in modified: print(f'Fixing end of file in: {f}')
+          sys.exit(1 if modified else 0)
+          "
         language: system
         types: [text]
         exclude: '\.(bat|cmd|ps1)$'
@@ -58,14 +87,33 @@ repos:
 
       - id: check-added-large-files
         name: check for added large files
-        entry: 'python3 -c ''import sys, os; large_files = [f for f in sys.argv[1:] if os.path.isfile(f) and os.path.getsize(f) > 500*1024]; [print(f"File too large (>500KB): {f}") for f in large_files]; sys.exit(1) if large_files else sys.exit(0)'''
+        entry: |
+          python3 -c "
+          import sys, os
+          large_files = [f for f in sys.argv[1:] if os.path.isfile(f) and os.path.getsize(f) > 500*1024]
+          for f in large_files: print(f'File too large (>500KB): {f}')
+          sys.exit(1 if large_files else 0)
+          "
         language: system
         stages: [pre-commit, pre-merge-commit]
         description: "Prevent large files (>500KB) from being committed."
 
       - id: check-merge-conflict
         name: check for merge conflicts
-        entry: 'python3 -c ''import sys, os, re; conflicts = [f for f in sys.argv[1:] if os.path.isfile(f) and any(re.match(r"^(<<<<<<<|=======|>>>>>>>)", line) for line in open(f, "r", errors="ignore"))]; [print(f"Merge conflict markers found in: {f}") for f in conflicts]; sys.exit(1) if conflicts else sys.exit(0)'''
+        entry: |
+          python3 -c "
+          import sys, os, re
+          conflicts = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f):
+                  with open(f, 'r', errors='ignore') as fh:
+                      for line in fh:
+                          if re.match(r'^(<<<<<<<|=======|>>>>>>>|\|\|\|\|\|\|\|)', line):
+                              conflicts.append(f)
+                              break
+          for f in conflicts: print(f'Merge conflict markers found in: {f}')
+          sys.exit(1 if conflicts else 0)
+          "
         language: system
         stages: [pre-commit, pre-merge-commit]
         description: "Intercept files containing git merge conflict markers."
@@ -94,7 +142,13 @@ repos:
 
       - id: check-symlinks
         name: check for broken symlinks
-        entry: 'python3 -c ''import sys, os; broken = [f for f in sys.argv[1:] if os.path.islink(f) and not os.path.exists(f)]; [print(f"Broken symlink: {f}") for f in broken]; sys.exit(1) if broken else sys.exit(0)'''
+        entry: |
+          python3 -c "
+          import sys, os
+          broken = [f for f in sys.argv[1:] if os.path.islink(f) and not os.path.exists(f)]
+          for f in broken: print(f'Broken symlink: {f}')
+          sys.exit(1 if broken else 0)
+          "
         language: system
         stages: [pre-commit, pre-merge-commit]
         description: "Ensure symlinks point to existing locations."
@@ -237,7 +291,7 @@ repos:
         language: system
         entry: sh scripts/lib/lint-wrapper.sh psscriptanalyzer
         args:
-          - NoProfile
+          - -NoProfile
           - -Command
           - "& { if (!(Get-Command Invoke-ScriptAnalyzer -ErrorAction SilentlyContinue)) { exit 0 }; $r = $args | ForEach-Object { Invoke-ScriptAnalyzer -Path $_ -Severity Error,Warning }; if ($r) { $r | Format-Table -AutoSize; exit 1 } }"
         types: [powershell]
@@ -327,7 +381,18 @@ repos:
 
       - id: detect-private-key
         name: detect private key
-        entry: 'python3 -c ''import sys, os, re; pattern = re.compile(b"-----BEGIN " + b".*PRIVATE KEY-----"); found = [f for f in sys.argv[1:] if os.path.isfile(f) and pattern.search(open(f, "rb").read())]; [print(f"Private key detected: {f}") for f in found]; sys.exit(1) if found else sys.exit(0)'''
+        entry: |
+          python3 -c "
+          import sys, os, re
+          pattern = re.compile(b'-----BEGIN ' + b'.*PRIVATE KEY-----')
+          found = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f):
+                  with open(f, 'rb') as fh:
+                      if pattern.search(fh.read()): found.append(f)
+          for f in found: print(f'Private key detected: {f}')
+          sys.exit(1 if found else 0)
+          "
         language: system
         types: [text]
         exclude: '\.pre-commit-config\.yaml$'
@@ -336,21 +401,47 @@ repos:
       # ── Hardening & Security ──────────────────────────────────────────────
       - id: check-executables-have-shebangs
         name: check shell scripts for shebangs
-        entry: 'python3 -c ''import sys, os; missing = [f for f in sys.argv[1:] if os.path.isfile(f) and os.access(f, os.X_OK) and not open(f, "rb").read(2) == b"#!" and not os.path.isdir(f)]; [print(f"Executable lacks shebang: {f}") for f in missing]; sys.exit(1) if missing else sys.exit(0)'''
+        entry: |
+          python3 -c "
+          import sys, os
+          missing = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f) and os.access(f, os.X_OK):
+                  with open(f, 'rb') as fh:
+                      head = fh.read(2)
+                      if head != b'#!': missing.append(f)
+          for f in missing: print(f'Executable lacks shebang: {f}')
+          sys.exit(1 if missing else 0)
+          "
         language: system
-        types: [shell]
         description: "Executable scripts MUST start with a shebang (!#)."
 
       - id: check-shebang-scripts-are-executable
         name: check shebang scripts are executable
-        entry: 'python3 -c ''import sys, os; not_exec = [f for f in sys.argv[1:] if os.path.isfile(f) and open(f, "rb").read(2) == b"#!" and not os.access(f, os.X_OK)]; [print(f"Shebang script not executable: {f}") for f in not_exec]; sys.exit(1) if not_exec else sys.exit(0)'''
+        entry: |
+          python3 -c "
+          import sys, os
+          not_exec = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f) and not os.access(f, os.X_OK):
+                  with open(f, 'rb') as fh:
+                      if fh.read(2) == b'#!': not_exec.append(f)
+          for f in not_exec: print(f'Shebang script not executable: {f}')
+          sys.exit(1 if not_exec else 0)
+          "
         language: system
-        types: [shell]
         description: "Scripts with shebangs MUST have the executable bit set."
 
       - id: forbidden-files
         name: forbid temporary/debug files
-        entry: "python3 -c 'import sys, os, re; forbidden = [f for f in sys.argv[1:] if os.path.isfile(f) and re.search(r\"(test\\.txt|tmp\\.json|debug\\.log|\\.DS_Store|Thumbs\\.db|\\.swp|\\.bak)$\", f)]; [print(f\"Forbidden file detected: {f}\") for f in forbidden]; sys.exit(1) if forbidden else sys.exit(0)'"
+        entry: |
+          python3 -c "
+          import sys, os, re
+          pattern = re.compile(r'(test\.txt|tmp\.json|debug\.log|\.DS_Store|Thumbs\.db|\.swp|\.bak)$')
+          forbidden = [f for f in sys.argv[1:] if os.path.isfile(f) and pattern.search(f)]
+          for f in forbidden: print(f'Forbidden file detected: {f}')
+          sys.exit(1 if forbidden else 0)
+          "
         language: system
         stages: [pre-commit, pre-merge-commit]
         description: "Prevent accidental commit of temporary files (Rule 01.2.29)."

@@ -37,8 +37,13 @@ main() {
   shift
 
   # 1. Resolve Binary Path
+  local _LINTER_BIN="$_LINTER_WRAP"
+  case "$_LINTER_WRAP" in
+  psscriptanalyzer) _LINTER_BIN="pwsh" ;;
+  esac
+
   local _RESOLVED_BIN_WRAP
-  _RESOLVED_BIN_WRAP=$(resolve_bin "$_LINTER_WRAP")
+  _RESOLVED_BIN_WRAP=$(resolve_bin "$_LINTER_BIN")
 
   # 2. Check Existence
   if [ -z "$_RESOLVED_BIN_WRAP" ]; then
