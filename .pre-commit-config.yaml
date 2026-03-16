@@ -954,6 +954,13 @@ repos:
         types: [ruby]
         description: "Verify Ruby code against community style guides."
 
+      - id: dart-format
+        name: check dart style
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh dart format --output=none --set-exit-if-changed
+        types_or: [dart]
+        description: "Verify Dart code with the official SDK formatter."
+
       - id: mix-format
         name: check elixir style
         language: system
