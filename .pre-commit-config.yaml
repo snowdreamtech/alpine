@@ -293,6 +293,48 @@ repos:
         files: '\.(csv|tsv)$'
         description: "Verify that CSV/TSV files have consistent column counts across all rows."
 
+      - id: check-jsonc
+        name: check jsonc well-formedness
+        entry: |
+          python3 -c "
+          import sys, os, json, re
+          errors = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f) and os.path.getsize(f) < 2*1024*1024:
+                  try:
+                      with open(f, 'r', encoding='utf-8') as fh:
+                          content = fh.read()
+                          content = re.sub(r'//.*?\n|/\*.*?\*/', '', content, flags=re.S)
+                          json.loads(content)
+                  except Exception as e: errors.append(f'{f} ({e})')
+          for e in errors: print(f'Malformed JSONC: {e}')
+          sys.exit(1 if errors else 0)
+          "
+        language: system
+        files: '\.(jsonc|json5)$|tsconfig.*\.json$|devcontainer\.json$'
+        description: "Verify that JSON with Comments (JSONC/JSON5) files are well-formed."
+
+      - id: check-svg-safety
+        name: check svg safety
+        entry: |
+          python3 -c "
+          import sys, os, re
+          errors = []
+          for f in sys.argv[1:]:
+              if os.path.isfile(f) and os.path.getsize(f) < 5*1024*1024:
+                  try:
+                      with open(f, 'rb') as fh:
+                          content = fh.read().lower()
+                          if b'<script' in content or re.search(b' on\w+=', content):
+                              errors.append(f'{f} (contains potential script injection)')
+                  except Exception as e: errors.append(f'{f} ({e})')
+          for e in errors: print(f'Unsafe SVG detected: {e}')
+          sys.exit(1 if errors else 0)
+          "
+        language: system
+        files: '\.svg$'
+        description: "Verify that SVG files are well-formed and free of malicious script injections."
+
       # ── Formatting (Auto-fix) ──────────────────────────────────────────────
       - id: prettier
         name: prettier format
