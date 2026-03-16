@@ -760,6 +760,7 @@ repos:
         entry: |
           python3 -c "
           import sys, os
+          if os.name == 'nt': sys.exit(0)
           missing = []
           for f in sys.argv[1:]:
               if os.path.isfile(f) and os.access(f, os.X_OK):
