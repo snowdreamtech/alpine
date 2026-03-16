@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # scripts/bench.sh - Performance Benchmarking Suite
 #
 # Purpose:

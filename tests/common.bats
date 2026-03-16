@@ -13,7 +13,7 @@ setup() {
 
   # Create a dummy script that sources common.sh
   cat <<EOF >"$TEMP_DIR/test_script.sh"
-#!/bin/sh
+#!/usr/bin/env sh
 SCRIPT_DIR=\$(cd "\$(dirname "\$0")" && pwd)
 . "\$SCRIPT_DIR/scripts/lib/common.sh"
 

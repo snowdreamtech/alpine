@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Ruby Logic Module
 
 # Purpose: Installs Ruby runtime via mise.

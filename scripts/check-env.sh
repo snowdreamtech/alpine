@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # scripts/check-env.sh - Environment Health Auditor
 #
 # Purpose:

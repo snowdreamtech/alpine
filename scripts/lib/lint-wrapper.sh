@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # scripts/lib/lint-wrapper.sh - Robust wrapper for pre-commit hooks.
 #
 # Purpose:

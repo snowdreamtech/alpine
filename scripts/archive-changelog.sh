@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # scripts/archive-changelog.sh - Automate major-version changelog archiving
 #
 # Purpose:

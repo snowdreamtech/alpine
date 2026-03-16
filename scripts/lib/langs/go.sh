@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Go Logic Module
 
 # Purpose: Installs Go runtime via mise.

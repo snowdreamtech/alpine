@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Groovy Logic Module
 
 # Purpose: Installs Groovy runtime via mise.

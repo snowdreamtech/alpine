@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # scripts/setup.sh - Modular Project Setup Engine
 #
 # Purpose:

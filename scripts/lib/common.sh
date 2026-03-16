@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # scripts/lib/common.sh - Shared utility library for automation scripts.
 #
 # Purpose:

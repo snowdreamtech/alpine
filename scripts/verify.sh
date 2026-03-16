@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # scripts/verify.sh - Project Pre-flight Verifier
 #
 # Purpose:

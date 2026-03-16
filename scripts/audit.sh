@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # scripts/audit.sh - Automated Security Auditor
 #
 # Purpose:

@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # scripts/sync-docs.sh - Documentation Sync Wrapper
 #
 # Purpose:

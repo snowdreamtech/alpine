@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # OpenTofu Logic Module
 
 # Purpose: Installs OpenTofu via mise.

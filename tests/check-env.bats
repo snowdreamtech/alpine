@@ -45,23 +45,23 @@ teardown() {
   export PATH="$TEMP_DIR/bin:$PATH"
 
   cat <<EOF >"$TEMP_DIR/bin/node"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "v24.1.0"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/pnpm"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "9.0.0"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/python3"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "Python 3.12.9"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/git"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "git version 2.30.0"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/mise"
-#!/bin/sh
+#!/usr/bin/env sh
 if [ "\$1" = "ls" ]; then
   echo "{}"
 else
@@ -69,99 +69,99 @@ else
 fi
 EOF
   cat <<EOF >"$TEMP_DIR/bin/make"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "GNU Make 3.81"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/go"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "go version go1.21.0 darwin/arm64"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/ruby"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "ruby 3.2.2 (2023-03-30 revision e51014f9c0) [arm64-darwin22]"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/java"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "openjdk version \"17.0.8\" 2023-07-18"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/php"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "PHP 8.2.10 (cli) (built: Aug 31 2023 15:52:53) (NTS)"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/dotnet"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "7.0.401"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/cargo"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "cargo 1.72.1 (103487372 2023-09-19)"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/swift"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "Apple Swift version 5.9 (swiftlang-5.9.0.128.108 clang-1500.0.40.1)"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/kotlin"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "Kotlin version 1.9.10-release-445 (JRE 17.0.8+7)"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/dart"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "Dart SDK version: 3.1.2 (stable) (Tue Sep 12 14:43:30 2023 +0000) on \"macos_arm64\""
 EOF
   cat <<EOF >"$TEMP_DIR/bin/gitleaks"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "v8.30.0"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/osv-scanner"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "v2.3.3"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/trivy"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "v0.69.3"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/golangci-lint"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "1.55.0"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/zizmor"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "v1.3.1"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/shellcheck"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "0.11.0.1"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/shfmt"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "3.12.0.2"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/actionlint"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "1.7.11.24"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/editorconfig-checker"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "3.6.1"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/govulncheck"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "v0.1.0"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/cargo-audit"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "cargo-audit 0.17.0"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/pip-audit"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "2.8.0"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/checkmake"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "0.3.2"
 EOF
   cat <<EOF >"$TEMP_DIR/bin/hadolint"
-#!/bin/sh
+#!/usr/bin/env sh
 echo "2.12.0"
 EOF
   chmod +x "$TEMP_DIR/bin/"*
@@ -197,11 +197,11 @@ EOF
   mkdir -p "$TEMP_DIR/bin"
   # shellcheck disable=SC2030,SC2031
   export PATH="$TEMP_DIR/bin:$PATH"
-  printf '#!/bin/sh\necho "v24.1.0"\n' >"$TEMP_DIR/bin/node"
-  printf '#!/bin/sh\necho "9.0.0"\n' >"$TEMP_DIR/bin/pnpm"
-  printf '#!/bin/sh\necho "Python 3.10.0"\n' >"$TEMP_DIR/bin/python3"
-  printf '#!/bin/sh\necho "git version 2.30.0"\n' >"$TEMP_DIR/bin/git"
-  printf '#!/bin/sh\necho "GNU Make 3.81"\n' >"$TEMP_DIR/bin/make"
+  printf '#!/usr/bin/env sh\necho "v24.1.0"\n' >"$TEMP_DIR/bin/node"
+  printf '#!/usr/bin/env sh\necho "9.0.0"\n' >"$TEMP_DIR/bin/pnpm"
+  printf '#!/usr/bin/env sh\necho "Python 3.10.0"\n' >"$TEMP_DIR/bin/python3"
+  printf '#!/usr/bin/env sh\necho "git version 2.30.0"\n' >"$TEMP_DIR/bin/git"
+  printf '#!/usr/bin/env sh\necho "GNU Make 3.81"\n' >"$TEMP_DIR/bin/make"
   chmod +x "$TEMP_DIR/bin/"*
 
   # Remove critical file (README.md is NOT a guard file in common.sh)
@@ -217,11 +217,11 @@ EOF
   mkdir -p "$TEMP_DIR/bin"
   # shellcheck disable=SC2030,SC2031
   export PATH="$TEMP_DIR/bin:$PATH"
-  printf '#!/bin/sh\necho "v24.1.0"\n' >"$TEMP_DIR/bin/node"
-  printf '#!/bin/sh\necho "8.0.0"\n' >"$TEMP_DIR/bin/pnpm"
-  printf '#!/bin/sh\necho "Python 3.10.0"\n' >"$TEMP_DIR/bin/python3"
-  printf '#!/bin/sh\necho "git version 2.30.0"\n' >"$TEMP_DIR/bin/git"
-  printf '#!/bin/sh\necho "GNU Make 3.81"\n' >"$TEMP_DIR/bin/make"
+  printf '#!/usr/bin/env sh\necho "v24.1.0"\n' >"$TEMP_DIR/bin/node"
+  printf '#!/usr/bin/env sh\necho "8.0.0"\n' >"$TEMP_DIR/bin/pnpm"
+  printf '#!/usr/bin/env sh\necho "Python 3.10.0"\n' >"$TEMP_DIR/bin/python3"
+  printf '#!/usr/bin/env sh\necho "git version 2.30.0"\n' >"$TEMP_DIR/bin/git"
+  printf '#!/usr/bin/env sh\necho "GNU Make 3.81"\n' >"$TEMP_DIR/bin/make"
   chmod +x "$TEMP_DIR/bin/"*
 
   run sh scripts/check-env.sh
@@ -233,11 +233,11 @@ EOF
   mkdir -p "$TEMP_DIR/bin"
   # shellcheck disable=SC2030,SC2031
   export PATH="$TEMP_DIR/bin:$PATH"
-  printf '#!/bin/sh\necho "v24.1.0"\n' >"$TEMP_DIR/bin/node"
-  printf '#!/bin/sh\necho "9.0.0"\n' >"$TEMP_DIR/bin/pnpm"
-  printf '#!/bin/sh\necho "Python 3.7.0"\n' >"$TEMP_DIR/bin/python3"
-  printf '#!/bin/sh\necho "git version 2.30.0"\n' >"$TEMP_DIR/bin/git"
-  printf '#!/bin/sh\necho "GNU Make 3.81"\n' >"$TEMP_DIR/bin/make"
+  printf '#!/usr/bin/env sh\necho "v24.1.0"\n' >"$TEMP_DIR/bin/node"
+  printf '#!/usr/bin/env sh\necho "9.0.0"\n' >"$TEMP_DIR/bin/pnpm"
+  printf '#!/usr/bin/env sh\necho "Python 3.7.0"\n' >"$TEMP_DIR/bin/python3"
+  printf '#!/usr/bin/env sh\necho "git version 2.30.0"\n' >"$TEMP_DIR/bin/git"
+  printf '#!/usr/bin/env sh\necho "GNU Make 3.81"\n' >"$TEMP_DIR/bin/make"
   chmod +x "$TEMP_DIR/bin/"*
 
   touch main.py

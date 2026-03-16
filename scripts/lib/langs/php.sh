@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # PHP Logic Module
 
 # Purpose: Installs PHP runtime via mise.

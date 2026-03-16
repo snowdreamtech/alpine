@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Pulumi Logic Module
 
 # Purpose: Installs Pulumi CLI via mise.

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Kotlin Logic Module
 
 # Purpose: Installs Kotlin runtime via mise.

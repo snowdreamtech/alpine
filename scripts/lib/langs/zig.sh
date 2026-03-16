@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Zig Logic Module
 
 # Purpose: Installs Zig runtime via mise.

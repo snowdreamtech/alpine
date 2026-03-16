@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Dotnet Logic Module
 
 # Purpose: Installs .NET runtime via mise.

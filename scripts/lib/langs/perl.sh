@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Perl Logic Module
 
 # Purpose: Installs Perl runtime via mise.

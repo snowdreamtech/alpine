@@ -6,7 +6,7 @@
 
 ### POSIX Shell as Default (MANDATORY)
 
-**Unless explicitly specified**, ALL shell scripts in this project MUST be written as **POSIX-compliant shell scripts** (`#!/bin/sh`). Do NOT default to Bash. Rationale:
+**Unless explicitly specified**, ALL shell scripts in this project MUST be written as **POSIX-compliant shell scripts** (`#!/usr/bin/env sh`). Do NOT default to Bash. Rationale:
 
 - Ensures compatibility with minimal environments (Alpine Linux, BusyBox, base Docker images, embedded CI).
 - Prevents silent failures when `bash` is not installed.
@@ -27,7 +27,7 @@ When Bash-specific features are genuinely required, the script MUST:
 To ensure consistency in logging, colors, and argument parsing, ALL functional scripts MUST source the **`scripts/lib/common.sh`** library:
 
 ```sh
-#!/bin/sh
+#!/usr/bin/env sh
 set -e
 
 # ── Common Library ───────────────────────────────────────────────────────────
@@ -60,7 +60,7 @@ IFS=$'\n\t'
 
 ### Shebang Selection
 
-- **`#!/bin/sh`** — **DEFAULT**. Use for all scripts unless Bash features are explicitly required.
+- **`#!/usr/bin/env sh`** — **DEFAULT**. Use for all scripts unless Bash features are explicitly required.
 - **`#!/usr/bin/env bash`** — Only when Bash-specific features are required (with justification comment).
 - **NEVER use `#!/bin/bash`** — Invokes the outdated system Bash 3.x on macOS.
 
@@ -328,7 +328,7 @@ script.bat   →   script.ps1   →   script.sh
 ### Template: `script.sh` (Primary Logic)
 
 ```sh
-#!/bin/sh
+#!/usr/bin/env sh
 # Description: Your script description
 set -eu
 # ... all logic here ...

@@ -202,7 +202,7 @@
 - Provide a **`scripts/setup.sh` (or `setup.ps1`)** that automates the full onboarding sequence: runtime installation, tool setup, and repository hydration. This project uses a modularized setup script based on a POSIX shell core:
 
   ```bash
-  #!/bin/sh
+  #!/usr/bin/env sh
   # scripts/setup.sh - Modularized Project Setup Script
   . "scripts/lib/common.sh"
 

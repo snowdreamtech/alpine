@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # scripts/update.sh - Toolchain Update Manager
 #
 # Purpose:

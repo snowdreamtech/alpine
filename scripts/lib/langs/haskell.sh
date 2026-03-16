@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Haskell Logic Module
 
 # Purpose: Installs Haskell (GHC) runtime via mise.

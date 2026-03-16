@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Scala Logic Module
 
 # Purpose: Installs Scala runtime via mise.

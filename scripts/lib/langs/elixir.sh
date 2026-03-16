@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Elixir Logic Module
 
 # Purpose: Installs Elixir/Erlang runtime via mise.

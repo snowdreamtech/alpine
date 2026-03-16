@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Rust Logic Module
 
 # Purpose: Installs Rust runtime via mise.

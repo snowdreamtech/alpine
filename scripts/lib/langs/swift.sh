@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Swift Logic Module
 
 # Purpose: Installs Swift runtime via mise.

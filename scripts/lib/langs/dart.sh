@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Dart Logic Module
 
 # Purpose: Installs Dart runtime via mise.

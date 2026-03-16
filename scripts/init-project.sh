@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # scripts/init-project.sh - Project Branding Hydrator
 #
 # Purpose:

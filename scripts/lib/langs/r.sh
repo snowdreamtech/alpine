@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # R Logic Module
 
 # Purpose: Installs R runtime via mise.

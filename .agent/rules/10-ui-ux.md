@@ -181,7 +181,7 @@
   - **Green**: Success, completion, and resource creation.
   - **Yellow**: Warnings, dry-run (preview) mode, and non-blocking issues.
   - **Red**: Fatal errors and critical failures.
-- **Cross-Platform Compatibility**: Scripts MUST be **POSIX-compliant** (`#!/bin/sh`) to ensure execution across minimal environments (Alpine, BusyBox, etc.) and prevent system-specific edge cases.
+- **Cross-Platform Compatibility**: Scripts MUST be **POSIX-compliant** (`#!/usr/bin/env sh`) to ensure execution across minimal environments (Alpine, BusyBox, etc.) and prevent system-specific edge cases.
 - **Atomic Operations (File Integrity)**: Scripts that modify critical files SHOULD use the **Build-then-Swap** pattern: generate a temporary file first, then use an atomic `mv` to swap it into place. This prevents data corruption if the process is interrupted.
 - **Deduplication Intelligence**: When appending or prepending to logs/archives, scripts MUST implement a check to prevent redundant entries, ensuring data remains clean and unique.
 - Implement **Smart Discovery**: Command-line tools should attempt to auto-detect common project directories (e.g., `docs/changelogs/`, `bin/`, `dist/`) to minimize required manual configuration.

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Python Logic Module
 
 # Purpose: Installs the Python runtime, creates a venv, and installs dependencies.

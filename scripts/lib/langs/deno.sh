@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Deno Logic Module
 
 # Purpose: Installs Deno runtime via mise.

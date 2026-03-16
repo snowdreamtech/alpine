@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # scripts/release.sh - Standardized Release Manager
 #
 # Purpose:

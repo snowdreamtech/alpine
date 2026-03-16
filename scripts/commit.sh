@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # scripts/commit.sh - Guided Commit Manager
 #
 # Purpose:

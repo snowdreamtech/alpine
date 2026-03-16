@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # scripts/lint.sh - Unified Quality Orchestrator
 #
 # Purpose:

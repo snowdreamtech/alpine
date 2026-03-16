@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # scripts/test.sh - Multi-Stack Test Runner
 #
 # Purpose:

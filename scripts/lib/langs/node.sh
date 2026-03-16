@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Node.js Logic Module
 
 # Purpose: Installs Node.js runtime via mise.

@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Flutter Logic Module
 
 # Purpose: Installs Flutter runtime via mise.

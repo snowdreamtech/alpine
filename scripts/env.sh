@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # scripts/env.sh - Environment Configuration Orchestrator
 #
 # Purpose:

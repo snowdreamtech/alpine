@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Julia Logic Module
 
 # Purpose: Installs Julia runtime via mise.

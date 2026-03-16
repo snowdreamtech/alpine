@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # scripts/cleanup.sh - Deep Project Sanitizer
 #
 # Purpose:

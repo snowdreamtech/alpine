@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # scripts/docs.sh - Documentation Lifecycle Manager
 #
 # Purpose:

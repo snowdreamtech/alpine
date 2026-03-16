@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Java Logic Module
 
 # Purpose: Installs Java runtime via mise.

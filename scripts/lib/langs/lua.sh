@@ -1,4 +1,4 @@
-#!/usr/bin/env bash
+#!/usr/bin/env sh
 # Lua Logic Module
 
 # Purpose: Installs Lua runtime via mise.

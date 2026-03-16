@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env sh
 # scripts/health.sh - Unified Project Health Dashboard
 #
 # Purpose:
