@@ -1008,6 +1008,40 @@ has_lang_files() {
     LUA)
       _ext_lang="*.lua"
       ;;
+    JUST)
+      [ -f "Justfile" ] && return 0
+      [ -f ".justfile" ] && return 0
+      ;;
+    TASK)
+      [ -f "Taskfile.yml" ] && return 0
+      [ -f "Taskfile.yaml" ] && return 0
+      ;;
+    NIX)
+      [ -f "flake.nix" ] && return 0
+      [ -f "default.nix" ] && return 0
+      _ext_lang="*.nix"
+      ;;
+    ZIG)
+      [ -f "build.zig" ] && return 0
+      _ext_lang="*.zig"
+      ;;
+    CUES)
+      _ext_lang="*.cue *.jsonnet"
+      ;;
+    REGO)
+      _ext_lang="*.rego"
+      ;;
+    SERVER)
+      # Common server configs
+      [ -f "nginx.conf" ] && return 0
+      [ -f "Caddyfile" ] && return 0
+      [ -d "nginx" ] && return 0
+      ;;
+    EDGE)
+      # Modern edge/frontend deployment configs
+      [ -f "vercel.json" ] && return 0
+      [ -f "netlify.toml" ] && return 0
+      ;;
     esac
 
     # Use find for POSIX compatibility and performance
