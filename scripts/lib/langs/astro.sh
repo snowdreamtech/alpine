@@ -1,37 +1,52 @@
 #!/usr/bin/env sh
-# Astro Logic Module
+# scripts/lib/langs/astro.sh - Astro Module
+#
+# Standards:
+#   - POSIX-compliant sh logic.
+#   - Rule 01 (General), Rule 08 (Dev Env).
 
-# Purpose: Sets up Astro environment for project.
-setup_astro() {
-  local _T0_ASTRO_RT
-  _T0_ASTRO_RT=$(date +%s)
-  _log_setup "Astro" "astro"
+# Purpose: Checks for Astro development prerequisites.
+# Examples:
+#   check_astro
+check_astro() {
+  log_info "🔍 Checking Astro environment..."
 
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Frontend Tool" "Astro" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Astro files
-  if ! has_lang_files "*.astro"; then
-    log_summary "Frontend Tool" "Astro" "⏭️ Skipped" "-" "0"
-    return 0
-  fi
-
-  # Astro is typically managed via npm/vite.
-  # We focus on detection and availability.
-  local _STAT_ASTRO_RT="✅ Detected"
-
-  local _DUR_ASTRO_RT
-  _DUR_ASTRO_RT=$(($(date +%s) - _T0_ASTRO_RT))
-  log_summary "Frontend Tool" "Astro" "$_STAT_ASTRO_RT" "-" "$_DUR_ASTRO_RT"
-}
-
-# Purpose: Checks if Astro files are present.
-check_runtime_astro() {
-  local _TOOL_DESC_ASTRO="${1:-Astro}"
-  if ! has_lang_files "*.astro"; then
+  # Check for Node.js (Prerequisite)
+  if ! command -v node >/dev/null 2>&1; then
+    log_warn "⚠️  Astro requires Node.js. Please install it first."
     return 1
   fi
+
+  # Check for astro binary or project files
+  if command -v astro >/dev/null 2>&1; then
+    log_success "✅ Astro binary detected."
+  elif [ -f "astro.config.mjs" ] || [ -f "astro.config.js" ] || [ -f "astro.config.ts" ]; then
+    log_success "✅ Astro configuration file detected."
+  elif [ -f "package.json" ] && grep -q "\"astro\"" package.json; then
+    log_success "✅ Astro detected as project dependency."
+  else
+    log_info "⏭️  Astro: Skipped (no Astro files found)"
+    return 0
+  fi
+
   return 0
+}
+
+# Purpose: Installs Astro CLI globally.
+# Examples:
+#   install_astro
+install_astro() {
+  log_info "🚀 Setting up Astro CLI..."
+
+  if is_dry_run; then
+    log_info "DRY-RUN: npm install -g astro"
+    return 0
+  fi
+
+  if ! npm install -g astro; then
+    log_error "❌ Failed to install Astro CLI."
+    exit 1
+  fi
+
+  log_success "✅ Astro CLI installed successfully."
 }

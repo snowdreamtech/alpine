@@ -119,6 +119,11 @@ Modules (default: all):
   playwright         Install Playwright
   vitest             Install Vitest
   cypress            Install Cypress
+  astro              Install Astro CLI
+  sveltekit          Check SvelteKit Config
+  solidstart         Check SolidStart Config
+  storybook          Check Storybook Config
+  docusaurus         Check Docusaurus Config
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1936,6 +1941,11 @@ EOF
     playwright) setup_playwright ;;
     vitest) setup_vitest ;;
     cypress) setup_cypress ;;
+    astro) setup_astro ;;
+    sveltekit) setup_sveltekit ;;
+    solidstart) setup_solidstart ;;
+    storybook) setup_storybook ;;
+    docusaurus) setup_docusaurus ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2234,6 +2244,36 @@ setup_vitest() {
 setup_cypress() {
   . "$SCRIPT_DIR/lib/langs/cypress.sh"
   install_cypress
+}
+
+# Purpose: Wrapper for Astro setup.
+setup_astro() {
+  . "$SCRIPT_DIR/lib/langs/astro.sh"
+  install_astro
+}
+
+# Purpose: Wrapper for SvelteKit setup.
+setup_sveltekit() {
+  . "$SCRIPT_DIR/lib/langs/sveltekit.sh"
+  install_sveltekit
+}
+
+# Purpose: Wrapper for SolidStart setup.
+setup_solidstart() {
+  . "$SCRIPT_DIR/lib/langs/solidstart.sh"
+  install_solidstart
+}
+
+# Purpose: Wrapper for Storybook setup.
+setup_storybook() {
+  . "$SCRIPT_DIR/lib/langs/storybook.sh"
+  install_storybook
+}
+
+# Purpose: Wrapper for Docusaurus setup.
+setup_docusaurus() {
+  . "$SCRIPT_DIR/lib/langs/docusaurus.sh"
+  install_docusaurus
 }
 
 main "$@"
