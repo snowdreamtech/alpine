@@ -150,6 +150,14 @@ Modules (default: all):
   pandas             Check Pandas Config
   quarkus            Install Quarkus CLI
   micronaut          Install Micronaut CLI
+  vault              Install Vault CLI
+  semgrep            Install Semgrep CLI
+  checkov            Install Checkov CLI
+  mage               Install Mage CLI
+  tanstack-query     Check TanStack Query Config
+  zustand            Check Zustand Config
+  appium             Install Appium CLI
+  testcafe           Install TestCafe CLI
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1998,6 +2006,14 @@ EOF
     pandas) setup_pandas ;;
     quarkus) setup_quarkus ;;
     micronaut) setup_micronaut ;;
+    vault) setup_vault ;;
+    semgrep) setup_semgrep ;;
+    checkov) setup_checkov ;;
+    mage) setup_mage ;;
+    tanstack-query) setup_tanstack_query ;;
+    zustand) setup_zustand ;;
+    appium) setup_appium ;;
+    testcafe) setup_testcafe ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2471,6 +2487,54 @@ setup_quarkus() {
 setup_micronaut() {
   . "$SCRIPT_DIR/lib/langs/micronaut.sh"
   install_micronaut
+}
+
+# Purpose: Wrapper for Vault setup.
+setup_vault() {
+  . "$SCRIPT_DIR/lib/langs/vault.sh"
+  install_vault
+}
+
+# Purpose: Wrapper for Semgrep setup.
+setup_semgrep() {
+  . "$SCRIPT_DIR/lib/langs/semgrep.sh"
+  install_semgrep
+}
+
+# Purpose: Wrapper for Checkov setup.
+setup_checkov() {
+  . "$SCRIPT_DIR/lib/langs/checkov.sh"
+  install_checkov
+}
+
+# Purpose: Wrapper for Mage setup.
+setup_mage() {
+  . "$SCRIPT_DIR/lib/langs/mage.sh"
+  install_mage
+}
+
+# Purpose: Wrapper for TanStack Query setup.
+setup_tanstack_query() {
+  . "$SCRIPT_DIR/lib/langs/tanstack-query.sh"
+  install_tanstack_query
+}
+
+# Purpose: Wrapper for Zustand setup.
+setup_zustand() {
+  . "$SCRIPT_DIR/lib/langs/zustand.sh"
+  install_zustand
+}
+
+# Purpose: Wrapper for Appium setup.
+setup_appium() {
+  . "$SCRIPT_DIR/lib/langs/appium.sh"
+  install_appium
+}
+
+# Purpose: Wrapper for TestCafe setup.
+setup_testcafe() {
+  . "$SCRIPT_DIR/lib/langs/testcafe.sh"
+  install_testcafe
 }
 
 main "$@"

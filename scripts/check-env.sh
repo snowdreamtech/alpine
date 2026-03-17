@@ -206,6 +206,8 @@ main() {
   check_runtime "solidstart" "SolidStart"
   check_runtime "storybook" "Storybook"
   check_runtime "docusaurus" "Docusaurus"
+  check_runtime "tanstack-query" "TanStack Query"
+  check_runtime "zustand" "Zustand"
   check_runtime "axum" "Axum"
   check_runtime "actix" "Actix"
   check_runtime "echo" "Echo"
@@ -886,6 +888,10 @@ main() {
     check_vitest
     . "$SCRIPT_DIR/lib/langs/cypress.sh"
     check_cypress
+    . "$SCRIPT_DIR/lib/langs/appium.sh"
+    check_appium
+    . "$SCRIPT_DIR/lib/langs/testcafe.sh"
+    check_testcafe
   fi
   printf "\n"
 
@@ -967,6 +973,9 @@ main() {
   check_tool_version "OSV-scanner" "osv-scanner" "$(get_mise_tool_version osv-scanner)" "osv-scanner --version" 0 1
   check_tool_version "Trivy" "trivy" "$(get_mise_tool_version trivy)" "trivy --version" 0 1
   check_tool_version "Zizmor" "zizmor" "$(get_mise_tool_version zizmor)" "zizmor --version" 0 1
+  check_runtime "vault" "HashiCorp Vault"
+  check_runtime "semgrep" "Semgrep"
+  check_runtime "checkov" "Checkov"
 
   log_info "── Lint & Quality Tools ──"
   check_tool_version "Shfmt" "shfmt" "$(get_mise_tool_version shfmt-py)" "shfmt --version" 0 0
@@ -980,6 +989,7 @@ main() {
   if has_lang_files "go.mod" "*.go"; then
     check_tool_version "golangci-lint" "golangci-lint" "$(get_mise_tool_version golangci-lint)" "golangci-lint --version" 0 0
     check_tool_version "Govulncheck" "govulncheck" "latest" "govulncheck ./..." 0 1
+    check_runtime "mage" "Mage"
   fi
   if has_lang_files "Makefile" "*.make"; then
     check_tool_version "Checkmake" "checkmake" "$(get_mise_tool_version checkmake)" "checkmake --version" 0 0
