@@ -973,9 +973,12 @@ main() {
   check_tool_version "OSV-scanner" "osv-scanner" "$(get_mise_tool_version osv-scanner)" "osv-scanner --version" 0 1
   check_tool_version "Trivy" "trivy" "$(get_mise_tool_version trivy)" "trivy --version" 0 1
   check_tool_version "Zizmor" "zizmor" "$(get_mise_tool_version zizmor)" "zizmor --version" 0 1
-  check_runtime "vault" "HashiCorp Vault"
-  check_runtime "semgrep" "Semgrep"
-  check_runtime "checkov" "Checkov"
+  . "$SCRIPT_DIR/lib/langs/vault.sh"
+  check_vault
+  . "$SCRIPT_DIR/lib/langs/semgrep.sh"
+  check_semgrep
+  . "$SCRIPT_DIR/lib/langs/checkov.sh"
+  check_checkov
 
   log_info "── Lint & Quality Tools ──"
   check_tool_version "Shfmt" "shfmt" "$(get_mise_tool_version shfmt-py)" "shfmt --version" 0 0
@@ -989,7 +992,8 @@ main() {
   if has_lang_files "go.mod" "*.go"; then
     check_tool_version "golangci-lint" "golangci-lint" "$(get_mise_tool_version golangci-lint)" "golangci-lint --version" 0 0
     check_tool_version "Govulncheck" "govulncheck" "latest" "govulncheck ./..." 0 1
-    check_runtime "mage" "Mage"
+    . "$SCRIPT_DIR/lib/langs/mage.sh"
+    check_mage
   fi
   if has_lang_files "Makefile" "*.make"; then
     check_tool_version "Checkmake" "checkmake" "$(get_mise_tool_version checkmake)" "checkmake --version" 0 0
