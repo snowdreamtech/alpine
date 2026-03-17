@@ -404,6 +404,13 @@ main() {
   else
     log_info "⏭️  Free Pascal: Skipped (no Pascal files)"
   fi
+
+  # Lean 4
+  if has_lang_files "lean-toolchain lakefile.lean" "*.lean"; then
+    check_runtime "lean" "Lean 4 (Modular)"
+  else
+    log_info "⏭️  Lean 4: Skipped (no Lean files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
