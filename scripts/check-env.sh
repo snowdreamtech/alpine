@@ -551,6 +551,13 @@ main() {
   else
     log_info "⏭️  Verilog: Skipped (no Verilog files)"
   fi
+
+  # VHDL
+  if has_lang_files "*.vhd *.vhdl"; then
+    check_runtime "vhdl" "VHDL (Modular)"
+  else
+    log_info "⏭️  VHDL: Skipped (no VHDL files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
