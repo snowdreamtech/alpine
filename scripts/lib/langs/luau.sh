@@ -2,6 +2,7 @@
 # Luau Logic Module
 
 # Purpose: Installs Luau via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_luau() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Luau via mise."
@@ -24,8 +25,8 @@ setup_luau() {
     return 0
   fi
 
-  # Detect Luau files
-  if ! has_lang_files "*.luau"; then
+  # Detect Prolog files
+  if ! has_lang_files "" "*.pl *.pro *.prolog"; then
     log_summary "Runtime" "Luau" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -39,6 +40,9 @@ setup_luau() {
 }
 
 # Purpose: Checks if Luau is available.
+# Delegate: N/A
+# Examples:
+#   check_runtime_luau "Linter"
 check_runtime_luau() {
   local _TOOL_DESC_LUAU="${1:-Luau}"
   if ! command -v luau >/dev/null 2>&1; then
