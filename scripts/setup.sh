@@ -1441,6 +1441,15 @@ install_editorconfig_checker() {
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_ECC="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_ECC="❌ Failed"
+  # Symlink Fix: Ensure editorconfig-checker binary is available if only ec exists
+  local _ECC_INSTALL_DIR
+  _ECC_INSTALL_DIR=$(mise ls --json | jq -r '."editorconfig-checker"[0].install_path' 2>/dev/null)
+  if [ -d "$_ECC_INSTALL_DIR/bin" ]; then
+    if [ -f "$_ECC_INSTALL_DIR/bin/ec" ] && [ ! -f "$_ECC_INSTALL_DIR/bin/editorconfig-checker" ]; then
+      ln -sf "ec" "$_ECC_INSTALL_DIR/bin/editorconfig-checker"
+      mise reshim >/dev/null 2>&1 || true
+    fi
+  fi
   log_summary "Lint Tool" "editorconfig-checker" "$_STAT_ECC" "$(get_version editorconfig-checker)" "$(($(date +%s) - _T0_ECC))"
 }
 
