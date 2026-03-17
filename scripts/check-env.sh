@@ -600,6 +600,13 @@ main() {
   else
     log_info "⏭️  CUDA: Skipped (no CUDA files)"
   fi
+
+  # Bicep
+  if has_lang_files "*.bicep"; then
+    check_runtime "bicep" "Bicep (Modular)"
+  else
+    log_info "⏭️  Bicep: Skipped (no Bicep files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
