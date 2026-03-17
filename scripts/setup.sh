@@ -208,6 +208,16 @@ Modules (default: all):
   lerna              Install Lerna CLI
   single-spa         Install Single-spa CLI
   module-federation  Check Federation Config
+  cilium             Install Cilium CLI
+  falco              Check Falco Config
+  kyverno            Install Kyverno CLI
+  opa                Install OPA CLI
+  react-hook-form    Check RHF Config
+  tanstack-table     Check Table Config
+  styled-components  Check Styled Components
+  emotion            Check Emotion Config
+  vanilla-extract    Check Vanilla Extract
+  husky              Install Husky
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -2114,6 +2124,16 @@ EOF
     lerna) setup_lerna ;;
     single-spa) setup_single_spa ;;
     module-federation) setup_module_federation ;;
+    cilium) setup_cilium ;;
+    falco) setup_falco ;;
+    kyverno) setup_kyverno ;;
+    opa) setup_opa ;;
+    react-hook-form) setup_react_hook_form ;;
+    tanstack-table) setup_tanstack_table ;;
+    styled-components) setup_styled_components ;;
+    emotion) setup_emotion ;;
+    vanilla-extract) setup_vanilla_extract ;;
+    husky) setup_husky ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2935,6 +2955,66 @@ setup_single_spa() {
 setup_module_federation() {
   . "$SCRIPT_DIR/lib/langs/module-federation.sh"
   install_module_federation
+}
+
+# Purpose: Wrapper for Cilium setup.
+setup_cilium() {
+  . "$SCRIPT_DIR/lib/langs/cilium.sh"
+  install_cilium
+}
+
+# Purpose: Wrapper for Falco setup.
+setup_falco() {
+  . "$SCRIPT_DIR/lib/langs/falco.sh"
+  install_falco
+}
+
+# Purpose: Wrapper for Kyverno setup.
+setup_kyverno() {
+  . "$SCRIPT_DIR/lib/langs/kyverno.sh"
+  install_kyverno
+}
+
+# Purpose: Wrapper for OPA setup.
+setup_opa() {
+  . "$SCRIPT_DIR/lib/langs/opa.sh"
+  install_opa
+}
+
+# Purpose: Wrapper for React Hook Form setup.
+setup_react_hook_form() {
+  . "$SCRIPT_DIR/lib/langs/react-hook-form.sh"
+  install_react_hook_form
+}
+
+# Purpose: Wrapper for TanStack Table setup.
+setup_tanstack_table() {
+  . "$SCRIPT_DIR/lib/langs/tanstack-table.sh"
+  install_tanstack_table
+}
+
+# Purpose: Wrapper for Styled Components setup.
+setup_styled_components() {
+  . "$SCRIPT_DIR/lib/langs/styled-components.sh"
+  install_styled_components
+}
+
+# Purpose: Wrapper for Emotion setup.
+setup_emotion() {
+  . "$SCRIPT_DIR/lib/langs/emotion.sh"
+  install_emotion
+}
+
+# Purpose: Wrapper for Vanilla Extract setup.
+setup_vanilla_extract() {
+  . "$SCRIPT_DIR/lib/langs/vanilla-extract.sh"
+  install_vanilla_extract
+}
+
+# Purpose: Wrapper for Husky setup.
+setup_husky() {
+  . "$SCRIPT_DIR/lib/langs/husky.sh"
+  install_husky
 }
 
 main "$@"

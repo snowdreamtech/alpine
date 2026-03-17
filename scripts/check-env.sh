@@ -280,6 +280,16 @@ main() {
   check_runtime "lerna" "Lerna"
   check_runtime "single-spa" "Single-spa"
   check_runtime "module-federation" "Module Federation"
+  check_runtime "cilium" "Cilium"
+  check_runtime "falco" "Falco"
+  check_runtime "kyverno" "Kyverno"
+  check_runtime "opa" "OPA"
+  check_runtime "react-hook-form" "React Hook Form"
+  check_runtime "tanstack-table" "TanStack Table"
+  check_runtime "styled-components" "Styled Components"
+  check_runtime "emotion" "Emotion"
+  check_runtime "vanilla-extract" "Vanilla Extract"
+  check_runtime "husky" "Husky"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
