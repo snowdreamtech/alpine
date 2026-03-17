@@ -397,6 +397,13 @@ main() {
   else
     log_info "⏭️  Vala: Skipped (no Vala files)"
   fi
+
+  # Free Pascal
+  if has_lang_files "*.pas *.pp *.inc *.lpr"; then
+    check_runtime "fpc" "Free Pascal (Modular)"
+  else
+    log_info "⏭️  Free Pascal: Skipped (no Pascal files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
