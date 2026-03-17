@@ -509,6 +509,13 @@ main() {
   else
     log_info "⏭️  Terragrunt: Skipped (no Terragrunt files)"
   fi
+
+  # Apache Spark
+  if has_lang_files "spark-defaults.conf *.pyspark"; then
+    check_runtime "spark" "Apache Spark (Modular)"
+  else
+    log_info "⏭️  Apache Spark: Skipped (no Spark files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
