@@ -140,14 +140,17 @@ main() {
   # Node.js
   if [ -f "$PACKAGE_JSON" ]; then
     check_tool_version "Node.js" "node" "$(get_mise_tool_version node)" "node -v" 1
-    check_tool_version "pnpm" "pnpm" "$(get_mise_tool_version pnpm)" "pnpm -v" # Front-end tools
-    check_runtime "node" "Node.js"
-    check_runtime "deno" "Deno"
-    check_runtime "bun" "Bun"
-    check_runtime "vue" "Vue (Modular)"
+    check_tool_version "pnpm" "pnpm" "$(get_mise_tool_version pnpm)" "pnpm -v"
   else
     log_info "⏭️  Node.js/pnpm: Skipped (no package.json)"
   fi
+
+  # Front-end tools (Modular)
+  check_runtime "node" "Node.js"
+  check_runtime "deno" "Deno"
+  check_runtime "bun" "Bun"
+  check_runtime "vue" "Vue"
+  check_runtime "svelte" "Svelte"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
