@@ -474,6 +474,13 @@ main() {
   else
     log_info "⏭️  Starlark: Skipped (no Starlark files)"
   fi
+
+  # Tcl
+  if has_lang_files "*.tcl *.tk"; then
+    check_runtime "tcl" "Tcl (Modular)"
+  else
+    log_info "⏭️  Tcl: Skipped (no Tcl files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support

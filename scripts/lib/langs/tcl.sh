@@ -1,0 +1,49 @@
+#!/usr/bin/env sh
+# Tcl Logic Module
+
+# Purpose: Installs Tcl via mise.
+install_runtime_tcl() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Tcl via mise."
+    return 0
+  fi
+
+  # shellcheck disable=SC2154
+  run_mise install "tcl@${MISE_TOOL_VERSION_TCL}"
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Sets up Tcl environment for project.
+setup_tcl() {
+  local _T0_TCL_RT
+  _T0_TCL_RT=$(date +%s)
+  _log_setup "Tcl" "tclsh"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Tcl" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  # Detect Tcl files
+  if ! has_lang_files "*.tcl *.tk"; then
+    log_summary "Runtime" "Tcl" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_TCL_RT="✅ Installed"
+  install_runtime_tcl || _STAT_TCL_RT="❌ Failed"
+
+  local _DUR_TCL_RT
+  _DUR_TCL_RT=$(($(date +%s) - _T0_TCL_RT))
+  log_summary "Runtime" "Tcl" "$_STAT_TCL_RT" "$(get_version tclsh "echo 'puts [info patchlevel]' | tclsh" | awk '{print $NF}')" "$_DUR_TCL_RT"
+}
+
+# Purpose: Checks if Tcl is available.
+check_runtime_tcl() {
+  local _TOOL_DESC_TCL="${1:-Tcl}"
+  if ! command -v tclsh >/dev/null 2>&1; then
+    log_warn "Required runtime 'tclsh' for $_TOOL_DESC_TCL is missing. Skipping."
+    return 1
+  fi
+  return 0
+}
