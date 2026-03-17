@@ -570,10 +570,17 @@ main() {
   fi
 
   # Verilog
-  if has_lang_files "*.v *.sv"; then
+  if has_lang_files "*.v"; then
     check_runtime "verilog" "Verilog (Modular)"
   else
-    log_info "⏭️  Verilog: Skipped (no Verilog files)"
+    log_info "⏭️  Verilog: Skipped (no .v files)"
+  fi
+
+  # SystemVerilog
+  if has_lang_files "*.sv *.svh"; then
+    check_runtime "systemverilog" "SystemVerilog (Modular)"
+  else
+    log_info "⏭️  SystemVerilog: Skipped (no .sv files)"
   fi
 
   # VHDL
