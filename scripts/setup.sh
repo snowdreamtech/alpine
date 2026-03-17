@@ -101,6 +101,8 @@ Modules (default: all):
   react-native       Invite React Native CLI
   expo               Install Expo CLI
   ionic              Install Ionic CLI
+  express            Install Express Generator
+  fastify            Install Fastify CLI
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1900,6 +1902,8 @@ EOF
     react-native) setup_react_native ;;
     expo) setup_expo ;;
     ionic) setup_ionic ;;
+    express) setup_express ;;
+    fastify) setup_fastify ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2090,6 +2094,18 @@ setup_expo() {
 setup_ionic() {
   . "$SCRIPT_DIR/lib/langs/ionic.sh"
   install_ionic
+}
+
+# Purpose: Wrapper for Express setup.
+setup_express() {
+  . "$SCRIPT_DIR/lib/langs/express.sh"
+  install_express
+}
+
+# Purpose: Wrapper for Fastify setup.
+setup_fastify() {
+  . "$SCRIPT_DIR/lib/langs/fastify.sh"
+  install_fastify
 }
 
 main "$@"
