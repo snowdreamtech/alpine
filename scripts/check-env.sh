@@ -299,6 +299,13 @@ main() {
   else
     log_info "⏭️  Vlang: Skipped (no Vlang files)"
   fi
+
+  # Crystal
+  if has_lang_files "shard.yml" "*.cr"; then
+    check_runtime "crystal" "Crystal (Modular)"
+  else
+    log_info "⏭️  Crystal: Skipped (no Crystal files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
