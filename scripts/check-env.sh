@@ -418,6 +418,13 @@ main() {
   else
     log_info "⏭️  Common Lisp: Skipped (no Lisp files)"
   fi
+
+  # Racket
+  if has_lang_files "*.rkt *.rktl"; then
+    check_runtime "racket" "Racket (Modular)"
+  else
+    log_info "⏭️  Racket: Skipped (no Racket files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
