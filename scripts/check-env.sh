@@ -453,6 +453,13 @@ main() {
   else
     log_info "⏭️  MoonBit: Skipped (no MoonBit files)"
   fi
+
+  # Grain
+  if has_lang_files "*.gr"; then
+    check_runtime "grain" "Grain (Modular)"
+  else
+    log_info "⏭️  Grain: Skipped (no Grain files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
