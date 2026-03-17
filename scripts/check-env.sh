@@ -89,10 +89,15 @@ check_tool_version() {
     return 0
   fi
 
-  local _LV_LOWER_VER
-  _LV_LOWER_VER=$(printf "%s\n%s" "$_LV_MIN_VER" "$_LV_CURRENT_VER" | sort -n -t. -k1,1 -k2,2 -k3,3 | head -n1)
+  # Canonicalize versions to 3 components to avoid revision suffix mismatches (e.g. 1.7.11.24)
+  local _LV_MIN_CANON _LV_CUR_CANON
+  _LV_MIN_CANON=$(echo "$_LV_MIN_VER" | cut -d. -f1-3)
+  _LV_CUR_CANON=$(echo "$_LV_CURRENT_VER" | cut -d. -f1-3)
 
-  if [ "$_LV_LOWER_VER" = "$_LV_MIN_VER" ] || [ "$_LV_CURRENT_VER" = "$_LV_MIN_VER" ]; then
+  local _LV_LOWER_VER
+  _LV_LOWER_VER=$(printf "%s\n%s" "$_LV_MIN_CANON" "$_LV_CUR_CANON" | sort -n -t. -k1,1 -k2,2 -k3,3 | head -n1)
+
+  if [ "$_LV_LOWER_VER" = "$_LV_MIN_CANON" ] || [ "$_LV_CUR_CANON" = "$_LV_MIN_CANON" ]; then
     log_success "✅ $_LV_NAME: v$_LV_CURRENT_VER (matches/exceeds v$_LV_MIN_VER)"
   else
     log_warn "⚠️  $_LV_NAME: v$_LV_CURRENT_VER (below recommended v$_LV_MIN_VER)"
