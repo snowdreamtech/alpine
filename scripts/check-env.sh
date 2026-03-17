@@ -516,6 +516,13 @@ main() {
   else
     log_info "⏭️  Apache Spark: Skipped (no Spark files)"
   fi
+
+  # Helm
+  if has_lang_files "Chart.yaml values.yaml charts/"; then
+    check_runtime "helm" "Helm (Modular)"
+  else
+    log_info "⏭️  Helm: Skipped (no Helm files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
