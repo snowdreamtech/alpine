@@ -827,6 +827,10 @@ main() {
     . "$SCRIPT_DIR/lib/langs/expo.sh"
     check_expo
 
+    # Ionic
+    . "$SCRIPT_DIR/lib/langs/ionic.sh"
+    check_ionic
+
     printf "\n"
   fi
 

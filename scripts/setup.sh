@@ -100,6 +100,7 @@ Modules (default: all):
   flutter            Install Flutter SDK
   react-native       Invite React Native CLI
   expo               Install Expo CLI
+  ionic              Install Ionic CLI
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1898,6 +1899,7 @@ EOF
     flutter) setup_flutter ;;
     react-native) setup_react_native ;;
     expo) setup_expo ;;
+    ionic) setup_ionic ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2082,6 +2084,12 @@ setup_react_native() {
 setup_expo() {
   . "$SCRIPT_DIR/lib/langs/expo.sh"
   install_expo
+}
+
+# Purpose: Wrapper for Ionic setup.
+setup_ionic() {
+  . "$SCRIPT_DIR/lib/langs/ionic.sh"
+  install_ionic
 }
 
 main "$@"
