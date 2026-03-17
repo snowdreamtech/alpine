@@ -2,6 +2,7 @@
 # Move Logic Module
 
 # Purpose: Installs Move toolchain (via aptos CLI) via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_move() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Aptos CLI (Move toolchain) via mise."
@@ -39,6 +40,8 @@ setup_move() {
 }
 
 # Purpose: Checks if Move (aptos) is available.
+# Examples:
+#   check_runtime_move "Linter"
 check_runtime_move() {
   local _TOOL_DESC_MOVE="${1:-Move}"
   if ! command -v aptos >/dev/null 2>&1; then

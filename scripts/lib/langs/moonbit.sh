@@ -2,6 +2,7 @@
 # MoonBit Logic Module
 
 # Purpose: Installs MoonBit via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_moonbit() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install MoonBit via mise."
@@ -39,6 +40,8 @@ setup_moonbit() {
 }
 
 # Purpose: Checks if MoonBit is available.
+# Examples:
+#   check_runtime_moonbit "Linter"
 check_runtime_moonbit() {
   local _TOOL_DESC_MOON="${1:-MoonBit}"
   if ! command -v moon >/dev/null 2>&1; then

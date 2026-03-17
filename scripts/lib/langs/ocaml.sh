@@ -2,6 +2,7 @@
 # OCaml Logic Module
 
 # Purpose: Installs OCaml and OPAM via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_ocaml() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install OCaml via mise."
@@ -40,6 +41,8 @@ setup_ocaml() {
 }
 
 # Purpose: Checks if OCaml is available.
+# Examples:
+#   check_runtime_ocaml "Linter"
 check_runtime_ocaml() {
   local _TOOL_DESC_OCM="${1:-OCaml}"
   if ! command -v ocaml >/dev/null 2>&1; then

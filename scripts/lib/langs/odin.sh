@@ -2,6 +2,7 @@
 # Odin Logic Module
 
 # Purpose: Installs Odin compiler via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_odin() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Odin compiler via mise."
@@ -39,6 +40,8 @@ setup_odin() {
 }
 
 # Purpose: Checks if Odin compiler is available.
+# Examples:
+#   check_runtime_odin "Linter"
 check_runtime_odin() {
   local _TOOL_DESC_ODIN="${1:-Odin}"
   if ! command -v odin >/dev/null 2>&1; then

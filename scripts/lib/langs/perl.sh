@@ -2,6 +2,7 @@
 # Perl Logic Module
 
 # Purpose: Installs Perl runtime via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_perl() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Perl runtime."

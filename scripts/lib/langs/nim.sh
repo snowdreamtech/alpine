@@ -2,6 +2,7 @@
 # Nim Logic Module
 
 # Purpose: Installs Nim compiler via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_nim() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Nim compiler via mise."
@@ -39,6 +40,8 @@ setup_nim() {
 }
 
 # Purpose: Checks if Nim compiler is available.
+# Examples:
+#   check_runtime_nim "Linter"
 check_runtime_nim() {
   local _TOOL_DESC_NIM="${1:-Nim}"
   if ! command -v nim >/dev/null 2>&1; then
