@@ -8,7 +8,7 @@
 # Purpose: Checks for Typesense development prerequisites.
 # Examples:
 #   check_typesense
-check_typesense() {
+check_runtime_typesense() {
   log_info "🔍 Checking Typesense environment..."
 
   # Check for Typesense binary or configuration files
@@ -29,7 +29,7 @@ check_typesense() {
 #   install_typesense
 install_typesense() {
   log_info "🚀 Typesense setup usually involves Docker or system binary."
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: docker run -d -p 8108:8108 typesense/typesense:0.25.1"
     return 0
   fi

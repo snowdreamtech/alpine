@@ -8,7 +8,7 @@
 # Purpose: Checks for Neo4j development prerequisites.
 # Examples:
 #   check_neo4j
-check_neo4j() {
+check_runtime_neo4j() {
   log_info "🔍 Checking Neo4j environment..."
 
   # Check for Neo4j binary or configuration files
@@ -31,7 +31,7 @@ check_neo4j() {
 #   install_neo4j
 install_neo4j() {
   log_info "🚀 Neo4j setup usually involves Docker or system binary."
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: docker run -d --name neo4j -p 7474:7474 -p 7687:7687 neo4j"
     return 0
   fi

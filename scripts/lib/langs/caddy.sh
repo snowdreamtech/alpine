@@ -8,7 +8,7 @@
 # Purpose: Checks for Caddy development prerequisites.
 # Examples:
 #   check_caddy
-check_caddy() {
+check_runtime_caddy() {
   log_info "🔍 Checking Caddy environment..."
 
   # Check for Caddy command or project files

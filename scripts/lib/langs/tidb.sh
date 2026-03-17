@@ -8,7 +8,7 @@
 # Purpose: Checks for TiDB development prerequisites.
 # Examples:
 #   check_tidb
-check_tidb() {
+check_runtime_tidb() {
   log_info "🔍 Checking TiDB environment..."
 
   # Check for TiUP (TiDB's package manager) or TiDB binary
@@ -32,7 +32,7 @@ check_tidb() {
 install_tidb() {
   log_info "🚀 Setting up TiUP..."
 
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: curl --proto '=https' --tlsv1.2 -sSf https://tiup-mirrors.pingcap.com/install.sh | sh"
     return 0
   fi

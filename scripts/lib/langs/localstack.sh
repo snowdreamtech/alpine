@@ -8,7 +8,7 @@
 # Purpose: Checks for LocalStack development prerequisites.
 # Examples:
 #   check_localstack
-check_localstack() {
+check_runtime_localstack() {
   log_info "🔍 Checking LocalStack environment..."
 
   # Check for localstack binary or docker-compose
@@ -30,7 +30,7 @@ check_localstack() {
 install_localstack() {
   log_info "🚀 Setting up LocalStack CLI..."
 
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: pip install localstack"
     return 0
   fi

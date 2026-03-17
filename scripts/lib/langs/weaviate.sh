@@ -8,7 +8,7 @@
 # Purpose: Checks for Weaviate development prerequisites.
 # Examples:
 #   check_weaviate
-check_weaviate() {
+check_runtime_weaviate() {
   log_info "🔍 Checking Weaviate environment..."
 
   # Check for weaviate binary or configuration files
@@ -29,7 +29,7 @@ check_weaviate() {
 #   install_weaviate
 install_weaviate() {
   log_info "🚀 Weaviate installation is platform dependent. Usually deployed via Docker."
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: Skip Weaviate installation."
     return 0
   fi

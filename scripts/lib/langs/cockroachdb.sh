@@ -8,7 +8,7 @@
 # Purpose: Checks for CockroachDB development prerequisites.
 # Examples:
 #   check_cockroachdb
-check_cockroachdb() {
+check_runtime_cockroachdb() {
   log_info "🔍 Checking CockroachDB environment..."
 
   # Check for CockroachDB binary
@@ -29,7 +29,7 @@ check_cockroachdb() {
 #   install_cockroachdb
 install_cockroachdb() {
   log_info "🚀 CockroachDB setup usually involves Docker or system binary."
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: curl https://binaries.cockroachdb.com/cockroach-latest.darwin-10.9-amd64.tgz | tar -xz"
     return 0
   fi

@@ -8,7 +8,7 @@
 # Purpose: Checks for Buck2 development prerequisites.
 # Examples:
 #   check_buck2
-check_buck2() {
+check_runtime_buck2() {
   log_info "🔍 Checking Buck2 environment..."
 
   # Check for Buck2 binary or configuration files
@@ -29,7 +29,7 @@ check_buck2() {
 #   install_buck2
 install_buck2() {
   log_info "🚀 Buck2 setup usually involves downloading the official binary or brew."
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: brew install buck2"
     return 0
   fi

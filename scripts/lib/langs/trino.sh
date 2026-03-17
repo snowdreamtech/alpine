@@ -8,7 +8,7 @@
 # Purpose: Checks for Trino development prerequisites.
 # Examples:
 #   check_trino
-check_trino() {
+check_runtime_trino() {
   log_info "🔍 Checking Trino environment..."
 
   # Check for Java (Prerequisite)
@@ -35,7 +35,7 @@ check_trino() {
 #   install_trino
 install_trino() {
   log_info "🚀 Trino setup usually involves downloading the CLI Jar or Docker."
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: brew install trino"
     return 0
   fi

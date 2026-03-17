@@ -8,7 +8,7 @@
 # Purpose: Checks for HashiCorp Vault development prerequisites.
 # Examples:
 #   check_vault
-check_vault() {
+check_runtime_vault() {
   log_info "🔍 Checking Vault environment..."
 
   # Check for vault binary or configuration files
@@ -29,7 +29,7 @@ check_vault() {
 #   install_vault
 install_vault() {
   log_info "🚀 Vault installation: Consider using brew install vault (MacOS) or downloading from HashiCorp."
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: Skip Vault installation."
     return 0
   fi

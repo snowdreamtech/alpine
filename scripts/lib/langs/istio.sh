@@ -8,7 +8,7 @@
 # Purpose: Checks for Istio development prerequisites.
 # Examples:
 #   check_istio
-check_istio() {
+check_runtime_istio() {
   log_info "🔍 Checking Istio environment..."
 
   # Check for istioctl binary or project files
@@ -29,7 +29,7 @@ check_istio() {
 #   install_istio
 install_istio() {
   log_info "🚀 Istio installation usually involves: curl -L https://istio.io/downloadIstio | sh -"
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: Skip Istio installation."
     return 0
   fi

@@ -8,7 +8,7 @@
 # Purpose: Checks for Kyverno development prerequisites.
 # Examples:
 #   check_kyverno
-check_kyverno() {
+check_runtime_kyverno() {
   log_info "🔍 Checking Kyverno environment..."
 
   # Check for Kyverno CLI
@@ -30,7 +30,7 @@ check_kyverno() {
 install_kyverno() {
   log_info "🚀 Setting up Kyverno CLI..."
 
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: brew install kyverno"
     return 0
   fi

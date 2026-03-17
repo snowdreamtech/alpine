@@ -60,81 +60,25 @@ Modules (default: all):
   swift              Install Swift linters (macOS)
   dotnet             Check .NET SDK
   security           Install security audit tools (osv-scanner, trivy, etc.)
-  editorconfig-checker Install editorconfig-checker
   shfmt              Install shfmt
   shellcheck         Install shellcheck
   actionlint         Install actionlint
   taplo              Install taplo
   prettier           Install prettier
-  sort-package-json  Install sort-package-json
-  goreleaser         Install goreleaser
-  spectral           Install spectral
-  commitlint         Install commitlint
-  dockerfile-utils   Install dockerfile-utils
-  clang-format       Install clang-format
-  ktlint             Install ktlint
-  ruff               Install ruff
-  yamllint           Install yamllint
-  sqlfluff           Install sqlfluff
-  markdownlint       Install markdownlint
-  ansible-lint       Install ansible-lint
-  dotenv-linter      Install dotenv-linter
-  bats               Install bats
-  bats-libs          Vendor bats libraries
-  eslint             Install eslint
-  stylelint          Install stylelint
-  vitepress          Install vitepress
-  commitizen         Install commitizen
-  pip-audit          Install pip-audit
-  stylua             Install stylua
   buf                Install buf
   tofu               Install opentofu
   just               Install Just
   task               Install Task
   nix                Check Nix
   zig                Install Zig
-  cue                Install CUE/Jsonnet
   rego               Install OPA/Rego
   server             Check Server Configs
   edge               Check Edge Configs
-  flutter            Install Flutter SDK
-  react-native       Invite React Native CLI
-  expo               Install Expo CLI
-  ionic              Install Ionic CLI
-  express            Install Express Generator
-  fastify            Install Fastify CLI
-  hono               Check Hono Configuration
-  flask              Check Flask Configuration
-  gin                Check Gin Configuration
-  fiber              Check Fiber Configuration
-  rails              Install Rails Gem
-  typeorm            Install TypeORM CLI
-  drizzle            Install Drizzle Kit
-  sqlalchemy         Check SQLAlchemy Configuration
   ansible            Install Ansible
   nginx              Install Nginx (Platform-dependent)
   caddy              Install Caddy (Platform-dependent)
   elasticsearch      Install Elasticsearch (Platform-dependent)
   meilisearch        Install Meilisearch (Platform-dependent)
-  playwright         Install Playwright
-  vitest             Install Vitest
-  cypress            Install Cypress
-  astro              Install Astro CLI
-  sveltekit          Check SvelteKit Config
-  solidstart         Check SolidStart Config
-  storybook          Check Storybook Config
-  docusaurus         Check Docusaurus Config
-  axum               Check Axum Config
-  actix              Check Actix Config
-  echo               Check Echo Config
-  gorm               Check Gorm Config
-  adonis             Check AdonisJS Config
-  strapi             Check Strapi Config
-  phoenix            Check Phoenix Config
-  symfony            Check Symfony Config
-  tortoise           Check Tortoise ORM Config
-  kmp                Check KMP Config
-  nativescript       Install NativeScript CLI
   kafka              Install Kafka (Platform-dependent)
   rabbitmq           Install RabbitMQ (Platform-dependent)
   prometheus         Install Prometheus (Platform-dependent)
@@ -144,50 +88,16 @@ Modules (default: all):
   linkerd            Install Linkerd CLI
   nats               Install NATS CLI
   pulsar             Install Apache Pulsar
-  llamaindex         Check LlamaIndex Config
   weaviate           Install Weaviate (Platform-dependent)
-  polars             Check Polars Config
-  pandas             Check Pandas Config
   quarkus            Install Quarkus CLI
   micronaut          Install Micronaut CLI
   vault              Install Vault CLI
   semgrep            Install Semgrep CLI
   checkov            Install Checkov CLI
   mage               Install Mage CLI
-  tanstack-query     Check TanStack Query Config
-  zustand            Check Zustand Config
-  appium             Install Appium CLI
-  testcafe           Install TestCafe CLI
-  turborepo          Install Turborepo CLI
-  nx                 Install Nx CLI
-  biome              Install Biome CLI
-  knip               Install Knip CLI
-  lefthook           Install Lefthook CLI
-  trpc               Check tRPC Config
-  jotai              Check Jotai Config
-  valtio             Check Valtio Config
-  recoil             Check Recoil Config
-  preact             Check Preact Config
-  noco-db            Check NocoDB Config
-  mongoose           Check Mongoose Config
-  sequelize          Install Sequelize CLI
-  kysely             Check Kysely Config
-  payload-cms        Check Payload CMS Config
-  directus           Check Directus Config
-  ghost              Install Ghost CLI
-  hardhat            Check Hardhat Config
   foundry            Install Foundry CLI
-  polars-js          Check Polars JS Config
-  ef-core            Install EF Core CLI
-  grafana            Check Grafana Config
-  loki               Check Loki Config
   vector             Install Vector
   fluentd            Check Fluentd Config
-  pytest             Install Pytest
-  junit              Check JUnit Config
-  mockito            Check Mockito Config
-  uvicorn            Install Uvicorn
-  gunicorn           Install Gunicorn
   neo4j              Check Neo4j Config
   scylladb           Check ScyllaDB Config
   cockroachdb        Check CockroachDB Config
@@ -201,53 +111,26 @@ Modules (default: all):
   bazel              Install Bazelisk
   buck2              Check Buck2 Config
   pants              Check Pants Config
-  langgraph          Check LangGraph Config
-  crewai             Check CrewAI Config
   ollama             Check Ollama Config
-  localstack         Install LocalStack CLI
-  lerna              Install Lerna CLI
-  single-spa         Install Single-spa CLI
-  module-federation  Check Federation Config
   cilium             Install Cilium CLI
   falco              Check Falco Config
   kyverno            Install Kyverno CLI
   opa                Install OPA CLI
-  react-hook-form    Check RHF Config
-  tanstack-table     Check Table Config
-  styled-components  Check Styled Components
-  emotion            Check Emotion Config
-  vanilla-extract    Check Vanilla Extract
-  husky              Install Husky
-  rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
-  playwright         Check Playwright Config
-  cypress            Check Cypress Config
-  vitest             Check Vitest Config
-  docusaurus         Check Docusaurus Config
-  mkdocs             Check MkDocs Config
-  sphinx             Check Sphinx Config
-  jupyter            Check Jupyter Notebooks
-  dvc                Check DVC Config
   elixir             Install Elixir/Erlang
   haskell            Install Haskell/Stack
   scala              Install Scala/SBT
   php                Install PHP Runtime
   rust               Install Rust Runtime
-  ruby               Setup Ruby & Rubocop
-  java               Setup Java & Google-Java-Format
-  dotnet             Setup .NET SDK
   deno               Setup Deno
   bun                Setup Bun
   kotlin             Setup Kotlin & Ktlint
-  dart               Setup Dart
-  zig                Setup Zig
   julia              Setup Julia
   r                  Setup R
   perl               Setup Perl
   lua                Setup Lua
   groovy             Setup Groovy
-  swift              Setup Swift & SwiftLint
   pre-commit         Install pre-commit
   hooks              Activate Pre-commit Hooks
   all                Run all of the above
@@ -1931,16 +1814,9 @@ EOF
     case $_cur_module in
     node) setup_node ;;
     python) setup_python ;;
-    fastapi) setup_fastapi ;;
-    django) setup_django ;;
-    springboot) setup_springboot ;;
-    laravel) setup_laravel ;;
-    nestjs) setup_nestjs ;;
-    tailwind) setup_tailwind ;;
     redis) setup_redis ;;
     mongodb) setup_mongodb ;;
     postgresql) setup_postgresql ;;
-    vite) setup_vite ;;
     deno) setup_deno ;;
     bun) setup_bun ;;
     pipx) install_pipx ;;
@@ -1976,81 +1852,25 @@ EOF
     govulncheck) install_govulncheck ;;
     cargo-audit) install_cargo_audit ;;
     security) setup_security ;;
-    editorconfig-checker) install_editorconfig_checker ;;
     shfmt) install_shfmt ;;
     shellcheck) install_shellcheck ;;
     actionlint) install_actionlint ;;
     taplo) install_taplo ;;
     prettier) install_prettier ;;
-    sort-package-json) install_sort_package_json ;;
-    goreleaser) install_goreleaser ;;
-    spectral) install_spectral ;;
-    commitlint) install_commitlint ;;
-    dockerfile-utils) install_dockerfile_utils ;;
-    clang-format) install_clang_format ;;
-    ktlint) install_ktlint ;;
-    ruff) install_ruff ;;
-    yamllint) install_yamllint ;;
-    sqlfluff) install_sqlfluff ;;
-    markdownlint) install_markdownlint ;;
-    ansible-lint) install_ansible_lint ;;
-    dotenv-linter) install_dotenv_linter ;;
-    bats) install_bats ;;
-    bats-libs) install_bats_libs ;;
-    eslint) install_eslint ;;
-    stylelint) install_stylelint ;;
-    vitepress) install_vitepress ;;
-    commitizen) install_commitizen ;;
-    pip-audit) install_pip_audit ;;
-    stylua) install_stylua ;;
     buf) install_buf ;;
     tofu) setup_tofu ;;
     just) install_just ;;
     task) install_task ;;
     nix) setup_nix ;;
     zig) setup_zig ;;
-    cue) install_cue ;;
     rego) install_rego ;;
     server) install_server ;;
     edge) install_edge ;;
-    flutter) setup_flutter ;;
-    react-native) setup_react_native ;;
-    expo) setup_expo ;;
-    ionic) setup_ionic ;;
-    express) setup_express ;;
-    fastify) setup_fastify ;;
-    hono) setup_hono ;;
-    flask) setup_flask ;;
-    gin) setup_gin ;;
-    fiber) setup_fiber ;;
-    rails) setup_rails ;;
-    typeorm) setup_typeorm ;;
-    drizzle) setup_drizzle ;;
-    sqlalchemy) setup_sqlalchemy ;;
     ansible) setup_ansible ;;
     nginx) setup_nginx ;;
     caddy) setup_caddy ;;
     elasticsearch) setup_elasticsearch ;;
     meilisearch) setup_meilisearch ;;
-    playwright) setup_playwright ;;
-    vitest) setup_vitest ;;
-    cypress) setup_cypress ;;
-    astro) setup_astro ;;
-    sveltekit) setup_sveltekit ;;
-    solidstart) setup_solidstart ;;
-    storybook) setup_storybook ;;
-    docusaurus) setup_docusaurus ;;
-    axum) setup_axum ;;
-    actix) setup_actix ;;
-    echo) setup_echo ;;
-    gorm) setup_gorm ;;
-    adonis) setup_adonis ;;
-    strapi) setup_strapi ;;
-    phoenix) setup_phoenix ;;
-    symfony) setup_symfony ;;
-    tortoise) setup_tortoise ;;
-    kmp) setup_kmp ;;
-    nativescript) setup_nativescript ;;
     kafka) setup_kafka ;;
     rabbitmq) setup_rabbitmq ;;
     prometheus) setup_prometheus ;;
@@ -2060,50 +1880,16 @@ EOF
     linkerd) setup_linkerd ;;
     nats) setup_nats ;;
     pulsar) setup_pulsar ;;
-    llamaindex) setup_llamaindex ;;
     weaviate) setup_weaviate ;;
-    polars) setup_polars ;;
-    pandas) setup_pandas ;;
     quarkus) setup_quarkus ;;
     micronaut) setup_micronaut ;;
     vault) setup_vault ;;
     semgrep) setup_semgrep ;;
     checkov) setup_checkov ;;
     mage) setup_mage ;;
-    tanstack-query) setup_tanstack_query ;;
-    zustand) setup_zustand ;;
-    appium) setup_appium ;;
-    testcafe) setup_testcafe ;;
-    turborepo) setup_turborepo ;;
-    nx) setup_nx ;;
-    biome) setup_biome ;;
-    knip) setup_knip ;;
-    lefthook) setup_lefthook ;;
-    trpc) setup_trpc ;;
-    jotai) setup_jotai ;;
-    valtio) setup_valtio ;;
-    recoil) setup_recoil ;;
-    preact) setup_preact ;;
-    noco-db) setup_noco_db ;;
-    mongoose) setup_mongoose ;;
-    sequelize) setup_sequelize ;;
-    kysely) setup_kysely ;;
-    payload-cms) setup_payload_cms ;;
-    directus) setup_directus ;;
-    ghost) setup_ghost ;;
-    hardhat) setup_hardhat ;;
     foundry) setup_foundry ;;
-    polars-js) setup_polars_js ;;
-    ef-core) setup_ef_core ;;
-    grafana) setup_grafana ;;
-    loki) setup_loki ;;
     vector) setup_vector ;;
     fluentd) setup_fluentd ;;
-    pytest) setup_pytest ;;
-    junit) setup_junit ;;
-    mockito) setup_mockito ;;
-    uvicorn) setup_uvicorn ;;
-    gunicorn) setup_gunicorn ;;
     neo4j) setup_neo4j ;;
     scylladb) setup_scylladb ;;
     cockroachdb) setup_cockroachdb ;;
@@ -2117,149 +1903,13 @@ EOF
     bazel) setup_bazel ;;
     buck2) setup_buck2 ;;
     pants) setup_pants ;;
-    langgraph) setup_langgraph ;;
-    crewai) setup_crewai ;;
     ollama) setup_ollama ;;
-    localstack) setup_localstack ;;
-    lerna) setup_lerna ;;
-    single-spa) setup_single_spa ;;
-    module-federation) setup_module_federation ;;
     cilium) setup_cilium ;;
     falco) setup_falco ;;
     kyverno) setup_kyverno ;;
     opa) setup_opa ;;
-    react-hook-form) setup_react_hook_form ;;
-    tanstack-table) setup_tanstack_table ;;
-    styled-components) setup_styled_components ;;
-    emotion) setup_emotion ;;
-    vanilla-extract) setup_vanilla_extract ;;
-    husky) setup_husky ;;
-    rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
-    odin) setup_odin ;;
-    nim) setup_nim ;;
-    clojure) setup_clojure ;;
-    gleam) setup_gleam ;;
-    mojo) setup_mojo ;;
-    objc) setup_objc ;;
-    ocaml) setup_ocaml ;;
-    fsharp) setup_fsharp ;;
-    erlang) setup_erlang ;;
-    vlang) setup_vlang ;;
-    crystal) setup_crystal ;;
-    dlang) setup_dlang ;;
-    haxe) setup_haxe ;;
-    assemblyscript) setup_assemblyscript ;;
-    ballerina) setup_ballerina ;;
-    kcl) setup_kcl ;;
-    pkl) setup_pkl ;;
-    move) setup_move ;;
-    elm) setup_elm ;;
-    rescript) setup_rescript ;;
-    ada) setup_ada ;;
-    luau) setup_luau ;;
-    raku) setup_raku ;;
-    vala) setup_vala ;;
-    fpc) setup_fpc ;;
-    lean) setup_lean ;;
-    lisp) setup_lisp ;;
-    racket) setup_racket ;;
-    prolog) setup_prolog ;;
-    fortran) setup_fortran ;;
-    wat) setup_wat ;;
-    wasmtime) setup_wasmtime ;;
-    ray) setup_ray ;;
-    mlflow) setup_mlflow ;;
-    airflow) setup_airflow ;;
-    prefect) setup_prefect ;;
-    dapr) setup_dapr ;;
-    abap) setup_abap ;;
-    prql) setup_prql ;;
-    lit) setup_lit ;;
-    capacitor) setup_capacitor ;;
-    awk) setup_awk ;;
-    sed) setup_sed ;;
-    gnuplot) setup_gnuplot ;;
-    graphviz) setup_graphviz ;;
-    plantuml) setup_plantuml ;;
-    capnproto) setup_capnproto ;;
-    wasmer) setup_wasmer ;;
-    nextjs) setup_nextjs ;;
-    nuxt) setup_nuxt ;;
-    remix) setup_remix ;;
-    dagger) setup_dagger ;;
-    temporal) setup_temporal ;;
-    langchain) setup_langchain ;;
-    pytorch) setup_pytorch ;;
-    dbt) setup_dbt ;;
-    otel) setup_otel ;;
-    clickhouse) setup_clickhouse ;;
-    moonbit) setup_moonbit ;;
-    grain) setup_grain ;;
-    jsonnet) setup_jsonnet ;;
-    starlark) setup_starlark ;;
-    tcl) setup_tcl ;;
-    duckdb) setup_duckdb ;;
-    vcpkg) setup_vcpkg ;;
-    gherkin) setup_gherkin ;;
-    terragrunt) setup_terragrunt ;;
-    spark) setup_spark ;;
-    helm) setup_helm ;;
-    graphql) setup_graphql ;;
-    typst) setup_typst ;;
-    verilog) setup_verilog ;;
-    vhdl) setup_vhdl ;;
-    octave) setup_octave ;;
-    matlab) setup_matlab ;;
-    plsql) setup_plsql ;;
-    tsql) setup_tsql ;;
-    cobol) setup_cobol ;;
-    openapi) setup_openapi ;;
-    promql) setup_promql ;;
-    latex) setup_latex ;;
-    proto) setup_proto ;;
-    cuda) setup_cuda ;;
-    bicep) setup_bicep ;;
-    cloudformation) setup_cloudformation ;;
-    arkts) setup_arkts ;;
-    shader) setup_shader ;;
-    qml) setup_qml ;;
-    apex) setup_apex ;;
-    applescript) setup_applescript ;;
-    vba) setup_vba ;;
-    vue) setup_vue ;;
-    svelte) setup_svelte ;;
-    assembly) setup_assembly ;;
-    gdscript) setup_gdscript ;;
-    liquid) setup_liquid ;;
-    avro) setup_avro ;;
-    thrift) setup_thrift ;;
-    kustomize) setup_kustomize ;;
-    solid) setup_solid ;;
-    stylus) setup_stylus ;;
-    postcss) setup_postcss ;;
-    k6) setup_k6 ;;
-    sass) setup_sass ;;
-    less) setup_less ;;
-    pug) setup_pug ;;
-    handlebars) setup_handlebars ;;
-    ejs) setup_ejs ;;
-    htmx) setup_htmx ;;
-    alpine) setup_alpine ;;
-    qwik) setup_qwik ;;
-    tauri) setup_tauri ;;
-    electron) setup_electron ;;
-    prisma) setup_prisma ;;
-    edgedb) setup_edgedb ;;
-    surrealdb) setup_surrealdb ;;
-    systemverilog) setup_systemverilog ;;
-    flatbuffers) setup_flatbuffers ;;
-    asyncapi) setup_asyncapi ;;
-    mkdocs) install_mkdocs ;;
-    sphinx) install_sphinx ;;
-    jupyter) install_jupyter ;;
-    dvc) install_dvc ;;
     elixir) setup_elixir ;;
     haskell) setup_haskell ;;
     scala) setup_scala ;;
@@ -2303,84 +1953,6 @@ EOF
   fi
 }
 
-# Purpose: Wrapper for React Native setup.
-setup_react_native() {
-  . "$SCRIPT_DIR/lib/langs/react-native.sh"
-  install_react_native
-}
-
-# Purpose: Wrapper for Expo setup.
-setup_expo() {
-  . "$SCRIPT_DIR/lib/langs/expo.sh"
-  install_expo
-}
-
-# Purpose: Wrapper for Ionic setup.
-setup_ionic() {
-  . "$SCRIPT_DIR/lib/langs/ionic.sh"
-  install_ionic
-}
-
-# Purpose: Wrapper for Express setup.
-setup_express() {
-  . "$SCRIPT_DIR/lib/langs/express.sh"
-  install_express
-}
-
-# Purpose: Wrapper for Fastify setup.
-setup_fastify() {
-  . "$SCRIPT_DIR/lib/langs/fastify.sh"
-  install_fastify
-}
-
-# Purpose: Wrapper for Hono setup.
-setup_hono() {
-  . "$SCRIPT_DIR/lib/langs/hono.sh"
-  install_hono
-}
-
-# Purpose: Wrapper for Flask setup.
-setup_flask() {
-  . "$SCRIPT_DIR/lib/langs/flask.sh"
-  install_flask
-}
-
-# Purpose: Wrapper for Gin setup.
-setup_gin() {
-  . "$SCRIPT_DIR/lib/langs/gin.sh"
-  install_gin
-}
-
-# Purpose: Wrapper for Fiber setup.
-setup_fiber() {
-  . "$SCRIPT_DIR/lib/langs/fiber.sh"
-  install_fiber
-}
-
-# Purpose: Wrapper for Rails setup.
-setup_rails() {
-  . "$SCRIPT_DIR/lib/langs/rails.sh"
-  install_rails
-}
-
-# Purpose: Wrapper for TypeORM setup.
-setup_typeorm() {
-  . "$SCRIPT_DIR/lib/langs/typeorm.sh"
-  install_typeorm
-}
-
-# Purpose: Wrapper for Drizzle setup.
-setup_drizzle() {
-  . "$SCRIPT_DIR/lib/langs/drizzle.sh"
-  install_drizzle
-}
-
-# Purpose: Wrapper for SQLAlchemy setup.
-setup_sqlalchemy() {
-  . "$SCRIPT_DIR/lib/langs/sqlalchemy.sh"
-  install_sqlalchemy
-}
-
 # Purpose: Wrapper for Ansible setup.
 setup_ansible() {
   . "$SCRIPT_DIR/lib/langs/ansible.sh"
@@ -2409,114 +1981,6 @@ setup_elasticsearch() {
 setup_meilisearch() {
   . "$SCRIPT_DIR/lib/langs/meilisearch.sh"
   install_meilisearch
-}
-
-# Purpose: Wrapper for Playwright setup.
-setup_playwright() {
-  . "$SCRIPT_DIR/lib/langs/playwright.sh"
-  install_playwright
-}
-
-# Purpose: Wrapper for Vitest setup.
-setup_vitest() {
-  . "$SCRIPT_DIR/lib/langs/vitest.sh"
-  install_vitest
-}
-
-# Purpose: Wrapper for Cypress setup.
-setup_cypress() {
-  . "$SCRIPT_DIR/lib/langs/cypress.sh"
-  install_cypress
-}
-
-# Purpose: Wrapper for Astro setup.
-setup_astro() {
-  . "$SCRIPT_DIR/lib/langs/astro.sh"
-  install_astro
-}
-
-# Purpose: Wrapper for SvelteKit setup.
-setup_sveltekit() {
-  . "$SCRIPT_DIR/lib/langs/sveltekit.sh"
-  install_sveltekit
-}
-
-# Purpose: Wrapper for SolidStart setup.
-setup_solidstart() {
-  . "$SCRIPT_DIR/lib/langs/solidstart.sh"
-  install_solidstart
-}
-
-# Purpose: Wrapper for Storybook setup.
-setup_storybook() {
-  . "$SCRIPT_DIR/lib/langs/storybook.sh"
-  install_storybook
-}
-
-# Purpose: Wrapper for Axum setup.
-setup_axum() {
-  . "$SCRIPT_DIR/lib/langs/axum.sh"
-  install_axum
-}
-
-# Purpose: Wrapper for Actix setup.
-setup_actix() {
-  . "$SCRIPT_DIR/lib/langs/actix.sh"
-  install_actix
-}
-
-# Purpose: Wrapper for Echo setup.
-setup_echo() {
-  . "$SCRIPT_DIR/lib/langs/echo.sh"
-  install_echo
-}
-
-# Purpose: Wrapper for Gorm setup.
-setup_gorm() {
-  . "$SCRIPT_DIR/lib/langs/gorm.sh"
-  install_gorm
-}
-
-# Purpose: Wrapper for AdonisJS setup.
-setup_adonis() {
-  . "$SCRIPT_DIR/lib/langs/adonis.sh"
-  install_adonis
-}
-
-# Purpose: Wrapper for Strapi setup.
-setup_strapi() {
-  . "$SCRIPT_DIR/lib/langs/strapi.sh"
-  install_strapi
-}
-
-# Purpose: Wrapper for Phoenix setup.
-setup_phoenix() {
-  . "$SCRIPT_DIR/lib/langs/phoenix.sh"
-  install_phoenix
-}
-
-# Purpose: Wrapper for Symfony setup.
-setup_symfony() {
-  . "$SCRIPT_DIR/lib/langs/symfony.sh"
-  install_symfony
-}
-
-# Purpose: Wrapper for Tortoise ORM setup.
-setup_tortoise() {
-  . "$SCRIPT_DIR/lib/langs/tortoise.sh"
-  install_tortoise
-}
-
-# Purpose: Wrapper for KMP setup.
-setup_kmp() {
-  . "$SCRIPT_DIR/lib/langs/kmp.sh"
-  install_kmp
-}
-
-# Purpose: Wrapper for NativeScript setup.
-setup_nativescript() {
-  . "$SCRIPT_DIR/lib/langs/nativescript.sh"
-  install_nativescript
 }
 
 # Purpose: Wrapper for Kafka setup.
@@ -2573,28 +2037,10 @@ setup_pulsar() {
   install_pulsar
 }
 
-# Purpose: Wrapper for LlamaIndex setup.
-setup_llamaindex() {
-  . "$SCRIPT_DIR/lib/langs/llamaindex.sh"
-  install_llamaindex
-}
-
 # Purpose: Wrapper for Weaviate setup.
 setup_weaviate() {
   . "$SCRIPT_DIR/lib/langs/weaviate.sh"
   install_weaviate
-}
-
-# Purpose: Wrapper for Polars setup.
-setup_polars() {
-  . "$SCRIPT_DIR/lib/langs/polars.sh"
-  install_polars
-}
-
-# Purpose: Wrapper for Pandas setup.
-setup_pandas() {
-  . "$SCRIPT_DIR/lib/langs/pandas.sh"
-  install_pandas
 }
 
 # Purpose: Wrapper for Quarkus setup.
@@ -2633,166 +2079,10 @@ setup_mage() {
   install_mage
 }
 
-# Purpose: Wrapper for TanStack Query setup.
-setup_tanstack_query() {
-  . "$SCRIPT_DIR/lib/langs/tanstack-query.sh"
-  install_tanstack_query
-}
-
-# Purpose: Wrapper for Zustand setup.
-setup_zustand() {
-  . "$SCRIPT_DIR/lib/langs/zustand.sh"
-  install_zustand
-}
-
-# Purpose: Wrapper for Appium setup.
-setup_appium() {
-  . "$SCRIPT_DIR/lib/langs/appium.sh"
-  install_appium
-}
-
-# Purpose: Wrapper for TestCafe setup.
-setup_testcafe() {
-  . "$SCRIPT_DIR/lib/langs/testcafe.sh"
-  install_testcafe
-}
-
-# Purpose: Wrapper for Turborepo setup.
-setup_turborepo() {
-  . "$SCRIPT_DIR/lib/langs/turborepo.sh"
-  install_turborepo
-}
-
-# Purpose: Wrapper for Nx setup.
-setup_nx() {
-  . "$SCRIPT_DIR/lib/langs/nx.sh"
-  install_nx
-}
-
-# Purpose: Wrapper for Biome setup.
-setup_biome() {
-  . "$SCRIPT_DIR/lib/langs/biome.sh"
-  install_biome
-}
-
-# Purpose: Wrapper for Knip setup.
-setup_knip() {
-  . "$SCRIPT_DIR/lib/langs/knip.sh"
-  install_knip
-}
-
-# Purpose: Wrapper for Lefthook setup.
-setup_lefthook() {
-  . "$SCRIPT_DIR/lib/langs/lefthook.sh"
-  install_lefthook
-}
-
-# Purpose: Wrapper for tRPC setup.
-setup_trpc() {
-  . "$SCRIPT_DIR/lib/langs/trpc.sh"
-  install_trpc
-}
-
-# Purpose: Wrapper for Jotai setup.
-setup_jotai() {
-  . "$SCRIPT_DIR/lib/langs/jotai.sh"
-  install_jotai
-}
-
-# Purpose: Wrapper for Valtio setup.
-setup_valtio() {
-  . "$SCRIPT_DIR/lib/langs/valtio.sh"
-  install_valtio
-}
-
-# Purpose: Wrapper for Recoil setup.
-setup_recoil() {
-  . "$SCRIPT_DIR/lib/langs/recoil.sh"
-  install_recoil
-}
-
-# Purpose: Wrapper for Preact setup.
-setup_preact() {
-  . "$SCRIPT_DIR/lib/langs/preact.sh"
-  install_preact
-}
-
-# Purpose: Wrapper for NocoDB setup.
-setup_noco_db() {
-  . "$SCRIPT_DIR/lib/langs/noco-db.sh"
-  install_noco_db
-}
-
-# Purpose: Wrapper for Mongoose setup.
-setup_mongoose() {
-  . "$SCRIPT_DIR/lib/langs/mongoose.sh"
-  install_mongoose
-}
-
-# Purpose: Wrapper for Sequelize setup.
-setup_sequelize() {
-  . "$SCRIPT_DIR/lib/langs/sequelize.sh"
-  install_sequelize
-}
-
-# Purpose: Wrapper for Kysely setup.
-setup_kysely() {
-  . "$SCRIPT_DIR/lib/langs/kysely.sh"
-  install_kysely
-}
-
-# Purpose: Wrapper for Payload CMS setup.
-setup_payload_cms() {
-  . "$SCRIPT_DIR/lib/langs/payload-cms.sh"
-  install_payload_cms
-}
-
-# Purpose: Wrapper for Directus setup.
-setup_directus() {
-  . "$SCRIPT_DIR/lib/langs/directus.sh"
-  install_directus
-}
-
-# Purpose: Wrapper for Ghost setup.
-setup_ghost() {
-  . "$SCRIPT_DIR/lib/langs/ghost.sh"
-  install_ghost
-}
-
-# Purpose: Wrapper for Hardhat setup.
-setup_hardhat() {
-  . "$SCRIPT_DIR/lib/langs/hardhat.sh"
-  install_hardhat
-}
-
 # Purpose: Wrapper for Foundry setup.
 setup_foundry() {
   . "$SCRIPT_DIR/lib/langs/foundry.sh"
   install_foundry
-}
-
-# Purpose: Wrapper for Polars JS setup.
-setup_polars_js() {
-  . "$SCRIPT_DIR/lib/langs/polars-js.sh"
-  install_polars_js
-}
-
-# Purpose: Wrapper for EF Core setup.
-setup_ef_core() {
-  . "$SCRIPT_DIR/lib/langs/ef-core.sh"
-  install_ef_core
-}
-
-# Purpose: Wrapper for Grafana setup.
-setup_grafana() {
-  . "$SCRIPT_DIR/lib/langs/grafana.sh"
-  install_grafana
-}
-
-# Purpose: Wrapper for Loki setup.
-setup_loki() {
-  . "$SCRIPT_DIR/lib/langs/loki.sh"
-  install_loki
 }
 
 # Purpose: Wrapper for Vector setup.
@@ -2805,36 +2095,6 @@ setup_vector() {
 setup_fluentd() {
   . "$SCRIPT_DIR/lib/langs/fluentd.sh"
   install_fluentd
-}
-
-# Purpose: Wrapper for Pytest setup.
-setup_pytest() {
-  . "$SCRIPT_DIR/lib/langs/pytest.sh"
-  install_pytest
-}
-
-# Purpose: Wrapper for JUnit setup.
-setup_junit() {
-  . "$SCRIPT_DIR/lib/langs/junit.sh"
-  install_junit
-}
-
-# Purpose: Wrapper for Mockito setup.
-setup_mockito() {
-  . "$SCRIPT_DIR/lib/langs/mockito.sh"
-  install_mockito
-}
-
-# Purpose: Wrapper for Uvicorn setup.
-setup_uvicorn() {
-  . "$SCRIPT_DIR/lib/langs/uvicorn.sh"
-  install_uvicorn
-}
-
-# Purpose: Wrapper for Gunicorn setup.
-setup_gunicorn() {
-  . "$SCRIPT_DIR/lib/langs/gunicorn.sh"
-  install_gunicorn
 }
 
 # Purpose: Wrapper for Neo4j setup.
@@ -2915,46 +2175,10 @@ setup_pants() {
   install_pants
 }
 
-# Purpose: Wrapper for LangGraph setup.
-setup_langgraph() {
-  . "$SCRIPT_DIR/lib/langs/langgraph.sh"
-  install_langgraph
-}
-
-# Purpose: Wrapper for CrewAI setup.
-setup_crewai() {
-  . "$SCRIPT_DIR/lib/langs/crewai.sh"
-  install_crewai
-}
-
 # Purpose: Wrapper for Ollama setup.
 setup_ollama() {
   . "$SCRIPT_DIR/lib/langs/ollama.sh"
   install_ollama
-}
-
-# Purpose: Wrapper for LocalStack setup.
-setup_localstack() {
-  . "$SCRIPT_DIR/lib/langs/localstack.sh"
-  install_localstack
-}
-
-# Purpose: Wrapper for Lerna setup.
-setup_lerna() {
-  . "$SCRIPT_DIR/lib/langs/lerna.sh"
-  install_lerna
-}
-
-# Purpose: Wrapper for Single-spa setup.
-setup_single_spa() {
-  . "$SCRIPT_DIR/lib/langs/single-spa.sh"
-  install_single_spa
-}
-
-# Purpose: Wrapper for Module Federation setup.
-setup_module_federation() {
-  . "$SCRIPT_DIR/lib/langs/module-federation.sh"
-  install_module_federation
 }
 
 # Purpose: Wrapper for Cilium setup.
@@ -2979,42 +2203,6 @@ setup_kyverno() {
 setup_opa() {
   . "$SCRIPT_DIR/lib/langs/opa.sh"
   install_opa
-}
-
-# Purpose: Wrapper for React Hook Form setup.
-setup_react_hook_form() {
-  . "$SCRIPT_DIR/lib/langs/react-hook-form.sh"
-  install_react_hook_form
-}
-
-# Purpose: Wrapper for TanStack Table setup.
-setup_tanstack_table() {
-  . "$SCRIPT_DIR/lib/langs/tanstack-table.sh"
-  install_tanstack_table
-}
-
-# Purpose: Wrapper for Styled Components setup.
-setup_styled_components() {
-  . "$SCRIPT_DIR/lib/langs/styled-components.sh"
-  install_styled_components
-}
-
-# Purpose: Wrapper for Emotion setup.
-setup_emotion() {
-  . "$SCRIPT_DIR/lib/langs/emotion.sh"
-  install_emotion
-}
-
-# Purpose: Wrapper for Vanilla Extract setup.
-setup_vanilla_extract() {
-  . "$SCRIPT_DIR/lib/langs/vanilla-extract.sh"
-  install_vanilla_extract
-}
-
-# Purpose: Wrapper for Husky setup.
-setup_husky() {
-  . "$SCRIPT_DIR/lib/langs/husky.sh"
-  install_husky
 }
 
 main "$@"

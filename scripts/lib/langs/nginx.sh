@@ -8,7 +8,7 @@
 # Purpose: Checks for Nginx development prerequisites.
 # Examples:
 #   check_nginx
-check_nginx() {
+check_runtime_nginx() {
   log_info "🔍 Checking Nginx environment..."
 
   # Check for Nginx command or project files

@@ -8,7 +8,7 @@
 # Purpose: Checks for Prometheus development prerequisites.
 # Examples:
 #   check_prometheus
-check_prometheus() {
+check_runtime_prometheus() {
   log_info "🔍 Checking Prometheus environment..."
 
   # Check for Prometheus binary or configuration files

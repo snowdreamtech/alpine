@@ -8,7 +8,7 @@
 # Purpose: Checks for Kafka development prerequisites.
 # Examples:
 #   check_kafka
-check_kafka() {
+check_runtime_kafka() {
   log_info "🔍 Checking Kafka environment..."
 
   # Check for Kafka binary or related files

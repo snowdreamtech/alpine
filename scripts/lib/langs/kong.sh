@@ -8,7 +8,7 @@
 # Purpose: Checks for Kong development prerequisites.
 # Examples:
 #   check_kong
-check_kong() {
+check_runtime_kong() {
   log_info "🔍 Checking Kong environment..."
 
   # Check for kong binary or configuration files

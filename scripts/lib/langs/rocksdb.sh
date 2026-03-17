@@ -8,7 +8,7 @@
 # Purpose: Checks for RocksDB development prerequisites.
 # Examples:
 #   check_rocksdb
-check_rocksdb() {
+check_runtime_rocksdb() {
   log_info "🔍 Checking RocksDB environment..."
 
   # RocksDB is an embedded library often found in C++, Rust or Go projects.

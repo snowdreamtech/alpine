@@ -8,7 +8,7 @@
 # Purpose: Checks for Traefik development prerequisites.
 # Examples:
 #   check_traefik
-check_traefik() {
+check_runtime_traefik() {
   log_info "🔍 Checking Traefik environment..."
 
   # Check for Traefik binary or configuration files

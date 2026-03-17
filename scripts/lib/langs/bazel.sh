@@ -8,7 +8,7 @@
 # Purpose: Checks for Bazel development prerequisites.
 # Examples:
 #   check_bazel
-check_bazel() {
+check_runtime_bazel() {
   log_info "🔍 Checking Bazel environment..."
 
   # Check for Bazel, Bazelisk or configuration files
@@ -32,7 +32,7 @@ check_bazel() {
 install_bazel() {
   log_info "🚀 Setting up Bazelisk..."
 
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: npm install -g @bazel/bazelisk"
     return 0
   fi

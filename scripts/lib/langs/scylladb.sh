@@ -8,7 +8,7 @@
 # Purpose: Checks for ScyllaDB development prerequisites.
 # Examples:
 #   check_scylladb
-check_scylladb() {
+check_runtime_scylladb() {
   log_info "🔍 Checking ScyllaDB environment..."
 
   # Check for ScyllaDB binary or configuration files
@@ -32,7 +32,7 @@ check_scylladb() {
 #   install_scylladb
 install_scylladb() {
   log_info "🚀 ScyllaDB setup usually involves Docker or system binary."
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: docker run --name scylla -d scylladb/scylla"
     return 0
   fi

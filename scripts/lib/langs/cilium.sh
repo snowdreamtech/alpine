@@ -8,7 +8,7 @@
 # Purpose: Checks for Cilium development prerequisites.
 # Examples:
 #   check_cilium
-check_cilium() {
+check_runtime_cilium() {
   log_info "🔍 Checking Cilium environment..."
 
   # Check for Cilium CLI binary
@@ -30,7 +30,7 @@ check_cilium() {
 install_cilium() {
   log_info "🚀 Setting up Cilium CLI..."
 
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: curl -L --remote-name-all https://github.com/cilium/cilium-cli/releases/latest/download/cilium-darwin-amd64.tar.gz"
     return 0
   fi

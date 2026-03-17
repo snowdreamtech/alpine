@@ -8,7 +8,7 @@
 # Purpose: Checks for Falco development prerequisites.
 # Examples:
 #   check_falco
-check_falco() {
+check_runtime_falco() {
   log_info "🔍 Checking Falco environment..."
 
   # Check for Falco binary or configuration

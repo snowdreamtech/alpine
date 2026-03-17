@@ -8,7 +8,7 @@
 # Purpose: Checks for Foundry development prerequisites.
 # Examples:
 #   check_foundry
-check_foundry() {
+check_runtime_foundry() {
   log_info "🔍 Checking Foundry environment..."
 
   # Check for Foundry binaries (forge, cast, anvil, chisel)
@@ -30,7 +30,7 @@ check_foundry() {
 install_foundry() {
   log_info "🚀 Setting up Foundry..."
 
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: curl -L https://foundry.paradigm.xyz | bash && foundryup"
     return 0
   fi

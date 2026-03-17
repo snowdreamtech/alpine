@@ -8,7 +8,7 @@
 # Purpose: Checks for NATS development prerequisites.
 # Examples:
 #   check_nats
-check_nats() {
+check_runtime_nats() {
   log_info "🔍 Checking NATS environment..."
 
   # Check for nats binary or related files
@@ -29,7 +29,7 @@ check_nats() {
 #   install_nats
 install_nats() {
   log_info "🚀 NATS CLI installation: curl -sfL https://raw.githubusercontent.com/nats-io/natscli/main/install.sh | sh"
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: Skip NATS installation."
     return 0
   fi

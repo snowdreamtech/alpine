@@ -8,7 +8,7 @@
 # Purpose: Checks for Vector development prerequisites.
 # Examples:
 #   check_vector
-check_vector() {
+check_runtime_vector() {
   log_info "🔍 Checking Vector environment..."
 
   # Check for Vector binary or configuration files
@@ -30,7 +30,7 @@ check_vector() {
 install_vector() {
   log_info "🚀 Setting up Vector..."
 
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: curl --proto '=https' --tlsv1.2 -sSf https://sh.vector.dev | sh"
     return 0
   fi

@@ -8,7 +8,7 @@
 # Purpose: Checks for RabbitMQ development prerequisites.
 # Examples:
 #   check_rabbitmq
-check_rabbitmq() {
+check_runtime_rabbitmq() {
   log_info "🔍 Checking RabbitMQ environment..."
 
   # Check for RabbitMQ binary or related files

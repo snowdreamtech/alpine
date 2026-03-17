@@ -8,7 +8,7 @@
 # Purpose: Checks for OPA (Open Policy Agent) development prerequisites.
 # Examples:
 #   check_opa
-check_opa() {
+check_runtime_opa() {
   log_info "🔍 Checking OPA environment..."
 
   # Check for OPA binary
@@ -30,7 +30,7 @@ check_opa() {
 install_opa() {
   log_info "🚀 Setting up OPA..."
 
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: curl -L -o opa https://openpolicyagent.org/downloads/v0.61.0/opa_darwin_amd64"
     return 0
   fi

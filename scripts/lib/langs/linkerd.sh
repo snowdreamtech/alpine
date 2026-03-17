@@ -8,7 +8,7 @@
 # Purpose: Checks for Linkerd development prerequisites.
 # Examples:
 #   check_linkerd
-check_linkerd() {
+check_runtime_linkerd() {
   log_info "🔍 Checking Linkerd environment..."
 
   # Check for linkerd binary or project files
@@ -29,7 +29,7 @@ check_linkerd() {
 #   install_linkerd
 install_linkerd() {
   log_info "🚀 Linkerd installation usually involves: curl --proto '=https' --tlsv1.2 -sSfL https://run.linkerd.io/install | sh"
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: Skip Linkerd installation."
     return 0
   fi

@@ -8,7 +8,7 @@
 # Purpose: Checks for Semgrep development prerequisites.
 # Examples:
 #   check_semgrep
-check_semgrep() {
+check_runtime_semgrep() {
   log_info "🔍 Checking Semgrep environment..."
 
   # Check for semgrep binary or configuration files
@@ -29,7 +29,7 @@ check_semgrep() {
 #   install_semgrep
 install_semgrep() {
   log_info "🚀 Semgrep setup usually happens via: pip install semgrep or brew install semgrep"
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: Skip Semgrep installation."
     return 0
   fi

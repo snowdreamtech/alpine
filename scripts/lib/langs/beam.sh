@@ -8,7 +8,7 @@
 # Purpose: Checks for Apache Beam development prerequisites.
 # Examples:
 #   check_beam
-check_beam() {
+check_runtime_beam() {
   log_info "🔍 Checking Apache Beam environment..."
 
   # Apache Beam is a SDK often used with Python, Go or Java.

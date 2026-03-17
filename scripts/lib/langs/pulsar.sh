@@ -8,7 +8,7 @@
 # Purpose: Checks for Apache Pulsar development prerequisites.
 # Examples:
 #   check_pulsar
-check_pulsar() {
+check_runtime_pulsar() {
   log_info "🔍 Checking Apache Pulsar environment..."
 
   # Check for pulsar binary or related files
@@ -29,7 +29,7 @@ check_pulsar() {
 #   install_pulsar
 install_pulsar() {
   log_info "🚀 Apache Pulsar installation: Consider using Docker or downloading from: https://pulsar.apache.org/download/"
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: Skip Pulsar installation."
     return 0
   fi

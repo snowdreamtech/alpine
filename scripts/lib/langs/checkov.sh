@@ -8,7 +8,7 @@
 # Purpose: Checks for Checkov development prerequisites.
 # Examples:
 #   check_checkov
-check_checkov() {
+check_runtime_checkov() {
   log_info "🔍 Checking Checkov environment..."
 
   # Check for checkov binary or configuration files
@@ -29,7 +29,7 @@ check_checkov() {
 #   install_checkov
 install_checkov() {
   log_info "🚀 Checkov setup usually happens via: pip install checkov"
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: Skip Checkov installation."
     return 0
   fi

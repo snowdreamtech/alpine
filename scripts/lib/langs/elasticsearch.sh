@@ -8,7 +8,7 @@
 # Purpose: Checks for Elasticsearch development prerequisites.
 # Examples:
 #   check_elasticsearch
-check_elasticsearch() {
+check_runtime_elasticsearch() {
   log_info "🔍 Checking Elasticsearch environment..."
 
   # Check for Elasticsearch binary or configuration files

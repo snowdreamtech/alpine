@@ -8,7 +8,7 @@
 # Purpose: Checks for Apache Flink development prerequisites.
 # Examples:
 #   check_flink
-check_flink() {
+check_runtime_flink() {
   log_info "🔍 Checking Apache Flink environment..."
 
   # Check for Java (Prerequisite)
@@ -35,7 +35,7 @@ check_flink() {
 #   install_flink
 install_flink() {
   log_info "🚀 Apache Flink setup usually involves downloading the official binary."
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: brew install apache-flink"
     return 0
   fi

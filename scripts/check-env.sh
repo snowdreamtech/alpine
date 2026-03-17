@@ -155,23 +155,6 @@ main() {
   check_runtime "node" "Node.js"
   check_runtime "deno" "Deno"
   check_runtime "bun" "Bun"
-  check_runtime "vue" "Vue"
-  check_runtime "svelte" "Svelte"
-  check_runtime "astro" "Astro"
-  check_runtime "liquid" "Liquid"
-  check_runtime "solid" "SolidJS"
-  check_runtime "qwik" "Qwik"
-  check_runtime "sass" "Sass"
-  check_runtime "less" "Less"
-  check_runtime "pug" "Pug"
-  check_runtime "handlebars" "Handlebars"
-  check_runtime "ejs" "EJS"
-  check_runtime "htmx" "HTMX"
-  check_runtime "alpine" "Alpine.js"
-  check_runtime "stylus" "Stylus"
-  check_runtime "postcss" "PostCSS"
-  check_runtime "lit" "Lit"
-  check_runtime "capacitor" "Capacitor"
   check_runtime "awk" "AWK"
   check_runtime "sed" "Sed"
   check_runtime "gnuplot" "Gnuplot"
@@ -179,84 +162,17 @@ main() {
   check_runtime "plantuml" "PlantUML"
   check_runtime "capnproto" "Cap'n Proto"
   check_runtime "wasmer" "Wasmer"
-  check_runtime "nextjs" "Next.js"
-  check_runtime "nuxt" "Nuxt"
-  check_runtime "remix" "Remix"
   check_runtime "dagger" "Dagger"
-  check_runtime "turborepo" "Turborepo"
-  check_runtime "nx" "Nx"
   check_runtime "biome" "Biome"
   check_runtime "knip" "Knip"
   check_runtime "lefthook" "Lefthook"
   check_runtime "temporal" "Temporal"
-  check_runtime "langchain" "LangChain"
-  check_runtime "hono" "Hono"
-  check_runtime "express" "Express"
-  check_runtime "fastify" "Fastify"
-  check_runtime "fastapi" "FastAPI"
-  check_runtime "flask" "Flask"
-  check_runtime "gin" "Gin"
-  check_runtime "fiber" "Fiber"
-  check_runtime "django" "Django"
-  check_runtime "springboot" "Spring Boot"
-  check_runtime "laravel" "Laravel"
-  check_runtime "nestjs" "NestJS"
-  check_runtime "noco-db" "NocoDB"
-  check_runtime "mongoose" "Mongoose"
-  check_runtime "sequelize" "Sequelize"
-  check_runtime "kysely" "Kysely"
-  check_runtime "payload-cms" "Payload CMS"
-  check_runtime "directus" "Directus"
-  check_runtime "ghost" "Ghost"
-  check_runtime "hardhat" "Hardhat"
-  check_runtime "foundry" "Foundry"
-  check_runtime "tailwind" "Tailwind CSS"
   check_runtime "redis" "Redis"
   check_runtime "mongodb" "MongoDB"
   check_runtime "postgresql" "PostgreSQL"
-  check_runtime "vite" "Vite"
-  check_runtime "astro" "Astro"
-  check_runtime "sveltekit" "SvelteKit"
-  check_runtime "solidstart" "SolidStart"
-  check_runtime "storybook" "Storybook"
-  check_runtime "docusaurus" "Docusaurus"
-  check_runtime "tanstack-query" "TanStack Query"
-  check_runtime "trpc" "tRPC"
-  check_runtime "zustand" "Zustand"
-  check_runtime "jotai" "Jotai"
-  check_runtime "valtio" "Valtio"
-  check_runtime "recoil" "Recoil"
-  check_runtime "preact" "Preact"
-  check_runtime "axum" "Axum"
-  check_runtime "actix" "Actix"
-  check_runtime "echo" "Echo"
-  check_runtime "gorm" "Gorm"
-  check_runtime "adonis" "AdonisJS"
-  check_runtime "strapi" "Strapi"
-  check_runtime "phoenix" "Phoenix"
-  check_runtime "symfony" "Symfony"
+  check_runtime "foundry" "Foundry"
   check_runtime "quarkus" "Quarkus"
   check_runtime "micronaut" "Micronaut"
-  check_runtime "ef-core" "EF Core"
-  check_runtime "tortoise" "Tortoise ORM"
-  check_runtime "typeorm" "TypeORM"
-  check_runtime "drizzle" "Drizzle"
-  check_runtime "sqlalchemy" "SQLAlchemy"
-  check_runtime "pytorch" "PyTorch"
-  check_runtime "llamaindex" "LlamaIndex"
-  check_runtime "weaviate" "Weaviate"
-  check_runtime "polars" "Polars"
-  check_runtime "pandas" "Pandas"
-  check_runtime "polars-js" "Polars JS"
-  check_runtime "pytest" "Pytest"
-  check_runtime "junit" "JUnit"
-  check_runtime "mockito" "Mockito"
-  check_runtime "uvicorn" "Uvicorn"
-  check_runtime "gunicorn" "Gunicorn"
-  check_runtime "dbt" "dbt"
-  check_runtime "otel" "OpenTelemetry"
-  check_runtime "grafana" "Grafana"
-  check_runtime "loki" "Loki"
   check_runtime "vector" "Vector"
   check_runtime "fluentd" "Fluentd"
   check_runtime "clickhouse" "ClickHouse"
@@ -273,23 +189,11 @@ main() {
   check_runtime "bazel" "Bazel"
   check_runtime "buck2" "Buck2"
   check_runtime "pants" "Pants"
-  check_runtime "langgraph" "LangGraph"
-  check_runtime "crewai" "CrewAI"
   check_runtime "ollama" "Ollama"
-  check_runtime "localstack" "LocalStack"
-  check_runtime "lerna" "Lerna"
-  check_runtime "single-spa" "Single-spa"
-  check_runtime "module-federation" "Module Federation"
   check_runtime "cilium" "Cilium"
   check_runtime "falco" "Falco"
   check_runtime "kyverno" "Kyverno"
   check_runtime "opa" "OPA"
-  check_runtime "react-hook-form" "React Hook Form"
-  check_runtime "tanstack-table" "TanStack Table"
-  check_runtime "styled-components" "Styled Components"
-  check_runtime "emotion" "Emotion"
-  check_runtime "vanilla-extract" "Vanilla Extract"
-  check_runtime "husky" "Husky"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
@@ -371,42 +275,35 @@ main() {
 
   # Ansible
   if has_lang_files "ansible.cfg playbook.yml site.yml" "roles/"; then
-    . "$SCRIPT_DIR/lib/langs/ansible.sh"
-    check_ansible
+    check_runtime "ansible" "Ansible"
   else
     log_info "⏭️  Ansible: Skipped (no Ansible files)"
   fi
 
   # Nginx
   if has_lang_files "nginx.conf" "conf.d/ sites-available/ sites-enabled/"; then
-    . "$SCRIPT_DIR/lib/langs/nginx.sh"
-    check_nginx
+    check_runtime "nginx" "Nginx"
   else
     log_info "⏭️  Nginx: Skipped (no Nginx files)"
   fi
 
   # Caddy
   if has_lang_files "Caddyfile" ""; then
-    . "$SCRIPT_DIR/lib/langs/caddy.sh"
-    check_caddy
+    check_runtime "caddy" "Caddy"
   else
     log_info "⏭️  Caddy: Skipped (no Caddyfile)"
   fi
 
   # Elasticsearch
   if has_lang_files "elasticsearch.yml" "config/elasticsearch.yml"; then
-    . "$SCRIPT_DIR/lib/langs/elasticsearch.sh"
-    check_elasticsearch
+    check_runtime "elasticsearch" "Elasticsearch"
   else
     log_info "⏭️  Elasticsearch: Skipped (no Elasticsearch files)"
   fi
 
   # Meilisearch
   if has_lang_files "meilisearch.toml" ""; then
-    . "$SCRIPT_DIR/lib/langs/meilisearch.sh"
-    check_meilisearch
-  else
-    log_info "⏭️  Meilisearch: Skipped (no Meilisearch files)"
+    check_runtime "meilisearch" "Meilisearch"
   fi
 
   # Solidity
@@ -939,20 +836,6 @@ main() {
     log_info "⏭️  Electron: Skipped (no electron in package.json)"
   fi
 
-  # Testing Frameworks
-  if [ -f "package.json" ]; then
-    log_info "── Testing Frameworks ──"
-    . "$SCRIPT_DIR/lib/langs/playwright.sh"
-    check_playwright
-    . "$SCRIPT_DIR/lib/langs/vitest.sh"
-    check_vitest
-    . "$SCRIPT_DIR/lib/langs/cypress.sh"
-    check_cypress
-    . "$SCRIPT_DIR/lib/langs/appium.sh"
-    check_appium
-    . "$SCRIPT_DIR/lib/langs/testcafe.sh"
-    check_testcafe
-  fi
   printf "\n"
 
   # 5. Group: Mobile Support
@@ -965,27 +848,6 @@ main() {
         check_tool_version "Flutter" "flutter" "3.0.0" "flutter --version" 0
       else check_tool_version "Dart" "dart" "3.0.0" "dart --version" 0; fi
     fi
-
-    # React Native
-    . "$SCRIPT_DIR/lib/langs/react-native.sh"
-    check_react_native
-
-    # Expo
-    . "$SCRIPT_DIR/lib/langs/expo.sh"
-    check_expo
-
-    # Ionic
-    . "$SCRIPT_DIR/lib/langs/ionic.sh"
-    check_ionic
-
-    # KMP
-    . "$SCRIPT_DIR/lib/langs/kmp.sh"
-    check_kmp
-
-    # NativeScript
-    . "$SCRIPT_DIR/lib/langs/nativescript.sh"
-    check_nativescript
-
     printf "\n"
   fi
 
@@ -993,28 +855,19 @@ main() {
   if has_lang_files "docker-compose.yml prometheus.yml traefik.yml traefik.toml kong.yml kong.conf istio-init.yaml" ""; then
     log_info "── Messaging & Cloud Native ──"
     # Messaging
-    . "$SCRIPT_DIR/lib/langs/kafka.sh"
-    check_kafka
-    . "$SCRIPT_DIR/lib/langs/rabbitmq.sh"
-    check_rabbitmq
-    . "$SCRIPT_DIR/lib/langs/nats.sh"
-    check_nats
-    . "$SCRIPT_DIR/lib/langs/pulsar.sh"
-    check_pulsar
+    check_runtime "kafka" "Kafka"
+    check_runtime "rabbitmq" "RabbitMQ"
+    check_runtime "nats" "NATS"
+    check_runtime "pulsar" "Pulsar"
 
     # Cloud Native Networking
-    . "$SCRIPT_DIR/lib/langs/traefik.sh"
-    check_traefik
-    . "$SCRIPT_DIR/lib/langs/istio.sh"
-    check_istio
-    . "$SCRIPT_DIR/lib/langs/kong.sh"
-    check_kong
-    . "$SCRIPT_DIR/lib/langs/linkerd.sh"
-    check_linkerd
+    check_runtime "traefik" "Traefik"
+    check_runtime "istio" "Istio"
+    check_runtime "kong" "Kong"
+    check_runtime "linkerd" "Linkerd"
 
     # Observability
-    . "$SCRIPT_DIR/lib/langs/prometheus.sh"
-    check_prometheus
+    check_runtime "prometheus" "Prometheus"
     printf "\n"
   fi
 
@@ -1033,18 +886,14 @@ main() {
   check_tool_version "OSV-scanner" "osv-scanner" "$(get_mise_tool_version osv-scanner)" "osv-scanner --version" 0 1
   check_tool_version "Trivy" "trivy" "$(get_mise_tool_version trivy)" "trivy --version" 0 1
   check_tool_version "Zizmor" "zizmor" "$(get_mise_tool_version zizmor)" "zizmor --version" 0 1
-  . "$SCRIPT_DIR/lib/langs/vault.sh"
-  check_vault
-  . "$SCRIPT_DIR/lib/langs/semgrep.sh"
-  check_semgrep
-  . "$SCRIPT_DIR/lib/langs/checkov.sh"
-  check_checkov
+  check_runtime "vault" "Vault"
+  check_runtime "semgrep" "Semgrep"
+  check_runtime "checkov" "Checkov"
 
   log_info "── Lint & Quality Tools ──"
   check_tool_version "Shfmt" "shfmt" "$(get_mise_tool_version shfmt-py)" "shfmt --version" 0 0
   check_tool_version "Shellcheck" "shellcheck" "$(get_mise_tool_version shellcheck-py)" "shellcheck --version" 0 0
   check_tool_version "Actionlint" "actionlint" "$(get_mise_tool_version actionlint-py)" "actionlint --version" 0 0
-  check_tool_version "EditorConfig" "editorconfig-checker" "$(get_mise_tool_version editorconfig-checker)" "editorconfig-checker --version" 0 0
 
   if [ -f "Dockerfile" ] || [ -f "docker-compose.yml" ]; then
     check_tool_version "Hadolint" "hadolint" "$(get_mise_tool_version hadolint)" "hadolint --version" 0 0
@@ -1052,8 +901,7 @@ main() {
   if has_lang_files "go.mod" "*.go"; then
     check_tool_version "golangci-lint" "golangci-lint" "$(get_mise_tool_version golangci-lint)" "golangci-lint --version" 0 0
     check_tool_version "Govulncheck" "govulncheck" "latest" "govulncheck ./..." 0 1
-    . "$SCRIPT_DIR/lib/langs/mage.sh"
-    check_mage
+    check_runtime "mage" "Mage"
   fi
   if has_lang_files "Makefile" "*.make"; then
     check_tool_version "Checkmake" "checkmake" "$(get_mise_tool_version checkmake)" "checkmake --version" 0 0

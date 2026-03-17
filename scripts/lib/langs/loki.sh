@@ -8,7 +8,7 @@
 # Purpose: Checks for Grafana Loki development prerequisites.
 # Examples:
 #   check_loki
-check_loki() {
+check_runtime_loki() {
   log_info "🔍 Checking Loki environment..."
 
   # Check for Loki binary or configuration files
@@ -31,7 +31,7 @@ check_loki() {
 #   install_loki
 install_loki() {
   log_info "🚀 Loki setup usually involves Docker or Helm."
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: docker run -d -p 3100:3100 grafana/loki"
     return 0
   fi

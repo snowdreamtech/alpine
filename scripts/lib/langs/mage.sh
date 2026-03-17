@@ -8,7 +8,7 @@
 # Purpose: Checks for Mage development prerequisites.
 # Examples:
 #   check_mage
-check_mage() {
+check_runtime_mage() {
   log_info "🔍 Checking Mage environment..."
 
   # Check for Mage binary or project files
@@ -29,7 +29,7 @@ check_mage() {
 #   install_mage
 install_mage() {
   log_info "🚀 Mage installation: go install github.com/magefile/mage@latest"
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: Skip Mage installation."
     return 0
   fi

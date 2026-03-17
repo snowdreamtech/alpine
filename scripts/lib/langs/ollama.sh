@@ -8,7 +8,7 @@
 # Purpose: Checks for Ollama development prerequisites.
 # Examples:
 #   check_ollama
-check_ollama() {
+check_runtime_ollama() {
   log_info "🔍 Checking Ollama environment..."
 
   # Check for Ollama binary
@@ -30,7 +30,7 @@ check_ollama() {
 install_ollama() {
   log_info "🚀 Setting up Ollama..."
 
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: curl -L https://ollama.com/download/Ollama-darwin.zip -o Ollama.zip"
     return 0
   fi

@@ -8,7 +8,7 @@
 # Purpose: Checks for Grafana development prerequisites.
 # Examples:
 #   check_grafana
-check_grafana() {
+check_runtime_grafana() {
   log_info "🔍 Checking Grafana environment..."
 
   # Check for Grafana CLI or configuration files
@@ -31,7 +31,7 @@ check_grafana() {
 #   install_grafana
 install_grafana() {
   log_info "🚀 Grafana setup usually involves Docker or system package manager."
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: docker run -d -p 3000:3000 grafana/grafana"
     return 0
   fi

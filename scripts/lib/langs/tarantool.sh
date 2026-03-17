@@ -8,7 +8,7 @@
 # Purpose: Checks for Tarantool development prerequisites.
 # Examples:
 #   check_tarantool
-check_tarantool() {
+check_runtime_tarantool() {
   log_info "🔍 Checking Tarantool environment..."
 
   # Check for Tarantool binary
@@ -31,7 +31,7 @@ check_tarantool() {
 #   install_tarantool
 install_tarantool() {
   log_info "🚀 Tarantool setup usually involves Docker or system binary."
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: brew install tarantool"
     return 0
   fi

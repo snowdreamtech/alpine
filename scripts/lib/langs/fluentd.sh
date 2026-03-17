@@ -8,7 +8,7 @@
 # Purpose: Checks for Fluentd development prerequisites.
 # Examples:
 #   check_fluentd
-check_fluentd() {
+check_runtime_fluentd() {
   log_info "🔍 Checking Fluentd environment..."
 
   # Check for Fluentd binary or configuration files
@@ -31,7 +31,7 @@ check_fluentd() {
 #   install_fluentd
 install_fluentd() {
   log_info "🚀 Fluentd setup usually involves Docker or td-agent package."
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: docker run -d -p 24224:24224 fluent/fluentd"
     return 0
   fi

@@ -8,7 +8,7 @@
 # Purpose: Checks for Meilisearch development prerequisites.
 # Examples:
 #   check_meilisearch
-check_meilisearch() {
+check_runtime_meilisearch() {
   log_info "🔍 Checking Meilisearch environment..."
 
   # Check for Meilisearch binary or configuration files

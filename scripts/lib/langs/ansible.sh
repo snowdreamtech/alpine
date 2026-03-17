@@ -8,7 +8,7 @@
 # Purpose: Checks for Ansible development prerequisites.
 # Examples:
 #   check_ansible
-check_ansible() {
+check_runtime_ansible() {
   log_info "🔍 Checking Ansible environment..."
 
   # Check for Python (Prerequisite)
@@ -36,7 +36,7 @@ check_ansible() {
 install_ansible() {
   log_info "🚀 Setting up Ansible..."
 
-  if is_dry_run; then
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_info "DRY-RUN: pip install ansible ansible-lint"
     return 0
   fi
