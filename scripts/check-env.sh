@@ -306,6 +306,13 @@ main() {
   else
     log_info "⏭️  Crystal: Skipped (no Crystal files)"
   fi
+
+  # Dlang
+  if has_lang_files "dub.json dub.sdl" "*.d"; then
+    check_runtime "dlang" "Dlang (Modular)"
+  else
+    log_info "⏭️  Dlang: Skipped (no Dlang files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
