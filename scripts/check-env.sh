@@ -708,6 +708,13 @@ main() {
   else
     log_info "⏭️  Tauri: Skipped (no tauri.conf.json)"
   fi
+
+  # Electron
+  if [ -f "package.json" ] && grep -q '"electron"' package.json; then
+    check_runtime "electron" "Electron (Modular)"
+  else
+    log_info "⏭️  Electron: Skipped (no electron in package.json)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
