@@ -646,6 +646,13 @@ main() {
     log_info "⏭️  Prisma: Skipped (no .prisma files)"
   fi
 
+  # FlatBuffers
+  if has_lang_files "*.fbs"; then
+    check_runtime "flatbuffers" "FlatBuffers (Modular)"
+  else
+    log_info "⏭️  FlatBuffers: Skipped (no .fbs files)"
+  fi
+
   # EdgeDB
   if has_lang_files "edgedb.toml" "*.esdl"; then
     check_runtime "edgedb" "EdgeDB (Modular)"
