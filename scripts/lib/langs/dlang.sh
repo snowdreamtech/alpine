@@ -2,6 +2,7 @@
 # Dlang Logic Module
 
 # Purpose: Installs Dlang (dmd) via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_dlang() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Dlang (dmd) via mise."
@@ -39,6 +40,8 @@ setup_dlang() {
 }
 
 # Purpose: Checks if Dlang is available.
+# Examples:
+#   check_runtime_dlang "Linter"
 check_runtime_dlang() {
   local _TOOL_DESC_D="${1:-Dlang}"
   if ! command -v dmd >/dev/null 2>&1; then

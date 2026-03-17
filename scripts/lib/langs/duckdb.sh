@@ -2,6 +2,7 @@
 # DuckDB Logic Module
 
 # Purpose: Installs DuckDB via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_duckdb() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install DuckDB via mise."
@@ -25,7 +26,7 @@ setup_duckdb() {
   fi
 
   # Detect SQL/DuckDB files
-  if ! has_lang_files "*.sql *.duckdb"; then
+  if ! has_lang_files "" "*.sql *.duckdb"; then
     log_summary "Runtime" "DuckDB" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -39,6 +40,8 @@ setup_duckdb() {
 }
 
 # Purpose: Checks if DuckDB is available.
+# Examples:
+#   check_runtime_duckdb "Linter"
 check_runtime_duckdb() {
   local _TOOL_DESC_DUCK="${1:-DuckDB}"
   if ! command -v duckdb >/dev/null 2>&1; then

@@ -2,6 +2,7 @@
 # Deno Logic Module
 
 # Purpose: Installs Deno runtime via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_deno() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Deno runtime."

@@ -2,6 +2,7 @@
 # Crystal Logic Module
 
 # Purpose: Installs Crystal and Shards via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_crystal() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Crystal via mise."
@@ -39,6 +40,8 @@ setup_crystal() {
 }
 
 # Purpose: Checks if Crystal is available.
+# Examples:
+#   check_runtime_crystal "Linter"
 check_runtime_crystal() {
   local _TOOL_DESC_CRY="${1:-Crystal}"
   if ! command -v crystal >/dev/null 2>&1; then
