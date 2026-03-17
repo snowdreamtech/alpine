@@ -177,6 +177,7 @@ main() {
   check_runtime "nuxt" "Nuxt"
   check_runtime "remix" "Remix"
   check_runtime "dagger" "Dagger"
+  check_runtime "temporal" "Temporal"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
