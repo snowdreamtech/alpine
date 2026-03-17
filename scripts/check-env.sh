@@ -376,6 +376,13 @@ main() {
   else
     log_info "⏭️  Ada: Skipped (no Ada files)"
   fi
+
+  # Luau
+  if has_lang_files "*.luau"; then
+    check_runtime "luau" "Luau (Modular)"
+  else
+    log_info "⏭️  Luau: Skipped (no Luau files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
