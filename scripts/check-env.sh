@@ -158,6 +158,7 @@ main() {
   check_runtime "sass" "Sass"
   check_runtime "less" "Less"
   check_runtime "pug" "Pug"
+  check_runtime "handlebars" "Handlebars"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
