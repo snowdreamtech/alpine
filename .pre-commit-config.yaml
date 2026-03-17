@@ -791,6 +791,7 @@ repos:
         entry: |
           python3 -c "
           import sys, os, stat
+          if os.name == 'nt': sys.exit(0)
           not_exec = []
           for f in sys.argv[1:]:
               if os.path.isfile(f):
