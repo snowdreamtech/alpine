@@ -8,7 +8,8 @@ install_runtime_mojo() {
     return 0
   fi
 
-  run_mise install mojo
+  # shellcheck disable=SC2154
+  run_mise install "mojo@${MISE_TOOL_VERSION_MOJO}"
   eval "$(mise activate bash --shims)"
 }
 

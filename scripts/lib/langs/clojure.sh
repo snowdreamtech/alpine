@@ -9,7 +9,8 @@ install_runtime_clojure() {
   fi
 
   run_mise install clojure
-  run_mise install leiningen
+  # shellcheck disable=SC2154
+  run_mise install "clojure@${MISE_TOOL_VERSION_CLOJURE}"
   eval "$(mise activate bash --shims)"
 }
 

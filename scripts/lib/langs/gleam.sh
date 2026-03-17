@@ -8,7 +8,8 @@ install_runtime_gleam() {
     return 0
   fi
 
-  run_mise install gleam
+  # shellcheck disable=SC2154
+  run_mise install "gleam@${MISE_TOOL_VERSION_GLEAM}"
   eval "$(mise activate bash --shims)"
 }
 
