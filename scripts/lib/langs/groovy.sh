@@ -2,6 +2,7 @@
 # Groovy Logic Module
 
 # Purpose: Installs Groovy runtime via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_groovy() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Groovy runtime."

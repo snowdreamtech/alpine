@@ -2,6 +2,7 @@
 # Mojo Logic Module
 
 # Purpose: Installs Mojo runtime via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_mojo() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Mojo runtime via mise."
@@ -39,6 +40,8 @@ setup_mojo() {
 }
 
 # Purpose: Checks if Mojo is available.
+# Examples:
+#   check_runtime_mojo "Linter"
 check_runtime_mojo() {
   local _TOOL_DESC_MOJ="${1:-Mojo}"
   if ! command -v mojo >/dev/null 2>&1; then

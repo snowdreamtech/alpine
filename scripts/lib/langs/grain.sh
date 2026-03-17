@@ -2,6 +2,7 @@
 # Grain Logic Module
 
 # Purpose: Installs Grain via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_grain() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Grain via mise."
@@ -25,7 +26,7 @@ setup_grain() {
   fi
 
   # Detect Grain files
-  if ! has_lang_files "*.gr"; then
+  if ! has_lang_files "" "*.gr"; then
     log_summary "Runtime" "Grain" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -39,6 +40,8 @@ setup_grain() {
 }
 
 # Purpose: Checks if Grain is available.
+# Examples:
+#   check_runtime_grain "Linter"
 check_runtime_grain() {
   local _TOOL_DESC_GRAIN="${1:-Grain}"
   if ! command -v grain >/dev/null 2>&1; then
