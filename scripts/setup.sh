@@ -108,6 +108,7 @@ Modules (default: all):
   gin                Check Gin Configuration
   fiber              Check Fiber Configuration
   rails              Install Rails Gem
+  typeorm            Install TypeORM CLI
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1914,6 +1915,7 @@ EOF
     gin) setup_gin ;;
     fiber) setup_fiber ;;
     rails) setup_rails ;;
+    typeorm) setup_typeorm ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2146,6 +2148,12 @@ setup_fiber() {
 setup_rails() {
   . "$SCRIPT_DIR/lib/langs/rails.sh"
   install_rails
+}
+
+# Purpose: Wrapper for TypeORM setup.
+setup_typeorm() {
+  . "$SCRIPT_DIR/lib/langs/typeorm.sh"
+  install_typeorm
 }
 
 main "$@"
