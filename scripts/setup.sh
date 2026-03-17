@@ -106,6 +106,7 @@ Modules (default: all):
   hono               Check Hono Configuration
   flask              Check Flask Configuration
   gin                Check Gin Configuration
+  fiber              Check Fiber Configuration
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1910,6 +1911,7 @@ EOF
     hono) setup_hono ;;
     flask) setup_flask ;;
     gin) setup_gin ;;
+    fiber) setup_fiber ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2130,6 +2132,12 @@ setup_flask() {
 setup_gin() {
   . "$SCRIPT_DIR/lib/langs/gin.sh"
   install_gin
+}
+
+# Purpose: Wrapper for Fiber setup.
+setup_fiber() {
+  . "$SCRIPT_DIR/lib/langs/fiber.sh"
+  install_fiber
 }
 
 main "$@"

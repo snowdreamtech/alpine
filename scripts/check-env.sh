@@ -191,6 +191,7 @@ main() {
   check_runtime "fastapi" "FastAPI"
   check_runtime "flask" "Flask"
   check_runtime "gin" "Gin"
+  check_runtime "fiber" "Fiber"
   check_runtime "django" "Django"
   check_runtime "springboot" "Spring Boot"
   check_runtime "laravel" "Laravel"
