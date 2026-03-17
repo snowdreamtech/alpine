@@ -46,10 +46,10 @@ setup_ruby() {
   # Also ensure linting tools are present
   install_ruby_lint
 }
-# Purpose: Checks if Ruby runtime is available.
+# Purpose: Checks if Rust runtime is available.
 # Examples:
-#   check_runtime_ruby "Linter"
-check_runtime_ruby() {
+#   check_runtime_rust "Linter"
+check_runtime_rust() {
   local _TOOL_DESC_RUBY="${1:-Ruby}"
   if ! command -v ruby >/dev/null 2>&1; then
     log_warn "Required runtime 'ruby' for $_TOOL_DESC_RUBY is missing. Skipping."

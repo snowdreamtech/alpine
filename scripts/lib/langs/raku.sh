@@ -2,6 +2,7 @@
 # Raku Logic Module
 
 # Purpose: Installs Raku (via rakudo) via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_raku() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Raku (rakudo) via mise."
@@ -39,6 +40,8 @@ setup_raku() {
 }
 
 # Purpose: Checks if Raku is available.
+# Examples:
+#   check_runtime_raku "Linter"
 check_runtime_raku() {
   local _TOOL_DESC_RAKU="${1:-Raku}"
   if ! command -v raku >/dev/null 2>&1; then

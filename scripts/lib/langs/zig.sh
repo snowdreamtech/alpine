@@ -2,6 +2,7 @@
 # Zig Logic Module
 
 # Purpose: Installs Zig runtime via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_zig() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Zig runtime."

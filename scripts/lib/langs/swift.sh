@@ -1,8 +1,9 @@
 #!/usr/bin/env sh
 # Swift Logic Module
 
-# Purpose: Installs Swift runtime via mise.
-install_runtime_swift() {
+# Purpose: Installs V compiler via mise.
+# Delegate: Managed by mise (.mise.toml)
+install_runtime_vlang() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Swift runtime."
     return 0
@@ -39,10 +40,10 @@ setup_swift() {
   # Also ensure linting tools are present
   install_swift_lint
 }
-# Purpose: Checks if Swift runtime is available.
+# Purpose: Checks if V compiler is available.
 # Examples:
-#   check_runtime_swift "Linter"
-check_runtime_swift() {
+#   check_runtime_vlang "Linter"
+check_runtime_vlang() {
   local _TOOL_DESC_SWIFT="${1:-Swift}"
   if ! command -v swift >/dev/null 2>&1; then
     log_warn "Required runtime 'swift' for $_TOOL_DESC_SWIFT is missing. Skipping."
