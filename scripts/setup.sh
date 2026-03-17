@@ -105,6 +105,7 @@ Modules (default: all):
   fastify            Install Fastify CLI
   hono               Check Hono Configuration
   flask              Check Flask Configuration
+  gin                Check Gin Configuration
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1908,6 +1909,7 @@ EOF
     fastify) setup_fastify ;;
     hono) setup_hono ;;
     flask) setup_flask ;;
+    gin) setup_gin ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2122,6 +2124,12 @@ setup_hono() {
 setup_flask() {
   . "$SCRIPT_DIR/lib/langs/flask.sh"
   install_flask
+}
+
+# Purpose: Wrapper for Gin setup.
+setup_gin() {
+  . "$SCRIPT_DIR/lib/langs/gin.sh"
+  install_gin
 }
 
 main "$@"
