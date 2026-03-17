@@ -285,6 +285,13 @@ main() {
   else
     log_info "⏭️  F#: Skipped (no F# files)"
   fi
+
+  # Erlang
+  if has_lang_files "rebar.config erlang.mk" "*.erl *.hrl"; then
+    check_runtime "erlang" "Erlang (Modular)"
+  else
+    log_info "⏭️  Erlang: Skipped (no Erlang files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
