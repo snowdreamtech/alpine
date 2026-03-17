@@ -165,6 +165,7 @@ main() {
   check_runtime "stylus" "Stylus"
   check_runtime "postcss" "PostCSS"
   check_runtime "lit" "Lit"
+  check_runtime "capacitor" "Capacitor"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
