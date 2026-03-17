@@ -2,6 +2,7 @@
 # Gleam Logic Module
 
 # Purpose: Installs Gleam runtime via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_gleam() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Gleam runtime via mise."
@@ -39,6 +40,8 @@ setup_gleam() {
 }
 
 # Purpose: Checks if Gleam is available.
+# Examples:
+#   check_runtime_gleam "Linter"
 check_runtime_gleam() {
   local _TOOL_DESC_GLM="${1:-Gleam}"
   if ! command -v gleam >/dev/null 2>&1; then

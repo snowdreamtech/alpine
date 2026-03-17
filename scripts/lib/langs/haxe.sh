@@ -2,6 +2,7 @@
 # Haxe Logic Module
 
 # Purpose: Installs Haxe via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_haxe() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Haxe via mise."
@@ -14,6 +15,7 @@ install_runtime_haxe() {
 }
 
 # Purpose: Sets up Haxe environment for project.
+# Delegate: Managed by mise (.mise.toml)
 setup_haxe() {
   local _T0_HX_RT
   _T0_HX_RT=$(date +%s)
@@ -39,6 +41,8 @@ setup_haxe() {
 }
 
 # Purpose: Checks if Haxe is available.
+# Examples:
+#   check_runtime_haxe "Linter"
 check_runtime_haxe() {
   local _TOOL_DESC_HX="${1:-Haxe}"
   if ! command -v haxe >/dev/null 2>&1; then
