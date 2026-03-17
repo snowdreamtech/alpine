@@ -369,6 +369,13 @@ main() {
   else
     log_info "⏭️  ReScript: Skipped (no ReScript files)"
   fi
+
+  # Ada
+  if has_lang_files "*.adb *.ads *.gpr"; then
+    check_runtime "ada" "Ada (Modular)"
+  else
+    log_info "⏭️  Ada: Skipped (no Ada files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support

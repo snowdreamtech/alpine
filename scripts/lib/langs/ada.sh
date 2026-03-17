@@ -1,0 +1,49 @@
+#!/usr/bin/env sh
+# Ada Logic Module
+
+# Purpose: Installs Ada (GNAT) via mise.
+install_runtime_ada() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Ada (GNAT) via mise."
+    return 0
+  fi
+
+  # shellcheck disable=SC2154
+  run_mise install "gnat@${MISE_TOOL_VERSION_ADA}"
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Sets up Ada environment for project.
+setup_ada() {
+  local _T0_ADA_RT
+  _T0_ADA_RT=$(date +%s)
+  _log_setup "Ada" "gnat"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Ada" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  # Detect Ada files
+  if ! has_lang_files "*.adb *.ads *.gpr"; then
+    log_summary "Runtime" "Ada" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_ADA_RT="✅ Installed"
+  install_runtime_ada || _STAT_ADA_RT="❌ Failed"
+
+  local _DUR_ADA_RT
+  _DUR_ADA_RT=$(($(date +%s) - _T0_ADA_RT))
+  log_summary "Runtime" "Ada" "$_STAT_ADA_RT" "$(get_version gnat --version | head -n 1 | awk '{print $NF}')" "$_DUR_ADA_RT"
+}
+
+# Purpose: Checks if Ada (GNAT) is available.
+check_runtime_ada() {
+  local _TOOL_DESC_ADA="${1:-Ada}"
+  if ! command -v gnat >/dev/null 2>&1; then
+    log_warn "Required runtime 'gnat' for $_TOOL_DESC_ADA is missing. Skipping."
+    return 1
+  fi
+  return 0
+}
