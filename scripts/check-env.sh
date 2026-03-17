@@ -818,6 +818,11 @@ main() {
         check_tool_version "Flutter" "flutter" "3.0.0" "flutter --version" 0
       else check_tool_version "Dart" "dart" "3.0.0" "dart --version" 0; fi
     fi
+
+    # React Native
+    . "$SCRIPT_DIR/lib/langs/react-native.sh"
+    check_react_native
+
     printf "\n"
   fi
 

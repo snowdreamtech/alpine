@@ -98,6 +98,7 @@ Modules (default: all):
   server             Check Server Configs
   edge               Check Edge Configs
   flutter            Install Flutter SDK
+  react-native       Invite React Native CLI
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1894,6 +1895,7 @@ EOF
     server) install_server ;;
     edge) install_edge ;;
     flutter) setup_flutter ;;
+    react-native) setup_react_native ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2066,6 +2068,12 @@ EOF
       printf "  - Run %bmake verify%b to ensure environment health.\n" "${GREEN}" "${NC}"
     fi
   fi
+}
+
+# Purpose: Wrapper for React Native setup.
+setup_react_native() {
+  . "$SCRIPT_DIR/lib/langs/react-native.sh"
+  install_react_native
 }
 
 main "$@"
