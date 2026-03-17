@@ -649,6 +649,13 @@ main() {
   else
     log_info "⏭️  AppleScript: Skipped (no AppleScript files)"
   fi
+
+  # VBA
+  if has_lang_files "*.vba *.bas *.cls"; then
+    check_runtime "vba" "VBA (Modular)"
+  else
+    log_info "⏭️  VBA: Skipped (no VBA files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
