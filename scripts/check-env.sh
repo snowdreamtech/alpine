@@ -683,6 +683,7 @@ main() {
     check_runtime "plsql" "PL/SQL (Modular)"
     check_runtime "tsql" "T-SQL (Modular)"
     check_runtime "cobol" "COBOL (Modular)"
+    check_runtime "prql" "PRQL (Modular)"
   else
     log_info "⏭️  SurrealDB: Skipped (no .surql files)"
   fi
