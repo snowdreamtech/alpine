@@ -26,7 +26,7 @@ setup_racket() {
   fi
 
   # Detect Racket files
-  if ! has_lang_files "." "*.rkt" "*.rktl"; then
+  if ! has_lang_files "" "*.rkt *.rktl"; then
     log_summary "Runtime" "Racket" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -40,7 +40,6 @@ setup_racket() {
 }
 
 # Purpose: Checks if Racket is available.
-# Delegate: Managed by mise (.mise.toml)
 # Examples:
 #   check_runtime_racket "Linter"
 check_runtime_racket() {

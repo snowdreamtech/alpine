@@ -2,6 +2,7 @@
 # Prolog Logic Module
 
 # Purpose: Installs SWI-Prolog via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_prolog() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install SWI-Prolog via mise."
@@ -25,7 +26,7 @@ setup_prolog() {
   fi
 
   # Detect Prolog files
-  if ! has_lang_files "*.pl *.pro *.prolog"; then
+  if ! has_lang_files "" "*.pl *.pro *.prolog"; then
     log_summary "Runtime" "Prolog" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -39,6 +40,8 @@ setup_prolog() {
 }
 
 # Purpose: Checks if SWI-Prolog is available.
+# Examples:
+#   check_runtime_prolog "Linter"
 check_runtime_prolog() {
   local _TOOL_DESC_PROLOG="${1:-Prolog}"
   if ! command -v swipl >/dev/null 2>&1; then

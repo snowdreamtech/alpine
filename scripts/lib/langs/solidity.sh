@@ -2,6 +2,7 @@
 # Solidity Logic Module
 
 # Purpose: Installs Solidity compiler (solc) via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_solidity() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Solidity compiler (solc) via mise."
@@ -39,6 +40,8 @@ setup_solidity() {
 }
 
 # Purpose: Checks if Solidity compiler is available.
+# Examples:
+#   check_runtime_solidity "Linter"
 check_runtime_solidity() {
   local _TOOL_DESC_SOL="${1:-Solidity}"
   if ! command -v solc >/dev/null 2>&1; then

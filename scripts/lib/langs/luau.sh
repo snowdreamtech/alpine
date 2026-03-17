@@ -25,8 +25,8 @@ setup_luau() {
     return 0
   fi
 
-  # Detect Prolog files
-  if ! has_lang_files "" "*.pl *.pro *.prolog"; then
+  # Detect Luau files
+  if ! has_lang_files "" "*.luau"; then
     log_summary "Runtime" "Luau" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -40,7 +40,6 @@ setup_luau() {
 }
 
 # Purpose: Checks if Luau is available.
-# Delegate: N/A
 # Examples:
 #   check_runtime_luau "Linter"
 check_runtime_luau() {
