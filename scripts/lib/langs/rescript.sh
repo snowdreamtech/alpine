@@ -1,0 +1,49 @@
+#!/usr/bin/env sh
+# ReScript Logic Module
+
+# Purpose: Installs ReScript compiler (rescript) via mise (npm provider).
+install_runtime_rescript() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install ReScript compiler via mise npm provider."
+    return 0
+  fi
+
+  # shellcheck disable=SC2154
+  run_mise install "npm:rescript@${MISE_TOOL_VERSION_RESCRIPT}"
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Sets up ReScript environment for project.
+setup_rescript() {
+  local _T0_RES_RT
+  _T0_RES_RT=$(date +%s)
+  _log_setup "ReScript" "rescript"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "ReScript" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  # Detect ReScript files
+  if ! has_lang_files "rescript.json bsconfig.json" "*.res *.resi"; then
+    log_summary "Runtime" "ReScript" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_RES_RT="✅ Installed"
+  install_runtime_rescript || _STAT_RES_RT="❌ Failed"
+
+  local _DUR_RES_RT
+  _DUR_RES_RT=$(($(date +%s) - _T0_RES_RT))
+  log_summary "Runtime" "ReScript" "$_STAT_RES_RT" "$(get_version rescript --version)" "$_DUR_RES_RT"
+}
+
+# Purpose: Checks if ReScript is available.
+check_runtime_rescript() {
+  local _TOOL_DESC_RES="${1:-ReScript}"
+  if ! command -v rescript >/dev/null 2>&1; then
+    log_warn "Required runtime 'rescript' for $_TOOL_DESC_RES is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

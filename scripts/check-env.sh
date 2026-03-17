@@ -362,6 +362,13 @@ main() {
   else
     log_info "⏭️  Elm: Skipped (no Elm files)"
   fi
+
+  # ReScript
+  if has_lang_files "rescript.json bsconfig.json" "*.res *.resi"; then
+    check_runtime "rescript" "ReScript (Modular)"
+  else
+    log_info "⏭️  ReScript: Skipped (no ReScript files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
