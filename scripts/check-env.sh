@@ -151,6 +151,7 @@ main() {
   check_runtime "bun" "Bun"
   check_runtime "vue" "Vue"
   check_runtime "svelte" "Svelte"
+  check_runtime "astro" "Astro"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
