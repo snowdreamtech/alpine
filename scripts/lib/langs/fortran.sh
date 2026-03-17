@@ -1,0 +1,49 @@
+#!/usr/bin/env sh
+# Fortran Logic Module
+
+# Purpose: Installs GFortran (via GCC) via mise.
+install_runtime_fortran() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install GFortran via mise."
+    return 0
+  fi
+
+  # shellcheck disable=SC2154
+  run_mise install "gcc@${MISE_TOOL_VERSION_GCC}"
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Sets up Fortran environment for project.
+setup_fortran() {
+  local _T0_FORT_RT
+  _T0_FORT_RT=$(date +%s)
+  _log_setup "Fortran" "gfortran"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Fortran" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  # Detect Fortran files
+  if ! has_lang_files "*.f *.for *.f90 *.f95"; then
+    log_summary "Runtime" "Fortran" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_FORT_RT="✅ Installed"
+  install_runtime_fortran || _STAT_FORT_RT="❌ Failed"
+
+  local _DUR_FORT_RT
+  _DUR_FORT_RT=$(($(date +%s) - _T0_FORT_RT))
+  log_summary "Runtime" "Fortran" "$_STAT_FORT_RT" "$(get_version gfortran --version | head -n 1 | awk '{print $NF}')" "$_DUR_FORT_RT"
+}
+
+# Purpose: Checks if GFortran is available.
+check_runtime_fortran() {
+  local _TOOL_DESC_FORT="${1:-Fortran}"
+  if ! command -v gfortran >/dev/null 2>&1; then
+    log_warn "Required runtime 'gfortran' for $_TOOL_DESC_FORT is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

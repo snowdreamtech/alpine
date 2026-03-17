@@ -432,6 +432,13 @@ main() {
   else
     log_info "⏭️  Prolog: Skipped (no Prolog files)"
   fi
+
+  # Fortran
+  if has_lang_files "*.f *.for *.f90 *.f95"; then
+    check_runtime "fortran" "Fortran (Modular)"
+  else
+    log_info "⏭️  Fortran: Skipped (no Fortran files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
