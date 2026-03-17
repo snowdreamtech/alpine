@@ -1,9 +1,9 @@
 #!/usr/bin/env sh
 # Terraform Logic Module
 
-# Purpose: Installs OpenTofu via mise.
+# Purpose: Installs Terraform via mise.
 # Delegate: Managed by mise (.mise.toml)
-install_runtime_tofu() {
+install_runtime_terraform() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Terraform via mise."
     return 0
