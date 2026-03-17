@@ -1,0 +1,49 @@
+#!/usr/bin/env sh
+# Starlark Logic Module
+
+# Purpose: Installs Bazel (for Starlark) via mise.
+install_runtime_starlark() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Bazel via mise."
+    return 0
+  fi
+
+  # shellcheck disable=SC2154
+  run_mise install "bazel@${MISE_TOOL_VERSION_BAZEL}"
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Sets up Starlark environment for project.
+setup_starlark() {
+  local _T0_STAR_RT
+  _T0_STAR_RT=$(date +%s)
+  _log_setup "Starlark" "bazel"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Starlark" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  # Detect Starlark files (Bazel ecosystem)
+  if ! has_lang_files "*.star *.bzl BUILD WORKSPACE MODULE.bazel"; then
+    log_summary "Runtime" "Starlark" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_STAR_RT="✅ Installed"
+  install_runtime_starlark || _STAT_STAR_RT="❌ Failed"
+
+  local _DUR_STAR_RT
+  _DUR_STAR_RT=$(($(date +%s) - _T0_STAR_RT))
+  log_summary "Runtime" "Starlark" "$_STAT_STAR_RT" "$(get_version bazel --version | awk '{print $NF}')" "$_DUR_STAR_RT"
+}
+
+# Purpose: Checks if Bazel is available.
+check_runtime_starlark() {
+  local _TOOL_DESC_STAR="${1:-Starlark}"
+  if ! command -v bazel >/dev/null 2>&1; then
+    log_warn "Required runtime 'bazel' for $_TOOL_DESC_STAR is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

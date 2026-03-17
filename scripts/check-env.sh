@@ -467,6 +467,13 @@ main() {
   else
     log_info "⏭️  Jsonnet: Skipped (no Jsonnet files)"
   fi
+
+  # Starlark
+  if has_lang_files "*.star *.bzl BUILD WORKSPACE MODULE.bazel"; then
+    check_runtime "starlark" "Starlark (Modular)"
+  else
+    log_info "⏭️  Starlark: Skipped (no Starlark files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
