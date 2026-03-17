@@ -628,6 +628,13 @@ main() {
   else
     log_info "⏭️  Shader: Skipped (no Shader files)"
   fi
+
+  # QML
+  if has_lang_files "*.qml"; then
+    check_runtime "qml" "QML (Modular)"
+  else
+    log_info "⏭️  QML: Skipped (no QML files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
