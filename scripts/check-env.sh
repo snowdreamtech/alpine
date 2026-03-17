@@ -270,6 +270,29 @@ main() {
   done
   [ "${CORE_HEALTHY_ST:-0}" -eq 0 ] && log_success "✅ Basic project structure is intact."
 
+  # 8. Script Permissions Audit
+  log_info "── Script Permissions ──"
+  local _s_chk _p_err=0
+  # Use a temporary file to avoid subshell variable loss with find | while read
+  find scripts -name "*.sh" -type f >/tmp/scripts_to_check.txt
+  while read -r _s_chk; do
+    if [ -f "$_s_chk" ]; then
+      # Check if it has a shebang
+      if head -n 1 "$_s_chk" | grep -q "^#!"; then
+        if [ ! -x "$_s_chk" ]; then
+          log_error "❌ Script lacks executable bit: $_s_chk"
+          _p_err=1
+          HEALTHY_ST=1
+        fi
+      fi
+    fi
+  done </tmp/scripts_to_check.txt
+  rm -f /tmp/scripts_to_check.txt
+
+  if [ "$_p_err" -eq 0 ]; then
+    log_success "✅ All automation scripts have correct executable permissions."
+  fi
+
   # Final combined health check
   if [ "${HEALTHY_ST:-0}" -eq 0 ]; then
     log_success "\n✨ Environment is HEALTHY! Ready for development."
