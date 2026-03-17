@@ -176,6 +176,7 @@ main() {
   check_runtime "nextjs" "Next.js"
   check_runtime "nuxt" "Nuxt"
   check_runtime "remix" "Remix"
+  check_runtime "dagger" "Dagger"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
