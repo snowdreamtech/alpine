@@ -170,6 +170,7 @@ main() {
   check_runtime "sed" "Sed"
   check_runtime "gnuplot" "Gnuplot"
   check_runtime "graphviz" "Graphviz"
+  check_runtime "plantuml" "PlantUML"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
