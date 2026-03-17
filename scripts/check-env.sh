@@ -460,6 +460,13 @@ main() {
   else
     log_info "⏭️  Grain: Skipped (no Grain files)"
   fi
+
+  # Jsonnet
+  if has_lang_files "*.jsonnet *.libsonnet"; then
+    check_runtime "jsonnet" "Jsonnet (Modular)"
+  else
+    log_info "⏭️  Jsonnet: Skipped (no Jsonnet files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
