@@ -159,6 +159,7 @@ main() {
   check_runtime "less" "Less"
   check_runtime "pug" "Pug"
   check_runtime "handlebars" "Handlebars"
+  check_runtime "ejs" "EJS"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
