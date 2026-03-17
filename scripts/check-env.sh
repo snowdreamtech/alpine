@@ -215,6 +215,13 @@ main() {
   else
     log_info "⏭️  Terraform: Skipped (no Terraform files)"
   fi
+
+  # Solidity
+  if has_lang_files "" "*.sol"; then
+    check_runtime "solidity" "Solidity (Modular)"
+  else
+    log_info "⏭️  Solidity: Skipped (no Solidity files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
