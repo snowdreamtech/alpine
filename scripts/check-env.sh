@@ -161,6 +161,7 @@ main() {
   check_runtime "handlebars" "Handlebars"
   check_runtime "ejs" "EJS"
   check_runtime "htmx" "HTMX"
+  check_runtime "alpine" "Alpine.js"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
