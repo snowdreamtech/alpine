@@ -320,6 +320,13 @@ main() {
   else
     log_info "⏭️  Haxe: Skipped (no Haxe files)"
   fi
+
+  # AssemblyScript
+  if has_lang_files "asconfig.json" "*.as"; then
+    check_runtime "assemblyscript" "AssemblyScript (Modular)"
+  else
+    log_info "⏭️  AssemblyScript: Skipped (no AssemblyScript files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support

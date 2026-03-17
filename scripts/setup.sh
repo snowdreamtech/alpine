@@ -1800,7 +1800,7 @@ EOF
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
     # Full list for "On-demand" (default) or "All" (explicit)
-    _MODULES_LIST="node python deno bun pipx gitleaks hadolint go checkmake tflint kube-linter powershell java ruby kotlin dart swift lua perl julia r groovy dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format cpp terraform solidity odin nim clojure gleam mojo objc ocaml fsharp erlang vlang crystal dlang haxe ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit stylua buf tofu just task nix zig cue rego server edge flutter rn pulumi crossplane playwright cypress vitest docusaurus mkdocs sphinx jupyter dvc elixir haskell scala pre-commit hooks"
+    _MODULES_LIST="node python deno bun pipx gitleaks hadolint go checkmake tflint kube-linter powershell java ruby kotlin dart swift lua perl julia r groovy dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format cpp terraform solidity odin nim clojure gleam mojo objc ocaml fsharp erlang vlang crystal dlang haxe assemblyscript ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit stylua buf tofu just task nix zig cue rego server edge flutter rn pulumi crossplane playwright cypress vitest docusaurus mkdocs sphinx jupyter dvc elixir haskell scala pre-commit hooks"
   else
     # Specific modules requested (e.g., ./setup.sh node)
     _MODULES_LIST="${_RAW_ARGS}"
@@ -1922,6 +1922,7 @@ EOF
     crystal) setup_crystal ;;
     dlang) setup_dlang ;;
     haxe) setup_haxe ;;
+    assemblyscript) setup_assemblyscript ;;
     playwright) install_playwright ;;
     cypress) install_cypress ;;
     vitest) install_vitest ;;
