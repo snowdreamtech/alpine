@@ -2,6 +2,7 @@
 # Helm Logic Module
 
 # Purpose: Installs Helm via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_helm() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Helm via mise."
@@ -25,7 +26,7 @@ setup_helm() {
   fi
 
   # Detect Helm files
-  if ! has_lang_files "Chart.yaml values.yaml charts/"; then
+  if ! has_lang_files "Chart.yaml values.yaml" "CHARTS"; then
     log_summary "IaC Tool" "Helm" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -39,6 +40,8 @@ setup_helm() {
 }
 
 # Purpose: Checks if Helm is available.
+# Examples:
+#   check_runtime_helm "Linter"
 check_runtime_helm() {
   local _TOOL_DESC_HELM="${1:-Helm}"
   if ! command -v helm >/dev/null 2>&1; then

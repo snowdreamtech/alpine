@@ -2,6 +2,7 @@
 # Haskell Logic Module
 
 # Purpose: Installs Haskell (GHC) runtime via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_haskell() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Haskell runtime."
