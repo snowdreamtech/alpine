@@ -103,6 +103,7 @@ Modules (default: all):
   ionic              Install Ionic CLI
   express            Install Express Generator
   fastify            Install Fastify CLI
+  hono               Check Hono Configuration
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1904,6 +1905,7 @@ EOF
     ionic) setup_ionic ;;
     express) setup_express ;;
     fastify) setup_fastify ;;
+    hono) setup_hono ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2106,6 +2108,12 @@ setup_express() {
 setup_fastify() {
   . "$SCRIPT_DIR/lib/langs/fastify.sh"
   install_fastify
+}
+
+# Purpose: Wrapper for Hono setup.
+setup_hono() {
+  . "$SCRIPT_DIR/lib/langs/hono.sh"
+  install_hono
 }
 
 main "$@"

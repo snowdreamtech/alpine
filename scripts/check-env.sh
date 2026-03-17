@@ -185,6 +185,7 @@ main() {
   check_runtime "dagger" "Dagger"
   check_runtime "temporal" "Temporal"
   check_runtime "langchain" "LangChain"
+  check_runtime "hono" "Hono"
   check_runtime "express" "Express"
   check_runtime "fastify" "Fastify"
   check_runtime "fastapi" "FastAPI"
