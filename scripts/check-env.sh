@@ -348,6 +348,13 @@ main() {
   else
     log_info "⏭️  Pkl: Skipped (no Pkl files)"
   fi
+
+  # Move
+  if has_lang_files "Move.toml" "*.move"; then
+    check_runtime "move" "Move (Modular)"
+  else
+    log_info "⏭️  Move: Skipped (no Move files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
