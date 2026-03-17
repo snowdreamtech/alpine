@@ -632,6 +632,13 @@ main() {
     log_info "⏭️  Thrift: Skipped (no .thrift files)"
   fi
 
+  # Prisma
+  if has_lang_files "schema.prisma" "*.prisma"; then
+    check_runtime "prisma" "Prisma (Modular)"
+  else
+    log_info "⏭️  Prisma: Skipped (no .prisma files)"
+  fi
+
   # CUDA
   if has_lang_files "*.cu *.cuh"; then
     check_runtime "cuda" "CUDA (Modular)"
