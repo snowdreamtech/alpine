@@ -614,6 +614,13 @@ main() {
   else
     log_info "⏭️  CloudFormation: Skipped (no CloudFormation files)"
   fi
+
+  # ArkTS
+  if has_lang_files "*.ets"; then
+    check_runtime "arkts" "ArkTS (Modular)"
+  else
+    log_info "⏭️  ArkTS: Skipped (no ArkTS files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
