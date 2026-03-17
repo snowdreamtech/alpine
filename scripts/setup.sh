@@ -168,6 +168,16 @@ Modules (default: all):
   valtio             Check Valtio Config
   recoil             Check Recoil Config
   preact             Check Preact Config
+  noco-db            Check NocoDB Config
+  mongoose           Check Mongoose Config
+  sequelize          Install Sequelize CLI
+  kysely             Check Kysely Config
+  payload-cms        Check Payload CMS Config
+  directus           Check Directus Config
+  ghost              Install Ghost CLI
+  hardhat            Check Hardhat Config
+  foundry            Install Foundry CLI
+  polars-js          Check Polars JS Config
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -2034,6 +2044,16 @@ EOF
     valtio) setup_valtio ;;
     recoil) setup_recoil ;;
     preact) setup_preact ;;
+    noco-db) setup_noco_db ;;
+    mongoose) setup_mongoose ;;
+    sequelize) setup_sequelize ;;
+    kysely) setup_kysely ;;
+    payload-cms) setup_payload_cms ;;
+    directus) setup_directus ;;
+    ghost) setup_ghost ;;
+    hardhat) setup_hardhat ;;
+    foundry) setup_foundry ;;
+    polars-js) setup_polars_js ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2615,6 +2635,66 @@ setup_recoil() {
 setup_preact() {
   . "$SCRIPT_DIR/lib/langs/preact.sh"
   install_preact
+}
+
+# Purpose: Wrapper for NocoDB setup.
+setup_noco_db() {
+  . "$SCRIPT_DIR/lib/langs/noco-db.sh"
+  install_noco_db
+}
+
+# Purpose: Wrapper for Mongoose setup.
+setup_mongoose() {
+  . "$SCRIPT_DIR/lib/langs/mongoose.sh"
+  install_mongoose
+}
+
+# Purpose: Wrapper for Sequelize setup.
+setup_sequelize() {
+  . "$SCRIPT_DIR/lib/langs/sequelize.sh"
+  install_sequelize
+}
+
+# Purpose: Wrapper for Kysely setup.
+setup_kysely() {
+  . "$SCRIPT_DIR/lib/langs/kysely.sh"
+  install_kysely
+}
+
+# Purpose: Wrapper for Payload CMS setup.
+setup_payload_cms() {
+  . "$SCRIPT_DIR/lib/langs/payload-cms.sh"
+  install_payload_cms
+}
+
+# Purpose: Wrapper for Directus setup.
+setup_directus() {
+  . "$SCRIPT_DIR/lib/langs/directus.sh"
+  install_directus
+}
+
+# Purpose: Wrapper for Ghost setup.
+setup_ghost() {
+  . "$SCRIPT_DIR/lib/langs/ghost.sh"
+  install_ghost
+}
+
+# Purpose: Wrapper for Hardhat setup.
+setup_hardhat() {
+  . "$SCRIPT_DIR/lib/langs/hardhat.sh"
+  install_hardhat
+}
+
+# Purpose: Wrapper for Foundry setup.
+setup_foundry() {
+  . "$SCRIPT_DIR/lib/langs/foundry.sh"
+  install_foundry
+}
+
+# Purpose: Wrapper for Polars JS setup.
+setup_polars_js() {
+  . "$SCRIPT_DIR/lib/langs/polars-js.sh"
+  install_polars_js
 }
 
 main "$@"
