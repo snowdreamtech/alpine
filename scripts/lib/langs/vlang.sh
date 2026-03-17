@@ -8,7 +8,8 @@ install_runtime_vlang() {
     return 0
   fi
 
-  run_mise install vlang
+  # shellcheck disable=SC2154
+  run_mise install "vlang@${MISE_TOOL_VERSION_VLANG}"
   eval "$(mise activate bash --shims)"
 }
 

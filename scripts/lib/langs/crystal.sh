@@ -8,7 +8,8 @@ install_runtime_crystal() {
     return 0
   fi
 
-  run_mise install crystal
+  # shellcheck disable=SC2154
+  run_mise install "crystal@${MISE_TOOL_VERSION_CRYSTAL}"
   eval "$(mise activate bash --shims)"
 }
 

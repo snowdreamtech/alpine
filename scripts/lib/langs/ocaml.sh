@@ -8,7 +8,8 @@ install_runtime_ocaml() {
     return 0
   fi
 
-  run_mise install ocaml
+  # shellcheck disable=SC2154
+  run_mise install "ocaml@${MISE_TOOL_VERSION_OCAML}"
   eval "$(mise activate bash --shims)"
 }
 
