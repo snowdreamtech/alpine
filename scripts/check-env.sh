@@ -202,6 +202,7 @@ main() {
   check_runtime "postgresql" "PostgreSQL"
   check_runtime "vite" "Vite"
   check_runtime "typeorm" "TypeORM"
+  check_runtime "drizzle" "Drizzle"
   check_runtime "pytorch" "PyTorch"
   check_runtime "dbt" "dbt"
   check_runtime "otel" "OpenTelemetry"

@@ -109,6 +109,7 @@ Modules (default: all):
   fiber              Check Fiber Configuration
   rails              Install Rails Gem
   typeorm            Install TypeORM CLI
+  drizzle            Install Drizzle Kit
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1916,6 +1917,7 @@ EOF
     fiber) setup_fiber ;;
     rails) setup_rails ;;
     typeorm) setup_typeorm ;;
+    drizzle) setup_drizzle ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2154,6 +2156,12 @@ setup_rails() {
 setup_typeorm() {
   . "$SCRIPT_DIR/lib/langs/typeorm.sh"
   install_typeorm
+}
+
+# Purpose: Wrapper for Drizzle setup.
+setup_drizzle() {
+  . "$SCRIPT_DIR/lib/langs/drizzle.sh"
+  install_drizzle
 }
 
 main "$@"
