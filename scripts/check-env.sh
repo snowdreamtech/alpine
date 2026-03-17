@@ -190,6 +190,7 @@ main() {
   check_runtime "springboot" "Spring Boot"
   check_runtime "laravel" "Laravel"
   check_runtime "nestjs" "NestJS"
+  check_runtime "tailwind" "Tailwind CSS"
   check_runtime "pytorch" "PyTorch"
   check_runtime "dbt" "dbt"
   check_runtime "otel" "OpenTelemetry"
