@@ -1800,7 +1800,7 @@ EOF
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
     # Full list for "On-demand" (default) or "All" (explicit)
-    _MODULES_LIST="node python deno bun pipx gitleaks hadolint go checkmake tflint kube-linter powershell java ruby kotlin dart swift lua perl julia r groovy dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format cpp terraform solidity odin nim clojure gleam mojo objc ocaml fsharp erlang vlang crystal dlang haxe assemblyscript ballerina kcl pkl move elm rescript ada luau raku vala fpc lean lisp racket prolog fortran wat moonbit grain jsonnet starlark tcl ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit stylua buf tofu just task nix zig cue rego server edge flutter rn pulumi crossplane playwright cypress vitest docusaurus mkdocs sphinx jupyter dvc elixir haskell scala pre-commit hooks"
+    _MODULES_LIST="node python deno bun pipx gitleaks hadolint go checkmake tflint kube-linter powershell java ruby kotlin dart swift lua perl julia r groovy dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format cpp terraform solidity odin nim clojure gleam mojo objc ocaml fsharp erlang vlang crystal dlang haxe assemblyscript ballerina kcl pkl move elm rescript ada luau raku vala fpc lean lisp racket prolog fortran wat moonbit grain jsonnet starlark tcl duckdb ktlint ruff yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint stylelint vitepress commitizen pip-audit stylua buf tofu just task nix zig cue rego server edge flutter rn pulumi crossplane playwright cypress vitest docusaurus mkdocs sphinx jupyter dvc elixir haskell scala pre-commit hooks"
   else
     # Specific modules requested (e.g., ./setup.sh node)
     _MODULES_LIST="${_RAW_ARGS}"
@@ -1945,6 +1945,7 @@ EOF
     jsonnet) setup_jsonnet ;;
     starlark) setup_starlark ;;
     tcl) setup_tcl ;;
+    duckdb) setup_duckdb ;;
     playwright) install_playwright ;;
     cypress) install_cypress ;;
     vitest) install_vitest ;;

@@ -481,6 +481,13 @@ main() {
   else
     log_info "⏭️  Tcl: Skipped (no Tcl files)"
   fi
+
+  # DuckDB
+  if has_lang_files "*.sql *.duckdb"; then
+    check_runtime "duckdb" "DuckDB (Modular)"
+  else
+    log_info "⏭️  DuckDB: Skipped (no SQL/DuckDB files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
