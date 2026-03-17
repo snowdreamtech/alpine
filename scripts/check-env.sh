@@ -433,6 +433,13 @@ main() {
     log_info "⏭️  Prolog: Skipped (no Prolog files)"
   fi
 
+  # PowerShell
+  if has_lang_files "*.ps1 *.psm1 *.psd1"; then
+    check_runtime "pwsh" "PowerShell (Modular)"
+  else
+    log_info "⏭️  PowerShell: Skipped (no PowerShell files)"
+  fi
+
   # Fortran
   if has_lang_files "*.f *.for *.f90 *.f95"; then
     check_runtime "fortran" "Fortran (Modular)"

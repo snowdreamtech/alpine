@@ -402,37 +402,6 @@ install_kube_linter() {
   log_summary "Lint Tool" "Kube-Linter" "$_STAT_KL" "$(get_version kube-linter)" "$(($(date +%s) - _T0_KL))"
 }
 
-setup_powershell() {
-  local _T0_PS
-  _T0_PS=$(date +%s)
-  local _TITLE="PowerShell Linter"
-  local _PROVIDER="PSScriptAnalyzer"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Lint Tool" "PowerShell" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "" "*.ps1 *.psm1 *.psd1"; then
-    log_summary "Lint Tool" "PowerShell" "⏭️ Skipped" "-" "0"
-    return 0
-  fi
-
-  if ! command -v pwsh >/dev/null 2>&1; then
-    log_summary "Lint Tool" "PowerShell" "⏭️ Skipped (pwsh missing)" "-" "0"
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-  local _STAT_PS="✅ Installed"
-  run_quiet pwsh -NoProfile -Command "if (!(Get-Module -ListAvailable PSScriptAnalyzer)) { Install-Module -Name PSScriptAnalyzer -Force -SkipPublisherCheck -Scope CurrentUser }" || _STAT_PS="❌ Failed"
-  # shellcheck disable=SC2016
-  local _V_PS
-  # shellcheck disable=SC2016
-  _V_PS=$(pwsh -NoProfile -Command '(Get-Module PSScriptAnalyzer -ListAvailable).Version | Select-Object -First 1 | ForEach-Object { $_.ToString() }' 2>/dev/null || echo "installed")
-  log_summary "Lint Tool" "PowerShell" "$_STAT_PS" "$_V_PS" "$(($(date +%s) - _T0_PS))"
-}
-
 # Purpose: Installs google-java-format for Java project linting.
 # Delegate: Managed by mise (.mise.toml)
 # WARNING: google-java-format has no prebuilt binary for linux/arm64.
