@@ -425,6 +425,13 @@ main() {
   else
     log_info "⏭️  Racket: Skipped (no Racket files)"
   fi
+
+  # Prolog
+  if has_lang_files "*.pl *.pro *.prolog"; then
+    check_runtime "prolog" "Prolog (Modular)"
+  else
+    log_info "⏭️  Prolog: Skipped (no Prolog files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
