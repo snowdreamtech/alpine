@@ -2,6 +2,7 @@
 # Lua Logic Module
 
 # Purpose: Installs Lua runtime via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_lua() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Lua runtime."

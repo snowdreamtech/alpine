@@ -1,17 +1,6 @@
 #!/usr/bin/env sh
 # Kotlin Logic Module
 
-# Purpose: Installs Lua runtime via mise.
-# Delegate: Managed by mise (.mise.toml)
-install_runtime_lua() {
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_debug "DRY_RUN: Would install Lua runtime."
-    return 0
-  fi
-  run_mise install lua
-  eval "$(mise activate bash --shims)"
-}
-
 # Purpose: Installs Kotlin runtime via mise.
 # Delegate: Managed by mise (.mise.toml)
 install_runtime_kotlin() {
