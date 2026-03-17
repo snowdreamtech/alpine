@@ -104,6 +104,7 @@ Modules (default: all):
   express            Install Express Generator
   fastify            Install Fastify CLI
   hono               Check Hono Configuration
+  flask              Check Flask Configuration
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1906,6 +1907,7 @@ EOF
     express) setup_express ;;
     fastify) setup_fastify ;;
     hono) setup_hono ;;
+    flask) setup_flask ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2114,6 +2116,12 @@ setup_fastify() {
 setup_hono() {
   . "$SCRIPT_DIR/lib/langs/hono.sh"
   install_hono
+}
+
+# Purpose: Wrapper for Flask setup.
+setup_flask() {
+  . "$SCRIPT_DIR/lib/langs/flask.sh"
+  install_flask
 }
 
 main "$@"

@@ -189,6 +189,7 @@ main() {
   check_runtime "express" "Express"
   check_runtime "fastify" "Fastify"
   check_runtime "fastapi" "FastAPI"
+  check_runtime "flask" "Flask"
   check_runtime "django" "Django"
   check_runtime "springboot" "Spring Boot"
   check_runtime "laravel" "Laravel"
