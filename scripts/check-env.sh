@@ -180,6 +180,7 @@ main() {
   check_runtime "temporal" "Temporal"
   check_runtime "langchain" "LangChain"
   check_runtime "pytorch" "PyTorch"
+  check_runtime "dbt" "dbt"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
