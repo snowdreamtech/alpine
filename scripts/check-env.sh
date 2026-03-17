@@ -917,18 +917,30 @@ main() {
     printf "\n"
   fi
 
-  # 6. Group: Message & Observability
-  if has_lang_files "docker-compose.yml prometheus.yml" ""; then
-    log_info "── Message & Observability ──"
-    # Kafka
+  # 6. Group: Messaging & Cloud Native
+  if has_lang_files "docker-compose.yml prometheus.yml traefik.yml traefik.toml kong.yml kong.conf istio-init.yaml" ""; then
+    log_info "── Messaging & Cloud Native ──"
+    # Messaging
     . "$SCRIPT_DIR/lib/langs/kafka.sh"
     check_kafka
-
-    # RabbitMQ
     . "$SCRIPT_DIR/lib/langs/rabbitmq.sh"
     check_rabbitmq
+    . "$SCRIPT_DIR/lib/langs/nats.sh"
+    check_nats
+    . "$SCRIPT_DIR/lib/langs/pulsar.sh"
+    check_pulsar
 
-    # Prometheus
+    # Cloud Native Networking
+    . "$SCRIPT_DIR/lib/langs/traefik.sh"
+    check_traefik
+    . "$SCRIPT_DIR/lib/langs/istio.sh"
+    check_istio
+    . "$SCRIPT_DIR/lib/langs/kong.sh"
+    check_kong
+    . "$SCRIPT_DIR/lib/langs/linkerd.sh"
+    check_linkerd
+
+    # Observability
     . "$SCRIPT_DIR/lib/langs/prometheus.sh"
     check_prometheus
     printf "\n"

@@ -138,6 +138,12 @@ Modules (default: all):
   kafka              Install Kafka (Platform-dependent)
   rabbitmq           Install RabbitMQ (Platform-dependent)
   prometheus         Install Prometheus (Platform-dependent)
+  traefik            Install Traefik (Platform-dependent)
+  istio              Install Istio CLI
+  kong               Install Kong CLI
+  linkerd            Install Linkerd CLI
+  nats               Install NATS CLI
+  pulsar             Install Apache Pulsar
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1974,6 +1980,12 @@ EOF
     kafka) setup_kafka ;;
     rabbitmq) setup_rabbitmq ;;
     prometheus) setup_prometheus ;;
+    traefik) setup_traefik ;;
+    istio) setup_istio ;;
+    kong) setup_kong ;;
+    linkerd) setup_linkerd ;;
+    nats) setup_nats ;;
+    pulsar) setup_pulsar ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2375,6 +2387,42 @@ setup_rabbitmq() {
 setup_prometheus() {
   . "$SCRIPT_DIR/lib/langs/prometheus.sh"
   install_prometheus
+}
+
+# Purpose: Wrapper for Traefik setup.
+setup_traefik() {
+  . "$SCRIPT_DIR/lib/langs/traefik.sh"
+  install_traefik
+}
+
+# Purpose: Wrapper for Istio setup.
+setup_istio() {
+  . "$SCRIPT_DIR/lib/langs/istio.sh"
+  install_istio
+}
+
+# Purpose: Wrapper for Kong setup.
+setup_kong() {
+  . "$SCRIPT_DIR/lib/langs/kong.sh"
+  install_kong
+}
+
+# Purpose: Wrapper for Linkerd setup.
+setup_linkerd() {
+  . "$SCRIPT_DIR/lib/langs/linkerd.sh"
+  install_linkerd
+}
+
+# Purpose: Wrapper for NATS setup.
+setup_nats() {
+  . "$SCRIPT_DIR/lib/langs/nats.sh"
+  install_nats
+}
+
+# Purpose: Wrapper for Pulsar setup.
+setup_pulsar() {
+  . "$SCRIPT_DIR/lib/langs/pulsar.sh"
+  install_pulsar
 }
 
 main "$@"
