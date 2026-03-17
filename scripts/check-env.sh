@@ -155,6 +155,7 @@ main() {
   check_runtime "liquid" "Liquid"
   check_runtime "solid" "SolidJS"
   check_runtime "qwik" "Qwik"
+  check_runtime "sass" "Sass"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
