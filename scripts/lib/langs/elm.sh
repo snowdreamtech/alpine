@@ -1,0 +1,49 @@
+#!/usr/bin/env sh
+# Elm Logic Module
+
+# Purpose: Installs Elm via mise.
+install_runtime_elm() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Elm via mise."
+    return 0
+  fi
+
+  # shellcheck disable=SC2154
+  run_mise install "elm@${MISE_TOOL_VERSION_ELM}"
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Sets up Elm environment for project.
+setup_elm() {
+  local _T0_ELM_RT
+  _T0_ELM_RT=$(date +%s)
+  _log_setup "Elm" "elm"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Elm" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  # Detect Elm files
+  if ! has_lang_files "elm.json" "*.elm"; then
+    log_summary "Runtime" "Elm" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_ELM_RT="✅ Installed"
+  install_runtime_elm || _STAT_ELM_RT="❌ Failed"
+
+  local _DUR_ELM_RT
+  _DUR_ELM_RT=$(($(date +%s) - _T0_ELM_RT))
+  log_summary "Runtime" "Elm" "$_STAT_ELM_RT" "$(get_version elm --version)" "$_DUR_ELM_RT"
+}
+
+# Purpose: Checks if Elm is available.
+check_runtime_elm() {
+  local _TOOL_DESC_ELM="${1:-Elm}"
+  if ! command -v elm >/dev/null 2>&1; then
+    log_warn "Required runtime 'elm' for $_TOOL_DESC_ELM is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

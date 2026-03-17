@@ -355,6 +355,13 @@ main() {
   else
     log_info "⏭️  Move: Skipped (no Move files)"
   fi
+
+  # Elm
+  if has_lang_files "elm.json" "*.elm"; then
+    check_runtime "elm" "Elm (Modular)"
+  else
+    log_info "⏭️  Elm: Skipped (no Elm files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
