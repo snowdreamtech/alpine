@@ -260,6 +260,16 @@ main() {
   check_runtime "vector" "Vector"
   check_runtime "fluentd" "Fluentd"
   check_runtime "clickhouse" "ClickHouse"
+  check_runtime "neo4j" "Neo4j"
+  check_runtime "scylladb" "ScyllaDB"
+  check_runtime "cockroachdb" "CockroachDB"
+  check_runtime "tidb" "TiDB"
+  check_runtime "flink" "Apache Flink"
+  check_runtime "beam" "Apache Beam"
+  check_runtime "trino" "Trino"
+  check_runtime "typesense" "Typesense"
+  check_runtime "tarantool" "Tarantool"
+  check_runtime "rocksdb" "RocksDB"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then

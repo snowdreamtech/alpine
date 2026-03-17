@@ -188,6 +188,16 @@ Modules (default: all):
   mockito            Check Mockito Config
   uvicorn            Install Uvicorn
   gunicorn           Install Gunicorn
+  neo4j              Check Neo4j Config
+  scylladb           Check ScyllaDB Config
+  cockroachdb        Check CockroachDB Config
+  tidb               Install TiUP (TiDB)
+  flink              Check Flink Config
+  beam               Check Beam SDK Config
+  trino              Check Trino Config
+  typesense          Check Typesense Config
+  tarantool          Check Tarantool Config
+  rocksdb            Check RocksDB Config
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -2074,6 +2084,16 @@ EOF
     mockito) setup_mockito ;;
     uvicorn) setup_uvicorn ;;
     gunicorn) setup_gunicorn ;;
+    neo4j) setup_neo4j ;;
+    scylladb) setup_scylladb ;;
+    cockroachdb) setup_cockroachdb ;;
+    tidb) setup_tidb ;;
+    flink) setup_flink ;;
+    beam) setup_beam ;;
+    trino) setup_trino ;;
+    typesense) setup_typesense ;;
+    tarantool) setup_tarantool ;;
+    rocksdb) setup_rocksdb ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2775,6 +2795,66 @@ setup_uvicorn() {
 setup_gunicorn() {
   . "$SCRIPT_DIR/lib/langs/gunicorn.sh"
   install_gunicorn
+}
+
+# Purpose: Wrapper for Neo4j setup.
+setup_neo4j() {
+  . "$SCRIPT_DIR/lib/langs/neo4j.sh"
+  install_neo4j
+}
+
+# Purpose: Wrapper for ScyllaDB setup.
+setup_scylladb() {
+  . "$SCRIPT_DIR/lib/langs/scylladb.sh"
+  install_scylladb
+}
+
+# Purpose: Wrapper for CockroachDB setup.
+setup_cockroachdb() {
+  . "$SCRIPT_DIR/lib/langs/cockroachdb.sh"
+  install_cockroachdb
+}
+
+# Purpose: Wrapper for TiDB setup.
+setup_tidb() {
+  . "$SCRIPT_DIR/lib/langs/tidb.sh"
+  install_tidb
+}
+
+# Purpose: Wrapper for Flink setup.
+setup_flink() {
+  . "$SCRIPT_DIR/lib/langs/flink.sh"
+  install_flink
+}
+
+# Purpose: Wrapper for Beam setup.
+setup_beam() {
+  . "$SCRIPT_DIR/lib/langs/beam.sh"
+  install_beam
+}
+
+# Purpose: Wrapper for Trino setup.
+setup_trino() {
+  . "$SCRIPT_DIR/lib/langs/trino.sh"
+  install_trino
+}
+
+# Purpose: Wrapper for Typesense setup.
+setup_typesense() {
+  . "$SCRIPT_DIR/lib/langs/typesense.sh"
+  install_typesense
+}
+
+# Purpose: Wrapper for Tarantool setup.
+setup_tarantool() {
+  . "$SCRIPT_DIR/lib/langs/tarantool.sh"
+  install_tarantool
+}
+
+# Purpose: Wrapper for RocksDB setup.
+setup_rocksdb() {
+  . "$SCRIPT_DIR/lib/langs/rocksdb.sh"
+  install_rocksdb
 }
 
 main "$@"
