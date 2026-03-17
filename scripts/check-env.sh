@@ -565,6 +565,13 @@ main() {
   else
     log_info "⏭️  Octave: Skipped (no Octave files)"
   fi
+
+  # OpenAPI
+  if has_lang_files "openapi.yaml openapi.json swagger.yaml swagger.json"; then
+    check_runtime "openapi" "OpenAPI (Modular)"
+  else
+    log_info "⏭️  OpenAPI: Skipped (no OpenAPI files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
