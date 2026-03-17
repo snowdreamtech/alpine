@@ -639,6 +639,13 @@ main() {
     log_info "⏭️  Prisma: Skipped (no .prisma files)"
   fi
 
+  # EdgeDB
+  if has_lang_files "edgedb.toml" "*.esdl"; then
+    check_runtime "edgedb" "EdgeDB (Modular)"
+  else
+    log_info "⏭️  EdgeDB: Skipped (no .esdl files)"
+  fi
+
   # CUDA
   if has_lang_files "*.cu *.cuh"; then
     check_runtime "cuda" "CUDA (Modular)"
