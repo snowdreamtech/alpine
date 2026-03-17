@@ -111,6 +111,11 @@ Modules (default: all):
   typeorm            Install TypeORM CLI
   drizzle            Install Drizzle Kit
   sqlalchemy         Check SQLAlchemy Configuration
+  ansible            Install Ansible
+  nginx              Install Nginx (Platform-dependent)
+  caddy              Install Caddy (Platform-dependent)
+  elasticsearch      Install Elasticsearch (Platform-dependent)
+  meilisearch        Install Meilisearch (Platform-dependent)
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1920,6 +1925,11 @@ EOF
     typeorm) setup_typeorm ;;
     drizzle) setup_drizzle ;;
     sqlalchemy) setup_sqlalchemy ;;
+    ansible) setup_ansible ;;
+    nginx) setup_nginx ;;
+    caddy) setup_caddy ;;
+    elasticsearch) setup_elasticsearch ;;
+    meilisearch) setup_meilisearch ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2170,6 +2180,36 @@ setup_drizzle() {
 setup_sqlalchemy() {
   . "$SCRIPT_DIR/lib/langs/sqlalchemy.sh"
   install_sqlalchemy
+}
+
+# Purpose: Wrapper for Ansible setup.
+setup_ansible() {
+  . "$SCRIPT_DIR/lib/langs/ansible.sh"
+  install_ansible
+}
+
+# Purpose: Wrapper for Nginx setup.
+setup_nginx() {
+  . "$SCRIPT_DIR/lib/langs/nginx.sh"
+  install_nginx
+}
+
+# Purpose: Wrapper for Caddy setup.
+setup_caddy() {
+  . "$SCRIPT_DIR/lib/langs/caddy.sh"
+  install_caddy
+}
+
+# Purpose: Wrapper for Elasticsearch setup.
+setup_elasticsearch() {
+  . "$SCRIPT_DIR/lib/langs/elasticsearch.sh"
+  install_elasticsearch
+}
+
+# Purpose: Wrapper for Meilisearch setup.
+setup_meilisearch() {
+  . "$SCRIPT_DIR/lib/langs/meilisearch.sh"
+  install_meilisearch
 }
 
 main "$@"

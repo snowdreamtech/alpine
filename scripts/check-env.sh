@@ -287,6 +287,46 @@ main() {
     log_info "⏭️  Terraform: Skipped (no Terraform files)"
   fi
 
+  # Ansible
+  if has_lang_files "ansible.cfg playbook.yml site.yml" "roles/"; then
+    . "$SCRIPT_DIR/lib/langs/ansible.sh"
+    check_ansible
+  else
+    log_info "⏭️  Ansible: Skipped (no Ansible files)"
+  fi
+
+  # Nginx
+  if has_lang_files "nginx.conf" "conf.d/ sites-available/ sites-enabled/"; then
+    . "$SCRIPT_DIR/lib/langs/nginx.sh"
+    check_nginx
+  else
+    log_info "⏭️  Nginx: Skipped (no Nginx files)"
+  fi
+
+  # Caddy
+  if has_lang_files "Caddyfile" ""; then
+    . "$SCRIPT_DIR/lib/langs/caddy.sh"
+    check_caddy
+  else
+    log_info "⏭️  Caddy: Skipped (no Caddyfile)"
+  fi
+
+  # Elasticsearch
+  if has_lang_files "elasticsearch.yml" "config/elasticsearch.yml"; then
+    . "$SCRIPT_DIR/lib/langs/elasticsearch.sh"
+    check_elasticsearch
+  else
+    log_info "⏭️  Elasticsearch: Skipped (no Elasticsearch files)"
+  fi
+
+  # Meilisearch
+  if has_lang_files "meilisearch.toml" ""; then
+    . "$SCRIPT_DIR/lib/langs/meilisearch.sh"
+    check_meilisearch
+  else
+    log_info "⏭️  Meilisearch: Skipped (no Meilisearch files)"
+  fi
+
   # Solidity
   if has_lang_files "" "*.sol"; then
     check_runtime "solidity" "Solidity (Modular)"
