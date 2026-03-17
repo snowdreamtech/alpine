@@ -264,6 +264,13 @@ main() {
   else
     log_info "⏭️  Mojo: Skipped (no Mojo files)"
   fi
+
+  # Objective-C
+  if has_lang_files "" "*.m *.mm"; then
+    check_runtime "objc" "Objective-C (Modular)"
+  else
+    log_info "⏭️  Objective-C: Skipped (no Objective-C files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
