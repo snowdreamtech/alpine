@@ -635,6 +635,13 @@ main() {
   else
     log_info "⏭️  QML: Skipped (no QML files)"
   fi
+
+  # Apex
+  if has_lang_files "*.cls *.trigger"; then
+    check_runtime "apex" "Apex (Modular)"
+  else
+    log_info "⏭️  Apex: Skipped (no Apex files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
