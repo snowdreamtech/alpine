@@ -2,6 +2,7 @@
 # Vala Logic Module
 
 # Purpose: Installs Vala via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_vala() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Vala via mise."
@@ -10,6 +11,19 @@ install_runtime_vala() {
 
   # shellcheck disable=SC2154
   run_mise install "vala@${MISE_TOOL_VERSION_VALA}"
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Installs VCPKG (often used alongside C++).
+# Delegate: Managed by mise (.mise.toml)
+install_runtime_vcpkg() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Vala via mise."
+    return 0
+  fi
+
+  # shellcheck disable=SC2154
+  run_mise install "vcpkg@${MISE_TOOL_VERSION_VCPKG}"
   eval "$(mise activate bash --shims)"
 }
 
@@ -25,7 +39,7 @@ setup_vala() {
   fi
 
   # Detect Vala files
-  if ! has_lang_files "*.vala *.vapi"; then
+  if ! has_lang_files "" "*.vala *.vapi"; then
     log_summary "Runtime" "Vala" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -39,6 +53,8 @@ setup_vala() {
 }
 
 # Purpose: Checks if Vala (valac) is available.
+# Examples:
+#   check_runtime_vala "Linter"
 check_runtime_vala() {
   local _TOOL_DESC_VALA="${1:-Vala}"
   if ! command -v valac >/dev/null 2>&1; then

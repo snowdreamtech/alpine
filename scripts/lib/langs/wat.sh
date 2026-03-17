@@ -2,6 +2,7 @@
 # WebAssembly Text (WAT) Logic Module
 
 # Purpose: Installs Wasmtime via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_wat() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Wasmtime via mise."
@@ -25,7 +26,7 @@ setup_wat() {
   fi
 
   # Detect WAT/Wasm files
-  if ! has_lang_files "*.wat *.wasm"; then
+  if ! has_lang_files "" "*.wat *.wasm"; then
     log_summary "Runtime" "WebAssembly" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -39,6 +40,8 @@ setup_wat() {
 }
 
 # Purpose: Checks if Wasmtime is available.
+# Examples:
+#   check_runtime_wat "Linter"
 check_runtime_wat() {
   local _TOOL_DESC_WAT="${1:-WebAssembly}"
   if ! command -v wasmtime >/dev/null 2>&1; then
