@@ -646,6 +646,13 @@ main() {
     log_info "⏭️  EdgeDB: Skipped (no .esdl files)"
   fi
 
+  # SurrealDB
+  if has_lang_files "*.surql"; then
+    check_runtime "surrealdb" "SurrealDB (Modular)"
+  else
+    log_info "⏭️  SurrealDB: Skipped (no .surql files)"
+  fi
+
   # CUDA
   if has_lang_files "*.cu *.cuh"; then
     check_runtime "cuda" "CUDA (Modular)"
