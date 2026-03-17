@@ -1,0 +1,53 @@
+#!/usr/bin/env sh
+# VCPKG Logic Module
+
+# Purpose: Installs VCPKG (often used alongside C++).
+install_runtime_vcpkg() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install VCPKG."
+    return 0
+  fi
+
+  # Note: vcpkg is often installed via git or system package manager.
+  # Here we look for asdf/mise plugin or system command.
+  if ! command -v vcpkg >/dev/null 2>&1; then
+    log_info "VCPKG not found. Attempting to install via mise (if plugin available)..."
+    # shellcheck disable=SC2154
+    run_mise install vcpkg || log_warn "Could not install vcpkg via mise. Please install it manually."
+  fi
+}
+
+# Purpose: Sets up VCPKG environment for project.
+setup_vcpkg() {
+  local _T0_VCPKG_RT
+  _T0_VCPKG_RT=$(date +%s)
+  _log_setup "VCPKG" "vcpkg"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "VCPKG" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  # Detect VCPKG files
+  if ! has_lang_files "vcpkg.json vcpkg-configuration.json"; then
+    log_summary "Runtime" "VCPKG" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_VCPKG_RT="✅ Detected"
+  install_runtime_vcpkg || _STAT_VCPKG_RT="❌ Missing"
+
+  local _DUR_VCPKG_RT
+  _DUR_VCPKG_RT=$(($(date +%s) - _T0_VCPKG_RT))
+  log_summary "Runtime" "VCPKG" "$_STAT_VCPKG_RT" "$(get_version vcpkg version | awk '{print $NF}')" "$_DUR_VCPKG_RT"
+}
+
+# Purpose: Checks if VCPKG is available.
+check_runtime_vcpkg() {
+  local _TOOL_DESC_VCPKG="${1:-VCPKG}"
+  if ! command -v vcpkg >/dev/null 2>&1; then
+    log_warn "Required tool 'vcpkg' for $_TOOL_DESC_VCPKG is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

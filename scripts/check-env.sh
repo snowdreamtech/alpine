@@ -488,6 +488,13 @@ main() {
   else
     log_info "⏭️  DuckDB: Skipped (no SQL/DuckDB files)"
   fi
+
+  # VCPKG
+  if has_lang_files "vcpkg.json vcpkg-configuration.json"; then
+    check_runtime "vcpkg" "VCPKG (Modular)"
+  else
+    log_info "⏭️  VCPKG: Skipped (no VCPKG files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
