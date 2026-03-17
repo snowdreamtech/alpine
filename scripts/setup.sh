@@ -198,6 +198,16 @@ Modules (default: all):
   typesense          Check Typesense Config
   tarantool          Check Tarantool Config
   rocksdb            Check RocksDB Config
+  bazel              Install Bazelisk
+  buck2              Check Buck2 Config
+  pants              Check Pants Config
+  langgraph          Check LangGraph Config
+  crewai             Check CrewAI Config
+  ollama             Check Ollama Config
+  localstack         Install LocalStack CLI
+  lerna              Install Lerna CLI
+  single-spa         Install Single-spa CLI
+  module-federation  Check Federation Config
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -2094,6 +2104,16 @@ EOF
     typesense) setup_typesense ;;
     tarantool) setup_tarantool ;;
     rocksdb) setup_rocksdb ;;
+    bazel) setup_bazel ;;
+    buck2) setup_buck2 ;;
+    pants) setup_pants ;;
+    langgraph) setup_langgraph ;;
+    crewai) setup_crewai ;;
+    ollama) setup_ollama ;;
+    localstack) setup_localstack ;;
+    lerna) setup_lerna ;;
+    single-spa) setup_single_spa ;;
+    module-federation) setup_module_federation ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2855,6 +2875,66 @@ setup_tarantool() {
 setup_rocksdb() {
   . "$SCRIPT_DIR/lib/langs/rocksdb.sh"
   install_rocksdb
+}
+
+# Purpose: Wrapper for Bazel setup.
+setup_bazel() {
+  . "$SCRIPT_DIR/lib/langs/bazel.sh"
+  install_bazel
+}
+
+# Purpose: Wrapper for Buck2 setup.
+setup_buck2() {
+  . "$SCRIPT_DIR/lib/langs/buck2.sh"
+  install_buck2
+}
+
+# Purpose: Wrapper for Pants setup.
+setup_pants() {
+  . "$SCRIPT_DIR/lib/langs/pants.sh"
+  install_pants
+}
+
+# Purpose: Wrapper for LangGraph setup.
+setup_langgraph() {
+  . "$SCRIPT_DIR/lib/langs/langgraph.sh"
+  install_langgraph
+}
+
+# Purpose: Wrapper for CrewAI setup.
+setup_crewai() {
+  . "$SCRIPT_DIR/lib/langs/crewai.sh"
+  install_crewai
+}
+
+# Purpose: Wrapper for Ollama setup.
+setup_ollama() {
+  . "$SCRIPT_DIR/lib/langs/ollama.sh"
+  install_ollama
+}
+
+# Purpose: Wrapper for LocalStack setup.
+setup_localstack() {
+  . "$SCRIPT_DIR/lib/langs/localstack.sh"
+  install_localstack
+}
+
+# Purpose: Wrapper for Lerna setup.
+setup_lerna() {
+  . "$SCRIPT_DIR/lib/langs/lerna.sh"
+  install_lerna
+}
+
+# Purpose: Wrapper for Single-spa setup.
+setup_single_spa() {
+  . "$SCRIPT_DIR/lib/langs/single-spa.sh"
+  install_single_spa
+}
+
+# Purpose: Wrapper for Module Federation setup.
+setup_module_federation() {
+  . "$SCRIPT_DIR/lib/langs/module-federation.sh"
+  install_module_federation
 }
 
 main "$@"

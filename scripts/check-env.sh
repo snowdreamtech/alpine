@@ -270,6 +270,16 @@ main() {
   check_runtime "typesense" "Typesense"
   check_runtime "tarantool" "Tarantool"
   check_runtime "rocksdb" "RocksDB"
+  check_runtime "bazel" "Bazel"
+  check_runtime "buck2" "Buck2"
+  check_runtime "pants" "Pants"
+  check_runtime "langgraph" "LangGraph"
+  check_runtime "crewai" "CrewAI"
+  check_runtime "ollama" "Ollama"
+  check_runtime "localstack" "LocalStack"
+  check_runtime "lerna" "Lerna"
+  check_runtime "single-spa" "Single-spa"
+  check_runtime "module-federation" "Module Federation"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
