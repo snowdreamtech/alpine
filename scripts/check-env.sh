@@ -579,6 +579,13 @@ main() {
   else
     log_info "⏭️  PromQL: Skipped (no PromQL files)"
   fi
+
+  # LaTeX
+  if has_lang_files "*.tex *.bib"; then
+    check_runtime "latex" "LaTeX (Modular)"
+  else
+    log_info "⏭️  LaTeX: Skipped (no LaTeX files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
