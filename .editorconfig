@@ -40,7 +40,6 @@ indent_size = 2
 [*.{sh,bash,zsh,ps1,bat,cmd}]
 indent_style = space
 indent_size = 2
-end_of_line = lf
 
 # ── Special Syntactic Requirements ──────────────────────────────────────────
 # Makefile requires literal Tabs for command blocks
