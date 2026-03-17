@@ -278,6 +278,13 @@ main() {
   else
     log_info "⏭️  OCaml: Skipped (no OCaml files)"
   fi
+
+  # F#
+  if has_lang_files "" "*.fs *.fsi *.fsx *.fsproj"; then
+    check_runtime "fsharp" "F# (Modular)"
+  else
+    log_info "⏭️  F#: Skipped (no F# files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
