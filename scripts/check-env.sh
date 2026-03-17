@@ -446,6 +446,13 @@ main() {
   else
     log_info "⏭️  WebAssembly: Skipped (no Wasm files)"
   fi
+
+  # MoonBit
+  if has_lang_files "moon.pkg.json" "*.mbt"; then
+    check_runtime "moonbit" "MoonBit (Modular)"
+  else
+    log_info "⏭️  MoonBit: Skipped (no MoonBit files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
