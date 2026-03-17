@@ -2,6 +2,7 @@
 # Bun Logic Module
 
 # Purpose: Installs Bun runtime via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_bun() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Bun runtime."

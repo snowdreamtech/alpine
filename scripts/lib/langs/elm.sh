@@ -2,6 +2,7 @@
 # Elm Logic Module
 
 # Purpose: Installs Elm via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_elm() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Elm via mise."
@@ -39,6 +40,8 @@ setup_elm() {
 }
 
 # Purpose: Checks if Elm is available.
+# Examples:
+#   check_runtime_elm "Linter"
 check_runtime_elm() {
   local _TOOL_DESC_ELM="${1:-Elm}"
   if ! command -v elm >/dev/null 2>&1; then
