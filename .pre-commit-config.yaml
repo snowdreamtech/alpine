@@ -787,12 +787,15 @@ repos:
         name: check shebang scripts are executable
         entry: |
           python3 -c "
-          import sys, os
+          import sys, os, stat
           not_exec = []
           for f in sys.argv[1:]:
-              if os.path.isfile(f) and not os.access(f, os.X_OK):
-                  with open(f, 'rb') as fh:
-                      if fh.read(2) == b'#!': not_exec.append(f)
+              if os.path.isfile(f):
+                  mode = os.stat(f).st_mode
+                  # Check if any execution bit is set (Owner, Group, or Others)
+                  if not (mode & (stat.S_IXUSR | stat.S_IXGRP | stat.S_IXOTH)):
+                      with open(f, 'rb') as fh:
+                          if fh.read(2) == b'#!': not_exec.append(f)
           for f in not_exec: print(f'Shebang script not executable: {f}')
           sys.exit(1 if not_exec else 0)
           "
