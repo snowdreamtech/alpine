@@ -616,6 +616,13 @@ main() {
     log_info "⏭️  Avro: Skipped (no .avsc files)"
   fi
 
+  # Thrift
+  if has_lang_files "*.thrift"; then
+    check_runtime "thrift" "Thrift (Modular)"
+  else
+    log_info "⏭️  Thrift: Skipped (no .thrift files)"
+  fi
+
   # CUDA
   if has_lang_files "*.cu *.cuh"; then
     check_runtime "cuda" "CUDA (Modular)"
