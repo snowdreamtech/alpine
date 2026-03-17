@@ -495,6 +495,13 @@ main() {
   else
     log_info "⏭️  VCPKG: Skipped (no VCPKG files)"
   fi
+
+  # Gherkin
+  if has_lang_files "*.feature"; then
+    check_runtime "gherkin" "Gherkin (Modular)"
+  else
+    log_info "⏭️  Gherkin: Skipped (no Gherkin files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
