@@ -643,6 +643,13 @@ main() {
     log_info "⏭️  Shader: Skipped (no Shader files)"
   fi
 
+  # GDScript
+  if has_lang_files "*.gd"; then
+    check_runtime "gdscript" "GDScript (Modular)"
+  else
+    log_info "⏭️  GDScript: Skipped (no GDScript files)"
+  fi
+
   # QML
   if has_lang_files "*.qml"; then
     check_runtime "qml" "QML (Modular)"
