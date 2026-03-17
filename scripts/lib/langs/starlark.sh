@@ -2,6 +2,7 @@
 # Starlark Logic Module
 
 # Purpose: Installs Bazel (for Starlark) via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_starlark() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Bazel via mise."
@@ -25,7 +26,7 @@ setup_starlark() {
   fi
 
   # Detect Starlark files (Bazel ecosystem)
-  if ! has_lang_files "*.star *.bzl BUILD WORKSPACE MODULE.bazel"; then
+  if ! has_lang_files "BUILD WORKSPACE MODULE.bazel" "*.star *.bzl"; then
     log_summary "Runtime" "Starlark" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -39,6 +40,8 @@ setup_starlark() {
 }
 
 # Purpose: Checks if Bazel is available.
+# Examples:
+#   check_runtime_starlark "Linter"
 check_runtime_starlark() {
   local _TOOL_DESC_STAR="${1:-Starlark}"
   if ! command -v bazel >/dev/null 2>&1; then

@@ -2,6 +2,7 @@
 # Typst Logic Module
 
 # Purpose: Installs Typst via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_typst() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Typst via mise."
@@ -25,7 +26,7 @@ setup_typst() {
   fi
 
   # Detect Typst files
-  if ! has_lang_files "*.typ"; then
+  if ! has_lang_files "" "*.typ"; then
     log_summary "Doc Tool" "Typst" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -39,6 +40,8 @@ setup_typst() {
 }
 
 # Purpose: Checks if Typst is available.
+# Examples:
+#   check_runtime_typst "Linter"
 check_runtime_typst() {
   local _TOOL_DESC_TYPST="${1:-Typst}"
   if ! command -v typst >/dev/null 2>&1; then

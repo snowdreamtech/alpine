@@ -2,6 +2,7 @@
 # Terragrunt Logic Module
 
 # Purpose: Installs Terragrunt via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_terragrunt() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Terragrunt via mise."
@@ -25,7 +26,7 @@ setup_terragrunt() {
   fi
 
   # Detect Terragrunt files
-  if ! has_lang_files "terragrunt.hcl"; then
+  if ! has_lang_files "" "HCL"; then
     log_summary "Runtime" "Terragrunt" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -39,6 +40,8 @@ setup_terragrunt() {
 }
 
 # Purpose: Checks if Terragrunt is available.
+# Examples:
+#   check_runtime_terragrunt "Linter"
 check_runtime_terragrunt() {
   local _TOOL_DESC_TERRA="${1:-Terragrunt}"
   if ! command -v terragrunt >/dev/null 2>&1; then

@@ -2,6 +2,7 @@
 # Tcl Logic Module
 
 # Purpose: Installs Tcl via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_tcl() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Tcl via mise."
@@ -25,7 +26,7 @@ setup_tcl() {
   fi
 
   # Detect Tcl files
-  if ! has_lang_files "*.tcl *.tk"; then
+  if ! has_lang_files "" "*.tcl *.tk"; then
     log_summary "Runtime" "Tcl" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -39,6 +40,8 @@ setup_tcl() {
 }
 
 # Purpose: Checks if Tcl is available.
+# Examples:
+#   check_runtime_tcl "Linter"
 check_runtime_tcl() {
   local _TOOL_DESC_TCL="${1:-Tcl}"
   if ! command -v tclsh >/dev/null 2>&1; then
