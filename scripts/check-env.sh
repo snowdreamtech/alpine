@@ -107,6 +107,7 @@ check_tool_version() {
 # Examples:
 #   main --verbose
 main() {
+  export _G_AUDIT_MODE=1
   # 1. Execution Context Guard
   guard_project_root
 

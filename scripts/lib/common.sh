@@ -982,6 +982,9 @@ check_runtime() {
   # If check_runtime_<name> exists in the environment, delegate to it.
   if command -v "check_runtime_${_RT_NAME}" >/dev/null 2>&1; then
     if ! "check_runtime_${_RT_NAME}" "$_TOOL_DESC"; then
+      if [ "${_G_AUDIT_MODE:-0}" -eq 1 ]; then
+        return 1
+      fi
       exit 0 # Graceful skip for pre-commit
     fi
     return 0
@@ -990,6 +993,9 @@ check_runtime() {
   # Priority 2: Standard Command Check (Fallback)
   if ! command -v "$_RT_NAME" >/dev/null 2>&1; then
     log_warn "Required runtime '$_RT_NAME' for $_TOOL_DESC is missing. Skipping."
+    if [ "${_G_AUDIT_MODE:-0}" -eq 1 ]; then
+      return 1
+    fi
     exit 0
   fi
 }
