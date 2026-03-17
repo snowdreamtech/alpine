@@ -208,6 +208,13 @@ main() {
   else
     log_info "⏭️  C/C++: Skipped (no C/C++ files)"
   fi
+
+  # Terraform
+  if has_lang_files "" "*.tf *.tfvars *.hcl"; then
+    check_runtime "terraform" "Terraform (Modular)"
+  else
+    log_info "⏭️  Terraform: Skipped (no Terraform files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
