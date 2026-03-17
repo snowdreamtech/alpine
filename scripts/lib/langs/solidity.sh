@@ -8,7 +8,8 @@ install_runtime_solidity() {
     return 0
   fi
 
-  run_mise install solc
+  # shellcheck disable=SC2154
+  run_mise install "solidity@${MISE_TOOL_VERSION_SOLIDITY}"
   eval "$(mise activate bash --shims)"
 }
 
