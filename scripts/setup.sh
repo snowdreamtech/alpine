@@ -144,6 +144,12 @@ Modules (default: all):
   linkerd            Install Linkerd CLI
   nats               Install NATS CLI
   pulsar             Install Apache Pulsar
+  llamaindex         Check LlamaIndex Config
+  weaviate           Install Weaviate (Platform-dependent)
+  polars             Check Polars Config
+  pandas             Check Pandas Config
+  quarkus            Install Quarkus CLI
+  micronaut          Install Micronaut CLI
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1986,6 +1992,12 @@ EOF
     linkerd) setup_linkerd ;;
     nats) setup_nats ;;
     pulsar) setup_pulsar ;;
+    llamaindex) setup_llamaindex ;;
+    weaviate) setup_weaviate ;;
+    polars) setup_polars ;;
+    pandas) setup_pandas ;;
+    quarkus) setup_quarkus ;;
+    micronaut) setup_micronaut ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2423,6 +2435,42 @@ setup_nats() {
 setup_pulsar() {
   . "$SCRIPT_DIR/lib/langs/pulsar.sh"
   install_pulsar
+}
+
+# Purpose: Wrapper for LlamaIndex setup.
+setup_llamaindex() {
+  . "$SCRIPT_DIR/lib/langs/llamaindex.sh"
+  install_llamaindex
+}
+
+# Purpose: Wrapper for Weaviate setup.
+setup_weaviate() {
+  . "$SCRIPT_DIR/lib/langs/weaviate.sh"
+  install_weaviate
+}
+
+# Purpose: Wrapper for Polars setup.
+setup_polars() {
+  . "$SCRIPT_DIR/lib/langs/polars.sh"
+  install_polars
+}
+
+# Purpose: Wrapper for Pandas setup.
+setup_pandas() {
+  . "$SCRIPT_DIR/lib/langs/pandas.sh"
+  install_pandas
+}
+
+# Purpose: Wrapper for Quarkus setup.
+setup_quarkus() {
+  . "$SCRIPT_DIR/lib/langs/quarkus.sh"
+  install_quarkus
+}
+
+# Purpose: Wrapper for Micronaut setup.
+setup_micronaut() {
+  . "$SCRIPT_DIR/lib/langs/micronaut.sh"
+  install_micronaut
 }
 
 main "$@"
