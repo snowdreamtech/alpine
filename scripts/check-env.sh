@@ -537,6 +537,13 @@ main() {
   else
     log_info "⏭️  Typst: Skipped (no Typst files)"
   fi
+
+  # Verilog
+  if has_lang_files "*.v *.sv"; then
+    check_runtime "verilog" "Verilog (Modular)"
+  else
+    log_info "⏭️  Verilog: Skipped (no Verilog files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
