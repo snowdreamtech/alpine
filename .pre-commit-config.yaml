@@ -614,22 +614,20 @@ repos:
         entry: sh scripts/lib/lint-wrapper.sh prettier
         args: [--write]
         types_or:
-          [
-            json,
-            yaml,
-            vue,
-            javascript,
-            jsx,
-            ts,
-            tsx,
-            graphql,
-            sql,
-            html,
-            css,
-            markdown,
-            astro,
-            svelte,
-          ]
+          - json
+          - yaml
+          - vue
+          - javascript
+          - jsx
+          - ts
+          - tsx
+          - graphql
+          - sql
+          - html
+          - css
+          - markdown
+          - astro
+          - svelte
         exclude: |
           (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
         description: "Format web-standard file types using Prettier (including Astro/Svelte)."
@@ -899,7 +897,12 @@ repos:
         language: system
         entry: sh scripts/lib/lint-wrapper.sh eslint
         args: [--fix]
-        types_or: [javascript, ts, tsx, jsx, vue]
+        types_or:
+          - javascript
+          - ts
+          - tsx
+          - jsx
+          - vue
         exclude: |
           (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
         description: "Find and fix problems in JavaScript/TypeScript/Vue code."
@@ -908,7 +911,10 @@ repos:
         name: stylelint quality check
         language: system
         entry: sh scripts/lib/lint-wrapper.sh stylelint --fix
-        types_or: [css, scss, less]
+        types_or:
+          - css
+          - scss
+          - less
         exclude: |
           (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
         description: "Lint style sheets for CSS/SCSS/Less quality."
