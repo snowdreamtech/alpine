@@ -124,6 +124,15 @@ Modules (default: all):
   solidstart         Check SolidStart Config
   storybook          Check Storybook Config
   docusaurus         Check Docusaurus Config
+  axum               Check Axum Config
+  actix              Check Actix Config
+  echo               Check Echo Config
+  gorm               Check Gorm Config
+  adonis             Check AdonisJS Config
+  strapi             Check Strapi Config
+  phoenix            Check Phoenix Config
+  symfony            Check Symfony Config
+  tortoise           Check Tortoise ORM Config
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1946,6 +1955,15 @@ EOF
     solidstart) setup_solidstart ;;
     storybook) setup_storybook ;;
     docusaurus) setup_docusaurus ;;
+    axum) setup_axum ;;
+    actix) setup_actix ;;
+    echo) setup_echo ;;
+    gorm) setup_gorm ;;
+    adonis) setup_adonis ;;
+    strapi) setup_strapi ;;
+    phoenix) setup_phoenix ;;
+    symfony) setup_symfony ;;
+    tortoise) setup_tortoise ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2042,7 +2060,6 @@ EOF
     vba) setup_vba ;;
     vue) setup_vue ;;
     svelte) setup_svelte ;;
-    astro) setup_astro ;;
     assembly) setup_assembly ;;
     gdscript) setup_gdscript ;;
     liquid) setup_liquid ;;
@@ -2069,10 +2086,6 @@ EOF
     systemverilog) setup_systemverilog ;;
     flatbuffers) setup_flatbuffers ;;
     asyncapi) setup_asyncapi ;;
-    playwright) install_playwright ;;
-    cypress) install_cypress ;;
-    vitest) install_vitest ;;
-    docusaurus) install_docusaurus ;;
     mkdocs) install_mkdocs ;;
     sphinx) install_sphinx ;;
     jupyter) install_jupyter ;;
@@ -2270,10 +2283,58 @@ setup_storybook() {
   install_storybook
 }
 
-# Purpose: Wrapper for Docusaurus setup.
-setup_docusaurus() {
-  . "$SCRIPT_DIR/lib/langs/docusaurus.sh"
-  install_docusaurus
+# Purpose: Wrapper for Axum setup.
+setup_axum() {
+  . "$SCRIPT_DIR/lib/langs/axum.sh"
+  install_axum
+}
+
+# Purpose: Wrapper for Actix setup.
+setup_actix() {
+  . "$SCRIPT_DIR/lib/langs/actix.sh"
+  install_actix
+}
+
+# Purpose: Wrapper for Echo setup.
+setup_echo() {
+  . "$SCRIPT_DIR/lib/langs/echo.sh"
+  install_echo
+}
+
+# Purpose: Wrapper for Gorm setup.
+setup_gorm() {
+  . "$SCRIPT_DIR/lib/langs/gorm.sh"
+  install_gorm
+}
+
+# Purpose: Wrapper for AdonisJS setup.
+setup_adonis() {
+  . "$SCRIPT_DIR/lib/langs/adonis.sh"
+  install_adonis
+}
+
+# Purpose: Wrapper for Strapi setup.
+setup_strapi() {
+  . "$SCRIPT_DIR/lib/langs/strapi.sh"
+  install_strapi
+}
+
+# Purpose: Wrapper for Phoenix setup.
+setup_phoenix() {
+  . "$SCRIPT_DIR/lib/langs/phoenix.sh"
+  install_phoenix
+}
+
+# Purpose: Wrapper for Symfony setup.
+setup_symfony() {
+  . "$SCRIPT_DIR/lib/langs/symfony.sh"
+  install_symfony
+}
+
+# Purpose: Wrapper for Tortoise ORM setup.
+setup_tortoise() {
+  . "$SCRIPT_DIR/lib/langs/tortoise.sh"
+  install_tortoise
 }
 
 main "$@"
