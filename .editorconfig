@@ -1,43 +1,61 @@
-# EditorConfig is awesome: https://EditorConfig.org
+# EditorConfig - Project-wide Coding Standards
+# This file defines the "Gold Standard" for indentation and file hygiene
+# to ensure consistent formatting across all 161+ supported tech stacks.
+#
+# Reference: https://EditorConfig.org
 
-# top-most EditorConfig file
+# Top-most EditorConfig file
 root = true
 
-# Unix-style newlines with a newline ending every file
+# ── Global Defaults ──────────────────────────────────────────────────────────
 [*]
+charset = utf-8
 end_of_line = lf
 insert_final_newline = true
 trim_trailing_whitespace = true
-charset = utf-8
 
-# 4 space indentation for Python, Go, Rust scripts
-[*.{py,go,rs}]
+# ── 4-Space Indentation ──────────────────────────────────────────────────────
+# Modern backend, system, and enterprise languages
+[*.{py,go,rs,java,kt,kts,scala,cs,proto,c,cpp,h,hpp,objc,m,mm,f90,f95,pas,pp}]
 indent_style = space
 indent_size = 4
 
-# 2 space indentation for web dialects and configs
-[*.{js,ts,jsx,tsx,cjs,mjs,json,jsonc,yaml,yml,html,css,scss,vue}]
+# ── 2-Space Indentation ──────────────────────────────────────────────────────
+# Web stack, configuration files, and infrastructure-as-code
+[*.{js,ts,jsx,tsx,cjs,mjs,json,jsonc,yaml,yml,toml,html,htm,css,scss,sass,less,vue,astro,svelte}]
 indent_style = space
 indent_size = 2
 
-# Tab indentation (no size specified) for Makefiles
+[*.{xml,svg,sql,tf,tfvars,dockerfile,Dockerfile}]
+indent_style = space
+indent_size = 2
+
+# Hidden config and RC files
+[.{babelrc,eslintrc,prettierrc,stylelintrc,yamllint.yml}]
+indent_style = space
+indent_size = 2
+
+# ── Shell & Scripting ──────────────────────────────────────────────────────
+# Unified to 2 spaces and LF for cross-platform portability
+[*.{sh,bash,zsh,ps1,bat,cmd}]
+indent_style = space
+indent_size = 2
+end_of_line = lf
+
+# ── Special Syntactic Requirements ──────────────────────────────────────────
+# Makefile requires literal Tabs for command blocks
 [Makefile]
 indent_style = tab
 
-# Markdown formatting exceptions (allow trailing spaces for strict line breaks)
+# Markdown requires trailing spaces for hard line breaks (<br>)
 [*.md]
+indent_style = space
+indent_size = 2
 trim_trailing_whitespace = false
 max_line_length = off
-indent_size = 2
-indent_style = space
 
-# Shell Scripts (Unix)
-[*.{sh,zsh,bash}]
-indent_style = space
-indent_size = 2
-end_of_line = lf
-
-[*.{ps1,bat,cmd}]
-indent_style = space
-indent_size = 2
-end_of_line = lf
+# ── Binary & Static Assets ──────────────────────────────────────────────────
+# Prevent metadata corruption or noise in binary files
+[*.{png,jpg,jpeg,gif,webp,ico,pdf,zip,gz,tar,7z,exe,dll,so,o,pyc}]
+insert_final_newline = false
+trim_trailing_whitespace = false
