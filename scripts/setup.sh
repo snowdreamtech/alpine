@@ -116,6 +116,9 @@ Modules (default: all):
   caddy              Install Caddy (Platform-dependent)
   elasticsearch      Install Elasticsearch (Platform-dependent)
   meilisearch        Install Meilisearch (Platform-dependent)
+  playwright         Install Playwright
+  vitest             Install Vitest
+  cypress            Install Cypress
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1930,6 +1933,9 @@ EOF
     caddy) setup_caddy ;;
     elasticsearch) setup_elasticsearch ;;
     meilisearch) setup_meilisearch ;;
+    playwright) setup_playwright ;;
+    vitest) setup_vitest ;;
+    cypress) setup_cypress ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2210,6 +2216,24 @@ setup_elasticsearch() {
 setup_meilisearch() {
   . "$SCRIPT_DIR/lib/langs/meilisearch.sh"
   install_meilisearch
+}
+
+# Purpose: Wrapper for Playwright setup.
+setup_playwright() {
+  . "$SCRIPT_DIR/lib/langs/playwright.sh"
+  install_playwright
+}
+
+# Purpose: Wrapper for Vitest setup.
+setup_vitest() {
+  . "$SCRIPT_DIR/lib/langs/vitest.sh"
+  install_vitest
+}
+
+# Purpose: Wrapper for Cypress setup.
+setup_cypress() {
+  . "$SCRIPT_DIR/lib/langs/cypress.sh"
+  install_cypress
 }
 
 main "$@"

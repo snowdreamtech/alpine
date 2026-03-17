@@ -856,6 +856,17 @@ main() {
   else
     log_info "⏭️  Electron: Skipped (no electron in package.json)"
   fi
+
+  # Testing Frameworks
+  if [ -f "package.json" ]; then
+    log_info "── Testing Frameworks ──"
+    . "$SCRIPT_DIR/lib/langs/playwright.sh"
+    check_playwright
+    . "$SCRIPT_DIR/lib/langs/vitest.sh"
+    check_vitest
+    . "$SCRIPT_DIR/lib/langs/cypress.sh"
+    check_cypress
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
