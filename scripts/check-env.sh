@@ -341,6 +341,13 @@ main() {
   else
     log_info "⏭️  KCL: Skipped (no KCL files)"
   fi
+
+  # Pkl
+  if has_lang_files "PklProject" "*.pkl"; then
+    check_runtime "pkl" "Pkl (Modular)"
+  else
+    log_info "⏭️  Pkl: Skipped (no Pkl files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
