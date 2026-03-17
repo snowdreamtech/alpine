@@ -1,0 +1,49 @@
+#!/usr/bin/env sh
+# WebAssembly Text (WAT) Logic Module
+
+# Purpose: Installs Wasmtime via mise.
+install_runtime_wat() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Wasmtime via mise."
+    return 0
+  fi
+
+  # shellcheck disable=SC2154
+  run_mise install "wasmtime@${MISE_TOOL_VERSION_WASMTIME}"
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Sets up WAT environment for project.
+setup_wat() {
+  local _T0_WAT_RT
+  _T0_WAT_RT=$(date +%s)
+  _log_setup "WebAssembly" "wasmtime"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "WebAssembly" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  # Detect WAT/Wasm files
+  if ! has_lang_files "*.wat *.wasm"; then
+    log_summary "Runtime" "WebAssembly" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_WAT_RT="✅ Installed"
+  install_runtime_wat || _STAT_WAT_RT="❌ Failed"
+
+  local _DUR_WAT_RT
+  _DUR_WAT_RT=$(($(date +%s) - _T0_WAT_RT))
+  log_summary "Runtime" "WebAssembly" "$_STAT_WAT_RT" "$(get_version wasmtime --version | head -n 1 | awk '{print $NF}')" "$_DUR_WAT_RT"
+}
+
+# Purpose: Checks if Wasmtime is available.
+check_runtime_wat() {
+  local _TOOL_DESC_WAT="${1:-WebAssembly}"
+  if ! command -v wasmtime >/dev/null 2>&1; then
+    log_warn "Required runtime 'wasmtime' for $_TOOL_DESC_WAT is missing. Skipping."
+    return 1
+  fi
+  return 0
+}

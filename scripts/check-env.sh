@@ -439,6 +439,13 @@ main() {
   else
     log_info "⏭️  Fortran: Skipped (no Fortran files)"
   fi
+
+  # WebAssembly Text
+  if has_lang_files "*.wat *.wasm"; then
+    check_runtime "wat" "WebAssembly (Modular)"
+  else
+    log_info "⏭️  WebAssembly: Skipped (no Wasm files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
