@@ -327,6 +327,13 @@ main() {
   else
     log_info "⏭️  AssemblyScript: Skipped (no AssemblyScript files)"
   fi
+
+  # Ballerina
+  if has_lang_files "Ballerina.toml" "*.bal"; then
+    check_runtime "ballerina" "Ballerina (Modular)"
+  else
+    log_info "⏭️  Ballerina: Skipped (no Ballerina files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
