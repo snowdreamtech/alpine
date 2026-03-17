@@ -133,6 +133,11 @@ Modules (default: all):
   phoenix            Check Phoenix Config
   symfony            Check Symfony Config
   tortoise           Check Tortoise ORM Config
+  kmp                Check KMP Config
+  nativescript       Install NativeScript CLI
+  kafka              Install Kafka (Platform-dependent)
+  rabbitmq           Install RabbitMQ (Platform-dependent)
+  prometheus         Install Prometheus (Platform-dependent)
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1964,6 +1969,11 @@ EOF
     phoenix) setup_phoenix ;;
     symfony) setup_symfony ;;
     tortoise) setup_tortoise ;;
+    kmp) setup_kmp ;;
+    nativescript) setup_nativescript ;;
+    kafka) setup_kafka ;;
+    rabbitmq) setup_rabbitmq ;;
+    prometheus) setup_prometheus ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2335,6 +2345,36 @@ setup_symfony() {
 setup_tortoise() {
   . "$SCRIPT_DIR/lib/langs/tortoise.sh"
   install_tortoise
+}
+
+# Purpose: Wrapper for KMP setup.
+setup_kmp() {
+  . "$SCRIPT_DIR/lib/langs/kmp.sh"
+  install_kmp
+}
+
+# Purpose: Wrapper for NativeScript setup.
+setup_nativescript() {
+  . "$SCRIPT_DIR/lib/langs/nativescript.sh"
+  install_nativescript
+}
+
+# Purpose: Wrapper for Kafka setup.
+setup_kafka() {
+  . "$SCRIPT_DIR/lib/langs/kafka.sh"
+  install_kafka
+}
+
+# Purpose: Wrapper for RabbitMQ setup.
+setup_rabbitmq() {
+  . "$SCRIPT_DIR/lib/langs/rabbitmq.sh"
+  install_rabbitmq
+}
+
+# Purpose: Wrapper for Prometheus setup.
+setup_prometheus() {
+  . "$SCRIPT_DIR/lib/langs/prometheus.sh"
+  install_prometheus
 }
 
 main "$@"

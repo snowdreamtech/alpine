@@ -906,6 +906,31 @@ main() {
     . "$SCRIPT_DIR/lib/langs/ionic.sh"
     check_ionic
 
+    # KMP
+    . "$SCRIPT_DIR/lib/langs/kmp.sh"
+    check_kmp
+
+    # NativeScript
+    . "$SCRIPT_DIR/lib/langs/nativescript.sh"
+    check_nativescript
+
+    printf "\n"
+  fi
+
+  # 6. Group: Message & Observability
+  if has_lang_files "docker-compose.yml prometheus.yml" ""; then
+    log_info "── Message & Observability ──"
+    # Kafka
+    . "$SCRIPT_DIR/lib/langs/kafka.sh"
+    check_kafka
+
+    # RabbitMQ
+    . "$SCRIPT_DIR/lib/langs/rabbitmq.sh"
+    check_rabbitmq
+
+    # Prometheus
+    . "$SCRIPT_DIR/lib/langs/prometheus.sh"
+    check_prometheus
     printf "\n"
   fi
 
