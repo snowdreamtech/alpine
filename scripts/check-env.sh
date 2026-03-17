@@ -586,6 +586,13 @@ main() {
   else
     log_info "⏭️  LaTeX: Skipped (no LaTeX files)"
   fi
+
+  # Protobuf
+  if has_lang_files "*.proto"; then
+    check_runtime "proto" "Protobuf (Modular)"
+  else
+    log_info "⏭️  Protobuf: Skipped (no Protobuf files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
