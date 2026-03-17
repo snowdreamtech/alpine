@@ -168,6 +168,7 @@ main() {
   check_runtime "capacitor" "Capacitor"
   check_runtime "awk" "AWK"
   check_runtime "sed" "Sed"
+  check_runtime "gnuplot" "Gnuplot"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
