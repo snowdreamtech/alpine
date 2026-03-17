@@ -186,6 +186,7 @@ main() {
   check_runtime "temporal" "Temporal"
   check_runtime "langchain" "LangChain"
   check_runtime "fastapi" "FastAPI"
+  check_runtime "django" "Django"
   check_runtime "pytorch" "PyTorch"
   check_runtime "dbt" "dbt"
   check_runtime "otel" "OpenTelemetry"
