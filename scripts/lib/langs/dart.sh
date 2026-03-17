@@ -35,17 +35,6 @@ setup_dart() {
   _DUR_DART_RT=$(($(date +%s) - _T0_DART_RT))
   log_summary "Runtime" "Dart" "$_STAT_DART_RT" "$(get_version dart --version | head -n 1)" "$_DUR_DART_RT"
 }
-# Purpose: Checks if .NET runtime is available.
-# Examples:
-#   check_runtime_dotnet "Linter"
-check_runtime_dotnet() {
-  local _TOOL_DESC_DART="${1:-Dart}"
-  if ! command -v dart >/dev/null 2>&1; then
-    log_warn "Required runtime 'dart' for $_TOOL_DESC_DART is missing. Skipping."
-    return 1
-  fi
-  return 0
-}
 # Purpose: Checks if Dart runtime is available.
 # Examples:
 #   check_runtime_dart "Linter"
