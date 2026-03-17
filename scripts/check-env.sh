@@ -210,10 +210,17 @@ main() {
   fi
 
   # C/C++
-  if has_lang_files "CMakeLists.txt Makefile" "*.cpp *.c *.cc *.h *.hpp"; then
-    check_runtime "cpp" "C/C++ (Modular)"
+  if has_lang_files "*.c *.cpp *.h *.hpp"; then
+    check_runtime "cpp" "C/C++"
   else
     log_info "⏭️  C/C++: Skipped (no C/C++ files)"
+  fi
+
+  # Assembly
+  if has_lang_files "*.s *.asm"; then
+    check_runtime "assembly" "Assembly (Modular)"
+  else
+    log_info "⏭️  Assembly: Skipped (no Assembly files)"
   fi
 
   # Terraform
