@@ -701,6 +701,13 @@ main() {
   else
     log_info "⏭️  VBA: Skipped (no VBA files)"
   fi
+
+  # Tauri
+  if has_lang_files "tauri.conf.json src-tauri/tauri.conf.json"; then
+    check_runtime "tauri" "Tauri (Modular)"
+  else
+    log_info "⏭️  Tauri: Skipped (no tauri.conf.json)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
