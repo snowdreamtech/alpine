@@ -26,7 +26,7 @@ setup_fortran() {
   fi
 
   # Detect Fortran files
-  if ! has_lang_files "" "*.f" "*.for" "*.f90" "*.f95"; then
+  if ! has_lang_files "" "*.f *.for *.f90 *.f95"; then
     log_summary "Runtime" "Fortran" "⏭️ Skipped" "-" "0"
     return 0
   fi

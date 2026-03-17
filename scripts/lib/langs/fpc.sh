@@ -2,6 +2,7 @@
 # Free Pascal (FPC) Logic Module
 
 # Purpose: Installs Free Pascal Compiler (fpc) via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_fpc() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Free Pascal Compiler via mise."
@@ -25,7 +26,7 @@ setup_fpc() {
   fi
 
   # Detect Pascal files
-  if ! has_lang_files "*.pas *.pp *.inc *.lpr"; then
+  if ! has_lang_files "" "*.pas *.pp *.inc *.lpr"; then
     log_summary "Runtime" "Free Pascal" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -39,6 +40,8 @@ setup_fpc() {
 }
 
 # Purpose: Checks if FPC is available.
+# Examples:
+#   check_runtime_fpc "Linter"
 check_runtime_fpc() {
   local _TOOL_DESC_FPC="${1:-Free Pascal}"
   if ! command -v fpc >/dev/null 2>&1; then
