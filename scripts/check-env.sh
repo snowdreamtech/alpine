@@ -157,6 +157,7 @@ main() {
   check_runtime "qwik" "Qwik"
   check_runtime "sass" "Sass"
   check_runtime "less" "Less"
+  check_runtime "pug" "Pug"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
