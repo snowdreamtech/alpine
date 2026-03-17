@@ -226,6 +226,7 @@ main() {
   if has_lang_files "Gemfile .ruby-version package.json" "*.rb"; then
     check_tool_version "Ruby" "ruby" "3.0.0" "ruby -v" 0
     check_runtime "ruby" "Ruby (Modular)"
+    check_runtime "rails" "Rails"
   else
     log_info "⏭️  Ruby: Skipped (no ruby files)"
   fi

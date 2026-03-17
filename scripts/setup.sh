@@ -107,6 +107,7 @@ Modules (default: all):
   flask              Check Flask Configuration
   gin                Check Gin Configuration
   fiber              Check Fiber Configuration
+  rails              Install Rails Gem
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1912,6 +1913,7 @@ EOF
     flask) setup_flask ;;
     gin) setup_gin ;;
     fiber) setup_fiber ;;
+    rails) setup_rails ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2138,6 +2140,12 @@ setup_gin() {
 setup_fiber() {
   . "$SCRIPT_DIR/lib/langs/fiber.sh"
   install_fiber
+}
+
+# Purpose: Wrapper for Rails setup.
+setup_rails() {
+  . "$SCRIPT_DIR/lib/langs/rails.sh"
+  install_rails
 }
 
 main "$@"
