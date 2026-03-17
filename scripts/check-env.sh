@@ -178,6 +178,7 @@ main() {
   check_runtime "remix" "Remix"
   check_runtime "dagger" "Dagger"
   check_runtime "temporal" "Temporal"
+  check_runtime "langchain" "LangChain"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
