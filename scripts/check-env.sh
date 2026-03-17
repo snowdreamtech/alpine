@@ -558,6 +558,13 @@ main() {
   else
     log_info "⏭️  VHDL: Skipped (no VHDL files)"
   fi
+
+  # Octave
+  if has_lang_files "*.m"; then
+    check_runtime "octave" "Octave (Modular)"
+  else
+    log_info "⏭️  Octave: Skipped (no Octave files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
