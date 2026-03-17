@@ -334,6 +334,13 @@ main() {
   else
     log_info "⏭️  Ballerina: Skipped (no Ballerina files)"
   fi
+
+  # KCL
+  if has_lang_files "kcl.mod" "*.k"; then
+    check_runtime "kcl" "KCL (Modular)"
+  else
+    log_info "⏭️  KCL: Skipped (no KCL files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
