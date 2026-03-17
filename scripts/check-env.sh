@@ -201,6 +201,13 @@ main() {
   else
     log_info "⏭️  Rust: Skipped (no rust files)"
   fi
+
+  # C/C++
+  if has_lang_files "CMakeLists.txt Makefile" "*.cpp *.c *.cc *.h *.hpp"; then
+    check_runtime "cpp" "C/C++ (Modular)"
+  else
+    log_info "⏭️  C/C++: Skipped (no C/C++ files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
