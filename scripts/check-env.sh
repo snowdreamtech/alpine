@@ -540,10 +540,17 @@ main() {
   fi
 
   # Helm
-  if has_lang_files "Chart.yaml values.yaml charts/"; then
+  if has_lang_files "Chart.yaml"; then
     check_runtime "helm" "Helm (Modular)"
   else
-    log_info "⏭️  Helm: Skipped (no Helm files)"
+    log_info "⏭️  Helm: Skipped (no Chart.yaml)"
+  fi
+
+  # Kustomize
+  if has_lang_files "kustomization.yaml kustomization.yml"; then
+    check_runtime "kustomize" "Kustomize (Modular)"
+  else
+    log_info "⏭️  Kustomize: Skipped (no kustomization.yaml)"
   fi
 
   # GraphQL
