@@ -383,6 +383,13 @@ main() {
   else
     log_info "⏭️  Luau: Skipped (no Luau files)"
   fi
+
+  # Raku
+  if has_lang_files "META6.json" "*.raku *.rakumod *.p6 *.pm6"; then
+    check_runtime "raku" "Raku (Modular)"
+  else
+    log_info "⏭️  Raku: Skipped (no Raku files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
