@@ -606,7 +606,14 @@ main() {
   if has_lang_files "*.proto"; then
     check_runtime "proto" "Protobuf (Modular)"
   else
-    log_info "⏭️  Protobuf: Skipped (no Protobuf files)"
+    log_info "⏭️  Protobuf: Skipped (no .proto files)"
+  fi
+
+  # Avro
+  if has_lang_files "*.avsc"; then
+    check_runtime "avro" "Avro (Modular)"
+  else
+    log_info "⏭️  Avro: Skipped (no .avsc files)"
   fi
 
   # CUDA
