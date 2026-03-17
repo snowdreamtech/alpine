@@ -179,6 +179,7 @@ main() {
   check_runtime "dagger" "Dagger"
   check_runtime "temporal" "Temporal"
   check_runtime "langchain" "LangChain"
+  check_runtime "pytorch" "PyTorch"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
