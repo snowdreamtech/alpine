@@ -390,6 +390,13 @@ main() {
   else
     log_info "⏭️  Raku: Skipped (no Raku files)"
   fi
+
+  # Vala
+  if has_lang_files "*.vala *.vapi"; then
+    check_runtime "vala" "Vala (Modular)"
+  else
+    log_info "⏭️  Vala: Skipped (no Vala files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support

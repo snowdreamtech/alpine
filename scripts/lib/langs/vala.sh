@@ -1,0 +1,49 @@
+#!/usr/bin/env sh
+# Vala Logic Module
+
+# Purpose: Installs Vala via mise.
+install_runtime_vala() {
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_debug "DRY_RUN: Would install Vala via mise."
+    return 0
+  fi
+
+  # shellcheck disable=SC2154
+  run_mise install "vala@${MISE_TOOL_VERSION_VALA}"
+  eval "$(mise activate bash --shims)"
+}
+
+# Purpose: Sets up Vala environment for project.
+setup_vala() {
+  local _T0_VALA_RT
+  _T0_VALA_RT=$(date +%s)
+  _log_setup "Vala" "valac"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Runtime" "Vala" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  # Detect Vala files
+  if ! has_lang_files "*.vala *.vapi"; then
+    log_summary "Runtime" "Vala" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  local _STAT_VALA_RT="✅ Installed"
+  install_runtime_vala || _STAT_VALA_RT="❌ Failed"
+
+  local _DUR_VALA_RT
+  _DUR_VALA_RT=$(($(date +%s) - _T0_VALA_RT))
+  log_summary "Runtime" "Vala" "$_STAT_VALA_RT" "$(get_version valac --version | head -n 1 | awk '{print $NF}')" "$_DUR_VALA_RT"
+}
+
+# Purpose: Checks if Vala (valac) is available.
+check_runtime_vala() {
+  local _TOOL_DESC_VALA="${1:-Vala}"
+  if ! command -v valac >/dev/null 2>&1; then
+    log_warn "Required runtime 'valac' for $_TOOL_DESC_VALA is missing. Skipping."
+    return 1
+  fi
+  return 0
+}
