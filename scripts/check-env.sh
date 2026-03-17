@@ -604,6 +604,13 @@ main() {
     log_info "⏭️  OpenAPI: Skipped (no OpenAPI files)"
   fi
 
+  # AsyncAPI
+  if has_lang_files "asyncapi.yaml asyncapi.yml asyncapi.json"; then
+    check_runtime "asyncapi" "AsyncAPI (Modular)"
+  else
+    log_info "⏭️  AsyncAPI: Skipped (no AsyncAPI files)"
+  fi
+
   # PromQL
   if has_lang_files "*.promql"; then
     check_runtime "promql" "PromQL (Modular)"
