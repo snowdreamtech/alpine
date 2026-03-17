@@ -271,6 +271,13 @@ main() {
   else
     log_info "⏭️  Objective-C: Skipped (no Objective-C files)"
   fi
+
+  # OCaml
+  if has_lang_files "dune-project dune opam" "*.ml *.mli *.mll *.mly"; then
+    check_runtime "ocaml" "OCaml (Modular)"
+  else
+    log_info "⏭️  OCaml: Skipped (no OCaml files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
