@@ -110,6 +110,7 @@ Modules (default: all):
   rails              Install Rails Gem
   typeorm            Install TypeORM CLI
   drizzle            Install Drizzle Kit
+  sqlalchemy         Check SQLAlchemy Configuration
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1918,6 +1919,7 @@ EOF
     rails) setup_rails ;;
     typeorm) setup_typeorm ;;
     drizzle) setup_drizzle ;;
+    sqlalchemy) setup_sqlalchemy ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2162,6 +2164,12 @@ setup_typeorm() {
 setup_drizzle() {
   . "$SCRIPT_DIR/lib/langs/drizzle.sh"
   install_drizzle
+}
+
+# Purpose: Wrapper for SQLAlchemy setup.
+setup_sqlalchemy() {
+  . "$SCRIPT_DIR/lib/langs/sqlalchemy.sh"
+  install_sqlalchemy
 }
 
 main "$@"
