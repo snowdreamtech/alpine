@@ -178,6 +178,16 @@ Modules (default: all):
   hardhat            Check Hardhat Config
   foundry            Install Foundry CLI
   polars-js          Check Polars JS Config
+  ef-core            Install EF Core CLI
+  grafana            Check Grafana Config
+  loki               Check Loki Config
+  vector             Install Vector
+  fluentd            Check Fluentd Config
+  pytest             Install Pytest
+  junit              Check JUnit Config
+  mockito            Check Mockito Config
+  uvicorn            Install Uvicorn
+  gunicorn           Install Gunicorn
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -2054,6 +2064,16 @@ EOF
     hardhat) setup_hardhat ;;
     foundry) setup_foundry ;;
     polars-js) setup_polars_js ;;
+    ef-core) setup_ef_core ;;
+    grafana) setup_grafana ;;
+    loki) setup_loki ;;
+    vector) setup_vector ;;
+    fluentd) setup_fluentd ;;
+    pytest) setup_pytest ;;
+    junit) setup_junit ;;
+    mockito) setup_mockito ;;
+    uvicorn) setup_uvicorn ;;
+    gunicorn) setup_gunicorn ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2695,6 +2715,66 @@ setup_foundry() {
 setup_polars_js() {
   . "$SCRIPT_DIR/lib/langs/polars-js.sh"
   install_polars_js
+}
+
+# Purpose: Wrapper for EF Core setup.
+setup_ef_core() {
+  . "$SCRIPT_DIR/lib/langs/ef-core.sh"
+  install_ef_core
+}
+
+# Purpose: Wrapper for Grafana setup.
+setup_grafana() {
+  . "$SCRIPT_DIR/lib/langs/grafana.sh"
+  install_grafana
+}
+
+# Purpose: Wrapper for Loki setup.
+setup_loki() {
+  . "$SCRIPT_DIR/lib/langs/loki.sh"
+  install_loki
+}
+
+# Purpose: Wrapper for Vector setup.
+setup_vector() {
+  . "$SCRIPT_DIR/lib/langs/vector.sh"
+  install_vector
+}
+
+# Purpose: Wrapper for Fluentd setup.
+setup_fluentd() {
+  . "$SCRIPT_DIR/lib/langs/fluentd.sh"
+  install_fluentd
+}
+
+# Purpose: Wrapper for Pytest setup.
+setup_pytest() {
+  . "$SCRIPT_DIR/lib/langs/pytest.sh"
+  install_pytest
+}
+
+# Purpose: Wrapper for JUnit setup.
+setup_junit() {
+  . "$SCRIPT_DIR/lib/langs/junit.sh"
+  install_junit
+}
+
+# Purpose: Wrapper for Mockito setup.
+setup_mockito() {
+  . "$SCRIPT_DIR/lib/langs/mockito.sh"
+  install_mockito
+}
+
+# Purpose: Wrapper for Uvicorn setup.
+setup_uvicorn() {
+  . "$SCRIPT_DIR/lib/langs/uvicorn.sh"
+  install_uvicorn
+}
+
+# Purpose: Wrapper for Gunicorn setup.
+setup_gunicorn() {
+  . "$SCRIPT_DIR/lib/langs/gunicorn.sh"
+  install_gunicorn
 }
 
 main "$@"
