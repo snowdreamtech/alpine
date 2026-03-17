@@ -502,6 +502,13 @@ main() {
   else
     log_info "⏭️  Gherkin: Skipped (no Gherkin files)"
   fi
+
+  # Terragrunt
+  if has_lang_files "terragrunt.hcl"; then
+    check_runtime "terragrunt" "Terragrunt (Modular)"
+  else
+    log_info "⏭️  Terragrunt: Skipped (no Terragrunt files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
