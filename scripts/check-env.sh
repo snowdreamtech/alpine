@@ -140,8 +140,11 @@ main() {
   # Node.js
   if [ -f "$PACKAGE_JSON" ]; then
     check_tool_version "Node.js" "node" "$(get_mise_tool_version node)" "node -v" 1
-    check_tool_version "pnpm" "pnpm" "$(get_mise_tool_version pnpm)" "pnpm -v" 1
-    check_runtime "node" "Node.js (Modular)"
+    check_tool_version "pnpm" "pnpm" "$(get_mise_tool_version pnpm)" "pnpm -v" # Front-end tools
+    check_runtime "node" "Node.js"
+    check_runtime "deno" "Deno"
+    check_runtime "bun" "Bun"
+    check_runtime "vue" "Vue (Modular)"
   else
     log_info "⏭️  Node.js/pnpm: Skipped (no package.json)"
   fi
