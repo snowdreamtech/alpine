@@ -189,6 +189,7 @@ main() {
   check_runtime "django" "Django"
   check_runtime "springboot" "Spring Boot"
   check_runtime "laravel" "Laravel"
+  check_runtime "nestjs" "NestJS"
   check_runtime "pytorch" "PyTorch"
   check_runtime "dbt" "dbt"
   check_runtime "otel" "OpenTelemetry"
