@@ -222,6 +222,20 @@ main() {
   else
     log_info "⏭️  Solidity: Skipped (no Solidity files)"
   fi
+
+  # Nix
+  if has_lang_files "flake.nix shell.nix default.nix" "*.nix"; then
+    check_runtime "nix" "Nix (Modular)"
+  else
+    log_info "⏭️  Nix: Skipped (no Nix files)"
+  fi
+
+  # Odin
+  if has_lang_files "" "*.odin"; then
+    check_runtime "odin" "Odin (Modular)"
+  else
+    log_info "⏭️  Odin: Skipped (no Odin files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support

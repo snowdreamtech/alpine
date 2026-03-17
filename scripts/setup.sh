@@ -1571,20 +1571,6 @@ install_task() {
   log_summary "Toolchain" "Task" "$_STAT_TASK" "$(get_version task --version)" "$(($(date +%s) - _T0_TASK))"
 }
 
-# Purpose: Verifies Nix availability.
-install_nix() {
-  _log_setup "Nix Check" "nix"
-  if ! has_lang_files "" "NIX"; then
-    log_summary "Runtime" "Nix" "⏭️ Skipped" "-" "0"
-    return 0
-  fi
-  if command -v nix >/dev/null 2>&1; then
-    log_summary "Runtime" "Nix" "✅ Available" "$(nix --version | awk '{print $3}')" "0"
-  else
-    log_summary "Runtime" "Nix" "⏭️ Missing" "-" "0"
-  fi
-}
-
 # Purpose: Installs CUE and Jsonnet.
 # Delegate: Managed by mise (.mise.toml)
 install_cue() {
@@ -1913,7 +1899,7 @@ EOF
     tofu) setup_tofu ;;
     just) install_just ;;
     task) install_task ;;
-    nix) install_nix ;;
+    nix) setup_nix ;;
     zig) setup_zig ;;
     cue) install_cue ;;
     rego) install_rego ;;
@@ -1923,6 +1909,7 @@ EOF
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
+    odin) setup_odin ;;
     playwright) install_playwright ;;
     cypress) install_cypress ;;
     vitest) install_vitest ;;
