@@ -2,6 +2,7 @@
 # Vlang Logic Module
 
 # Purpose: Installs V compiler via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_vlang() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Vlang via mise."
@@ -39,6 +40,8 @@ setup_vlang() {
 }
 
 # Purpose: Checks if V compiler is available.
+# Examples:
+#   check_runtime_vlang "Linter"
 check_runtime_vlang() {
   local _TOOL_DESC_VLG="${1:-Vlang}"
   if ! command -v v >/dev/null 2>&1; then
