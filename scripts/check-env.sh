@@ -597,11 +597,12 @@ main() {
     log_info "⏭️  VHDL: Skipped (no VHDL files)"
   fi
 
-  # Octave
+  # Octave / MATLAB
   if has_lang_files "*.m"; then
     check_runtime "octave" "Octave (Modular)"
+    check_runtime "matlab" "MATLAB (Modular)"
   else
-    log_info "⏭️  Octave: Skipped (no Octave files)"
+    log_info "⏭️  Octave/MATLAB: Skipped (no .m files)"
   fi
 
   # OpenAPI
@@ -677,6 +678,7 @@ main() {
   # SurrealDB
   if has_lang_files "*.surql"; then
     check_runtime "surrealdb" "SurrealDB (Modular)"
+    check_runtime "plsql" "PL/SQL (Modular)"
   else
     log_info "⏭️  SurrealDB: Skipped (no .surql files)"
   fi
