@@ -158,6 +158,16 @@ Modules (default: all):
   zustand            Check Zustand Config
   appium             Install Appium CLI
   testcafe           Install TestCafe CLI
+  turborepo          Install Turborepo CLI
+  nx                 Install Nx CLI
+  biome              Install Biome CLI
+  knip               Install Knip CLI
+  lefthook           Install Lefthook CLI
+  trpc               Check tRPC Config
+  jotai              Check Jotai Config
+  valtio             Check Valtio Config
+  recoil             Check Recoil Config
+  preact             Check Preact Config
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -2014,6 +2024,16 @@ EOF
     zustand) setup_zustand ;;
     appium) setup_appium ;;
     testcafe) setup_testcafe ;;
+    turborepo) setup_turborepo ;;
+    nx) setup_nx ;;
+    biome) setup_biome ;;
+    knip) setup_knip ;;
+    lefthook) setup_lefthook ;;
+    trpc) setup_trpc ;;
+    jotai) setup_jotai ;;
+    valtio) setup_valtio ;;
+    recoil) setup_recoil ;;
+    preact) setup_preact ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2535,6 +2555,66 @@ setup_appium() {
 setup_testcafe() {
   . "$SCRIPT_DIR/lib/langs/testcafe.sh"
   install_testcafe
+}
+
+# Purpose: Wrapper for Turborepo setup.
+setup_turborepo() {
+  . "$SCRIPT_DIR/lib/langs/turborepo.sh"
+  install_turborepo
+}
+
+# Purpose: Wrapper for Nx setup.
+setup_nx() {
+  . "$SCRIPT_DIR/lib/langs/nx.sh"
+  install_nx
+}
+
+# Purpose: Wrapper for Biome setup.
+setup_biome() {
+  . "$SCRIPT_DIR/lib/langs/biome.sh"
+  install_biome
+}
+
+# Purpose: Wrapper for Knip setup.
+setup_knip() {
+  . "$SCRIPT_DIR/lib/langs/knip.sh"
+  install_knip
+}
+
+# Purpose: Wrapper for Lefthook setup.
+setup_lefthook() {
+  . "$SCRIPT_DIR/lib/langs/lefthook.sh"
+  install_lefthook
+}
+
+# Purpose: Wrapper for tRPC setup.
+setup_trpc() {
+  . "$SCRIPT_DIR/lib/langs/trpc.sh"
+  install_trpc
+}
+
+# Purpose: Wrapper for Jotai setup.
+setup_jotai() {
+  . "$SCRIPT_DIR/lib/langs/jotai.sh"
+  install_jotai
+}
+
+# Purpose: Wrapper for Valtio setup.
+setup_valtio() {
+  . "$SCRIPT_DIR/lib/langs/valtio.sh"
+  install_valtio
+}
+
+# Purpose: Wrapper for Recoil setup.
+setup_recoil() {
+  . "$SCRIPT_DIR/lib/langs/recoil.sh"
+  install_recoil
+}
+
+# Purpose: Wrapper for Preact setup.
+setup_preact() {
+  . "$SCRIPT_DIR/lib/langs/preact.sh"
+  install_preact
 }
 
 main "$@"
