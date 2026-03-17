@@ -292,6 +292,13 @@ main() {
   else
     log_info "⏭️  Erlang: Skipped (no Erlang files)"
   fi
+
+  # Vlang
+  if has_lang_files "v.mod" "*.v *.vsh"; then
+    check_runtime "vlang" "Vlang (Modular)"
+  else
+    log_info "⏭️  Vlang: Skipped (no Vlang files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
