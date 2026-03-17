@@ -2,6 +2,7 @@
 # Apache Spark Logic Module
 
 # Purpose: Installs Apache Spark via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_spark() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Apache Spark via mise."
@@ -25,7 +26,7 @@ setup_spark() {
   fi
 
   # Detect Spark/PySpark files
-  if ! has_lang_files "spark-defaults.conf *.pyspark"; then
+  if ! has_lang_files "" "spark-defaults.conf *.pyspark"; then
     log_summary "Runtime" "Apache Spark" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -39,6 +40,8 @@ setup_spark() {
 }
 
 # Purpose: Checks if Apache Spark is available.
+# Examples:
+#   check_runtime_spark "Linter"
 check_runtime_spark() {
   local _TOOL_DESC_SPARK="${1:-Apache Spark}"
   if ! command -v spark-shell >/dev/null 2>&1; then

@@ -1,8 +1,9 @@
 #!/usr/bin/env sh
 # Terraform Logic Module
 
-# Purpose: Installs Terraform via mise.
-install_runtime_terraform() {
+# Purpose: Installs OpenTofu via mise.
+# Delegate: Managed by mise (.mise.toml)
+install_runtime_tofu() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Terraform via mise."
     return 0
@@ -39,6 +40,8 @@ setup_terraform() {
 }
 
 # Purpose: Checks if Terraform is available.
+# Examples:
+#   check_runtime_terraform "Linter"
 check_runtime_terraform() {
   local _TOOL_DESC_TF="${1:-Terraform}"
   if ! command -v terraform >/dev/null 2>&1; then
