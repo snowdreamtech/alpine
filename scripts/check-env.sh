@@ -236,6 +236,27 @@ main() {
   else
     log_info "⏭️  Odin: Skipped (no Odin files)"
   fi
+
+  # Nim
+  if has_lang_files "nim.cfg nimble.ini" "*.nim *.nims *.nimble"; then
+    check_runtime "nim" "Nim (Modular)"
+  else
+    log_info "⏭️  Nim: Skipped (no Nim files)"
+  fi
+
+  # Clojure
+  if has_lang_files "project.clj deps.edn bb.edn" "*.clj *.cljs *.cljc *.edn"; then
+    check_runtime "clojure" "Clojure (Modular)"
+  else
+    log_info "⏭️  Clojure: Skipped (no Clojure files)"
+  fi
+
+  # Gleam
+  if has_lang_files "gleam.toml" "*.gleam"; then
+    check_runtime "gleam" "Gleam (Modular)"
+  else
+    log_info "⏭️  Gleam: Skipped (no Gleam files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
