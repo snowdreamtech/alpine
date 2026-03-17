@@ -679,6 +679,7 @@ main() {
   if has_lang_files "*.surql"; then
     check_runtime "surrealdb" "SurrealDB (Modular)"
     check_runtime "plsql" "PL/SQL (Modular)"
+    check_runtime "tsql" "T-SQL (Modular)"
   else
     log_info "⏭️  SurrealDB: Skipped (no .surql files)"
   fi
