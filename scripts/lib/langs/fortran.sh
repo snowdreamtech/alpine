@@ -2,6 +2,7 @@
 # Fortran Logic Module
 
 # Purpose: Installs GFortran (via GCC) via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_fortran() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install GFortran via mise."
@@ -25,7 +26,7 @@ setup_fortran() {
   fi
 
   # Detect Fortran files
-  if ! has_lang_files "*.f *.for *.f90 *.f95"; then
+  if ! has_lang_files "" "*.f" "*.for" "*.f90" "*.f95"; then
     log_summary "Runtime" "Fortran" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -39,6 +40,8 @@ setup_fortran() {
 }
 
 # Purpose: Checks if GFortran is available.
+# Examples:
+#   check_runtime_fortran "Linter"
 check_runtime_fortran() {
   local _TOOL_DESC_FORT="${1:-Fortran}"
   if ! command -v gfortran >/dev/null 2>&1; then
