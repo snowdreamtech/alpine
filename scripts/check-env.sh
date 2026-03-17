@@ -154,6 +154,7 @@ main() {
   check_runtime "astro" "Astro"
   check_runtime "liquid" "Liquid"
   check_runtime "solid" "SolidJS"
+  check_runtime "qwik" "Qwik"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
