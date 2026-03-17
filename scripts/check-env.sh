@@ -593,6 +593,13 @@ main() {
   else
     log_info "⏭️  Protobuf: Skipped (no Protobuf files)"
   fi
+
+  # CUDA
+  if has_lang_files "*.cu *.cuh"; then
+    check_runtime "cuda" "CUDA (Modular)"
+  else
+    log_info "⏭️  CUDA: Skipped (no CUDA files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
