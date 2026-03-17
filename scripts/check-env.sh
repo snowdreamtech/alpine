@@ -411,6 +411,13 @@ main() {
   else
     log_info "⏭️  Lean 4: Skipped (no Lean files)"
   fi
+
+  # Common Lisp
+  if has_lang_files "*.lisp *.cl *.asd"; then
+    check_runtime "lisp" "Common Lisp (Modular)"
+  else
+    log_info "⏭️  Common Lisp: Skipped (no Lisp files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
