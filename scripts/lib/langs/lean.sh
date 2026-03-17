@@ -2,6 +2,7 @@
 # Lean 4 Logic Module
 
 # Purpose: Installs Lean 4 via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_lean() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Lean 4 via mise."
@@ -39,6 +40,9 @@ setup_lean() {
 }
 
 # Purpose: Checks if Lean 4 is available.
+# Delegate: N/A
+# Examples:
+#   check_runtime_lean "Linter"
 check_runtime_lean() {
   local _TOOL_DESC_LEAN="${1:-Lean 4}"
   if ! command -v lean >/dev/null 2>&1; then

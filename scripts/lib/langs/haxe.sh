@@ -15,7 +15,6 @@ install_runtime_haxe() {
 }
 
 # Purpose: Sets up Haxe environment for project.
-# Delegate: Managed by mise (.mise.toml)
 setup_haxe() {
   local _T0_HX_RT
   _T0_HX_RT=$(date +%s)
