@@ -2,6 +2,7 @@
 # Common Lisp Logic Module
 
 # Purpose: Installs SBCL via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_lisp() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install SBCL via mise."
@@ -25,7 +26,7 @@ setup_lisp() {
   fi
 
   # Detect Common Lisp files
-  if ! has_lang_files "*.lisp *.cl *.asd"; then
+  if ! has_lang_files "" "*.lisp *.cl *.asd"; then
     log_summary "Runtime" "Common Lisp" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -39,6 +40,8 @@ setup_lisp() {
 }
 
 # Purpose: Checks if SBCL is available.
+# Examples:
+#   check_runtime_lisp "Linter"
 check_runtime_lisp() {
   local _TOOL_DESC_LISP="${1:-Common Lisp}"
   if ! command -v sbcl >/dev/null 2>&1; then

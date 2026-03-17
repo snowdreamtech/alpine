@@ -29,7 +29,7 @@ setup_jsonnet() {
   fi
 
   # Detect Jsonnet files
-  if ! has_lang_files "jsonnet" "*.jsonnet *.libsonnet"; then
+  if ! has_lang_files "" "*.jsonnet *.libsonnet"; then
     log_summary "Runtime" "Jsonnet" "⏭️ Skipped" "-" "0"
     return 0
   fi
