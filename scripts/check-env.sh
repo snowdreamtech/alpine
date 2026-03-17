@@ -607,6 +607,13 @@ main() {
   else
     log_info "⏭️  Bicep: Skipped (no Bicep files)"
   fi
+
+  # CloudFormation
+  if has_lang_files "*.template *.cfn.yaml *.cfn.json"; then
+    check_runtime "cloudformation" "CloudFormation (Modular)"
+  else
+    log_info "⏭️  CloudFormation: Skipped (no CloudFormation files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
