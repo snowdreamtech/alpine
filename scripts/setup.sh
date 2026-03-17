@@ -99,6 +99,7 @@ Modules (default: all):
   edge               Check Edge Configs
   flutter            Install Flutter SDK
   react-native       Invite React Native CLI
+  expo               Install Expo CLI
   rn                 Check React Native Config
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1896,6 +1897,7 @@ EOF
     edge) install_edge ;;
     flutter) setup_flutter ;;
     react-native) setup_react_native ;;
+    expo) setup_expo ;;
     rn) install_rn ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -2074,6 +2076,12 @@ EOF
 setup_react_native() {
   . "$SCRIPT_DIR/lib/langs/react-native.sh"
   install_react_native
+}
+
+# Purpose: Wrapper for Expo setup.
+setup_expo() {
+  . "$SCRIPT_DIR/lib/langs/expo.sh"
+  install_expo
 }
 
 main "$@"

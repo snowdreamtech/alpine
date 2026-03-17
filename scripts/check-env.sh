@@ -823,6 +823,10 @@ main() {
     . "$SCRIPT_DIR/lib/langs/react-native.sh"
     check_react_native
 
+    # Expo
+    . "$SCRIPT_DIR/lib/langs/expo.sh"
+    check_expo
+
     printf "\n"
   fi
 
