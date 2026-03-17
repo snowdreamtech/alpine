@@ -523,6 +523,20 @@ main() {
   else
     log_info "⏭️  Helm: Skipped (no Helm files)"
   fi
+
+  # GraphQL
+  if has_lang_files "*.graphql *.gql"; then
+    check_runtime "graphql" "GraphQL (Modular)"
+  else
+    log_info "⏭️  GraphQL: Skipped (no GraphQL files)"
+  fi
+
+  # Typst
+  if has_lang_files "*.typ"; then
+    check_runtime "typst" "Typst (Modular)"
+  else
+    log_info "⏭️  Typst: Skipped (no Typst files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
