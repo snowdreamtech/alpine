@@ -621,6 +621,13 @@ main() {
   else
     log_info "⏭️  ArkTS: Skipped (no ArkTS files)"
   fi
+
+  # Shader
+  if has_lang_files "*.hlsl *.glsl *.vert *.frag *.comp"; then
+    check_runtime "shader" "Shader (Modular)"
+  else
+    log_info "⏭️  Shader: Skipped (no Shader files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
