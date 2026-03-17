@@ -2,6 +2,7 @@
 # Pulumi Logic Module
 
 # Purpose: Installs Pulumi CLI via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_pulumi() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Pulumi CLI."

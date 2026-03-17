@@ -2,6 +2,7 @@
 # Pkl Logic Module
 
 # Purpose: Installs Pkl via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_pkl() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Pkl via mise."
@@ -39,6 +40,8 @@ setup_pkl() {
 }
 
 # Purpose: Checks if Pkl is available.
+# Examples:
+#   check_runtime_pkl "Linter"
 check_runtime_pkl() {
   local _TOOL_DESC_PKL="${1:-Pkl}"
   if ! command -v pkl >/dev/null 2>&1; then

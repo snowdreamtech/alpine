@@ -2,6 +2,7 @@
 # ReScript Logic Module
 
 # Purpose: Installs ReScript compiler (rescript) via mise (npm provider).
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_rescript() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install ReScript compiler via mise npm provider."
@@ -39,6 +40,8 @@ setup_rescript() {
 }
 
 # Purpose: Checks if ReScript is available.
+# Examples:
+#   check_runtime_rescript "Linter"
 check_runtime_rescript() {
   local _TOOL_DESC_RES="${1:-ReScript}"
   if ! command -v rescript >/dev/null 2>&1; then
