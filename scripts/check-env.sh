@@ -182,6 +182,7 @@ main() {
   check_runtime "pytorch" "PyTorch"
   check_runtime "dbt" "dbt"
   check_runtime "otel" "OpenTelemetry"
+  check_runtime "clickhouse" "ClickHouse"
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
