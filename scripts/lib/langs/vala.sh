@@ -14,19 +14,6 @@ install_runtime_vala() {
   eval "$(mise activate bash --shims)"
 }
 
-# Purpose: Installs VCPKG (often used alongside C++).
-# Delegate: Managed by mise (.mise.toml)
-install_runtime_vcpkg() {
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_debug "DRY_RUN: Would install Vala via mise."
-    return 0
-  fi
-
-  # shellcheck disable=SC2154
-  run_mise install "vcpkg@${MISE_TOOL_VERSION_VCPKG}"
-  eval "$(mise activate bash --shims)"
-}
-
 # Purpose: Sets up Vala environment for project.
 setup_vala() {
   local _T0_VALA_RT

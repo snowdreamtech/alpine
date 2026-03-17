@@ -2,6 +2,7 @@
 # VCPKG Logic Module
 
 # Purpose: Installs VCPKG (often used alongside C++).
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_vcpkg() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install VCPKG."
@@ -29,7 +30,7 @@ setup_vcpkg() {
   fi
 
   # Detect VCPKG files
-  if ! has_lang_files "vcpkg.json vcpkg-configuration.json"; then
+  if ! has_lang_files "vcpkg.json vcpkg-configuration.json" ""; then
     log_summary "Runtime" "VCPKG" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -43,6 +44,8 @@ setup_vcpkg() {
 }
 
 # Purpose: Checks if VCPKG is available.
+# Examples:
+#   check_runtime_vcpkg "Linter"
 check_runtime_vcpkg() {
   local _TOOL_DESC_VCPKG="${1:-VCPKG}"
   if ! command -v vcpkg >/dev/null 2>&1; then
