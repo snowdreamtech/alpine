@@ -313,6 +313,13 @@ main() {
   else
     log_info "⏭️  Dlang: Skipped (no Dlang files)"
   fi
+
+  # Haxe
+  if has_lang_files "project.xml build.hxml" "*.hx"; then
+    check_runtime "haxe" "Haxe (Modular)"
+  else
+    log_info "⏭️  Haxe: Skipped (no Haxe files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
