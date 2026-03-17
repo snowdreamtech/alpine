@@ -642,6 +642,13 @@ main() {
   else
     log_info "⏭️  Apex: Skipped (no Apex files)"
   fi
+
+  # AppleScript
+  if has_lang_files "*.applescript *.scpt"; then
+    check_runtime "applescript" "AppleScript (Modular)"
+  else
+    log_info "⏭️  AppleScript: Skipped (no AppleScript files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
