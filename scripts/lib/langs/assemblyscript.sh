@@ -2,6 +2,7 @@
 # AssemblyScript Logic Module
 
 # Purpose: Installs AssemblyScript (asc) via mise (npm provider).
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_assemblyscript() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install AssemblyScript (asc) via mise npm provider."
@@ -39,6 +40,8 @@ setup_assemblyscript() {
 }
 
 # Purpose: Checks if AssemblyScript is available.
+# Examples:
+#   check_runtime_assemblyscript "Linter"
 check_runtime_assemblyscript() {
   local _TOOL_DESC_AS="${1:-AssemblyScript}"
   if ! command -v asc >/dev/null 2>&1; then

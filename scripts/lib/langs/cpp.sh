@@ -2,13 +2,13 @@
 # C/C++ Logic Module
 
 # Purpose: Installs C/C++ toolchain via mise or system package manager.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_cpp() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install C/C++ toolchain (gcc, clang, cmake, ninja)."
     return 0
   fi
 
-  # Prefer mise if configured, otherwise rely on system-level guards
   # Prefer mise if configured, otherwise rely on system-level guards
   if command -v mise >/dev/null 2>&1; then
     # shellcheck disable=SC2154
@@ -59,6 +59,8 @@ setup_cpp() {
 }
 
 # Purpose: Checks if C/C++ toolchain is available.
+# Examples:
+#   check_runtime_cpp "Linter"
 check_runtime_cpp() {
   local _TOOL_DESC_CPP="${1:-C/C++}"
   if ! command -v gcc >/dev/null 2>&1 && ! command -v clang >/dev/null 2>&1; then

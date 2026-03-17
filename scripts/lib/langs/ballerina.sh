@@ -2,6 +2,7 @@
 # Ballerina Logic Module
 
 # Purpose: Installs Ballerina via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_ballerina() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Ballerina via mise."
@@ -39,6 +40,8 @@ setup_ballerina() {
 }
 
 # Purpose: Checks if Ballerina is available.
+# Examples:
+#   check_runtime_ballerina "Linter"
 check_runtime_ballerina() {
   local _TOOL_DESC_BAL="${1:-Ballerina}"
   if ! command -v bal >/dev/null 2>&1; then

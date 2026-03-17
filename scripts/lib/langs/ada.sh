@@ -2,6 +2,7 @@
 # Ada Logic Module
 
 # Purpose: Installs Ada (GNAT) via mise.
+# Delegate: Managed by mise (.mise.toml)
 install_runtime_ada() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Ada (GNAT) via mise."
@@ -25,7 +26,7 @@ setup_ada() {
   fi
 
   # Detect Ada files
-  if ! has_lang_files "*.adb *.ads *.gpr"; then
+  if ! has_lang_files "" "*.adb *.ads *.gpr"; then
     log_summary "Runtime" "Ada" "⏭️ Skipped" "-" "0"
     return 0
   fi
@@ -39,6 +40,8 @@ setup_ada() {
 }
 
 # Purpose: Checks if Ada (GNAT) is available.
+# Examples:
+#   check_runtime_ada "Linter"
 check_runtime_ada() {
   local _TOOL_DESC_ADA="${1:-Ada}"
   if ! command -v gnat >/dev/null 2>&1; then
