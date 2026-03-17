@@ -572,6 +572,13 @@ main() {
   else
     log_info "⏭️  OpenAPI: Skipped (no OpenAPI files)"
   fi
+
+  # PromQL
+  if has_lang_files "*.promql"; then
+    check_runtime "promql" "PromQL (Modular)"
+  else
+    log_info "⏭️  PromQL: Skipped (no PromQL files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
