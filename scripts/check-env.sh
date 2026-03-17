@@ -257,6 +257,13 @@ main() {
   else
     log_info "⏭️  Gleam: Skipped (no Gleam files)"
   fi
+
+  # Mojo
+  if has_lang_files "" "*.mojo *.fire"; then
+    check_runtime "mojo" "Mojo (Modular)"
+  else
+    log_info "⏭️  Mojo: Skipped (no Mojo files)"
+  fi
   printf "\n"
 
   # 5. Group: Mobile Support
