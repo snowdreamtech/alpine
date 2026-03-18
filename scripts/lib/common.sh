@@ -943,19 +943,25 @@ get_version() {
     return 0
   }
 
+  local _BIN_PATH
+  _BIN_PATH=$(command -v "$_CMD_VER" 2>/dev/null)
+
   # 1. Try Mise First (Fast & Reliable for JIT tools)
+  # But ONLY if it's a mise shim or not in PATH. If it's a real binary in PATH (mock/system), use it.
   if command -v mise >/dev/null 2>&1; then
-    local _MISE_VER_OUT
-    # 1. Broaden search keys: direct, common prefixes, and specific aliases (e.g. shellcheck-py)
-    _MISE_VER_OUT=$(mise ls --json | jq -r "to_entries[] | select(.key == \"$_CMD_VER\" or .key == \"npm:$_CMD_VER\" or .key == \"github:$_CMD_VER\" or .key == \"cargo:$_CMD_VER\" or .key == \"pipx:$_CMD_VER\" or .key == \"pipx:$_CMD_VER-py\" or .key == \"github:goreleaser/$_CMD_VER\") | .value[] | select(.active==true or .installed==true) | .version" | head -n 1)
-    if [ -n "$_MISE_VER_OUT" ] && [ "$_MISE_VER_OUT" != "null" ]; then
-      echo "$_MISE_VER_OUT"
-      return 0
+    # If not in PATH OR it IS a mise shim, query mise directly
+    if [ -z "$_BIN_PATH" ] || echo "$_BIN_PATH" | grep -q "mise/shims"; then
+      local _MISE_VER_OUT
+      _MISE_VER_OUT=$(mise ls --json | jq -r "to_entries[] | select(.key == \"$_CMD_VER\" or .key == \"npm:$_CMD_VER\" or .key == \"github:$_CMD_VER\" or .key == \"cargo:$_CMD_VER\" or .key == \"pipx:$_CMD_VER\" or .key == \"pipx:$_CMD_VER-py\" or .key == \"github:goreleaser/$_CMD_VER\") | .value[] | select(.active==true or .installed==true) | .version" | head -n 1)
+      if [ -n "$_MISE_VER_OUT" ] && [ "$_MISE_VER_OUT" != "null" ]; then
+        echo "$_MISE_VER_OUT"
+        return 0
+      fi
     fi
   fi
 
   # 2. Fallback to binary execution
-  if command -v "$_CMD_VER" >/dev/null 2>&1; then
+  if [ -n "$_BIN_PATH" ]; then
     case "$_CMD_VER" in
     python | python3)
       "$_CMD_VER" --version 2>&1 | cut -d' ' -f2
