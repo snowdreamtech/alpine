@@ -151,50 +151,6 @@ main() {
     log_info "⏭️  Node.js/pnpm: Skipped (no package.json)"
   fi
 
-  # Front-end tools (Modular)
-  check_runtime "node" "Node.js"
-  check_runtime "deno" "Deno"
-  check_runtime "bun" "Bun"
-  check_runtime "awk" "AWK"
-  check_runtime "sed" "Sed"
-  check_runtime "gnuplot" "Gnuplot"
-  check_runtime "graphviz" "Graphviz"
-  check_runtime "plantuml" "PlantUML"
-  check_runtime "capnproto" "Cap'n Proto"
-  check_runtime "wasmer" "Wasmer"
-  check_runtime "dagger" "Dagger"
-  check_runtime "biome" "Biome"
-  check_runtime "knip" "Knip"
-  check_runtime "lefthook" "Lefthook"
-  check_runtime "temporal" "Temporal"
-  check_runtime "redis" "Redis"
-  check_runtime "mongodb" "MongoDB"
-  check_runtime "postgresql" "PostgreSQL"
-  check_runtime "foundry" "Foundry"
-  check_runtime "quarkus" "Quarkus"
-  check_runtime "micronaut" "Micronaut"
-  check_runtime "vector" "Vector"
-  check_runtime "fluentd" "Fluentd"
-  check_runtime "clickhouse" "ClickHouse"
-  check_runtime "neo4j" "Neo4j"
-  check_runtime "scylladb" "ScyllaDB"
-  check_runtime "cockroachdb" "CockroachDB"
-  check_runtime "tidb" "TiDB"
-  check_runtime "flink" "Apache Flink"
-  check_runtime "beam" "Apache Beam"
-  check_runtime "trino" "Trino"
-  check_runtime "typesense" "Typesense"
-  check_runtime "tarantool" "Tarantool"
-  check_runtime "rocksdb" "RocksDB"
-  check_runtime "bazel" "Bazel"
-  check_runtime "buck2" "Buck2"
-  check_runtime "pants" "Pants"
-  check_runtime "ollama" "Ollama"
-  check_runtime "cilium" "Cilium"
-  check_runtime "falco" "Falco"
-  check_runtime "kyverno" "Kyverno"
-  check_runtime "opa" "OPA"
-
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
     check_tool_version "Python" "$PYTHON" "$(get_mise_tool_version python)" "$PYTHON --version" 1
@@ -744,12 +700,36 @@ main() {
   # SurrealDB
   if has_lang_files "*.surql"; then
     check_runtime "surrealdb" "SurrealDB (Modular)"
-    check_runtime "plsql" "PL/SQL (Modular)"
-    check_runtime "tsql" "T-SQL (Modular)"
-    check_runtime "cobol" "COBOL (Modular)"
-    check_runtime "prql" "PRQL (Modular)"
   else
     log_info "⏭️  SurrealDB: Skipped (no .surql files)"
+  fi
+
+  # PL/SQL
+  if has_lang_files "*.sql *.pls *.plsql"; then
+    check_runtime "plsql" "PL/SQL (Modular)"
+  else
+    log_info "⏭️  PL/SQL: Skipped (no PL/SQL files)"
+  fi
+
+  # T-SQL
+  if has_lang_files "*.sql *.tsql"; then
+    check_runtime "tsql" "T-SQL (Modular)"
+  else
+    log_info "⏭️  T-SQL: Skipped (no T-SQL files)"
+  fi
+
+  # COBOL
+  if has_lang_files "*.cob *.cbl"; then
+    check_runtime "cobol" "COBOL (Modular)"
+  else
+    log_info "⏭️  COBOL: Skipped (no COBOL files)"
+  fi
+
+  # PRQL
+  if has_lang_files "*.prql"; then
+    check_runtime "prql" "PRQL (Modular)"
+  else
+    log_info "⏭️  PRQL: Skipped (no PRQL files)"
   fi
 
   # CUDA

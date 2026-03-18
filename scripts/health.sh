@@ -58,6 +58,7 @@ main() {
   # Temporary report buffer
   local _TMP_REPORT
   _TMP_REPORT=$(mktemp)
+  trap 'rm -f "$_TMP_REPORT"' EXIT
 
   cat <<EOF >"$_TMP_REPORT"
 # Project Health Dashboard

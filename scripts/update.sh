@@ -196,6 +196,8 @@ main() {
   local _CREATED_SUMMARY_M=false
   if [ -z "$SETUP_SUMMARY_FILE" ]; then
     SETUP_SUMMARY_FILE=$(mktemp)
+    # Ensure this script cleans up the file it created if it exits early
+    trap 'rm -f "$SETUP_SUMMARY_FILE"' EXIT INT TERM
     export SETUP_SUMMARY_FILE
     _CREATED_SUMMARY_M=true
 
