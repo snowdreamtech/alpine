@@ -147,6 +147,7 @@ main() {
   if [ -f "$PACKAGE_JSON" ]; then
     check_tool_version "Node.js" "node" "$(get_mise_tool_version node)" "node -v" 1
     check_tool_version "pnpm" "pnpm" "$(get_mise_tool_version pnpm)" "pnpm -v"
+    check_runtime "node" "Node.js (Modular)"
   else
     log_info "⏭️  Node.js/pnpm: Skipped (no package.json)"
   fi
@@ -603,7 +604,10 @@ main() {
   if has_lang_files "Package.swift pubspec.yaml build.gradle.kts" "*.swift *.kt *.dart"; then
     log_info "── Mobile Support ──"
     if has_lang_files "Package.swift" "*.swift"; then check_tool_version "Swift" "swift" "5.0" "swift --version" 0; fi
-    if has_lang_files "build.gradle.kts" "*.kt *.kts"; then check_tool_version "Kotlin" "kotlin" "1.9.0" "kotlin -version" 0; fi
+    if has_lang_files "build.gradle.kts" "*.kt *.kts"; then
+      check_tool_version "Kotlin" "kotlin" "1.9.0" "kotlin -version" 0
+      check_runtime "kotlin" "Kotlin (Modular)"
+    fi
     if [ -f "pubspec.yaml" ] || has_lang_files "" "*.dart"; then
       if command -v flutter >/dev/null 2>&1; then
         check_tool_version "Flutter" "flutter" "3.0.0" "flutter --version" 0
