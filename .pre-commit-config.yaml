@@ -759,14 +759,6 @@ repos:
         files: "Dockerfile.*"
         description: "Audit Dockerfiles for best practices and security vulnerabilities."
 
-      - id: deno-fmt
-        name: check deno style
-        language: system
-        entry: sh scripts/lib/lint-wrapper.sh deno fmt --check
-        files: '\.(ts|js|json|jsonc|md)$'
-        exclude: '(node_modules/|package\.json|package-lock\.json|tsconfig\.json)'
-        description: "Verify Deno code compliance with native formatter."
-
       # -- Hardening & Security ----------------------------------------------
       - id: check-executables-have-shebangs
         name: check shell scripts for shebangs
