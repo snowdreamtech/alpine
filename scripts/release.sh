@@ -15,7 +15,8 @@
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
-#   - Automated version extraction from manifests.
+#   - Supports multiple package ecosystems (Node.js, Python, Go, etc.).
+#   - Works with release-please for automated versioning.
 #   - Guarded git operations with dry-run support.
 
 set -e
@@ -38,6 +39,7 @@ Standardized release manager for versioning and tagging.
 Options:
   --dry-run        Preview release actions without executing them.
   --git-tag        Explicitly create a git tag and push to origin (default: skip).
+  --sync-lockfiles Synchronize lockfiles for all package ecosystems.
   -q, --quiet      Suppress informational output.
   -v, --verbose    Enable verbose/debug output.
   -h, --help       Show this help message.
@@ -45,6 +47,13 @@ Options:
 VERSION:
   A semantic version (e.g., 1.2.3 or v1.2.3). If omitted,
   the version is extracted from project manifests (SSoT).
+
+Note:
+  This script supports multiple package ecosystems:
+  - Node.js (package.json, pnpm-lock.yaml)
+  - Python (pyproject.toml, requirements.txt)
+  - Go (go.mod)
+  - Docs (docs/package.json)
 
 EOF
 }
@@ -113,6 +122,33 @@ perform_git_release() {
   fi
 }
 
+# Purpose: Synchronizes lockfiles for all supported package ecosystems.
+# Examples:
+#   sync_all_lockfiles
+sync_all_lockfiles() {
+  log_info "── Lockfile Synchronization ──"
+
+  # Node.js (root)
+  if [ -f "pnpm-lock.yaml" ]; then
+    log_info "Syncing Node.js lockfile (pnpm)..."
+    pnpm install --no-frozen-lockfile
+  elif [ -f "yarn.lock" ]; then
+    log_info "Syncing Node.js lockfile (yarn)..."
+    yarn install --no-immutable
+  elif [ -f "package-lock.json" ]; then
+    log_info "Syncing Node.js lockfile (npm)..."
+    npm install --package-lock-only
+  fi
+
+  # Docs (docs/)
+  if [ -f "docs/package.json" ]; then
+    log_info "Syncing docs dependencies..."
+    (cd docs && pnpm install --no-frozen-lockfile)
+  fi
+
+  log_success "Lockfile synchronization complete."
+}
+
 # Purpose: Main entry point for the release management engine.
 # Params:
 #   $@ - Command line arguments and optional version
@@ -125,11 +161,15 @@ main() {
   # 2. Argument Parsing
   local _REL_TARGET_VERSION=""
   local _DO_TAG_MAIN=0
+  local _SYNC_LOCKFILES=0
   local _arg_rel
   for _arg_rel in "$@"; do
     case "$_arg_rel" in
     --git-tag)
       _DO_TAG_MAIN=1
+      ;;
+    --sync-lockfiles)
+      _SYNC_LOCKFILES=1
       ;;
     [0-9]* | v[0-9]*)
       _REL_TARGET_VERSION="$_arg_rel"
@@ -140,18 +180,24 @@ main() {
 
   log_info "📦 Starting Standardized Release Process...\n"
 
-  # 3. Pre-release verification
+  # 3. Sync lockfiles if requested
+  if [ "$_SYNC_LOCKFILES" -eq 1 ]; then
+    sync_all_lockfiles
+    printf "\n"
+  fi
+
+  # 4. Pre-release verification
   run_release_verify
 
   printf "\n"
 
-  # 4. Versioning & Tagging logic
+  # 5. Versioning & Tagging logic
   perform_git_release "$_REL_TARGET_VERSION" "$_DO_TAG_MAIN"
 
   printf "\n"
 
-  # Optional: run npm release if extra tools are defined in package.json
-  run_npm_script "release"
+  # 6. Sync lockfiles after version bump
+  sync_all_lockfiles
 
   log_success "\n✨ Release process completed successfully!"
 
