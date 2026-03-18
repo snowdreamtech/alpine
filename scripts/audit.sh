@@ -113,9 +113,11 @@ main() {
       log_summary "Node.js" "$NPM-audit" "⚖️ Previewed" "-" "0"
     else
       local _REG_ARG_JS=""
-      if [ "$NPM" = "pnpm" ] || [ "$NPM" = "npm" ]; then
+      case "$NPM" in
+      pnpm | npm)
         _REG_ARG_JS="--registry=https://registry.npmjs.org"
-      fi
+        ;;
+      esac
 
       # shellcheck disable=SC2086
       if run_quiet "$NPM" audit $_REG_ARG_JS; then
