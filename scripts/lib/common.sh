@@ -1041,11 +1041,6 @@ get_project_version() {
   fi
 }
 
-# Purpose: Verifies if a required runtime or tool is available in the environment.
-#          Silently EXITS the script (skip) if missing, assuming optionality.
-# Params:
-#   $1 - Command/Binary name to check
-#   $2 - Human-readable tool name (for logging)
 # Purpose: Verifies that a required runtime is available.
 #          Gracefully skips (exit 0) if missing, for linter wrappers.
 # Params:

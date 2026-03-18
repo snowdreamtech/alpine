@@ -263,10 +263,6 @@ install_go_lint() {
 }
 
 # Purpose: Installs checkmake for Makefile linting.
-# Params:
-#   None (uses global CHECKMAKE_VERSION)
-# Examples:
-# Purpose: Installs checkmake for Makefile linting.
 # Delegate: Managed by mise (.mise.toml)
 install_checkmake() {
   local _T0_CM
