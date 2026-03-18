@@ -134,7 +134,7 @@ main() {
       ! -path "./node_modules/*" \
       ! -path "./.venv/*" \
       ! -path "./scripts/init-project.sh" \
-      -exec perl -pi -e "s/$_OLD_PROJ_REF/$_PROJECT_NAME_HYD/g" {} +
+      -exec perl -pi -e "s~$_OLD_PROJ_REF~$_PROJECT_NAME_HYD~g" {} +
 
     find . -type f \
       ! -path "*/.git/*" \
@@ -143,7 +143,7 @@ main() {
       ! -path "./scripts/init-project.sh" \
       ! -path "./scripts/init-project.ps1" \
       ! -path "./scripts/init-project.bat" \
-      -exec perl -pi -e "s/$_OLD_ORG_REF|$_OLD_USER_REF/$_GITHUB_ORG_HYD/g" {} +
+      -exec perl -pi -e "s~$_OLD_ORG_REF|$_OLD_USER_REF~$_GITHUB_ORG_HYD~g" {} +
   fi
 
   # 6. Update LICENSE
@@ -153,7 +153,7 @@ main() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_warn "DRY-RUN: Would update LICENSE copyright to $_CUR_YEAR_HYD and $_AUTHOR_NAME_HYD."
   else
-    perl -pi -e "s/Copyright \(c\) \d{4}-present SnowdreamTech Inc\./Copyright (c) $_CUR_YEAR_HYD-present $_AUTHOR_NAME_HYD/g" LICENSE
+    perl -pi -e "s~Copyright \(c\) \d{4}-present SnowdreamTech Inc\.~Copyright (c) $_CUR_YEAR_HYD-present $_AUTHOR_NAME_HYD~g" LICENSE
   fi
 
   # 7. Git Initialization
