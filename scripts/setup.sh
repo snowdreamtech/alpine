@@ -1781,7 +1781,7 @@ EOF
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
     # Full list for "On-demand" (default) or "All" (explicit)
-    _MODULES_LIST="node python deno bun pipx php rust fastapi django springboot laravel nestjs tailwind vite gitleaks hadolint go checkmake tflint kube-linter java ruby kotlin dart swift lua perl julia r groovy dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format cpp terraform solidity odin nim clojure gleam mojo objc ocaml fsharp erlang vlang crystal dlang haxe assemblyscript ballerina kcl pkl move elm rescript ada luau raku vala fpc lean lisp racket prolog fortran wat wasmtime ray mlflow airflow prefect dapr abap prql lit capacitor awk sed gnuplot graphviz plantuml capnproto wasmer nextjs nuxt remix dagger temporal langchain pytorch dbt otel clickhouse moonbit grain jsonnet starlark tcl duckdb vcpkg gherkin terragrunt spark helm graphql typst verilog vhdl octave matlab plsql tsql cobol stylus postcss k6 openapi promql latex proto cuda bicep cloudformation arkts shader qml apex applescript vba vue svelte astro assembly gdscript liquid avro thrift kustomize solid qwik tauri electron prisma edgedb surrealdb systemverilog flatbuffers asyncapi sass less pug handlebars ejs htmx alpine ktlint ruff stylelint yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint vitepress commitizen pip-audit stylua buf tofu just task zig cue rego server edge flutter rn pulumi crossplane playwright cypress vitest docusaurus mkdocs sphinx jupyter dvc elixir haskell scala pre-commit hooks"
+    _MODULES_LIST="node python deno bun pipx php rust gitleaks hadolint go checkmake tflint kube-linter java ruby kotlin dart swift lua perl julia r groovy dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format cpp terraform solidity ktlint ruff stylelint yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint vitepress commitizen pip-audit stylua buf tofu just task zig cue rego server edge rn pulumi crossplane playwright cypress vitest docusaurus mkdocs sphinx jupyter dvc elixir haskell scala pre-commit hooks"
   else
     # Specific modules requested (e.g., ./setup.sh node)
     _MODULES_LIST="${_RAW_ARGS}"
@@ -1909,6 +1909,39 @@ EOF
     scala) setup_scala ;;
     pre-commit) install_pre_commit ;;
     hooks) setup_hooks ;;
+
+    editorconfig-checker) install_editorconfig_checker ;;
+    sort-package-json) install_sort_package_json ;;
+    goreleaser) install_goreleaser ;;
+    spectral) install_spectral ;;
+    commitlint) install_commitlint ;;
+    dockerfile-utils) install_dockerfile_utils ;;
+    clang-format) install_clang_format ;;
+    ktlint) install_ktlint ;;
+    ruff) install_ruff ;;
+    stylelint) install_stylelint ;;
+    yamllint) install_yamllint ;;
+    sqlfluff) install_sqlfluff ;;
+    markdownlint) install_markdownlint ;;
+    ansible-lint) install_ansible_lint ;;
+    dotenv-linter) install_dotenv_linter ;;
+    bats) install_bats ;;
+    bats-libs) install_bats_libs ;;
+    eslint) install_eslint ;;
+    vitepress) install_vitepress ;;
+    commitizen) install_commitizen ;;
+    pip-audit) install_pip_audit ;;
+    stylua) install_stylua ;;
+    cue) install_cue ;;
+    rn) install_rn ;;
+    playwright) install_playwright ;;
+    cypress) install_cypress ;;
+    vitest) install_vitest ;;
+    docusaurus) install_docusaurus ;;
+    mkdocs) install_mkdocs ;;
+    sphinx) install_sphinx ;;
+    jupyter) install_jupyter ;;
+    dvc) install_dvc ;;
     *) log_error "Unknown module: $_cur_module" ;;
     esac
   done
