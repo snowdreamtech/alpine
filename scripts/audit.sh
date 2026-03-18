@@ -15,7 +15,7 @@
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
-#   - Multi-stack scanning (npm, pip, go, cargo, osv, trivy).
+#   - Multi-stack scanning (Node.js, pip, go, cargo, osv, trivy).
 #   - Gitleaks integration for secrets detection.
 
 # Note: We do NOT set -e here because we want to run all audit modules even if some fail.
