@@ -1396,6 +1396,11 @@ install_pre_commit() {
   local _TITLE="Pre-commit"
   local _PROVIDER="pipx:pre-commit"
 
+  if [ "${_PRE_COMMIT_INSTALLED:-false}" = "true" ]; then
+    return 0
+  fi
+  _PRE_COMMIT_INSTALLED="true"
+
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Other" "Pre-commit" "⚖️ Previewed" "-" "0"
     return 0
