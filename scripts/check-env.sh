@@ -185,7 +185,6 @@ main() {
   if has_lang_files "Gemfile .ruby-version package.json" "*.rb"; then
     check_tool_version "Ruby" "ruby" "3.0.0" "ruby -v" 0
     check_runtime "ruby" "Ruby (Modular)"
-    check_runtime "rails" "Rails"
   else
     log_info "⏭️  Ruby: Skipped (no ruby files)"
   fi
@@ -613,26 +612,6 @@ main() {
     printf "\n"
   fi
 
-  # 6. Group: Messaging & Cloud Native
-  if has_lang_files "docker-compose.yml prometheus.yml traefik.yml traefik.toml kong.yml kong.conf istio-init.yaml" ""; then
-    log_info "── Messaging & Cloud Native ──"
-    # Messaging
-    check_runtime "kafka" "Kafka"
-    check_runtime "rabbitmq" "RabbitMQ"
-    check_runtime "nats" "NATS"
-    check_runtime "pulsar" "Pulsar"
-
-    # Cloud Native Networking
-    check_runtime "traefik" "Traefik"
-    check_runtime "istio" "Istio"
-    check_runtime "kong" "Kong"
-    check_runtime "linkerd" "Linkerd"
-
-    # Observability
-    check_runtime "prometheus" "Prometheus"
-    printf "\n"
-  fi
-
   log_info "── Toolchain Manager ──"
   if command -v mise >/dev/null 2>&1; then
     log_success "✅ mise: Active ($(get_version mise))"
@@ -648,9 +627,6 @@ main() {
   check_tool_version "OSV-scanner" "osv-scanner" "$(get_mise_tool_version osv-scanner)" "osv-scanner --version" 0 1
   check_tool_version "Trivy" "trivy" "$(get_mise_tool_version trivy)" "trivy --version" 0 1
   check_tool_version "Zizmor" "zizmor" "$(get_mise_tool_version zizmor)" "zizmor --version" 0 1
-  check_runtime "vault" "Vault"
-  check_runtime "semgrep" "Semgrep"
-  check_runtime "checkov" "Checkov"
 
   log_info "── Lint & Quality Tools ──"
   check_tool_version "Shfmt" "shfmt" "$(get_mise_tool_version shfmt-py)" "shfmt --version" 0 0
@@ -663,7 +639,6 @@ main() {
   if has_lang_files "go.mod" "*.go"; then
     check_tool_version "golangci-lint" "golangci-lint" "$(get_mise_tool_version golangci-lint)" "golangci-lint --version" 0 0
     check_tool_version "Govulncheck" "govulncheck" "latest" "govulncheck ./..." 0 1
-    check_runtime "mage" "Mage"
   fi
   if has_lang_files "Makefile" "*.make"; then
     check_tool_version "Checkmake" "checkmake" "$(get_mise_tool_version checkmake)" "checkmake --version" 0 0
