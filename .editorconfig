@@ -27,15 +27,9 @@ indent_style = space
 indent_size = 2
 
 # Scripting & Functional DSLs
-[*.{sh,bash,zsh,ps1,rb,pl,pm,lua,luau,tcl,awk,sed,arkts,ml,mli,clj,cljs,cljc,edn,lisp,lsp,cl,rkt,scm,gleam,cr,hx,mo,mbt,gr,typ,prql}]
+[*.{sh,bash,zsh,ps1,bat,cmd,rb,pl,pm,lua,luau,tcl,awk,sed,arkts,ml,mli,clj,cljs,cljc,edn,lisp,lsp,cl,rkt,scm,gleam,cr,hx,mo,mbt,gr,typ,prql}]
 indent_style = space
 indent_size = 2
-
-# Windows-specific Scripts
-[*.{bat,cmd}]
-indent_style = space
-indent_size = 2
-end_of_line = crlf
 
 # Hidden config and RC files
 [.{babelrc,eslintrc,prettierrc,stylelintrc,yamllint.yml,ansible-lint,shellcheckrc,sqlfluff,gitleaksignore}]
