@@ -74,48 +74,6 @@ Modules (default: all):
   rego               Install OPA/Rego
   server             Check Server Configs
   edge               Check Edge Configs
-  ansible            Install Ansible
-  nginx              Install Nginx (Platform-dependent)
-  caddy              Install Caddy (Platform-dependent)
-  elasticsearch      Install Elasticsearch (Platform-dependent)
-  meilisearch        Install Meilisearch (Platform-dependent)
-  kafka              Install Kafka (Platform-dependent)
-  rabbitmq           Install RabbitMQ (Platform-dependent)
-  prometheus         Install Prometheus (Platform-dependent)
-  traefik            Install Traefik (Platform-dependent)
-  istio              Install Istio CLI
-  kong               Install Kong CLI
-  linkerd            Install Linkerd CLI
-  nats               Install NATS CLI
-  pulsar             Install Apache Pulsar
-  weaviate           Install Weaviate (Platform-dependent)
-  quarkus            Install Quarkus CLI
-  micronaut          Install Micronaut CLI
-  vault              Install Vault CLI
-  semgrep            Install Semgrep CLI
-  checkov            Install Checkov CLI
-  mage               Install Mage CLI
-  foundry            Install Foundry CLI
-  vector             Install Vector
-  fluentd            Check Fluentd Config
-  neo4j              Check Neo4j Config
-  scylladb           Check ScyllaDB Config
-  cockroachdb        Check CockroachDB Config
-  tidb               Install TiUP (TiDB)
-  flink              Check Flink Config
-  beam               Check Beam SDK Config
-  trino              Check Trino Config
-  typesense          Check Typesense Config
-  tarantool          Check Tarantool Config
-  rocksdb            Check RocksDB Config
-  bazel              Install Bazelisk
-  buck2              Check Buck2 Config
-  pants              Check Pants Config
-  ollama             Check Ollama Config
-  cilium             Install Cilium CLI
-  falco              Check Falco Config
-  kyverno            Install Kyverno CLI
-  opa                Install OPA CLI
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
   elixir             Install Elixir/Erlang
