@@ -221,6 +221,11 @@ install_pipx() {
     return 0
   fi
 
+  if command -v pipx >/dev/null 2>&1; then
+    log_summary "Toolchain Manager" "Pipx" "✅ Exists" "$(get_version pipx)" "$(($(date +%s) - _T0_PIPX))"
+    return 0
+  fi
+
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_PIPX="✅ mise"
   run_mise install pipx || _STAT_PIPX="❌ Failed"
