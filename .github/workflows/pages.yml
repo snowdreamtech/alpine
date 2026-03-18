@@ -73,8 +73,11 @@ jobs:
         run: |
           make setup
           make install
-        env:
-          VENV: ${{ env.VENV }}
+
+      - name: "📦 Install Documentation Dependencies"
+        shell: sh
+        run: |
+          cd docs && pnpm install
 
       - name: "🚀 Compile Documentation Artifacts"
         shell: sh
