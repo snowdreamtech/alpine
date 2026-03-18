@@ -44,10 +44,14 @@ main() {
   esac
 
   local _RESOLVED_BIN_WRAP
-  _RESOLVED_BIN_WRAP=$(resolve_bin "$_LINTER_BIN")
+  _RESOLVED_BIN_WRAP=$(resolve_bin "$_LINTER_BIN") || true
 
   # 2. Check Existence
   if [ -z "$_RESOLVED_BIN_WRAP" ]; then
+    if [ "${_G_AUDIT_MODE:-0}" -eq 1 ]; then
+      log_error "❌ ${_LINTER_WRAP} not found but required in AUDIT mode. Failing."
+      exit 1
+    fi
     log_warn "⚠️  ${_LINTER_WRAP} not found. Skipping linting for this module."
     log_info "💡 Run 'make setup' to install required tools."
     exit 0
