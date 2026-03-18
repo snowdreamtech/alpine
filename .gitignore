@@ -688,3 +688,4 @@ test-results/
 *.bz2
 *.xz
 *.7z
+docs/package.json
