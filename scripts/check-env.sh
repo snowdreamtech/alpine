@@ -84,7 +84,7 @@ check_tool_version() {
   [ "$_LV_CURRENT_VER" = "-" ] && _LV_CURRENT_VER="0.0"
 
   # If requirement is empty or -, allow anything
-  if [ -z "$_LV_MIN_VER" ] || [ "$_LV_MIN_VER" = "-" ]; then
+  if [ -z "${_LV_MIN_VER:-}" ] || [ "${_LV_MIN_VER:-}" = "-" ]; then
     log_success "✅ $_LV_NAME: v$_LV_CURRENT_VER (detected)"
     return 0
   fi
