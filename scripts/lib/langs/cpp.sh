@@ -11,8 +11,6 @@ install_runtime_cpp() {
 
   # Prefer mise if configured, otherwise rely on system-level guards
   if command -v mise >/dev/null 2>&1; then
-    # shellcheck disable=SC2154
-    run_mise install "llvm@${MISE_TOOL_VERSION_LLVM}"
     run_mise install cmake
     run_mise install ninja
     eval "$(mise activate bash --shims)"
