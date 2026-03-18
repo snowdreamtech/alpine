@@ -9,10 +9,11 @@ install_runtime_cpp() {
     return 0
   fi
 
-  # Prefer mise if configured, otherwise rely on system-level guards
+  # Prefer native tools (brew/port/apt) for speed, fallback to mise for consistency
+  ensure_tool cmake || return 1
+  ensure_tool ninja || return 1
+
   if command -v mise >/dev/null 2>&1; then
-    run_mise install cmake
-    run_mise install ninja
     eval "$(mise activate bash --shims)"
   fi
 

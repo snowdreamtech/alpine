@@ -514,6 +514,76 @@ log_debug() {
   if [ "${VERBOSE:-1}" -ge 2 ]; then printf "[DEBUG] %b\n" "$_msg_dbg"; fi
 }
 
+# Purpose: Attempts to install a tool using native package managers (brew, apt, choco, etc.)
+# Params:
+#   $1 - Tool/Package name
+# Returns:
+#   0 - Success
+#   1 - Failure or no manager found
+install_native_tool() {
+  local _PKG="$1"
+  [ -z "$_PKG" ] && return 1
+
+  case "$_G_OS" in
+  macos)
+    if command -v brew >/dev/null 2>&1; then
+      log_info "Installing $_PKG via Homebrew..."
+      brew install "$_PKG" && return 0
+    elif command -v port >/dev/null 2>&1; then
+      log_info "Installing $_PKG via MacPorts..."
+      sudo port install "$_PKG" && return 0
+    fi
+    ;;
+  linux)
+    if command -v apt-get >/dev/null 2>&1; then
+      log_info "Installing $_PKG via apt..."
+      sudo apt-get update -y && sudo apt-get install -y "$_PKG" && return 0
+    elif command -v dnf >/dev/null 2>&1; then
+      log_info "Installing $_PKG via dnf..."
+      sudo dnf install -y "$_PKG" && return 0
+    elif command -v pacman >/dev/null 2>&1; then
+      log_info "Installing $_PKG via pacman..."
+      sudo pacman -S --noconfirm "$_PKG" && return 0
+    fi
+    ;;
+  windows)
+    if command -v choco >/dev/null 2>&1; then
+      log_info "Installing $_PKG via Chocolatey..."
+      choco install -y "$_PKG" && return 0
+    elif command -v scoop >/dev/null 2>&1; then
+      log_info "Installing $_PKG via Scoop..."
+      scoop install "$_PKG" && return 0
+    elif command -v winget >/dev/null 2>&1; then
+      log_info "Installing $_PKG via Winget..."
+      winget install "$_PKG" && return 0
+    fi
+    ;;
+  esac
+
+  return 1
+}
+
+# Purpose: Ensures a tool is available (Check system -> Try Native -> Try Mise).
+# Params:
+#   $1 - Tool name
+#   $2 - Mise provider name (optional, defaults to tool name)
+ensure_tool() {
+  local _TOOL="$1"
+  local _PRV="${2:-$_TOOL}"
+
+  if command -v "$_TOOL" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  install_native_tool "$_TOOL" && return 0
+
+  if command -v mise >/dev/null 2>&1; then
+    run_mise install "$_PRV" && return 0
+  fi
+
+  return 1
+}
+
 log_debug "common.sh (v2026.03.14.01) loaded"
 
 # Purpose: Returns the absolute path to the project root directory.
