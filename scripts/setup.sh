@@ -69,10 +69,8 @@ Modules (default: all):
   tofu               Install opentofu
   just               Install Just
   task               Install Task
-  nix                Check Nix
   zig                Install Zig
   rego               Install OPA/Rego
-  server             Check Server Configs
   edge               Check Edge Configs
   pulumi             Install Pulumi CLI
   crossplane         Check Crossplane Manifests
@@ -1140,28 +1138,6 @@ install_dotenv_linter() {
   log_summary "Lint Tool" "dotenv-linter" "$_STAT_DOT" "$(get_version dotenv-linter)" "$(($(date +%s) - _T0_DOT))"
 }
 
-install_ansible_lint() {
-  local _T0_ANS
-  _T0_ANS=$(date +%s)
-  local _TITLE="Ansible-lint"
-  local _PROVIDER="pipx:ansible-lint"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Lint Tool" "Ansible-lint" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "" "ansible.cfg playbook.yml roles/ tasks/"; then
-    log_summary "Lint Tool" "Ansible-lint" "⏭️ Skipped" "-" "0"
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-  local _STAT_ANS="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_ANS="❌ Failed"
-  log_summary "Lint Tool" "Ansible-lint" "$_STAT_ANS" "$(get_version ansible-lint)" "$(($(date +%s) - _T0_ANS))"
-}
-
 install_bats() {
   local _T0_BATS
   _T0_BATS=$(date +%s)
@@ -1563,15 +1539,6 @@ install_rego() {
   log_summary "Security Tool" "Rego" "$_STAT_REGO" "$(get_version opa version | grep Version | awk '{print $NF}')" "$(($(date +%s) - _T0_REGO))"
 }
 
-# Purpose: Checks for Server configurations.
-install_server() {
-  if ! has_lang_files "" "SERVER"; then
-    log_summary "Config" "Server" "⏭️ Skipped" "-" "0"
-    return 0
-  fi
-  log_summary "Config" "Server" "✅ Detected" "-" "0"
-}
-
 # Purpose: Checks for Edge deployment configurations.
 install_edge() {
   if ! has_lang_files "" "EDGE"; then
@@ -1744,7 +1711,7 @@ EOF
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
     # Full list for "On-demand" (default) or "All" (explicit)
-    _MODULES_LIST="node python deno bun pipx php rust gitleaks hadolint go checkmake tflint kube-linter java ruby kotlin dart swift lua perl julia r groovy dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format cpp terraform solidity ktlint ruff stylelint yamllint sqlfluff markdownlint ansible-lint dotenv-linter bats bats-libs eslint vitepress commitizen pip-audit stylua buf tofu just task zig cue rego server edge rn pulumi crossplane playwright cypress vitest docusaurus mkdocs sphinx jupyter dvc elixir haskell scala pre-commit hooks"
+    _MODULES_LIST="node python deno bun pipx php rust gitleaks hadolint go checkmake tflint kube-linter java ruby kotlin dart swift lua perl julia r groovy dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format cpp terraform solidity ktlint ruff stylelint yamllint sqlfluff markdownlint dotenv-linter bats bats-libs eslint vitepress commitizen pip-audit stylua buf tofu just task zig cue rego edge rn pulumi crossplane playwright cypress vitest docusaurus mkdocs sphinx jupyter dvc elixir haskell scala pre-commit hooks"
   else
     # Specific modules requested (e.g., ./setup.sh node)
     _MODULES_LIST="${_RAW_ARGS}"
@@ -1821,7 +1788,6 @@ EOF
     task) install_task ;;
     zig) setup_zig ;;
     rego) install_rego ;;
-    server) install_server ;;
     edge) install_edge ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -1844,7 +1810,6 @@ EOF
     yamllint) install_yamllint ;;
     sqlfluff) install_sqlfluff ;;
     markdownlint) install_markdownlint ;;
-    ansible-lint) install_ansible_lint ;;
     dotenv-linter) install_dotenv_linter ;;
     bats) install_bats ;;
     bats-libs) install_bats_libs ;;
