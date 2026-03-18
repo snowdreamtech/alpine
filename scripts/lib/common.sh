@@ -1099,6 +1099,42 @@ install_runtime_hooks() {
   fi
 }
 
+# Purpose: Standardizes lockfile synchronization across all package managers.
+# Params:
+#   $1 - Optional subdirectory (default: current directory)
+# Examples:
+#   sync_node_lockfile "docs"
+sync_node_lockfile() {
+  local _SYNC_DIR="${1:-.}"
+  local _OLDPWD_SYNC
+  _OLDPWD_SYNC="$(pwd)"
+
+  cd "$_SYNC_DIR" || return 1
+
+  if [ -f "package.json" ]; then
+    case "$NPM" in
+    pnpm)
+      log_info "Syncing Node.js lockfile (pnpm)..."
+      run_quiet pnpm install --no-frozen-lockfile
+      ;;
+    yarn)
+      log_info "Syncing Node.js lockfile (yarn)..."
+      run_quiet yarn install --no-immutable
+      ;;
+    bun)
+      log_info "Syncing Node.js lockfile (bun)..."
+      run_quiet bun install
+      ;;
+    *)
+      log_info "Syncing Node.js lockfile (npm)..."
+      run_quiet npm install --package-lock-only
+      ;;
+    esac
+  fi
+
+  cd "$_OLDPWD_SYNC" || exit 1
+}
+
 # Purpose: Executes an npm/pnpm script with infinite-recursion detection.
 # Params:
 #   $1 - Name of the npm script (e.g., "test")
@@ -1106,8 +1142,10 @@ install_runtime_hooks() {
 #   run_npm_script "test"
 run_npm_script() {
   local _SCRIPT_NAME_NPM="$1"
+  shift # Capture remaining arguments
+  local _EXTRA_ARGS_NPM="$*"
   local _CURRENT_BASENAME_NPM
-  _CURRENT_BASENAME_NPM=$(basename "$0")
+  _CURRENT_BASENAME_NPM="$(basename "$0")"
 
   if [ -f "package.json" ]; then
     # 1. Manager Detection & Guard
@@ -1134,12 +1172,14 @@ run_npm_script() {
         log_debug "Node script '$_SCRIPT_NAME_NPM' is a self-reference to '$_CURRENT_BASENAME_NPM'. Skipping."
         return 0
       fi
-      log_info "── Running Node.js script: $_NODE_MGR $_SCRIPT_NAME_NPM ──"
-      "$_NODE_MGR" run "$_SCRIPT_NAME_NPM"
+      log_info "── Running Node.js script: $_NODE_MGR $_SCRIPT_NAME_NPM $_EXTRA_ARGS_NPM ──"
+      # shellcheck disable=SC2086
+      "$_NODE_MGR" run "$_SCRIPT_NAME_NPM" $_EXTRA_ARGS_NPM
     elif [ "$_SCRIPT_NAME_NPM" = "install" ] || [ "$_SCRIPT_NAME_NPM" = "update" ]; then
       # 4. Special Fallback for native commands if not defined in package.json scripts
-      log_info "── Node.js standard command: $_NODE_MGR $_SCRIPT_NAME_NPM ──"
-      run_quiet "$_NODE_MGR" "$_SCRIPT_NAME_NPM"
+      log_info "── Node.js standard command: $_NODE_MGR $_SCRIPT_NAME_NPM $_EXTRA_ARGS_NPM ──"
+      # shellcheck disable=SC2086
+      run_quiet "$_NODE_MGR" "$_SCRIPT_NAME_NPM" $_EXTRA_ARGS_NPM
     fi
   fi
   return 0
