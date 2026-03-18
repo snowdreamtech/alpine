@@ -72,26 +72,27 @@ _execute_update() {
 
 # ── Functions ────────────────────────────────────────────────────────────────
 
-# Purpose: Updates global pnpm installation via corepack or self-update.
+# Purpose: Updates global Node.js manager if applicable.
 # Examples:
-#   update_pnpm_global
-update_pnpm_global() {
-  if command -v pnpm >/dev/null 2>&1; then
-    # Intelligent pnpm update: detects if managed by corepack
+#   update_node_manager_global
+update_node_manager_global() {
+  case "$NPM" in
+  pnpm)
     if command -v corepack >/dev/null 2>&1 && pnpm self-update --help 2>&1 | grep -q "corepack" >/dev/null 2>&1; then
       _execute_update "Manager" "pnpm" "corepack prepare pnpm@latest --activate" "$(get_version pnpm)"
     else
       _execute_update "Manager" "pnpm" "pnpm self-update" "$(get_version pnpm)"
     fi
-  fi
+    ;;
+  esac
 }
 
-# Purpose: Updates project dependencies using pnpm update.
+# Purpose: Updates project dependencies using the detected manager.
 # Examples:
-#   update_pnpm_project
-update_pnpm_project() {
-  if [ -f "pnpm-lock.yaml" ] && command -v pnpm >/dev/null 2>&1; then
-    _execute_update "Project" "pnpm-deps" "pnpm update" ""
+#   update_node_project_deps
+update_node_project_deps() {
+  if [ -f "$PACKAGE_JSON" ]; then
+    _execute_update "Project" "$NPM-deps" "$NPM update" ""
   fi
 }
 
@@ -224,8 +225,8 @@ main() {
 
   update_homebrew
   update_macports
-  update_pnpm_global
-  update_pnpm_project
+  update_node_manager_global
+  update_node_project_deps
   update_python_venv
   update_go_mod
   update_cargo_deps
