@@ -10,7 +10,7 @@ install_runtime_node() {
   fi
 
   # 1. Runtime initialization
-  run_mise install node pnpm
+  run_mise install node pnpm yarn
   eval "$(mise activate bash --shims)"
 
   # 2. Dependency resolution
