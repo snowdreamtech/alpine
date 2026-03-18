@@ -103,8 +103,8 @@ main() {
     log_success "DRY-RUN: Would search and remove all __pycache__ and *.pyc files."
   else
     # Using POSIX compliant find
-    find . -type d -name "__pycache__" ! -path "*/.*" -exec rm -rf {} \; 2>/dev/null || true
-    find . -type f -name "*.pyc" ! -path "*/.*" -exec rm -f {} \; 2>/dev/null || true
+    find . -type d -name "__pycache__" ! -path "*/.*" -exec rm -rf {} + 2>/dev/null || true
+    find . -type f -name "*.pyc" ! -path "*/.*" -exec rm -f {} + 2>/dev/null || true
   fi
 
   # Node.js
@@ -121,8 +121,8 @@ main() {
     log_success "DRY-RUN: Would remove .DS_Store and Thumbs.db files."
   else
     # Using POSIX compliant find
-    find . -type f -name ".DS_Store" ! -path "*/.*" -exec rm -f {} \; 2>/dev/null || true
-    find . -type f -name "Thumbs.db" ! -path "*/.*" -exec rm -f {} \; 2>/dev/null || true
+    find . -type f -name ".DS_Store" ! -path "*/.*" -exec rm -f {} + 2>/dev/null || true
+    find . -type f -name "Thumbs.db" ! -path "*/.*" -exec rm -f {} + 2>/dev/null || true
   fi
 
   log_success "\n✨ Cleanup complete!"
