@@ -632,15 +632,6 @@ repos:
           (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
         description: "Format web-standard file types using Prettier (including Astro/Svelte)."
 
-      # - id: typos
-      #   name: typos check
-      #   language: system
-      #   entry: sh scripts/lib/lint-wrapper.sh typos
-      #   args: [--write-changes]
-      #   exclude: |
-      #     (?x)^(\.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml)/.*
-      #   description: "Source code spell checker."
-
       - id: zizmor
         name: zizmor security audit
         language: system
