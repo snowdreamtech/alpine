@@ -17,6 +17,7 @@
 #   - Dynamic binary resolution (.venv, node_modules, PATH).
 #   - Native runtime detection (Java, Ruby, Node, Dart, DOTNET).
 #   - OS-specific guards (Apple Swift).
+set -e
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
