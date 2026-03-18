@@ -17,11 +17,13 @@ Executes the implementation plan by **processing all tasks** defined in `tasks.m
 1. Reads `tasks.md` to get the ordered task list
 2. Processes tasks one at a time in dependency order
 3. For each task:
-   - Implements the changes
-   - Runs the relevant pre-commit checks
-   - Makes an atomic commit with a descriptive message
-   - Marks the task as complete in `tasks.md`
-4. Reports progress after each task
+
+- Implements the changes
+- Runs the relevant pre-commit checks
+- Makes an atomic commit with a descriptive message
+- Marks the task as complete in `tasks.md`
+
+1. Reports progress after each task
 
 ## Workflow
 

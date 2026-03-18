@@ -19,13 +19,13 @@
 
 ```text
 [ 用户 / 开发者 / CI ]
-         |
+        |
     [ Makefile ] (便捷入口点)
-         |
-         v
+        |
+        v
     [ scripts/*.sh ] (核心 POSIX 逻辑, SSoT)
     /    |      \
-   /     |       \
+  /     |       \
   /      |        \
 [lib/common.sh] [lib/langs/*.sh] [Windows 包装器]
 (工具库/SSoT)   (语言模块)            (.bat, .ps1)

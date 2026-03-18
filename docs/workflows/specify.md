@@ -28,11 +28,11 @@ A `spec.md` file containing:
 
 ```
 User provides: feature description (natural language)
-         ↓
+        ↓
 AI reads: existing spec.md (if any), project constitution
-         ↓
+        ↓
 AI produces: structured spec.md with all required sections
-         ↓
+        ↓
 User reviews and iterates (use /speckit.clarify for ambiguities)
 ```
 

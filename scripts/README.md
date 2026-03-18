@@ -19,13 +19,13 @@ This component provides a suite of cross-platform scripts to manage the developm
 
 ```text
 [ User / Developer / CI ]
-         |
+        |
     [ Makefile ] (Convenience Entry)
-         |
-         v
+        |
+        v
     [ scripts/*.sh ] (Core POSIX Logic, SSoT)
     /    |      \
-   /     |       \
+  /     |       \
   /      |        \
 [lib/common.sh] [lib/langs/*.sh] [Windows Wrappers]
 (Utils/SSoT)    (Lang Modules)    (.ps1, .bat)

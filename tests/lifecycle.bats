@@ -8,13 +8,7 @@ setup() {
   export TEMP_DIR
   unset _SNOWDREAM_TOP_LEVEL_SCRIPT
   TEMP_DIR="$(mktemp -d)"
-  mkdir -p "$TEMP_DIR/scripts/lib"
-
-  # Copy relevant scripts
-  cp "scripts/install.sh" "$TEMP_DIR/scripts/"
-  cp "scripts/setup.sh" "$TEMP_DIR/scripts/"
-  cp "scripts/init-project.sh" "$TEMP_DIR/scripts/"
-  cp "scripts/lib/common.sh" "$TEMP_DIR/scripts/lib/"
+  cp -r scripts "$TEMP_DIR/"
 
   # Create a dummy project structure
   cd "$TEMP_DIR" || exit

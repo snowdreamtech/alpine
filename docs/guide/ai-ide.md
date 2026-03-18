@@ -11,9 +11,9 @@ Each AI IDE expects its configuration in a specific directory. This template cre
 
 ```text
 .agent/rules/          ← Single Source of Truth (you edit here)
-     ↑
-     │  mirrors
-     │
+    ↑
+    │  mirrors
+    │
 .cursor/rules/         ← Cursor IDE reads from here
 .cline/rules/          ← Cline reads from here
 .windsurf/rules/       ← Windsurf reads from here
@@ -63,18 +63,18 @@ If your AI tool isn't listed, adding support takes 2 steps:
 
 1. **Create the directory structure**:
 
-   ```bash
-   mkdir -p .your-ide/rules
-   mkdir -p .your-ide/commands
-   ```
+```bash
+mkdir -p .your-ide/rules
+mkdir -p .your-ide/commands
+```
 
-2. **Create the redirect rules file** (copy from `.cline/rules/rules.md` as template):
+1. **Create the redirect rules file** (copy from `.cline/rules/rules.md` as template):
 
-   ```bash
-   cp .cline/rules/rules.md .your-ide/rules/rules.md
-   ```
+```bash
+cp .cline/rules/rules.md .your-ide/rules/rules.md
+```
 
-3. **Open a PR** to contribute it back to the template!
+1. **Open a PR** to contribute it back to the template!
 
 ## Custom Instructions Per IDE
 
