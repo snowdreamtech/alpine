@@ -100,17 +100,31 @@ fi
 
 VENV="${VENV:-.venv}"
 PYTHON="${PYTHON:-python3}"
+# Purpose: Dynamically detects the Node.js package manager based on lockfiles.
+# Returns: "pnpm", "yarn", "bun", or "npm".
+_detect_node_manager() {
+  if [ -f "pnpm-lock.yaml" ]; then
+    echo "pnpm"
+  elif [ -f "yarn.lock" ]; then
+    echo "yarn"
+  elif [ -f "bun.lockb" ]; then
+    echo "bun"
+  elif [ -f "package-lock.json" ]; then
+    echo "npm"
+  elif command -v pnpm >/dev/null 2>&1; then
+    echo "pnpm"
+  elif command -v yarn >/dev/null 2>&1; then
+    echo "yarn"
+  elif command -v bun >/dev/null 2>&1; then
+    echo "bun"
+  else
+    echo "npm"
+  fi
+}
+
 # Dynamically detect Node.js package manager if not explicitly set
 if [ -z "$NPM" ]; then
-  if command -v bun >/dev/null 2>&1; then
-    NPM="bun"
-  elif command -v pnpm >/dev/null 2>&1; then
-    NPM="pnpm"
-  elif command -v yarn >/dev/null 2>&1; then
-    NPM="yarn"
-  else
-    NPM="npm"
-  fi
+  NPM=$(_detect_node_manager)
 fi
 export NPM
 DOCS_DIR="docs"
