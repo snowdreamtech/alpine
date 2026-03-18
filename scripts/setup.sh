@@ -1000,7 +1000,6 @@ install_commitlint() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
-  log_info "Installing commitlint + convention config via mise..."
   run_mise install "$_PROVIDER" "$_CONFIG_PROVIDER" || _STAT_CL="❌ Failed"
 
   log_summary "Other" "Commitlint" "$_STAT_CL" "$(get_version commitlint)" "$(($(date +%s) - _T0_CL))"
