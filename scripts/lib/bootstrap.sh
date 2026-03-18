@@ -120,10 +120,18 @@ _mise_install_tier3() {
   if command -v cargo >/dev/null 2>&1; then
     log_info "Detected Cargo. Installing mise..."
     cargo install mise && return 0
-  elif command -v npm >/dev/null 2>&1; then
-    log_info "Detected npm. Installing mise..."
-    # npm install -g might fail due to permissions, but we try.
-    npm install -g @jdxcode/mise && return 0
+  else
+    local _m_bs
+    for _m_bs in pnpm npm bun; do
+      if command -v "$_m_bs" >/dev/null 2>&1; then
+        log_info "Detected $_m_bs. Installing mise..."
+        "$_m_bs" install -g @jdxcode/mise && return 0
+      fi
+    done
+    if command -v yarn >/dev/null 2>&1; then
+      log_info "Detected yarn. Installing mise..."
+      yarn global add @jdxcode/mise && return 0
+    fi
   fi
   return 1
 }
