@@ -117,6 +117,7 @@ main() {
         _REG_ARG_JS="--registry=https://registry.npmjs.org"
       fi
 
+      # shellcheck disable=SC2086
       if run_quiet "$NPM" audit $_REG_ARG_JS; then
         log_summary "Node.js" "$NPM-audit" "✅ Secure" "$(get_version "$NPM")" "$(($(date +%s) - _T0_JS))"
       else
