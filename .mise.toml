@@ -43,6 +43,7 @@ checkmake = "0.3.2"
 editorconfig-checker = "3.6.1"
 gitleaks = "8.30.0"
 node = "20.18.3"
+pnpm = "9.15.5"
 python = "3.12.9"
 
 # These are managed via scripts/setup.sh to allow platform-aware

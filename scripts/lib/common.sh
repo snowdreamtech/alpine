@@ -109,33 +109,27 @@ _LOCAL_BIN_NODE=$(pwd)/node_modules/.bin
 _LOCAL_MISE_BIN="$_G_MISE_BIN_BASE"
 _LOCAL_MISE_SHIMS="$_G_MISE_SHIMS_BASE"
 
-if [ -d "$_LOCAL_MISE_BIN" ]; then
-  case ":$PATH:" in
-  *":$_LOCAL_MISE_BIN:"*) ;;
-  *) export PATH="$_LOCAL_MISE_BIN:$PATH" ;;
-  esac
-fi
+# Resilience: Always attempt to add these paths to ensure toolchain availability
+# even if directories are created later (like during setup JIT).
+case ":$PATH:" in
+*":$_LOCAL_MISE_BIN:"*) ;;
+*) export PATH="$_LOCAL_MISE_BIN:$PATH" ;;
+esac
 
-if [ -d "$_LOCAL_MISE_SHIMS" ]; then
-  case ":$PATH:" in
-  *":$_LOCAL_MISE_SHIMS:"*) ;;
-  *) export PATH="$_LOCAL_MISE_SHIMS:$PATH" ;;
-  esac
-fi
+case ":$PATH:" in
+*":$_LOCAL_MISE_SHIMS:"*) ;;
+*) export PATH="$_LOCAL_MISE_SHIMS:$PATH" ;;
+esac
 
-if [ -d "$_LOCAL_BIN_VENV" ]; then
-  case ":$PATH:" in
-  *":$_LOCAL_BIN_VENV:"*) ;;
-  *) export PATH="$_LOCAL_BIN_VENV:$PATH" ;;
-  esac
-fi
+case ":$PATH:" in
+*":$_LOCAL_BIN_VENV:"*) ;;
+*) export PATH="$_LOCAL_BIN_VENV:$PATH" ;;
+esac
 
-if [ -d "$_LOCAL_BIN_NODE" ]; then
-  case ":$PATH:" in
-  *":$_LOCAL_BIN_NODE:"*) ;;
-  *) export PATH="$_LOCAL_BIN_NODE:$PATH" ;;
-  esac
-fi
+case ":$PATH:" in
+*":$_LOCAL_BIN_NODE:"*) ;;
+*) export PATH="$_LOCAL_BIN_NODE:$PATH" ;;
+esac
 
 # Purpose: Dynamically detects the Node.js package manager based on lockfiles.
 # Returns: "pnpm", "yarn", "bun", or "npm".
