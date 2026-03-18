@@ -89,7 +89,7 @@ main() {
 
   # 4. Check for dependencies
   local _NPM_LOCAL_CMT
-  _NPM_LOCAL_CMT=${NPM:-pnpm}
+  _NPM_LOCAL_CMT="$NPM"
   if ! command -v "$_NPM_LOCAL_CMT" >/dev/null 2>&1; then
     log_error "Error: $_NPM_LOCAL_CMT client not found."
     exit 1
