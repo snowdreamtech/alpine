@@ -129,21 +129,12 @@ sync_all_lockfiles() {
   log_info "── Lockfile Synchronization ──"
 
   # Node.js (root)
-  if [ -f "pnpm-lock.yaml" ]; then
-    log_info "Syncing Node.js lockfile (pnpm)..."
-    pnpm install --no-frozen-lockfile
-  elif [ -f "yarn.lock" ]; then
-    log_info "Syncing Node.js lockfile (yarn)..."
-    yarn install --no-immutable
-  elif [ -f "package-lock.json" ]; then
-    log_info "Syncing Node.js lockfile (npm)..."
-    npm install --package-lock-only
-  fi
+  sync_node_lockfile "."
 
   # Docs (docs/)
   if [ -f "docs/package.json" ]; then
     log_info "Syncing docs dependencies..."
-    (cd docs && pnpm install --no-frozen-lockfile)
+    sync_node_lockfile "docs"
   fi
 
   log_success "Lockfile synchronization complete."
