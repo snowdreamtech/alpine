@@ -167,6 +167,20 @@ main() {
     log_info "⏭️  Go: Skipped (no go files)"
   fi
 
+  # Deno
+  if has_lang_files "deno.json deno.jsonc" "*.ts *.tsx *.js *.jsx"; then
+    check_runtime "deno" "Deno (Modular)"
+  else
+    log_info "⏭️  Deno: Skipped (no deno files)"
+  fi
+
+  # Bun
+  if has_lang_files "bun.lockb package.json" "*.ts *.tsx *.js *.jsx"; then
+    check_runtime "bun" "Bun (Modular)"
+  else
+    log_info "⏭️  Bun: Skipped (no bun files)"
+  fi
+
   # Ruby
   if has_lang_files "Gemfile .ruby-version package.json" "*.rb"; then
     check_tool_version "Ruby" "ruby" "3.0.0" "ruby -v" 0
@@ -507,6 +521,83 @@ main() {
     check_runtime "typst" "Typst (Modular)"
   else
     log_info "⏭️  Typst: Skipped (no Typst files)"
+  fi
+
+  # Perl
+  if has_lang_files "cpanfile Makefile.PL" "*.pl *.pm"; then
+    check_runtime "perl" "Perl (Modular)"
+  else
+    log_info "⏭️  Perl: Skipped (no perl files)"
+  fi
+
+  # Julia
+  if has_lang_files "Project.toml Manifest.toml" "*.jl"; then
+    check_runtime "julia" "Julia (Modular)"
+  else
+    log_info "⏭️  Julia: Skipped (no julia files)"
+  fi
+
+  # Groovy
+  if has_lang_files "build.gradle build.gradle.kts" "*.groovy *.gvy"; then
+    check_runtime "groovy" "Groovy (Modular)"
+  else
+    log_info "⏭️  Groovy: Skipped (no groovy files)"
+  fi
+
+  # Zig
+  if has_lang_files "build.zig" "*.zig"; then
+    check_runtime "zig" "Zig (Modular)"
+  else
+    log_info "⏭️  Zig: Skipped (no zig files)"
+  fi
+
+  # Tofu
+  if has_lang_files "tofu.lock" "*.tf"; then
+    check_runtime "tofu" "OpenTofu (Modular)"
+  else
+    log_info "⏭️  Tofu: Skipped (no tofu files)"
+  fi
+
+  # Pulumi
+  if has_lang_files "Pulumi.yaml Pulumi.stack.yaml"; then
+    check_runtime "pulumi" "Pulumi (Modular)"
+  else
+    log_info "⏭️  Pulumi: Skipped (no pulumi files)"
+  fi
+
+  # Elixir
+  if has_lang_files "mix.exs" "*.ex *.exs"; then
+    check_runtime "elixir" "Elixir (Modular)"
+  else
+    log_info "⏭️  Elixir: Skipped (no elixir files)"
+  fi
+
+  # Haskell
+  if has_lang_files "stack.yaml cabal.project package.yaml" "*.hs *.lhs"; then
+    check_runtime "haskell" "Haskell (Modular)"
+  else
+    log_info "⏭️  Haskell: Skipped (no haskell files)"
+  fi
+
+  # Scala
+  if has_lang_files "build.sbt build.gradle.kts" "*.scala *.sc"; then
+    check_runtime "scala" "Scala (Modular)"
+  else
+    log_info "⏭️  Scala: Skipped (no scala files)"
+  fi
+
+  # Lua
+  if has_lang_files "*.lua"; then
+    check_runtime "lua" "Lua (Modular)"
+  else
+    log_info "⏭️  Lua: Skipped (no lua files)"
+  fi
+
+  # R
+  if has_lang_files "DESCRIPTION" "*.R *.r"; then
+    check_runtime "r" "R (Modular)"
+  else
+    log_info "⏭️  R: Skipped (no R files)"
   fi
 
   # Mobile Support

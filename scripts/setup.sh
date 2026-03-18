@@ -53,7 +53,6 @@ Modules (default: all):
   checkmake          Install checkmake (Makefile linting)
   tflint             Install TFLint
   kube-linter        Install Kube-Linter
-  powershell         Setup PSScriptAnalyzer
   java               Install google-java-format
   ruby               Setup Rubocop
   dart               Check Dart SDK
