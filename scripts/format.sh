@@ -54,9 +54,9 @@ run_shfmt_format() {
 
   if [ -n "$_SHFMT_BIN" ]; then
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
-      "$_SHFMT_BIN" -d -s -i 2 scripts/*.sh tests/*.bats 2>/dev/null || true
+      "$_SHFMT_BIN" -d -s -i 2 scripts/ tests/ 2>/dev/null || true
     else
-      "$_SHFMT_BIN" -w -s -i 2 scripts/*.sh tests/*.bats 2>/dev/null || true
+      "$_SHFMT_BIN" -w -s -i 2 scripts/ tests/ 2>/dev/null || true
     fi
   else
     log_warn "Warning: shfmt not found. Skipping shell formatting."
