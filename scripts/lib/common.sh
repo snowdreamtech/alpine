@@ -127,6 +127,7 @@ ARCHIVE_DIR="${ARCHIVE_DIR:-.}"
 # NOTE: GITHUB_PROXY is optimized for Release/Archive/File downloads.
 # It does NOT support project folder clones (git clone).
 ENABLE_GITHUB_PROXY="${ENABLE_GITHUB_PROXY:-0}"
+GITHUB_PROXY="${GITHUB_PROXY:-https://gh-proxy.sn0wdr1am.com/}"
 
 # ── 🔨 SSoT Tool Versions ────────────────────────────────────────────────────
 
@@ -325,10 +326,12 @@ run_mise() {
 
     # 4. Rigorous Comparison (Ensures exact match or prefix)
     if [ "$_CUR_VER" != "-" ] && [ -n "$_REQ_VER" ]; then
-      if [ "$_CUR_VER" = "$_REQ_VER" ] || echo "$_CUR_VER" | grep -q "^${_REQ_VER}"; then
+      case "$_CUR_VER" in
+      "$_REQ_VER"*)
         # Skip if version matches
         return 0
-      fi
+        ;;
+      esac
     fi
 
     # 5. Backend-aware Manager Existence Check
