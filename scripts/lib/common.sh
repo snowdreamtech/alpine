@@ -100,6 +100,43 @@ fi
 
 VENV="${VENV:-.venv}"
 PYTHON="${PYTHON:-python3}"
+# ── 🛣️ PATH Augmentation ──────────────────────────────────────────────────────
+
+# Automatically add local bin directories to PATH to ensure orchestrated tools
+# are prioritized over system globals without requiring manual activation.
+_LOCAL_BIN_VENV=$(pwd)/${VENV}/${_G_VENV_BIN}
+_LOCAL_BIN_NODE=$(pwd)/node_modules/.bin
+_LOCAL_MISE_BIN="$_G_MISE_BIN_BASE"
+_LOCAL_MISE_SHIMS="$_G_MISE_SHIMS_BASE"
+
+if [ -d "$_LOCAL_MISE_BIN" ]; then
+  case ":$PATH:" in
+  *":$_LOCAL_MISE_BIN:"*) ;;
+  *) export PATH="$_LOCAL_MISE_BIN:$PATH" ;;
+  esac
+fi
+
+if [ -d "$_LOCAL_MISE_SHIMS" ]; then
+  case ":$PATH:" in
+  *":$_LOCAL_MISE_SHIMS:"*) ;;
+  *) export PATH="$_LOCAL_MISE_SHIMS:$PATH" ;;
+  esac
+fi
+
+if [ -d "$_LOCAL_BIN_VENV" ]; then
+  case ":$PATH:" in
+  *":$_LOCAL_BIN_VENV:"*) ;;
+  *) export PATH="$_LOCAL_BIN_VENV:$PATH" ;;
+  esac
+fi
+
+if [ -d "$_LOCAL_BIN_NODE" ]; then
+  case ":$PATH:" in
+  *":$_LOCAL_BIN_NODE:"*) ;;
+  *) export PATH="$_LOCAL_BIN_NODE:$PATH" ;;
+  esac
+fi
+
 # Purpose: Dynamically detects the Node.js package manager based on lockfiles.
 # Returns: "pnpm", "yarn", "bun", or "npm".
 _detect_node_manager() {
@@ -177,43 +214,6 @@ fi
 # Standardized library directory reference
 _G_LIB_DIR="${_G_PROJECT_ROOT}/scripts/lib"
 export _G_LIB_DIR
-
-# ── �🛣️ PATH Augmentation ──────────────────────────────────────────────────────
-
-# Automatically add local bin directories to PATH to ensure orchestrated tools
-# are prioritized over system globals without requiring manual activation.
-_LOCAL_BIN_VENV=$(pwd)/${VENV}/${_G_VENV_BIN}
-_LOCAL_BIN_NODE=$(pwd)/node_modules/.bin
-_LOCAL_MISE_BIN="$_G_MISE_BIN_BASE"
-_LOCAL_MISE_SHIMS="$_G_MISE_SHIMS_BASE"
-
-if [ -d "$_LOCAL_MISE_BIN" ]; then
-  case ":$PATH:" in
-  *":$_LOCAL_MISE_BIN:"*) ;;
-  *) export PATH="$_LOCAL_MISE_BIN:$PATH" ;;
-  esac
-fi
-
-if [ -d "$_LOCAL_MISE_SHIMS" ]; then
-  case ":$PATH:" in
-  *":$_LOCAL_MISE_SHIMS:"*) ;;
-  *) export PATH="$_LOCAL_MISE_SHIMS:$PATH" ;;
-  esac
-fi
-
-if [ -d "$_LOCAL_BIN_VENV" ]; then
-  case ":$PATH:" in
-  *":$_LOCAL_BIN_VENV:"*) ;;
-  *) export PATH="$_LOCAL_BIN_VENV:$PATH" ;;
-  esac
-fi
-
-if [ -d "$_LOCAL_BIN_NODE" ]; then
-  case ":$PATH:" in
-  *":$_LOCAL_BIN_NODE:"*) ;;
-  *) export PATH="$_LOCAL_BIN_NODE:$PATH" ;;
-  esac
-fi
 
 # ── 🛣️ CI Persistence (GitHub Actions) ───────────────────────────────────────
 
@@ -1117,12 +1117,7 @@ run_npm_script() {
 
   if [ -f "package.json" ]; then
     # 1. Manager Detection & Guard
-    local _NODE_MGR
-    if [ -n "$NPM" ]; then
-      _NODE_MGR="$NPM"
-    else
-      _NODE_MGR=$(_detect_node_manager)
-    fi
+    _NODE_MGR="$NPM"
 
     if ! command -v "$_NODE_MGR" >/dev/null 2>&1; then
       log_warn "Warning: $_NODE_MGR command not found and no fallback available. Skipping Node.js task: $_SCRIPT_NAME_NPM."
