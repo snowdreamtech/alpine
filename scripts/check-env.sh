@@ -146,10 +146,10 @@ main() {
   # Node.js
   if [ -f "$PACKAGE_JSON" ]; then
     check_tool_version "Node.js" "node" "$(get_mise_tool_version node)" "node -v" 1
-    check_tool_version "pnpm" "pnpm" "$(get_mise_tool_version pnpm)" "pnpm -v"
+    check_tool_version "$NPM" "$NPM" "$(get_mise_tool_version "$NPM")" "$NPM -v"
     check_runtime "node" "Node.js (Modular)"
   else
-    log_info "⏭️  Node.js/pnpm: Skipped (no package.json)"
+    log_info "⏭️  Node.js/$NPM: Skipped (no package.json)"
   fi
 
   # Python
