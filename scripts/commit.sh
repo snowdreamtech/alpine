@@ -40,7 +40,6 @@ Options:
   -h, --help       Show this help message.
 
 Environment Variables:
-  NPM              NPM client (default: pnpm)
 
 EOF
 }

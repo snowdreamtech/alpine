@@ -44,7 +44,7 @@ Options:
   -h, --help       Show this help message.
 
 Environment Variables:
-  NPM              NPM client (default: pnpm)
+  NPM              NPM client (detected: $NPM)
   DOCS_DIR         Documentation directory (default: docs)
 
 EOF
