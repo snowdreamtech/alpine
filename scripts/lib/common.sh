@@ -716,10 +716,6 @@ has_lang_files() {
       # Also check for .proto files via find loop
       _ext_lang="*.proto"
       ;;
-    GRAPHQL)
-      [ -f "codegen.yml" ] && return 0
-      _ext_lang="*.graphql *.gql"
-      ;;
     LUA)
       _ext_lang="*.lua"
       ;;
@@ -731,11 +727,6 @@ has_lang_files() {
       [ -f "Taskfile.yml" ] && return 0
       [ -f "Taskfile.yaml" ] && return 0
       ;;
-    NIX)
-      [ -f "flake.nix" ] && return 0
-      [ -f "default.nix" ] && return 0
-      _ext_lang="*.nix"
-      ;;
     ZIG)
       [ -f "build.zig" ] && return 0
       _ext_lang="*.zig"
@@ -745,12 +736,6 @@ has_lang_files() {
       ;;
     REGO)
       _ext_lang="*.rego"
-      ;;
-    SERVER)
-      # Common server configs
-      [ -f "nginx.conf" ] && return 0
-      [ -f "Caddyfile" ] && return 0
-      [ -d "nginx" ] && return 0
       ;;
     EDGE)
       # Modern edge/frontend deployment configs

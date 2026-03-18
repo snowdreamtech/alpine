@@ -215,13 +215,6 @@ main() {
     log_info "⏭️  C/C++: Skipped (no C/C++ files)"
   fi
 
-  # Assembly
-  if has_lang_files "*.s *.asm"; then
-    check_runtime "assembly" "Assembly (Modular)"
-  else
-    log_info "⏭️  Assembly: Skipped (no Assembly files)"
-  fi
-
   # Terraform
   if has_lang_files "" "*.tf *.tfvars *.hcl"; then
     check_runtime "terraform" "Terraform (Modular)"
@@ -229,51 +222,11 @@ main() {
     log_info "⏭️  Terraform: Skipped (no Terraform files)"
   fi
 
-  # Ansible
-  if has_lang_files "ansible.cfg playbook.yml site.yml" "roles/"; then
-    check_runtime "ansible" "Ansible"
-  else
-    log_info "⏭️  Ansible: Skipped (no Ansible files)"
-  fi
-
-  # Nginx
-  if has_lang_files "nginx.conf" "conf.d/ sites-available/ sites-enabled/"; then
-    check_runtime "nginx" "Nginx"
-  else
-    log_info "⏭️  Nginx: Skipped (no Nginx files)"
-  fi
-
-  # Caddy
-  if has_lang_files "Caddyfile" ""; then
-    check_runtime "caddy" "Caddy"
-  else
-    log_info "⏭️  Caddy: Skipped (no Caddyfile)"
-  fi
-
-  # Elasticsearch
-  if has_lang_files "elasticsearch.yml" "config/elasticsearch.yml"; then
-    check_runtime "elasticsearch" "Elasticsearch"
-  else
-    log_info "⏭️  Elasticsearch: Skipped (no Elasticsearch files)"
-  fi
-
-  # Meilisearch
-  if has_lang_files "meilisearch.toml" ""; then
-    check_runtime "meilisearch" "Meilisearch"
-  fi
-
   # Solidity
   if has_lang_files "" "*.sol"; then
     check_runtime "solidity" "Solidity (Modular)"
   else
     log_info "⏭️  Solidity: Skipped (no Solidity files)"
-  fi
-
-  # Nix
-  if has_lang_files "flake.nix shell.nix default.nix" "*.nix"; then
-    check_runtime "nix" "Nix (Modular)"
-  else
-    log_info "⏭️  Nix: Skipped (no Nix files)"
   fi
 
   # Odin
@@ -311,25 +264,11 @@ main() {
     log_info "⏭️  Mojo: Skipped (no Mojo files)"
   fi
 
-  # Objective-C
-  if has_lang_files "" "*.m *.mm"; then
-    check_runtime "objc" "Objective-C (Modular)"
-  else
-    log_info "⏭️  Objective-C: Skipped (no Objective-C files)"
-  fi
-
   # OCaml
   if has_lang_files "dune-project dune opam" "*.ml *.mli *.mll *.mly"; then
     check_runtime "ocaml" "OCaml (Modular)"
   else
     log_info "⏭️  OCaml: Skipped (no OCaml files)"
-  fi
-
-  # F#
-  if has_lang_files "" "*.fs *.fsi *.fsx *.fsproj"; then
-    check_runtime "fsharp" "F# (Modular)"
-  else
-    log_info "⏭️  F#: Skipped (no F# files)"
   fi
 
   # Erlang
@@ -479,13 +418,6 @@ main() {
     log_info "⏭️  Prolog: Skipped (no Prolog files)"
   fi
 
-  # PowerShell
-  if has_lang_files "*.ps1 *.psm1 *.psd1"; then
-    check_runtime "pwsh" "PowerShell (Modular)"
-  else
-    log_info "⏭️  PowerShell: Skipped (no PowerShell files)"
-  fi
-
   # Fortran
   if has_lang_files "*.f *.for *.f90 *.f95"; then
     check_runtime "fortran" "Fortran (Modular)"
@@ -549,13 +481,6 @@ main() {
     log_info "⏭️  VCPKG: Skipped (no VCPKG files)"
   fi
 
-  # Gherkin
-  if has_lang_files "*.feature"; then
-    check_runtime "gherkin" "Gherkin (Modular)"
-  else
-    log_info "⏭️  Gherkin: Skipped (no Gherkin files)"
-  fi
-
   # Terragrunt
   if has_lang_files "terragrunt.hcl"; then
     check_runtime "terragrunt" "Terragrunt (Modular)"
@@ -577,20 +502,6 @@ main() {
     log_info "⏭️  Helm: Skipped (no Chart.yaml)"
   fi
 
-  # Kustomize
-  if has_lang_files "kustomization.yaml kustomization.yml"; then
-    check_runtime "kustomize" "Kustomize (Modular)"
-  else
-    log_info "⏭️  Kustomize: Skipped (no kustomization.yaml)"
-  fi
-
-  # GraphQL
-  if has_lang_files "*.graphql *.gql"; then
-    check_runtime "graphql" "GraphQL (Modular)"
-  else
-    log_info "⏭️  GraphQL: Skipped (no GraphQL files)"
-  fi
-
   # Typst
   if has_lang_files "*.typ"; then
     check_runtime "typst" "Typst (Modular)"
@@ -598,227 +509,7 @@ main() {
     log_info "⏭️  Typst: Skipped (no Typst files)"
   fi
 
-  # Verilog
-  if has_lang_files "*.v"; then
-    check_runtime "verilog" "Verilog (Modular)"
-  else
-    log_info "⏭️  Verilog: Skipped (no .v files)"
-  fi
-
-  # SystemVerilog
-  if has_lang_files "*.sv *.svh"; then
-    check_runtime "systemverilog" "SystemVerilog (Modular)"
-  else
-    log_info "⏭️  SystemVerilog: Skipped (no .sv files)"
-  fi
-
-  # VHDL
-  if has_lang_files "*.vhd *.vhdl"; then
-    check_runtime "vhdl" "VHDL (Modular)"
-  else
-    log_info "⏭️  VHDL: Skipped (no VHDL files)"
-  fi
-
-  # Octave / MATLAB
-  if has_lang_files "*.m"; then
-    check_runtime "octave" "Octave (Modular)"
-    check_runtime "matlab" "MATLAB (Modular)"
-  else
-    log_info "⏭️  Octave/MATLAB: Skipped (no .m files)"
-  fi
-
-  # OpenAPI
-  if has_lang_files "openapi.yaml openapi.json swagger.yaml swagger.json"; then
-    check_runtime "openapi" "OpenAPI (Modular)"
-  else
-    log_info "⏭️  OpenAPI: Skipped (no OpenAPI files)"
-  fi
-
-  # AsyncAPI
-  if has_lang_files "asyncapi.yaml asyncapi.yml asyncapi.json"; then
-    check_runtime "asyncapi" "AsyncAPI (Modular)"
-  else
-    log_info "⏭️  AsyncAPI: Skipped (no AsyncAPI files)"
-  fi
-
-  # PromQL
-  if has_lang_files "*.promql"; then
-    check_runtime "promql" "PromQL (Modular)"
-  else
-    log_info "⏭️  PromQL: Skipped (no PromQL files)"
-  fi
-
-  # LaTeX
-  if has_lang_files "*.tex *.bib"; then
-    check_runtime "latex" "LaTeX (Modular)"
-  else
-    log_info "⏭️  LaTeX: Skipped (no LaTeX files)"
-  fi
-
-  # Protobuf
-  if has_lang_files "*.proto"; then
-    check_runtime "proto" "Protobuf (Modular)"
-  else
-    log_info "⏭️  Protobuf: Skipped (no .proto files)"
-  fi
-
-  # Avro
-  if has_lang_files "*.avsc"; then
-    check_runtime "avro" "Avro (Modular)"
-  else
-    log_info "⏭️  Avro: Skipped (no .avsc files)"
-  fi
-
-  # Thrift
-  if has_lang_files "*.thrift"; then
-    check_runtime "thrift" "Thrift (Modular)"
-  else
-    log_info "⏭️  Thrift: Skipped (no .thrift files)"
-  fi
-
-  # Prisma
-  if has_lang_files "schema.prisma" "*.prisma"; then
-    check_runtime "prisma" "Prisma (Modular)"
-  else
-    log_info "⏭️  Prisma: Skipped (no .prisma files)"
-  fi
-
-  # FlatBuffers
-  if has_lang_files "*.fbs"; then
-    check_runtime "flatbuffers" "FlatBuffers (Modular)"
-  else
-    log_info "⏭️  FlatBuffers: Skipped (no .fbs files)"
-  fi
-
-  # EdgeDB
-  if has_lang_files "edgedb.toml" "*.esdl"; then
-    check_runtime "edgedb" "EdgeDB (Modular)"
-  else
-    log_info "⏭️  EdgeDB: Skipped (no .esdl files)"
-  fi
-
-  # SurrealDB
-  if has_lang_files "*.surql"; then
-    check_runtime "surrealdb" "SurrealDB (Modular)"
-  else
-    log_info "⏭️  SurrealDB: Skipped (no .surql files)"
-  fi
-
-  # PL/SQL
-  if has_lang_files "*.sql *.pls *.plsql"; then
-    check_runtime "plsql" "PL/SQL (Modular)"
-  else
-    log_info "⏭️  PL/SQL: Skipped (no PL/SQL files)"
-  fi
-
-  # T-SQL
-  if has_lang_files "*.sql *.tsql"; then
-    check_runtime "tsql" "T-SQL (Modular)"
-  else
-    log_info "⏭️  T-SQL: Skipped (no T-SQL files)"
-  fi
-
-  # COBOL
-  if has_lang_files "*.cob *.cbl"; then
-    check_runtime "cobol" "COBOL (Modular)"
-  else
-    log_info "⏭️  COBOL: Skipped (no COBOL files)"
-  fi
-
-  # PRQL
-  if has_lang_files "*.prql"; then
-    check_runtime "prql" "PRQL (Modular)"
-  else
-    log_info "⏭️  PRQL: Skipped (no PRQL files)"
-  fi
-
-  # CUDA
-  if has_lang_files "*.cu *.cuh"; then
-    check_runtime "cuda" "CUDA (Modular)"
-  else
-    log_info "⏭️  CUDA: Skipped (no CUDA files)"
-  fi
-
-  # Bicep
-  if has_lang_files "*.bicep"; then
-    check_runtime "bicep" "Bicep (Modular)"
-  else
-    log_info "⏭️  Bicep: Skipped (no Bicep files)"
-  fi
-
-  # CloudFormation
-  if has_lang_files "*.template *.cfn.yaml *.cfn.json"; then
-    check_runtime "cloudformation" "CloudFormation (Modular)"
-  else
-    log_info "⏭️  CloudFormation: Skipped (no CloudFormation files)"
-  fi
-
-  # ArkTS
-  if has_lang_files "*.ets"; then
-    check_runtime "arkts" "ArkTS (Modular)"
-  else
-    log_info "⏭️  ArkTS: Skipped (no ArkTS files)"
-  fi
-
-  # Shader
-  if has_lang_files "*.hlsl *.glsl *.vert *.frag *.comp"; then
-    check_runtime "shader" "Shader (Modular)"
-  else
-    log_info "⏭️  Shader: Skipped (no Shader files)"
-  fi
-
-  # GDScript
-  if has_lang_files "*.gd"; then
-    check_runtime "gdscript" "GDScript (Modular)"
-  else
-    log_info "⏭️  GDScript: Skipped (no GDScript files)"
-  fi
-
-  # QML
-  if has_lang_files "*.qml"; then
-    check_runtime "qml" "QML (Modular)"
-  else
-    log_info "⏭️  QML: Skipped (no QML files)"
-  fi
-
-  # Apex
-  if has_lang_files "*.cls *.trigger"; then
-    check_runtime "apex" "Apex (Modular)"
-  else
-    log_info "⏭️  Apex: Skipped (no Apex files)"
-  fi
-
-  # AppleScript
-  if has_lang_files "*.applescript *.scpt"; then
-    check_runtime "applescript" "AppleScript (Modular)"
-  else
-    log_info "⏭️  AppleScript: Skipped (no AppleScript files)"
-  fi
-
-  # VBA
-  if has_lang_files "*.vba *.bas *.cls"; then
-    check_runtime "vba" "VBA (Modular)"
-  else
-    log_info "⏭️  VBA: Skipped (no VBA files)"
-  fi
-
-  # Tauri
-  if has_lang_files "tauri.conf.json src-tauri/tauri.conf.json"; then
-    check_runtime "tauri" "Tauri (Modular)"
-  else
-    log_info "⏭️  Tauri: Skipped (no tauri.conf.json)"
-  fi
-
-  # Electron
-  if [ -f "package.json" ] && grep -q '"electron"' package.json; then
-    check_runtime "electron" "Electron (Modular)"
-  else
-    log_info "⏭️  Electron: Skipped (no electron in package.json)"
-  fi
-
-  printf "\n"
-
-  # 5. Group: Mobile Support
+  # Mobile Support
   if has_lang_files "Package.swift pubspec.yaml build.gradle.kts" "*.swift *.kt *.dart"; then
     log_info "── Mobile Support ──"
     if has_lang_files "Package.swift" "*.swift"; then check_tool_version "Swift" "swift" "5.0" "swift --version" 0; fi
