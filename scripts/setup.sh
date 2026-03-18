@@ -45,7 +45,7 @@ Options:
   -h, --help         Show this help message.
 
 Modules (default: all):
-  node               Setup Node.js & pnpm
+  node               Setup Node.js & Node.js Package Manager
   python             Setup Python Virtual Environment & dependencies
   gitleaks           Install Gitleaks (secrets scanning)
   hadolint           Install Hadolint (Docker linting)

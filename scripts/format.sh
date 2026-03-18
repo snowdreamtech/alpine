@@ -124,7 +124,7 @@ main() {
   printf "\n"
   run_ruff_format
 
-  # Optional: run npm format if extra tools are defined in package.json
+  # Optional: run format script if defined in package.json
   run_npm_script "format"
 
   log_success "\n✨ Formatting complete!"
