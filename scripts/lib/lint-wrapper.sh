@@ -88,7 +88,7 @@ main() {
   gofmt) check_runtime go "$_LINTER_WRAP" ;;
   cargo) check_runtime rust "$_LINTER_WRAP" ;;
   *)
-    # Generic fallback for other binary tools (typos, yamllint, etc.)
+    # Generic fallback for other binary tools (yamllint, etc.)
     # If a module exists for the tool name, it will be used.
     check_runtime "$_LINTER_WRAP" "$_LINTER_WRAP"
     ;;
