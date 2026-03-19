@@ -298,20 +298,12 @@ get_mise_tool_version() {
 
   # Robust regex for [.mise.toml] parsing:
   # 1. Matches lines starting with the tool name (optionally quoted and prefixed)
-  # 2. ALSO matches MISE_TOOL_VERSION_<UPPERCASE_NAME> in [env] section
   local _VER
   _VER=$(grep -E "^\"?([^:]+:)?${_TOOL_NAME_MISE}\"?[[:space:]]*=" "$_MISE_TOM_PATH" 2>/dev/null |
     sed -E 's/^[^=]*=[[:space:]]*"([^"]*)".*/\1/' | head -n 1 || true)
 
-  if [ -z "$_VER" ]; then
-    # Fallback to MISE_TOOL_VERSION_<UPPERCASE_NAME> (e.g. for pnpm -> MISE_TOOL_VERSION_PNPM)
-    local _UC_NAME
-    _UC_NAME=$(echo "$_TOOL_NAME_MISE" | tr '[:lower:]' '[:upper:]' | sed 's/-/_/g')
-    _VER=$(grep -E "^MISE_TOOL_VERSION_${_UC_NAME}[[:space:]]*=" "$_MISE_TOM_PATH" 2>/dev/null |
-      sed -E 's/^[^=]*=[[:space:]]*"([^"]*)".*/\1/' | head -n 1 || true)
-  fi
-
-  echo "$_VER"
+  # Fallback to 'latest' if no version is explicitly defined in .mise.toml
+  echo "${_VER:-latest}"
 }
 
 # Purpose: Executes a mise command with retry logic and intelligent fallback.
