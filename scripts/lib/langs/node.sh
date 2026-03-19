@@ -20,8 +20,22 @@ install_runtime_node() {
   _V_PNPM=$(get_mise_tool_version pnpm)
   local _V_YARN
   _V_YARN=$(get_mise_tool_version yarn)
-  corepack prepare "pnpm@${_V_PNPM:-latest}" --activate
-  corepack prepare "yarn@${_V_YARN:-latest}" --activate
+
+  # Resilient pnpm installation (Handles corepack signature errors in fresh CI)
+  if ! corepack prepare "pnpm@${_V_PNPM:-latest}" --activate; then
+    log_warn "Corepack failed to prepare pnpm (Signature error?). Attempting update and direct fallback..."
+    npm install -g corepack@latest --force >/dev/null 2>&1 || true
+    corepack prepare "pnpm@${_V_PNPM:-latest}" --activate || {
+      log_warn "Corepack still failed. Using direct npm installation for pnpm."
+      npm install -g "pnpm@${_V_PNPM:-latest}" --force
+    }
+  fi
+
+  # Resilient yarn installation
+  if ! corepack prepare "yarn@${_V_YARN:-latest}" --activate; then
+    log_warn "Corepack failed for yarn. Using direct npm installation."
+    npm install -g "yarn@${_V_YARN:-latest}" --force
+  fi
 
   # 2. Dependency resolution
   if [ -f "$PACKAGE_JSON" ]; then
