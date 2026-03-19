@@ -938,16 +938,18 @@ log_summary() {
 
 # Purpose: Safely extracts version strings from various command outputs.
 # Params:
-#   $1 - Binary or Command path to execute
+#   $1 - Binary or Command name to execute
 #   $2 - Argument to fetch version (default: --version)
+#   $3 - Optional: Exact Mise plugin/provider name for cache lookup
 # Returns:
 #   Detected version string (stripped) or "-" if command fails/missing.
 # Examples:
 #   V=$(get_version "node")
-#   V=$(get_version "go" "version")
+#   V=$(get_version "shfmt" "" "shfmt-py")
 get_version() {
   local _CMD_VER="$1"
   local _ARG_VER="${2:---version}"
+  local _M_PLUGIN="${3:-$_CMD_VER}"
   [ -z "$_CMD_VER" ] && {
     echo "-"
     return 0
@@ -964,9 +966,9 @@ get_version() {
       local _MISE_VER_OUT
       # Optimization: Use global state cache if available to avoid repeated mise invocations
       if [ -n "$_G_MISE_LS_JSON" ]; then
-        _MISE_VER_OUT=$(echo "$_G_MISE_LS_JSON" | jq -r "to_entries[] | select(.key == \"$_CMD_VER\" or (.key | endswith(\":$_CMD_VER\")) or (.key | endswith(\"/$_CMD_VER\"))) | .value[] | select(.active==true or .installed==true) | .version" 2>/dev/null | head -n 1)
+        _MISE_VER_OUT=$(echo "$_G_MISE_LS_JSON" | jq -r "to_entries[] | select(.key == \"$_M_PLUGIN\" or (.key | endswith(\":$_M_PLUGIN\")) or (.key | endswith(\"/$_M_PLUGIN\"))) | .value[] | select(.active==true or .installed==true) | .version" 2>/dev/null | head -n 1)
       else
-        _MISE_VER_OUT=$(mise ls --json 2>/dev/null | jq -r ".[] | select(.plugin == \"$_CMD_VER\" or (.plugin | endswith(\":$_CMD_VER\")) or (.plugin | endswith(\"/$_CMD_VER\"))) | select(.active==true or .installed==true) | .version" 2>/dev/null | head -n 1)
+        _MISE_VER_OUT=$(mise ls --json 2>/dev/null | jq -r "to_entries[] | select(.key == \"$_M_PLUGIN\" or (.key | endswith(\":$_M_PLUGIN\")) or (.key | endswith(\"/$_M_PLUGIN\"))) | .value[] | select(.active==true or .installed==true) | .version" 2>/dev/null | head -n 1)
       fi
       if [ -n "$_MISE_VER_OUT" ] && [ "$_MISE_VER_OUT" != "null" ]; then
         echo "$_MISE_VER_OUT"

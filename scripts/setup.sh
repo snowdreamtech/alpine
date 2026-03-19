@@ -340,7 +340,7 @@ install_commitlint() {
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
-  _CUR_VER=$(get_version commitlint)
+  _CUR_VER=$(get_version commitlint "" "@commitlint/cli")
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
@@ -851,7 +851,7 @@ install_shfmt() {
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
-  _CUR_VER=$(get_version shfmt)
+  _CUR_VER=$(get_version shfmt "" "shfmt-py")
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "pipx:shfmt-py")
 
@@ -880,7 +880,7 @@ install_shellcheck() {
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
-  _CUR_VER=$(get_version shellcheck)
+  _CUR_VER=$(get_version shellcheck "" "shellcheck-py")
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "pipx:shellcheck-py")
 
@@ -915,7 +915,7 @@ install_actionlint() {
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
-  _CUR_VER=$(get_version actionlint)
+  _CUR_VER=$(get_version actionlint "" "actionlint-py")
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
@@ -949,7 +949,7 @@ install_taplo() {
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
-  _CUR_VER=$(get_version taplo)
+  _CUR_VER=$(get_version taplo "" "@taplo/cli")
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
