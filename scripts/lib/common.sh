@@ -966,9 +966,9 @@ get_version() {
       local _MISE_VER_OUT
       # Optimization: Use global state cache if available to avoid repeated mise invocations
       if [ -n "$_G_MISE_LS_JSON" ]; then
-        _MISE_VER_OUT=$(echo "$_G_MISE_LS_JSON" | jq -r "to_entries[] | select(.key == \"$_M_PLUGIN\" or (.key | endswith(\":$_M_PLUGIN\")) or (.key | endswith(\"/$_M_PLUGIN\"))) | .value[] | select(.active==true or .installed==true) | .version" 2>/dev/null | head -n 1)
+        _MISE_VER_OUT=$(echo "$_G_MISE_LS_JSON" | jq -r "to_entries[] | select(.key == \"$_M_PLUGIN\" or (.key | endswith(\":$_M_PLUGIN\")) or (.key | endswith(\"/$_M_PLUGIN\"))) | .value[] | select(.active==true) | .version" 2>/dev/null | head -n 1)
       else
-        _MISE_VER_OUT=$(mise ls --json 2>/dev/null | jq -r "to_entries[] | select(.key == \"$_M_PLUGIN\" or (.key | endswith(\":$_M_PLUGIN\")) or (.key | endswith(\"/$_M_PLUGIN\"))) | .value[] | select(.active==true or .installed==true) | .version" 2>/dev/null | head -n 1)
+        _MISE_VER_OUT=$(mise ls --json 2>/dev/null | jq -r "to_entries[] | select(.key == \"$_M_PLUGIN\" or (.key | endswith(\":$_M_PLUGIN\")) or (.key | endswith(\"/$_M_PLUGIN\"))) | .value[] | select(.active==true) | .version" 2>/dev/null | head -n 1)
       fi
       if [ -n "$_MISE_VER_OUT" ] && [ "$_MISE_VER_OUT" != "null" ]; then
         echo "$_MISE_VER_OUT"
