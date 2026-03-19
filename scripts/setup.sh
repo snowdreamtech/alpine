@@ -302,7 +302,7 @@ install_tflint() {
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_TF="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_TF="❌ Failed"
-  log_summary "Terraform" "TFLint" "$_STAT_TF" "$(get_version tflint)" "$(($(date +%s) - _T0_TF))"
+  log_summary "IaC" "TFLint" "$_STAT_TF" "$(get_version tflint)" "$(($(date +%s) - _T0_TF))"
 }
 
 # Purpose: Installs Kube-Linter.
@@ -321,7 +321,7 @@ install_kube_linter() {
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_KL="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_KL="❌ Failed"
-  log_summary "Kubernetes" "Kube-Linter" "$_STAT_KL" "$(get_version kube-linter)" "$(($(date +%s) - _T0_KL))"
+  log_summary "IaC" "Kube-Linter" "$_STAT_KL" "$(get_version kube-linter)" "$(($(date +%s) - _T0_KL))"
 }
 
 # Purpose: Installs google-java-format for Java project linting.
@@ -1591,12 +1591,12 @@ EOF
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
     # Grouped list for "On-demand" (default) or "All" (explicit)
-    # 1. Base Tools (Universal)
-    local _BASE_LIST="pipx gitleaks checkmake editorconfig-checker shfmt shellcheck actionlint taplo prettier commitlint commitizen pre-commit hooks cue yamllint markdownlint dotenv-linter just task"
-    # 2. Language Runtimes & Specific Tools
+    # 1. Base Tools (Universal Lint/Format/Task)
+    local _BASE_LIST="pipx gitleaks checkmake editorconfig-checker shfmt shellcheck actionlint taplo prettier commitlint commitizen pre-commit hooks cue yamllint markdownlint dotenv-linter just task sort-package-json stylua clang-format"
+    # 2. Language Runtimes & Specific Toolsets
     local _LANG_LIST="node python go rust java kotlin php ruby dart swift lua perl julia r groovy dotnet zig elixir haskell scala"
-    # 3. Domain Tools (Security, IaC, Testing, etc.)
-    local _DOMAIN_LIST="osv-scanner trivy zizmor govulncheck cargo-audit pip-audit rego hadolint tflint kube-linter tofu pulumi crossplane spectral buf playwright cypress vitest bats bats-libs vitepress docusaurus mkdocs sphinx jupyter dvc"
+    # 3. Domain Tools (Security, IaC, Platforms, Testing, Docs, AI, etc.)
+    local _DOMAIN_LIST="osv-scanner trivy zizmor govulncheck cargo-audit pip-audit rego hadolint tflint kube-linter tofu pulumi crossplane spectral buf goreleaser playwright cypress vitest bats bats-libs vitepress docusaurus mkdocs sphinx jupyter dvc rn ruff eslint stylelint sqlfluff ktlint dockerfile-utils"
 
     _MODULES_LIST="${_BASE_LIST} ${_LANG_LIST} ${_DOMAIN_LIST}"
   else
@@ -1630,11 +1630,16 @@ EOF
   local _cur_grp=""
   for _cur_module in $_MODULES_LIST; do
     # Visual Grouping Headers for 'All' mode
+    # Visual Grouping Headers for 'All' mode (prints before the first active module in each category)
     if [ "$_IS_ALL_MODULES" = "true" ]; then
-      case $_cur_module in
-      pipx) [ "$_cur_grp" != "base" ] && log_info "── Base Toolset ──" && _cur_grp="base" ;;
-      node) [ "$_cur_grp" != "lang" ] && log_info "── Language Toolsets ──" && _cur_grp="lang" ;;
-      osv-scanner) [ "$_cur_grp" != "domain" ] && log_info "── Domain Toolsets ──" && _cur_grp="domain" ;;
+      case " ${_BASE_LIST} " in *" ${_cur_module} "*)
+        [ "$_cur_grp" != "base" ] && log_info "── Base Toolset ──" && _cur_grp="base" ;;
+      esac
+      case " ${_LANG_LIST} " in *" ${_cur_module} "*)
+        [ "$_cur_grp" != "lang" ] && log_info "── Language Toolsets ──" && _cur_grp="lang" ;;
+      esac
+      case " ${_DOMAIN_LIST} " in *" ${_cur_module} "*)
+        [ "$_cur_grp" != "domain" ] && log_info "── Domain Toolsets ──" && _cur_grp="domain" ;;
       esac
     fi
 
