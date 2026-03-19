@@ -1715,12 +1715,17 @@ EOF
       log_summary "Environment" "System" "✅ Active" "$(uname -s)/$(uname -m)" "0"
       log_summary "Environment" "Shell" "✅ Active" "$(basename "$SHELL")" "0"
 
-      # Detect Go/Rust even if not explicitly setup
-      if command -v go >/dev/null 2>&1; then
-        log_summary "Runtime" "Go" "✅ Detected" "$(go version | awk '{print $3}')" "0"
+      # Detect Go/Rust even if not explicitly setup (Safe version check)
+      local _V_GO_DET
+      _V_GO_DET=$(get_version go)
+      if [ "$_V_GO_DET" != "-" ]; then
+        log_summary "Runtime" "Go" "✅ Detected" "$_V_GO_DET" "0"
       fi
-      if command -v cargo >/dev/null 2>&1; then
-        log_summary "Runtime" "Rust" "✅ Detected" "$(cargo --version | awk '{print $2}')" "0"
+
+      local _V_RS_DET
+      _V_RS_DET=$(get_version cargo)
+      if [ "$_V_RS_DET" != "-" ]; then
+        log_summary "Runtime" "Rust" "✅ Detected" "$_V_RS_DET" "0"
       fi
     } >"$SETUP_SUMMARY_FILE"
 
