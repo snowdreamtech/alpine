@@ -100,6 +100,43 @@ fi
 
 VENV="${VENV:-.venv}"
 PYTHON="${PYTHON:-python3}"
+
+# ── 🔄 Mise Environment Sync (SSoT Protection) ──────────────────────────────
+
+# Purpose: Syncs MISE_TOOL_VERSION_<UPPERCASE> environment variables from the
+#          [tools] section of .mise.toml. This ensures backward compatibility
+#          with scripts that rely on these variables while maintaining a
+#          single source of truth in the [tools] section.
+_sync_mise_env() {
+  local _MISE_TOM_SYNC
+  _MISE_TOM_SYNC="$(pwd)/.mise.toml"
+  [ -f "$_MISE_TOM_SYNC" ] || return 0
+
+  # High-performance parsing:
+  # 1. Find the [tools] section and read until the next section
+  # 2. Extract key = "version" pairs
+  # 3. Handle both simple names (node) and namespaced providers (npm:@taplo/cli)
+  # 4. Export as MISE_TOOL_VERSION_<UPPERCASE_NAME>
+  local _TOOLS_RAW
+  _TOOLS_RAW=$(sed -n '/^\[tools\]/,/^\[/p' "$_MISE_TOM_SYNC" | grep -E '^[[:space:]]*"?([^:]+:)?[-_a-zA-Z0-9.@/]+"?[[:space:]]*=' || true)
+
+  echo "$_TOOLS_RAW" | while read -r _LINE; do
+    [ -z "$_LINE" ] && continue
+    # Extract Key and Value
+    local _KEY
+    _KEY=$(echo "$_LINE" | cut -d'=' -f1 | tr -d ' "[:space:]' | sed -E 's/^[^:]+://; s/.*\///')
+    local _VAL
+    _VAL=$(echo "$_LINE" | cut -d'=' -f2 | tr -d ' "[:space:]')
+
+    # Standardize Key (e.g. @taplo/cli -> TAPLO_CLI, node -> NODE)
+    local _VAR_NAME
+    _VAR_NAME=$(echo "$_KEY" | tr '[:lower:]' '[:upper:]' | tr -c '[:alnum:]' '_' | sed 's/^_//; s/_$//')
+
+    # Export only if not already set (allow environment overrides)
+    eval "export MISE_TOOL_VERSION_${_VAR_NAME}=\${MISE_TOOL_VERSION_${_VAR_NAME}:-\"$_VAL\"}"
+  done
+}
+_sync_mise_env
 # ── 🛣️ PATH Augmentation ──────────────────────────────────────────────────────
 
 # Automatically add local bin directories to PATH to ensure orchestrated tools
