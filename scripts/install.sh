@@ -2,7 +2,7 @@
 # scripts/install.sh - Unified Dependency Orchestrator
 #
 # Purpose:
-#   Consolidates disparate package managers (pnpm, pip, pre-commit) into a single CLI.
+#   Consolidates disparate package managers (Node.js, pip, pre-commit) into a single CLI.
 #   Ensures all environmental dependencies are installed and properly linked.
 #
 # Usage:
@@ -26,7 +26,7 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 
 # ── Functions ────────────────────────────────────────────────────────────────
 
-# Purpose: Extracts and installs Node.js dependencies using pnpm.
+# Purpose: Extracts and installs Node.js dependencies using the detected manager.
 # Examples:
 #   install_node_deps
 install_node_deps() {
