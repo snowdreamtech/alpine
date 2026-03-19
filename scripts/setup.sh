@@ -350,7 +350,8 @@ install_commitlint() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+  # Robust matching: Exact or contains (to handle @commitlint/cli@ prefix if cleanup fails)
+  if [ "$_CUR_VER" != "-" ] && ([ "$_CUR_VER" = "$_REQ_VER" ] || echo "$_CUR_VER" | grep -q "$_REQ_VER"); then
     log_summary "Base" "Commitlint" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
