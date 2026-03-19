@@ -16,18 +16,16 @@ install_runtime_ada() {
 
 # Purpose: Sets up Ada environment for project.
 setup_ada() {
+  if ! has_lang_files "" "*.adb *.ads *.gpr"; then
+    return 0
+  fi
+
   local _T0_ADA_RT
   _T0_ADA_RT=$(date +%s)
   _log_setup "Ada" "gnat"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Ada" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Ada files
-  if ! has_lang_files "" "*.adb *.ads *.gpr"; then
-    log_summary "Runtime" "Ada" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

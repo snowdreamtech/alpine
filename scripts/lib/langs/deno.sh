@@ -14,17 +14,16 @@ install_runtime_deno() {
 
 # Purpose: Sets up Deno runtime.
 setup_deno() {
+  if ! has_lang_files "deno.json deno.jsonc" ""; then
+    return 0
+  fi
+
   local _T0_DENO_RT
   _T0_DENO_RT=$(date +%s)
   _log_setup "Deno Runtime" "deno"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Deno" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "deno.json deno.jsonc" ""; then
-    log_summary "Runtime" "Deno" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

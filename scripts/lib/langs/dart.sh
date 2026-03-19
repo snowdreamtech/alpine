@@ -14,17 +14,16 @@ install_runtime_dart() {
 
 # Purpose: Sets up Dart runtime.
 setup_dart() {
+  if ! has_lang_files "pubspec.yaml" "*.dart"; then
+    return 0
+  fi
+
   local _T0_DART_RT
   _T0_DART_RT=$(date +%s)
   _log_setup "Dart Runtime" "dart"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Dart" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "pubspec.yaml" "*.dart"; then
-    log_summary "Runtime" "Dart" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

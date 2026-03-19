@@ -16,18 +16,16 @@ install_runtime_moonbit() {
 
 # Purpose: Sets up MoonBit environment for project.
 setup_moonbit() {
+  if ! has_lang_files "moon.pkg.json" "*.mbt"; then
+    return 0
+  fi
+
   local _T0_MOON_RT
   _T0_MOON_RT=$(date +%s)
   _log_setup "MoonBit" "moon"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "MoonBit" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect MoonBit project
-  if ! has_lang_files "moon.pkg.json" "*.mbt"; then
-    log_summary "Runtime" "MoonBit" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

@@ -16,18 +16,16 @@ install_runtime_move() {
 
 # Purpose: Sets up Move environment for project.
 setup_move() {
+  if ! has_lang_files "Move.toml" "*.move"; then
+    return 0
+  fi
+
   local _T0_MOVE_RT
   _T0_MOVE_RT=$(date +%s)
   _log_setup "Move" "aptos"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Move" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Move files
-  if ! has_lang_files "Move.toml" "*.move"; then
-    log_summary "Runtime" "Move" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

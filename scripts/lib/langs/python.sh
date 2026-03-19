@@ -33,6 +33,10 @@ install_runtime_python() {
 
 # Purpose: Initializes a Python virtual environment and installs development dependencies.
 setup_python() {
+  if ! has_lang_files "$REQUIREMENTS_TXT $PYPROJECT_TOML" "*.py"; then
+    return 0
+  fi
+
   local _T0_PY
   _T0_PY=$(date +%s)
   _log_setup "Python Virtual Environment" "python"

@@ -16,18 +16,16 @@ install_runtime_ballerina() {
 
 # Purpose: Sets up Ballerina environment for project.
 setup_ballerina() {
+  if ! has_lang_files "Ballerina.toml" "*.bal"; then
+    return 0
+  fi
+
   local _T0_BAL_RT
   _T0_BAL_RT=$(date +%s)
   _log_setup "Ballerina" "bal"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Ballerina" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Ballerina files
-  if ! has_lang_files "Ballerina.toml" "*.bal"; then
-    log_summary "Runtime" "Ballerina" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

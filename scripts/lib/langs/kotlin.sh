@@ -14,17 +14,16 @@ install_runtime_kotlin() {
 
 # Purpose: Sets up Kotlin runtime and mandatory linting tools.
 setup_kotlin() {
+  if ! has_lang_files "build.gradle.kts" "*.kt *.kts"; then
+    return 0
+  fi
+
   local _T0_KOTLIN_RT
   _T0_KOTLIN_RT=$(date +%s)
   _log_setup "Kotlin Runtime" "kotlin"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Kotlin" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "build.gradle.kts" "*.kt *.kts"; then
-    log_summary "Runtime" "Kotlin" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

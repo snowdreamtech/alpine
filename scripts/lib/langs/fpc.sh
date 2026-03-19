@@ -16,18 +16,16 @@ install_runtime_fpc() {
 
 # Purpose: Sets up FPC environment for project.
 setup_fpc() {
+  if ! has_lang_files "" "*.pas *.pp *.inc *.lpr"; then
+    return 0
+  fi
+
   local _T0_FPC_RT
   _T0_FPC_RT=$(date +%s)
   _log_setup "Free Pascal" "fpc"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Free Pascal" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Pascal files
-  if ! has_lang_files "" "*.pas *.pp *.inc *.lpr"; then
-    log_summary "Runtime" "Free Pascal" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

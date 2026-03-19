@@ -16,18 +16,16 @@ install_runtime_duckdb() {
 
 # Purpose: Sets up DuckDB environment for project.
 setup_duckdb() {
+  if ! has_lang_files "" "*.sql *.duckdb"; then
+    return 0
+  fi
+
   local _T0_DUCK_RT
   _T0_DUCK_RT=$(date +%s)
   _log_setup "DuckDB" "duckdb"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "DuckDB" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect SQL/DuckDB files
-  if ! has_lang_files "" "*.sql *.duckdb"; then
-    log_summary "Runtime" "DuckDB" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

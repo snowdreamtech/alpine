@@ -16,18 +16,16 @@ install_runtime_pkl() {
 
 # Purpose: Sets up Pkl environment for project.
 setup_pkl() {
+  if ! has_lang_files "PklProject" "*.pkl"; then
+    return 0
+  fi
+
   local _T0_PKL_RT
   _T0_PKL_RT=$(date +%s)
   _log_setup "Pkl" "pkl"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Pkl" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Pkl files
-  if ! has_lang_files "PklProject" "*.pkl"; then
-    log_summary "Runtime" "Pkl" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

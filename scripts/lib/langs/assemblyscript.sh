@@ -16,18 +16,16 @@ install_runtime_assemblyscript() {
 
 # Purpose: Sets up AssemblyScript environment for project.
 setup_assemblyscript() {
+  if ! has_lang_files "asconfig.json" "*.as"; then
+    return 0
+  fi
+
   local _T0_AS_RT
   _T0_AS_RT=$(date +%s)
   _log_setup "AssemblyScript" "asc"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "AssemblyScript" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect AssemblyScript files
-  if ! has_lang_files "asconfig.json" "*.as"; then
-    log_summary "Runtime" "AssemblyScript" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

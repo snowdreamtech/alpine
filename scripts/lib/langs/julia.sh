@@ -14,17 +14,16 @@ install_runtime_julia() {
 
 # Purpose: Sets up Julia runtime.
 setup_julia() {
+  if ! has_lang_files "Project.toml" "*.jl"; then
+    return 0
+  fi
+
   local _T0_JULIA_RT
   _T0_JULIA_RT=$(date +%s)
   _log_setup "Julia Runtime" "julia"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Julia" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "Project.toml" "*.jl"; then
-    log_summary "Runtime" "Julia" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

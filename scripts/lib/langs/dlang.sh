@@ -16,18 +16,16 @@ install_runtime_dlang() {
 
 # Purpose: Sets up Dlang environment for project.
 setup_dlang() {
+  if ! has_lang_files "dub.json dub.sdl" "*.d"; then
+    return 0
+  fi
+
   local _T0_D_RT
   _T0_D_RT=$(date +%s)
   _log_setup "Dlang" "dmd"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Dlang" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Dlang files
-  if ! has_lang_files "dub.json dub.sdl" "*.d"; then
-    log_summary "Runtime" "Dlang" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

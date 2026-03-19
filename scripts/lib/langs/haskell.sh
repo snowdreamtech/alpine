@@ -15,17 +15,16 @@ install_runtime_haskell() {
 
 # Purpose: Sets up Haskell runtime.
 setup_haskell() {
+  if ! has_lang_files "package.yaml stack.yaml *.cabal" "*.hs"; then
+    return 0
+  fi
+
   local _T0_HASKELL_RT
   _T0_HASKELL_RT=$(date +%s)
   _log_setup "Haskell Runtime" "haskell"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Haskell" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "package.yaml stack.yaml *.cabal" "*.hs"; then
-    log_summary "Runtime" "Haskell" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

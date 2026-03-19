@@ -14,17 +14,16 @@ install_runtime_zig() {
 
 # Purpose: Sets up Zig runtime.
 setup_zig() {
+  if ! has_lang_files "build.zig" "*.zig"; then
+    return 0
+  fi
+
   local _T0_ZIG_RT
   _T0_ZIG_RT=$(date +%s)
   _log_setup "Zig Runtime" "zig"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Zig" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "build.zig" "*.zig"; then
-    log_summary "Runtime" "Zig" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

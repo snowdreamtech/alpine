@@ -16,18 +16,16 @@ install_runtime_terragrunt() {
 
 # Purpose: Sets up Terragrunt environment for project.
 setup_terragrunt() {
+  if ! has_lang_files "" "HCL"; then
+    return 0
+  fi
+
   local _T0_TERRA_RT
   _T0_TERRA_RT=$(date +%s)
   _log_setup "Terragrunt" "terragrunt"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Terragrunt" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Terragrunt files
-  if ! has_lang_files "" "HCL"; then
-    log_summary "Runtime" "Terragrunt" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

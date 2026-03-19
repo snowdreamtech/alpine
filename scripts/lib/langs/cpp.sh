@@ -26,18 +26,16 @@ install_runtime_cpp() {
 
 # Purpose: Sets up C/C++ environment for project.
 setup_cpp() {
+  if ! has_lang_files "CMakeLists.txt Makefile" "*.cpp *.c *.cc *.h *.hpp"; then
+    return 0
+  fi
+
   local _T0_CPP_RT
   _T0_CPP_RT=$(date +%s)
   _log_setup "C/C++ Toolchain" "cpp"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "C/C++" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect CMake, Makefile, or source files
-  if ! has_lang_files "CMakeLists.txt Makefile" "*.cpp *.c *.cc *.h *.hpp"; then
-    log_summary "Runtime" "C/C++" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

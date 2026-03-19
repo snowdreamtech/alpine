@@ -20,18 +20,16 @@ install_runtime_vcpkg() {
 
 # Purpose: Sets up VCPKG environment for project.
 setup_vcpkg() {
+  if ! has_lang_files "vcpkg.json vcpkg-configuration.json" ""; then
+    return 0
+  fi
+
   local _T0_VCPKG_RT
   _T0_VCPKG_RT=$(date +%s)
   _log_setup "VCPKG" "vcpkg"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "VCPKG" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect VCPKG files
-  if ! has_lang_files "vcpkg.json vcpkg-configuration.json" ""; then
-    log_summary "Runtime" "VCPKG" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

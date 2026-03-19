@@ -16,18 +16,16 @@ install_runtime_grain() {
 
 # Purpose: Sets up Grain environment for project.
 setup_grain() {
+  if ! has_lang_files "" "*.gr"; then
+    return 0
+  fi
+
   local _T0_GRAIN_RT
   _T0_GRAIN_RT=$(date +%s)
   _log_setup "Grain" "grain"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Grain" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Grain files
-  if ! has_lang_files "" "*.gr"; then
-    log_summary "Runtime" "Grain" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

@@ -16,18 +16,16 @@ install_runtime_lisp() {
 
 # Purpose: Sets up Common Lisp environment for project.
 setup_lisp() {
+  if ! has_lang_files "" "*.lisp *.cl *.asd"; then
+    return 0
+  fi
+
   local _T0_LISP_RT
   _T0_LISP_RT=$(date +%s)
   _log_setup "Common Lisp" "sbcl"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Common Lisp" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Common Lisp files
-  if ! has_lang_files "" "*.lisp *.cl *.asd"; then
-    log_summary "Runtime" "Common Lisp" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

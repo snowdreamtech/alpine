@@ -16,18 +16,16 @@ install_runtime_tcl() {
 
 # Purpose: Sets up Tcl environment for project.
 setup_tcl() {
+  if ! has_lang_files "" "*.tcl *.tk"; then
+    return 0
+  fi
+
   local _T0_TCL_RT
   _T0_TCL_RT=$(date +%s)
   _log_setup "Tcl" "tclsh"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Tcl" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Tcl files
-  if ! has_lang_files "" "*.tcl *.tk"; then
-    log_summary "Runtime" "Tcl" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

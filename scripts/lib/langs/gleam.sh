@@ -16,18 +16,16 @@ install_runtime_gleam() {
 
 # Purpose: Sets up Gleam environment for project.
 setup_gleam() {
+  if ! has_lang_files "gleam.toml" "*.gleam"; then
+    return 0
+  fi
+
   local _T0_GLM_RT
   _T0_GLM_RT=$(date +%s)
   _log_setup "Gleam" "gleam"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Gleam" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Gleam files
-  if ! has_lang_files "gleam.toml" "*.gleam"; then
-    log_summary "Runtime" "Gleam" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

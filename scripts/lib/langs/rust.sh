@@ -17,17 +17,16 @@ install_runtime_rust() {
 # Purpose: Sets up Rust runtime.
 # Delegate: Managed by mise (.mise.toml)
 setup_rust() {
+  if ! has_lang_files "Cargo.toml" "*.rs"; then
+    return 0
+  fi
+
   local _T0_RUST_RT
   _T0_RUST_RT=$(date +%s)
   _log_setup "Rust Runtime" "rust"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Rust" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "Cargo.toml" "*.rs"; then
-    log_summary "Runtime" "Rust" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

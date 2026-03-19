@@ -16,18 +16,16 @@ install_runtime_elm() {
 
 # Purpose: Sets up Elm environment for project.
 setup_elm() {
+  if ! has_lang_files "elm.json" "*.elm"; then
+    return 0
+  fi
+
   local _T0_ELM_RT
   _T0_ELM_RT=$(date +%s)
   _log_setup "Elm" "elm"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Elm" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Elm files
-  if ! has_lang_files "elm.json" "*.elm"; then
-    log_summary "Runtime" "Elm" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

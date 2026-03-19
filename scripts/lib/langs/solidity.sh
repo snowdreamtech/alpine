@@ -16,18 +16,16 @@ install_runtime_solidity() {
 
 # Purpose: Sets up Solidity environment for project.
 setup_solidity() {
+  if ! has_lang_files "" "*.sol"; then
+    return 0
+  fi
+
   local _T0_SOL_RT
   _T0_SOL_RT=$(date +%s)
   _log_setup "Solidity" "solc"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Solidity" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Solidity files
-  if ! has_lang_files "" "*.sol"; then
-    log_summary "Runtime" "Solidity" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

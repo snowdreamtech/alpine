@@ -15,18 +15,16 @@ install_runtime_erlang() {
 
 # Purpose: Sets up Erlang environment for project.
 setup_erlang() {
+  if ! has_lang_files "rebar.config erlang.mk" "*.erl *.hrl"; then
+    return 0
+  fi
+
   local _T0_ERL_RT
   _T0_ERL_RT=$(date +%s)
   _log_setup "Erlang" "erlang"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Erlang" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Erlang files
-  if ! has_lang_files "rebar.config erlang.mk" "*.erl *.hrl"; then
-    log_summary "Runtime" "Erlang" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

@@ -16,18 +16,16 @@ install_runtime_fortran() {
 
 # Purpose: Sets up Fortran environment for project.
 setup_fortran() {
+  if ! has_lang_files "" "*.f *.for *.f90 *.f95"; then
+    return 0
+  fi
+
   local _T0_FORT_RT
   _T0_FORT_RT=$(date +%s)
   _log_setup "Fortran" "gfortran"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Fortran" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Fortran files
-  if ! has_lang_files "" "*.f *.for *.f90 *.f95"; then
-    log_summary "Runtime" "Fortran" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

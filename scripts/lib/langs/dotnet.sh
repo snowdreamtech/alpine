@@ -16,17 +16,16 @@ install_runtime_dotnet() {
 
 # Purpose: Sets up Dotnet runtime.
 setup_dotnet() {
+  if ! has_lang_files "global.json *.csproj *.fsproj *.sln" ""; then
+    return 0
+  fi
+
   local _T0_DOTNET_RT
   _T0_DOTNET_RT=$(date +%s)
   _log_setup ".NET Runtime" "dotnet"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" ".NET" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "global.json *.csproj *.fsproj *.sln" ""; then
-    log_summary "Runtime" ".NET" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

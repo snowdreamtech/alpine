@@ -22,17 +22,16 @@ install_runtime_ruby() {
 # Purpose: Sets up Ruby runtime and mandatory linting tools.
 # Delegate: Managed by mise (.mise.toml)
 setup_ruby() {
+  if ! has_lang_files "Gemfile Gemfile.lock" "*.rb"; then
+    return 0
+  fi
+
   local _T0_RUBY_RT
   _T0_RUBY_RT=$(date +%s)
   _log_setup "Ruby Runtime" "ruby"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Ruby" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "Gemfile Gemfile.lock" "*.rb"; then
-    log_summary "Runtime" "Ruby" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

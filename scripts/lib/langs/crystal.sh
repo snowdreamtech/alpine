@@ -16,18 +16,16 @@ install_runtime_crystal() {
 
 # Purpose: Sets up Crystal environment for project.
 setup_crystal() {
+  if ! has_lang_files "shard.yml" "*.cr"; then
+    return 0
+  fi
+
   local _T0_CRY_RT
   _T0_CRY_RT=$(date +%s)
   _log_setup "Crystal" "crystal"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Crystal" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Crystal files
-  if ! has_lang_files "shard.yml" "*.cr"; then
-    log_summary "Runtime" "Crystal" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

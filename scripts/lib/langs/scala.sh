@@ -15,17 +15,16 @@ install_runtime_scala() {
 
 # Purpose: Sets up Scala runtime.
 setup_scala() {
+  if ! has_lang_files "build.sbt" "*.scala *.sc"; then
+    return 0
+  fi
+
   local _T0_SCALA_RT
   _T0_SCALA_RT=$(date +%s)
   _log_setup "Scala Runtime" "scala"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Scala" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "build.sbt" "*.scala *.sc"; then
-    log_summary "Runtime" "Scala" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

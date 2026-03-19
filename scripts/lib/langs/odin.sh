@@ -16,18 +16,16 @@ install_runtime_odin() {
 
 # Purpose: Sets up Odin environment for project.
 setup_odin() {
+  if ! has_lang_files "" "*.odin"; then
+    return 0
+  fi
+
   local _T0_ODIN_RT
   _T0_ODIN_RT=$(date +%s)
   _log_setup "Odin" "odin"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Odin" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Odin files
-  if ! has_lang_files "" "*.odin"; then
-    log_summary "Runtime" "Odin" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

@@ -17,17 +17,16 @@ install_runtime_java() {
 # Purpose: Sets up Java runtime and mandatory linting tools.
 # Delegate: Managed by mise (.mise.toml)
 setup_java() {
+  if ! has_lang_files "pom.xml build.gradle" "*.java"; then
+    return 0
+  fi
+
   local _T0_JAVA_RT
   _T0_JAVA_RT=$(date +%s)
   _log_setup "Java Runtime" "java"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Java" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "pom.xml build.gradle" "*.java"; then
-    log_summary "Runtime" "Java" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

@@ -17,18 +17,16 @@ install_runtime_clojure() {
 
 # Purpose: Sets up Clojure environment for project.
 setup_clojure() {
+  if ! has_lang_files "project.clj deps.edn bb.edn" "*.clj *.cljs *.cljc *.edn"; then
+    return 0
+  fi
+
   local _T0_CLJ_RT
   _T0_CLJ_RT=$(date +%s)
   _log_setup "Clojure" "clojure"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Clojure" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Clojure files
-  if ! has_lang_files "project.clj deps.edn bb.edn" "*.clj *.cljs *.cljc *.edn"; then
-    log_summary "Runtime" "Clojure" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

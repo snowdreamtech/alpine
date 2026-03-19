@@ -17,17 +17,16 @@ install_runtime_elixir() {
 
 # Purpose: Sets up Elixir runtime and mandatory linting tools.
 setup_elixir() {
+  if ! has_lang_files "mix.exs" "*.ex *.exs"; then
+    return 0
+  fi
+
   local _T0_ELIXIR_RT
   _T0_ELIXIR_RT=$(date +%s)
   _log_setup "Elixir Runtime" "elixir"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Elixir" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "mix.exs" "*.ex *.exs"; then
-    log_summary "Runtime" "Elixir" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

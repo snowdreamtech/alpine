@@ -16,19 +16,16 @@ install_runtime_ocaml() {
 
 # Purpose: Sets up OCaml environment for project.
 setup_ocaml() {
+  if ! has_lang_files "dune-project dune opam" "*.ml *.mli *.mll *.mly"; then
+    return 0
+  fi
+
   local _T0_OCM_RT
   _T0_OCM_RT=$(date +%s)
   _log_setup "OCaml" "ocaml"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "OCaml" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect OCaml files
-  # opam files, dune files, or .ml/.mli files
-  if ! has_lang_files "dune-project dune opam" "*.ml *.mli *.mll *.mly"; then
-    log_summary "Runtime" "OCaml" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

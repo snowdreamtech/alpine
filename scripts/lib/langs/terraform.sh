@@ -16,18 +16,16 @@ install_runtime_terraform() {
 
 # Purpose: Sets up Terraform environment for project.
 setup_terraform() {
+  if ! has_lang_files "" "*.tf *.tfvars *.hcl"; then
+    return 0
+  fi
+
   local _T0_TF_RT
   _T0_TF_RT=$(date +%s)
   _log_setup "Terraform" "terraform"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Terraform" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Terraform files
-  if ! has_lang_files "" "*.tf *.tfvars *.hcl"; then
-    log_summary "Runtime" "Terraform" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

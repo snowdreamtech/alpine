@@ -16,18 +16,16 @@ install_runtime_starlark() {
 
 # Purpose: Sets up Starlark environment for project.
 setup_starlark() {
+  if ! has_lang_files "BUILD WORKSPACE MODULE.bazel" "*.star *.bzl"; then
+    return 0
+  fi
+
   local _T0_STAR_RT
   _T0_STAR_RT=$(date +%s)
   _log_setup "Starlark" "bazel"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Starlark" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Starlark files (Bazel ecosystem)
-  if ! has_lang_files "BUILD WORKSPACE MODULE.bazel" "*.star *.bzl"; then
-    log_summary "Runtime" "Starlark" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

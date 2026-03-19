@@ -16,18 +16,16 @@ install_runtime_lean() {
 
 # Purpose: Sets up Lean 4 environment for project.
 setup_lean() {
+  if ! has_lang_files "lean-toolchain lakefile.lean" "*.lean"; then
+    return 0
+  fi
+
   local _T0_LEAN_RT
   _T0_LEAN_RT=$(date +%s)
   _log_setup "Lean 4" "lean"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Lean 4" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Lean 4 files
-  if ! has_lang_files "lean-toolchain lakefile.lean" "*.lean"; then
-    log_summary "Runtime" "Lean 4" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

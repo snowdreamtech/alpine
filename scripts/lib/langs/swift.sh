@@ -16,17 +16,16 @@ install_runtime_swift() {
 # Purpose: Sets up Swift runtime and mandatory linting tools.
 # shellcheck disable=SC2329
 setup_swift() {
+  if ! has_lang_files "Package.swift" "*.swift"; then
+    return 0
+  fi
+
   local _T0_SWIFT_RT
   _T0_SWIFT_RT=$(date +%s)
   _log_setup "Swift Runtime" "swift"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Swift" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "Package.swift" "*.swift"; then
-    log_summary "Runtime" "Swift" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

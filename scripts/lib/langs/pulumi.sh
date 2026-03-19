@@ -15,17 +15,16 @@ install_runtime_pulumi() {
 
 # Purpose: Sets up Pulumi IaC.
 setup_pulumi() {
-  local _T0_PULUMI_RT
-  _T0_PULUMI_RT=$(date +%s)
-  _log_setup "Pulumi CLI" "pulumi"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "IaC" "Pulumi" "⚖️ Previewed" "-" "0"
+  if ! has_lang_files "" "PULUMI"; then
     return 0
   fi
 
-  if ! has_lang_files "Pulumi.yaml" ""; then
-    log_summary "IaC" "Pulumi" "⏭️ Skipped" "-" "0"
+  local _T0_PULUMI
+  _T0_PULUMI=$(date +%s)
+  _log_setup "Pulumi" "pulumi"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "IaC" "Pulumi" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
@@ -33,7 +32,7 @@ setup_pulumi() {
   install_runtime_pulumi || _STAT_PULUMI_RT="❌ Failed"
 
   local _DUR_PULUMI_RT
-  _DUR_PULUMI_RT=$(($(date +%s) - _T0_PULUMI_RT))
+  _DUR_PULUMI_RT=$(($(date +%s) - _T0_PULUMI))
   log_summary "IaC" "Pulumi" "$_STAT_PULUMI_RT" "$(get_version pulumi version)" "$_DUR_PULUMI_RT"
 }
 # Purpose: Checks if Pulumi CLI is available.

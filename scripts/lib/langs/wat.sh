@@ -16,18 +16,16 @@ install_runtime_wat() {
 
 # Purpose: Sets up WAT environment for project.
 setup_wat() {
+  if ! has_lang_files "" "*.wat *.wasm"; then
+    return 0
+  fi
+
   local _T0_WAT_RT
   _T0_WAT_RT=$(date +%s)
   _log_setup "WebAssembly" "wasmtime"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "WebAssembly" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect WAT/Wasm files
-  if ! has_lang_files "" "*.wat *.wasm"; then
-    log_summary "Runtime" "WebAssembly" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

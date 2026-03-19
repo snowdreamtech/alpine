@@ -16,18 +16,16 @@ install_runtime_luau() {
 
 # Purpose: Sets up Luau environment for project.
 setup_luau() {
+  if ! has_lang_files "" "*.luau"; then
+    return 0
+  fi
+
   local _T0_LUAU_RT
   _T0_LUAU_RT=$(date +%s)
   _log_setup "Luau" "luau"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Luau" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Luau files
-  if ! has_lang_files "" "*.luau"; then
-    log_summary "Runtime" "Luau" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

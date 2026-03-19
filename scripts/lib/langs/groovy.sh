@@ -15,17 +15,16 @@ install_runtime_groovy() {
 
 # Purpose: Sets up Groovy runtime.
 setup_groovy() {
+  if ! has_lang_files "" "*.groovy *.gradle"; then
+    return 0
+  fi
+
   local _T0_GROOVY_RT
   _T0_GROOVY_RT=$(date +%s)
   _log_setup "Groovy Runtime" "groovy"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Groovy" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "" "*.groovy *.gradle"; then
-    log_summary "Runtime" "Groovy" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

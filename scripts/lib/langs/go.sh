@@ -17,17 +17,16 @@ install_runtime_go() {
 # Purpose: Sets up Go runtime for project.
 # Delegate: Managed by mise (.mise.toml)
 setup_go() {
+  if ! has_lang_files "go.mod go.sum" "*.go"; then
+    return 0
+  fi
+
   local _T0_GO_RT
   _T0_GO_RT=$(date +%s)
   _log_setup "Go Runtime" "go"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Go" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "go.mod go.sum" "*.go"; then
-    log_summary "Runtime" "Go" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

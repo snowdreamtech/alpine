@@ -15,17 +15,16 @@ install_runtime_perl() {
 
 # Purpose: Sets up Perl runtime.
 setup_perl() {
+  if ! has_lang_files "Makefile.PL Build.PL" "*.pl *.pm"; then
+    return 0
+  fi
+
   local _T0_PERL_RT
   _T0_PERL_RT=$(date +%s)
   _log_setup "Perl Runtime" "perl"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Perl" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "Makefile.PL Build.PL" "*.pl *.pm"; then
-    log_summary "Runtime" "Perl" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

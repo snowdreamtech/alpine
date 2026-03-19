@@ -15,18 +15,16 @@ install_runtime_kcl() {
 
 # Purpose: Sets up KCL environment for project.
 setup_kcl() {
+  if ! has_lang_files "kcl.mod" "*.k"; then
+    return 0
+  fi
+
   local _T0_KCL_RT
   _T0_KCL_RT=$(date +%s)
   _log_setup "KCL" "kcl"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "KCL" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect KCL files
-  if ! has_lang_files "kcl.mod" "*.k"; then
-    log_summary "Runtime" "KCL" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

@@ -16,27 +16,25 @@ install_runtime_helm() {
 
 # Purpose: Sets up Helm environment for project.
 setup_helm() {
-  local _T0_HELM_RT
-  _T0_HELM_RT=$(date +%s)
-  _log_setup "Helm" "helm"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "IaC Tool" "Helm" "⚖️ Previewed" "-" "0"
+  if ! has_lang_files "" "CHARTS *.yaml *.yml"; then
     return 0
   fi
 
-  # Detect Helm files
-  if ! has_lang_files "Chart.yaml values.yaml" "CHARTS"; then
-    log_summary "IaC Tool" "Helm" "⏭️ Skipped" "-" "0"
+  local _T0_HELM
+  _T0_HELM=$(date +%s)
+  _log_setup "Helm" "helm"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "IaC" "Helm" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
   local _STAT_HELM_RT="✅ Installed"
   install_runtime_helm || _STAT_HELM_RT="❌ Failed"
 
-  local _DUR_HELM_RT
-  _DUR_HELM_RT=$(($(date +%s) - _T0_HELM_RT))
-  log_summary "IaC Tool" "Helm" "$_STAT_HELM_RT" "$(get_version helm version --short)" "$_DUR_HELM_RT"
+  local _DUR_HELM
+  _DUR_HELM=$(($(date +%s) - _T0_HELM))
+  log_summary "IaC" "Helm" "$_STAT_HELM_RT" "$(get_version helm version --short)" "$_DUR_HELM"
 }
 
 # Purpose: Checks if Helm is available.

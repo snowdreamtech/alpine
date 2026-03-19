@@ -47,6 +47,10 @@ install_runtime_node() {
 
 # Purpose: Configures Node.js runtime and installs dependencies.
 setup_node() {
+  if ! has_lang_files "$PACKAGE_JSON"; then
+    return 0
+  fi
+
   local _T0_NODE
   _T0_NODE=$(date +%s)
   _log_setup "Node.js" "node"

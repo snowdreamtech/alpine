@@ -16,18 +16,16 @@ install_runtime_nim() {
 
 # Purpose: Sets up Nim environment for project.
 setup_nim() {
+  if ! has_lang_files "nim.cfg nimble.ini" "*.nim *.nims *.nimble"; then
+    return 0
+  fi
+
   local _T0_NIM_RT
   _T0_NIM_RT=$(date +%s)
   _log_setup "Nim" "nim"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Nim" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Nim files
-  if ! has_lang_files "nim.cfg nimble.ini" "*.nim *.nims *.nimble"; then
-    log_summary "Runtime" "Nim" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

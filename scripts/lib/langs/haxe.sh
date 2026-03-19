@@ -16,18 +16,16 @@ install_runtime_haxe() {
 
 # Purpose: Sets up Haxe environment for project.
 setup_haxe() {
+  if ! has_lang_files "project.xml build.hxml" "*.hx"; then
+    return 0
+  fi
+
   local _T0_HX_RT
   _T0_HX_RT=$(date +%s)
   _log_setup "Haxe" "haxe"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Haxe" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Haxe files
-  if ! has_lang_files "project.xml build.hxml" "*.hx"; then
-    log_summary "Runtime" "Haxe" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

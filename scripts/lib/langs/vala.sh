@@ -16,18 +16,16 @@ install_runtime_vala() {
 
 # Purpose: Sets up Vala environment for project.
 setup_vala() {
+  if ! has_lang_files "" "*.vala *.vapi"; then
+    return 0
+  fi
+
   local _T0_VALA_RT
   _T0_VALA_RT=$(date +%s)
   _log_setup "Vala" "valac"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Vala" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Vala files
-  if ! has_lang_files "" "*.vala *.vapi"; then
-    log_summary "Runtime" "Vala" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

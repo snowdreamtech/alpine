@@ -16,18 +16,16 @@ install_runtime_spark() {
 
 # Purpose: Sets up Apache Spark environment for project.
 setup_spark() {
+  if ! has_lang_files "" "spark-defaults.conf *.pyspark"; then
+    return 0
+  fi
+
   local _T0_SPARK_RT
   _T0_SPARK_RT=$(date +%s)
   _log_setup "Apache Spark" "spark-shell"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Apache Spark" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Spark/PySpark files
-  if ! has_lang_files "" "spark-defaults.conf *.pyspark"; then
-    log_summary "Runtime" "Apache Spark" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

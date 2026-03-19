@@ -16,18 +16,16 @@ install_runtime_mojo() {
 
 # Purpose: Sets up Mojo environment for project.
 setup_mojo() {
+  if ! has_lang_files "" "*.mojo *.fire"; then
+    return 0
+  fi
+
   local _T0_MOJ_RT
   _T0_MOJ_RT=$(date +%s)
   _log_setup "Mojo" "mojo"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Mojo" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Mojo files
-  if ! has_lang_files "" "*.mojo *.fire"; then
-    log_summary "Runtime" "Mojo" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

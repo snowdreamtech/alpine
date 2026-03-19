@@ -15,17 +15,16 @@ install_runtime_lua() {
 
 # Purpose: Sets up Lua runtime and mandatory linting tools.
 setup_lua() {
+  if ! has_lang_files "" "*.lua"; then
+    return 0
+  fi
+
   local _T0_LUA_RT
   _T0_LUA_RT=$(date +%s)
   _log_setup "Lua Runtime" "lua"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Lua" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "" "*.lua"; then
-    log_summary "Runtime" "Lua" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

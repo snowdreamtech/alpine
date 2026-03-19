@@ -22,17 +22,16 @@ install_runtime_php() {
 # Purpose: Sets up PHP runtime.
 # Delegate: Managed by mise (.mise.toml)
 setup_php() {
+  if ! has_lang_files "composer.json" "*.php"; then
+    return 0
+  fi
+
   local _T0_PHP_RT
   _T0_PHP_RT=$(date +%s)
   _log_setup "PHP Runtime" "php"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "PHP" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "composer.json" "*.php"; then
-    log_summary "Runtime" "PHP" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

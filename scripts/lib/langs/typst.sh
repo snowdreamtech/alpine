@@ -16,27 +16,25 @@ install_runtime_typst() {
 
 # Purpose: Sets up Typst environment for project.
 setup_typst() {
-  local _T0_TYPST_RT
-  _T0_TYPST_RT=$(date +%s)
+  if ! has_lang_files "" "*.typ"; then
+    return 0
+  fi
+
+  local _T0_TYPST
+  _T0_TYPST=$(date +%s)
   _log_setup "Typst" "typst"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Doc Tool" "Typst" "⚖️ Previewed" "-" "0"
+    log_summary "Docs" "Typst" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
-  # Detect Typst files
-  if ! has_lang_files "" "*.typ"; then
-    log_summary "Doc Tool" "Typst" "⏭️ Skipped" "-" "0"
-    return 0
-  fi
+  local _STAT_TYPST="✅ Installed"
+  install_runtime_typst || _STAT_TYPST="❌ Failed"
 
-  local _STAT_TYPST_RT="✅ Installed"
-  install_runtime_typst || _STAT_TYPST_RT="❌ Failed"
-
-  local _DUR_TYPST_RT
-  _DUR_TYPST_RT=$(($(date +%s) - _T0_TYPST_RT))
-  log_summary "Doc Tool" "Typst" "$_STAT_TYPST_RT" "$(get_version typst --version | awk '{print $2}')" "$_DUR_TYPST_RT"
+  local _DUR_TYPST
+  _DUR_TYPST=$(($(date +%s) - _T0_TYPST))
+  log_summary "Docs" "Typst" "$_STAT_TYPST" "$(get_version typst --version | awk '{print $2}')" "$_DUR_TYPST"
 }
 
 # Purpose: Checks if Typst is available.

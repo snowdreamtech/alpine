@@ -16,18 +16,16 @@ install_runtime_prolog() {
 
 # Purpose: Sets up Prolog environment for project.
 setup_prolog() {
+  if ! has_lang_files "" "*.pl *.pro *.prolog"; then
+    return 0
+  fi
+
   local _T0_PROLOG_RT
   _T0_PROLOG_RT=$(date +%s)
   _log_setup "Prolog" "swipl"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Prolog" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # Detect Prolog files
-  if ! has_lang_files "" "*.pl *.pro *.prolog"; then
-    log_summary "Runtime" "Prolog" "⏭️ Skipped" "-" "0"
     return 0
   fi
 

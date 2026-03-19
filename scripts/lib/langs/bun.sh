@@ -14,17 +14,16 @@ install_runtime_bun() {
 
 # Purpose: Sets up Bun runtime.
 setup_bun() {
+  if ! has_lang_files "bun.lockb" ""; then
+    return 0
+  fi
+
   local _T0_BUN_RT
   _T0_BUN_RT=$(date +%s)
   _log_setup "Bun Runtime" "bun"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Bun" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  if ! has_lang_files "bun.lockb" ""; then
-    log_summary "Runtime" "Bun" "⏭️ Skipped" "-" "0"
     return 0
   fi
 
