@@ -535,7 +535,13 @@ install_osv_scanner() {
 
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_OSV="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_OSV="❌ Failed"
+  local _V_OSV
+  _V_OSV=$(get_mise_tool_version osv-scanner)
+  if [ -n "$_V_OSV" ]; then
+    run_mise install "${_PROVIDER}@${_V_OSV}" || _STAT_OSV="❌ Failed"
+  else
+    run_mise install "$_PROVIDER" || _STAT_OSV="❌ Failed"
+  fi
   log_summary "Security Tool" "OSV-Scanner" "$_STAT_OSV" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV))"
 }
 
@@ -565,7 +571,13 @@ install_lychee() {
 
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_LYCHEE="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_LYCHEE="❌ Failed"
+  local _V_LYCHEE
+  _V_LYCHEE=$(get_mise_tool_version lychee)
+  if [ -n "$_V_LYCHEE" ]; then
+    run_mise install "${_PROVIDER}@${_V_LYCHEE}" || _STAT_LYCHEE="❌ Failed"
+  else
+    run_mise install "$_PROVIDER" || _STAT_LYCHEE="❌ Failed"
+  fi
   log_summary "Security Tool" "Lychee" "$_STAT_LYCHEE" "$(get_version lychee)" "$(($(date +%s) - _T0_LYCHEE))"
 }
 
@@ -590,7 +602,13 @@ install_trivy() {
 
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_TRVY="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_TRVY="❌ Failed"
+  local _V_TRVY
+  _V_TRVY=$(get_mise_tool_version trivy)
+  if [ -n "$_V_TRVY" ]; then
+    run_mise install "${_PROVIDER}@${_V_TRVY}" || _STAT_TRVY="❌ Failed"
+  else
+    run_mise install "$_PROVIDER" || _STAT_TRVY="❌ Failed"
+  fi
   log_summary "Security Tool" "Trivy" "$_STAT_TRVY" "$(get_version trivy)" "$(($(date +%s) - _T0_TRVY))"
 }
 
@@ -682,7 +700,13 @@ install_zizmor() {
 
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_ZIZ="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_ZIZ="❌ Failed"
+  local _V_ZIZ
+  _V_ZIZ=$(get_mise_tool_version zizmor)
+  if [ -n "$_V_ZIZ" ]; then
+    run_mise install "${_PROVIDER}@${_V_ZIZ}" || _STAT_ZIZ="❌ Failed"
+  else
+    run_mise install "$_PROVIDER" || _STAT_ZIZ="❌ Failed"
+  fi
   log_summary "Security Tool" "Zizmor" "$_STAT_ZIZ" "$(get_version zizmor)" "$(($(date +%s) - _T0_ZIZ))"
 }
 
@@ -717,7 +741,13 @@ install_cargo_audit() {
 
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_CRGO="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_CRGO="❌ Failed"
+  local _V_CRGO
+  _V_CRGO=$(get_mise_tool_version cargo-audit)
+  if [ -n "$_V_CRGO" ]; then
+    run_mise install "${_PROVIDER}@${_V_CRGO}" || _STAT_CRGO="❌ Failed"
+  else
+    run_mise install "$_PROVIDER" || _STAT_CRGO="❌ Failed"
+  fi
   log_summary "Security Tool" "Cargo-Audit" "$_STAT_CRGO" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_CRGO))"
 }
 
@@ -752,7 +782,13 @@ install_govulncheck() {
 
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_GOVC="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_GOVC="❌ Failed"
+  local _V_GOVC
+  _V_GOVC=$(get_mise_tool_version govulncheck)
+  if [ -n "$_V_GOVC" ]; then
+    run_mise install "${_PROVIDER}@${_V_GOVC}" || _STAT_GOVC="❌ Failed"
+  else
+    run_mise install "$_PROVIDER" || _STAT_GOVC="❌ Failed"
+  fi
   log_summary "Security Tool" "Govulncheck" "$_STAT_GOVC" "$(get_version govulncheck)" "$(($(date +%s) - _T0_GOVC))"
 }
 
@@ -1318,7 +1354,13 @@ install_pip_audit() {
 
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_PA="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_PA="❌ Failed"
+  local _V_PA
+  _V_PA=$(get_mise_tool_version pip-audit)
+  if [ -n "$_V_PA" ]; then
+    run_mise install "${_PROVIDER}@${_V_PA}" || _STAT_PA="❌ Failed"
+  else
+    run_mise install "$_PROVIDER" || _STAT_PA="❌ Failed"
+  fi
   log_summary "Security Tool" "pip-audit" "$_STAT_PA" "$(get_version pip-audit --version)" "$(($(date +%s) - _T0_PA))"
 }
 
