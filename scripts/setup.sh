@@ -381,13 +381,6 @@ install_java_lint() {
     return 0
   fi
 
-  # ARM64 Linux: no prebuilt binary available for google-java-format
-  if [ "$OS" = "linux" ] && [ "$ARCH" = "aarch64" ]; then
-    log_warn "google-java-format has no prebuilt binary for linux/arm64. Skipping."
-    log_summary "Lint Tool" "Java Lint" "⚠️ ARM64 N/A" "-" "0"
-    return 0
-  fi
-
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_JAVA="✅ mise"
   run_mise install "github:google/google-java-format" || _STAT_JAVA="❌ Failed"
