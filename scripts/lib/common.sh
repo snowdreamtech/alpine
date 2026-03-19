@@ -959,7 +959,8 @@ get_version() {
     # If not in PATH OR it IS a mise shim, query mise directly
     if [ -z "$_BIN_PATH" ] || echo "$_BIN_PATH" | grep -q "mise/shims"; then
       local _MISE_VER_OUT
-      _MISE_VER_OUT=$(mise ls --json | jq -r "to_entries[] | select(.key == \"$_CMD_VER\" or .key == \"npm:$_CMD_VER\" or .key == \"github:$_CMD_VER\" or .key == \"cargo:$_CMD_VER\" or .key == \"pipx:$_CMD_VER\" or .key == \"pipx:$_CMD_VER-py\" or .key == \"github:goreleaser/$_CMD_VER\") | .value[] | select(.active==true or .installed==true) | .version" | head -n 1)
+      # Comprehensive JQ filter to match tool name regardless of provider prefix (e.g. npm:@taplo/cli, pipx:pre-commit, github:google/osv-scanner)
+      _MISE_VER_OUT=$(mise ls --json 2>/dev/null | jq -r "to_entries[] | select(.key == \"$_CMD_VER\" or .key == \"npm:$_CMD_VER\" or .key == \"github:$_CMD_VER\" or .key == \"cargo:$_CMD_VER\" or .key == \"pipx:$_CMD_VER\" or .key == \"pipx:$_CMD_VER-py\" or .key == \"github:goreleaser/$_CMD_VER\" or (.key | contains(\":$_CMD_VER\")) or (.key | endswith(\"/$_CMD_VER\"))) | .value[] | select(.active==true or .installed==true) | .version" | head -n 1)
       if [ -n "$_MISE_VER_OUT" ] && [ "$_MISE_VER_OUT" != "null" ]; then
         echo "$_MISE_VER_OUT"
         return 0
@@ -1031,7 +1032,10 @@ resolve_bin() {
   if [ -n "$_SYS_BIN" ]; then
     # Guard: If it's a mise shim, verify it's not "hollow"
     if echo "$_SYS_BIN" | grep -q "mise/shims"; then
-      if ! mise ls "$_BIN_RES" --json 2>/dev/null | jq -e ".[] | select(.active==true or .installed==true)" >/dev/null 2>&1; then
+      local _M_BIN
+      _M_BIN=$(command -v mise 2>/dev/null || echo "$_G_MISE_BIN_BASE/mise")
+      # Improved JQ filter to correctly identify installed tools even with provider prefixes
+      if ! "$_M_BIN" ls --json 2>/dev/null | jq -e "to_entries[] | select(.key == \"$_BIN_RES\" or (.key | contains(\":$_BIN_RES\"))) | .value[] | select(.active==true or .installed==true)" >/dev/null 2>&1; then
         # Also check if it's in our [env] section as a CI-only tool
         if [ -n "$(get_mise_tool_version "$_BIN_RES")" ]; then
           # It's a managed tool but not installed locally. Return 1 to indicate "not found".
