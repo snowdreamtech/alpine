@@ -975,11 +975,12 @@ get_version() {
         return 0
       fi
 
-      # If it's a mise shim but no version is active, DO NOT fall back to execution
-      # as it will trigger "mise ERROR No version is set for shim".
+      # If it's a mise shim but no version is active, try to execute it with MISE_QUIET to see if it works
       if echo "$_BIN_PATH" | grep -q "mise/shims"; then
-        echo "-"
-        return 0
+        if ! MISE_QUIET=1 "$_CMD_VER" "$_ARG_VER" >/dev/null 2>&1; then
+          echo "-"
+          return 0
+        fi
       fi
     fi
   fi
