@@ -30,22 +30,32 @@ setup_dotnet() {
 
   if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
     log_summary "Runtime" ".NET" "✅ Detected" "$_CUR_VER" "0"
-    return 0
+  else
+
+    _log_setup ".NET Runtime" "dotnet"
+
+    if [ "${DRY_RUN:-0}" -eq 0 ]; then
+      install_runtime_dotnet || return 1
+    fi
+    log_summary "Runtime" ".NET" "✅ Installed" "$(get_version dotnet --version)" "$(($(date +%s) - _T0_DOTNET_RT))"
   fi
 
-  _log_setup ".NET Runtime" "dotnet"
+  # Install .NET specific tools
+  install_dotnet_format
+}
 
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Runtime" ".NET" "⚖️ Previewed" "-" "0"
-    return 0
+# Purpose: Installs dotnet-format for .NET linting.
+# Delegate: Managed by mise (.mise.toml)
+install_dotnet_format() {
+  local _T0_DNF
+  _T0_DNF=$(date +%s)
+  _log_setup "Dotnet Format" "dotnet"
+  local _STAT_DNF="✅ Available"
+  # dotnet-format is now built-in as 'dotnet format'
+  if ! dotnet format --version >/dev/null 2>&1; then
+    _STAT_DNF="❌ Missing"
   fi
-
-  local _STAT_DOTNET_RT="✅ Installed"
-  install_runtime_dotnet || _STAT_DOTNET_RT="❌ Failed"
-
-  local _DUR_DOTNET_RT
-  _DUR_DOTNET_RT=$(($(date +%s) - _T0_DOTNET_RT))
-  log_summary "Runtime" ".NET" "$_STAT_DOTNET_RT" "$(get_version dotnet --version)" "$_DUR_DOTNET_RT"
+  log_summary "Dotnet" "Dotnet Format" "$_STAT_DNF" "$(dotnet format --version 2>/dev/null || echo "-")" "$(($(date +%s) - _T0_DNF))"
 }
 # Purpose: Checks if .NET runtime is available.
 # Examples:

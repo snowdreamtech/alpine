@@ -458,26 +458,6 @@ install_ruby_lint() {
 #   None
 # Examples:
 #   setup_dotnet
-setup_dotnet() {
-  local _T0_DOT
-  _T0_DOT=$(date +%s)
-
-  if ! has_lang_files "global.json" "*.csproj *.sln *.cs"; then
-    return 0
-  fi
-
-  _log_setup ".NET SDK Check" "dotnet"
-
-  local _STAT_DOTNET="✅ Installed"
-  install_runtime_dotnet || _STAT_DOTNET="❌ Failed"
-
-  local _DUR_DOTNET
-  _DUR_DOTNET=$(($(date +%s) - _T0_DOT))
-  log_summary "Dotnet" ".NET" "$_STAT_DOTNET" "$(get_version dotnet)" "$_DUR_DOTNET"
-
-  # Install .NET specific tools (managed via mise)
-  install_dotnet_format
-}
 
 # Purpose: Installs osv-scanner for vulnerability scanning.
 # Delegate: Managed by mise (.mise.toml)
@@ -584,19 +564,6 @@ install_trivy() {
 
 
 
-# Purpose: Installs dotnet-format for .NET linting.
-# Delegate: Managed by mise (.mise.toml)
-install_dotnet_format() {
-  local _T0_DNF
-  _T0_DNF=$(date +%s)
-  _log_setup "Dotnet Format" "dotnet"
-  local _STAT_DNF="✅ Available"
-  # dotnet-format is now built-in as 'dotnet format'
-  if ! dotnet format --version >/dev/null 2>&1; then
-    _STAT_DNF="❌ Missing"
-  fi
-  log_summary "Dotnet" "Dotnet Format" "$_STAT_DNF" "$(dotnet format --version 2>/dev/null || echo "-")" "$(($(date +%s) - _T0_DNF))"
-}
 
 # Purpose: Installs zizmor for GitHub Actions auditing.
 # Delegate: Managed by mise (.mise.toml)
