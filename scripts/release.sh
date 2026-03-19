@@ -50,7 +50,7 @@ VERSION:
 
 Note:
   This script supports multiple package ecosystems:
-  - Node.js (package.json, pnpm-lock.yaml)
+  - Node.js (package.json, lockfile)
   - Python (pyproject.toml, requirements.txt)
   - Go (go.mod)
   - Docs (docs/package.json)
