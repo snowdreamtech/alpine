@@ -21,7 +21,7 @@ install_runtime_node() {
   fi
 }
 
-# Purpose: Configures Node.js runtime and installs pnpm dependencies.
+# Purpose: Configures Node.js runtime and installs dependencies.
 setup_node() {
   local _T0_NODE
   _T0_NODE=$(date +%s)

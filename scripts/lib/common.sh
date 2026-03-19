@@ -153,7 +153,7 @@ _detect_node_manager() {
   fi
 }
 
-# Dynamically detect Node.js package manager if not explicitly set
+# Dynamically# Purpose: Runs a Node.js package manager script safely.
 if [ -z "$NPM" ]; then
   NPM=$(_detect_node_manager)
 fi
@@ -184,7 +184,7 @@ MISE_VERSION="${MISE_VERSION:-2026.3.8}"
 # by the project's .mise.toml file. Do not add hardcoded version variables here.
 # Any tool added below MUST have a corresponding entry in .mise.toml Tools section.
 
-# ── � Project Context Detection ──────────────────────────────────────────────
+# ──  Project Context Detection ──────────────────────────────────────────────
 
 # Robustly identify the project root directory
 if [ -z "$_G_PROJECT_ROOT" ]; then
@@ -1099,11 +1099,7 @@ install_runtime_hooks() {
   fi
 }
 
-# Purpose: Standardizes lockfile synchronization across all package managers.
-# Params:
-#   $1 - Optional subdirectory (default: current directory)
-# Examples:
-#   sync_node_lockfile "docs"
+# Purpose: Synchronizes Node.js lockfile safely.
 sync_node_lockfile() {
   local _SYNC_DIR="${1:-.}"
   local _OLDPWD_SYNC
