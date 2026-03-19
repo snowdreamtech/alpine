@@ -1590,8 +1590,15 @@ EOF
 
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
-    # Full list for "On-demand" (default) or "All" (explicit)
-    _MODULES_LIST="node python deno bun pipx php rust gitleaks hadolint go checkmake tflint kube-linter java ruby kotlin dart swift lua perl julia r groovy dotnet osv-scanner trivy zizmor govulncheck cargo-audit editorconfig-checker shfmt shellcheck actionlint taplo prettier sort-package-json goreleaser spectral commitlint dockerfile-utils clang-format cpp terraform solidity ktlint ruff stylelint yamllint sqlfluff markdownlint dotenv-linter bats bats-libs eslint vitepress commitizen pip-audit stylua buf tofu just task zig cue rego edge rn pulumi crossplane playwright cypress vitest docusaurus mkdocs sphinx jupyter dvc elixir haskell scala pre-commit hooks"
+    # Grouped list for "On-demand" (default) or "All" (explicit)
+    # 1. Base Tools (Universal)
+    local _BASE_LIST="pipx gitleaks checkmake editorconfig-checker shfmt shellcheck actionlint taplo prettier commitlint commitizen pre-commit hooks cue yamllint markdownlint dotenv-linter just task"
+    # 2. Language Runtimes & Specific Tools
+    local _LANG_LIST="node python go rust java kotlin php ruby dart swift lua perl julia r groovy dotnet zig elixir haskell scala"
+    # 3. Domain Tools (Security, IaC, Testing, etc.)
+    local _DOMAIN_LIST="osv-scanner trivy zizmor govulncheck cargo-audit pip-audit rego hadolint tflint kube-linter tofu pulumi crossplane spectral buf playwright cypress vitest bats bats-libs vitepress docusaurus mkdocs sphinx jupyter dvc"
+
+    _MODULES_LIST="${_BASE_LIST} ${_LANG_LIST} ${_DOMAIN_LIST}"
   else
     # Specific modules requested (e.g., ./setup.sh node)
     _MODULES_LIST="${_RAW_ARGS}"
@@ -1619,22 +1626,25 @@ EOF
   fi
 
   # 7. Execution
-  local _cur_module
+  # ── Execution Loop ──
+  local _cur_grp=""
   for _cur_module in $_MODULES_LIST; do
-    case $_cur_module in node) setup_node ;;
+    # Visual Grouping Headers for 'All' mode
+    if [ "$_IS_ALL_MODULES" = "true" ]; then
+      case $_cur_module in
+      pipx) [ "$_cur_grp" != "base" ] && log_info "── Base Toolset ──" && _cur_grp="base" ;;
+      node) [ "$_cur_grp" != "lang" ] && log_info "── Language Toolsets ──" && _cur_grp="lang" ;;
+      osv-scanner) [ "$_cur_grp" != "domain" ] && log_info "── Domain Toolsets ──" && _cur_grp="domain" ;;
+      esac
+    fi
+
+    case $_cur_module in
+    node) setup_node ;;
     python) setup_python ;;
-    deno) setup_deno ;;
-    bun) setup_bun ;;
-    pipx) install_pipx ;;
-    gitleaks) install_gitleaks ;;
-    checkmake) install_checkmake ;;
-    hadolint) install_hadolint ;;
     go)
       setup_go
       install_go_lint
       ;;
-    tflint) install_tflint ;;
-    kube-linter) install_kube_linter ;;
     php) setup_php ;;
     rust) setup_rust ;;
     java) setup_java ;;
@@ -1676,7 +1686,12 @@ EOF
     scala) setup_scala ;;
     pre-commit) install_pre_commit ;;
     hooks) setup_hooks ;;
-
+    pipx) install_pipx ;;
+    gitleaks) install_gitleaks ;;
+    checkmake) install_checkmake ;;
+    hadolint) install_hadolint ;;
+    tflint) install_tflint ;;
+    kube-linter) install_kube_linter ;;
     editorconfig-checker) install_editorconfig_checker ;;
     sort-package-json) install_sort_package_json ;;
     goreleaser) install_goreleaser ;;
