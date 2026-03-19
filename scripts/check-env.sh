@@ -79,8 +79,9 @@ check_tool_version() {
     return 1
   fi
 
+  local _LV_MISE_KEY="${7:-$_LV_CMD}"
   local _LV_CURRENT_VER
-  _LV_CURRENT_VER=$(get_version "$_LV_CMD" | tr -d '\r')
+  _LV_CURRENT_VER=$(get_version "$_LV_CMD" "" "$_LV_MISE_KEY" | tr -d '\r')
   [ "$_LV_CURRENT_VER" = "-" ] && _LV_CURRENT_VER="0.0"
 
   # If requirement is empty or -, allow anything
@@ -633,9 +634,9 @@ main() {
   check_tool_version "Zizmor" "zizmor" "$(get_mise_tool_version zizmor)" "zizmor --version" 0 1
 
   log_info "── Lint & Quality Tools ──"
-  check_tool_version "Shfmt" "shfmt" "$(get_mise_tool_version "pipx:shfmt-py")" "shfmt --version" 0 0
-  check_tool_version "Shellcheck" "shellcheck" "$(get_mise_tool_version "pipx:shellcheck-py")" "shellcheck --version" 0 0
-  check_tool_version "Actionlint" "actionlint" "$(get_mise_tool_version "pipx:actionlint-py")" "actionlint --version" 0 0
+  check_tool_version "Shfmt" "shfmt" "$(get_mise_tool_version "pipx:shfmt-py")" "shfmt --version" 0 0 "pipx:shfmt-py"
+  check_tool_version "Shellcheck" "shellcheck" "$(get_mise_tool_version "pipx:shellcheck-py")" "shellcheck --version" 0 0 "pipx:shellcheck-py"
+  check_tool_version "Actionlint" "actionlint" "$(get_mise_tool_version "pipx:actionlint-py")" "actionlint --version" 0 0 "pipx:actionlint-py"
 
   if [ -f "Dockerfile" ] || [ -f "docker-compose.yml" ]; then
     check_tool_version "Hadolint" "hadolint" "$(get_mise_tool_version hadolint)" "hadolint --version" 0 0
