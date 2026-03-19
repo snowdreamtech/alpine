@@ -21,7 +21,13 @@
 "github:terraform-linters/tflint" = "0.61.0"
 "github:nicklockwood/SwiftFormat" = "0.60.0"
 "github:realm/SwiftLint" = "0.63.2"
-"github:google/google-java-format" = "1.22.0"
+"github:google/google-java-format" = { version = "v1.35.0", asset = [
+  { match = "darwin-arm64" },
+  { match = "linux-x86-64" },
+  { match = "linux-arm64" },
+  { match = "windows-x86-64" },
+  { match = "all-deps.jar" },
+] }
 "github:JohnnyMorganz/StyLua" = "2.0.2"
 "github:bufbuild/buf" = "1.50.0"
 "github:casey/just" = "1.39.0"
