@@ -10,7 +10,7 @@ install_runtime_assemblyscript() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "npm:assemblyscript@${MISE_TOOL_VERSION_ASSEMBLYSCRIPT}"
+  run_mise install "npm:assemblyscript@$(get_mise_tool_version assemblyscript)"
   eval "$(mise activate bash --shims)"
 }
 

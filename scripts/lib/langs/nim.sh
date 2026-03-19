@@ -10,7 +10,7 @@ install_runtime_nim() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "nim@${MISE_TOOL_VERSION_NIM}"
+  run_mise install "nim@$(get_mise_tool_version nim)"
   eval "$(mise activate bash --shims)"
 }
 

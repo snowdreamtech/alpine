@@ -10,7 +10,7 @@ install_runtime_vala() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "vala@${MISE_TOOL_VERSION_VALA}"
+  run_mise install "vala@$(get_mise_tool_version vala)"
   eval "$(mise activate bash --shims)"
 }
 

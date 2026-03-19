@@ -10,7 +10,7 @@ install_runtime_ballerina() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "ballerina@${MISE_TOOL_VERSION_BALLERINA}"
+  run_mise install "ballerina@$(get_mise_tool_version ballerina)"
   eval "$(mise activate bash --shims)"
 }
 

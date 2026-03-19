@@ -9,7 +9,7 @@ install_runtime_groovy() {
     return 0
   fi
   # shellcheck disable=SC2154
-  run_mise install "groovy@${MISE_TOOL_VERSION_GROOVY}"
+  run_mise install "groovy@$(get_mise_tool_version groovy)"
   eval "$(mise activate bash --shims)"
 }
 

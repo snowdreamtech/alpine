@@ -10,7 +10,7 @@ install_runtime_lisp() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "sbcl@${MISE_TOOL_VERSION_SBCL}"
+  run_mise install "sbcl@$(get_mise_tool_version sbcl)"
   eval "$(mise activate bash --shims)"
 }
 

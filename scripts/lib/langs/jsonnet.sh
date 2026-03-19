@@ -10,7 +10,7 @@ install_runtime_jsonnet() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "go-jsonnet@${MISE_TOOL_VERSION_JSONNET}"
+  run_mise install "go-jsonnet@$(get_mise_tool_version jsonnet)"
   eval "$(mise activate bash --shims)"
 }
 

@@ -9,7 +9,7 @@ install_runtime_erlang() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "erlang@${MISE_TOOL_VERSION_ERLANG}"
+  run_mise install "erlang@$(get_mise_tool_version erlang)"
   eval "$(mise activate bash --shims)"
 }
 

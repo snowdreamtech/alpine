@@ -10,7 +10,7 @@ install_runtime_terraform() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "terraform@${MISE_TOOL_VERSION_TERRAFORM}"
+  run_mise install "terraform@$(get_mise_tool_version terraform)"
   eval "$(mise activate bash --shims)"
 }
 

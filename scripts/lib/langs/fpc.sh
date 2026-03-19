@@ -10,7 +10,7 @@ install_runtime_fpc() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "fpc@${MISE_TOOL_VERSION_FPC}"
+  run_mise install "fpc@$(get_mise_tool_version fpc)"
   eval "$(mise activate bash --shims)"
 }
 

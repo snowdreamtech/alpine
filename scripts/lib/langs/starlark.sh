@@ -10,7 +10,7 @@ install_runtime_starlark() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "bazel@${MISE_TOOL_VERSION_BAZEL}"
+  run_mise install "bazel@$(get_mise_tool_version bazel)"
   eval "$(mise activate bash --shims)"
 }
 

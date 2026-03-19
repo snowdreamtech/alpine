@@ -10,7 +10,7 @@ install_runtime_grain() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "grain@${MISE_TOOL_VERSION_GRAIN}"
+  run_mise install "grain@$(get_mise_tool_version grain)"
   eval "$(mise activate bash --shims)"
 }
 

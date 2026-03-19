@@ -10,7 +10,7 @@ install_runtime_elm() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "elm@${MISE_TOOL_VERSION_ELM}"
+  run_mise install "elm@$(get_mise_tool_version elm)"
   eval "$(mise activate bash --shims)"
 }
 

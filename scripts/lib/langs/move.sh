@@ -10,7 +10,7 @@ install_runtime_move() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "aptos@${MISE_TOOL_VERSION_MOVE}"
+  run_mise install "aptos@$(get_mise_tool_version move)"
   eval "$(mise activate bash --shims)"
 }
 

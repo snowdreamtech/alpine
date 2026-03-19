@@ -10,7 +10,7 @@ install_runtime_terragrunt() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "terragrunt@${MISE_TOOL_VERSION_TERRAGRUNT}"
+  run_mise install "terragrunt@$(get_mise_tool_version terragrunt)"
   eval "$(mise activate bash --shims)"
 }
 

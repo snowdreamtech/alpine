@@ -9,7 +9,7 @@ install_runtime_lua() {
     return 0
   fi
   # shellcheck disable=SC2154
-  run_mise install "lua@${MISE_TOOL_VERSION_LUA}"
+  run_mise install "lua@$(get_mise_tool_version lua)"
   eval "$(mise activate bash --shims)"
 }
 

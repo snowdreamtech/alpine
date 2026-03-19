@@ -9,7 +9,7 @@ install_runtime_tofu() {
     return 0
   fi
   # shellcheck disable=SC2154
-  run_mise install "opentofu@${MISE_TOOL_VERSION_OPENTOFU}"
+  run_mise install "opentofu@$(get_mise_tool_version opentofu)"
   eval "$(mise activate bash --shims)"
 }
 

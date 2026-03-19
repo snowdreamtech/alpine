@@ -10,7 +10,7 @@ install_runtime_raku() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "rakudo@${MISE_TOOL_VERSION_RAKU}"
+  run_mise install "rakudo@$(get_mise_tool_version raku)"
   eval "$(mise activate bash --shims)"
 }
 

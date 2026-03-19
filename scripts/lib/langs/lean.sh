@@ -10,7 +10,7 @@ install_runtime_lean() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "lean@${MISE_TOOL_VERSION_LEAN}"
+  run_mise install "lean@$(get_mise_tool_version lean)"
   eval "$(mise activate bash --shims)"
 }
 

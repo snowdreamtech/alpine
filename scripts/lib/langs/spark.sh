@@ -10,7 +10,7 @@ install_runtime_spark() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "spark@${MISE_TOOL_VERSION_SPARK}"
+  run_mise install "spark@$(get_mise_tool_version spark)"
   eval "$(mise activate bash --shims)"
 }
 

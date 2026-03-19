@@ -10,7 +10,7 @@ install_runtime_helm() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "helm@${MISE_TOOL_VERSION_HELM}"
+  run_mise install "helm@$(get_mise_tool_version helm)"
   eval "$(mise activate bash --shims)"
 }
 

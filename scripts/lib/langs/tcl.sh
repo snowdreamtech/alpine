@@ -10,7 +10,7 @@ install_runtime_tcl() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "tcl@${MISE_TOOL_VERSION_TCL}"
+  run_mise install "tcl@$(get_mise_tool_version tcl)"
   eval "$(mise activate bash --shims)"
 }
 

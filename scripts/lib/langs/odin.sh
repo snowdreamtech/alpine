@@ -10,7 +10,7 @@ install_runtime_odin() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "odin@${MISE_TOOL_VERSION_ODIN}"
+  run_mise install "odin@$(get_mise_tool_version odin)"
   eval "$(mise activate bash --shims)"
 }
 

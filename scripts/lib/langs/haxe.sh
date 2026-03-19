@@ -10,7 +10,7 @@ install_runtime_haxe() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "haxe@${MISE_TOOL_VERSION_HAXE}"
+  run_mise install "haxe@$(get_mise_tool_version haxe)"
   eval "$(mise activate bash --shims)"
 }
 

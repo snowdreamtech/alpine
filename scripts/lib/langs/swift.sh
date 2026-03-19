@@ -9,7 +9,7 @@ install_runtime_swift() {
     return 0
   fi
   # shellcheck disable=SC2154
-  run_mise install "swift@${MISE_TOOL_VERSION_SWIFT}"
+  run_mise install "swift@$(get_mise_tool_version swift)"
   eval "$(mise activate bash --shims)"
 }
 

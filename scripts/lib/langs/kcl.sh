@@ -9,7 +9,7 @@ install_runtime_kcl() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "kclvm@${MISE_TOOL_VERSION_KCL}"
+  run_mise install "kclvm@$(get_mise_tool_version kcl)"
   eval "$(mise activate bash --shims)"
 }
 

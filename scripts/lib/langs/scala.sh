@@ -9,7 +9,7 @@ install_runtime_scala() {
     return 0
   fi
   # shellcheck disable=SC2154
-  run_mise install "scala@${MISE_TOOL_VERSION_SCALA}"
+  run_mise install "scala@$(get_mise_tool_version scala)"
   eval "$(mise activate bash --shims)"
 }
 

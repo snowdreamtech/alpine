@@ -10,7 +10,7 @@ install_runtime_typst() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "typst@${MISE_TOOL_VERSION_TYPST}"
+  run_mise install "typst@$(get_mise_tool_version typst)"
   eval "$(mise activate bash --shims)"
 }
 

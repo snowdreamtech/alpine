@@ -8,7 +8,7 @@ install_runtime_julia() {
     return 0
   fi
   # shellcheck disable=SC2154
-  run_mise install "julia@${MISE_TOOL_VERSION_JULIA}"
+  run_mise install "julia@$(get_mise_tool_version julia)"
   eval "$(mise activate bash --shims)"
 }
 

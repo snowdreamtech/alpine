@@ -10,7 +10,7 @@ install_runtime_fortran() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "gcc@${MISE_TOOL_VERSION_GCC}"
+  run_mise install "gcc@$(get_mise_tool_version gcc)"
   eval "$(mise activate bash --shims)"
 }
 

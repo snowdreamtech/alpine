@@ -9,9 +9,9 @@ install_runtime_elixir() {
     return 0
   fi
   # shellcheck disable=SC2154
-  run_mise install "erlang@${MISE_TOOL_VERSION_ERLANG}"
+  run_mise install "erlang@$(get_mise_tool_version erlang)"
   # shellcheck disable=SC2154
-  run_mise install "elixir@${MISE_TOOL_VERSION_ELIXIR}"
+  run_mise install "elixir@$(get_mise_tool_version elixir)"
   eval "$(mise activate bash --shims)"
 }
 

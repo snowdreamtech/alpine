@@ -10,7 +10,7 @@ install_runtime_rescript() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "npm:rescript@${MISE_TOOL_VERSION_RESCRIPT}"
+  run_mise install "npm:rescript@$(get_mise_tool_version rescript)"
   eval "$(mise activate bash --shims)"
 }
 

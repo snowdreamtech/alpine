@@ -9,7 +9,7 @@ install_runtime_pulumi() {
     return 0
   fi
   # shellcheck disable=SC2154
-  run_mise install "pulumi@${MISE_TOOL_VERSION_PULUMI}"
+  run_mise install "pulumi@$(get_mise_tool_version pulumi)"
   eval "$(mise activate bash --shims)"
 }
 

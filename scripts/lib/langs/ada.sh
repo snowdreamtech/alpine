@@ -10,7 +10,7 @@ install_runtime_ada() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "gnat@${MISE_TOOL_VERSION_ADA}"
+  run_mise install "gnat@$(get_mise_tool_version ada)"
   eval "$(mise activate bash --shims)"
 }
 

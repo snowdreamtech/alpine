@@ -10,7 +10,7 @@ install_runtime_moonbit() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "moonbit@${MISE_TOOL_VERSION_MOONBIT}"
+  run_mise install "moonbit@$(get_mise_tool_version moonbit)"
   eval "$(mise activate bash --shims)"
 }
 

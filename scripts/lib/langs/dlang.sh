@@ -10,7 +10,7 @@ install_runtime_dlang() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "dmd@${MISE_TOOL_VERSION_DLANG}"
+  run_mise install "dmd@$(get_mise_tool_version dlang)"
   eval "$(mise activate bash --shims)"
 }
 

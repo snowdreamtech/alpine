@@ -10,7 +10,7 @@ install_runtime_luau() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "luau@${MISE_TOOL_VERSION_LUAU}"
+  run_mise install "luau@$(get_mise_tool_version luau)"
   eval "$(mise activate bash --shims)"
 }
 

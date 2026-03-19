@@ -10,7 +10,7 @@ install_runtime_duckdb() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "duckdb@${MISE_TOOL_VERSION_DUCKDB}"
+  run_mise install "duckdb@$(get_mise_tool_version duckdb)"
   eval "$(mise activate bash --shims)"
 }
 

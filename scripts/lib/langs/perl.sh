@@ -9,7 +9,7 @@ install_runtime_perl() {
     return 0
   fi
   # shellcheck disable=SC2154
-  run_mise install "perl@${MISE_TOOL_VERSION_PERL}"
+  run_mise install "perl@$(get_mise_tool_version perl)"
   eval "$(mise activate bash --shims)"
 }
 

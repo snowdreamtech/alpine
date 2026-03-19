@@ -9,7 +9,7 @@ install_runtime_haskell() {
     return 0
   fi
   # shellcheck disable=SC2154
-  run_mise install "ghc@${MISE_TOOL_VERSION_GHC}"
+  run_mise install "ghc@$(get_mise_tool_version ghc)"
   eval "$(mise activate bash --shims)"
 }
 

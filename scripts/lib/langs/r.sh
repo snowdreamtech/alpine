@@ -9,7 +9,7 @@ install_runtime_r() {
     return 0
   fi
   # shellcheck disable=SC2154
-  run_mise install "R@${MISE_TOOL_VERSION_R}"
+  run_mise install "R@$(get_mise_tool_version r)"
   eval "$(mise activate bash --shims)"
 }
 

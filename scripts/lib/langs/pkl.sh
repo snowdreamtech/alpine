@@ -10,7 +10,7 @@ install_runtime_pkl() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "pkl@${MISE_TOOL_VERSION_PKL}"
+  run_mise install "pkl@$(get_mise_tool_version pkl)"
   eval "$(mise activate bash --shims)"
 }
 
