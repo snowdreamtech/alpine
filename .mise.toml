@@ -2,60 +2,73 @@
 # mise.toml — Optimized for fast installation and weak networks
 # ------------------------------------------------------------
 # Strategy:
-# 1. Prefer npm and pipx providers for tools available on registries
-#    because they are faster and more stable under weak networks.
-# 2. Use GitHub provider only for tools that are GitHub‑release‑only.
-# 3. Apply GitHub proxy via url_replacements to accelerate downloads.
-# 4. Keep all configuration explicit, auditable, and reproducible.
+# 1. Functional Grouping: Tools are organized by domain (Runtimes, Security, etc.)
+# 2. Alphabetical Sorting: All entries are sorted within their respective blocks.
+# 3. Prefer npm and pipx providers for tools available on registries.
+# 4. Use GitHub provider for binary-only tools (accelerated via Proxy).
 # ------------------------------------------------------------
 
 [tools]
 
-# ------------------------------------------------------------
-# GitHub Release-only tools (no npm/pipx alternatives available)
-# These rely on GitHub releases and benefit from proxy acceleration.
-# ------------------------------------------------------------
-"github:goreleaser/goreleaser" = "2.14.1"
-"github:hadolint/hadolint" = "2.14.0"
-"github:stackrox/kube-linter" = "0.8.1"
-"github:terraform-linters/tflint" = "0.61.0"
-"github:google/osv-scanner" = "2.3.3"
-"github:aquasecurity/trivy" = "0.69.3"
-"github:realm/SwiftLint" = "0.63.2"
-"github:google/google-java-format" = { version = "v1.35.0", asset = [
-  { match = "darwin-arm64" },
-  { match = "linux-x86-64" },
-  { match = "linux-arm64" },
-  { match = "windows-x86-64" },
-  { match = "all-deps.jar" },
-] }
-"github:JohnnyMorganz/StyLua" = "2.0.2"
-"github:bufbuild/buf" = "1.50.0"
-"github:casey/just" = "1.39.0"
-"github:go-task/task" = "3.41.0"
-"github:cue-lang/cue" = "0.12.0"
-"github:open-policy-agent/opa" = "1.2.0"
-"github:google/go-jsonnet" = "0.20.0"
-"go:golang.org/x/vuln/cmd/govulncheck" = "v1.1.4"
+# ── 🏗️ Core Runtimes & Language SDKs ─────────────────────────────────────────
+ada = "14.2.0"
+bun = "1.2.4"
+clojure = "1.12.0.1479"
+crystal = "1.15.1"
+dart = "3.7.0"
+deno = "2.2.2"
+dlang = "2.109.1"
+dotnet = "9.0.201"
+elixir = "1.18.2-otp-27"
+elm = "0.19.1"
+erlang = "27.2.2"
+fpc = "3.2.2"
+gcc = "15.2"
+ghc = "9.10.1"
+gleam = "1.8.1"
+go = "1.23.6"
+groovy = "4.0.25"
+haxe = "4.3.6"
+java = "21.0.6+7"
+julia = "1.11.3"
+kotlin = "2.1.10"
+lean = "4.26.0"
+llvm = "19.1.7"
+lua = "5.4.7"
+luau = "0.712"
+mojo = "0.26.1"
+nim = "2.2.0"
+node = "20.18.3"
+ocaml = "5.3.0"
+odin = "dev-2026-03"
+perl = "5.40.0"
+php = "8.3.16"
+pnpm = "10.30.3"
+python = "3.12.9"
+R = "4.4.2"
+racket = "9.1"
+raku = "2026.02"
+rescript = "12.0.0"
+ruby = "3.4.2"
+rust = "1.85.0"
+sbcl = "2.6.2"
+scala = "3.6.3"
+solc = "0.8.28"
+swift = "6.0.3"
+swi-prolog = "10.1.5"
+tcl = "9.0.3"
+vlang = "0.5.1"
+wasmtime = "42.0.1"
+yarn = "1.22.22"
+zig = "0.14.0"
+"github:grain-lang/grain" = "0.7.2"
+"github:moonbitlang/moonbit-compiler" = "0.8.0"
 
-# ------------------------------------------------------------
-# Default provider tools (mise native provider is fastest here)
-# These tools have stable binary distributions or cached providers.
-# ------------------------------------------------------------
+# ── 💎 General Quality & Project Management ──────────────────────────────────
 checkmake = "0.3.2"
 editorconfig-checker = "3.6.1"
-gitleaks = "8.30.0"
-node = "20.18.3"
-python = "3.12.9"
-
-# These are managed via scripts/setup.sh to allow platform-aware
-# and versioned installations without forcing CI failures.
-
-
-# ------------------------------------------------------------
-# npm-based tools (best performance under weak networks)
-# npm registry can be mirrored (e.g., npmmirror.com) for speed.
-# ------------------------------------------------------------
+"github:casey/just" = "1.39.0"
+"github:go-task/task" = "3.41.0"
 "npm:@commitlint/cli" = "20.4.3"
 "npm:@commitlint/config-conventional" = "20.4.3"
 "npm:bats" = "1.13.0"
@@ -63,107 +76,75 @@ python = "3.12.9"
 "npm:bats-support" = "0.3.0"
 "npm:commitizen" = "4.3.1"
 "npm:cz-conventional-changelog" = "3.3.0"
-"npm:dockerfile-utils" = "0.16.3"
+"pipx:pre-commit" = "4.5.1"
+
+# ── 🛡️ Security Auditing ─────────────────────────────────────────────────────
+gitleaks = "8.30.0"
+"cargo:cargo-audit" = "0.20.1"
+"github:aquasecurity/trivy" = "0.69.3"
+"github:google/osv-scanner" = "2.3.3"
+"go:golang.org/x/vuln/cmd/govulncheck" = "v1.1.4"
+"pipx:pip-audit" = "2.8.0"
+"pipx:zizmor" = "1.3.1"
+
+# ── 🎨 Language-Specific Toolsets (Lint/Fmt) ──────────────────────────────────
+golangci-lint = "1.64.5"
+kcl = "0.11.1"
+move = "1.2.0"
+pkl = "0.31.0"
+"github:JohnnyMorganz/StyLua" = "2.0.2"
+"github:bufbuild/buf" = "1.50.0"
+"github:cue-lang/cue" = "0.12.0"
+"github:google/go-jsonnet" = "0.20.0"
+"github:google/google-java-format" = { version = "v1.35.0", asset = [
+  { match = "darwin-arm64" },
+  { match = "linux-x86-64" },
+  { match = "linux-arm64" },
+  { match = "windows-x86-64" },
+  { match = "all-deps.jar" },
+] }
+"github:hadolint/hadolint" = "2.14.0"
+"github:open-policy-agent/opa" = "1.2.0"
+"github:realm/SwiftLint" = "0.63.2"
+"npm:@naturalcycles/ktlint" = "2.1.10"
+"npm:@taplo/cli" = "0.7.0"
+"npm:assemblyscript" = "0.27.31"
 "npm:eslint" = "10.0.3"
 "npm:markdownlint-cli2" = "0.21.0"
 "npm:prettier" = "3.8.1"
 "npm:sort-package-json" = "3.6.1"
 "npm:stylelint" = "16.26.1"
 "npm:stylelint-config-standard" = "37.0.0"
-"npm:vitepress" = "1.6.4"
-"npm:@taplo/cli" = "0.7.0"
-"npm:@naturalcycles/ktlint" = "2.1.10"
-"npm:@stoplight/spectral-cli" = "5.9.1"
-
-# ------------------------------------------------------------
-# pipx-based tools (stable and mirror-friendly)
-# pipx benefits from PyPI mirrors (e.g., Tsinghua, Aliyun).
-# ------------------------------------------------------------
-"pipx:pre-commit" = "4.5.1"
-"pipx:ruff" = "0.15.4"
-"pipx:yamllint" = "1.38.0"
-"pipx:sqlfluff" = "4.0.4"
-"pipx:ansible-lint" = "26.1.1"
-"pipx:shellcheck-py" = "0.11.0.1"
 "pipx:actionlint-py" = "1.7.11.24"
-"pipx:shfmt-py" = "3.12.0.2"
 "pipx:clang-format" = "19.1.7"
 "pipx:dotenv-linter" = "0.7.0"
-"pipx:zizmor" = "1.3.1"
-"pipx:pip-audit" = "2.8.0"
-"cargo:cargo-audit" = "0.20.1"
+"pipx:ruff" = "0.15.4"
+"pipx:shellcheck-py" = "0.11.0.1"
+"pipx:shfmt-py" = "3.12.0.2"
+"pipx:sqlfluff" = "4.0.4"
+"pipx:yamllint" = "1.38.0"
 
-# ------------------------------------------------------------
-# On-demand Runtimes & SDKs (Categorized for SSoT)
-# ------------------------------------------------------------
-bun = "1.2.4"
-dart = "3.7.0"
-deno = "2.2.2"
-dotnet = "9.0.201"
-elixir = "1.18.2-otp-27"
-erlang = "27.2.2"
-flutter = "3.29.0"
-ghc = "9.10.1"
-go = "1.23.6"
-groovy = "4.0.25"
-java = "21.0.6+7"
-julia = "1.11.3"
-kotlin = "2.1.10"
-lua = "5.4.7"
-"github:opentofu/opentofu" = "1.9.0"
-"github:lychee-app/lychee" = "lychee-v0.23.0"
-perl = "5.40.0"
-php = "8.3.16"
-pnpm = "10.30.3"
-yarn = "1.22.22"
-golangci-lint = "1.64.5"
-"github:pulumi/pulumi" = "3.153.1"
-R = "4.4.2"
-ruby = "3.4.2"
-rust = "1.85.0"
-scala = "3.6.3"
-swift = "6.0.3"
-terraform = "1.11.0"
-solc = "0.8.28"
-odin = "dev-2026-03"
-nim = "2.2.0"
-clojure = "1.12.0.1479"
-gleam = "1.8.1"
-mojo = "0.26.1"
-ocaml = "5.3.0"
-vlang = "0.5.1"
-crystal = "1.15.1"
-llvm = "19.1.7"
-dlang = "2.109.1"
-haxe = "4.3.6"
-"npm:assemblyscript" = "0.27.31"
-"github:ballerina-platform/ballerina-distribution" = "2201.11.0"
-kcl = "0.11.1"
-pkl = "0.31.0"
-move = "1.2.0"
-elm = "0.19.1"
-rescript = "12.0.0"
-ada = "14.2.0"
-luau = "0.712"
-raku = "2026.02"
-vala = "0.56.18"
-fpc = "3.2.2"
-lean = "4.26.0"
-sbcl = "2.6.2"
-racket = "9.1"
-swi-prolog = "10.1.5"
-gcc = "15.2"
-wasmtime = "42.0.1"
-"github:moonbitlang/moonbit-compiler" = "0.8.0"
-"github:grain-lang/grain" = "0.7.2"
+# ── ☁️ DevOps & Infrastructure ────────────────────────────────────────────────
 bazel = "9.0.1"
-tcl = "9.0.3"
-terragrunt = "1.0.0-rc3"
-spark = "4.1.1"
 helm = "3.17.1"
-typst = "0.13.0"
+spark = "4.1.1"
+terraform = "1.11.0"
+terragrunt = "1.0.0-rc3"
+"github:ballerina-platform/ballerina-distribution" = "2201.11.0"
+"github:goreleaser/goreleaser" = "2.14.1"
+"github:opentofu/opentofu" = "1.9.0"
+"github:pulumi/pulumi" = "3.153.1"
+"github:stackrox/kube-linter" = "0.8.1"
+"github:terraform-linters/tflint" = "0.61.0"
+"npm:@stoplight/spectral-cli" = "5.9.1"
+"npm:dockerfile-utils" = "0.16.3"
+"pipx:ansible-lint" = "26.1.1"
+
+# ── 📖 Documentation & Data ──────────────────────────────────────────────────
 duckdb = "1.5.0"
-zig = "0.14.0"
+typst = "0.13.0"
+"github:lychee-app/lychee" = "lychee-v0.23.0"
+"npm:vitepress" = "1.6.4"
 
 # ------------------------------------------------------------
 # Global settings
@@ -173,10 +154,11 @@ experimental = true
 asdf_compat = true
 status.missing_tools = "never"
 
-# Environment variables for performance acceleration in weak networks.
-# Centralized SSoT for mirroring and registry configuration.
+# ------------------------------------------------------------
+# Environment variables for performance acceleration
+# ------------------------------------------------------------
 [env]
-# Performance Toggles: set to "1" or "true" to activate
+# Performance Toggles
 ENABLE_GITHUB_PROXY = "1"
 PYTHONUTF8 = "1"
 
@@ -189,18 +171,16 @@ MISE_NODE_MIRROR_URL = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/"
 PIP_INDEX_URL = "https://pypi.tuna.tsinghua.edu.cn/simple"
 PIP_TRUSTED_HOST = "pypi.tuna.tsinghua.edu.cn"
 PYTHON_BUILD_MIRROR_URL = "https://mirrors.tuna.tsinghua.edu.cn/python/"
+
+# Ruby acceleration
 RUBY_BUILD_MIRROR_URL = "https://mirrors.tuna.tsinghua.edu.cn/ruby-build/"
 
-# Go acceleration (China optimization)
+# Go acceleration
 GOPROXY = "https://goproxy.cn,direct"
 
 # Rust & Cargo acceleration
 RUSTUP_DIST_SERVER = "https://mirrors.tuna.tsinghua.edu.cn/rustup"
 RUSTUP_UPDATE_ROOT = "https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup"
 
-# GitHub Proxy (SSoT)
-# Used specifically for direct GitHub binary/asset downloads
+# GitHub Proxy
 GITHUB_PROXY = "https://gh-proxy.sn0wdr1am.com/"
-
-# Environment variables for performance acceleration in weak networks.
-[env]
