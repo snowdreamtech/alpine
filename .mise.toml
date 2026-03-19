@@ -4,8 +4,9 @@
 # Strategy:
 # 1. Functional Grouping: Tools are organized by domain (Runtimes, Security, etc.)
 # 2. Alphabetical Sorting: All entries are sorted within their respective blocks.
-# 3. Prefer npm and pipx providers for tools available on registries.
-# 4. Use GitHub provider for binary-only tools (accelerated via Proxy).
+# 3. Explicit Providers: Use asdf:, npm:, pipx:, github: for Clarity & SSoT.
+# 4. Network Acceleration: url_replacements + env mirrors for peak performance.
+# 5. Pure SSoT: legacy_version_file=false to enforce mise.toml as the source.
 # ------------------------------------------------------------
 
 [tools]
@@ -153,6 +154,13 @@ typst = "0.13.0"
 experimental = true
 asdf_compat = true
 status.missing_tools = "never"
+legacy_version_file = false
+plugin_autoupdate_last_check_duration = "1 week"
+
+# ── 🌉 URL Replacements (The GitHub Proxy Engine) ─────────────────────────────
+# Automatically reroutes GitHub downloads through the high-speed proxy.
+[url_replacements]
+"https://github.com" = "https://gh-proxy.sn0wdr1am.com/https://github.com"
 
 # ------------------------------------------------------------
 # Environment variables for performance acceleration
@@ -182,5 +190,5 @@ GOPROXY = "https://goproxy.cn,direct"
 RUSTUP_DIST_SERVER = "https://mirrors.tuna.tsinghua.edu.cn/rustup"
 RUSTUP_UPDATE_ROOT = "https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup"
 
-# GitHub Proxy
+# GITHUB_PROXY variable for scripts
 GITHUB_PROXY = "https://gh-proxy.sn0wdr1am.com/"
