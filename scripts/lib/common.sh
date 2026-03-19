@@ -1026,8 +1026,20 @@ resolve_bin() {
   fi
 
   # 3. Check System PATH
-  if command -v "$_BIN_RES" >/dev/null 2>&1; then
-    command -v "$_BIN_RES"
+  local _SYS_BIN
+  _SYS_BIN=$(command -v "$_BIN_RES" 2>/dev/null)
+  if [ -n "$_SYS_BIN" ]; then
+    # Guard: If it's a mise shim, verify it's not "hollow"
+    if echo "$_SYS_BIN" | grep -q "mise/shims"; then
+      if ! mise ls "$_BIN_RES" --json 2>/dev/null | jq -e ".[] | select(.active==true or .installed==true)" >/dev/null 2>&1; then
+        # Also check if it's in our [env] section as a CI-only tool
+        if [ -n "$(get_mise_tool_version "$_BIN_RES")" ]; then
+          # It's a managed tool but not installed locally. Return 1 to indicate "not found".
+          return 1
+        fi
+      fi
+    fi
+    echo "$_SYS_BIN"
     return 0
   fi
 

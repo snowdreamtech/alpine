@@ -98,6 +98,13 @@ main() {
 
   log_info "🔍 Starting Unified Project Linter...\n"
 
+  # Skip heavy tools locally to avoid mise shim errors and reduce overhead.
+  # These tools are managed via [env] in .mise.toml and only installed/used in CI.
+  if ! is_ci_env; then
+    # Note: Using comma-separated list for pre-commit SKIP env var.
+    export SKIP="${SKIP:+$SKIP,}zizmor,osv-scanner,trivy,govulncheck,cargo-audit,pip-audit,lychee"
+  fi
+
   run_pre_commit_lint "$_FIX_LNT"
 
   log_success "\n✨ Linting complete!"
