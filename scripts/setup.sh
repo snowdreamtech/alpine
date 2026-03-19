@@ -1047,6 +1047,17 @@ install_goreleaser() {
     return 0
   fi
 
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version "goreleaser" "")
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Go" "GoReleaser" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_GR="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_GR="❌ Failed"
@@ -1191,6 +1202,17 @@ install_ruff() {
     return 0
   fi
 
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version "ruff" "")
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "pipx:ruff")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Python" "Ruff" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_RUF="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_RUF="❌ Failed"
@@ -1209,6 +1231,17 @@ install_yamllint() {
   fi
 
   if ! has_lang_files ".yamllint .yamllint.yml" "*.yaml *.yml"; then
+    return 0
+  fi
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version "yamllint" "")
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "pipx:yamllint")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Base" "Yamllint" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
 
@@ -1254,6 +1287,17 @@ install_markdownlint() {
     return 0
   fi
 
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version "markdownlint-cli2" "", "markdownlint-cli2")
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "npm:markdownlint-cli2")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Base" "Markdownlint" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_MD="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_MD="❌ Failed"
@@ -1293,6 +1337,17 @@ install_bats() {
   fi
 
   if ! has_lang_files "" "*.bats"; then
+    return 0
+  fi
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version "bats" "")
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Shell" "Bats" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
 
@@ -1353,6 +1408,17 @@ install_eslint() {
   fi
 
   if ! has_lang_files "package.json" "*.js *.ts *.vue *.jsx *.tsx"; then
+    return 0
+  fi
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version "eslint" "")
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "npm:eslint")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Node" "ESLint" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
 
@@ -1501,6 +1567,17 @@ install_pre_commit() {
   fi
 
   if [ ! -f ".pre-commit-config.yaml" ]; then
+    return 0
+  fi
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version "pre-commit" "")
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Base" "Pre-commit" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
 
