@@ -852,9 +852,11 @@ install_shellcheck() {
   _REQ_VER=$(get_mise_tool_version "pipx:shellcheck-py")
 
   # Special Case: Shellcheck version check can be 'latest'
-  if [ "$_CUR_VER" != "-" ] && ([ "$_CUR_VER" = "$_REQ_VER" ] || [ "$_REQ_VER" = "latest" ]); then
-    log_summary "Base" "Shellcheck" "✅ Exists" "$_CUR_VER" "0"
-    return 0
+  if [ "$_CUR_VER" != "-" ]; then
+    if [ "$_CUR_VER" = "$_REQ_VER" ] || [ "$_REQ_VER" = "latest" ]; then
+      log_summary "Base" "Shellcheck" "✅ Exists" "$_CUR_VER" "0"
+      return 0
+    fi
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"

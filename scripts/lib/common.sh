@@ -1003,7 +1003,7 @@ get_version() {
     *)
       # For other binaries, try to get version from the output
       # We strip 'v' or 'V' prefix and focus on the version number
-      "$_CMD_VER" "$_ARG_VER" 2>&1 | head -n 1 | sed 's/^[vV]//' | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
+      "$_CMD_VER" "$_ARG_VER" 2>&1 | sed 's/^[vV]//' | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
       ;;
     esac
   else
