@@ -34,6 +34,7 @@ setup_swift() {
     _log_setup "Swift Runtime" "swift"
 
     if [ "${DRY_RUN:-0}" -eq 0 ]; then
+      log_warn "Swift installation is large (~1GB+) and may take several minutes. Please wait..."
       install_runtime_swift || return 1
     fi
     log_summary "Runtime" "Swift" "✅ Installed" "$(get_version swift --version | head -n 1)" "$(($(date +%s) - _T0_SWIFT_RT))"

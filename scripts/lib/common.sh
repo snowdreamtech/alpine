@@ -429,30 +429,33 @@ run_mise() {
     # try running with proxy disabled for subsequent attempts.
     if [ $_RETRY_COUNT -gt 0 ]; then
       log_warn "Retrying with direct connection (bypassing all git proxies)..."
-      if (
+      (
         export GIT_CONFIG_GLOBAL=/dev/null
         export GIT_CONFIG_SYSTEM=/dev/null
-        if [ "${VERBOSE:-1}" -le 1 ]; then
+        if [ "${VERBOSE:-1}" -le 0 ]; then
           # shellcheck disable=SC2086
           MISE_QUIET=1 "$_M_BIN" $_MISE_OPTS "$_CMD" "$@" >/dev/null 2>&1
         else
           # shellcheck disable=SC2086
-          MISE_QUIET=1 "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"
+          "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"
         fi
-      ); then
-        _STATUS=0
-        break
-      fi
+      )
+      _STATUS=$?
+      [ $_STATUS -eq 0 ] && break
+      # If command failed due to interruption (SIGINT/SIGTERM), exit immediately
+      [ $_STATUS -gt 128 ] && return $_STATUS
     else
-      if [ "${VERBOSE:-1}" -le 1 ]; then
+      if [ "${VERBOSE:-1}" -le 0 ]; then
         # shellcheck disable=SC2086
         MISE_QUIET=1 "$_M_BIN" $_MISE_OPTS "$_CMD" "$@" >/dev/null 2>&1
       else
         # shellcheck disable=SC2086
-        MISE_QUIET=1 "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"
+        "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"
       fi
       _STATUS=$?
       [ $_STATUS -eq 0 ] && break
+      # If command failed due to interruption, exit immediately
+      [ $_STATUS -gt 128 ] && return $_STATUS
     fi
 
     _RETRY_COUNT=$((_RETRY_COUNT + 1))
