@@ -176,18 +176,17 @@ install_pipx() {
   _T0_PIPX=$(date +%s)
   local _TITLE="Pipx"
   local _PROVIDER="pipx"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "Pipx" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if command -v pipx >/dev/null 2>&1; then
     log_summary "Base" "Pipx" "✅ Exists" "$(get_version pipx)" "$(($(date +%s) - _T0_PIPX))"
     return 0
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "Pipx" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_PIPX="✅ mise"
   run_mise install pipx || _STAT_PIPX="❌ Failed"
   log_summary "Base" "Pipx" "$_STAT_PIPX" "$(get_version pipx)" "$(($(date +%s) - _T0_PIPX))"
@@ -308,22 +307,19 @@ install_checkmake() {
 setup_hooks() {
   local _T0_HOOK
   _T0_HOOK=$(date +%s)
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "Hooks" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  # 1. Dependency: pre-commit must be installed
-  install_pre_commit
-
-  # Fast-path: Check if hooks already exist
+  # 2. Fast-path: Check if hooks already exist
   if [ -f ".git/hooks/pre-commit" ]; then
     log_summary "Base" "Hooks" "✅ Activated" "4.5.1" "0"
     return 0
   fi
 
-  # 2. Activation
+  # 3. Action Required (Real or Preview)
   _log_setup "Pre-commit Hooks" "pipx:pre-commit"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "Hooks" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_HOOK="✅ Activated"
   install_runtime_hooks || _STAT_HOOK="❌ Failed"
 
@@ -519,12 +515,6 @@ install_osv_scanner() {
   _T0_OSV=$(date +%s)
   local _TITLE="osv-scanner"
   local _PROVIDER="github:google/osv-scanner"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Security" "osv-scanner" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! is_ci_env; then
     return 0
   fi
@@ -541,6 +531,11 @@ install_osv_scanner() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Security" "osv-scanner" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_OSV="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_OSV="❌ Failed"
   log_summary "Security" "osv-scanner" "$_STAT_OSV" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV))"
@@ -554,12 +549,6 @@ install_lychee() {
   _T0_LYCH=$(date +%s)
   local _TITLE="lychee"
   local _PROVIDER="github:lycheeverse/lychee"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Docs" "lychee" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! is_ci_env; then
     log_summary "Docs" "lychee" "⏭️ Local skip" "-" "0"
     return 0
@@ -577,6 +566,11 @@ install_lychee() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Docs" "lychee" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_LYCH="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_LYCH="❌ Failed"
   log_summary "Docs" "lychee" "$_STAT_LYCH" "$(get_version lychee)" "$(($(date +%s) - _T0_LYCH))"
@@ -590,12 +584,6 @@ install_trivy() {
   _T0_TRIV=$(date +%s)
   local _TITLE="Trivy"
   local _PROVIDER="github:aquasecurity/trivy"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Security" "Trivy" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! is_ci_env; then
     return 0
   fi
@@ -612,6 +600,11 @@ install_trivy() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Security" "Trivy" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_TRIV="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_TRIV="❌ Failed"
   log_summary "Security" "Trivy" "$_STAT_TRIV" "$(get_version trivy)" "$(($(date +%s) - _T0_TRIV))"
@@ -697,12 +690,6 @@ install_zizmor() {
   _T0_ZIZ=$(date +%s)
   local _TITLE="Zizmor"
   local _PROVIDER="pipx:zizmor"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Security" "Zizmor" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! is_ci_env; then
     return 0
   fi
@@ -723,6 +710,11 @@ install_zizmor() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Security" "Zizmor" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_ZIZ="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_ZIZ="❌ Failed"
   log_summary "Security" "Zizmor" "$_STAT_ZIZ" "$(get_version zizmor)" "$(($(date +%s) - _T0_ZIZ))"
@@ -736,12 +728,6 @@ install_cargo_audit() {
   _T0_CRGO=$(date +%s)
   local _TITLE="Cargo-Audit"
   local _PROVIDER="cargo:cargo-audit"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Rust" "Cargo-Audit" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! is_ci_env; then
     return 0
   fi
@@ -766,6 +752,11 @@ install_cargo_audit() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Rust" "Cargo-Audit" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_CRGO="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_CRGO="❌ Failed"
   log_summary "Rust" "Cargo-Audit" "$_STAT_CRGO" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_CRGO))"
@@ -779,12 +770,6 @@ install_govulncheck() {
   _T0_GOVC=$(date +%s)
   local _TITLE="Govulncheck"
   local _PROVIDER="go:golang.org/x/vuln/cmd/govulncheck"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Go" "Govulncheck" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! is_ci_env; then
     return 0
   fi
@@ -809,6 +794,11 @@ install_govulncheck() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Go" "Govulncheck" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_GOVC="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_GOVC="❌ Failed"
   log_summary "Go" "Govulncheck" "$_STAT_GOVC" "$(get_version govulncheck)" "$(($(date +%s) - _T0_GOVC))"
@@ -880,12 +870,6 @@ install_actionlint() {
   _T0_ACT=$(date +%s)
   local _TITLE="Actionlint"
   local _PROVIDER="pipx:actionlint-py"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "Actionlint" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files ".github/workflows" "*.yml *.yaml"; then
     return 0
   fi
@@ -902,6 +886,11 @@ install_actionlint() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "Actionlint" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_ACT="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_ACT="❌ Failed"
   log_summary "Base" "Actionlint" "$_STAT_ACT" "$(get_version actionlint)" "$(($(date +%s) - _T0_ACT))"
@@ -914,12 +903,6 @@ install_taplo() {
   _T0_TAP=$(date +%s)
   local _TITLE="Taplo"
   local _PROVIDER="npm:@taplo/cli"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "Taplo" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files "" "*.toml"; then
     return 0
   fi
@@ -936,6 +919,11 @@ install_taplo() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "Taplo" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_TAP="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_TAP="❌ Failed"
   log_summary "Base" "Taplo" "$_STAT_TAP" "$(get_version taplo)" "$(($(date +%s) - _T0_TAP))"
@@ -948,12 +936,6 @@ install_prettier() {
   _T0_PRE=$(date +%s)
   local _TITLE="Prettier"
   local _PROVIDER="npm:prettier"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "Prettier" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files "" "*.json *.yaml *.yml *.vue *.js *.ts *.jsx *.tsx"; then
     return 0
   fi
@@ -970,6 +952,11 @@ install_prettier() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "Prettier" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_PRE="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_PRE="❌ Failed"
   log_summary "Base" "Prettier" "$_STAT_PRE" "$(get_version prettier)" "$(($(date +%s) - _T0_PRE))"
@@ -982,12 +969,6 @@ install_sort_package_json() {
   _T0_SPJ=$(date +%s)
   local _TITLE="sort-package-json"
   local _PROVIDER="npm:sort-package-json"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Node" "sort-package-json" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if [ ! -f "package.json" ]; then
     return 0
   fi
@@ -1004,6 +985,11 @@ install_sort_package_json() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Node" "sort-package-json" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_SPJ="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_SPJ="❌ Failed"
   log_summary "Node" "sort-package-json" "$_STAT_SPJ" "$(get_version sort-package-json)" "$(($(date +%s) - _T0_SPJ))"
@@ -1014,12 +1000,6 @@ install_goreleaser() {
   _T0_GR=$(date +%s)
   local _TITLE="GoReleaser"
   local _PROVIDER="github:goreleaser/goreleaser"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Go" "GoReleaser" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files ".goreleaser.yaml .goreleaser.yml" ""; then
     return 0
   fi
@@ -1036,6 +1016,11 @@ install_goreleaser() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Go" "GoReleaser" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_GR="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_GR="❌ Failed"
   log_summary "Go" "GoReleaser" "$_STAT_GR" "$(get_version goreleaser)" "$(($(date +%s) - _T0_GR))"
@@ -1048,12 +1033,6 @@ install_spectral() {
   _T0_SPEC=$(date +%s)
   local _TITLE="Spectral"
   local _PROVIDER="npm:@stoplight/spectral-cli"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "API" "Spectral" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files "" "openapi.yaml openapi.json *.openapi.yaml *.openapi.json"; then
     return 0
   fi
@@ -1070,6 +1049,11 @@ install_spectral() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "API" "Spectral" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_SPEC="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_SPEC="❌ Failed"
   log_summary "Base" "Spectral" "$_STAT_SPEC" "$(get_version spectral)" "$(($(date +%s) - _T0_SPEC))"
@@ -1084,12 +1068,6 @@ install_commitlint() {
   # SSoT: Install both CLI and conventional config via mise npm provider
   local _PROVIDER="npm:@commitlint/cli"
   local _CONFIG_PROVIDER="npm:@commitlint/config-conventional"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "Commitlint" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if [ ! -d ".git" ]; then
     return 0
   fi
@@ -1107,6 +1085,11 @@ install_commitlint() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "Commitlint" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_CL="✅ mise"
   run_mise install "$_PROVIDER" "$_CONFIG_PROVIDER" || _STAT_CL="❌ Failed"
 
@@ -1118,17 +1101,16 @@ install_dockerfile_utils() {
   _T0_DU=$(date +%s)
   local _TITLE="dockerfile-utils"
   local _PROVIDER="npm:dockerfile-utils"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Docker" "dockerfile-utils" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files "Dockerfile" "*.dockerfile *.Dockerfile"; then
     return 0
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Docker" "dockerfile-utils" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_DU="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_DU="❌ Failed"
   log_summary "Docker" "dockerfile-utils" "$_STAT_DU" "$(get_version dockerfile-utils)" "$(($(date +%s) - _T0_DU))"
@@ -1139,17 +1121,16 @@ install_clang_format() {
   _T0_CF=$(date +%s)
   local _TITLE="clang-format"
   local _PROVIDER="pipx:clang-format"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "CPP" "clang-format" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files "" "*.c *.cpp *.h *.hpp *.cc *.m *.mm"; then
     return 0
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "CPP" "clang-format" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_CF="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_CF="❌ Failed"
   log_summary "CPP" "clang-format" "$_STAT_CF" "$(get_version clang-format)" "$(($(date +%s) - _T0_CF))"
@@ -1160,17 +1141,16 @@ install_ktlint() {
   _T0_KT=$(date +%s)
   local _TITLE="ktlint"
   local _PROVIDER="npm:@naturalcycles/ktlint"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Kotlin" "ktlint" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files "" "*.kt *.kts"; then
     return 0
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Kotlin" "ktlint" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_KT="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_KT="❌ Failed"
   log_summary "Kotlin" "ktlint" "$_STAT_KT" "$(get_version ktlint --version)" "$(($(date +%s) - _T0_KT))"
@@ -1181,12 +1161,6 @@ install_ruff() {
   _T0_RUF=$(date +%s)
   local _TITLE="Ruff"
   local _PROVIDER="pipx:ruff"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Python" "Ruff" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files "requirements.txt pyproject.toml" "*.py"; then
     return 0
   fi
@@ -1203,6 +1177,11 @@ install_ruff() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Python" "Ruff" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_RUF="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_RUF="❌ Failed"
   log_summary "Python" "Ruff" "$_STAT_RUF" "$(get_version ruff)" "$(($(date +%s) - _T0_RUF))"
@@ -1213,12 +1192,6 @@ install_yamllint() {
   _T0_YL=$(date +%s)
   local _TITLE="Yamllint"
   local _PROVIDER="pipx:yamllint"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "Yamllint" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files ".yamllint .yamllint.yml" "*.yaml *.yml"; then
     return 0
   fi
@@ -1235,6 +1208,11 @@ install_yamllint() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "Yamllint" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_YL="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_YL="❌ Failed"
   log_summary "Base" "Yamllint" "$_STAT_YL" "$(get_version yamllint)" "$(($(date +%s) - _T0_YL))"
@@ -1245,17 +1223,16 @@ install_sqlfluff() {
   _T0_SQL=$(date +%s)
   local _TITLE="Sqlfluff"
   local _PROVIDER="sqlfluff"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "SQL" "Sqlfluff" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files ".sqlfluff" "*.sql"; then
     return 0
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "SQL" "Sqlfluff" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_SQL="✅ mise"
   run_mise install sqlfluff || _STAT_SQL="❌ Failed"
   log_summary "SQL" "Sqlfluff" "$_STAT_SQL" "$(get_version sqlfluff)" "$(($(date +%s) - _T0_SQL))"
@@ -1266,12 +1243,6 @@ install_markdownlint() {
   _T0_MD=$(date +%s)
   local _TITLE="Markdownlint"
   local _PROVIDER="npm:markdownlint-cli2"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "Markdownlint" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files "" "*.md"; then
     return 0
   fi
@@ -1288,6 +1259,11 @@ install_markdownlint() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "Markdownlint" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_MD="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_MD="❌ Failed"
   log_summary "Base" "Markdownlint" "$_STAT_MD" "$(get_version markdownlint-cli2)" "$(($(date +%s) - _T0_MD))"
@@ -1298,17 +1274,16 @@ install_dotenv_linter() {
   _T0_DOT=$(date +%s)
   local _TITLE="dotenv-linter"
   local _PROVIDER="pipx:dotenv-linter"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "dotenv-linter" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files ".env .env.example" "*.env"; then
     return 0
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "dotenv-linter" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_DOT="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_DOT="❌ Failed"
   log_summary "Base" "dotenv-linter" "$_STAT_DOT" "$(get_version dotenv-linter)" "$(($(date +%s) - _T0_DOT))"
@@ -1319,12 +1294,6 @@ install_bats() {
   _T0_BATS=$(date +%s)
   local _TITLE="Bats"
   local _PROVIDER="npm:bats"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Shell" "Bats" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files "" "*.bats"; then
     return 0
   fi
@@ -1341,6 +1310,11 @@ install_bats() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Shell" "Bats" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_BATS="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_BATS="❌ Failed"
   log_summary "Shell" "Bats" "$_STAT_BATS" "$(get_version bats --version)" "$(($(date +%s) - _T0_BATS))"
@@ -1356,12 +1330,6 @@ install_bats_libs() {
   if ! has_lang_files "" "*.bats"; then
     return 0
   fi
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Shell" "Bats-Libs" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   # Fast-path: Check if libraries already exist in vendor
   if [ -d "vendor/bats-support" ] && [ -d "vendor/bats-assert" ]; then
     log_summary "Shell" "Bats-Libs" "✅ Vendored" "v0.3.0/v2.1.0" "0"
@@ -1369,6 +1337,11 @@ install_bats_libs() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Shell" "Bats-Libs" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
 
   local _VENDOR_DIR="vendor"
   mkdir -p "$_VENDOR_DIR"
@@ -1396,12 +1369,6 @@ install_eslint() {
   _T0_ES=$(date +%s)
   local _TITLE="ESLint"
   local _PROVIDER="npm:eslint"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Node" "ESLint" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files "package.json" "*.js *.ts *.vue *.jsx *.tsx"; then
     return 0
   fi
@@ -1418,6 +1385,11 @@ install_eslint() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Node" "ESLint" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_ES="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_ES="❌ Failed"
   log_summary "Node" "ESLint" "$_STAT_ES" "$(get_version eslint)" "$(($(date +%s) - _T0_ES))"
@@ -1517,12 +1489,6 @@ install_pip_audit() {
   _T0_PA=$(date +%s)
   local _TITLE="pip-audit"
   local _PROVIDER="pipx:pip-audit"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Python" "pip-audit" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! is_ci_env; then
     return 0
   fi
@@ -1532,6 +1498,11 @@ install_pip_audit() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Python" "pip-audit" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_PA="✅ mise"
   local _V_PA
   _V_PA=$(get_mise_tool_version pip-audit)
@@ -1555,12 +1526,6 @@ install_pre_commit() {
     return 0
   fi
   _PRE_COMMIT_INSTALLED="true"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "Pre-commit" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if [ ! -f ".pre-commit-config.yaml" ]; then
     return 0
   fi
@@ -1577,6 +1542,11 @@ install_pre_commit() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "Pre-commit" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_PC="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_PC="❌ Failed"
   log_summary "Base" "Pre-commit" "$_STAT_PC" "$(get_version pre-commit --version)" "$(($(date +%s) - _T0_PC))"
@@ -1599,12 +1569,6 @@ install_editorconfig_checker() {
   _T0_ECC=$(date +%s)
   local _TITLE="editorconfig-checker"
   local _PROVIDER="github:editorconfig-checker/editorconfig-checker"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "editorconfig-checker" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files ".editorconfig" ""; then
     return 0
   fi
@@ -1621,6 +1585,11 @@ install_editorconfig_checker() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "editorconfig-checker" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_ECC="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_ECC="❌ Failed"
   # Symlink Fix: Ensure editorconfig-checker binary is available if only ec exists
@@ -1642,17 +1611,16 @@ install_stylua() {
   _T0_SL=$(date +%s)
   local _TITLE="StyLua"
   local _PROVIDER="github:JohnnyMorganz/StyLua"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Lua" "StyLua" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files "" "LUA"; then
     return 0
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lua" "StyLua" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_SL="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_SL="❌ Failed"
   log_summary "Lua" "StyLua" "$_STAT_SL" "$(get_version stylua)" "$(($(date +%s) - _T0_SL))"
@@ -1665,17 +1633,16 @@ install_buf() {
   _T0_BUF=$(date +%s)
   local _TITLE="Buf"
   local _PROVIDER="github:bufbuild/buf"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Protobuf" "Buf" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files "" "PROTOC"; then
     return 0
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Protobuf" "Buf" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_BUF="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_BUF="❌ Failed"
   log_summary "Protobuf" "Buf" "$_STAT_BUF" "$(get_version buf --version)" "$(($(date +%s) - _T0_BUF))"
@@ -1688,17 +1655,16 @@ install_just() {
   _T0_JUST=$(date +%s)
   local _TITLE="Just"
   local _PROVIDER="github:casey/just"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "Just" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files "" "JUST"; then
     return 0
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "Just" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_JUST="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_JUST="❌ Failed"
   log_summary "Base" "Just" "$_STAT_JUST" "$(get_version just --version)" "$(($(date +%s) - _T0_JUST))"
@@ -1711,17 +1677,16 @@ install_task() {
   _T0_TASK=$(date +%s)
   local _TITLE="Task"
   local _PROVIDER="github:go-task/task"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "Task" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files "" "TASK"; then
     return 0
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "Task" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_TASK="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_TASK="❌ Failed"
   log_summary "Base" "Task" "$_STAT_TASK" "$(get_version task --version)" "$(($(date +%s) - _T0_TASK))"
@@ -1734,17 +1699,16 @@ install_cue() {
   _T0_CUE=$(date +%s)
   local _TITLE="CUE/Jsonnet"
   local _PROVIDER="github:cue-lang/cue"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "CUE" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files "" "CUES"; then
     return 0
   fi
 
   _log_setup "$_TITLE" "cue/jsonnet"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "CUE" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_CUE="✅ mise"
   run_mise install "$_PROVIDER" "github:google/go-jsonnet" || _STAT_CUE="❌ Failed"
   log_summary "Base" "CUE/Jsonnet" "$_STAT_CUE" "$(get_version cue version | head -n 1)" "$(($(date +%s) - _T0_CUE))"
@@ -1757,17 +1721,16 @@ install_rego() {
   _T0_REGO=$(date +%s)
   local _TITLE="Rego (OPA)"
   local _PROVIDER="github:open-policy-agent/opa"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Security" "Rego" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
   if ! has_lang_files "" "REGO"; then
     return 0
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Security" "Rego" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_REGO="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_REGO="❌ Failed"
   log_summary "Security" "Rego" "$_STAT_REGO" "$(get_version opa version | grep Version | awk '{print $NF}')" "$(($(date +%s) - _T0_REGO))"
