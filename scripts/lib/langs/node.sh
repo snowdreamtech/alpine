@@ -10,8 +10,14 @@ install_runtime_node() {
   fi
 
   # 1. Runtime initialization
-  run_mise install node pnpm yarn
+  run_mise install node
   eval "$(mise activate bash --shims)"
+
+  # 1b. Package Manager initialization (Corepack)
+  log_info "Initializing Node.js package managers (corepack)..."
+  corepack enable
+  corepack prepare "pnpm@${MISE_TOOL_VERSION_PNPM:-latest}" --activate
+  corepack prepare "yarn@${MISE_TOOL_VERSION_YARN:-latest}" --activate
 
   # 2. Dependency resolution
   if [ -f "$PACKAGE_JSON" ]; then
