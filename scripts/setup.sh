@@ -316,6 +316,12 @@ setup_hooks() {
   # 1. Dependency: pre-commit must be installed
   install_pre_commit
 
+  # Fast-path: Check if hooks already exist
+  if [ -f ".git/hooks/pre-commit" ]; then
+    log_summary "Base" "Hooks" "✅ Activated" "4.5.1" "0"
+    return 0
+  fi
+
   # 2. Activation
   _log_setup "Pre-commit Hooks" "pipx:pre-commit"
   local _STAT_HOOK="✅ Activated"
@@ -1370,6 +1376,12 @@ install_bats_libs() {
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Shell" "Bats-Libs" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  # Fast-path: Check if libraries already exist in vendor
+  if [ -d "vendor/bats-support" ] && [ -d "vendor/bats-assert" ]; then
+    log_summary "Shell" "Bats-Libs" "✅ Vendored" "v0.3.0/v2.1.0" "0"
     return 0
   fi
 
