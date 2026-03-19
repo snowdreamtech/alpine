@@ -294,13 +294,20 @@ get_mise_tool_version() {
   local _TOOL_NAME_MISE="$1"
   local _MISE_TOM_PATH
   _MISE_TOM_PATH=$(get_project_root)/.mise.toml
-  [ -f "$_MISE_TOM_PATH" ] || return 0
+  [ -f "$_MISE_TOM_PATH" ] || { echo "latest"; return 0; }
 
-  # Robust regex for [.mise.toml] parsing:
-  # 1. Matches lines starting with the tool name (optionally quoted and prefixed)
   local _VER
-  _VER=$(grep -E "^\"?([^:]+:)?${_TOOL_NAME_MISE}\"?[[:space:]]*=" "$_MISE_TOM_PATH" 2>/dev/null |
+  # 1. Try exact match (including quotes and provider prefix if provider string given)
+  _VER=$(grep -E "^\"?${_TOOL_NAME_MISE}\"?[[:space:]]*=" "$_MISE_TOM_PATH" 2>/dev/null |
     sed -E 's/^[^=]*=[[:space:]]*"([^"]*)".*/\1/' | head -n 1 || true)
+
+  # 2. Try matching the "basename" of the tool (e.g. github:foo/bar -> bar)
+  if [ -z "$_VER" ]; then
+    local _SHORT_NAME
+    _SHORT_NAME=$(echo "$_TOOL_NAME_MISE" | sed -E 's/^[^:]+://; s/.*\///')
+    _VER=$(grep -E "^\"?([^:]+:)?${_SHORT_NAME}\"?[[:space:]]*=" "$_MISE_TOM_PATH" 2>/dev/null |
+      sed -E 's/^[^=]*=[[:space:]]*"([^"]*)".*/\1/' | head -n 1 || true)
+  fi
 
   # Fallback to 'latest' if no version is explicitly defined in .mise.toml
   echo "${_VER:-latest}"
