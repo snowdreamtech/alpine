@@ -84,6 +84,22 @@ update_node_manager_global() {
       _execute_update "Manager" "pnpm" "pnpm self-update" "$(get_version pnpm)"
     fi
     ;;
+  npm)
+    # Most npm versions are updated via npm itself, but since we use mise,
+    # it's usually better to let mise handle it. We skip global self-update for npm here.
+    log_debug "Skipping global self-update for $NPM (managed via mise)."
+    ;;
+  yarn)
+    if command -v corepack >/dev/null 2>&1; then
+      _execute_update "Manager" "yarn" "corepack prepare yarn@latest --activate" "$(get_version yarn)"
+    else
+      # Berry/Modern yarn uses 'set version latest' for self-updates
+      _execute_update "Manager" "yarn" "yarn set version latest" "$(get_version yarn)"
+    fi
+    ;;
+  bun)
+    _execute_update "Manager" "$NPM" "$NPM upgrade" "$(get_version "$NPM" "--version")"
+    ;;
   esac
 }
 
