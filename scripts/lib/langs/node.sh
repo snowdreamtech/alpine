@@ -16,8 +16,12 @@ install_runtime_node() {
   # 1b. Package Manager initialization (Corepack)
   log_info "Initializing Node.js package managers (corepack)..."
   corepack enable
-  corepack prepare "pnpm@${MISE_TOOL_VERSION_PNPM:-latest}" --activate
-  corepack prepare "yarn@${MISE_TOOL_VERSION_YARN:-latest}" --activate
+  local _V_PNPM
+  _V_PNPM=$(get_mise_tool_version pnpm)
+  local _V_YARN
+  _V_YARN=$(get_mise_tool_version yarn)
+  corepack prepare "pnpm@${_V_PNPM:-latest}" --activate
+  corepack prepare "yarn@${_V_YARN:-latest}" --activate
 
   # 2. Dependency resolution
   if [ -f "$PACKAGE_JSON" ]; then
