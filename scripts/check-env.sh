@@ -633,9 +633,9 @@ main() {
   check_tool_version "Zizmor" "zizmor" "$(get_mise_tool_version zizmor)" "zizmor --version" 0 1
 
   log_info "── Lint & Quality Tools ──"
-  check_tool_version "Shfmt" "shfmt" "$(get_mise_tool_version shfmt-py)" "shfmt --version" 0 0
-  check_tool_version "Shellcheck" "shellcheck" "$(get_mise_tool_version shellcheck-py)" "shellcheck --version" 0 0
-  check_tool_version "Actionlint" "actionlint" "$(get_mise_tool_version actionlint-py)" "actionlint --version" 0 0
+  check_tool_version "Shfmt" "shfmt" "$(get_mise_tool_version "pipx:shfmt-py")" "shfmt --version" 0 0
+  check_tool_version "Shellcheck" "shellcheck" "$(get_mise_tool_version "pipx:shellcheck-py")" "shellcheck --version" 0 0
+  check_tool_version "Actionlint" "actionlint" "$(get_mise_tool_version "pipx:actionlint-py")" "actionlint --version" 0 0
 
   if [ -f "Dockerfile" ] || [ -f "docker-compose.yml" ]; then
     check_tool_version "Hadolint" "hadolint" "$(get_mise_tool_version hadolint)" "hadolint --version" 0 0
