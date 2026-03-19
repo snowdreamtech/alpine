@@ -5,7 +5,7 @@
 # 1. Functional Grouping: Tools are organized by domain (Runtimes, Security, etc.)
 # 2. Alphabetical Sorting: All entries are sorted within their respective blocks.
 # 3. Explicit Providers: Use asdf:, npm:, pipx:, github: for Clarity & SSoT.
-# 4. Network Acceleration: url_replacements + env mirrors for peak performance.
+# 4. Network Acceleration: Environment mirrors for peak performance.
 # 5. Pure SSoT: legacy_version_file=false to enforce mise.toml as the source.
 # ------------------------------------------------------------
 
@@ -157,10 +157,7 @@ status.missing_tools = "never"
 legacy_version_file = false
 plugin_autoupdate_last_check_duration = "1 week"
 
-# ── 🌉 URL Replacements (The GitHub Proxy Engine) ─────────────────────────────
-# Automatically reroutes GitHub downloads through the high-speed proxy.
-[url_replacements]
-"https://github.com" = "https://gh-proxy.sn0wdr1am.com/https://github.com"
+
 
 # ------------------------------------------------------------
 # Environment variables for performance acceleration
