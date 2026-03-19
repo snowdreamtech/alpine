@@ -14,16 +14,30 @@ install_runtime_rust() {
   eval "$(mise activate bash --shims)"
 }
 
-# Purpose: Sets up Rust runtime.
+# Purpose: Sets up Rust runtime for project.
 # Delegate: Managed by mise (.mise.toml)
 setup_rust() {
-  if ! has_lang_files "Cargo.toml" "*.rs"; then
+  if ! has_lang_files "Cargo.toml Cargo.lock" "*.rs"; then
     return 0
   fi
 
   local _T0_RUST_RT
   _T0_RUST_RT=$(date +%s)
-  _log_setup "Rust Runtime" "rust"
+  local _TITLE="Rust Runtime"
+  local _PROVIDER="rust"
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version rust)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Runtime" "Rust" "✅ Detected" "$_CUR_VER" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Rust" "⚖️ Previewed" "-" "0"

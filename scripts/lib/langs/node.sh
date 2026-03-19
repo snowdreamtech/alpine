@@ -45,29 +45,44 @@ install_runtime_node() {
   fi
 }
 
-# Purpose: Configures Node.js runtime and installs dependencies.
+# Purpose: Sets up Node.js runtime for project.
+# Delegate: Managed by mise (.mise.toml)
 setup_node() {
-  if ! has_lang_files "$PACKAGE_JSON"; then
+  if ! has_lang_files "package.json .nvmrc .node-version" "*.js *.ts *.jsx *.tsx"; then
     return 0
   fi
 
-  local _T0_NODE
-  _T0_NODE=$(date +%s)
-  _log_setup "Node.js" "node"
+  local _T0_NODE_RT
+  _T0_NODE_RT=$(date +%s)
+  local _TITLE="Node.js"
+  local _PROVIDER="node"
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version node)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Runtime" "Node.js" "✅ Detected" "$_CUR_VER" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Node.js" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
-  local _STAT_NODE="✅ Installed"
-  install_runtime_node || _STAT_NODE="❌ Failed"
+  local _STAT_NODE_RT="✅ Installed"
+  install_runtime_node || _STAT_NODE_RT="❌ Failed"
 
-  local _DUR_NODE
-  _DUR_NODE=$(($(date +%s) - _T0_NODE))
-  log_summary "Runtime" "Node.js" "$_STAT_NODE" "$(get_version node)" "$_DUR_NODE"
+  local _DUR_NODE_RT
+  _DUR_NODE_RT=$(($(date +%s) - _T0_NODE_RT))
+  log_summary "Runtime" "Node.js" "$_STAT_NODE_RT" "$(get_version node)" "$_DUR_NODE_RT"
 
-  if [ "$_STAT_NODE" = "✅ Installed" ] && [ -f "$PACKAGE_JSON" ]; then
+  if [ "$_STAT_NODE_RT" = "✅ Installed" ] && [ -f "$PACKAGE_JSON" ]; then
     # Detect Frameworks from package.json for summary
     if grep -q '"vitepress"' "$PACKAGE_JSON"; then log_summary "Framework" "VitePress" "✅ Detected" "$(get_version node "exec vitepress --version")" "0"; fi
     if grep -q '"vue"' "$PACKAGE_JSON"; then log_summary "Framework" "Vue" "✅ Detected" "-" "0"; fi

@@ -294,7 +294,10 @@ get_mise_tool_version() {
   local _TOOL_NAME_MISE="$1"
   local _MISE_TOM_PATH
   _MISE_TOM_PATH=$(get_project_root)/.mise.toml
-  [ -f "$_MISE_TOM_PATH" ] || { echo "latest"; return 0; }
+  [ -f "$_MISE_TOM_PATH" ] || {
+    echo "latest"
+    return 0
+  }
 
   local _VER
   # 1. Try exact match (including quotes and provider prefix if provider string given)
@@ -347,7 +350,7 @@ run_mise() {
     if [ "$_CUR_VER" != "-" ] && [ -n "$_REQ_VER" ]; then
       case "$_CUR_VER" in
       "$_REQ_VER"*)
-        # Skip if version matches
+        # Skip if version matches (Instant skip if using cached state)
         return 0
         ;;
       esac
@@ -959,8 +962,12 @@ get_version() {
     # If not in PATH OR it IS a mise shim, query mise directly
     if [ -z "$_BIN_PATH" ] || echo "$_BIN_PATH" | grep -q "mise/shims"; then
       local _MISE_VER_OUT
-      # Comprehensive JQ filter to match tool name regardless of provider prefix (e.g. npm:@taplo/cli, pipx:pre-commit, github:google/osv-scanner)
-      _MISE_VER_OUT=$(mise ls --json 2>/dev/null | jq -r "to_entries[] | select(.key == \"$_CMD_VER\" or .key == \"npm:$_CMD_VER\" or .key == \"github:$_CMD_VER\" or .key == \"cargo:$_CMD_VER\" or .key == \"pipx:$_CMD_VER\" or .key == \"pipx:$_CMD_VER-py\" or .key == \"github:goreleaser/$_CMD_VER\" or (.key | contains(\":$_CMD_VER\")) or (.key | endswith(\"/$_CMD_VER\"))) | .value[] | select(.active==true or .installed==true) | .version" | head -n 1)
+      # Optimization: Use global state cache if available to avoid repeated mise invocations
+      if [ -n "$_G_MISE_LS_JSON" ]; then
+        _MISE_VER_OUT=$(echo "$_G_MISE_LS_JSON" | jq -r "to_entries[] | select(.key == \"$_CMD_VER\" or (.key | endswith(\":$_CMD_VER\")) or (.key | endswith(\"/$_CMD_VER\"))) | .value[] | select(.active==true or .installed==true) | .version" 2>/dev/null | head -n 1)
+      else
+        _MISE_VER_OUT=$(mise ls --json 2>/dev/null | jq -r ".[] | select(.plugin == \"$_CMD_VER\" or (.plugin | endswith(\":$_CMD_VER\")) or (.plugin | endswith(\"/$_CMD_VER\"))) | select(.active==true or .installed==true) | .version" 2>/dev/null | head -n 1)
+      fi
       if [ -n "$_MISE_VER_OUT" ] && [ "$_MISE_VER_OUT" != "null" ]; then
         echo "$_MISE_VER_OUT"
         return 0

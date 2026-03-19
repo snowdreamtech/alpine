@@ -162,8 +162,14 @@ sanitize_path() {
   local _PATH_SAN="$1"
   echo "$_PATH_SAN" | sed "s|$HOME|~|g"
 }
-
 # language-specific modules are loaded dynamically via ${_G_LIB_DIR}/langs/*.sh
+
+# Optimization: Pre-cache mise state to avoid repeated invocations (accelerates no-op runs)
+if command -v mise >/dev/null 2>&1; then
+  log_info "Synchronizing mise state for fast-path detection..."
+  _G_MISE_LS_JSON=$(mise ls --json --current 2>/dev/null)
+  export _G_MISE_LS_JSON
+fi
 
 install_pipx() {
   local _T0_PIPX
@@ -199,6 +205,17 @@ install_gitleaks() {
     return 0
   fi
 
+  # Fast-path: Check version-aware existence (Optimized via _G_MISE_LS_JSON)
+  local _CUR_VER
+  _CUR_VER=$(get_version gitleaks)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Base" "Gitleaks" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_GITL="✅ mise"
   run_mise install gitleaks || _STAT_GITL="❌ Failed"
@@ -214,6 +231,17 @@ install_hadolint() {
   local _PROVIDER="github:hadolint/hadolint"
 
   if ! has_lang_files "Dockerfile docker-compose.yml" "*.dockerfile *.Dockerfile"; then
+    return 0
+  fi
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version hadolint)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Docker" "Hadolint" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
 
@@ -253,6 +281,17 @@ install_checkmake() {
     return 0
   fi
 
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version checkmake)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Base" "Checkmake" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_CM="✅ mise"
   run_mise install checkmake || _STAT_CM="❌ Failed"
@@ -287,6 +326,35 @@ setup_hooks() {
   log_summary "Base" "Hooks" "$_STAT_HOOK" "$(get_version pre-commit --version)" "$_DUR_HOOK"
 }
 
+# Purpose: Installs Commitlint.
+# Delegate: Managed by mise (.mise.toml)
+install_commitlint() {
+  local _T0_COM
+  _T0_COM=$(date +%s)
+  local _TITLE="Commitlint"
+  local _PROVIDER="npm:@commitlint/cli"
+
+  if [ ! -d ".git" ]; then
+    return 0
+  fi
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version commitlint)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Base" "Commitlint" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+  local _STAT_COM="✅ mise"
+  run_mise install "$_PROVIDER" "npm:@commitlint/config-conventional" || _STAT_COM="❌ Failed"
+  log_summary "Base" "Commitlint" "$_STAT_COM" "$(get_version commitlint)" "$(($(date +%s) - _T0_COM))"
+}
+
 # Purpose: Installs TFLint.
 # Delegate: Managed by mise (.mise.toml)
 install_tflint() {
@@ -299,10 +367,21 @@ install_tflint() {
     return 0
   fi
 
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version tflint)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "DevOps" "TFLint" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_TF="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_TF="❌ Failed"
-  log_summary "IaC" "TFLint" "$_STAT_TF" "$(get_version tflint)" "$(($(date +%s) - _T0_TF))"
+  log_summary "DevOps" "TFLint" "$_STAT_TF" "$(get_version tflint)" "$(($(date +%s) - _T0_TF))"
 }
 
 # Purpose: Installs Kube-Linter.
@@ -313,15 +392,25 @@ install_kube_linter() {
   local _TITLE="Kube-Linter"
   local _PROVIDER="github:stackrox/kube-linter"
 
-  # Enhanced guard: Detect K8s manifests or Helm charts ONLY
-  if ! has_lang_files "" "CHARTS K8S"; then
+  if ! has_lang_files "" "deployment.yaml service.yaml k8s/*.yaml *.k8s.yaml"; then
+    return 0
+  fi
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version kube-linter)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "DevOps" "Kube-Linter" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_KL="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_KL="❌ Failed"
-  log_summary "IaC" "Kube-Linter" "$_STAT_KL" "$(get_version kube-linter)" "$(($(date +%s) - _T0_KL))"
+  log_summary "DevOps" "Kube-Linter" "$_STAT_KL" "$(get_version kube-linter)" "$(($(date +%s) - _T0_KL))"
 }
 
 # Purpose: Installs google-java-format for Java project linting.
@@ -451,11 +540,11 @@ setup_dotnet() {
 install_osv_scanner() {
   local _T0_OSV
   _T0_OSV=$(date +%s)
-  local _TITLE="OSV-Scanner"
+  local _TITLE="osv-scanner"
   local _PROVIDER="github:google/osv-scanner"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Security" "OSV-Scanner" "⚖️ Previewed" "-" "0"
+    log_summary "Security" "osv-scanner" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
@@ -463,76 +552,92 @@ install_osv_scanner() {
     return 0
   fi
 
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version osv-scanner)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Security" "osv-scanner" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_OSV="✅ mise"
-  local _V_OSV
-  _V_OSV=$(get_mise_tool_version osv-scanner)
-  if [ -n "$_V_OSV" ]; then
-    run_mise install "${_PROVIDER}@${_V_OSV}" || _STAT_OSV="❌ Failed"
-  else
-    run_mise install "$_PROVIDER" || _STAT_OSV="❌ Failed"
-  fi
-  log_summary "Security" "OSV-Scanner" "$_STAT_OSV" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV))"
+  run_mise install "$_PROVIDER" || _STAT_OSV="❌ Failed"
+  log_summary "Security" "osv-scanner" "$_STAT_OSV" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV))"
 }
 
 # Purpose: Installs lychee for broken link checking.
 # Delegate: Managed by mise (.mise.toml)
 # NOTE: CI-only tool — network intensive. Skipped on local environments.
 install_lychee() {
-  if ! has_lang_files "" "*.md *.html *.sh *.txt"; then
-    return 0
-  fi
-
-  local _T0_LY
-  _T0_LY=$(date +%s)
-  local _TITLE="Lychee"
+  local _T0_LYCH
+  _T0_LYCH=$(date +%s)
+  local _TITLE="lychee"
   local _PROVIDER="github:lycheeverse/lychee"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Docs" "Lychee" "⚖️ Previewed" "-" "0"
+    log_summary "Docs" "lychee" "⚖️ Previewed" "-" "0"
     return 0
   fi
 
   if ! is_ci_env; then
-    log_summary "Docs" "Lychee" "⏭️ Local skip" "-" "0"
+    log_summary "Docs" "lychee" "⏭️ Local skip" "-" "0"
+    return 0
+  fi
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version lychee)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Docs" "lychee" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
-  local _STAT_LY="✅ mise"
-  local _V_LY
-  _V_LY=$(get_mise_tool_version lychee)
-  if [ -n "$_V_LY" ]; then
-    run_mise install "${_PROVIDER}@${_V_LY}" || _STAT_LY="❌ Failed"
-  else
-    run_mise install "$_PROVIDER" || _STAT_LY="❌ Failed"
-  fi
-  log_summary "Docs" "Lychee" "$_STAT_LY" "$(get_version lychee)" "$(($(date +%s) - _T0_LY))"
+  local _STAT_LYCH="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_LYCH="❌ Failed"
+  log_summary "Docs" "lychee" "$_STAT_LYCH" "$(get_version lychee)" "$(($(date +%s) - _T0_LYCH))"
 }
 
 # Purpose: Installs Trivy for security scanning.
 # Delegate: Managed by mise (.mise.toml)
 # NOTE: CI-only tool — heavy and slow. Skipped on local environments.
 install_trivy() {
-  local _T0_TRVY
-  _T0_TRVY=$(date +%s)
+  local _T0_TRIV
+  _T0_TRIV=$(date +%s)
   local _TITLE="Trivy"
   local _PROVIDER="github:aquasecurity/trivy"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Security" "Trivy" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
 
   if ! is_ci_env; then
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
-  local _STAT_TRVY="✅ mise"
-  local _V_TRVY
-  _V_TRVY=$(get_mise_tool_version trivy)
-  if [ -n "$_V_TRVY" ]; then
-    run_mise install "${_PROVIDER}@${_V_TRVY}" || _STAT_TRVY="❌ Failed"
-  else
-    run_mise install "$_PROVIDER" || _STAT_TRVY="❌ Failed"
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version trivy)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Security" "Trivy" "✅ Exists" "$_CUR_VER" "0"
+    return 0
   fi
-  log_summary "Security" "Trivy" "$_STAT_TRVY" "$(get_version trivy)" "$(($(date +%s) - _T0_TRVY))"
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+  local _STAT_TRIV="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_TRIV="❌ Failed"
+  log_summary "Security" "Trivy" "$_STAT_TRIV" "$(get_version trivy)" "$(($(date +%s) - _T0_TRIV))"
 }
 
 # Purpose: Installs swiftformat for Swift linting.
@@ -544,6 +649,17 @@ install_swiftformat() {
   local _PROVIDER="github:nicklockwood/SwiftFormat"
 
   if ! has_lang_files "Package.swift" "*.swift"; then
+    return 0
+  fi
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version swiftformat)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Swift" "SwiftFormat" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
 
@@ -562,6 +678,17 @@ install_swiftlint() {
   local _PROVIDER="github:realm/SwiftLint"
 
   if ! has_lang_files "Package.swift" "*.swift"; then
+    return 0
+  fi
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version swiftlint)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Swift" "SwiftLint" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
 
@@ -594,6 +721,11 @@ install_zizmor() {
   local _TITLE="Zizmor"
   local _PROVIDER="pipx:zizmor"
 
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Security" "Zizmor" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
   if ! is_ci_env; then
     return 0
   fi
@@ -602,15 +734,20 @@ install_zizmor() {
     return 0
   fi
 
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version zizmor)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Security" "Zizmor" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_ZIZ="✅ mise"
-  local _V_ZIZ
-  _V_ZIZ=$(get_mise_tool_version zizmor)
-  if [ -n "$_V_ZIZ" ]; then
-    run_mise install "${_PROVIDER}@${_V_ZIZ}" || _STAT_ZIZ="❌ Failed"
-  else
-    run_mise install "$_PROVIDER" || _STAT_ZIZ="❌ Failed"
-  fi
+  run_mise install "$_PROVIDER" || _STAT_ZIZ="❌ Failed"
   log_summary "Security" "Zizmor" "$_STAT_ZIZ" "$(get_version zizmor)" "$(($(date +%s) - _T0_ZIZ))"
 }
 
@@ -622,6 +759,11 @@ install_cargo_audit() {
   _T0_CRGO=$(date +%s)
   local _TITLE="Cargo-Audit"
   local _PROVIDER="cargo:cargo-audit"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Rust" "Cargo-Audit" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
 
   if ! is_ci_env; then
     return 0
@@ -635,19 +777,24 @@ install_cargo_audit() {
     return 0
   fi
 
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version cargo-audit)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Rust" "Cargo-Audit" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_CRGO="✅ mise"
-  local _V_CRGO
-  _V_CRGO=$(get_mise_tool_version cargo-audit)
-  if [ -n "$_V_CRGO" ]; then
-    run_mise install "${_PROVIDER}@${_V_CRGO}" || _STAT_CRGO="❌ Failed"
-  else
-    run_mise install "$_PROVIDER" || _STAT_CRGO="❌ Failed"
-  fi
+  run_mise install "$_PROVIDER" || _STAT_CRGO="❌ Failed"
   log_summary "Rust" "Cargo-Audit" "$_STAT_CRGO" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_CRGO))"
 }
 
-# Purpose: Installs govulncheck for Go projects.
+# Purpose: Installs govulncheck for Go project vulnerability scanning.
 # Delegate: Managed by mise (.mise.toml)
 # NOTE: CI-only tool — vulnerability scanner. Skipped on local environments.
 install_govulncheck() {
@@ -655,6 +802,11 @@ install_govulncheck() {
   _T0_GOVC=$(date +%s)
   local _TITLE="Govulncheck"
   local _PROVIDER="go:golang.org/x/vuln/cmd/govulncheck"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Go" "Govulncheck" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
 
   if ! is_ci_env; then
     return 0
@@ -668,18 +820,25 @@ install_govulncheck() {
     return 0
   fi
 
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version govulncheck)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Go" "Govulncheck" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_GOVC="✅ mise"
-  local _V_GOVC
-  _V_GOVC=$(get_mise_tool_version govulncheck)
-  if [ -n "$_V_GOVC" ]; then
-    run_mise install "${_PROVIDER}@${_V_GOVC}" || _STAT_GOVC="❌ Failed"
-  else
-    run_mise install "$_PROVIDER" || _STAT_GOVC="❌ Failed"
-  fi
+  run_mise install "$_PROVIDER" || _STAT_GOVC="❌ Failed"
   log_summary "Go" "Govulncheck" "$_STAT_GOVC" "$(get_version govulncheck)" "$(($(date +%s) - _T0_GOVC))"
 }
 
+# Purpose: Installs Shfmt.
+# Delegate: Managed by mise (.mise.toml)
 install_shfmt() {
   local _T0_SHF
   _T0_SHF=$(date +%s)
@@ -690,12 +849,25 @@ install_shfmt() {
     return 0
   fi
 
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version shfmt)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "pipx:shfmt-py")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Base" "Shfmt" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_SHF="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_SHF="❌ Failed"
   log_summary "Base" "Shfmt" "$_STAT_SHF" "$(get_version shfmt)" "$(($(date +%s) - _T0_SHF))"
 }
 
+# Purpose: Installs Shellcheck.
+# Delegate: Managed by mise (.mise.toml)
 install_shellcheck() {
   local _T0_SHC
   _T0_SHC=$(date +%s)
@@ -706,17 +878,27 @@ install_shellcheck() {
     return 0
   fi
 
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version shellcheck)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "pipx:shellcheck-py")
+
+  # Special Case: Shellcheck version check can be 'latest'
+  if [ "$_CUR_VER" != "-" ] && ([ "$_CUR_VER" = "$_REQ_VER" ] || [ "$_REQ_VER" = "latest" ]); then
+    log_summary "Base" "Shellcheck" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_SHC="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_SHC="❌ Failed"
   log_summary "Base" "Shellcheck" "$_STAT_SHC" "$(get_version shellcheck)" "$(($(date +%s) - _T0_SHC))"
 }
 
+# Purpose: Installs Actionlint.
+# Delegate: Managed by mise (.mise.toml)
 install_actionlint() {
-  if ! has_lang_files "" ".github/workflows/*.yml .github/workflows/*.yaml"; then
-    return 0
-  fi
-
   local _T0_ACT
   _T0_ACT=$(date +%s)
   local _TITLE="Actionlint"
@@ -727,12 +909,29 @@ install_actionlint() {
     return 0
   fi
 
+  if ! has_lang_files ".github/workflows" "*.yml *.yaml"; then
+    return 0
+  fi
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version actionlint)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Base" "Actionlint" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_ACT="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_ACT="❌ Failed"
   log_summary "Base" "Actionlint" "$_STAT_ACT" "$(get_version actionlint)" "$(($(date +%s) - _T0_ACT))"
 }
 
+# Purpose: Installs Taplo.
+# Delegate: Managed by mise (.mise.toml)
 install_taplo() {
   local _T0_TAP
   _T0_TAP=$(date +%s)
@@ -748,12 +947,25 @@ install_taplo() {
     return 0
   fi
 
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version taplo)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Base" "Taplo" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_TAP="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_TAP="❌ Failed"
   log_summary "Base" "Taplo" "$_STAT_TAP" "$(get_version taplo)" "$(($(date +%s) - _T0_TAP))"
 }
 
+# Purpose: Installs Prettier.
+# Delegate: Managed by mise (.mise.toml)
 install_prettier() {
   local _T0_PRE
   _T0_PRE=$(date +%s)
@@ -769,12 +981,25 @@ install_prettier() {
     return 0
   fi
 
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version prettier)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Base" "Prettier" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_PRE="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_PRE="❌ Failed"
   log_summary "Base" "Prettier" "$_STAT_PRE" "$(get_version prettier)" "$(($(date +%s) - _T0_PRE))"
 }
 
+# Purpose: Installs sort-package-json.
+# Delegate: Managed by mise (.mise.toml)
 install_sort_package_json() {
   local _T0_SPJ
   _T0_SPJ=$(date +%s)
@@ -787,6 +1012,17 @@ install_sort_package_json() {
   fi
 
   if [ ! -f "package.json" ]; then
+    return 0
+  fi
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version sort-package-json)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Node" "sort-package-json" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
 
@@ -830,14 +1066,25 @@ install_spectral() {
     return 0
   fi
 
-  if ! has_lang_files "" "*openapi* *swagger* *asyncapi*"; then
+  if ! has_lang_files "" "openapi.yaml openapi.json *.openapi.yaml *.openapi.json"; then
+    return 0
+  fi
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version spectral)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Base" "Spectral" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_SPEC="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_SPEC="❌ Failed"
-  log_summary "API" "Spectral" "$_STAT_SPEC" "$(get_version spectral)" "$(($(date +%s) - _T0_SPEC))"
+  log_summary "Base" "Spectral" "$_STAT_SPEC" "$(get_version spectral)" "$(($(date +%s) - _T0_SPEC))"
 }
 
 # Purpose: Installs commitlint.
@@ -1123,12 +1370,18 @@ install_stylelint() {
   local _TITLE="Stylelint"
   local _PROVIDER="npm:stylelint"
 
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Node" "Stylelint" "⚖️ Previewed" "-" "0"
+  if ! has_lang_files "" "*.css *.scss *.less *.vue"; then
     return 0
   fi
 
-  if ! has_lang_files "" "*.css *.scss *.less *.vue"; then
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version stylelint)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Node" "Stylelint" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
 
@@ -1146,12 +1399,18 @@ install_vitepress() {
   local _TITLE="VitePress"
   local _PROVIDER="npm:vitepress"
 
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Docs" "VitePress" "⚖️ Previewed" "-" "0"
+  if [ ! -d docs ]; then
     return 0
   fi
 
-  if [ ! -d docs ]; then
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version vitepress)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Docs" "VitePress" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
 
@@ -1169,12 +1428,18 @@ install_commitizen() {
   local _TITLE="Commitizen"
   local _PROVIDER="npm:commitizen"
 
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "Commitizen" "⚖️ Previewed" "-" "0"
+  if [ ! -f "package.json" ]; then
     return 0
   fi
 
-  if [ ! -f "package.json" ]; then
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version commitizen)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Base" "Commitizen" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
 
@@ -1269,6 +1534,17 @@ install_editorconfig_checker() {
   fi
 
   if ! has_lang_files ".editorconfig" ""; then
+    return 0
+  fi
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version editorconfig-checker)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Base" "editorconfig-checker" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
 
@@ -1633,13 +1909,16 @@ EOF
     # Visual Grouping Headers for 'All' mode (prints before the first active module in each category)
     if [ "$_IS_ALL_MODULES" = "true" ]; then
       case " ${_BASE_LIST} " in *" ${_cur_module} "*)
-        [ "$_cur_grp" != "base" ] && log_info "── Base Toolset ──" && _cur_grp="base" ;;
+        [ "$_cur_grp" != "base" ] && log_info "── Base Toolset ──" && _cur_grp="base"
+        ;;
       esac
       case " ${_LANG_LIST} " in *" ${_cur_module} "*)
-        [ "$_cur_grp" != "lang" ] && log_info "── Language Toolsets ──" && _cur_grp="lang" ;;
+        [ "$_cur_grp" != "lang" ] && log_info "── Language Toolsets ──" && _cur_grp="lang"
+        ;;
       esac
       case " ${_DOMAIN_LIST} " in *" ${_cur_module} "*)
-        [ "$_cur_grp" != "domain" ] && log_info "── Domain Toolsets ──" && _cur_grp="domain" ;;
+        [ "$_cur_grp" != "domain" ] && log_info "── Domain Toolsets ──" && _cur_grp="domain"
+        ;;
       esac
     fi
 
