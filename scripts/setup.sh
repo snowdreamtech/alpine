@@ -332,36 +332,6 @@ setup_hooks() {
   log_summary "Base" "Hooks" "$_STAT_HOOK" "$(get_version pre-commit --version)" "$_DUR_HOOK"
 }
 
-# Purpose: Installs Commitlint.
-# Delegate: Managed by mise (.mise.toml)
-install_commitlint() {
-  local _T0_COM
-  _T0_COM=$(date +%s)
-  local _TITLE="Commitlint"
-  local _PROVIDER="npm:@commitlint/cli"
-
-  if [ ! -d ".git" ]; then
-    return 0
-  fi
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version commitlint "" "@commitlint/cli")
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
-
-  # Robust matching: Exact or contains (to handle @commitlint/cli@ prefix if cleanup fails)
-  if [ "$_CUR_VER" != "-" ] && ([ "$_CUR_VER" = "$_REQ_VER" ] || echo "$_CUR_VER" | grep -q "$_REQ_VER"); then
-    log_summary "Base" "Commitlint" "✅ Exists" "$_CUR_VER" "0"
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-  local _STAT_COM="✅ mise"
-  run_mise install "$_PROVIDER" "npm:@commitlint/config-conventional" || _STAT_COM="❌ Failed"
-  log_summary "Base" "Commitlint" "$_STAT_COM" "$(get_version commitlint)" "$(($(date +%s) - _T0_COM))"
-}
-
 # Purpose: Installs TFLint.
 # Delegate: Managed by mise (.mise.toml)
 install_tflint() {
@@ -1121,6 +1091,18 @@ install_commitlint() {
   fi
 
   if [ ! -d ".git" ]; then
+    return 0
+  fi
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version commitlint "" "@commitlint/cli")
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  # Robust matching: Exact or contains (to handle @commitlint/cli@ prefix if cleanup fails)
+  if [ "$_CUR_VER" != "-" ] && ([ "$_CUR_VER" = "$_REQ_VER" ] || echo "$_CUR_VER" | grep -q "$_REQ_VER"); then
+    log_summary "Base" "Commitlint" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
 
