@@ -22,6 +22,17 @@ setup_nim() {
 
   local _T0_NIM_RT
   _T0_NIM_RT=$(date +%s)
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version nim)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "nim")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Runtime" "Nim" "✅ Detected" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "Nim" "nim"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then

@@ -22,6 +22,17 @@ setup_spark() {
 
   local _T0_SPARK_RT
   _T0_SPARK_RT=$(date +%s)
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version spark-shell)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "spark-shell")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Runtime" "Apache Spark" "✅ Detected" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "Apache Spark" "spark-shell"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then

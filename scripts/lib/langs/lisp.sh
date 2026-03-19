@@ -22,6 +22,17 @@ setup_lisp() {
 
   local _T0_LISP_RT
   _T0_LISP_RT=$(date +%s)
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version sbcl)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "sbcl")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Runtime" "Common Lisp" "✅ Detected" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "Common Lisp" "sbcl"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then

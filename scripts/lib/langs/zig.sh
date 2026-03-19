@@ -20,6 +20,17 @@ setup_zig() {
 
   local _T0_ZIG_RT
   _T0_ZIG_RT=$(date +%s)
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version zig)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "zig")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Runtime" "Zig" "✅ Detected" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "Zig Runtime" "zig"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then

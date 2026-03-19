@@ -21,6 +21,17 @@ setup_pulumi() {
 
   local _T0_PULUMI
   _T0_PULUMI=$(date +%s)
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version pulumi)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "pulumi")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "IaC" "Pulumi" "✅ Detected" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "Pulumi" "pulumi"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
