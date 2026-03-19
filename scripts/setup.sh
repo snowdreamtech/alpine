@@ -451,13 +451,6 @@ install_ruby_lint() {
 # Params:
 #   None
 # Examples:
-#   setup_dart
-setup_dart() {
-  if command -v dart >/dev/null 2>&1; then
-    _log_setup "Dart SDK" "dart"
-    log_summary "Runtime" "Dart" "✅ Available" "$(get_version dart)" "0"
-  fi
-}
 
 # Purpose: Sets up Swift linting tools on macOS.
 # Params:
