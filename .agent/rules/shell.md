@@ -555,3 +555,13 @@ install_example_tool() {
 2. **Performance (Lazy Loading)**: Never install a language-specific tool unless the corresponding files are detected.
 3. **Strict Error Handling**: Use `|| _STAT="❌ Failed"` pattern to ensure the summary table accurately reflects failures without crashing the entire setup sequence.
 4. **SSoT Versioning**: Always use `get_version` or `get_mise_tool_version` to pull versions from `.mise.toml` for the summary table.
+5. **Human-Centric Feedback**: Large SDK installations (e.g., Swift, .NET, Java) MUST NOT be silent. Never suppress progress output (`MISE_QUIET=1`) for commands known to take more than a few seconds. Always provide a clear warning using `log_warn` before starting a potentially long download/installation.
+6. **Robust Interruption Handling**: All wrapper functions (like `run_mise`) MUST check for signal-based exit statuses (e.g., `_STATUS -gt 128`). If a command is interrupted by the user (Ctrl+C), the script MUST NOT attempt to retry and MUST exit immediately to prevent "stuck" states.
+
+## 10. Language-Specific Best Practices
+
+Refer to the following individual files for deeper language-specific shell patterns:
+
+- [swift.md](file://./swift.md) — Swift-specific linter and runtime logic.
+- [javascript.md](file://./javascript.md) — Node/npm/pnpm management patterns.
+- [rust.md](file://./rust.md) — Cargo and rustup integration patterns.

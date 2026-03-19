@@ -214,7 +214,7 @@
   ...
   ```
 
-  Scripts MUST be idempotent — safe to run multiple times without causing errors or duplicate data.
+- **Modular Setup Principle**: Language-specific setup logic MUST reside in `scripts/lib/langs/` as independent modules. The main `scripts/setup.sh` MUST NOT contain legacy setup functions that override modular logic. This ensures a single source of truth for detection and installation logic.
 
 - Track **onboarding time**: periodically measure how long it takes a new developer to go from `git clone` to a passing test run. The target is **≤ 15 minutes**. Failures to meet this SLA MUST be treated as developer experience bugs.
 
