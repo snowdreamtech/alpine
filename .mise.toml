@@ -81,30 +81,30 @@ plugin_autoupdate_last_check_duration = "1 week"
 # Environment variables for performance acceleration
 # ------------------------------------------------------------
 [env]
-ENABLE_GITHUB_PROXY = "1"
+ENABLE_GITHUB_PROXY = "{% if env.CI is defined %}0{% else %}1{% endif %}"
 PYTHONUTF8 = "1"
 # Corepack: bypass signature verification (fixes Windows Node 20 key mismatch)
 COREPACK_INTEGRITY_KEYS = "0"
 
 # Node.js & npm acceleration
-NPM_CONFIG_REGISTRY = "https://registry.npmmirror.com"
-NODEJS_ORG_MIRROR = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/"
-MISE_NODE_MIRROR_URL = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/"
+NPM_CONFIG_REGISTRY = "{% if env.CI is defined %}https://registry.npmjs.org{% else %}https://registry.npmmirror.com{% endif %}"
+NODEJS_ORG_MIRROR = "{% if env.CI is defined %}https://nodejs.org/dist/{% else %}https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/{% endif %}"
+MISE_NODE_MIRROR_URL = "{% if env.CI is defined %}https://nodejs.org/dist/{% else %}https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/{% endif %}"
 
 # Python & pip acceleration
-PIP_INDEX_URL = "https://pypi.tuna.tsinghua.edu.cn/simple"
-PIP_TRUSTED_HOST = "pypi.tuna.tsinghua.edu.cn"
-PYTHON_BUILD_MIRROR_URL = "https://mirrors.tuna.tsinghua.edu.cn/python/"
+PIP_INDEX_URL = "{% if env.CI is defined %}https://pypi.org/simple{% else %}https://pypi.tuna.tsinghua.edu.cn/simple{% endif %}"
+PIP_TRUSTED_HOST = "{% if env.CI is defined %}pypi.org{% else %}pypi.tuna.tsinghua.edu.cn{% endif %}"
+PYTHON_BUILD_MIRROR_URL = "{% if env.CI is defined %}https://www.python.org/ftp/python/{% else %}https://mirrors.tuna.tsinghua.edu.cn/python/{% endif %}"
 
 # Ruby acceleration
-RUBY_BUILD_MIRROR_URL = "https://mirrors.tuna.tsinghua.edu.cn/ruby-build/"
+RUBY_BUILD_MIRROR_URL = "{% if env.CI is defined %}https://cache.ruby-lang.org/pub/ruby/{% else %}https://mirrors.tuna.tsinghua.edu.cn/ruby-build/{% endif %}"
 
 # Go acceleration
-GOPROXY = "https://goproxy.cn,direct"
+GOPROXY = "{% if env.CI is defined %}https://proxy.golang.org,direct{% else %}https://goproxy.cn,direct{% endif %}"
 
 # Rust & Cargo acceleration
-RUSTUP_DIST_SERVER = "https://mirrors.tuna.tsinghua.edu.cn/rustup"
-RUSTUP_UPDATE_ROOT = "https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup"
+RUSTUP_DIST_SERVER = "{% if env.CI is defined %}https://static.rust-lang.org{% else %}https://mirrors.tuna.tsinghua.edu.cn/rustup{% endif %}"
+RUSTUP_UPDATE_ROOT = "{% if env.CI is defined %}https://static.rust-lang.org/rustup{% else %}https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup{% endif %}"
 
 # GITHUB_PROXY variable for scripts
-GITHUB_PROXY = "https://gh-proxy.sn0wdr1am.com/"
+GITHUB_PROXY = "{% if env.CI is defined %}{% else %}https://gh-proxy.sn0wdr1am.com/{% endif %}"
