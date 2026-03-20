@@ -55,6 +55,9 @@ EOF
 # Examples:
 #   _ensure_bats_vendor
 _ensure_bats_vendor() {
+  # bats test files use: load 'vendor/bats-support/load.bash'
+  # bats resolves load paths relative to the test file's directory (tests/).
+  # So 'vendor/...' → tests/vendor/ (kept inside tests/ for locality).
   local _VENDOR_DIR="tests/vendor"
   local _BATS_SUPPORT_DIR="$_VENDOR_DIR/bats-support"
   local _BATS_ASSERT_DIR="$_VENDOR_DIR/bats-assert"

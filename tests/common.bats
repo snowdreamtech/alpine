@@ -1,8 +1,8 @@
 #!/usr/bin/env bats
 
 setup() {
-  load '../vendor/bats-support/load.bash'
-  load '../vendor/bats-assert/load.bash'
+  load 'vendor/bats-support/load.bash'
+  load 'vendor/bats-assert/load.bash'
 
   # Create a temporary workspace
   export TEMP_DIR
