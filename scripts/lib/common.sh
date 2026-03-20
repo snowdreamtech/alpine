@@ -403,7 +403,9 @@ run_mise() {
   local _MAX_RETRIES=3
   local _RETRY_COUNT=0
   local _STATUS=1
-  local _T_OUT=60 # 60s timeout for network-heavy tasks (kotlin, ghc, etc.)
+  # 120s per attempt to handle large GitHub releases on slow networks.
+  # Previously 60s which caused frequent timeouts for tools like moonbit/grain.
+  local _T_OUT=120
 
   local _MISE_OPTS=""
   if [ "${VERBOSE:-1}" -ge 2 ]; then _MISE_OPTS="--verbose"; fi
@@ -422,7 +424,9 @@ run_mise() {
     fi
     _STATUS=$?
     [ $_STATUS -eq 0 ] && break
-    [ $_STATUS -gt 128 ] && break # Interrupted
+    # Exit code 124 = timeout expiry; treat as retryable network failure.
+    # Exit codes > 128 = signal (SIGTERM/SIGKILL); abort immediately.
+    if [ $_STATUS -gt 128 ] && [ $_STATUS -ne 124 ]; then break; fi
 
     _RETRY_COUNT=$((_RETRY_COUNT + 1))
     if [ $_RETRY_COUNT -lt $_MAX_RETRIES ]; then
