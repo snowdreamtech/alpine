@@ -24,6 +24,7 @@ editorconfig-checker = "3.6.1"
 # Git / commit workflow
 "npm:@commitlint/cli" = "20.5.0"
 "npm:@commitlint/config-conventional" = "20.5.0"
+"npm:bats" = "1.13.0"
 "npm:commitizen" = "4.3.1"
 "npm:cz-conventional-changelog" = "3.3.0"
 
@@ -81,6 +82,8 @@ plugin_autoupdate_last_check_duration = "1 week"
 [env]
 ENABLE_GITHUB_PROXY = "1"
 PYTHONUTF8 = "1"
+# Corepack: bypass signature verification (fixes Windows Node 20 key mismatch)
+COREPACK_INTEGRITY_KEYS = "0"
 
 # Node.js & npm acceleration
 NPM_CONFIG_REGISTRY = "https://registry.npmmirror.com"
