@@ -150,6 +150,37 @@ install_editorconfig_checker() {
   log_summary "Base" "Editorconfig-Checker" "$_STAT_EC" "$(get_version editorconfig-checker)" "$(($(date +%s) - _T0_EC))"
 }
 
+# Purpose: Installs GoReleaser as a universal release automation tool.
+# Note: goreleaser supports multi-language projects (Go, Rust, Python, Node, etc.)
+#       It is installed globally regardless of project language.
+install_goreleaser() {
+  local _T0_GR
+  _T0_GR=$(date +%s)
+  local _TITLE="GoReleaser"
+  local _PROVIDER="github:goreleaser/goreleaser"
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version goreleaser "")
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
+    log_summary "Base" "GoReleaser" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "GoReleaser" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
+  local _STAT_GR="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_GR="❌ Failed"
+  log_summary "Base" "GoReleaser" "$_STAT_GR" "$(get_version goreleaser)" "$(($(date +%s) - _T0_GR))"
+}
+
 # Purpose: Sets up Base environment.
 setup_base() {
   install_pipx
@@ -157,4 +188,5 @@ setup_base() {
   install_checkmake
   setup_hooks
   install_editorconfig_checker
+  install_goreleaser
 }

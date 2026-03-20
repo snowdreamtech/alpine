@@ -60,39 +60,6 @@ install_govulncheck() {
   log_summary "Go" "Govulncheck" "$_STAT_GOVC" "$(get_version govulncheck)" "$(($(date +%s) - _T0_GOVC))"
 }
 
-# Purpose: Installs GoReleaser.
-# Delegate: Managed by mise (.mise.toml)
-install_goreleaser() {
-  local _T0_GR
-  _T0_GR=$(date +%s)
-  local _TITLE="GoReleaser"
-  local _PROVIDER="github:goreleaser/goreleaser"
-  if ! has_lang_files ".goreleaser.yaml .goreleaser.yml" ""; then
-    return 0
-  fi
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version "goreleaser" "")
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
-
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Go" "GoReleaser" "✅ Exists" "$_CUR_VER" "0"
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Go" "GoReleaser" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_GR="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_GR="❌ Failed"
-  log_summary "Go" "GoReleaser" "$_STAT_GR" "$(get_version goreleaser)" "$(($(date +%s) - _T0_GR))"
-}
-
 # Purpose: Sets up Go runtime for project.
 # Delegate: Managed by mise (.mise.toml)
 setup_go() {
@@ -131,7 +98,6 @@ setup_go() {
   # Setup related tools
   install_go_lint
   install_govulncheck
-  install_goreleaser
 }
 # Purpose: Checks if Go runtime is available.
 # Examples:
