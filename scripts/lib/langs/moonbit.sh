@@ -1,16 +1,13 @@
 #!/usr/bin/env sh
 # MoonBit Logic Module
 
-# Purpose: Installs MoonBit via mise.
-# Delegate: Managed by mise (.mise.toml)
+# Purpose: Installs MoonBit via mise (version pinned in scripts/lib/versions.sh).
 install_runtime_moonbit() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install MoonBit via mise."
     return 0
   fi
-
-  # shellcheck disable=SC2154
-  run_mise install "moonbit@$(get_mise_tool_version moonbit)"
+  run_mise install "${VER_MOONBIT_PROVIDER}@${VER_MOONBIT}"
 }
 
 # Purpose: Sets up MoonBit environment for project.
@@ -26,8 +23,7 @@ setup_moonbit() {
   # Fast-path: Check version-aware existence
   local _CUR_VER
   _CUR_VER=$(get_version moon)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "moon")
+  local _REQ_VER="${VER_MOONBIT}"
 
   if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Runtime" "MoonBit" "✅ Detected" "$_CUR_VER" "0"

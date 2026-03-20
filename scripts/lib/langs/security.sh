@@ -3,12 +3,11 @@
 
 # Purpose: Installs osv-scanner for vulnerability scanning.
 # CI-only: Heavy GitHub Release binary (~40MB). Local dev skips to prevent stalling.
-# Delegate: Managed by mise (.mise.toml)
 install_osv_scanner() {
   local _T0_OSV
   _T0_OSV=$(date +%s)
   local _TITLE="OSV-Scanner"
-  local _PROVIDER="github:google/osv-scanner"
+  local _PROVIDER="${VER_OSV_SCANNER_PROVIDER}"
 
   # CI-only guard: skip on local dev to prevent 40MB download stall.
   if ! is_ci_env; then
@@ -19,8 +18,7 @@ install_osv_scanner() {
   # Fast-path: Check version-aware existence
   local _CUR_VER
   _CUR_VER=$(get_version osv-scanner)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  local _REQ_VER="${VER_OSV_SCANNER}"
 
   if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Security" "OSV-Scanner" "✅ Exists" "$_CUR_VER" "0"
@@ -40,12 +38,11 @@ install_osv_scanner() {
 
 # Purpose: Installs trivy for vulnerability scanning.
 # CI-only: Heavy GitHub Release binary (~80MB). Local dev skips to prevent stalling.
-# Delegate: Managed by mise (.mise.toml)
 install_trivy() {
   local _T0_TRIVY
   _T0_TRIVY=$(date +%s)
   local _TITLE="Trivy"
-  local _PROVIDER="github:aquasecurity/trivy"
+  local _PROVIDER="${VER_TRIVY_PROVIDER}"
 
   # CI-only guard: skip on local dev to prevent 80MB download stall.
   if ! is_ci_env; then
@@ -56,8 +53,7 @@ install_trivy() {
   # Fast-path: Check version-aware existence
   local _CUR_VER
   _CUR_VER=$(get_version trivy)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  local _REQ_VER="${VER_TRIVY}"
 
   if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Security" "Trivy" "✅ Exists" "$_CUR_VER" "0"
@@ -81,7 +77,7 @@ install_zizmor() {
   local _T0_ZIZ
   _T0_ZIZ=$(date +%s)
   local _TITLE="Zizmor"
-  local _PROVIDER="pipx:zizmor"
+  local _PROVIDER="${VER_ZIZMOR_PROVIDER}"
 
   if ! has_lang_files ".github/workflows" "*.yaml *.yml"; then
     return 0
@@ -90,8 +86,7 @@ install_zizmor() {
   # Fast-path: Check version-aware existence
   local _CUR_VER
   _CUR_VER=$(get_version zizmor)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  local _REQ_VER="${VER_ZIZMOR}"
 
   if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Security" "Zizmor" "✅ Exists" "$_CUR_VER" "0"
@@ -116,7 +111,7 @@ install_cargo_audit() {
   local _T0_CA
   _T0_CA=$(date +%s)
   local _TITLE="Cargo-Audit"
-  local _PROVIDER="github:rustsec/rustsec"
+  local _PROVIDER="${VER_CARGO_AUDIT_PROVIDER}"
 
   if ! has_lang_files "Cargo.toml Cargo.lock" ""; then
     return 0
@@ -131,8 +126,7 @@ install_cargo_audit() {
   # Fast-path: Check version-aware existence
   local _CUR_VER
   _CUR_VER=$(get_version cargo-audit)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  local _REQ_VER="${VER_CARGO_AUDIT}"
 
   if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Security" "Cargo-Audit" "✅ Exists" "$_CUR_VER" "0"
