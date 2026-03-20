@@ -925,13 +925,13 @@ get_version() {
     # Special cases for tools with unusual version output or slow shims
     case "$_CMD_VER" in
     python)
-      python --version | cut -d' ' -f2 && return 0
+      python --version 2>/dev/null | cut -d' ' -f2 && return 0
       ;;
     node)
-      "$_CMD_VER" --version 2>&1 | sed 's/^v//'
+      "$_CMD_VER" --version 2>/dev/null | sed 's/^v//'
       ;;
     go)
-      "$_CMD_VER" version 2>&1 | awk '{print $3}' | sed 's/^go//'
+      "$_CMD_VER" version 2>/dev/null | awk '{print $3}' | sed 's/^go//'
       ;;
     java)
       # java -version outputs to stderr and puts version in quotes
@@ -945,7 +945,7 @@ get_version() {
       # For other binaries, try to get version from the output
       # We strip 'v' or 'V' prefix and focus on the version number
       # Use MISE_OFFLINE=1 to prevent shims from trying to resolve versions over network
-      MISE_OFFLINE=1 "$_CMD_VER" "$_ARG_VER" 2>&1 | sed 's/^[vV]//' | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
+      MISE_OFFLINE=1 "$_CMD_VER" "$_ARG_VER" 2>/dev/null | sed 's/^[vV]//' | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
       ;;
     esac
   else

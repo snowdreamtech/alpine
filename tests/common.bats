@@ -8,8 +8,7 @@ setup() {
   export TEMP_DIR
   unset _SNOWDREAM_TOP_LEVEL_SCRIPT
   TEMP_DIR="$(mktemp -d)"
-  mkdir -p "$TEMP_DIR/scripts/lib"
-  cp "scripts/lib/common.sh" "$TEMP_DIR/scripts/lib/"
+  cp -r scripts "$TEMP_DIR/"
 
   # Create a dummy script that sources common.sh
   cat <<EOF >"$TEMP_DIR/test_script.sh"

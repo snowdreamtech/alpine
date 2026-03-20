@@ -24,6 +24,16 @@ set -e
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
+# ── Extension Modules Sourcing ───────────────────────────────────────────────
+# Dynamically load all language-specific setup modules.
+for _lang_mod in "${SCRIPT_DIR}/lib/langs"/*.sh; do
+  if [ -f "$_lang_mod" ]; then
+    # shellcheck disable=SC1090
+    . "$_lang_mod"
+  fi
+done
+unset _lang_mod
+
 # ── Functions ────────────────────────────────────────────────────────────────
 
 # Purpose: Extracts and installs Node.js dependencies using the detected manager.
@@ -67,6 +77,27 @@ install_git_hooks() {
 main() {
   # 1. Execution Context Guard
   guard_project_root
+
+  # ── Concurrency Guard (Lockfile) ──
+  # Using project-local lock to allow concurrent setup in different clones/test environments
+  local _LOCKFILE="${_G_PROJECT_ROOT}/.setup.lock"
+  if [ -f "$_LOCKFILE" ]; then
+    local _PID
+    _PID=$(cat "$_LOCKFILE")
+    if ps -p "$_PID" >/dev/null 2>&1; then
+      log_error "Setup or installation already in progress (PID: $_PID)."
+      log_info "If you are sure no other task is running, you can:"
+      log_info "  1. Kill the process: kill -9 $_PID"
+      log_info "  2. Remove the lock: rm -f $_LOCKFILE"
+      exit 1
+    else
+      log_warn "Stale lockfile detected (PID: $_PID is dead). Cleaning up..."
+      rm -f "$_LOCKFILE"
+    fi
+  fi
+  echo "$$" >"$_LOCKFILE"
+  # shellcheck disable=SC2064
+  trap "rm -f $_LOCKFILE" EXIT INT TERM
 
   # 2. Argument Parsing
   parse_common_args "$@"

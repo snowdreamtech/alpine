@@ -48,9 +48,13 @@ teardown() {
   run sh scripts/setup.sh --dry-run
   assert_success
   assert_output --partial "Running in DRY-RUN mode"
-  assert_output --partial "Setting up Node.js"
-  assert_output --partial "Setting up Python Virtual Environment"
-  assert_output --partial "Setting up Pre-commit Hooks"
+  # Support both fresh setup and pre-detected tools
+  run bash -c "sh scripts/setup.sh --dry-run | grep -E 'Setting up Node.js|✅ Detected.*Node.js'"
+  assert_success
+  run bash -c "sh scripts/setup.sh --dry-run | grep -E 'Setting up Python|✅ Detected.*Python'"
+  assert_success
+  run bash -c "sh scripts/setup.sh --dry-run | grep -E 'Setting up Pre-commit Hooks|✅ Detected.*Git Hooks'"
+  assert_success
 }
 
 # --- init-project.sh tests ---

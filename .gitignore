@@ -691,3 +691,4 @@ test-results/
 *.xz
 *.7z
 # docs/package.json
+.setup.lock

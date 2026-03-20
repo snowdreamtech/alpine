@@ -8,16 +8,8 @@ setup() {
   export TEMP_DIR
   unset _SNOWDREAM_TOP_LEVEL_SCRIPT
   TEMP_DIR="$(mktemp -d)"
-  mkdir -p "$TEMP_DIR/scripts/lib"
-
-  # Prevent parent orchestration scripts (like test.sh) from turning off logs
-  unset _SNOWDREAM_TOP_LEVEL_SCRIPT
-
   # Copy functional scripts
-  for f in archive-changelog.sh audit.sh cleanup.sh commit.sh release.sh update.sh verify.sh check-env.sh lint.sh test.sh; do
-    cp "scripts/$f" "$TEMP_DIR/scripts/"
-  done
-  cp "scripts/lib/common.sh" "$TEMP_DIR/scripts/lib/"
+  cp -r scripts "$TEMP_DIR/"
 
   # Create a dummy project structure
   cd "$TEMP_DIR" || exit

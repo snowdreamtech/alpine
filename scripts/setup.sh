@@ -92,7 +92,8 @@ main() {
   parse_common_args "$@"
 
   # ── Concurrency Guard (Lockfile) ──
-  local _LOCKFILE="/tmp/project_setup.lock"
+  # Using project-local lock to allow concurrent setup in different clones/test environments
+  local _LOCKFILE="${_G_PROJECT_ROOT}/.setup.lock"
   if [ -f "$_LOCKFILE" ]; then
     local _PID
     _PID=$(cat "$_LOCKFILE")
@@ -322,8 +323,7 @@ EOF
     testing) setup_testing ;;
     docs) setup_docs ;;
     ai) setup_ai ;;
-    helm) setup_helm ;;
-    k8s) setup_k8s ;;
+    helm | k8s) setup_helm ;;
     terragrunt) setup_terragrunt ;;
     # Legacy/Mapping aliases
     hadolint | dockerfile-utils) setup_docker ;;
