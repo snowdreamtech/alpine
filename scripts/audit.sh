@@ -112,12 +112,15 @@ main() {
       log_success "DRY-RUN: Would run $NPM audit"
       log_summary "Node.js" "$NPM-audit" "⚖️ Previewed" "-" "0"
     else
+      # Use the registry configured via NPM_CONFIG_REGISTRY (injected by .mise.toml [env]
+      # as https://registry.npmmirror.com for CN networks). Avoid hardcoding registry.npmjs.org
+      # which may time out in restricted network environments.
       local _REG_ARG_JS=""
-      case "$NPM" in
-      pnpm | npm)
-        _REG_ARG_JS="--registry=https://registry.npmjs.org"
-        ;;
-      esac
+      if [ -n "${npm_config_registry:-}" ]; then
+        _REG_ARG_JS="--registry=${npm_config_registry}"
+      elif [ -n "${NPM_CONFIG_REGISTRY:-}" ]; then
+        _REG_ARG_JS="--registry=${NPM_CONFIG_REGISTRY}"
+      fi
 
       # shellcheck disable=SC2086
       if run_quiet "$NPM" audit $_REG_ARG_JS; then
