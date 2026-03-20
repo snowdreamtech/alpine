@@ -153,14 +153,32 @@ EOF
       log_summary "Environment" "System" "✅ Active" "$(uname -s)/$(uname -m)" "0"
       log_summary "Environment" "Shell" "✅ Active" "$(basename "$SHELL")" "0"
 
-      # Detect Go/Rust/Node even if not explicitly setup (Safe version check)
-      for _r in go rust node python; do
+      # Detect language runtimes only when corresponding project files exist.
+      # This prevents spurious "⚠️ Warning" entries for unrelated runtimes
+      # caused by mise cache key substring mismatches (e.g. "go" matching "goreleaser").
+      for _r in node python; do
         local _v
         _v=$(get_version "$_r")
         if [ "$_v" != "-" ]; then
           log_summary "Runtime" "$_r" "✅ Detected" "$_v" "0"
         fi
       done
+      # Only detect Go when go.mod is present (avoids mise cache key false-positive on "goreleaser/...")
+      if has_lang_files "go.mod" "*.go"; then
+        local _vgo
+        _vgo=$(get_version "go")
+        if [ "$_vgo" != "-" ]; then
+          log_summary "Runtime" "go" "✅ Detected" "$_vgo" "0"
+        fi
+      fi
+      # Only detect Rust when Cargo.toml is present
+      if has_lang_files "Cargo.toml Cargo.lock" "*.rs"; then
+        local _vrust
+        _vrust=$(get_version "rust")
+        if [ "$_vrust" != "-" ]; then
+          log_summary "Runtime" "rust" "✅ Detected" "$_vrust" "0"
+        fi
+      fi
     } >"$SETUP_SUMMARY_FILE"
 
     # Set master sentinel for subsequent steps in CI
