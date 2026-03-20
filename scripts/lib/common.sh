@@ -96,6 +96,7 @@ DRY_RUN=${DRY_RUN:-0}
 # Ref: Rule 01 (General), Rule 08 (Dev Env)
 export MISE_YES=true
 export MISE_NON_INTERACTIVE=true
+export MISE_QUIET=true
 # Force mise to use system git for better proxy/config compatibility
 export MISE_GIT_ALWAYS_USE_GIX=0
 export MISE_GIX=0
