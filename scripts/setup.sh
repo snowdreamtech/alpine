@@ -197,7 +197,10 @@ EOF
   # ── CI/Local Environment Filtering ──
   # Skip heavyweight tools in local dev unless explicitly requested or 'all' is specified.
   if ! is_ci_env && [ "$_IS_ALL_MODULES" != "true" ] && [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ]; then
-    local _HEAVY_MODULES="markdown yaml toml security docs testing ai helm k8s terragrunt"
+    # Skip heavyweight and rarely-needed modules in local dev to prevent
+    # long network downloads (especially GitHub-released binaries).
+    # These can still be installed on-demand via: sh scripts/setup.sh <module>
+    local _HEAVY_MODULES="markdown yaml toml security docs testing ai helm k8s terragrunt grain moonbit move luau rescript starlark tcl wat pkl kcl ada assemblyscript ballerina fpc lean lisp racket prolog fortran typst"
     local _SMART_LIST=""
     for _m in $_MODULES_LIST; do
       case " ${_HEAVY_MODULES} " in *" ${_m} "*)
