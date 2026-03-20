@@ -587,6 +587,8 @@ build/
 ### VitePress ###
 docs/.vitepress/dist
 docs/.vitepress/cache
+.vitepress/dist
+.vitepress/cache
 
 ### General Frontend Build ###
 dist/
