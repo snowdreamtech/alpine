@@ -373,21 +373,6 @@ install_kube_linter() {
 # Delegate: Managed by mise (.mise.toml)
 # WARNING: google-java-format has no prebuilt binary for linux/arm64.
 #          On ARM64 Linux, this step is skipped. Use: java -jar google-java-format.jar
-install_java_lint() {
-  local _T0_JAVA
-  _T0_JAVA=$(date +%s)
-  local _TITLE="Java Lint"
-  local _PROVIDER="google-java-format"
-
-  if ! has_lang_files "pom.xml build.gradle" "*.java"; then
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-  local _STAT_JAVA="✅ mise"
-  run_mise install "github:google/google-java-format" || _STAT_JAVA="❌ Failed"
-  log_summary "Java" "Java Lint" "$_STAT_JAVA" "$(get_version google-java-format)" "$(($(date +%s) - _T0_JAVA))"
-}
 
 # Purpose: Sets up Rubocop for Ruby project linting.
 # Params:
@@ -430,17 +415,6 @@ install_ruby_lint() {
   log_summary "Ruby" "Rubocop" "$_STAT_RUBY" "$(get_version rubocop)" "$(($(date +%s) - _T0_RUBY))"
 }
 
-# Purpose: Verifies Dart SDK availability.
-# Params:
-#   None
-# Examples:
-
-
-# Purpose: Verifies .NET SDK availability.
-# Params:
-#   None
-# Examples:
-#   setup_dotnet
 
 # Purpose: Installs osv-scanner for vulnerability scanning.
 # Delegate: Managed by mise (.mise.toml)
@@ -933,25 +907,6 @@ install_clang_format() {
   log_summary "CPP" "clang-format" "$_STAT_CF" "$(get_version clang-format)" "$(($(date +%s) - _T0_CF))"
 }
 
-install_ktlint() {
-  local _T0_KT
-  _T0_KT=$(date +%s)
-  local _TITLE="ktlint"
-  local _PROVIDER="npm:@naturalcycles/ktlint"
-  if ! has_lang_files "" "*.kt *.kts"; then
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Kotlin" "ktlint" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_KT="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_KT="❌ Failed"
-  log_summary "Kotlin" "ktlint" "$_STAT_KT" "$(get_version ktlint --version)" "$(($(date +%s) - _T0_KT))"
-}
 
 install_ruff() {
   local _T0_RUF
@@ -1812,7 +1767,7 @@ EOF
     commitlint) install_commitlint ;;
     dockerfile-utils) install_dockerfile_utils ;;
     clang-format) install_clang_format ;;
-    ktlint) install_ktlint ;;
+    ktlint) setup_kotlin ;;
     ruff) install_ruff ;;
     stylelint) install_stylelint ;;
     yamllint) install_yamllint ;;

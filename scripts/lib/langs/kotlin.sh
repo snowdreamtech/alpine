@@ -12,6 +12,25 @@ install_runtime_kotlin() {
   eval "$(mise activate bash --shims)"
 }
 
+# Purpose: Installs ktlint.
+# Delegate: Managed by mise (.mise.toml)
+install_ktlint() {
+  local _T0_KT
+  _T0_KT=$(date +%s)
+  local _TITLE="ktlint"
+  local _PROVIDER="npm:@naturalcycles/ktlint"
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Kotlin" "ktlint" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
+  local _STAT_KT="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_KT="❌ Failed"
+  log_summary "Kotlin" "ktlint" "$_STAT_KT" "$(get_version ktlint --version)" "$(($(date +%s) - _T0_KT))"
+}
+
 # Purpose: Sets up Kotlin runtime and mandatory linting tools.
 setup_kotlin() {
   if ! has_lang_files "build.gradle.kts" "*.kt *.kts"; then
@@ -28,22 +47,20 @@ setup_kotlin() {
 
   if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
     log_summary "Runtime" "Kotlin" "✅ Detected" "$_CUR_VER" "0"
-    return 0
+  else
+    _log_setup "Kotlin Runtime" "kotlin"
+
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
+      log_summary "Runtime" "Kotlin" "⚖️ Previewed" "-" "0"
+    else
+      local _STAT_KOTLIN_RT="✅ Installed"
+      install_runtime_kotlin || _STAT_KOTLIN_RT="❌ Failed"
+
+      local _DUR_KOTLIN_RT
+      _DUR_KOTLIN_RT=$(($(date +%s) - _T0_KOTLIN_RT))
+      log_summary "Runtime" "Kotlin" "$_STAT_KOTLIN_RT" "$(get_version kotlin -version | head -n 1)" "$_DUR_KOTLIN_RT"
+    fi
   fi
-
-  _log_setup "Kotlin Runtime" "kotlin"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Runtime" "Kotlin" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  local _STAT_KOTLIN_RT="✅ Installed"
-  install_runtime_kotlin || _STAT_KOTLIN_RT="❌ Failed"
-
-  local _DUR_KOTLIN_RT
-  _DUR_KOTLIN_RT=$(($(date +%s) - _T0_KOTLIN_RT))
-  log_summary "Runtime" "Kotlin" "$_STAT_KOTLIN_RT" "$(get_version kotlin -version | head -n 1)" "$_DUR_KOTLIN_RT"
 
   # Also ensure linting tools are present
   install_ktlint

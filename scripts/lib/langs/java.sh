@@ -14,6 +14,22 @@ install_runtime_java() {
   eval "$(mise activate bash --shims)"
 }
 
+# Purpose: Installs google-java-format for Java project linting.
+# Delegate: Managed by mise (.mise.toml)
+# WARNING: google-java-format has no prebuilt binary for linux/arm64.
+#          On ARM64 Linux, this step is skipped. Use: java -jar google-java-format.jar
+install_java_lint() {
+  local _T0_JAVA
+  _T0_JAVA=$(date +%s)
+  local _TITLE="Java Lint"
+  local _PROVIDER="google-java-format"
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+  local _STAT_JAVA="✅ mise"
+  run_mise install "github:google/google-java-format" || _STAT_JAVA="❌ Failed"
+  log_summary "Java" "Java Lint" "$_STAT_JAVA" "$(get_version google-java-format)" "$(($(date +%s) - _T0_JAVA))"
+}
+
 # Purpose: Sets up Java runtime and mandatory linting tools.
 # Delegate: Managed by mise (.mise.toml)
 setup_java() {
@@ -31,22 +47,20 @@ setup_java() {
 
   if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
     log_summary "Runtime" "Java" "✅ Detected" "$_CUR_VER" "0"
-    return 0
+  else
+    _log_setup "Java Runtime" "java"
+
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
+      log_summary "Runtime" "Java" "⚖️ Previewed" "-" "0"
+    else
+      local _STAT_JAVA_RT="✅ Installed"
+      install_runtime_java || _STAT_JAVA_RT="❌ Failed"
+
+      local _DUR_JAVA_RT
+      _DUR_JAVA_RT=$(($(date +%s) - _T0_JAVA_RT))
+      log_summary "Runtime" "Java" "$_STAT_JAVA_RT" "$(get_version java)" "$_DUR_JAVA_RT"
+    fi
   fi
-
-  _log_setup "Java Runtime" "java"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Runtime" "Java" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  local _STAT_JAVA_RT="✅ Installed"
-  install_runtime_java || _STAT_JAVA_RT="❌ Failed"
-
-  local _DUR_JAVA_RT
-  _DUR_JAVA_RT=$(($(date +%s) - _T0_JAVA_RT))
-  log_summary "Runtime" "Java" "$_STAT_JAVA_RT" "$(get_version java)" "$_DUR_JAVA_RT"
 
   # Also ensure linting tools are present
   install_java_lint
