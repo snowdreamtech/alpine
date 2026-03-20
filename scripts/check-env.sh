@@ -68,11 +68,14 @@ check_tool_version() {
 
   log_debug "Checking $_LV_NAME (min: $_LV_MIN_VER)..."
 
+  # CI-only guard: skip entirely in local environments BEFORE touching command -v,
+  # which could trigger a mise shim installation attempt and stall the process.
+  if [ "$_LV_CI_ONLY" -eq 1 ] && ! is_ci_env; then
+    log_info "⏭️  $_LV_NAME: CI-only (skipped locally)"
+    return 0
+  fi
+
   if ! command -v "$_LV_CMD" >/dev/null 2>&1; then
-    if [ "$_LV_CI_ONLY" -eq 1 ] && ! is_ci_env; then
-      log_info "⏭️  $_LV_NAME: CI-only (skipped locally)"
-      return 0
-    fi
     log_warn "❌ $_LV_NAME: Not found."
     HEALTHY_ST=1
     [ "${_LV_CRITICAL:-0}" -eq 1 ] && CORE_HEALTHY_ST=1
