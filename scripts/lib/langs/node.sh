@@ -9,6 +9,12 @@ install_runtime_node() {
     return 0
   fi
 
+  # Fix: Windows Node 20 has an old bundled corepack that doesn't recognise
+  # the new npm signing key (SHA256:DhQ8...). Setting COREPACK_INTEGRITY_KEYS=0
+  # disables signature verification globally for this process and its children.
+  # See: https://github.com/nodejs/corepack/issues/612
+  export COREPACK_INTEGRITY_KEYS=0
+
   # 1. Runtime initialization
   run_mise install node
 
