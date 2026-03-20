@@ -74,24 +74,40 @@ _ensure_bats_vendor() {
     return 1
   fi
 
+  # Use GITHUB_PROXY for reliable access in restricted network environments.
+  # Rule 01: All GitHub resource downloads MUST use the configured proxy prefix.
+  local _PROXY="${GITHUB_PROXY:-https://gh-proxy.sn0wdr1am.com/}"
+
+  # Helper: clone with up to 3 retries, using proxy-prefixed URL first,
+  # then falling back to the bare mirror URL if proxy also fails.
+  _clone_with_retry() {
+    local _REPO="$1"
+    local _DEST="$2"
+    local _ATTEMPT=0
+    local _MAX_ATTEMPTS=3
+
+    while [ $_ATTEMPT -lt $_MAX_ATTEMPTS ]; do
+      _ATTEMPT=$((_ATTEMPT + 1))
+      if git clone --depth=1 --quiet "${_PROXY}https://github.com/${_REPO}.git" "$_DEST" 2>/dev/null; then
+        return 0
+      fi
+      log_warn "Clone attempt $_ATTEMPT/$_MAX_ATTEMPTS failed for $_REPO. Retrying..."
+      sleep 2
+    done
+
+    # Final fallback: bare GitHub URL (without proxy) for environments where proxy is not needed
+    log_warn "Proxy clone failed. Falling back to direct GitHub URL for $_REPO ..."
+    git clone --depth=1 --quiet "https://github.com/${_REPO}.git" "$_DEST"
+  }
+
   # bats-support
   if [ ! -f "$_BATS_SUPPORT_DIR/load.bash" ]; then
-    git clone --depth=1 --quiet \
-      "https://github.com/bats-core/bats-support.git" \
-      "$_BATS_SUPPORT_DIR" 2>/dev/null ||
-      git clone --depth=1 --quiet \
-        "https://ghproxy.cn/github.com/bats-core/bats-support.git" \
-        "$_BATS_SUPPORT_DIR"
+    _clone_with_retry "bats-core/bats-support" "$_BATS_SUPPORT_DIR"
   fi
 
   # bats-assert
   if [ ! -f "$_BATS_ASSERT_DIR/load.bash" ]; then
-    git clone --depth=1 --quiet \
-      "https://github.com/bats-core/bats-assert.git" \
-      "$_BATS_ASSERT_DIR" 2>/dev/null ||
-      git clone --depth=1 --quiet \
-        "https://ghproxy.cn/github.com/bats-core/bats-assert.git" \
-        "$_BATS_ASSERT_DIR"
+    _clone_with_retry "bats-core/bats-assert" "$_BATS_ASSERT_DIR"
   fi
 
   log_info "bats vendor libraries installed."
