@@ -26,6 +26,11 @@ install_shfmt() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "Shfmt" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_SHF="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_SHF="❌ Failed"
   log_summary "Base" "Shfmt" "$_STAT_SHF" "$(get_version shfmt)" "$(($(date +%s) - _T0_SHF))"
@@ -60,6 +65,11 @@ install_shellcheck() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "Shellcheck" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_SHC="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_SHC="❌ Failed"
   log_summary "Base" "Shellcheck" "$_STAT_SHC" "$(get_version shellcheck)" "$(($(date +%s) - _T0_SHC))"
