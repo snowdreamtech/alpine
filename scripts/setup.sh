@@ -250,23 +250,6 @@ install_hadolint() {
   log_summary "Docker" "Hadolint" "$_STAT_HADO" "$(get_version hadolint)" "$(($(date +%s) - _T0_HADO))"
 }
 
-# Purpose: Installs golangci-lint for Go projects.
-# Delegate: Managed by mise (.mise.toml)
-install_go_lint() {
-  local _T0_GO
-  _T0_GO=$(date +%s)
-  local _TITLE="Go Lint"
-  local _PROVIDER="github:golangci/golangci-lint"
-
-  if ! has_lang_files "go.mod go.sum" "*.go"; then
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-  local _STAT_GO="✅ mise"
-  run_mise install golangci-lint || _STAT_GO="❌ Failed"
-  log_summary "Go" "Go Lint" "$_STAT_GO" "$(get_version golangci-lint)" "$(($(date +%s) - _T0_GO))"
-}
 
 # Purpose: Installs checkmake for Makefile linting.
 # Delegate: Managed by mise (.mise.toml)
@@ -645,47 +628,6 @@ install_cargo_audit() {
   log_summary "Rust" "Cargo-Audit" "$_STAT_CRGO" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_CRGO))"
 }
 
-# Purpose: Installs govulncheck for Go project vulnerability scanning.
-# Delegate: Managed by mise (.mise.toml)
-# NOTE: CI-only tool — vulnerability scanner. Skipped on local environments.
-install_govulncheck() {
-  local _T0_GOVC
-  _T0_GOVC=$(date +%s)
-  local _TITLE="Govulncheck"
-  local _PROVIDER="go:golang.org/x/vuln/cmd/govulncheck"
-  if ! is_ci_env; then
-    return 0
-  fi
-
-  if ! has_lang_files "go.mod go.sum" "*.go"; then
-    return 0
-  fi
-
-  if ! command -v go >/dev/null 2>&1; then
-    return 0
-  fi
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version govulncheck)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
-
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
-    log_summary "Go" "Govulncheck" "✅ Exists" "$_CUR_VER" "0"
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Go" "Govulncheck" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_GOVC="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_GOVC="❌ Failed"
-  log_summary "Go" "Govulncheck" "$_STAT_GOVC" "$(get_version govulncheck)" "$(($(date +%s) - _T0_GOVC))"
-}
 
 # Purpose: Installs Shfmt.
 # Delegate: Managed by mise (.mise.toml)
@@ -880,36 +822,6 @@ install_sort_package_json() {
   log_summary "Node" "sort-package-json" "$_STAT_SPJ" "$(get_version sort-package-json)" "$(($(date +%s) - _T0_SPJ))"
 }
 
-install_goreleaser() {
-  local _T0_GR
-  _T0_GR=$(date +%s)
-  local _TITLE="GoReleaser"
-  local _PROVIDER="github:goreleaser/goreleaser"
-  if ! has_lang_files ".goreleaser.yaml .goreleaser.yml" ""; then
-    return 0
-  fi
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version "goreleaser" "")
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
-
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
-    log_summary "Go" "GoReleaser" "✅ Exists" "$_CUR_VER" "0"
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Go" "GoReleaser" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_GR="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_GR="❌ Failed"
-  log_summary "Go" "GoReleaser" "$_STAT_GR" "$(get_version goreleaser)" "$(($(date +%s) - _T0_GR))"
-}
 
 # Purpose: Installs spectral for API linting.
 # Delegate: Managed by mise (.mise.toml)
@@ -1845,10 +1757,7 @@ EOF
     case $_cur_module in
     node) setup_node ;;
     python) setup_python ;;
-    go)
-      setup_go
-      install_go_lint
-      ;;
+    go) setup_go ;;
     php) setup_php ;;
     rust) setup_rust ;;
     java) setup_java ;;
@@ -1868,7 +1777,7 @@ EOF
     osv-scanner) install_osv_scanner ;;
     trivy) install_trivy ;;
     zizmor) install_zizmor ;;
-    govulncheck) install_govulncheck ;;
+    govulncheck) setup_go ;;
     cargo-audit) install_cargo_audit ;;
     security) setup_security ;;
     shfmt) install_shfmt ;;
@@ -1898,7 +1807,7 @@ EOF
     kube-linter) install_kube_linter ;;
     editorconfig-checker) install_editorconfig_checker ;;
     sort-package-json) install_sort_package_json ;;
-    goreleaser) install_goreleaser ;;
+    goreleaser) setup_go ;;
     spectral) install_spectral ;;
     commitlint) install_commitlint ;;
     dockerfile-utils) install_dockerfile_utils ;;
