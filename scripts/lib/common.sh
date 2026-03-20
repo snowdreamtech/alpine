@@ -314,36 +314,53 @@ EOF
   export _NETWORK_OPTIMIZED=true
 }
 
-# Purpose: Extracts the configured version of a tool from .mise.toml.
+# Purpose: Extracts the configured version of a tool from .mise.toml or VER_* env vars.
+# Lookup order:
+#   1. Exact key match in .mise.toml
+#   2. Basename match in .mise.toml  (e.g. "github:foo/bar" -> "bar")
+#   3. VER_<UPPER_NAME> env variable set by scripts/lib/versions.sh (Tier 2 tools)
+#   4. Fallback: "latest"
 # Params:
-#   $1 - Tool name (e.g., "node", "python", "golangci-lint")
+#   $1 - Tool name (e.g., "rust", "helm", "github:goreleaser/goreleaser")
 # Returns:
-#   The version string or empty if not found.
+#   The pinned version string, or "latest" if not found anywhere.
 # Examples:
-#   VER=$(get_mise_tool_version "node")
+#   VER=$(get_mise_tool_version "rust")      # -> VER_RUST from versions.sh
+#   VER=$(get_mise_tool_version "node")      # -> from .mise.toml
 get_mise_tool_version() {
   local _TOOL_NAME_MISE="$1"
   local _MISE_TOM_PATH
   _MISE_TOM_PATH=$(get_project_root)/.mise.toml
-  [ -f "$_MISE_TOM_PATH" ] || {
-    echo "latest"
-    return 0
-  }
 
-  local _VER
-  # 1. Try exact match (including quotes and provider prefix if provider string given)
-  _VER=$(grep -E "^\"?${_TOOL_NAME_MISE}\"?[[:space:]]*=" "$_MISE_TOM_PATH" 2>/dev/null |
-    sed -E 's/^[^=]*=[[:space:]]*"([^"]*)".*/\1/' | head -n 1 || true)
+  local _VER=""
 
-  # 2. Try matching the "basename" of the tool (e.g. github:foo/bar -> bar)
-  if [ -z "$_VER" ]; then
-    local _SHORT_NAME
-    _SHORT_NAME=$(echo "$_TOOL_NAME_MISE" | sed -E 's/^[^:]+://; s/.*\///')
-    _VER=$(grep -E "^\"?([^:]+:)?${_SHORT_NAME}\"?[[:space:]]*=" "$_MISE_TOM_PATH" 2>/dev/null |
+  if [ -f "$_MISE_TOM_PATH" ]; then
+    # 1. Try exact match (including quotes and provider prefix if provider string given)
+    _VER=$(grep -E "^\"?${_TOOL_NAME_MISE}\"?[[:space:]]*=" "$_MISE_TOM_PATH" 2>/dev/null |
       sed -E 's/^[^=]*=[[:space:]]*"([^"]*)".*/\1/' | head -n 1 || true)
+
+    # 2. Try matching the "basename" of the tool (e.g. github:foo/bar -> bar)
+    if [ -z "$_VER" ]; then
+      local _SHORT_NAME
+      _SHORT_NAME=$(echo "$_TOOL_NAME_MISE" | sed -E 's/^[^:]+://; s/.*\///')
+      _VER=$(grep -E "^\"?([^:]+:)?${_SHORT_NAME}\"?[[:space:]]*=" "$_MISE_TOM_PATH" 2>/dev/null |
+        sed -E 's/^[^=]*=[[:space:]]*"([^"]*)".*/\1/' | head -n 1 || true)
+    fi
   fi
 
-  # Fallback to 'latest' if no version is explicitly defined in .mise.toml
+  # 3. Check VER_<UPPER> env variable from versions.sh (Tier 2 tools not in .mise.toml)
+  if [ -z "$_VER" ]; then
+    # Normalize: strip provider prefix, take basename, uppercase, replace non-alnum with _
+    local _VAR_KEY
+    _VAR_KEY=$(echo "$_TOOL_NAME_MISE" |
+      sed -E 's/^[^:]+://; s/.*\///' |
+      tr '[:lower:]' '[:upper:]' |
+      tr -c 'A-Z0-9\n' '_' |
+      sed 's/_*$//')
+    eval "_VER=\${VER_${_VAR_KEY}:-}"
+  fi
+
+  # 4. Fallback to 'latest' if no version is explicitly defined anywhere
   echo "${_VER:-latest}"
 }
 
