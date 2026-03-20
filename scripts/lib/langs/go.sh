@@ -1,20 +1,16 @@
 #!/usr/bin/env sh
 # Go Logic Module
 
-# Purpose: Installs Go runtime via mise.
-# Delegate: Managed by mise (.mise.toml)
+# Purpose: Installs Go runtime via mise (version pinned in scripts/lib/versions.sh).
 install_runtime_go() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Go runtime."
     return 0
   fi
-
-  # Runtime initialization
-  run_mise install go
+  run_mise install "go@${VER_GO}"
 }
 
-# Purpose: Installs golangci-lint for Go projects.
-# Delegate: Managed by mise (.mise.toml)
+# Purpose: Installs golangci-lint for Go projects (version pinned in versions.sh).
 install_go_lint() {
   local _T0_GO
   _T0_GO=$(date +%s)
@@ -25,8 +21,7 @@ install_go_lint() {
   # GitHub-released binary (~50MB) on every local setup run.
   local _CUR_VER
   _CUR_VER=$(get_version golangci-lint)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  local _REQ_VER="${VER_GOLANGCI_LINT}"
 
   if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Go" "Go Lint" "✅ Exists" "$_CUR_VER" "0"
@@ -44,13 +39,12 @@ install_go_lint() {
 }
 
 # Purpose: Installs govulncheck for Go project vulnerability scanning.
-# Delegate: Managed by mise (.mise.toml)
 # NOTE: CI-only tool — vulnerability scanner. Skipped on local environments.
 install_govulncheck() {
   local _T0_GOVC
   _T0_GOVC=$(date +%s)
   local _TITLE="Govulncheck"
-  local _PROVIDER="go:golang.org/x/vuln/cmd/govulncheck"
+  local _PROVIDER="${VER_GOVULNCHECK_PROVIDER}"
   if ! is_ci_env; then
     return 0
   fi
