@@ -161,7 +161,12 @@ main() {
   fi
 
   # 7. Multi-Stack Audit (OSV-Scanner) — CI-only: network-dependent, slow on local dev.
-  if is_ci_env && run_quiet command -v osv-scanner; then
+  # Only run when at least one lockfile is present to avoid pointless scan on bare projects.
+  _HAS_LOCKFILE=0
+  for _lf in package-lock.json pnpm-lock.yaml yarn.lock go.sum Cargo.lock requirements.txt Pipfile.lock; do
+    [ -f "$_lf" ] && _HAS_LOCKFILE=1 && break
+  done
+  if is_ci_env && [ "$_HAS_LOCKFILE" -eq 1 ] && run_quiet command -v osv-scanner; then
     local _T0_OSV_AUD
     _T0_OSV_AUD=$(date +%s)
     log_info "\n── Generic Vulnerability Scan (osv-scanner) ──"
