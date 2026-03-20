@@ -1,110 +1,69 @@
 # ------------------------------------------------------------
-# mise.toml — Optimized for fast installation and weak networks
+# mise.toml — Two-tier Tool Management
 # ------------------------------------------------------------
-# Strategy:
-# 1. Functional Grouping: Tools are organized by domain (Runtimes, Security, etc.)
-# 2. Alphabetical Sorting: All entries are sorted within their respective blocks.
-# 3. Explicit Providers: Use asdf:, npm:, pipx:, github: for Clarity & SSoT.
-# 4. Network Acceleration: Environment mirrors for peak performance.
-# 5. Pure SSoT: legacy_version_file=false to enforce mise.toml as the source.
+# TIER 1 (Core): Tools required for all projects — always installed.
+# TIER 2 (On-demand): Language/domain-specific — installed by
+#   scripts/lib/langs/*.sh when source files are detected.
 # ------------------------------------------------------------
 
 [tools]
 
-# ── 🏗️ Core Runtimes & Language SDKs ─────────────────────────────────────────
-bun = "1.2.4"
-deno = "2.2.2"
-dotnet = "9.0.201"
+# ── 🏗️ Core Runtimes ──────────────────────────────────────────────────────────
 go = "1.23.6"
-java = "21.0.2"
 node = "20.18.3"
 pnpm = "10.30.3"
 python = "3.12.9"
-rust = "1.85.0"
-yarn = "1.22.22"
-zig = "0.14.0"
-"github:grain-lang/grain" = { version = "0.7.2", ref = "grain-v0.7.2" }
-"github:moonbitlang/moonbit-compiler" = { version = "0.7.2", ref = "v0.7.2+c12686398" }
 
-# ── 💎 General Quality & Project Management ──────────────────────────────────
+# ── 🔐 Security (always needed — git commit guard) ────────────────────────────
+gitleaks = "8.30.0"
+
+# ── 💎 Core Quality & Commit Tooling ──────────────────────────────────────────
+# Tools invoked by pre-commit hooks or universally needed.
 checkmake = "0.3.2"
 editorconfig-checker = "3.6.1"
-"github:casey/just" = "1.39.0"
-"github:go-task/task" = "3.41.0"
+
+# Git / commit workflow
 "npm:@commitlint/cli" = "20.5.0"
 "npm:@commitlint/config-conventional" = "20.5.0"
-"npm:bats" = "1.13.0"
-"npm:bats-assert" = "2.2.4"
-"npm:bats-support" = "0.3.0"
 "npm:commitizen" = "4.3.1"
 "npm:cz-conventional-changelog" = "3.3.0"
-"pipx:pre-commit" = "4.5.1"
 
-# ── 🛡️ Security Auditing ─────────────────────────────────────────────────────
-gitleaks = "8.30.0"
-"cargo:cargo-audit" = "0.20.1"
-"github:aquasecurity/trivy" = "0.69.3"
-"github:google/osv-scanner" = "2.3.3"
-"go:golang.org/x/vuln/cmd/govulncheck" = "v1.1.4"
-"pipx:pip-audit" = "2.8.0"
-"pipx:zizmor" = "1.3.1"
-
-# ── 🎨 Language-Specific Toolsets (Lint/Fmt) ──────────────────────────────────
-golangci-lint = "1.64.5"
-"github:kcl-lang/kcl" = "v0.11.2"
-"github:apple/pkl" = "0.31.0"
-"github:JohnnyMorganz/StyLua" = "2.0.2"
-"github:bufbuild/buf" = "1.50.0"
-"github:cue-lang/cue" = "0.12.0"
-"github:google/go-jsonnet" = "0.20.0"
-"github:google/google-java-format" = { version = "v1.35.0", asset = [
-  { match = "darwin-arm64" },
-  { match = "linux-x86-64" },
-  { match = "linux-arm64" },
-  { match = "windows-x86-64" },
-  { match = "all-deps.jar" },
-] }
-"github:hadolint/hadolint" = "2.14.0"
-"github:open-policy-agent/opa" = "1.2.0"
-"github:realm/SwiftLint" = "0.63.2"
-"npm:@naturalcycles/ktlint" = "1.12.0"
-"npm:@taplo/cli" = "0.7.0"
-"npm:assemblyscript" = "0.27.31"
+# Formatting & linting (invoked by pre-commit hooks)
 "npm:eslint" = "10.0.3"
 "npm:markdownlint-cli2" = "0.21.0"
 "npm:prettier" = "3.8.1"
 "npm:sort-package-json" = "3.6.1"
-"npm:stylelint" = "16.26.1"
-"npm:stylelint-config-standard" = "37.0.0"
+"npm:@taplo/cli" = "0.7.0"
+
+# Docker / Infrastructure linters (invoked by pre-commit hooks)
+"github:hadolint/hadolint" = "2.14.0"
+"npm:dockerfile-utils" = "0.16.3"
+
+# Shell & scripting linters (pre-commit hooks)
 "pipx:actionlint-py" = "1.7.11.24"
-"pipx:clang-format" = "19.1.7"
-"pipx:dotenv-linter" = "0.7.0"
+"pipx:pre-commit" = "4.5.1"
 "pipx:ruff" = "0.15.4"
 "pipx:shellcheck-py" = "0.11.0.1"
 "pipx:shfmt-py" = "3.12.0.2"
-"pipx:sqlfluff" = "4.0.4"
 "pipx:yamllint" = "1.38.0"
 
-# ── ☁️ DevOps & Infrastructure ────────────────────────────────────────────────
-"github:bazelbuild/bazel" = "9.0.1"
-helm = "3.17.1"
-terraform = "1.11.0"
-terragrunt = "1.0.0-rc3"
-"github:ballerina-platform/ballerina-distribution" = "2201.11.0"
-"github:goreleaser/goreleaser" = "2.14.1"
-"github:opentofu/opentofu" = "1.9.0"
-"github:pulumi/pulumi" = "3.153.1"
-"github:stackrox/kube-linter" = "0.8.1"
-"github:terraform-linters/tflint" = "0.61.0"
-"npm:@stoplight/spectral-cli" = "6.15.0"
-"npm:dockerfile-utils" = "0.16.3"
-"pipx:ansible-lint" = "26.1.1"
+# Additional linters invoked by pre-commit hooks
+"pipx:clang-format" = "19.1.7"
+"pipx:dotenv-linter" = "0.7.0"
+"pipx:sqlfluff" = "4.0.4"
 
-# ── 📖 Documentation & Data ──────────────────────────────────────────────────
-duckdb = "1.5.0"
-typst = "0.13.0"
-"github:lycheeverse/lychee" = "lychee-v0.23.0"
-"npm:vitepress" = "1.6.4"
+# DevOps/release tools used globally
+"github:goreleaser/goreleaser" = "2.14.1"
+
+# ── NOTE: All remaining tools are TIER 2 (on-demand). ─────────────────────────
+# They are NOT listed here. Each scripts/lib/langs/*.sh module defines its
+# own _PROVIDER with an inline version and installs via run_mise when
+# the corresponding project files are detected.
+# Examples: rust, java, kotlin, grain, moonbit, helm, terraform, kcl, pkl,
+#           trivy, osv-scanner, cargo-audit, govulncheck, pip-audit, zizmor,
+#           swiftlint, ktlint, spectral, kube-linter, stylelint, buf, opa,
+#           cue, pkl, bazel, pulumi, duckdb, typst, lychee, vitepress, bun,
+#           deno, zig, ruby, dotnet, yarn, bats, assemblyscript, etc.
 
 # ------------------------------------------------------------
 # Global settings
@@ -121,7 +80,6 @@ plugin_autoupdate_last_check_duration = "1 week"
 # Environment variables for performance acceleration
 # ------------------------------------------------------------
 [env]
-# Performance Toggles
 ENABLE_GITHUB_PROXY = "1"
 PYTHONUTF8 = "1"
 
