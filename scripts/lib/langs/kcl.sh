@@ -1,15 +1,13 @@
 #!/usr/bin/env sh
 # KCL Logic Module
 
-# Purpose: Installs KCL via mise.
+# Purpose: Installs KCL via mise (version pinned in scripts/lib/versions.sh).
 install_runtime_kcl() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install KCL via mise."
     return 0
   fi
-
-  # shellcheck disable=SC2154
-  run_mise install "kclvm@$(get_mise_tool_version kcl)"
+  run_mise install "${VER_KCL_PROVIDER}@${VER_KCL}"
 }
 
 # Purpose: Sets up KCL environment for project.
@@ -25,8 +23,7 @@ setup_kcl() {
   # Fast-path: Check version-aware existence
   local _CUR_VER
   _CUR_VER=$(get_version kcl)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "kcl")
+  local _REQ_VER="${VER_KCL}"
 
   if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Runtime" "KCL" "✅ Detected" "$_CUR_VER" "0"
