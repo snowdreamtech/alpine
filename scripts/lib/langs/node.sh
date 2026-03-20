@@ -169,6 +169,66 @@ install_vitepress() {
   log_summary "Docs" "VitePress" "$_STAT_VP" "$(get_version vitepress)" "$(($(date +%s) - _T0_VP))"
 }
 
+# Purpose: Installs prettier.
+# Delegate: Managed by mise (.mise.toml)
+install_prettier() {
+  local _T0_PR
+  _T0_PR=$(date +%s)
+  local _TITLE="Prettier"
+  local _PROVIDER="npm:prettier"
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version prettier)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Base" "Prettier" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "Prettier" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
+  local _STAT_PR="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_PR="❌ Failed"
+  log_summary "Base" "Prettier" "$_STAT_PR" "$(get_version prettier)" "$(($(date +%s) - _T0_PR))"
+}
+
+# Purpose: Installs commitlint.
+# Delegate: Managed by mise (.mise.toml)
+install_commitlint() {
+  local _T0_CL
+  _T0_CL=$(date +%s)
+  local _TITLE="Commitlint"
+  local _PROVIDER="npm:@commitlint/cli"
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version commitlint)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Base" "Commitlint" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "Commitlint" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
+  local _STAT_CL="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_CL="❌ Failed"
+  log_summary "Base" "Commitlint" "$_STAT_CL" "$(get_version commitlint)" "$(($(date +%s) - _T0_CL))"
+}
+
 # Purpose: Installs commitizen.
 # Delegate: Managed by mise (.mise.toml)
 install_commitizen() {
@@ -258,6 +318,8 @@ setup_node() {
   install_stylelint
   install_vitepress
   install_commitizen
+  install_prettier
+  install_commitlint
 }
 # Purpose: Checks if Node.js runtime is available.
 # Examples:
