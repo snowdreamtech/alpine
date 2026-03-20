@@ -91,6 +91,20 @@ main() {
   # 2. Argument Parsing
   parse_common_args "$@"
 
+  # ── Concurrency Guard (Lockfile) ──
+  local _LOCKFILE="/tmp/snowdream_setup.lock"
+  if [ -f "$_LOCKFILE" ]; then
+    local _PID
+    _PID=$(cat "$_LOCKFILE")
+    if ps -p "$_PID" >/dev/null 2>&1; then
+      log_error "Setup already in progress (PID: $_PID). Please wait or kill it if it's stuck."
+      exit 1
+    fi
+  fi
+  echo "$$" >"$_LOCKFILE"
+  # shellcheck disable=SC2064
+  trap "rm -f $_LOCKFILE" EXIT INT TERM
+
   # 3. Network Optimization
   optimize_network
 
@@ -302,6 +316,9 @@ EOF
     testing) setup_testing ;;
     docs) setup_docs ;;
     ai) setup_ai ;;
+    helm) setup_helm ;;
+    k8s) setup_k8s ;;
+    terragrunt) setup_terragrunt ;;
     # Legacy/Mapping aliases
     hadolint | dockerfile-utils) setup_docker ;;
     sqlfluff) setup_sql ;;
