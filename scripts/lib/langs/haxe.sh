@@ -11,7 +11,6 @@ install_runtime_haxe() {
 
   # shellcheck disable=SC2154
   run_mise install "haxe@$(get_mise_tool_version haxe)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Haxe environment for project.

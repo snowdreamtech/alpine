@@ -11,7 +11,6 @@ install_runtime_moonbit() {
 
   # shellcheck disable=SC2154
   run_mise install "moonbit@$(get_mise_tool_version moonbit)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up MoonBit environment for project.

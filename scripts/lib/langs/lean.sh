@@ -11,7 +11,6 @@ install_runtime_lean() {
 
   # shellcheck disable=SC2154
   run_mise install "lean@$(get_mise_tool_version lean)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Lean 4 environment for project.

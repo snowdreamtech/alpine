@@ -11,7 +11,6 @@ install_runtime_ada() {
 
   # shellcheck disable=SC2154
   run_mise install "gnat@$(get_mise_tool_version ada)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Ada environment for project.

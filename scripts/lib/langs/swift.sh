@@ -10,7 +10,6 @@ install_runtime_swift() {
   fi
   # shellcheck disable=SC2154
   run_mise install "swift@$(get_mise_tool_version swift)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Swift runtime and mandatory linting tools.

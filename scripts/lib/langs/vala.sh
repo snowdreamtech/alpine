@@ -11,7 +11,6 @@ install_runtime_vala() {
 
   # shellcheck disable=SC2154
   run_mise install "vala@$(get_mise_tool_version vala)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Vala environment for project.

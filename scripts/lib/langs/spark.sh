@@ -11,7 +11,6 @@ install_runtime_spark() {
 
   # shellcheck disable=SC2154
   run_mise install "spark@$(get_mise_tool_version spark)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Apache Spark environment for project.

@@ -10,7 +10,6 @@ install_runtime_tofu() {
   fi
   # shellcheck disable=SC2154
   run_mise install "opentofu@$(get_mise_tool_version opentofu)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up OpenTofu IaC.

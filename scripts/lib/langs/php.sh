@@ -11,7 +11,6 @@ install_runtime_php() {
 
   # 1. Runtime initialization
   run_mise install php
-  eval "$(mise activate bash --shims)"
 
   # 2. Dependency resolution
   if [ -f "composer.json" ]; then

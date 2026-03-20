@@ -11,7 +11,6 @@ install_runtime_luau() {
 
   # shellcheck disable=SC2154
   run_mise install "luau@$(get_mise_tool_version luau)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Luau environment for project.

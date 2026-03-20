@@ -10,7 +10,6 @@ install_runtime_erlang() {
 
   # shellcheck disable=SC2154
   run_mise install "erlang@$(get_mise_tool_version erlang)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Erlang environment for project.

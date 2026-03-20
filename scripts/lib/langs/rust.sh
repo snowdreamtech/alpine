@@ -11,7 +11,6 @@ install_runtime_rust() {
 
   # Runtime initialization
   run_mise install rust
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Rust runtime for project.

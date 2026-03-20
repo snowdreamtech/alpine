@@ -11,7 +11,6 @@ install_runtime_mojo() {
 
   # shellcheck disable=SC2154
   run_mise install "mojo@$(get_mise_tool_version mojo)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Mojo environment for project.

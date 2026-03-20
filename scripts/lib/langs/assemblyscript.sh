@@ -11,7 +11,6 @@ install_runtime_assemblyscript() {
 
   # shellcheck disable=SC2154
   run_mise install "npm:assemblyscript@$(get_mise_tool_version assemblyscript)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up AssemblyScript environment for project.

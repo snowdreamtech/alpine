@@ -11,7 +11,6 @@ install_runtime_duckdb() {
 
   # shellcheck disable=SC2154
   run_mise install "duckdb@$(get_mise_tool_version duckdb)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up DuckDB environment for project.

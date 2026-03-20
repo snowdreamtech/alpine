@@ -9,7 +9,6 @@ install_runtime_bun() {
     return 0
   fi
   run_mise install bun
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Bun runtime.

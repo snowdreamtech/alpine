@@ -11,7 +11,6 @@ install_runtime_crystal() {
 
   # shellcheck disable=SC2154
   run_mise install "crystal@$(get_mise_tool_version crystal)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Crystal environment for project.

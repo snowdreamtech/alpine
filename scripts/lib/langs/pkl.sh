@@ -11,7 +11,6 @@ install_runtime_pkl() {
 
   # shellcheck disable=SC2154
   run_mise install "pkl@$(get_mise_tool_version pkl)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Pkl environment for project.

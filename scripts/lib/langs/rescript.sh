@@ -11,7 +11,6 @@ install_runtime_rescript() {
 
   # shellcheck disable=SC2154
   run_mise install "npm:rescript@$(get_mise_tool_version rescript)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up ReScript environment for project.

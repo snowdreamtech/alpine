@@ -11,7 +11,6 @@ install_runtime_nim() {
 
   # shellcheck disable=SC2154
   run_mise install "nim@$(get_mise_tool_version nim)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Nim environment for project.

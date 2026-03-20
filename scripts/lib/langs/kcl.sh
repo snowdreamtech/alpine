@@ -10,7 +10,6 @@ install_runtime_kcl() {
 
   # shellcheck disable=SC2154
   run_mise install "kclvm@$(get_mise_tool_version kcl)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up KCL environment for project.

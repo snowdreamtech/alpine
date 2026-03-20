@@ -11,7 +11,6 @@ install_runtime_elm() {
 
   # shellcheck disable=SC2154
   run_mise install "elm@$(get_mise_tool_version elm)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Elm environment for project.

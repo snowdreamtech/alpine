@@ -11,7 +11,6 @@ install_runtime_go() {
 
   # Runtime initialization
   run_mise install go
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Installs golangci-lint for Go projects.

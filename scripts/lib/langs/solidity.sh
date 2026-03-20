@@ -11,7 +11,6 @@ install_runtime_solidity() {
 
   # shellcheck disable=SC2154
   run_mise install "solidity@$(get_mise_tool_version solidity)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Solidity environment for project.

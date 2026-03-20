@@ -11,7 +11,6 @@ install_runtime_racket() {
 
   # shellcheck disable=SC2154
   run_mise install "racket@$(get_mise_tool_version racket)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Racket environment for project.

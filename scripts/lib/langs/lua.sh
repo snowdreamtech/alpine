@@ -10,7 +10,6 @@ install_runtime_lua() {
   fi
   # shellcheck disable=SC2154
   run_mise install "lua@$(get_mise_tool_version lua)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Installs stylua.

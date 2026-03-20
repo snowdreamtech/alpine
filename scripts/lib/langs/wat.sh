@@ -11,7 +11,6 @@ install_runtime_wat() {
 
   # shellcheck disable=SC2154
   run_mise install "wasmtime@$(get_mise_tool_version wasmtime)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up WAT environment for project.

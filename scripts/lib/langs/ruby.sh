@@ -11,7 +11,6 @@ install_runtime_ruby() {
 
   # Runtime initialization
   run_mise install ruby
-  eval "$(mise activate bash --shims)"
 
   # Project dependencies
   if [ -f "Gemfile" ]; then
@@ -47,7 +46,7 @@ install_ruby_lint() {
     fi
   fi
 
-  if [ "$_CUR_VER" != "-" ] && ([ "$_CUR_VER" = "$_REQ_VER" ] || [ "$_REQ_VER" = "" ]); then
+  if [ "$_CUR_VER" != "-" ] && { [ "$_CUR_VER" = "$_REQ_VER" ] || [ "$_REQ_VER" = "" ]; }; then
     log_summary "Ruby" "Rubocop" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi

@@ -11,7 +11,6 @@ install_runtime_dotnet() {
 
   # Runtime initialization
   run_mise install dotnet
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Dotnet runtime.

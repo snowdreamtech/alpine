@@ -11,7 +11,6 @@ install_runtime_ocaml() {
 
   # shellcheck disable=SC2154
   run_mise install "ocaml@$(get_mise_tool_version ocaml)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up OCaml environment for project.

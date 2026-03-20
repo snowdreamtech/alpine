@@ -11,7 +11,6 @@ install_runtime_node() {
 
   # 1. Runtime initialization
   run_mise install node
-  eval "$(mise activate bash --shims)"
 
   # 1b. Package Manager initialization (Corepack)
   log_info "Initializing Node.js package managers (corepack)..."

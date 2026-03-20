@@ -11,7 +11,6 @@ install_runtime_fpc() {
 
   # shellcheck disable=SC2154
   run_mise install "fpc@$(get_mise_tool_version fpc)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up FPC environment for project.

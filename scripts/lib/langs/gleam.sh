@@ -11,7 +11,6 @@ install_runtime_gleam() {
 
   # shellcheck disable=SC2154
   run_mise install "gleam@$(get_mise_tool_version gleam)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Gleam environment for project.

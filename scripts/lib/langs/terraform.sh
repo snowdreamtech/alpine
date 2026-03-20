@@ -11,7 +11,6 @@ install_runtime_terraform() {
 
   # shellcheck disable=SC2154
   run_mise install "terraform@$(get_mise_tool_version terraform)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Installs TFLint.

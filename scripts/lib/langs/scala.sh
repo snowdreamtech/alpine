@@ -10,7 +10,6 @@ install_runtime_scala() {
   fi
   # shellcheck disable=SC2154
   run_mise install "scala@$(get_mise_tool_version scala)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Scala runtime.

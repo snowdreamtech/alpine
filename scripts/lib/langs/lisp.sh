@@ -11,7 +11,6 @@ install_runtime_lisp() {
 
   # shellcheck disable=SC2154
   run_mise install "sbcl@$(get_mise_tool_version sbcl)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Common Lisp environment for project.

@@ -11,7 +11,6 @@ install_runtime_fortran() {
 
   # shellcheck disable=SC2154
   run_mise install "gcc@$(get_mise_tool_version gcc)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Fortran environment for project.

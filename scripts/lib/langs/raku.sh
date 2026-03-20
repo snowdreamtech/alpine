@@ -11,7 +11,6 @@ install_runtime_raku() {
 
   # shellcheck disable=SC2154
   run_mise install "rakudo@$(get_mise_tool_version raku)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Raku environment for project.

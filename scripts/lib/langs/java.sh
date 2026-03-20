@@ -11,7 +11,6 @@ install_runtime_java() {
 
   # Runtime initialization
   run_mise install java
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Installs google-java-format for Java project linting.

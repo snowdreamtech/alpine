@@ -11,7 +11,6 @@ install_runtime_move() {
 
   # shellcheck disable=SC2154
   run_mise install "aptos@$(get_mise_tool_version move)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Move environment for project.

@@ -11,7 +11,6 @@ install_runtime_python() {
 
   # 1. Runtime initialization
   run_mise install python
-  eval "$(mise activate bash --shims)"
 
   # 2. Virtualenv management
   if [ ! -d "$VENV" ]; then

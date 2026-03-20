@@ -9,7 +9,6 @@ install_runtime_zig() {
     return 0
   fi
   run_mise install zig
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Zig runtime.

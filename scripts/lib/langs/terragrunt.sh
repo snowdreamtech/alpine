@@ -11,7 +11,6 @@ install_runtime_terragrunt() {
 
   # shellcheck disable=SC2154
   run_mise install "terragrunt@$(get_mise_tool_version terragrunt)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Terragrunt environment for project.

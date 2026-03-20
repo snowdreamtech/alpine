@@ -10,7 +10,6 @@ install_runtime_groovy() {
   fi
   # shellcheck disable=SC2154
   run_mise install "groovy@$(get_mise_tool_version groovy)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Groovy runtime.

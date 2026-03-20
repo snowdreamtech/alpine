@@ -11,7 +11,6 @@ install_runtime_odin() {
 
   # shellcheck disable=SC2154
   run_mise install "odin@$(get_mise_tool_version odin)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Odin environment for project.

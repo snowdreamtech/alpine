@@ -9,7 +9,6 @@ install_runtime_deno() {
     return 0
   fi
   run_mise install deno
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Deno runtime.

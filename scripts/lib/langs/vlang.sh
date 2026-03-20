@@ -11,7 +11,6 @@ install_runtime_vlang() {
 
   # shellcheck disable=SC2154
   run_mise install "vlang@$(get_mise_tool_version vlang)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Vlang environment for project.

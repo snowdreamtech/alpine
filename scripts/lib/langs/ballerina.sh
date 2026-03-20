@@ -11,7 +11,6 @@ install_runtime_ballerina() {
 
   # shellcheck disable=SC2154
   run_mise install "ballerina@$(get_mise_tool_version ballerina)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Ballerina environment for project.

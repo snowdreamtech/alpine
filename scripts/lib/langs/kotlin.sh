@@ -9,7 +9,6 @@ install_runtime_kotlin() {
     return 0
   fi
   run_mise install kotlin
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Installs ktlint.

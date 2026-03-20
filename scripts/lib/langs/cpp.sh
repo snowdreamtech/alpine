@@ -13,10 +13,6 @@ install_runtime_cpp() {
   ensure_tool cmake || return 1
   ensure_tool ninja || return 1
 
-  if command -v mise >/dev/null 2>&1; then
-    eval "$(mise activate bash --shims)"
-  fi
-
   # System level check for compiler
   if ! command -v gcc >/dev/null 2>&1 && ! command -v clang >/dev/null 2>&1; then
     log_warn "No C/C++ compiler (gcc/clang) detected. Please install build-essential or xcode-select."
@@ -60,7 +56,7 @@ setup_cpp() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "cpp")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+  if [ "$_CUR_VER" != "-" ] && { [ "$_REQ_VER" = "latest" ] || [ "$_CUR_VER" = "$_REQ_VER" ]; }; then
     log_summary "Runtime" "C/C++" "✅ Detected" "$_CUR_VER" "0"
   else
     _log_setup "C/C++ Toolchain" "cpp"

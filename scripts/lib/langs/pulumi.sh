@@ -10,7 +10,6 @@ install_runtime_pulumi() {
   fi
   # shellcheck disable=SC2154
   run_mise install "pulumi@$(get_mise_tool_version pulumi)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Pulumi IaC.

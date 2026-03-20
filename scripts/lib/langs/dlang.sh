@@ -11,7 +11,6 @@ install_runtime_dlang() {
 
   # shellcheck disable=SC2154
   run_mise install "dmd@$(get_mise_tool_version dlang)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Dlang environment for project.

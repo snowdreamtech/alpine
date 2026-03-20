@@ -144,7 +144,7 @@ terragrunt = "1.0.0-rc3"
 # ── 📖 Documentation & Data ──────────────────────────────────────────────────
 duckdb = "1.5.0"
 typst = "0.13.0"
-"github:lychee-app/lychee" = "lychee-v0.23.0"
+"github:lycheeverse/lychee" = "lychee-v0.23.0"
 "npm:vitepress" = "1.6.4"
 
 # ------------------------------------------------------------

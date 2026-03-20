@@ -11,7 +11,6 @@ install_runtime_grain() {
 
   # shellcheck disable=SC2154
   run_mise install "grain@$(get_mise_tool_version grain)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Grain environment for project.

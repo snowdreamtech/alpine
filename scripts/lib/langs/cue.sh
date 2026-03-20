@@ -11,7 +11,6 @@ install_runtime_cue() {
 
   # shellcheck disable=SC2154
   run_mise install "cue@$(get_mise_tool_version cue)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up CUE environment for project.

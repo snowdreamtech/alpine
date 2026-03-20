@@ -25,6 +25,17 @@ set -e
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
+# ── Extension Modules Sourcing ───────────────────────────────────────────────
+# Dynamically load all language-specific setup modules.
+# shellcheck source=/dev/null
+for _lang_mod in "${SCRIPT_DIR}/lib/langs"/*.sh; do
+  if [ -f "$_lang_mod" ]; then
+    # shellcheck disable=SC1090
+    . "$_lang_mod"
+  fi
+done
+unset _lang_mod
+
 # ── Configuration ────────────────────────────────────────────────────────────
 # Global variables (VENV, PYTHON, etc.) are sourced from common.sh
 
@@ -152,8 +163,8 @@ EOF
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
     # Grouped list for "On-demand" (default) or "All" (explicit)
-    local _BASE_LIST="base shell toml yaml markdown node python go rust java kotlin php ruby dart swift lua cpp terraform solidity perl julia r groovy dotnet zig elixir haskell scala"
-    local _DOMAIN_LIST="docker sql openapi protobuf security runners testing docs ai"
+    local _BASE_LIST="base shell toml yaml markdown node python go rust java kotlin php ruby dart swift lua cpp terraform solidity perl julia r groovy dotnet zig elixir haskell scala ada assemblyscript ballerina bun clojure crystal deno dlang duckdb elm erlang fortran fpc gleam grain haxe jsonnet kcl lean lisp luau mojo moonbit move nim ocaml odin pkl prolog pulumi racket raku rescript starlark tcl tofu typst vala vcpkg vlang wat"
+    local _DOMAIN_LIST="docker sql openapi protobuf security runners testing docs ai helm k8s terraform terragrunt tofu pulumi"
     _MODULES_LIST="${_BASE_LIST} ${_DOMAIN_LIST}"
   else
     _MODULES_LIST="${_RAW_ARGS}"
@@ -220,6 +231,47 @@ EOF
     elixir) setup_elixir ;;
     haskell) setup_haskell ;;
     scala) setup_scala ;;
+    ada) setup_ada ;;
+    assemblyscript) setup_assemblyscript ;;
+    ballerina) setup_ballerina ;;
+    bun) setup_bun ;;
+    clojure) setup_clojure ;;
+    crystal) setup_crystal ;;
+    deno) setup_deno ;;
+    dlang) setup_dlang ;;
+    duckdb) setup_duckdb ;;
+    elm) setup_elm ;;
+    erlang) setup_erlang ;;
+    fortran) setup_fortran ;;
+    fpc) setup_fpc ;;
+    gleam) setup_gleam ;;
+    grain) setup_grain ;;
+    haxe) setup_haxe ;;
+    jsonnet) setup_jsonnet ;;
+    kcl) setup_kcl ;;
+    lean) setup_lean ;;
+    lisp) setup_lisp ;;
+    luau) setup_luau ;;
+    mojo) setup_mojo ;;
+    moonbit) setup_moonbit ;;
+    move) setup_move ;;
+    nim) setup_nim ;;
+    ocaml) setup_ocaml ;;
+    odin) setup_odin ;;
+    pkl) setup_pkl ;;
+    prolog) setup_prolog ;;
+    pulumi) setup_pulumi ;;
+    racket) setup_racket ;;
+    raku) setup_raku ;;
+    rescript) setup_rescript ;;
+    starlark) setup_starlark ;;
+    tcl) setup_tcl ;;
+    tofu) setup_tofu ;;
+    typst) setup_typst ;;
+    vala) setup_vala ;;
+    vcpkg) setup_vcpkg ;;
+    vlang) setup_vlang ;;
+    wat) setup_wat ;;
     docker) setup_docker ;;
     sql) setup_sql ;;
     openapi) setup_openapi ;;
@@ -237,6 +289,14 @@ EOF
     osv-scanner | trivy | zizmor | cargo-audit) setup_security ;;
     spectral) setup_openapi ;;
     buf) setup_protobuf ;;
+    ghc | stack | cabal) setup_haskell ;;
+    v | v-lang) setup_vlang ;;
+    kt | kts) setup_kotlin ;;
+    py) setup_python ;;
+    ts | js) setup_node ;;
+    rb) setup_ruby ;;
+    pl) setup_perl ;;
+    pipx) setup_base ;;
     just | task) setup_runners ;;
     playwright | cypress | vitest | bats | bats-libs) setup_testing ;;
     docusaurus | mkdocs | sphinx) setup_docs ;;

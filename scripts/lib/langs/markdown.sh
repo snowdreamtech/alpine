@@ -7,7 +7,7 @@ install_markdownlint() {
   local _T0_MD
   _T0_MD=$(date +%s)
   local _TITLE="Markdownlint"
-  local _PROVIDER="npm:markdownlint-cli"
+  local _PROVIDER="npm:markdownlint-cli2"
 
   if ! has_lang_files "" "*.md"; then
     return 0
@@ -15,7 +15,7 @@ install_markdownlint() {
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
-  _CUR_VER=$(get_version markdownlint)
+  _CUR_VER=$(get_version markdownlint-cli2 "" "markdownlint-cli2")
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 

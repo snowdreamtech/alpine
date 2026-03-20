@@ -11,7 +11,6 @@ install_runtime_starlark() {
 
   # shellcheck disable=SC2154
   run_mise install "bazel@$(get_mise_tool_version bazel)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Starlark environment for project.

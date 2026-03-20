@@ -11,7 +11,6 @@ install_runtime_prolog() {
 
   # shellcheck disable=SC2154
   run_mise install "swiprolog@$(get_mise_tool_version swiprolog)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Prolog environment for project.

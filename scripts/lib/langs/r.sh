@@ -10,7 +10,6 @@ install_runtime_r() {
   fi
   # shellcheck disable=SC2154
   run_mise install "R@$(get_mise_tool_version r)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up R runtime.

@@ -11,7 +11,6 @@ install_runtime_typst() {
 
   # shellcheck disable=SC2154
   run_mise install "typst@$(get_mise_tool_version typst)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Typst environment for project.

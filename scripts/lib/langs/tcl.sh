@@ -11,7 +11,6 @@ install_runtime_tcl() {
 
   # shellcheck disable=SC2154
   run_mise install "tcl@$(get_mise_tool_version tcl)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Tcl environment for project.

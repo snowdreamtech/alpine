@@ -11,7 +11,6 @@ install_runtime_jsonnet() {
 
   # shellcheck disable=SC2154
   run_mise install "go-jsonnet@$(get_mise_tool_version jsonnet)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Jsonnet environment for project.

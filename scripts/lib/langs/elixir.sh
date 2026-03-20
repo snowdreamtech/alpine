@@ -12,7 +12,6 @@ install_runtime_elixir() {
   run_mise install "erlang@$(get_mise_tool_version erlang)"
   # shellcheck disable=SC2154
   run_mise install "elixir@$(get_mise_tool_version elixir)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Elixir runtime and mandatory linting tools.

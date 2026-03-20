@@ -9,7 +9,6 @@ install_runtime_julia() {
   fi
   # shellcheck disable=SC2154
   run_mise install "julia@$(get_mise_tool_version julia)"
-  eval "$(mise activate bash --shims)"
 }
 
 # Purpose: Sets up Julia runtime.

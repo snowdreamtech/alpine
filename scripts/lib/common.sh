@@ -31,6 +31,20 @@ YELLOW=$(printf '\033[1;33m')
 RED=$(printf '\033[0;31m')
 NC=$(printf '\033[0m')
 
+# ── 🛠️ POSIX realpath Fallback ───────────────────────────────────────────────
+# Ensures compatibility for tools/plugins that expect 'realpath' (missing on macOS/minimal systems).
+if ! command -v realpath >/dev/null 2>&1; then
+  if command -v grealpath >/dev/null 2>&1; then
+    realpath() { grealpath "$@"; }
+  elif command -v python3 >/dev/null 2>&1; then
+    realpath() { python3 -c "import os, sys; print(os.path.realpath(sys.argv[1]))" "$1"; }
+  elif command -v perl >/dev/null 2>&1; then
+    realpath() { perl -MCwd -e 'print Cwd::abs_path($ARGV[0])' "$1"; }
+  fi
+  # shellcheck disable=SC3045
+  export -f realpath 2>/dev/null || true
+fi
+
 # ── 🎭 Global Environment Detection ──────────────────────────────────────────
 
 # Detect OS and set pathing conventions dynamically to ensure absolute parity
@@ -1256,12 +1270,5 @@ init_summary_table() {
 }
 
 # ── Extension Modules Sourcing ──
-# Dynamically load all language-specific setup modules.
-# shellcheck source=/dev/null
-for _lang_mod in "${_G_LIB_DIR}/langs"/*.sh; do
-  if [ -f "$_lang_mod" ]; then
-    # shellcheck disable=SC1090
-    . "$_lang_mod"
-  fi
-done
-unset _lang_mod
+# Note: Dynamic loading of language-specific setup modules has been moved to setup.sh
+# to optimize performance for non-setup scripts.
