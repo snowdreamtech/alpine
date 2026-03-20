@@ -45,6 +45,159 @@ install_runtime_node() {
   fi
 }
 
+# Purpose: Installs sort-package-json.
+# Delegate: Managed by mise (.mise.toml)
+install_sort_package_json() {
+  local _T0_SPJ
+  _T0_SPJ=$(date +%s)
+  local _TITLE="sort-package-json"
+  local _PROVIDER="npm:sort-package-json"
+  if [ ! -f "package.json" ]; then
+    return 0
+  fi
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version sort-package-json)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Node" "sort-package-json" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Node" "sort-package-json" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
+  local _STAT_SPJ="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_SPJ="❌ Failed"
+  log_summary "Node" "sort-package-json" "$_STAT_SPJ" "$(get_version sort-package-json)" "$(($(date +%s) - _T0_SPJ))"
+}
+
+# Purpose: Installs eslint.
+# Delegate: Managed by mise (.mise.toml)
+install_eslint() {
+  local _T0_ES
+  _T0_ES=$(date +%s)
+  local _TITLE="ESLint"
+  local _PROVIDER="npm:eslint"
+  if ! has_lang_files "package.json" "*.js *.ts *.vue *.jsx *.tsx"; then
+    return 0
+  fi
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version "eslint" "")
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "npm:eslint")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Node" "ESLint" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Node" "ESLint" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
+  local _STAT_ES="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_ES="❌ Failed"
+  log_summary "Node" "ESLint" "$_STAT_ES" "$(get_version eslint)" "$(($(date +%s) - _T0_ES))"
+}
+
+# Purpose: Installs stylelint.
+# Delegate: Managed by mise (.mise.toml)
+install_stylelint() {
+  local _T0_SL
+  _T0_SL=$(date +%s)
+  local _TITLE="Stylelint"
+  local _PROVIDER="npm:stylelint"
+
+  if ! has_lang_files "" "*.css *.scss *.less *.vue"; then
+    return 0
+  fi
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version stylelint)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Node" "Stylelint" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+  local _STAT_SL="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_SL="❌ Failed"
+  log_summary "Node" "Stylelint" "$_STAT_SL" "$(get_version stylelint)" "$(($(date +%s) - _T0_SL))"
+}
+
+# Purpose: Installs vitepress.
+# Delegate: Managed by mise (.mise.toml)
+install_vitepress() {
+  local _T0_VP
+  _T0_VP=$(date +%s)
+  local _TITLE="VitePress"
+  local _PROVIDER="npm:vitepress"
+
+  if [ ! -d docs ] && ! grep -q '"vitepress"' "$PACKAGE_JSON" 2>/dev/null; then
+    return 0
+  fi
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version vitepress)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Docs" "VitePress" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+  local _STAT_VP="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_VP="❌ Failed"
+  log_summary "Docs" "VitePress" "$_STAT_VP" "$(get_version vitepress)" "$(($(date +%s) - _T0_VP))"
+}
+
+# Purpose: Installs commitizen.
+# Delegate: Managed by mise (.mise.toml)
+install_commitizen() {
+  local _T0_CZ
+  _T0_CZ=$(date +%s)
+  local _TITLE="Commitizen"
+  local _PROVIDER="npm:commitizen"
+
+  if [ ! -f "package.json" ]; then
+    return 0
+  fi
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version commitizen)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+    log_summary "Base" "Commitizen" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+  local _STAT_CZ="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_CZ="❌ Failed"
+  log_summary "Base" "Commitizen" "$_STAT_CZ" "$(get_version commitizen)" "$(($(date +%s) - _T0_CZ))"
+}
+
 # Purpose: Sets up Node.js runtime for project.
 # Delegate: Managed by mise (.mise.toml)
 setup_node() {
@@ -65,26 +218,23 @@ setup_node() {
 
   if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
     log_summary "Runtime" "Node.js" "✅ Detected" "$_CUR_VER" "0"
-    return 0
+  else
+    _log_setup "$_TITLE" "$_PROVIDER"
+
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
+      log_summary "Runtime" "Node.js" "⚖️ Previewed" "-" "0"
+    else
+      local _STAT_NODE_RT="✅ Installed"
+      install_runtime_node || _STAT_NODE_RT="❌ Failed"
+
+      local _DUR_NODE_RT
+      _DUR_NODE_RT=$(($(date +%s) - _T0_NODE_RT))
+      log_summary "Runtime" "Node.js" "$_STAT_NODE_RT" "$(get_version node)" "$_DUR_NODE_RT"
+    fi
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Runtime" "Node.js" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  local _STAT_NODE_RT="✅ Installed"
-  install_runtime_node || _STAT_NODE_RT="❌ Failed"
-
-  local _DUR_NODE_RT
-  _DUR_NODE_RT=$(($(date +%s) - _T0_NODE_RT))
-  log_summary "Runtime" "Node.js" "$_STAT_NODE_RT" "$(get_version node)" "$_DUR_NODE_RT"
-
-  if [ "$_STAT_NODE_RT" = "✅ Installed" ] && [ -f "$PACKAGE_JSON" ]; then
+  if [ -f "$PACKAGE_JSON" ]; then
     # Detect Frameworks from package.json for summary
-    if grep -q '"vitepress"' "$PACKAGE_JSON"; then log_summary "Framework" "VitePress" "✅ Detected" "$(get_version node "exec vitepress --version")" "0"; fi
     if grep -q '"vue"' "$PACKAGE_JSON"; then log_summary "Framework" "Vue" "✅ Detected" "-" "0"; fi
     if grep -q '"react"' "$PACKAGE_JSON"; then log_summary "Framework" "React" "✅ Detected" "-" "0"; fi
     if grep -q '"astro"' "$PACKAGE_JSON"; then log_summary "Framework" "Astro" "✅ Detected" "-" "0"; fi
@@ -101,6 +251,13 @@ setup_node() {
   if [ -f "deno.json" ] || [ -f "deno.jsonc" ]; then
     log_summary "Runtime" "Deno" "✅ Detected" "$(deno --version 2>/dev/null | head -n 1 | awk '{print $2}')" "0"
   fi
+
+  # Setup related tools
+  install_sort_package_json
+  install_eslint
+  install_stylelint
+  install_vitepress
+  install_commitizen
 }
 # Purpose: Checks if Node.js runtime is available.
 # Examples:

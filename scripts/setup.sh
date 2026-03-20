@@ -763,38 +763,6 @@ install_prettier() {
   log_summary "Base" "Prettier" "$_STAT_PRE" "$(get_version prettier)" "$(($(date +%s) - _T0_PRE))"
 }
 
-# Purpose: Installs sort-package-json.
-# Delegate: Managed by mise (.mise.toml)
-install_sort_package_json() {
-  local _T0_SPJ
-  _T0_SPJ=$(date +%s)
-  local _TITLE="sort-package-json"
-  local _PROVIDER="npm:sort-package-json"
-  if [ ! -f "package.json" ]; then
-    return 0
-  fi
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version sort-package-json)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
-
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
-    log_summary "Node" "sort-package-json" "✅ Exists" "$_CUR_VER" "0"
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Node" "sort-package-json" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_SPJ="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_SPJ="❌ Failed"
-  log_summary "Node" "sort-package-json" "$_STAT_SPJ" "$(get_version sort-package-json)" "$(($(date +%s) - _T0_SPJ))"
-}
 
 
 # Purpose: Installs spectral for API linting.
@@ -1084,128 +1052,10 @@ install_bats_libs() {
   log_summary "Shell" "Bats-Libs" "✅ Vendored" "v0.3.0/v2.1.0" "$(($(date +%s) - _T0_BL))"
 }
 
-# Purpose: Installs eslint.
-# Delegate: Managed by mise (.mise.toml)
-install_eslint() {
-  local _T0_ES
-  _T0_ES=$(date +%s)
-  local _TITLE="ESLint"
-  local _PROVIDER="npm:eslint"
-  if ! has_lang_files "package.json" "*.js *.ts *.vue *.jsx *.tsx"; then
-    return 0
-  fi
 
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version "eslint" "")
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "npm:eslint")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
-    log_summary "Node" "ESLint" "✅ Exists" "$_CUR_VER" "0"
-    return 0
-  fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
 
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Node" "ESLint" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_ES="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_ES="❌ Failed"
-  log_summary "Node" "ESLint" "$_STAT_ES" "$(get_version eslint)" "$(($(date +%s) - _T0_ES))"
-}
-
-# Purpose: Installs stylelint.
-# Delegate: Managed by mise (.mise.toml)
-install_stylelint() {
-  local _T0_SL
-  _T0_SL=$(date +%s)
-  local _TITLE="Stylelint"
-  local _PROVIDER="npm:stylelint"
-
-  if ! has_lang_files "" "*.css *.scss *.less *.vue"; then
-    return 0
-  fi
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version stylelint)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
-
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
-    log_summary "Node" "Stylelint" "✅ Exists" "$_CUR_VER" "0"
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-  local _STAT_SL="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_SL="❌ Failed"
-  log_summary "Node" "Stylelint" "$_STAT_SL" "$(get_version stylelint)" "$(($(date +%s) - _T0_SL))"
-}
-
-# Purpose: Installs vitepress.
-# Delegate: Managed by mise (.mise.toml)
-install_vitepress() {
-  local _T0_VP
-  _T0_VP=$(date +%s)
-  local _TITLE="VitePress"
-  local _PROVIDER="npm:vitepress"
-
-  if [ ! -d docs ]; then
-    return 0
-  fi
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version vitepress)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
-
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
-    log_summary "Docs" "VitePress" "✅ Exists" "$_CUR_VER" "0"
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-  local _STAT_VP="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_VP="❌ Failed"
-  log_summary "Docs" "VitePress" "$_STAT_VP" "$(get_version vitepress)" "$(($(date +%s) - _T0_VP))"
-}
-
-# Purpose: Installs commitizen.
-# Delegate: Managed by mise (.mise.toml)
-install_commitizen() {
-  local _T0_CZ
-  _T0_CZ=$(date +%s)
-  local _TITLE="Commitizen"
-  local _PROVIDER="npm:commitizen"
-
-  if [ ! -f "package.json" ]; then
-    return 0
-  fi
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version commitizen)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
-
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
-    log_summary "Base" "Commitizen" "✅ Exists" "$_CUR_VER" "0"
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-  local _STAT_CZ="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_CZ="❌ Failed"
-  log_summary "Base" "Commitizen" "$_STAT_CZ" "$(get_version commitizen)" "$(($(date +%s) - _T0_CZ))"
-}
-
-# Purpose: Installs pip-audit for Python dependency vulnerability scanning.
-# NOTE: CI-only tool — security audit. Skipped on local environments.
 
 # Purpose: Installs pre-commit.
 # Delegate: Managed by mise (.mise.toml)
@@ -1702,7 +1552,7 @@ EOF
     tflint) install_tflint ;;
     kube-linter) install_kube_linter ;;
     editorconfig-checker) install_editorconfig_checker ;;
-    sort-package-json) install_sort_package_json ;;
+    sort-package-json) setup_node ;;
     goreleaser) setup_go ;;
     spectral) install_spectral ;;
     commitlint) install_commitlint ;;
@@ -1710,16 +1560,16 @@ EOF
     clang-format) install_clang_format ;;
     ktlint) setup_kotlin ;;
     ruff) setup_python ;;
-    stylelint) install_stylelint ;;
+    stylelint) setup_node ;;
     yamllint) install_yamllint ;;
     sqlfluff) install_sqlfluff ;;
     markdownlint) install_markdownlint ;;
     dotenv-linter) install_dotenv_linter ;;
     bats) install_bats ;;
     bats-libs) install_bats_libs ;;
-    eslint) install_eslint ;;
-    vitepress) install_vitepress ;;
-    commitizen) install_commitizen ;;
+    eslint) setup_node ;;
+    vitepress) setup_node ;;
+    commitizen) setup_node ;;
     pip-audit) setup_python ;;
     stylua) install_stylua ;;
     cue) install_cue ;;
