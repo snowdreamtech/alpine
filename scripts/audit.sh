@@ -103,8 +103,8 @@ main() {
     fi
   fi
 
-  # 5. Dependency Audits (Node.js)
-  if [ -f "$PACKAGE_JSON" ]; then
+  # 5. Dependency Audits (Node.js) — CI-only: network-heavy, slow on local dev.
+  if is_ci_env && [ -f "$PACKAGE_JSON" ]; then
     local _T0_JS
     _T0_JS=$(date +%s)
     log_info "\n── Auditing Node.js dependencies ($NPM audit) ──"
@@ -132,8 +132,8 @@ main() {
     fi
   fi
 
-  # 6. Dependency Audits (Python)
-  if [ -f "requirements-dev.txt" ] || [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; then
+  # 6. Dependency Audits (Python) — CI-only: network-heavy, slow on local dev.
+  if is_ci_env && { [ -f "requirements-dev.txt" ] || [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; }; then
     local _T0_PY_AUD
     _T0_PY_AUD=$(date +%s)
     log_info "\n── Auditing Python dependencies (pip-audit) ──"
@@ -160,8 +160,8 @@ main() {
     fi
   fi
 
-  # 7. Multi-Stack Audit (OSV-Scanner)
-  if run_quiet command -v osv-scanner; then
+  # 7. Multi-Stack Audit (OSV-Scanner) — CI-only: network-dependent, slow on local dev.
+  if is_ci_env && run_quiet command -v osv-scanner; then
     local _T0_OSV_AUD
     _T0_OSV_AUD=$(date +%s)
     log_info "\n── Generic Vulnerability Scan (osv-scanner) ──"
@@ -186,8 +186,8 @@ main() {
     fi
   fi
 
-  # 8. Stack Specific (Go/Rust/Containers)
-  if [ -f "go.mod" ]; then
+  # 8. Stack Specific (Go/Rust/Containers) — CI-only: slow network scans.
+  if is_ci_env && [ -f "go.mod" ]; then
     local _T0_GO_AUD
     _T0_GO_AUD=$(date +%s)
     log_info "\n── Auditing Go dependencies (govulncheck) ──"
@@ -209,7 +209,7 @@ main() {
     fi
   fi
 
-  if [ -f "Cargo.toml" ]; then
+  if is_ci_env && [ -f "Cargo.toml" ]; then
     local _T0_RS_AUD
     _T0_RS_AUD=$(date +%s)
     log_info "\n── Auditing Rust dependencies (cargo audit) ──"
@@ -231,7 +231,7 @@ main() {
     fi
   fi
 
-  if [ -f "Dockerfile" ] || [ -f "docker-compose.yml" ]; then
+  if is_ci_env && { [ -f "Dockerfile" ] || [ -f "docker-compose.yml" ]; }; then
     local _T0_DKR_AUD
     _T0_DKR_AUD=$(date +%s)
     log_info "\n── Auditing Containers (trivy) ──"
