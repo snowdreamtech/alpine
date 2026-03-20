@@ -2,15 +2,13 @@
 # Grain Logic Module
 
 # Purpose: Installs Grain via mise.
-# Delegate: Managed by mise (.mise.toml)
 install_runtime_grain() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Grain via mise."
     return 0
   fi
-
-  # shellcheck disable=SC2154
-  run_mise install "grain@$(get_mise_tool_version grain)"
+  # Version pinned in scripts/lib/versions.sh (VER_GRAIN_PROVIDER, VER_GRAIN)
+  run_mise install "${VER_GRAIN_PROVIDER}@${VER_GRAIN}"
 }
 
 # Purpose: Sets up Grain environment for project.
@@ -26,8 +24,7 @@ setup_grain() {
   # Fast-path: Check version-aware existence
   local _CUR_VER
   _CUR_VER=$(get_version grain)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "grain")
+  local _REQ_VER="${VER_GRAIN}"
 
   if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Runtime" "Grain" "✅ Detected" "$_CUR_VER" "0"

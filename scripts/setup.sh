@@ -27,6 +27,8 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 # shellcheck source=/dev/null
 . "$SCRIPT_DIR/lib/registry.sh"
+# shellcheck source=/dev/null
+. "$SCRIPT_DIR/lib/versions.sh"
 
 # ── Extension Modules Sourcing ───────────────────────────────────────────────
 # Dynamically load all language-specific setup modules.
