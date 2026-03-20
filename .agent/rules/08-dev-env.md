@@ -225,7 +225,9 @@
   | **Primary (First-Class)** | Node, Python, Git, Make | **Strict**: Exit with `1` (BROKEN) if missing or version too low. |
   | **Secondary (On-Demand)** | Go, PHP, Java, Rust, Docker, etc. | **Robust**: Skip with `⏭️` or warn but exit with `0` (FUNCTIONAL). |
 
-- **Language-Aware Detection**: Health checks MUST be context-sensitive. Secondary tools and runtimes (e.g., `golangci-lint`, `Ruby`) MUST only be checked/installed if corresponding source files or manifests (e.g., `go.mod`, `Gemfile`) are detected in the repository. This minimizes "Setup Noise" for single-language or focused contributors.
+- **Language-Aware & Dynamic Detection**: Health checks and tool installations MUST be context-sensitive.
+  - **Prerequisite Detection**: Secondary tools (e.g., `golangci-lint`, `asdf:ghc`) MUST only be installed if corresponding source files or manifests are detected.
+  - **Dynamic Registration**: To avoid the "Mise Tax" (slow resolution of unused tools), tools MUST NOT be pre-committed to `.mise.toml` unless they are core essentials. Use `mise use --local [tool]@[version]` within setup modules to dynamically register runtimes ONLY when detected. This combines a "Large & Comprehensive" template with "Lean & Fast" execution.
 
 - **Grouped UX & Selective Display**:
   - Output MUST be organized into logical groups (e.g., Core Infrastructure, Language Runtimes, Mobile Support).

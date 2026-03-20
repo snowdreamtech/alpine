@@ -20,6 +20,9 @@
 - **Robustness Principle (输入宽容、输出严谨)**: All components, scripts, and APIs MUST be tolerant of variations in input while remaining strict and standardized in their output.
   - **Input Tolerance**: Support variations such as case-insensitive version prefixes (`v`, `V`), trailing slashes in URLs, or flexible boolean strings (`true`, `1`, `yes`).
   - **Output Strictness**: Guarantee consistent, predictable, and standardized output formats (e.g., pure numeric version strings, canonicalized paths, strictly formatted JSON).
+- **Performance-First Setup (Best of Both Worlds)**: Setup scripts MUST balance comprehensiveness (supporting 80+ tools) with extreme lean performance.
+  - **Dynamic Registration**: Language-specific runtimes MUST NOT be pre-registered in the global `.mise.toml` if they are not active in the project. They MUST be dynamically added via `mise use --local` ONLY after detected through source file analysis.
+  - **The "Mise Tax" Mitigation**: Avoid "ghost tool" resolution by keeping the core `.mise.toml` pruned to universal essentials (Node, Python, Go, Shell linters).
 - **CLI-First Efficiency**: When performing research, validation, or environment inspection, command-line tools (CLI) MUST be prioritized over browser-based methods. Browser interaction should only be used as a secondary fallback when CLI tools are unavailable or insufficient for the task, to minimize latency and improve execution speed.
 - When a non-idempotent operation is unavoidable, guard it explicitly:
 
