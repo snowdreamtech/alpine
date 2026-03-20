@@ -51,8 +51,8 @@ gitleaks = "8.30.0"
 
 # ── 🎨 Language-Specific Toolsets (Lint/Fmt) ──────────────────────────────────
 golangci-lint = "1.64.5"
-"asdf:kcl" = "0.11.1"
-"asdf:pkl" = "0.31.0"
+"github:kcl-lang/kcl" = "v0.11.2"
+"github:apple/pkl" = "0.31.0"
 "github:JohnnyMorganz/StyLua" = "2.0.2"
 "github:bufbuild/buf" = "1.50.0"
 "github:cue-lang/cue" = "0.12.0"
@@ -86,9 +86,8 @@ golangci-lint = "1.64.5"
 "pipx:yamllint" = "1.38.0"
 
 # ── ☁️ DevOps & Infrastructure ────────────────────────────────────────────────
-"asdf:bazel" = "9.0.1"
+"github:bazelbuild/bazel" = "9.0.1"
 helm = "3.17.1"
-"asdf:spark" = "4.1.1"
 terraform = "1.11.0"
 terragrunt = "1.0.0-rc3"
 "github:ballerina-platform/ballerina-distribution" = "2201.11.0"
