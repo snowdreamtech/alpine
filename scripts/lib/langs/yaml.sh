@@ -19,7 +19,7 @@ install_yamllint() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Config" "Yamllint" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
@@ -53,7 +53,7 @@ install_dotenv_linter() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Config" "Dotenv-Linter" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi

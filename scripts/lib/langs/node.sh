@@ -61,7 +61,7 @@ install_sort_package_json() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Node" "sort-package-json" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
@@ -94,7 +94,7 @@ install_eslint() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "npm:eslint")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Node" "ESLint" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
@@ -128,7 +128,7 @@ install_stylelint() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Node" "Stylelint" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
@@ -153,11 +153,11 @@ install_vitepress() {
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
-  _CUR_VER=$(get_version vitepress)
+  _CUR_VER=$(get_version vitepress "" "vitepress")
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Docs" "VitePress" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
@@ -182,7 +182,7 @@ install_prettier() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Base" "Prettier" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
@@ -208,11 +208,11 @@ install_commitlint() {
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
-  _CUR_VER=$(get_version commitlint)
+  _CUR_VER=$(get_version commitlint "" "@commitlint/cli")
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Base" "Commitlint" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
@@ -242,11 +242,11 @@ install_commitizen() {
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
-  _CUR_VER=$(get_version commitizen)
+  _CUR_VER=$(get_version commitizen "" "commitizen")
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Base" "Commitizen" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
@@ -275,7 +275,7 @@ setup_node() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Runtime" "Node.js" "✅ Detected" "$_CUR_VER" "0"
   else
     _log_setup "$_TITLE" "$_PROVIDER"

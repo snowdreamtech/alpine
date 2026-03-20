@@ -28,7 +28,7 @@ setup_haskell() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "haskell")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Runtime" "Haskell" "✅ Detected" "$_CUR_VER" "0"
     return 0
   fi

@@ -67,7 +67,7 @@ install_goreleaser() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Go" "GoReleaser" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
@@ -101,7 +101,7 @@ setup_go() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Runtime" "Go" "✅ Detected" "$_CUR_VER" "0"
   else
     _log_setup "$_TITLE" "$_PROVIDER"

@@ -15,7 +15,7 @@ install_osv_scanner() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Security" "OSV-Scanner" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
@@ -45,7 +45,7 @@ install_trivy() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Security" "Trivy" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
@@ -79,7 +79,7 @@ install_zizmor() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Security" "Zizmor" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi
@@ -113,7 +113,7 @@ install_cargo_audit() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
+  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Security" "Cargo-Audit" "✅ Exists" "$_CUR_VER" "0"
     return 0
   fi

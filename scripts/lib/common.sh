@@ -353,12 +353,13 @@ run_mise() {
     local _R_VER
     _R_VER=$(get_mise_tool_version "$_T_CHECK")
     local _T_BASE
-    _T_BASE=$(echo "$_T_CHECK" | sed -E 's/^([^:]+:)?(@[^/]+\/)?//; s/.*\///')
+    _T_BASE=$(echo "$_T_CHECK" | sed -E 's/^([^:]+:)?(@[^/]+\/)?//; s/.*\///') # Fast-path: Check version-aware existence
     local _C_VER
     _C_VER=$(get_version "$_T_BASE" | tr -d '\r')
 
     if [ "$_C_VER" != "-" ] && [ -n "$_R_VER" ]; then
-      case "$_C_VER" in "$_R_VER"*) return 0 ;; esac
+      # Use prefix matching: e.g. 3.12.0.2 (required) matches 3.12.0 (current)
+      case "$_R_VER" in "$_C_VER"*) return 0 ;; esac
     fi
 
     # Native/Backend Manager Awareness
@@ -911,7 +912,7 @@ get_version() {
   # 1. Try Mise First (Fast & Reliable for JIT tools)
   # Check mise via cache first (fastest)
   local _MISE_VER_OUT
-  _MISE_VER_OUT=$(echo "$_G_MISE_LS_JSON_CACHE" | jq -r 'to_entries[] | select(.key == "'"$_M_PLUGIN"'" or (.key | endswith(":'"$_M_PLUGIN"'")) or (.key | endswith("/'"$_M_PLUGIN"'"))) | .value[] | select(.active==true) | .version' | head -n 1 || true)
+  _MISE_VER_OUT=$(echo "$_G_MISE_LS_JSON_CACHE" | jq -r 'to_entries[] | select(.key == "'"$_M_PLUGIN"'" or (.key | contains(":'"$_M_PLUGIN"'")) or (.key | contains("/'"$_M_PLUGIN"'"))) | .value[] | select(.active==true) | .version' | head -n 1 || true)
 
   if [ -n "$_MISE_VER_OUT" ] && [ "$_MISE_VER_OUT" != "null" ]; then
     echo "$_MISE_VER_OUT" && return 0
@@ -933,6 +934,10 @@ get_version() {
     java)
       # java -version outputs to stderr and puts version in quotes
       "$_CMD_VER" "$_ARG_VER" 2>&1 | sed -n 's/.*version "\([0-9][0-9.]*\).*/\1/p' | head -n 1
+      ;;
+    vitepress | docusaurus)
+      # Avoid running binaries that might start a dev server on --version/--help
+      echo "-"
       ;;
     *)
       # For other binaries, try to get version from the output
@@ -1183,6 +1188,24 @@ init_summary_table() {
   } >>"$SETUP_SUMMARY_FILE"
 
   eval "export $_SENTINEL_TABLE=true"
+}
+
+# Purpose: Checks if the current tool version matches the required version (prefix match).
+# Params:
+#   $1 - Current version (detected)
+#   $2 - Required version (from registry/.mise.toml)
+# Returns:
+#   0 - Match
+#   1 - Mismatch
+is_version_match() {
+  local _CUR_V_M="$1"
+  local _REQ_V_M="$2"
+  [ "${_CUR_V_M:- -}" = "-" ] && return 1
+  [ -z "$_REQ_V_M" ] && return 1
+  [ "$_REQ_V_M" = "latest" ] && return 0
+  # Use prefix match to handle diffs like 3.12.0.2 (pkg) vs 3.12.0 (binary)
+  case "$_REQ_V_M" in "$_CUR_V_M"*) return 0 ;; esac
+  return 1
 }
 
 # ── Extension Modules Sourcing ──

@@ -13,15 +13,16 @@ install_shfmt() {
     return 0
   fi
 
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
+  # Fast-path: Check version-aware existence (prefix match to handle pkg vs binary diffs)
   _CUR_VER=$(get_version shfmt "" "shfmt-py")
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "pipx:shfmt-py")
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
-    log_summary "Base" "Shfmt" "✅ Exists" "$_CUR_VER" "0"
-    return 0
+  if [ "$_CUR_VER" != "-" ] && [ -n "$_REQ_VER" ]; then
+    case "$_REQ_VER" in "$_CUR_VER"*)
+      log_summary "Base" "Shfmt" "✅ Exists" "$_CUR_VER" "0"
+      return 0
+      ;;
+    esac
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
@@ -43,17 +44,19 @@ install_shellcheck() {
   fi
 
   # Fast-path: Check version-aware existence
-  local _CUR_VER
   _CUR_VER=$(get_version shellcheck "" "shellcheck-py")
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "pipx:shellcheck-py")
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
-  # Special Case: Shellcheck version check can be 'latest'
   if [ "$_CUR_VER" != "-" ]; then
-    if [ "$_CUR_VER" = "$_REQ_VER" ] || [ "$_REQ_VER" = "latest" ]; then
+    if [ "$_REQ_VER" = "latest" ]; then
       log_summary "Base" "Shellcheck" "✅ Exists" "$_CUR_VER" "0"
       return 0
     fi
+    case "$_REQ_VER" in "$_CUR_VER"*)
+      log_summary "Base" "Shellcheck" "✅ Exists" "$_CUR_VER" "0"
+      return 0
+      ;;
+    esac
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
@@ -74,14 +77,15 @@ install_actionlint() {
   fi
 
   # Fast-path: Check version-aware existence
-  local _CUR_VER
   _CUR_VER=$(get_version actionlint "" "actionlint-py")
-  local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
 
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
-    log_summary "Base" "Actionlint" "✅ Exists" "$_CUR_VER" "0"
-    return 0
+  if [ "$_CUR_VER" != "-" ] && [ -n "$_REQ_VER" ]; then
+    case "$_REQ_VER" in "$_CUR_VER"*)
+      log_summary "Base" "Actionlint" "✅ Exists" "$_CUR_VER" "0"
+      return 0
+      ;;
+    esac
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
