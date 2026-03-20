@@ -778,7 +778,8 @@ has_lang_files() {
     esac
 
     # Use find for POSIX compatibility and performance
-    if [ "$(find . \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify -o -name .tmp -o -name tmp \) -prune -o -maxdepth 5 -name "$_ext_lang" -print -quit 2>/dev/null)" ]; then
+    # Prune common build/dependency/cache/AI/IDE directories to ensure speed
+    if [ "$(find . \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify -o -name .tmp -o -name tmp -o -name .agent -o -name .agents -o -name .gemini -o -name .trae -o -name .windsurf -o -name .cursor -o -name .cline -o -name .roo -o -name .aide -o -name .bob -o -name .pi -o -name .adal -o -name .aide -o -name .zencoder -o -name .supermaven -o -name .neovate -o -name .qoder -o -name .kode -o -name .mux -o -name .shai -o -name .vibe -o -name .void -o -name .factory -o -name .bob -o -name .crush -o -name .pi -o -name .pochi -o -name .opencode -o -name .iflow -o -name .kilocode -o -name .bito -o -name .amazonq -o -name .codeium -o -name .tabnine -o -name .codegeex -o -name .blackbox -o -name .cody -o -name .continue -o -name .codebuddy -o -name .codex -o -name .cortex -o -name .openhands -o -name .melty -o -name .pearai -o -name .mcpjam -o -name .aider.conf.yml -o -name .commandcode -o -name .goose -o -name .aide -o -name .bob -o -name .pi -o -name .adal \) -prune -o -maxdepth 5 -name "$_ext_lang" -print -quit 2>/dev/null)" ]; then
       return 0
     fi
   done
