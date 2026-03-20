@@ -566,6 +566,6 @@ install_example_tool() {
 
 Refer to the following individual files for deeper language-specific shell patterns:
 
-- [swift.md](file://./swift.md) — Swift-specific linter and runtime logic.
-- [javascript.md](file://./javascript.md) — Node/npm/pnpm management patterns.
-- [rust.md](file://./rust.md) — Cargo and rustup integration patterns.
+- [swift.md](./swift.md) — Swift-specific linter and runtime logic.
+- [javascript.md](./javascript.md) — Node/npm/pnpm management patterns.
+- [rust.md](./rust.md) — Cargo and rustup integration patterns.
