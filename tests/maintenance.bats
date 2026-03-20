@@ -30,7 +30,7 @@ setup() {
   cat <<EOF >.mise.toml
 [tools]
 node = "20.18.3"
-pnpm = "9.0.0"
+pnpm = "10.30.3"
 python = "3.12.9"
 gitleaks = "8.30.0"
 osv-scanner = "2.3.3"
@@ -48,7 +48,7 @@ EOF
   export PATH="$TEMP_DIR/bin:$PATH"
 
   printf '#!/usr/bin/env sh\necho "v20.18.3"\n' >"$TEMP_DIR/bin/node"
-  printf '#!/usr/bin/env sh\necho "9.0.0"\n' >"$TEMP_DIR/bin/pnpm"
+  printf '#!/usr/bin/env sh\necho "10.30.3"\n' >"$TEMP_DIR/bin/pnpm"
   printf '#!/usr/bin/env sh\necho "git version 2.30.0"\n' >"$TEMP_DIR/bin/git"
   printf '#!/usr/bin/env sh\necho "GNU Make 3.81"\n' >"$TEMP_DIR/bin/make"
   printf '#!/usr/bin/env sh\necho "3.6.1"\n' >"$TEMP_DIR/bin/editorconfig-checker"

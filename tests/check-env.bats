@@ -18,7 +18,7 @@ setup() {
   cat <<EOF >.mise.toml
 [tools]
 node = "20.18.3"
-pnpm = "9.0.0"
+pnpm = "10.30.3"
 python = "3.12.9"
 gitleaks = "8.30.0"
 osv-scanner = "2.3.3"
@@ -49,14 +49,14 @@ teardown() {
   # shellcheck disable=SC2030,SC2031
   export PATH="$TEMP_DIR/bin:$PATH"
   printf '#!/usr/bin/env sh\necho "v24.1.0"\n' >"$TEMP_DIR/bin/node"
-  printf '#!/usr/bin/env sh\necho "8.0.0"\n' >"$TEMP_DIR/bin/pnpm"
+  printf '#!/usr/bin/env sh\necho "9.0.0"\n' >"$TEMP_DIR/bin/pnpm"
   printf '#!/usr/bin/env sh\necho "Python 3.10.0"\n' >"$TEMP_DIR/bin/python3"
   printf '#!/usr/bin/env sh\necho "git version 2.30.0"\n' >"$TEMP_DIR/bin/git"
   printf '#!/usr/bin/env sh\necho "GNU Make 3.81"\n' >"$TEMP_DIR/bin/make"
   chmod +x "$TEMP_DIR/bin/"*
 
   run sh scripts/check-env.sh
-  assert_output --partial "below recommended v9.0.0"
+  assert_output --partial "below recommended v10.30.3"
 }
 
 @test "check-env.sh: reports warning when Python version is too low" {
