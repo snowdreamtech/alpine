@@ -1289,11 +1289,11 @@ EOF
   if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
     # Grouped list for "On-demand" (default) or "All" (explicit)
     # 1. Base Tools (Universal Lint/Format/Task)
-    local _BASE_LIST="pipx gitleaks checkmake editorconfig-checker shfmt shellcheck actionlint taplo prettier commitlint commitizen pre-commit hooks cue yamllint markdownlint dotenv-linter just task sort-package-json stylua clang-format"
+    local _BASE_LIST="pipx gitleaks checkmake editorconfig-checker shfmt shellcheck actionlint taplo env-linter prettier commitlint hooks cue yamllint markdownlint dotenv-linter just task"
     # 2. Language Runtimes & Specific Toolsets
     local _LANG_LIST="node python go rust java kotlin php ruby dart swift lua perl julia r groovy dotnet zig elixir haskell scala"
     # 3. Domain Tools (Security, IaC, Platforms, Testing, Docs, AI, etc.)
-    local _DOMAIN_LIST="osv-scanner trivy zizmor govulncheck cargo-audit pip-audit rego hadolint tflint kube-linter tofu pulumi crossplane spectral buf goreleaser playwright cypress vitest bats bats-libs vitepress docusaurus mkdocs sphinx jupyter dvc rn ruff eslint stylelint sqlfluff ktlint dockerfile-utils"
+    local _DOMAIN_LIST="osv-scanner trivy zizmor rego hadolint tofu pulumi crossplane spectral buf goreleaser playwright cypress vitest bats bats-libs docusaurus mkdocs sphinx jupyter dvc rn sqlfluff dockerfile-utils"
 
     _MODULES_LIST="${_BASE_LIST} ${_LANG_LIST} ${_DOMAIN_LIST}"
   else
