@@ -913,7 +913,8 @@ get_version() {
   # 1. Try Mise First (Fast & Reliable for JIT tools)
   # Check mise via cache first (fastest)
   local _MISE_VER_OUT
-  _MISE_VER_OUT=$(echo "$_G_MISE_LS_JSON_CACHE" | jq -r 'to_entries[] | select(.key == "'"$_M_PLUGIN"'" or (.key | contains(":'"$_M_PLUGIN"'")) or (.key | contains("/'"$_M_PLUGIN"'"))) | .value[] | select(.active==true) | .version' | head -n 1 || true)
+  # Optimization: Include 'installed' tools even if not 'active' to avoid slow shim fallbacks
+  _MISE_VER_OUT=$(echo "$_G_MISE_LS_JSON_CACHE" | jq -r "to_entries[] | select(.key == \"$_M_PLUGIN\" or (.key | contains(\":$_M_PLUGIN\")) or (.key | contains(\"/$_M_PLUGIN\"))) | .value[] | select(.active==true or .installed==true) | .version" | head -n 1 || true)
 
   if [ -n "$_MISE_VER_OUT" ] && [ "$_MISE_VER_OUT" != "null" ]; then
     echo "$_MISE_VER_OUT" && return 0
@@ -943,7 +944,8 @@ get_version() {
     *)
       # For other binaries, try to get version from the output
       # We strip 'v' or 'V' prefix and focus on the version number
-      "$_CMD_VER" "$_ARG_VER" 2>&1 | sed 's/^[vV]//' | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
+      # Use MISE_OFFLINE=1 to prevent shims from trying to resolve versions over network
+      MISE_OFFLINE=1 "$_CMD_VER" "$_ARG_VER" 2>&1 | sed 's/^[vV]//' | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
       ;;
     esac
   else
