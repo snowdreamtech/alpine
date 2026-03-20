@@ -635,9 +635,9 @@ repos:
       - id: zizmor
         name: zizmor security audit
         language: system
-        entry: sh scripts/lib/lint-wrapper.sh zizmor
+        entry: sh scripts/lib/lint-wrapper.sh zizmor --no-online-audits
         files: ^\.github/workflows/.*\.yml$
-        description: "Audit GitHub Actions workflows for security vulnerabilities."
+        description: "Audit GitHub Actions workflows for security vulnerabilities (offline; full online audit runs in CI audit job)."
 
       - id: check-taskfile
         name: check taskfile

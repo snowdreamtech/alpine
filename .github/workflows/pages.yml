@@ -77,7 +77,9 @@ jobs:
       - name: "📦 Install Documentation Dependencies"
         shell: sh
         run: |
-          cd docs && pnpm install
+          # Use 'mise exec' to ensure pnpm is resolved via mise shims
+          # even when the mise shell integration is not activated.
+          mise exec -- pnpm --dir docs install
 
       - name: "🚀 Compile Documentation Artifacts"
         shell: sh

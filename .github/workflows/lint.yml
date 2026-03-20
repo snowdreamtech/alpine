@@ -157,6 +157,29 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
+          # Mise installs each npm package in its own isolated directory, so
+          # @commitlint/cli cannot find @commitlint/config-conventional via the
+          # default Node.js module resolution (starting from the project root).
+          # Fix: build NODE_PATH to include every mise npm package's node_modules.
+          _OS=$(uname -s)
+          case "$_OS" in
+            MINGW*|MSYS*|CYGWIN*)
+              _MISE_NPM_BASE="${LOCALAPPDATA}/mise/installs"
+              ;;
+            *)
+              _MISE_NPM_BASE="${HOME}/.local/share/mise/installs"
+              ;;
+          esac
+
+          _EXTRA_NODE_PATH=""
+          if [ -d "$_MISE_NPM_BASE" ]; then
+            for _pkg_dir in "$_MISE_NPM_BASE"/npm-*/*/lib/node_modules; do
+              [ -d "$_pkg_dir" ] || continue
+              _EXTRA_NODE_PATH="${_EXTRA_NODE_PATH}${_EXTRA_NODE_PATH:+:}${_pkg_dir}"
+            done
+          fi
+          export NODE_PATH="${_EXTRA_NODE_PATH}${_EXTRA_NODE_PATH:+:}${NODE_PATH:-}"
+
           if [ "$EVENT_NAME" = "pull_request" ]; then
             mise exec -- commitlint --from "$BASE_SHA" --to "$HEAD_SHA" --verbose
           else
