@@ -79,6 +79,8 @@ jobs:
       - name: "🔗 Synchronize Manifests & Lockfiles"
         if: ${{ steps.release.outputs.pr }}
         shell: sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           # Git configuration for automated commit
           git config user.name "github-actions[bot]"
@@ -99,4 +101,4 @@ jobs:
           # Commit and Push synchronization changes back to the PR
           git add .
           git commit -m "chore(release): synchronize lockfiles for version bump" || echo "No changes to sync"
-          git push origin HEAD
+          git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD
