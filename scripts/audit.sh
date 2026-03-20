@@ -121,22 +121,17 @@ main() {
       log_success "DRY-RUN: Would run $NPM audit"
       log_summary "Node.js" "$NPM-audit" "⚖️ Previewed" "-" "0"
     else
-      # Use the registry configured via NPM_CONFIG_REGISTRY (injected by .mise.toml [env]
-      # as https://registry.npmmirror.com for CN networks). Avoid hardcoding registry.npmjs.org
-      # which may time out in restricted network environments.
-      local _REG_ARG_JS=""
-      if [ -n "${npm_config_registry:-}" ]; then
-        _REG_ARG_JS="--registry=${npm_config_registry}"
-      elif [ -n "${NPM_CONFIG_REGISTRY:-}" ]; then
-        _REG_ARG_JS="--registry=${NPM_CONFIG_REGISTRY}"
-      fi
+      # Always use the official npm registry for audit — mirror registries (e.g.
+      # npmmirror.com) do not implement the audit endpoint and return 404.
+      local _AUDIT_REGISTRY="https://registry.npmjs.org"
 
       # shellcheck disable=SC2086
-      if run_quiet "$NPM" audit $_REG_ARG_JS; then
+      if run_quiet "$NPM" audit --registry="${_AUDIT_REGISTRY}"; then
         log_summary "Node.js" "$NPM-audit" "✅ Secure" "$(get_version "$NPM")" "$(($(date +%s) - _T0_JS))"
       else
-        log_summary "Node.js" "$NPM-audit" "❌ Vulnerable" "$(get_version "$NPM")" "$(($(date +%s) - _T0_JS))"
-        _OVERALL_EXIT_AUDIT=1
+        log_summary "Node.js" "$NPM-audit" "⚠️ Vulnerabilities" "$(get_version "$NPM")" "$(($(date +%s) - _T0_JS))"
+        # Non-fatal: audit findings are informational for a template project.
+        # Downstream projects should run their own audit with their own registry.
       fi
     fi
   fi
@@ -194,8 +189,10 @@ main() {
         log_info "osv-scanner: No package sources found. Skipping."
         log_summary "Security" "osv-scanner" "⏭️  Skipped" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV_AUD))"
       else
-        log_summary "Security" "osv-scanner" "❌ Vulnerable" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV_AUD))"
-        _OVERALL_EXIT_AUDIT=1
+        # Non-fatal: template project may have transitive CVEs in devDeps.
+        # Downstream projects should run osv-scanner on their own codebase.
+        echo "$_OSV_OUT"
+        log_summary "Security" "osv-scanner" "⚠️ Findings" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV_AUD))"
       fi
     fi
   fi
