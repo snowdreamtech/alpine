@@ -14,6 +14,7 @@
 # (Variables are used by sourcing scripts: lang modules and setup.sh)
 
 # ── 🏗️ Language Runtimes ──────────────────────────────────────────────────────
+VER_GO="1.23.6"
 VER_RUST="1.85.0"
 VER_BUN="1.2.4"
 VER_DENO="2.2.2"
