@@ -180,8 +180,11 @@ EOF
 
   # ── Mode & Module Selection ──
   local _IS_ALL_MODULES=false
+  # Default to LEAN mode (skip heavyweight quality/security tools) unless ALL is specified or LEAN=0
+  local _LEAN_MODE="${LEAN:-1}"
   if echo " ${_RAW_ARGS} " | grep -q " all "; then
     _IS_ALL_MODULES=true
+    _LEAN_MODE=0
   fi
 
   local _MODULES_LIST
@@ -194,7 +197,21 @@ EOF
     _MODULES_LIST="${_RAW_ARGS}"
   fi
 
-  # ── Module Skipping & Filtering ──
+  # ── LEAN Mode Filtering ──
+  if [ "$_LEAN_MODE" = "1" ] || [ "$_LEAN_MODE" = "true" ]; then
+    local _QUALITY_MODULES="markdown yaml toml security docs testing ai helm k8s terragrunt"
+    local _LEAN_LIST=""
+    for _m in $_MODULES_LIST; do
+      case " ${_QUALITY_MODULES} " in *" ${_m} "*)
+        log_debug "Skipping module in LEAN mode: $_m"
+        ;;
+      *) _LEAN_LIST="${_LEAN_LIST} ${_m}" ;;
+      esac
+    done
+    _MODULES_LIST=$_LEAN_LIST
+  fi
+
+  # ── Module Skipping & Filtering (SKIP_MODULES) ──
   if [ -n "$SKIP_MODULES" ]; then
     local _NEW_LIST=""
     for _m in $_MODULES_LIST; do

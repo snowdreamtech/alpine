@@ -10,7 +10,7 @@ install_runtime_helm() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "helm@$(get_mise_tool_version helm)"
+  run_with_timeout 120 run_mise install "helm@$(get_mise_tool_version helm)"
 }
 
 # Purpose: Installs kube-linter.
@@ -26,7 +26,7 @@ install_kube_linter() {
 
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_KL="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_KL="❌ Failed"
+  run_with_timeout 120 run_mise install "$_PROVIDER" || _STAT_KL="❌ Failed"
   log_summary "IaC" "Kube-Linter" "$_STAT_KL" "$(get_version kube-linter version)" "$(($(date +%s) - _T0_KL))"
 }
 

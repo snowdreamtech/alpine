@@ -253,6 +253,22 @@ fi
 # shellcheck source=/dev/null
 . "${_G_LIB_DIR}/bootstrap.sh"
 
+# Purpose: Runs a command with a timeout, handling gtimeout (macOS) and timeout (Linux).
+# Params:
+#   $1 - Timeout in seconds
+#   $@ - Command and arguments
+run_with_timeout() {
+  local _SEC="$1"
+  shift
+  if command -v gtimeout >/dev/null 2>&1; then
+    gtimeout "$_SEC" "$@"
+  elif command -v timeout >/dev/null 2>&1; then
+    timeout "$_SEC" "$@"
+  else
+    "$@"
+  fi
+}
+
 # ── 🌐 Network Optimization ──────────────────────────────────────────────────
 
 # Purpose: Dynamically detects network connectivity and applies mirrors/proxies.
