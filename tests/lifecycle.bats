@@ -7,6 +7,8 @@ setup() {
   # Create a temporary workspace
   export TEMP_DIR
   unset _SNOWDREAM_TOP_LEVEL_SCRIPT
+  unset _G_PROJECT_ROOT
+  unset _G_LIB_DIR
   TEMP_DIR="$(mktemp -d)"
   cp -r scripts "$TEMP_DIR/"
 
