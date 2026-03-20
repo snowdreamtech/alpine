@@ -49,25 +49,75 @@ Suites (default: all):
 EOF
 }
 
+# Purpose: Ensures bats helper libraries (bats-support, bats-assert) are installed
+# in tests/vendor/ before running any .bats test files.
+# The vendor/ directory is git-ignored; this function installs them on-demand.
+# Examples:
+#   _ensure_bats_vendor
+_ensure_bats_vendor() {
+  local _VENDOR_DIR="tests/vendor"
+  local _BATS_SUPPORT_DIR="$_VENDOR_DIR/bats-support"
+  local _BATS_ASSERT_DIR="$_VENDOR_DIR/bats-assert"
+
+  if [ -f "$_BATS_SUPPORT_DIR/load.bash" ] && [ -f "$_BATS_ASSERT_DIR/load.bash" ]; then
+    return 0
+  fi
+
+  log_info "Installing bats test helper libraries into $_VENDOR_DIR ..."
+  mkdir -p "$_VENDOR_DIR"
+
+  if ! command -v git >/dev/null 2>&1; then
+    log_warn "git not found; cannot install bats vendor libraries. Skipping."
+    return 1
+  fi
+
+  # bats-support
+  if [ ! -f "$_BATS_SUPPORT_DIR/load.bash" ]; then
+    git clone --depth=1 --quiet \
+      "https://github.com/bats-core/bats-support.git" \
+      "$_BATS_SUPPORT_DIR" 2>/dev/null ||
+      git clone --depth=1 --quiet \
+        "https://ghproxy.cn/github.com/bats-core/bats-support.git" \
+        "$_BATS_SUPPORT_DIR"
+  fi
+
+  # bats-assert
+  if [ ! -f "$_BATS_ASSERT_DIR/load.bash" ]; then
+    git clone --depth=1 --quiet \
+      "https://github.com/bats-core/bats-assert.git" \
+      "$_BATS_ASSERT_DIR" 2>/dev/null ||
+      git clone --depth=1 --quiet \
+        "https://ghproxy.cn/github.com/bats-core/bats-assert.git" \
+        "$_BATS_ASSERT_DIR"
+  fi
+
+  log_info "bats vendor libraries installed."
+}
+
 # Purpose: Executes Shell-specific test suites using the bats framework.
 # Scans the tests/ directory for .bats files.
 # Examples:
 #   run_shell_tests
 run_shell_tests() {
-  if [ -d "tests" ] && find tests -name "*.bats" | grep -q .; then
+  if [ -d "tests" ] && find tests -name "*.bats" 2>/dev/null | grep -q .; then
     log_info "── Running Shell Tests (bats) ──"
     local _BATS_BIN
     _BATS_BIN=$(resolve_bin "bats")
 
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would run bats tests in tests/"
+      return 0
     elif [ -n "$_BATS_BIN" ]; then
-      "$_BATS_BIN" tests/
+      # Ensure bats helper libraries are present before running tests
+      _ensure_bats_vendor
+      "$_BATS_BIN" tests/ && return 0
     else
       log_warn "Warning: bats not found. Skipping shell tests."
+      return 0
     fi
   else
     log_debug "No .bats files found in tests/. Skipping shell tests."
+    return 0
   fi
 }
 
