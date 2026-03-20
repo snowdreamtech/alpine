@@ -85,7 +85,7 @@ jobs:
         shell: sh
         run: |
           # Executes the static site generator (VitePress) to build the production frontend.
-          vitepress build docs
+          mise exec -- vitepress build docs
 
       - name: "📦 Stage Assets for Web Deployment"
         uses: actions/upload-pages-artifact@v4.0.0
