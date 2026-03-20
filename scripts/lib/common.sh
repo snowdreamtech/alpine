@@ -959,7 +959,7 @@ get_version() {
   }
 
   local _BIN_PATH
-  _BIN_PATH=$(command -v "$_CMD_VER" 2>/dev/null)
+  _BIN_PATH=$(command -v "$_CMD_VER" 2>/dev/null || true)
 
   # 1. Try Mise First (Fast & Reliable for JIT tools)
   # But ONLY if it's a mise shim or not in PATH. If it's a real binary in PATH (mock/system), use it.
