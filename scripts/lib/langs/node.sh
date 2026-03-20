@@ -140,6 +140,11 @@ install_stylelint() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Node" "Stylelint" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_SL="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_SL="❌ Failed"
   log_summary "Node" "Stylelint" "$_STAT_SL" "$(get_version stylelint)" "$(($(date +%s) - _T0_SL))"
@@ -169,6 +174,11 @@ install_vitepress() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Docs" "VitePress" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_VP="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_VP="❌ Failed"
   log_summary "Docs" "VitePress" "$_STAT_VP" "$(get_version vitepress)" "$(($(date +%s) - _T0_VP))"
@@ -258,6 +268,11 @@ install_commitizen() {
   fi
 
   _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "Commitizen" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
   local _STAT_CZ="✅ mise"
   run_mise install "$_PROVIDER" || _STAT_CZ="❌ Failed"
   log_summary "Base" "Commitizen" "$_STAT_CZ" "$(get_version commitizen)" "$(($(date +%s) - _T0_CZ))"
