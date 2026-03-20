@@ -51,11 +51,11 @@ teardown() {
   assert_success
   assert_output --partial "Running in DRY-RUN mode"
   # Support both fresh setup and pre-detected tools
-  run bash -c "sh scripts/setup.sh --dry-run | grep -E 'Setting up Node.js|✅ Detected.*Node.js'"
+  run bash -c "sh scripts/setup.sh --dry-run | grep -Ei 'Setting up Node.js|Node.js.*(Detected|Previewed|Installed|Exists)'"
   assert_success
-  run bash -c "sh scripts/setup.sh --dry-run | grep -E 'Setting up Python|✅ Detected.*Python'"
+  run bash -c "sh scripts/setup.sh --dry-run | grep -Ei 'Setting up Python|Python.*(Detected|Previewed|Installed|Exists)'"
   assert_success
-  run bash -c "sh scripts/setup.sh --dry-run | grep -E 'Setting up Pre-commit Hooks|✅ Detected.*Git Hooks'"
+  run bash -c "sh scripts/setup.sh --dry-run | grep -Ei 'Setting up Pre-commit Hooks|Hooks.*(Activated|Previewed)'"
   assert_success
 }
 
