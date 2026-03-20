@@ -170,6 +170,20 @@ EOF
     _MODULES_LIST="${_RAW_ARGS}"
   fi
 
+  # ── Module Skipping & Filtering ──
+  if [ -n "$SKIP_MODULES" ]; then
+    local _NEW_LIST=""
+    for _m in $_MODULES_LIST; do
+      case " ${SKIP_MODULES} " in *" ${_m} "*)
+        log_warn "Skipping module per SKIP_MODULES: $_m"
+        log_summary "Skipped" "$_m" "⏭️ Stopped" "-" "0"
+        ;;
+      *) _NEW_LIST="${_NEW_LIST} ${_m}" ;;
+      esac
+    done
+    _MODULES_LIST=$_NEW_LIST
+  fi
+
   # 5. Bootstrap Toolchain Manager
   bootstrap_mise || log_warn "Warning: mise bootstrap failed. Falling back to local tool installation."
 

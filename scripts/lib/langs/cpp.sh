@@ -44,7 +44,7 @@ install_clang_format() {
 
 # Purpose: Sets up C/C++ environment for project.
 setup_cpp() {
-  if ! has_lang_files "CMakeLists.txt Makefile" "*.cpp *.c *.cc *.h *.hpp"; then
+  if ! has_lang_files "CMakeLists.txt WORKSPACE .clang-format .clang-tidy" "*.cpp *.cc *.cxx *.h *.hpp *.hh"; then
     return 0
   fi
 

@@ -340,141 +340,75 @@ run_mise() {
   shift
 
   # Guard: Unset potentially invalid GITHUB_TOKEN to avoid 401 errors for GitHub-based tools.
-  # This is safe because our mirrors and global proxy handle connectivity.
   local _OLD_GITHUB_TOKEN="$GITHUB_TOKEN"
   unset GITHUB_TOKEN
 
-  # (Mise install is generally fast, but checking avoids overhead)
+  local _M_BIN
+  _M_BIN=$(command -v mise || echo "$HOME/.local/bin/mise")
+  [ "$_G_OS" = "windows" ] && [ ! -x "$_M_BIN" ] && _M_BIN="${_M_BIN}.exe"
+
+  # Performance Opt: Skip installation if version already matches SSoT
   if [ "$_CMD" = "install" ] && [ -n "$1" ]; then
-    local _TOOL_CHECK="$1"
+    local _T_CHECK="$1"
+    local _R_VER
+    _R_VER=$(get_mise_tool_version "$_T_CHECK")
+    local _T_BASE
+    _T_BASE=$(echo "$_T_CHECK" | sed -E 's/^([^:]+:)?(@[^/]+\/)?//; s/.*\///')
+    local _C_VER
+    _C_VER=$(get_version "$_T_BASE" | tr -d '\r')
 
-    # 1. Required Version from .mise.toml (SSoT)
-    local _REQ_VER
-    _REQ_VER=$(get_mise_tool_version "$_TOOL_CHECK")
-
-    # 2. Normalize binary name for check (strip prefixes and Stoplight scope etc)
-    local _TOOL_BASE
-    _TOOL_BASE=$(echo "$_TOOL_CHECK" | sed -E 's/^([^:]+:)?(@[^/]+\/)?//; s/.*\///')
-
-    # 3. Current Version Check
-    local _CUR_VER
-    _CUR_VER=$(get_version "$_TOOL_BASE" | tr -d '\r')
-
-    # 4. Rigorous Comparison (Ensures exact match or prefix)
-    if [ "$_CUR_VER" != "-" ] && [ -n "$_REQ_VER" ]; then
-      case "$_CUR_VER" in
-      "$_REQ_VER"*)
-        # Skip if version matches (Instant skip if using cached state)
-        return 0
-        ;;
-      esac
+    if [ "$_C_VER" != "-" ] && [ -n "$_R_VER" ]; then
+      case "$_C_VER" in "$_R_VER"*) return 0 ;; esac
     fi
 
-    # 5. Backend-aware Manager Existence Check
-    case "$_TOOL_CHECK" in
+    # Native/Backend Manager Awareness
+    case "$_T_CHECK" in
     cargo:*)
       if ! command -v cargo >/dev/null 2>&1; then
-        log_error "Cannot install '$_TOOL_CHECK': 'cargo' (Rust) is missing. Please install Rust first."
-        return 1
+        log_error "Cannot install '$_T_CHECK': 'cargo' (Rust) is missing." && return 1
       fi
       ;;
     go:*)
       if ! command -v go >/dev/null 2>&1; then
-        log_error "Cannot install '$_TOOL_CHECK': 'go' (Golang) is missing. Please install Go first."
-        return 1
-      fi
-      ;;
-    pipx:*)
-      if ! command -v pipx >/dev/null 2>&1; then
-        log_info "pipx not found — bootstrapping..."
-        local _M_BIN_PIPX
-        _M_BIN_PIPX=$(command -v mise 2>/dev/null || echo "$_G_MISE_BIN_BASE/mise")
-        [ "$_G_OS" = "windows" ] && [ ! -x "$_M_BIN_PIPX" ] && _M_BIN_PIPX="${_M_BIN_PIPX}.exe"
-
-        if [ "$_G_OS" = "windows" ]; then
-          # On Windows, pipx via mise (aqua) often fails. Use pip fallback.
-          python -m pip install --user pipx >/dev/null 2>&1 || true
-        else
-          # Install pipx without GITHUB_TOKEN
-          "$_M_BIN_PIPX" install pipx >/dev/null 2>&1 || true
-        fi
-
-        # Ensure mise shims and pipx paths are available
-        # pipx on windows typically installs to USERPROFILE/AppData/Local/pipx/pipx/bin or similar,
-        # but the shim is usually in the python scripts folder if installed via pip --user.
-        export PATH="$_G_MISE_SHIMS_BASE:$_G_MISE_BIN_BASE:$PATH"
-        if ! command -v pipx >/dev/null 2>&1; then
-          log_error "Cannot install '$_TOOL_CHECK': 'pipx' is missing even after bootstrap. Please run 'make setup' or install pipx first."
-          export GITHUB_TOKEN="$_OLD_GITHUB_TOKEN"
-          return 1
-        fi
+        log_error "Cannot install '$_T_CHECK': 'go' (Golang) is missing." && return 1
       fi
       ;;
     npm:*)
       if ! command -v npm >/dev/null 2>&1; then
-        log_error "Cannot install '$_TOOL_CHECK': 'npm' (Node.js) is missing. Please install Node.js first."
-        return 1
+        log_error "Cannot install '$_T_CHECK': 'npm' (Node.js) is missing." && return 1
       fi
       ;;
     esac
-
-    log_debug "Tool $_TOOL_BASE (current: $_CUR_VER, required: $_REQ_VER) needs initialization/update."
   fi
 
-  # ── Attempt 1: Standard Execution ──
-  optimize_network
+  # ── Execution with Retry & Timeout ──
   local _MAX_RETRIES=3
   local _RETRY_COUNT=0
   local _STATUS=1
+  local _T_OUT=60 # 60s timeout for network-heavy tasks (kotlin, ghc, etc.)
 
-  # Defensive: Ensure mise is available even if PATH is slightly out of sync
-  local _M_BIN
-  _M_BIN=$(command -v mise || echo "$HOME/.local/bin/mise")
-
-  # Propagate verbosity to mise
   local _MISE_OPTS=""
-  if [ "${VERBOSE:-1}" -ge 2 ]; then
-    _MISE_OPTS="--verbose"
-  fi
+  if [ "${VERBOSE:-1}" -ge 2 ]; then _MISE_OPTS="--verbose"; fi
 
   while [ $_RETRY_COUNT -lt $_MAX_RETRIES ]; do
-    # ── Intelligent Fallback ──
-    # If first attempt failed and we have a global git proxy active,
-    # try running with proxy disabled for subsequent attempts.
-    if [ $_RETRY_COUNT -gt 0 ]; then
-      log_warn "Retrying with direct connection (bypassing all git proxies)..."
-      (
-        export GIT_CONFIG_GLOBAL=/dev/null
-        export GIT_CONFIG_SYSTEM=/dev/null
-        if [ "${VERBOSE:-1}" -le 0 ]; then
-          # shellcheck disable=SC2086
-          MISE_QUIET=1 "$_M_BIN" $_MISE_OPTS "$_CMD" "$@" >/dev/null 2>&1
-        else
-          # shellcheck disable=SC2086
-          "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"
-        fi
-      )
-      _STATUS=$?
-      [ $_STATUS -eq 0 ] && break
-      # If command failed due to interruption (SIGINT/SIGTERM), exit immediately
-      [ $_STATUS -gt 128 ] && return $_STATUS
+    # Wrap in timeout if available
+    if command -v gtimeout >/dev/null 2>&1; then
+      # shellcheck disable=SC2086
+      gtimeout "$_T_OUT" "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"
+    elif command -v timeout >/dev/null 2>&1; then
+      # shellcheck disable=SC2086
+      timeout "$_T_OUT" "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"
     else
-      if [ "${VERBOSE:-1}" -le 0 ]; then
-        # shellcheck disable=SC2086
-        MISE_QUIET=1 "$_M_BIN" $_MISE_OPTS "$_CMD" "$@" >/dev/null 2>&1
-      else
-        # shellcheck disable=SC2086
-        "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"
-      fi
-      _STATUS=$?
-      [ $_STATUS -eq 0 ] && break
-      # If command failed due to interruption, exit immediately
-      [ $_STATUS -gt 128 ] && return $_STATUS
+      # shellcheck disable=SC2086
+      "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"
     fi
+    _STATUS=$?
+    [ $_STATUS -eq 0 ] && break
+    [ $_STATUS -gt 128 ] && break # Interrupted
 
     _RETRY_COUNT=$((_RETRY_COUNT + 1))
     if [ $_RETRY_COUNT -lt $_MAX_RETRIES ]; then
-      log_warn "mise command failed (attempt $_RETRY_COUNT/$_MAX_RETRIES). Retrying..."
+      log_warn "mise $_CMD failed (attempt $_RETRY_COUNT/$_MAX_RETRIES). Retrying..."
       sleep 1
     fi
   done
@@ -485,7 +419,6 @@ run_mise() {
   else
     unset GITHUB_TOKEN
   fi
-
   return $_STATUS
 }
 
@@ -976,37 +909,20 @@ get_version() {
   _BIN_PATH=$(command -v "$_CMD_VER" 2>/dev/null || true)
 
   # 1. Try Mise First (Fast & Reliable for JIT tools)
-  # But ONLY if it's a mise shim or not in PATH. If it's a real binary in PATH (mock/system), use it.
-  if command -v mise >/dev/null 2>&1; then
-    # If not in PATH OR it IS a mise shim, query mise directly
-    if [ -z "$_BIN_PATH" ] || echo "$_BIN_PATH" | grep -q "mise/shims"; then
-      local _MISE_VER_OUT
-      # Optimization: Use global state cache if available to avoid repeated mise invocations
-      if [ -n "$_G_MISE_LS_JSON" ]; then
-        _MISE_VER_OUT=$(echo "$_G_MISE_LS_JSON" | jq -r "to_entries[] | select(.key == \"$_M_PLUGIN\" or (.key | endswith(\":$_M_PLUGIN\")) or (.key | endswith(\"/$_M_PLUGIN\"))) | .value[] | select(.active==true) | .version" 2>/dev/null | head -n 1)
-      else
-        _MISE_VER_OUT=$(mise ls --json 2>/dev/null | jq -r "to_entries[] | select(.key == \"$_M_PLUGIN\" or (.key | endswith(\":$_M_PLUGIN\")) or (.key | endswith(\"/$_M_PLUGIN\"))) | .value[] | select(.active==true) | .version" 2>/dev/null | head -n 1)
-      fi
-      if [ -n "$_MISE_VER_OUT" ] && [ "$_MISE_VER_OUT" != "null" ]; then
-        echo "$_MISE_VER_OUT"
-        return 0
-      fi
+  # Check mise via cache first (fastest)
+  local _MISE_VER_OUT
+  _MISE_VER_OUT=$(echo "$_G_MISE_LS_JSON_CACHE" | jq -r 'to_entries[] | select(.key == "'"$_M_PLUGIN"'" or (.key | endswith(":'"$_M_PLUGIN"'")) or (.key | endswith("/'"$_M_PLUGIN"'"))) | .value[] | select(.active==true) | .version' | head -n 1 || true)
 
-      # If it's a mise shim but no version is active, try to execute it with MISE_QUIET to see if it works
-      if echo "$_BIN_PATH" | grep -q "mise/shims"; then
-        if ! MISE_QUIET=1 "$_CMD_VER" "$_ARG_VER" >/dev/null 2>&1; then
-          echo "-"
-          return 0
-        fi
-      fi
-    fi
+  if [ -n "$_MISE_VER_OUT" ] && [ "$_MISE_VER_OUT" != "null" ]; then
+    echo "$_MISE_VER_OUT" && return 0
   fi
 
-  # 2. Fallback to binary execution
+  # Fallback to system command
   if [ -n "$_BIN_PATH" ]; then
+    # Special cases for tools with unusual version output or slow shims
     case "$_CMD_VER" in
-    python | python3)
-      "$_CMD_VER" --version 2>&1 | cut -d' ' -f2
+    python)
+      python --version | cut -d' ' -f2 && return 0
       ;;
     node)
       "$_CMD_VER" --version 2>&1 | sed 's/^v//'
