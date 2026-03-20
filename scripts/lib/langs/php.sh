@@ -21,9 +21,11 @@ install_runtime_php() {
 # Purpose: Sets up PHP runtime.
 # Delegate: Managed by mise (.mise.toml)
 setup_php() {
-  if ! has_lang_files "composer.json" "*.php"; then
+  if ! has_lang_files "composer.json composer.lock" "*.php"; then
     return 0
   fi
+
+  setup_registry_php
 
   local _T0_PHP_RT
   _T0_PHP_RT=$(date +%s)

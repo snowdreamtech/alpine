@@ -15,9 +15,11 @@ install_runtime_racket() {
 
 # Purpose: Sets up Racket environment for project.
 setup_racket() {
-  if ! has_lang_files "" "*.rkt *.rktl"; then
+  if ! has_lang_files "info.rkt" "*.rkt"; then
     return 0
   fi
+
+  setup_registry_racket
 
   local _T0_RACKET_RT
   _T0_RACKET_RT=$(date +%s)

@@ -19,6 +19,8 @@ setup_lisp() {
     return 0
   fi
 
+  setup_registry_sbcl
+
   local _T0_LISP_RT
   _T0_LISP_RT=$(date +%s)
   # Fast-path: Check version-aware existence

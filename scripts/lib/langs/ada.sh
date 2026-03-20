@@ -15,9 +15,11 @@ install_runtime_ada() {
 
 # Purpose: Sets up Ada environment for project.
 setup_ada() {
-  if ! has_lang_files "" "*.adb *.ads *.gpr"; then
+  if ! has_lang_files "default.gpr package.gpr" "*.ada *.adb *.ads"; then
     return 0
   fi
+
+  setup_registry_ada
 
   local _T0_ADA_RT
   _T0_ADA_RT=$(date +%s)

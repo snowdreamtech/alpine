@@ -17,6 +17,8 @@ setup_dart() {
     return 0
   fi
 
+  setup_registry_dart
+
   local _T0_DART_RT
   _T0_DART_RT=$(date +%s)
   # Fast-path: Check version-aware existence

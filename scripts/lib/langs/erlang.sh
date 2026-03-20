@@ -18,6 +18,8 @@ setup_erlang() {
     return 0
   fi
 
+  setup_registry_erlang
+
   local _T0_ERL_RT
   _T0_ERL_RT=$(date +%s)
   # Fast-path: Check version-aware existence

@@ -15,9 +15,11 @@ install_runtime_grain() {
 
 # Purpose: Sets up Grain environment for project.
 setup_grain() {
-  if ! has_lang_files "" "*.gr"; then
+  if ! has_lang_files "grain.toml" "*.gr"; then
     return 0
   fi
+
+  setup_registry_grain
 
   local _T0_GRAIN_RT
   _T0_GRAIN_RT=$(date +%s)

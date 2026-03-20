@@ -18,6 +18,8 @@ setup_scala() {
     return 0
   fi
 
+  setup_registry_scala
+
   local _T0_SCALA_RT
   _T0_SCALA_RT=$(date +%s)
   # Fast-path: Check version-aware existence

@@ -15,9 +15,11 @@ install_runtime_ocaml() {
 
 # Purpose: Sets up OCaml environment for project.
 setup_ocaml() {
-  if ! has_lang_files "dune-project dune opam" "*.ml *.mli *.mll *.mly"; then
+  if ! has_lang_files "dune-project opam" "*.ml *.mli"; then
     return 0
   fi
+
+  setup_registry_ocaml
 
   local _T0_OCM_RT
   _T0_OCM_RT=$(date +%s)

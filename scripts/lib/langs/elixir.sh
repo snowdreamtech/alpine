@@ -20,6 +20,8 @@ setup_elixir() {
     return 0
   fi
 
+  setup_registry_elixir
+
   local _T0_ELIXIR_RT
   _T0_ELIXIR_RT=$(date +%s)
   # Fast-path: Check version-aware existence

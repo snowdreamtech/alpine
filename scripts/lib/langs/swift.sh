@@ -19,6 +19,8 @@ setup_swift() {
     return 0
   fi
 
+  setup_registry_swift
+
   local _T0_SWIFT_RT
   _T0_SWIFT_RT=$(date +%s)
   # Fast-path: Check version-aware existence

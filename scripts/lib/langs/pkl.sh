@@ -19,6 +19,8 @@ setup_pkl() {
     return 0
   fi
 
+  setup_registry_pkl
+
   local _T0_PKL_RT
   _T0_PKL_RT=$(date +%s)
   # Fast-path: Check version-aware existence

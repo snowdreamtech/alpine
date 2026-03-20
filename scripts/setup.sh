@@ -21,9 +21,12 @@
 
 set -e
 
-# ── Common Library ───────────────────────────────────────────────────────────
+# ── 🎒 Library Sourcing ──────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+# shellcheck source=/dev/null
 . "$SCRIPT_DIR/lib/common.sh"
+# shellcheck source=/dev/null
+. "$SCRIPT_DIR/lib/registry.sh"
 
 # ── Extension Modules Sourcing ───────────────────────────────────────────────
 # Dynamically load all language-specific setup modules.

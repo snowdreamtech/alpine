@@ -19,6 +19,8 @@ setup_odin() {
     return 0
   fi
 
+  setup_registry_odin
+
   local _T0_ODIN_RT
   _T0_ODIN_RT=$(date +%s)
   # Fast-path: Check version-aware existence

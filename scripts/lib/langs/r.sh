@@ -18,6 +18,8 @@ setup_r() {
     return 0
   fi
 
+  setup_registry_r
+
   local _T0_R_RT
   _T0_R_RT=$(date +%s)
   # Fast-path: Check version-aware existence

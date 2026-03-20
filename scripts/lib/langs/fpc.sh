@@ -15,9 +15,11 @@ install_runtime_fpc() {
 
 # Purpose: Sets up FPC environment for project.
 setup_fpc() {
-  if ! has_lang_files "" "*.pas *.pp *.inc *.lpr"; then
+  if ! has_lang_files "" "*.pas *.pp *.lpr"; then
     return 0
   fi
+
+  setup_registry_fpc
 
   local _T0_FPC_RT
   _T0_FPC_RT=$(date +%s)

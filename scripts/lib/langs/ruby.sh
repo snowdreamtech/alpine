@@ -72,9 +72,11 @@ install_ruby_lint() {
 # Purpose: Sets up Ruby runtime and mandatory linting tools.
 # Delegate: Managed by mise (.mise.toml)
 setup_ruby() {
-  if ! has_lang_files "Gemfile Gemfile.lock" "*.rb"; then
+  if ! has_lang_files "Gemfile Gemfile.lock Rakefile" "*.rb *.rake"; then
     return 0
   fi
+
+  setup_registry_ruby
 
   local _T0_RUBY_RT
   _T0_RUBY_RT=$(date +%s)

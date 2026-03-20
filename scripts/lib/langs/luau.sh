@@ -15,9 +15,11 @@ install_runtime_luau() {
 
 # Purpose: Sets up Luau environment for project.
 setup_luau() {
-  if ! has_lang_files "" "*.luau"; then
+  if ! has_lang_files "selene.toml" "*.luau"; then
     return 0
   fi
+
+  setup_registry_luau
 
   local _T0_LUAU_RT
   _T0_LUAU_RT=$(date +%s)

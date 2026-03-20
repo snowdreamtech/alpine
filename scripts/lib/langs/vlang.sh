@@ -15,9 +15,11 @@ install_runtime_vlang() {
 
 # Purpose: Sets up Vlang environment for project.
 setup_vlang() {
-  if ! has_lang_files "v.mod" "*.v *.vsh"; then
+  if ! has_lang_files "v.mod" "*.v"; then
     return 0
   fi
+
+  setup_registry_vlang
 
   local _T0_VLG_RT
   _T0_VLG_RT=$(date +%s)

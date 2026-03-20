@@ -19,6 +19,8 @@ setup_ballerina() {
     return 0
   fi
 
+  setup_registry_ballerina
+
   local _T0_BAL_RT
   _T0_BAL_RT=$(date +%s)
   # Fast-path: Check version-aware existence

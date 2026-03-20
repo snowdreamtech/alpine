@@ -32,9 +32,11 @@ install_ktlint() {
 
 # Purpose: Sets up Kotlin runtime and mandatory linting tools.
 setup_kotlin() {
-  if ! has_lang_files "build.gradle.kts" "*.kt *.kts"; then
+  if ! has_lang_files "build.gradle.kts build.gradle settings.gradle.kts" "*.kt *.kts"; then
     return 0
   fi
+
+  setup_registry_kotlin
 
   local _T0_KOTLIN_RT
   _T0_KOTLIN_RT=$(date +%s)

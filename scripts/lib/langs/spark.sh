@@ -15,9 +15,11 @@ install_runtime_spark() {
 
 # Purpose: Sets up Apache Spark environment for project.
 setup_spark() {
-  if ! has_lang_files "" "spark-defaults.conf *.pyspark"; then
+  if ! has_lang_files "spark-submit" "*.scala *.ipynb"; then
     return 0
   fi
+
+  setup_registry_spark
 
   local _T0_SPARK_RT
   _T0_SPARK_RT=$(date +%s)

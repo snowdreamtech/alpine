@@ -19,6 +19,8 @@ setup_elm() {
     return 0
   fi
 
+  setup_registry_elm
+
   local _T0_ELM_RT
   _T0_ELM_RT=$(date +%s)
   # Fast-path: Check version-aware existence

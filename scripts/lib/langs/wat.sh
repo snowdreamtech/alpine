@@ -19,6 +19,8 @@ setup_wat() {
     return 0
   fi
 
+  setup_registry_wasmtime
+
   local _T0_WAT_RT
   _T0_WAT_RT=$(date +%s)
   # Fast-path: Check version-aware existence

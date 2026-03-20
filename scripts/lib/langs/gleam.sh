@@ -19,6 +19,8 @@ setup_gleam() {
     return 0
   fi
 
+  setup_registry_gleam
+
   local _T0_GLM_RT
   _T0_GLM_RT=$(date +%s)
   # Fast-path: Check version-aware existence

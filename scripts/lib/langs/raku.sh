@@ -15,9 +15,11 @@ install_runtime_raku() {
 
 # Purpose: Sets up Raku environment for project.
 setup_raku() {
-  if ! has_lang_files "META6.json" "*.raku *.rakumod *.p6 *.pm6"; then
+  if ! has_lang_files "META6.json" "*.raku *.rakumod *.rakutest *.pm6 *.pl6"; then
     return 0
   fi
+
+  setup_registry_raku
 
   local _T0_RAKU_RT
   _T0_RAKU_RT=$(date +%s)

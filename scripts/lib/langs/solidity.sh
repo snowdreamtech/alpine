@@ -15,9 +15,11 @@ install_runtime_solidity() {
 
 # Purpose: Sets up Solidity environment for project.
 setup_solidity() {
-  if ! has_lang_files "" "*.sol"; then
+  if ! has_lang_files "foundry.toml hardhat.config.js" "*.sol"; then
     return 0
   fi
+
+  setup_registry_solc
 
   local _T0_SOL_RT
   _T0_SOL_RT=$(date +%s)

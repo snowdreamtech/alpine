@@ -18,6 +18,8 @@ setup_haskell() {
     return 0
   fi
 
+  setup_registry_ghc
+
   local _T0_HASKELL_RT
   _T0_HASKELL_RT=$(date +%s)
   # Fast-path: Check version-aware existence

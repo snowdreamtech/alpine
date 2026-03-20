@@ -15,9 +15,11 @@ install_runtime_tcl() {
 
 # Purpose: Sets up Tcl environment for project.
 setup_tcl() {
-  if ! has_lang_files "" "*.tcl *.tk"; then
+  if ! has_lang_files "" "*.tcl *.tk *.exp"; then
     return 0
   fi
+
+  setup_registry_tcl
 
   local _T0_TCL_RT
   _T0_TCL_RT=$(date +%s)

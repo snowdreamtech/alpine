@@ -15,9 +15,11 @@ install_runtime_mojo() {
 
 # Purpose: Sets up Mojo environment for project.
 setup_mojo() {
-  if ! has_lang_files "" "*.mojo *.fire"; then
+  if ! has_lang_files "mojoproject.toml" "*.mojo *.ipynb"; then
     return 0
   fi
+
+  setup_registry_mojo
 
   local _T0_MOJ_RT
   _T0_MOJ_RT=$(date +%s)

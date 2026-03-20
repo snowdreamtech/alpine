@@ -19,6 +19,8 @@ setup_starlark() {
     return 0
   fi
 
+  setup_registry_bazel
+
   local _T0_STAR_RT
   _T0_STAR_RT=$(date +%s)
   # Fast-path: Check version-aware existence

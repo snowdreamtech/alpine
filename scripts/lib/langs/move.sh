@@ -19,6 +19,8 @@ setup_move() {
     return 0
   fi
 
+  setup_registry_move
+
   local _T0_MOVE_RT
   _T0_MOVE_RT=$(date +%s)
   # Fast-path: Check version-aware existence

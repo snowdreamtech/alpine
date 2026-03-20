@@ -19,6 +19,8 @@ setup_lean() {
     return 0
   fi
 
+  setup_registry_lean
+
   local _T0_LEAN_RT
   _T0_LEAN_RT=$(date +%s)
   # Fast-path: Check version-aware existence

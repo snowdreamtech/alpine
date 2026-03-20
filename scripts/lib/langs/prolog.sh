@@ -15,9 +15,11 @@ install_runtime_prolog() {
 
 # Purpose: Sets up Prolog environment for project.
 setup_prolog() {
-  if ! has_lang_files "" "*.pl *.pro *.prolog"; then
+  if ! has_lang_files "" "*.pl *.pro *.P"; then
     return 0
   fi
+
+  setup_registry_prolog
 
   local _T0_PROLOG_RT
   _T0_PROLOG_RT=$(date +%s)

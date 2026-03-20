@@ -37,6 +37,8 @@ setup_lua() {
     return 0
   fi
 
+  setup_registry_lua
+
   local _T0_LUA_RT
   _T0_LUA_RT=$(date +%s)
   # Fast-path: Check version-aware existence

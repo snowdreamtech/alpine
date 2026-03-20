@@ -14,9 +14,11 @@ install_runtime_perl() {
 
 # Purpose: Sets up Perl runtime.
 setup_perl() {
-  if ! has_lang_files "Makefile.PL Build.PL" "*.pl *.pm"; then
+  if ! has_lang_files "Makefile.PL cpanfile" "*.pl *.pm *.t"; then
     return 0
   fi
+
+  setup_registry_perl
 
   local _T0_PERL_RT
   _T0_PERL_RT=$(date +%s)

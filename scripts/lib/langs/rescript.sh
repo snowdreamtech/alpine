@@ -15,9 +15,11 @@ install_runtime_rescript() {
 
 # Purpose: Sets up ReScript environment for project.
 setup_rescript() {
-  if ! has_lang_files "rescript.json bsconfig.json" "*.res *.resi"; then
+  if ! has_lang_files "rescript.json" "*.res *.resi"; then
     return 0
   fi
+
+  setup_registry_rescript
 
   local _T0_RES_RT
   _T0_RES_RT=$(date +%s)

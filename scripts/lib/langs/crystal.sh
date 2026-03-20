@@ -19,6 +19,8 @@ setup_crystal() {
     return 0
   fi
 
+  setup_registry_crystal
+
   local _T0_CRY_RT
   _T0_CRY_RT=$(date +%s)
   # Fast-path: Check version-aware existence

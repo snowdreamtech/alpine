@@ -18,6 +18,8 @@ setup_kcl() {
     return 0
   fi
 
+  setup_registry_kcl
+
   local _T0_KCL_RT
   _T0_KCL_RT=$(date +%s)
   # Fast-path: Check version-aware existence

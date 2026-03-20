@@ -17,6 +17,8 @@ setup_julia() {
     return 0
   fi
 
+  setup_registry_julia
+
   local _T0_JULIA_RT
   _T0_JULIA_RT=$(date +%s)
   # Fast-path: Check version-aware existence
