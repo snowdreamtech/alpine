@@ -19,6 +19,17 @@ install_ktlint() {
   local _TITLE="ktlint"
   local _PROVIDER="npm:@naturalcycles/ktlint"
 
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version ktlint --version)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+
+  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
+    log_summary "Kotlin" "ktlint" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
   _log_setup "$_TITLE" "$_PROVIDER"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
