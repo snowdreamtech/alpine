@@ -311,109 +311,13 @@ setup_hooks() {
   log_summary "Base" "Hooks" "$_STAT_HOOK" "$(get_version pre-commit --version)" "$_DUR_HOOK"
 }
 
-# Purpose: Installs TFLint.
-# Delegate: Managed by mise (.mise.toml)
-install_tflint() {
-  local _T0_TF
-  _T0_TF=$(date +%s)
-  local _TITLE="TFLint"
-  local _PROVIDER="github:terraform-linters/tflint"
 
-  if ! has_lang_files "" "*.tf"; then
-    return 0
-  fi
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version tflint)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
-
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
-    log_summary "DevOps" "TFLint" "✅ Exists" "$_CUR_VER" "0"
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-  local _STAT_TF="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_TF="❌ Failed"
-  log_summary "DevOps" "TFLint" "$_STAT_TF" "$(get_version tflint)" "$(($(date +%s) - _T0_TF))"
-}
-
-# Purpose: Installs Kube-Linter.
-# Delegate: Managed by mise (.mise.toml)
-install_kube_linter() {
-  local _T0_KL
-  _T0_KL=$(date +%s)
-  local _TITLE="Kube-Linter"
-  local _PROVIDER="github:stackrox/kube-linter"
-
-  if ! has_lang_files "" "deployment.yaml service.yaml k8s/*.yaml *.k8s.yaml"; then
-    return 0
-  fi
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version kube-linter)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
-
-  if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
-    log_summary "DevOps" "Kube-Linter" "✅ Exists" "$_CUR_VER" "0"
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-  local _STAT_KL="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_KL="❌ Failed"
-  log_summary "DevOps" "Kube-Linter" "$_STAT_KL" "$(get_version kube-linter)" "$(($(date +%s) - _T0_KL))"
-}
 
 # Purpose: Installs google-java-format for Java project linting.
 # Delegate: Managed by mise (.mise.toml)
 # WARNING: google-java-format has no prebuilt binary for linux/arm64.
 #          On ARM64 Linux, this step is skipped. Use: java -jar google-java-format.jar
 
-# Purpose: Sets up Rubocop for Ruby project linting.
-# Params:
-#   None
-# Examples:
-#   install_ruby_lint
-install_ruby_lint() {
-  local _T0_RUBY
-  _T0_RUBY=$(date +%s)
-  local _TITLE="Rubocop"
-  local _PROVIDER="rubocop"
-
-  if ! has_lang_files "Gemfile Gemfile.lock" "*.rb"; then
-    return 0
-  fi
-
-  if ! command -v gem >/dev/null 2>&1; then
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-
-  # Check in PATH and common user-gem locations to avoid redundant slow gem install
-  local _RUBO_BIN_REF="rubocop"
-  if ! command -v rubocop >/dev/null 2>&1; then
-    local _GEM_BIN_RUBY
-    _GEM_BIN_RUBY=$(gem environment 2>/dev/null | grep "EXECUTABLE DIRECTORY" | awk '{print $NF}')
-    if [ -x "$_GEM_BIN_RUBY/rubocop" ]; then
-      _RUBO_BIN_REF="$_GEM_BIN_RUBY/rubocop"
-    fi
-  fi
-
-  if command -v "$_RUBO_BIN_REF" >/dev/null 2>&1; then
-    log_summary "Ruby" "Rubocop" "✅ Exists" "$(get_version "$_RUBO_BIN_REF")" "0"
-    return 0
-  fi
-
-  local _STAT_RUBY="✅ Installed"
-  run_quiet gem install rubocop --user-install --no-document --quiet || _STAT_RUBY="❌ Failed"
-  log_summary "Ruby" "Rubocop" "$_STAT_RUBY" "$(get_version rubocop)" "$(($(date +%s) - _T0_RUBY))"
-}
 
 
 # Purpose: Installs osv-scanner for vulnerability scanning.
@@ -855,25 +759,6 @@ install_dockerfile_utils() {
   log_summary "Docker" "dockerfile-utils" "$_STAT_DU" "$(get_version dockerfile-utils)" "$(($(date +%s) - _T0_DU))"
 }
 
-install_clang_format() {
-  local _T0_CF
-  _T0_CF=$(date +%s)
-  local _TITLE="clang-format"
-  local _PROVIDER="pipx:clang-format"
-  if ! has_lang_files "" "*.c *.cpp *.h *.hpp *.cc *.m *.mm"; then
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "CPP" "clang-format" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_CF="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_CF="❌ Failed"
-  log_summary "CPP" "clang-format" "$_STAT_CF" "$(get_version clang-format)" "$(($(date +%s) - _T0_CF))"
-}
 
 
 
@@ -1147,27 +1032,6 @@ install_editorconfig_checker() {
   log_summary "Base" "editorconfig-checker" "$_STAT_ECC" "$(get_version editorconfig-checker)" "$(($(date +%s) - _T0_ECC))"
 }
 
-# Purpose: Installs stylua for Lua linting.
-# Delegate: Managed by mise (.mise.toml)
-install_stylua() {
-  local _T0_SL
-  _T0_SL=$(date +%s)
-  local _TITLE="StyLua"
-  local _PROVIDER="github:JohnnyMorganz/StyLua"
-  if ! has_lang_files "" "LUA"; then
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Lua" "StyLua" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_SL="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_SL="❌ Failed"
-  log_summary "Lua" "StyLua" "$_STAT_SL" "$(get_version stylua)" "$(($(date +%s) - _T0_SL))"
-}
 
 # Purpose: Installs buf for Protobuf linting/management.
 # Delegate: Managed by mise (.mise.toml)
@@ -1257,27 +1121,6 @@ install_cue() {
   log_summary "Base" "CUE/Jsonnet" "$_STAT_CUE" "$(get_version cue version | head -n 1)" "$(($(date +%s) - _T0_CUE))"
 }
 
-# Purpose: Installs OPA/Rego.
-# Delegate: Managed by mise (.mise.toml)
-install_rego() {
-  local _T0_REGO
-  _T0_REGO=$(date +%s)
-  local _TITLE="Rego (OPA)"
-  local _PROVIDER="github:open-policy-agent/opa"
-  if ! has_lang_files "" "REGO"; then
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Security" "Rego" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_REGO="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_REGO="❌ Failed"
-  log_summary "Security" "Rego" "$_STAT_REGO" "$(get_version opa version | grep Version | awk '{print $NF}')" "$(($(date +%s) - _T0_REGO))"
-}
 
 # Purpose: Checks for Edge deployment configurations.
 install_edge() {
@@ -1536,7 +1379,7 @@ EOF
     just) install_just ;;
     task) install_task ;;
     zig) setup_zig ;;
-    rego) install_rego ;;
+    rego) setup_rego ;;
     edge) install_edge ;;
     pulumi) setup_pulumi ;;
     crossplane) install_crossplane ;;
@@ -1549,15 +1392,15 @@ EOF
     gitleaks) install_gitleaks ;;
     checkmake) install_checkmake ;;
     hadolint) install_hadolint ;;
-    tflint) install_tflint ;;
-    kube-linter) install_kube_linter ;;
+    tflint) setup_terraform ;;
+    kube-linter) setup_helm ;;
     editorconfig-checker) install_editorconfig_checker ;;
     sort-package-json) setup_node ;;
     goreleaser) setup_go ;;
     spectral) install_spectral ;;
     commitlint) install_commitlint ;;
     dockerfile-utils) install_dockerfile_utils ;;
-    clang-format) install_clang_format ;;
+    clang-format) setup_cpp ;;
     ktlint) setup_kotlin ;;
     ruff) setup_python ;;
     stylelint) setup_node ;;
@@ -1571,7 +1414,7 @@ EOF
     vitepress) setup_node ;;
     commitizen) setup_node ;;
     pip-audit) setup_python ;;
-    stylua) install_stylua ;;
+    stylua) setup_lua ;;
     cue) install_cue ;;
     rn) install_rn ;;
     playwright) install_playwright ;;

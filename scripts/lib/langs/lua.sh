@@ -13,6 +13,25 @@ install_runtime_lua() {
   eval "$(mise activate bash --shims)"
 }
 
+# Purpose: Installs stylua.
+# Delegate: Managed by mise (.mise.toml)
+install_stylua() {
+  local _T0_LUA
+  _T0_LUA=$(date +%s)
+  local _TITLE="StyLua"
+  local _PROVIDER="github:JohnnyMorganz/StyLua"
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Lua" "StyLua" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
+  local _STAT_LUA="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_LUA="❌ Failed"
+  log_summary "Lua" "StyLua" "$_STAT_LUA" "$(get_version stylua --version)" "$(($(date +%s) - _T0_LUA))"
+}
+
 # Purpose: Sets up Lua runtime and mandatory linting tools.
 setup_lua() {
   if ! has_lang_files "" "*.lua"; then
@@ -29,22 +48,20 @@ setup_lua() {
 
   if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
     log_summary "Runtime" "Lua" "✅ Detected" "$_CUR_VER" "0"
-    return 0
+  else
+    _log_setup "Lua Runtime" "lua"
+
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
+      log_summary "Runtime" "Lua" "⚖️ Previewed" "-" "0"
+    else
+      local _STAT_LUA_RT="✅ Installed"
+      install_runtime_lua || _STAT_LUA_RT="❌ Failed"
+
+      local _DUR_LUA_RT
+      _DUR_LUA_RT=$(($(date +%s) - _T0_LUA_RT))
+      log_summary "Runtime" "Lua" "$_STAT_LUA_RT" "$(get_version lua -v | head -n 1)" "$_DUR_LUA_RT"
+    fi
   fi
-
-  _log_setup "Lua Runtime" "lua"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Runtime" "Lua" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  local _STAT_LUA_RT="✅ Installed"
-  install_runtime_lua || _STAT_LUA_RT="❌ Failed"
-
-  local _DUR_LUA_RT
-  _DUR_LUA_RT=$(($(date +%s) - _T0_LUA_RT))
-  log_summary "Runtime" "Lua" "$_STAT_LUA_RT" "$(get_version lua -v | head -n 1)" "$_DUR_LUA_RT"
 
   # Also ensure linting tools are present
   install_stylua

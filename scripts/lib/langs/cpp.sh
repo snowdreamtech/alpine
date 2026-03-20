@@ -24,6 +24,28 @@ install_runtime_cpp() {
   fi
 }
 
+# Purpose: Installs clang-format.
+# Delegate: Managed by mise (.mise.toml)
+install_clang_format() {
+  local _T0_CF
+  _T0_CF=$(date +%s)
+  local _TITLE="clang-format"
+  local _PROVIDER="pipx:clang-format"
+  if ! has_lang_files "" "*.c *.cpp *.h *.hpp *.cc *.m *.mm"; then
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "CPP" "clang-format" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
+  local _STAT_CF="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_CF="❌ Failed"
+  log_summary "CPP" "clang-format" "$_STAT_CF" "$(get_version clang-format)" "$(($(date +%s) - _T0_CF))"
+}
+
 # Purpose: Sets up C/C++ environment for project.
 setup_cpp() {
   if ! has_lang_files "CMakeLists.txt Makefile" "*.cpp *.c *.cc *.h *.hpp"; then
@@ -40,30 +62,31 @@ setup_cpp() {
 
   if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
     log_summary "Runtime" "C/C++" "✅ Detected" "$_CUR_VER" "0"
-    return 0
-  fi
-
-  _log_setup "C/C++ Toolchain" "cpp"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Runtime" "C/C++" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  local _STAT_CPP_RT="✅ Installed"
-  install_runtime_cpp || _STAT_CPP_RT="❌ Failed"
-
-  local _DUR_CPP_RT
-  _DUR_CPP_RT=$(($(date +%s) - _T0_CPP_RT))
-
-  local _CPP_VER
-  if command -v clang >/dev/null 2>&1; then
-    _CPP_VER=$(get_version clang | head -n 1)
   else
-    _CPP_VER=$(get_version gcc | head -n 1)
+    _log_setup "C/C++ Toolchain" "cpp"
+
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
+      log_summary "Runtime" "C/C++" "⚖️ Previewed" "-" "0"
+    else
+      local _STAT_CPP_RT="✅ Installed"
+      install_runtime_cpp || _STAT_CPP_RT="❌ Failed"
+
+      local _DUR_CPP_RT
+      _DUR_CPP_RT=$(($(date +%s) - _T0_CPP_RT))
+
+      local _CPP_VER
+      if command -v clang >/dev/null 2>&1; then
+        _CPP_VER=$(get_version clang | head -n 1)
+      else
+        _CPP_VER=$(get_version gcc | head -n 1)
+      fi
+
+      log_summary "Runtime" "C/C++" "$_STAT_CPP_RT" "$_CPP_VER" "$_DUR_CPP_RT"
+    fi
   fi
 
-  log_summary "Runtime" "C/C++" "$_STAT_CPP_RT" "$_CPP_VER" "$_DUR_CPP_RT"
+  # Setup related tools
+  install_clang_format
 }
 
 # Purpose: Checks if C/C++ toolchain is available.

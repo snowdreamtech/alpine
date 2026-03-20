@@ -14,6 +14,23 @@ install_runtime_helm() {
   eval "$(mise activate bash --shims)"
 }
 
+# Purpose: Installs kube-linter.
+# Delegate: Managed by mise (.mise.toml)
+install_kube_linter() {
+  local _T0_KL
+  _T0_KL=$(date +%s)
+  local _TITLE="Kube-Linter"
+  local _PROVIDER="github:stackrox/kube-linter"
+  if ! has_lang_files "" "CHARTS *.yaml *.yml"; then
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+  local _STAT_KL="✅ mise"
+  run_mise install "$_PROVIDER" || _STAT_KL="❌ Failed"
+  log_summary "IaC" "Kube-Linter" "$_STAT_KL" "$(get_version kube-linter version)" "$(($(date +%s) - _T0_KL))"
+}
+
 # Purpose: Sets up Helm environment for project.
 setup_helm() {
   if ! has_lang_files "" "CHARTS *.yaml *.yml"; then
@@ -30,22 +47,23 @@ setup_helm() {
 
   if [ "$_CUR_VER" != "-" ] && [ "$_CUR_VER" = "$_REQ_VER" ]; then
     log_summary "IaC" "Helm" "✅ Detected" "$_CUR_VER" "0"
-    return 0
+  else
+    _log_setup "Helm" "helm"
+
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
+      log_summary "IaC" "Helm" "⚖️ Previewed" "-" "0"
+    else
+      local _STAT_HELM_RT="✅ Installed"
+      install_runtime_helm || _STAT_HELM_RT="❌ Failed"
+
+      local _DUR_HELM
+      _DUR_HELM=$(($(date +%s) - _T0_HELM))
+      log_summary "IaC" "Helm" "$_STAT_HELM_RT" "$(get_version helm version --short)" "$_DUR_HELM"
+    fi
   fi
 
-  _log_setup "Helm" "helm"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "IaC" "Helm" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-
-  local _STAT_HELM_RT="✅ Installed"
-  install_runtime_helm || _STAT_HELM_RT="❌ Failed"
-
-  local _DUR_HELM
-  _DUR_HELM=$(($(date +%s) - _T0_HELM))
-  log_summary "IaC" "Helm" "$_STAT_HELM_RT" "$(get_version helm version --short)" "$_DUR_HELM"
+  # Setup related tools
+  install_kube_linter
 }
 
 # Purpose: Checks if Helm is available.
