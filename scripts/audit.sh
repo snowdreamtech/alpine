@@ -73,7 +73,12 @@ main() {
       log_success "DRY-RUN: Would run gitleaks detect"
       log_summary "Security" "gitleaks" "⚖️ Previewed" "-" "0"
     else
-      if run_quiet gitleaks detect --source . --verbose; then
+      # Run without --verbose to avoid git diff rename warnings that pollute stderr
+      # and cause gitleaks to emit error="stderr is not empty" even when no leaks exist.
+      # Raise diff.renameLimit via GIT_CONFIG_PARAMETERS so git won't emit the warning
+      # even on repos with large commit histories.
+      if GIT_CONFIG_PARAMETERS="${GIT_CONFIG_PARAMETERS} 'diff.renameLimit=5000'" \
+        run_quiet gitleaks detect --source . --no-banner; then
         log_summary "Security" "gitleaks" "✅ Clean" "$(get_version gitleaks)" "$(($(date +%s) - _T0_GL))"
       else
         log_summary "Security" "gitleaks" "❌ Leaks Found" "$(get_version gitleaks)" "$(($(date +%s) - _T0_GL))"
