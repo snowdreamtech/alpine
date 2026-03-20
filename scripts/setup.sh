@@ -92,7 +92,7 @@ main() {
   parse_common_args "$@"
 
   # ── Concurrency Guard (Lockfile) ──
-  local _LOCKFILE="/tmp/snowdream_setup.lock"
+  local _LOCKFILE="/tmp/project_setup.lock"
   if [ -f "$_LOCKFILE" ]; then
     local _PID
     _PID=$(cat "$_LOCKFILE")
