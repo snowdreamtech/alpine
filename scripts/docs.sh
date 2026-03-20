@@ -72,24 +72,26 @@ main() {
 
   log_info "📖 Documentation Manager ($_COMMAND_DOC)...\n"
 
-  # 3. Check for dependencies
-  if [ ! -d "$DOCS_DIR" ]; then
-    log_error "Error: Documentation directory '$DOCS_DIR' not found."
-    exit 1
-  fi
+  # 3. Dependency checks — skipped in dry-run (environment may not have docs/ or vitepress)
+  if [ "${DRY_RUN:-0}" -eq 0 ]; then
+    if [ ! -d "$DOCS_DIR" ]; then
+      log_error "Error: Documentation directory '$DOCS_DIR' not found."
+      exit 1
+    fi
 
-  if ! command -v "$NPM" >/dev/null 2>&1; then
-    log_error "Error: $NPM client not found."
-    exit 1
-  fi
+    if ! command -v "$NPM" >/dev/null 2>&1; then
+      log_error "Error: $NPM client not found."
+      exit 1
+    fi
 
-  # 4. Resolve VitePress
-  local _VITEPRESS_BIN
-  _VITEPRESS_BIN=$(resolve_bin "vitepress")
+    # 4. Resolve VitePress
+    local _VITEPRESS_BIN
+    _VITEPRESS_BIN=$(resolve_bin "vitepress")
 
-  if [ -z "$_VITEPRESS_BIN" ]; then
-    log_error "Error: vitepress not found. Please run 'make setup' first."
-    exit 1
+    if [ -z "$_VITEPRESS_BIN" ]; then
+      log_error "Error: vitepress not found. Please run 'make setup' first."
+      exit 1
+    fi
   fi
 
   # 5. Execute VitePress
@@ -98,6 +100,8 @@ main() {
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would start VitePress dev server on $DOCS_DIR"
     else
+      local _VITEPRESS_BIN
+      _VITEPRESS_BIN=$(resolve_bin "vitepress")
       log_info "Starting development server..."
       "$_VITEPRESS_BIN" dev "$DOCS_DIR"
     fi
@@ -106,6 +110,8 @@ main() {
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would build VitePress site from $DOCS_DIR"
     else
+      local _VITEPRESS_BIN
+      _VITEPRESS_BIN=$(resolve_bin "vitepress")
       log_info "Building documentation site..."
       "$_VITEPRESS_BIN" build "$DOCS_DIR"
       log_success "\n✨ Build complete! Artifacts are in $DOCS_DIR/.vitepress/dist"
@@ -115,6 +121,8 @@ main() {
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would preview VitePress site in $DOCS_DIR"
     else
+      local _VITEPRESS_BIN
+      _VITEPRESS_BIN=$(resolve_bin "vitepress")
       log_info "Previewing production build..."
       "$_VITEPRESS_BIN" preview "$DOCS_DIR"
     fi
