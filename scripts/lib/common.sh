@@ -934,8 +934,14 @@ get_version() {
   # 1. Try Mise First (Fast & Reliable for JIT tools)
   # Check mise via cache first (fastest)
   local _MISE_VER_OUT
-  # Optimization: Include 'installed' tools even if not 'active' to avoid slow shim fallbacks
-  _MISE_VER_OUT=$(echo "$_G_MISE_LS_JSON_CACHE" | jq -r "to_entries[] | select(.key == \"$_M_PLUGIN\" or (.key | contains(\":$_M_PLUGIN\")) or (.key | contains(\"/$_M_PLUGIN\"))) | .value[] | select(.active==true or .installed==true) | .version" | head -n 1 || true)
+  # Optimization: Prefer the currently active version; fall back to any installed version
+  # to avoid slow shim fallbacks. Using 'first(select(...))' or sort ensures active wins.
+  _MISE_VER_OUT=$(echo "$_G_MISE_LS_JSON_CACHE" | jq -r "
+    to_entries[]
+    | select(.key == \"$_M_PLUGIN\" or (.key | contains(\":$_M_PLUGIN\")) or (.key | contains(\"/$_M_PLUGIN\")))
+    | .value
+    | (map(select(.active==true))[0] // map(select(.installed==true))[0])
+    | .version // empty" 2>/dev/null | head -n 1 || true)
 
   if [ -n "$_MISE_VER_OUT" ] && [ "$_MISE_VER_OUT" != "null" ]; then
     echo "$_MISE_VER_OUT" && return 0
