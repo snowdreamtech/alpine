@@ -1,29 +1,26 @@
 #!/usr/bin/env sh
 # Kotlin Logic Module
 
-# Purpose: Installs Kotlin runtime via mise.
-# Delegate: Managed by mise (.mise.toml)
+# Purpose: Installs Kotlin runtime via mise (version pinned in scripts/lib/versions.sh).
 install_runtime_kotlin() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_debug "DRY_RUN: Would install Kotlin runtime."
     return 0
   fi
-  run_mise install kotlin
+  run_mise install "kotlin@${VER_KOTLIN}"
 }
 
-# Purpose: Installs ktlint.
-# Delegate: Managed by mise (.mise.toml)
+# Purpose: Installs ktlint (version pinned in scripts/lib/versions.sh).
 install_ktlint() {
   local _T0_KT
   _T0_KT=$(date +%s)
   local _TITLE="ktlint"
-  local _PROVIDER="npm:@naturalcycles/ktlint"
+  local _PROVIDER="${VER_KTLINT_PROVIDER}"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
   _CUR_VER=$(get_version ktlint --version)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  local _REQ_VER="${VER_KTLINT}"
 
   if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Kotlin" "ktlint" "✅ Exists" "$_CUR_VER" "0"
@@ -54,8 +51,7 @@ setup_kotlin() {
   # Fast-path: Check version-aware existence
   local _CUR_VER
   _CUR_VER=$(get_version kotlin)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "kotlin")
+  local _REQ_VER="${VER_KOTLIN}"
 
   if is_version_match "$_CUR_VER" "$_REQ_VER"; then
     log_summary "Runtime" "Kotlin" "✅ Detected" "$_CUR_VER" "0"
