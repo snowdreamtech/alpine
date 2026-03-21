@@ -47,6 +47,9 @@ setup_java() {
     return 0
   fi
 
+  # Dynamically register Java in .mise.toml if not already present.
+  setup_registry_java
+
   local _T0_JAVA_RT
   _T0_JAVA_RT=$(date +%s)
   # Fast-path: Check version-aware existence

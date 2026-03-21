@@ -26,6 +26,12 @@ register_mise_tool() {
 # only when their source files are detected or explicitly requested.
 
 setup_registry_go() { register_mise_tool "Go" "go" "${VER_GO}"; }
+setup_registry_rust() { register_mise_tool "Rust" "rust" "${VER_RUST}"; }
+setup_registry_java() { register_mise_tool "Java" "java" "${VER_JAVA}"; }
+setup_registry_dotnet() { register_mise_tool ".NET" "dotnet" "${VER_DOTNET}"; }
+setup_registry_zig() { register_mise_tool "Zig" "zig" "${VER_ZIG}"; }
+setup_registry_bun() { register_mise_tool "Bun" "bun" "${VER_BUN}"; }
+setup_registry_deno() { register_mise_tool "Deno" "deno" "${VER_DENO}"; }
 
 setup_registry_ada() { register_mise_tool "Ada" "asdf:ada" "14.2.0"; }
 setup_registry_clojure() { register_mise_tool "Clojure" "asdf:clojure" "1.12.0.1479"; }

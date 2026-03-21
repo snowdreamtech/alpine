@@ -20,6 +20,9 @@ setup_rust() {
     return 0
   fi
 
+  # Dynamically register Rust in .mise.toml if not already present.
+  setup_registry_rust
+
   local _T0_RUST_RT
   _T0_RUST_RT=$(date +%s)
   local _TITLE="Rust Runtime"

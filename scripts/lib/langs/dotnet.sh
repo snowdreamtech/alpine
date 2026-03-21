@@ -19,6 +19,9 @@ setup_dotnet() {
     return 0
   fi
 
+  # Dynamically register .NET in .mise.toml if not already present.
+  setup_registry_dotnet
+
   local _T0_DOTNET_RT
   _T0_DOTNET_RT=$(date +%s)
   # Fast-path: Check version-aware existence

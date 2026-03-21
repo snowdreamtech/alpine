@@ -17,6 +17,9 @@ setup_deno() {
     return 0
   fi
 
+  # Dynamically register Deno in .mise.toml if not already present.
+  setup_registry_deno
+
   local _T0_DENO_RT
   _T0_DENO_RT=$(date +%s)
   # Fast-path: Check version-aware existence

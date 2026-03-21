@@ -17,6 +17,9 @@ setup_zig() {
     return 0
   fi
 
+  # Dynamically register Zig in .mise.toml if not already present.
+  setup_registry_zig
+
   local _T0_ZIG_RT
   _T0_ZIG_RT=$(date +%s)
   # Fast-path: Check version-aware existence
