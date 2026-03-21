@@ -135,6 +135,8 @@ project-root/
 
 ```bash
 git clone <repo>
+cd <repo>
+git config core.ignorecase false  # MANDATORY for Mac/Windows
 make setup
 make install
 ```

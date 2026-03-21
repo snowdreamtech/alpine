@@ -145,6 +145,8 @@ project-root/
 
 ```bash
 git clone <repo>
+cd <repo>
+git config core.ignorecase false  # Mac/Windows 用户必须执行此设置
 make setup
 make install
 ```

@@ -216,3 +216,25 @@ git commit -m "update everything" # High risk of committing illegal/temp files
   ```
 
   Enforce tag signing verification via CI: `git tag -v v1.2.3`.
+
+## 7. Case Sensitivity (core.ignorecase)
+
+To prevent rebase conflicts and history fragmentation across different operating systems (especially on macOS and Windows), this project mandates a **case-sensitive** Git configuration.
+
+- **Mandatory Configuration**: You MUST set `core.ignorecase` to `false` in your local project repository:
+
+  ```bash
+  git config core.ignorecase false
+  ```
+
+- **Renaming Files**: Since the underlying file systems on macOS (APFS) and Windows (NTFS) are case-insensitive, simply renaming a file via your file explorer or IDE may not be detected by Git. You MUST use the `git mv` command for all case-only renames:
+
+  ```bash
+  # ✅ CORRECT: Git tracks the case change explicitly
+  git mv oldname.txt OldName.txt
+
+  # ❌ WRONG: Git may not see the change on case-insensitive filesystems
+  mv oldname.txt OldName.txt
+  ```
+
+- **Verification**: Ensure your configuration is active by running `git config core.ignorecase`. It MUST return `false`.
