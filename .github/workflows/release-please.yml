@@ -21,8 +21,6 @@ name: Release Please
     branches:
       - main
 
-permissions: {}
-
 jobs:
   verify:
     # Pre-flight check before opening/merging releases
@@ -49,7 +47,7 @@ jobs:
         uses: googleapis/release-please-action@v4.4.0
         with:
           # Automates versioning, PR creation, and CHANGELOG updates based on Conventional Commits.
-          token: ${{ secrets.PAT || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           # 'simple' release type is optimized for standard conventional commit projects.
           release-type: simple
           config-file: .release-please-config.json
