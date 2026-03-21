@@ -30,6 +30,7 @@ install_buf() {
     return 0
   fi
   local _STAT_BUF="✅ mise"
+  setup_registry_buf
   run_mise install "$_PROVIDER" || _STAT_BUF="❌ Failed"
   log_summary "Protobuf" "Buf" "$_STAT_BUF" "$(get_version buf --version)" "$(($(date +%s) - _T0_BUF))"
 }

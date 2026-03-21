@@ -31,6 +31,7 @@ install_spectral() {
     return 0
   fi
   local _STAT_SPEC="✅ mise"
+  setup_registry_spectral
   run_mise install "$_PROVIDER" || _STAT_SPEC="❌ Failed"
   log_summary "API" "Spectral" "$_STAT_SPEC" "$(get_version spectral)" "$(($(date +%s) - _T0_SPEC))"
 }
