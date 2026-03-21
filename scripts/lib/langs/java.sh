@@ -19,6 +19,17 @@ install_java_lint() {
   local _TITLE="Java Lint"
   local _PROVIDER="${VER_JAVA_FORMAT_PROVIDER}"
 
+  # Handle linux/arm64 lack of prebuilt binary gracefully
+  if [ "$_G_OS" = "linux" ]; then
+    local _ARCH
+    _ARCH=$(uname -m)
+    if [ "$_ARCH" = "aarch64" ] || [ "$_ARCH" = "arm64" ]; then
+      log_summary "Java" "Java Lint" "⏭️ Skipped" "-" "0"
+      log_warn "google-java-format has no native binary for linux/arm64 via mise. Skipping."
+      return 0
+    fi
+  fi
+
   # Fast-path: Check version-aware existence
   local _CUR_VER
   _CUR_VER=$(get_version google-java-format)
