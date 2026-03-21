@@ -286,10 +286,15 @@ optimize_network() {
 
   # 1. Handle Git Protocols & Proxies
   # Guard: If GITHUB_TOKEN is set, verify it's not broken (avoid 401 errors).
+  # Test via `/rate_limit` endpoint because GitHub Bot tokens lack `/user` access.
   if [ -n "$GITHUB_TOKEN" ]; then
-    if ! curl -Is --connect-timeout 2 -H "Authorization: token $GITHUB_TOKEN" https://api.github.com/user >/dev/null 2>&1; then
-      log_warn "Current GITHUB_TOKEN appears invalid or unauthorized (401). Unsetting for this session..."
+    local _HTTP_CODE
+    _HTTP_CODE=$(curl -o /dev/null -s -w "%{http_code}" -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/rate_limit --connect-timeout 2 2>/dev/null)
+    if [ "$_HTTP_CODE" = "401" ]; then
+      log_warn "Current GITHUB_TOKEN appears invalid or unauthorized ($_HTTP_CODE). Unsetting for this session..."
       unset GITHUB_TOKEN
+    elif [ -z "$_HTTP_CODE" ] || [ "$_HTTP_CODE" = "000" ]; then
+      log_debug "Network timeout verifying GITHUB_TOKEN. Keeping token."
     fi
   fi
 
