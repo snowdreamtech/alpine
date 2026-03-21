@@ -94,3 +94,9 @@ setup_registry_tflint() { register_mise_tool "TFLint" "${VER_TFLINT_PROVIDER:-gi
 setup_registry_tofu() { register_mise_tool "OpenTofu" "${VER_TOFU_PROVIDER:-github:opentofu/opentofu}" "${VER_TOFU:-latest}"; }
 setup_registry_just() { register_mise_tool "Just" "${VER_JUST_PROVIDER:-github:casey/just}" "${VER_JUST:-latest}"; }
 setup_registry_task() { register_mise_tool "Task" "${VER_TASK_PROVIDER:-github:go-task/task}" "${VER_TASK:-latest}"; }
+setup_registry_ktlint() { register_mise_tool "ktlint" "${VER_KTLINT_PROVIDER:-npm:@naturalcycles/ktlint}" "${VER_KTLINT:-latest}"; }
+setup_registry_swiftformat() { register_mise_tool "SwiftFormat" "${VER_SWIFTFORMAT_PROVIDER:-github:nicklockwood/SwiftFormat}" "${VER_SWIFTFORMAT:-latest}"; }
+setup_registry_swiftlint() { register_mise_tool "SwiftLint" "${VER_SWIFTLINT_PROVIDER:-github:realm/SwiftLint}" "${VER_SWIFTLINT:-latest}"; }
+setup_registry_rubocop() { register_mise_tool "Rubocop" "${VER_RUBOCOP_PROVIDER:-gem:rubocop}" "${VER_RUBOCOP:-latest}"; }
+setup_registry_google_java_format() { register_mise_tool "Google Java Format" "${VER_JAVA_FORMAT_PROVIDER:-github:google/google-java-format}" "${VER_JAVA_FORMAT:-latest}"; }
+setup_registry_stylua() { register_mise_tool "StyLua" "${VER_STYLUA_PROVIDER:-github:JohnnyMorganz/StyLua}" "${VER_STYLUA:-latest}"; }
