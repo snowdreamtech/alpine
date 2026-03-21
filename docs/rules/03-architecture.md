@@ -9,6 +9,7 @@ View the full rule: [`.agent/rules/03-architecture.md`](https://github.com/snowd
 ## Sections
 
 - 1. Cross-Platform Design
+- 1. Runtime & Dependency Strategy
 - 1. Project Organization & Configuration
 - 1. AI IDE Integration (Symlink Convention)
 - 1. AI IDE Configuration Reference

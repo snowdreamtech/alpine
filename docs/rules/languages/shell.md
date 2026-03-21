@@ -16,3 +16,5 @@ View the full rule: [`.agent/rules/shell.md`](https://github.com/snowdreamtech/t
 - 1. Cross-Platform Delegation Pattern
 - 1. Linting Requirements (All Script Types)
 - 1. High-Performance & Robustness Patterns
+- 1. Defensive Tool Installation Pattern (MANDATORY)
+- 1. Language-Specific Best Practices

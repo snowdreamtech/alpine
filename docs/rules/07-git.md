@@ -14,4 +14,6 @@ View the full rule: [`.agent/rules/07-git.md`](https://github.com/snowdreamtech/
 - 1. Branching Strategy
 - 1. Pull Request Requirements
 - 1. Code Review Standards
+- 1. Workspace Hygiene & Forbidden Files
 - 1. History Hygiene
+- 1. Case Sensitivity (core.ignorecase)
