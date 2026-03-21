@@ -32,6 +32,7 @@ install_osv_scanner() {
     return 0
   fi
   local _STAT_OSV="✅ mise"
+  setup_registry_osv_scanner
   run_with_timeout 120 run_mise install "$_PROVIDER" || _STAT_OSV="❌ Failed"
   log_summary "Security" "OSV-Scanner" "$_STAT_OSV" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV))"
 }
@@ -67,6 +68,7 @@ install_trivy() {
     return 0
   fi
   local _STAT_TRIVY="✅ mise"
+  setup_registry_trivy
   run_with_timeout 120 run_mise install "$_PROVIDER" || _STAT_TRIVY="❌ Failed"
   log_summary "Security" "Trivy" "$_STAT_TRIVY" "$(get_version trivy)" "$(($(date +%s) - _T0_TRIVY))"
 }
@@ -140,6 +142,7 @@ install_cargo_audit() {
     return 0
   fi
   local _STAT_CA="✅ mise"
+  setup_registry_cargo_audit
   run_mise install "$_PROVIDER" || _STAT_CA="❌ Failed"
   log_summary "Security" "Cargo-Audit" "$_STAT_CA" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_CA))"
 }
