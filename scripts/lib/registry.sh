@@ -44,6 +44,7 @@ setup_registry_erlang() { register_mise_tool "Erlang" "erlang" "27.2.2"; }
 setup_registry_fpc() { register_mise_tool "FPC" "asdf:fpc" "3.2.2"; }
 setup_registry_gcc() { register_mise_tool "GCC" "asdf:gcc" "15.2"; }
 setup_registry_ghc() { register_mise_tool "GHC" "asdf:ghc" "9.10.1"; }
+setup_registry_ormolu() { register_mise_tool "Ormolu" "ormolu" "0.7.7.0"; }
 setup_registry_gleam() { register_mise_tool "Gleam" "asdf:gleam" "1.8.1"; }
 setup_registry_groovy() { register_mise_tool "Groovy" "asdf:groovy" "4.0.25"; }
 setup_registry_haxe() { register_mise_tool "Haxe" "asdf:haxe" "4.3.6"; }

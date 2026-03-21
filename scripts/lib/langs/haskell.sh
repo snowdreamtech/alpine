@@ -12,6 +12,35 @@ install_runtime_haskell() {
   run_mise install "ghc@$(get_mise_tool_version ghc)"
 }
 
+# Purpose: Installs Haskell linter (ormolu).
+install_haskell_lint() {
+  local _T0_HASKELL
+  _T0_HASKELL=$(date +%s)
+  local _TITLE="Haskell Lint"
+  local _PROVIDER="ormolu"
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  local _CUR_VER
+  _CUR_VER=$(get_version "$_PROVIDER")
+
+  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
+    log_summary "Haskell" "Haskell Lint" "✅ Exists" "$_CUR_VER" "0"
+    return 0
+  fi
+
+  _log_setup "$_TITLE" "$_PROVIDER"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Haskell" "Haskell Lint" "⚖️ Previewed" "-" "0"
+    return 0
+  fi
+
+  local _STAT_HASKELL="✅ Installed"
+  run_mise install "${_PROVIDER}@${_REQ_VER}" || _STAT_HASKELL="❌ Failed"
+
+  log_summary "Haskell" "Haskell Lint" "$_STAT_HASKELL" "$(get_version ormolu)" "$(($(date +%s) - _T0_HASKELL))"
+}
+
 # Purpose: Sets up Haskell runtime.
 setup_haskell() {
   if ! has_lang_files "package.yaml stack.yaml *.cabal" "*.hs"; then
@@ -46,6 +75,9 @@ setup_haskell() {
   local _DUR_HASKELL_RT
   _DUR_HASKELL_RT=$(($(date +%s) - _T0_HASKELL_RT))
   log_summary "Runtime" "Haskell" "$_STAT_HASKELL_RT" "$(get_version ghc --version)" "$_DUR_HASKELL_RT"
+
+  setup_registry_ormolu
+  install_haskell_lint
 }
 # Purpose: Checks if Haskell runtime is available.
 # Examples:
