@@ -73,6 +73,7 @@ install_java_lint() {
     return 0
   fi
   local _STAT_JAVA="✅ mise"
+  setup_registry_google_java_format
   run_mise install "$_PROVIDER" || _STAT_JAVA="❌ Failed"
   log_summary "Java" "Java Lint" "$_STAT_JAVA" "$(get_version google-java-format)" "$(($(date +%s) - _T0_JAVA))"
 }

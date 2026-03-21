@@ -61,6 +61,7 @@ install_ruby_lint() {
   local _STAT_RUBY="✅ Installed"
   # Support mise gem provider if possible, else fallback to direct gem
   if command -v mise >/dev/null 2>&1; then
+    setup_registry_rubocop
     run_mise install "$_PROVIDER" || _STAT_RUBY="❌ Failed"
   else
     gem install rubocop --no-document || _STAT_RUBY="❌ Failed"

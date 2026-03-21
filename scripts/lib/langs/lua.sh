@@ -27,6 +27,7 @@ install_stylua() {
     return 0
   fi
   local _STAT_LUA="✅ mise"
+  setup_registry_stylua
   run_mise install "$_PROVIDER" || _STAT_LUA="❌ Failed"
   log_summary "Lua" "StyLua" "$_STAT_LUA" "$(get_version stylua --version)" "$(($(date +%s) - _T0_LUA))"
 }
