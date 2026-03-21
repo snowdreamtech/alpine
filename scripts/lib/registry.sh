@@ -82,3 +82,15 @@ setup_registry_pkl() { register_mise_tool "Pkl" "asdf:pkl" "0.31.0"; }
 setup_registry_bazel() { register_mise_tool "Bazel" "asdf:bazel" "9.0.1"; }
 setup_registry_spark() { register_mise_tool "Spark" "asdf:spark" "4.1.1"; }
 setup_registry_ballerina() { register_mise_tool "Ballerina" "github:ballerina-platform/ballerina-distribution" "2201.11.0"; }
+
+# -- Secondary Tooling / Infrastructure / Linting --
+setup_registry_kube_linter() { register_mise_tool "Kube-Linter" "${VER_KUBE_LINTER_PROVIDER:-github:stackrox/kube-linter}" "${VER_KUBE_LINTER:-latest}"; }
+setup_registry_spectral() { register_mise_tool "Spectral" "${VER_SPECTRAL_PROVIDER:-npm:@stoplight/spectral-cli}" "${VER_SPECTRAL:-latest}"; }
+setup_registry_buf() { register_mise_tool "Buf" "${VER_BUF_PROVIDER:-github:bufbuild/buf}" "${VER_BUF:-latest}"; }
+setup_registry_trivy() { register_mise_tool "Trivy" "${VER_TRIVY_PROVIDER:-github:aquasecurity/trivy}" "${VER_TRIVY:-latest}"; }
+setup_registry_osv_scanner() { register_mise_tool "OSV-Scanner" "${VER_OSV_SCANNER_PROVIDER:-github:google/osv-scanner}" "${VER_OSV_SCANNER:-latest}"; }
+setup_registry_cargo_audit() { register_mise_tool "Cargo-Audit" "${VER_CARGO_AUDIT_PROVIDER:-cargo:cargo-audit}" "${VER_CARGO_AUDIT:-latest}"; }
+setup_registry_tflint() { register_mise_tool "TFLint" "${VER_TFLINT_PROVIDER:-github:terraform-linters/tflint}" "${VER_TFLINT:-latest}"; }
+setup_registry_tofu() { register_mise_tool "OpenTofu" "${VER_TOFU_PROVIDER:-github:opentofu/opentofu}" "${VER_TOFU:-latest}"; }
+setup_registry_just() { register_mise_tool "Just" "${VER_JUST_PROVIDER:-github:casey/just}" "${VER_JUST:-latest}"; }
+setup_registry_task() { register_mise_tool "Task" "${VER_TASK_PROVIDER:-github:go-task/task}" "${VER_TASK:-latest}"; }
