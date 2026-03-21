@@ -686,11 +686,23 @@ is_ci_env() {
 #   $1 - Manifest files (space-separated, e.g., "go.mod package.json")
 #   $2 - File globs/extensions (space-separated, e.g., "*.go *.ts")
 # Returns:
-#   0 - Detected
+#   0 - Detected (or Force Setup active)
 #   1 - Not detected
+#
+# NOTE: If the environment variable FORCE_SETUP is set to 1, this function
+#       will always return 0 (success). This is useful for pre-provisioning
+#       environments (like DevContainer image building) where language-specific
+#       tools need to be installed before the actual source code is present.
+#
 # Examples:
 #   if has_lang_files "package.json" "*.ts *.js"; then echo "Node project"; fi
 has_lang_files() {
+  # Support for pre-provisioning: Skip file detection if force mode is active.
+  # This allows 'make setup <lang>' to work in headless/empty environments.
+  if [ "${FORCE_SETUP:-0}" -eq 1 ]; then
+    return 0
+  fi
+
   local _FILES_LANG="$1"
   local _EXTS_LANG="$2"
 

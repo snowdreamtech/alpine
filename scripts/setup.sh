@@ -281,6 +281,21 @@ EOF
       esac
     fi
 
+    # ── Force Mode Detection (Architectural Enhancement) ──
+    # If a specific module is explicitly requested by the user from the CLI
+    # (e.g., 'make setup go'), we set FORCE_SETUP=1. This instructs the
+    # language setup functions to skip the 'has_lang_files' check, which
+    # is essential for pre-provisioning (like DevContainer building) where
+    # tools are installed before source code exists.
+    export FORCE_SETUP=0
+    if [ "$_IS_ALL_MODULES" = "false" ] && [ -n "$(echo "${_RAW_ARGS}" | tr -d ' ')" ]; then
+      case " ${_RAW_ARGS} " in *" ${_cur_module} "*)
+        export FORCE_SETUP=1
+        log_debug "Force setup enabled for explicitly requested module: $_cur_module"
+        ;;
+      esac
+    fi
+
     # Dispatch to modular setup functions
     case $_cur_module in
     base) setup_base ;;
