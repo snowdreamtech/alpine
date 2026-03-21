@@ -74,7 +74,7 @@ _mise_detect_os() {
 _mise_install_tier1() {
   local _SHELL="$1"
   log_info "Tier 1: Trying official shell-specific streamer for ${_SHELL}..."
-  if curl -sS -L "https://mise.run/${_SHELL}" | sh; then
+  if curl --retry 5 --retry-delay 2 --retry-connrefused -sS -L "https://mise.run/${_SHELL}" | sh; then
     return 0
   fi
   return 1
@@ -157,9 +157,9 @@ _mise_install_tier4() {
 
   _download() {
     if command -v curl >/dev/null 2>&1; then
-      run_quiet curl -fSL --connect-timeout 15 -o "$2" "$1"
+      run_quiet curl --retry 5 --retry-delay 2 --retry-connrefused -fSL --connect-timeout 15 -o "$2" "$1"
     elif command -v wget >/dev/null 2>&1; then
-      run_quiet wget -q --timeout=15 -O "$2" "$1"
+      run_quiet wget --tries=5 --waitretry=2 -q --timeout=15 -O "$2" "$1"
     else
       log_error "Neither curl nor wget is available for manual download."
       return 1
