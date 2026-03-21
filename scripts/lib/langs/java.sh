@@ -20,42 +20,7 @@ install_java_lint() {
   local _PROVIDER="${VER_JAVA_FORMAT_PROVIDER}"
   local _REQ_VER="${VER_JAVA_FORMAT}"
 
-  # Fallback for linux/arm64 which lacks native google-java-format binaries
-  if [ "$_G_OS" = "linux" ] && { [ "$(uname -m)" = "aarch64" ] || [ "$(uname -m)" = "arm64" ]; }; then
-    local _BIN_PATH="$HOME/.local/bin/google-java-format"
-    local _JAR_PATH="$HOME/.local/share/java/google-java-format-${_REQ_VER}-all-deps.jar"
-
-    if [ -x "$_BIN_PATH" ] && [ -f "$_JAR_PATH" ]; then
-      log_summary "Java" "Java Lint" "✅ Exists (Jar)" "$_REQ_VER" "0"
-      return 0
-    fi
-
-    _log_setup "$_TITLE" "jar-fallback"
-    if [ "${DRY_RUN:-0}" -eq 1 ]; then
-      log_summary "Java" "Java Lint" "⚖️ Previewed" "-" "0"
-      return 0
-    fi
-
-    mkdir -p "$(dirname "$_BIN_PATH")" "$(dirname "$_JAR_PATH")"
-    local _URL="https://github.com/google/google-java-format/releases/download/v${_REQ_VER}/google-java-format-${_REQ_VER}-all-deps.jar"
-    [ "${ENABLE_GITHUB_PROXY}" = "1" ] || [ "${ENABLE_GITHUB_PROXY}" = "true" ] && _URL="${GITHUB_PROXY}${_URL}"
-
-    local _STAT_JAVA="✅ Installed (Jar wrapper)"
-    if command -v curl >/dev/null 2>&1; then
-      run_quiet curl --retry 5 --retry-delay 2 --retry-connrefused -fSL --connect-timeout 15 -o "$_JAR_PATH" "$_URL" || _STAT_JAVA="❌ Failed"
-    else
-      run_quiet wget --tries=5 --waitretry=2 -q --timeout=15 -O "$_JAR_PATH" "$_URL" || _STAT_JAVA="❌ Failed"
-    fi
-
-    if [ "$_STAT_JAVA" != "❌ Failed" ]; then
-      printf '#!/usr/bin/env sh\nexec java -jar "%s" "$@"\n' "$_JAR_PATH" >"$_BIN_PATH"
-      chmod +x "$_BIN_PATH"
-      log_summary "Java" "Java Lint" "$_STAT_JAVA" "$_REQ_VER" "$(($(date +%s) - _T0_JAVA))"
-    else
-      log_summary "Java" "Java Lint" "❌ Failed" "-" "$(($(date +%s) - _T0_JAVA))"
-    fi
-    return 0
-  fi
+  # Rely natively on mise's asset mapping from registry.sh for arm64/windows fallbacks
 
   # Fast-path: Check version-aware existence
   local _CUR_VER

@@ -20,6 +20,31 @@ register_mise_tool() {
   run_mise use "${_PROVIDER}@${_VERSION}"
 }
 
+# Purpose: Registers a tool in .mise.toml using a complex TOML value (e.g., dictionary with asset matches).
+# Params:
+#   $1 - Tool name (internal)
+#   $2 - Mise provider/name
+#   $3 - TOML representation (dictionary map)
+register_mise_tool_complex() {
+  local _NAME="$1"
+  local _TOOL="$2"
+  local _TOML_VALUE="$3"
+
+  # Check if already in .mise.toml
+  if grep -qE "^\"?${_TOOL}\"?[[:space:]]*=" "$(get_project_root)/.mise.toml" 2>/dev/null; then
+    return 0
+  fi
+
+  log_info "Dynamically registering ${_NAME} SDK (${_TOOL}) with complex assets..."
+
+  awk -v inject="\"${_TOOL}\" = ${_TOML_VALUE}" '
+    /^\[tools\]/ { print; print inject; next }
+    { print }
+  ' "$(get_project_root)/.mise.toml" >"$(get_project_root)/.mise.toml.tmp" && mv "$(get_project_root)/.mise.toml.tmp" "$(get_project_root)/.mise.toml"
+
+  run_mise install "${_TOOL}"
+}
+
 # --- Registry Data ---
 # Note: Core runtimes (Node, Python) are always in .mise.toml.
 # Secondary runtimes (Go, Rust, Java, etc.) are dynamically registered
@@ -98,5 +123,5 @@ setup_registry_ktlint() { register_mise_tool "ktlint" "${VER_KTLINT_PROVIDER:-np
 setup_registry_swiftformat() { register_mise_tool "SwiftFormat" "${VER_SWIFTFORMAT_PROVIDER:-github:nicklockwood/SwiftFormat}" "${VER_SWIFTFORMAT:-latest}"; }
 setup_registry_swiftlint() { register_mise_tool "SwiftLint" "${VER_SWIFTLINT_PROVIDER:-github:realm/SwiftLint}" "${VER_SWIFTLINT:-latest}"; }
 setup_registry_rubocop() { register_mise_tool "Rubocop" "${VER_RUBOCOP_PROVIDER:-gem:rubocop}" "${VER_RUBOCOP:-latest}"; }
-setup_registry_google_java_format() { register_mise_tool "Google Java Format" "${VER_JAVA_FORMAT_PROVIDER:-github:google/google-java-format}" "${VER_JAVA_FORMAT:-latest}"; }
+setup_registry_google_java_format() { register_mise_tool_complex "Google Java Format" "${VER_JAVA_FORMAT_PROVIDER:-github:google/google-java-format}" "{ version = \"${VER_JAVA_FORMAT:-latest}\", asset = [ { match = \"darwin-arm64\" }, { match = \"linux-x86-64\" }, { match = \"linux-arm64\" }, { match = \"windows-x86-64\" }, { match = \"all-deps.jar\" } ] }"; }
 setup_registry_stylua() { register_mise_tool "StyLua" "${VER_STYLUA_PROVIDER:-github:JohnnyMorganz/StyLua}" "${VER_STYLUA:-latest}"; }
