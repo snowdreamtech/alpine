@@ -34,6 +34,7 @@ install_ktlint() {
     return 0
   fi
   local _STAT_KT="✅ mise"
+  setup_registry_ktlint
   run_mise install "$_PROVIDER" || _STAT_KT="❌ Failed"
   log_summary "Kotlin" "ktlint" "$_STAT_KT" "$(get_version ktlint --version)" "$(($(date +%s) - _T0_KT))"
 }

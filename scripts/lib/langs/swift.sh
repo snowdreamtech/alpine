@@ -71,6 +71,7 @@ install_swiftformat() {
 
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_SF="✅ mise"
+  setup_registry_swiftformat
   run_mise install "$_PROVIDER" || _STAT_SF="❌ Failed"
   log_summary "Swift" "SwiftFormat" "$_STAT_SF" "$(get_version swiftformat)" "$(($(date +%s) - _T0_SF))"
 }
@@ -100,6 +101,7 @@ install_swiftlint() {
 
   _log_setup "$_TITLE" "$_PROVIDER"
   local _STAT_SL="✅ mise"
+  setup_registry_swiftlint
   run_mise install "$_PROVIDER" || _STAT_SL="❌ Failed"
   log_summary "Swift" "SwiftLint" "$_STAT_SL" "$(get_version swiftlint)" "$(($(date +%s) - _T0_SL))"
 }
