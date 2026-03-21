@@ -42,6 +42,7 @@ install_tflint() {
     return 0
   fi
   local _STAT_TF="✅ mise"
+  setup_registry_tflint
   run_mise install "$_PROVIDER" || _STAT_TF="❌ Failed"
   log_summary "IaC" "TFLint" "$_STAT_TF" "$(get_version tflint)" "$(($(date +%s) - _T0_TF))"
 }

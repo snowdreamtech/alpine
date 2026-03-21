@@ -9,6 +9,7 @@ install_runtime_tofu() {
     return 0
   fi
   # shellcheck disable=SC2154
+  setup_registry_tofu
   run_mise install "opentofu@$(get_mise_tool_version opentofu)"
 }
 

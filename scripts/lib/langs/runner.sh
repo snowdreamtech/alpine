@@ -30,6 +30,7 @@ install_just() {
     return 0
   fi
   local _STAT_JUST="✅ mise"
+  setup_registry_just
   run_mise install "$_PROVIDER" || _STAT_JUST="❌ Failed"
   log_summary "Base" "Just" "$_STAT_JUST" "$(get_version just --version)" "$(($(date +%s) - _T0_JUST))"
 }
@@ -63,6 +64,7 @@ install_task() {
     return 0
   fi
   local _STAT_TASK="✅ mise"
+  setup_registry_task
   run_mise install "$_PROVIDER" || _STAT_TASK="❌ Failed"
   log_summary "Base" "Task" "$_STAT_TASK" "$(get_version task --version)" "$(($(date +%s) - _T0_TASK))"
 }
