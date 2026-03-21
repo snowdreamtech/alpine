@@ -966,8 +966,12 @@ get_version() {
   # Optimization: Prefer the currently active version; fall back to any installed version
   # to avoid slow shim fallbacks. Using 'first(select(...))' or sort ensures active wins.
   _MISE_VER_OUT=$(echo "$_G_MISE_LS_JSON_CACHE" | jq -r "
-    to_entries[]
-    | select(.key == \"$_M_PLUGIN\" or (.key | contains(\":$_M_PLUGIN\")) or (.key | contains(\"/$_M_PLUGIN\")))
+    # Priority 1: Exact key match (e.g. 'go' matches only 'go', not 'go-task/task')
+    # Priority 2: Provider suffix match (e.g. ':go' or '/go' at end of key)
+    # This prevents false positives where short names like 'go' match unrelated
+    # tools such as 'github:go-task/task' via substring contains().
+    (to_entries[] | select(.key == \"$_M_PLUGIN\")) //
+    (to_entries[] | select(.key | endswith(\":$_M_PLUGIN\") or endswith(\"/$_M_PLUGIN\")))
     | .value
     | (map(select(.active==true))[0] // map(select(.installed==true))[0])
     | .version // empty" 2>/dev/null | head -n 1 || true)
