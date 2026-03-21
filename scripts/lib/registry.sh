@@ -66,6 +66,7 @@ setup_registry_rescript() { register_mise_tool "ReScript" "asdf:rescript" "12.0.
 setup_registry_ruby() { register_mise_tool "Ruby" "ruby" "3.4.2"; }
 setup_registry_sbcl() { register_mise_tool "SBCL" "asdf:sbcl" "2.6.2"; }
 setup_registry_scala() { register_mise_tool "Scala" "asdf:scala" "3.6.3"; }
+setup_registry_scalafmt() { register_mise_tool "Scalafmt" "scalafmt" "3.8.3"; }
 setup_registry_solc() { register_mise_tool "Solc" "asdf:solc" "0.8.28"; }
 setup_registry_swift() { register_mise_tool "Swift" "asdf:swift" "6.0.3"; }
 setup_registry_prolog() { register_mise_tool "Prolog" "asdf:swi-prolog" "10.1.5"; }
