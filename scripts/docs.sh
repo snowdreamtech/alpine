@@ -110,6 +110,14 @@ main() {
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would build VitePress site from $DOCS_DIR"
     else
+      # Install documentation dependencies if package.json exists
+      if [ -f "$DOCS_DIR/package.json" ]; then
+        log_info "Installing documentation dependencies..."
+        # use 'mise exec' to ensure pnpm is resolved via mise shims
+        # even when the mise shell integration is not activated.
+        run_mise exec -- pnpm --dir "$DOCS_DIR" install
+      fi
+
       local _VITEPRESS_BIN
       _VITEPRESS_BIN=$(resolve_bin "vitepress")
       log_info "Building documentation site..."

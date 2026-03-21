@@ -74,18 +74,11 @@ jobs:
           make setup
           make install
 
-      - name: "📦 Install Documentation Dependencies"
+      - name: "🚀 compile documentation artifacts"
         shell: sh
         run: |
-          # Use 'mise exec' to ensure pnpm is resolved via mise shims
-          # even when the mise shell integration is not activated.
-          mise exec -- pnpm --dir docs install
-
-      - name: "🚀 Compile Documentation Artifacts"
-        shell: sh
-        run: |
-          # Executes the static site generator (VitePress) to build the production frontend.
-          mise exec -- vitepress build docs
+          # executes the documentation manager to install dependencies and build site.
+          make docs ARGS="build"
 
       - name: "📦 Stage Assets for Web Deployment"
         uses: actions/upload-pages-artifact@v4.0.0
