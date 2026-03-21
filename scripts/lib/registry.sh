@@ -21,7 +21,11 @@ register_mise_tool() {
 }
 
 # --- Registry Data ---
-# Note: Core runtimes (Node, Python, Go, Rust) are already in .mise.toml.
+# Note: Core runtimes (Node, Python) are always in .mise.toml.
+# Secondary runtimes (Go, Rust, Java, etc.) are dynamically registered
+# only when their source files are detected or explicitly requested.
+
+setup_registry_go() { register_mise_tool "Go" "go" "${VER_GO}"; }
 
 setup_registry_ada() { register_mise_tool "Ada" "asdf:ada" "14.2.0"; }
 setup_registry_clojure() { register_mise_tool "Clojure" "asdf:clojure" "1.12.0.1479"; }

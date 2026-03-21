@@ -67,6 +67,11 @@ setup_go() {
     return 0
   fi
 
+  # Dynamically register Go in .mise.toml if not already present.
+  # This is essential for pre-provisioning (e.g., DevContainer builds)
+  # where Go is explicitly requested before source files exist.
+  setup_registry_go
+
   local _T0_GO_RT
   _T0_GO_RT=$(date +%s)
   local _TITLE="Go Runtime"
