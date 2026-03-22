@@ -1024,7 +1024,7 @@ get_version() {
 # Returns:
 #   Absolute or relative path to the resolved binary, or empty if not found.
 # Examples:
-#   BIN=$(resolve_bin "eslint")
+#   BIN=$(resolve_bin "eslint") || true
 resolve_bin() {
   local _BIN_RES="$1"
   [ -z "$_BIN_RES" ] && return 1
@@ -1140,7 +1140,7 @@ install_runtime_hooks() {
   fi
 
   local _PRE_COMMIT_BIN
-  _PRE_COMMIT_BIN=$(resolve_bin "pre-commit")
+  _PRE_COMMIT_BIN=$(resolve_bin "pre-commit") || true
   if [ -n "$_PRE_COMMIT_BIN" ]; then
     log_info "Running pre-commit install..."
     run_quiet "$_PRE_COMMIT_BIN" install
