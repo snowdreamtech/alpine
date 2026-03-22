@@ -362,7 +362,11 @@ get_mise_tool_version() {
       tr '[:lower:]' '[:upper:]' |
       tr -c 'A-Z0-9\n' '_' |
       sed 's/_*$//')
-    eval "_VER=\${VER_${_VAR_KEY}:-}"
+    # Safety: Only eval if key is a valid shell variable name (A-Z, 0-9, _)
+    case "$_VAR_KEY" in
+    *[!A-Z0-9_]*) ;;
+    *) eval "_VER=\${VER_${_VAR_KEY}:-}" ;;
+    esac
   fi
 
   # 4. Fallback to 'latest' if no version is explicitly defined anywhere
@@ -1018,49 +1022,64 @@ get_version() {
   fi
 }
 
-# Purpose: Resolves a binary path by checking local virtualenvs, node_modules, and PATH.
+# Purpose: Resolves the executable path for a tool across venv, node_modules,
+#          system PATH, and mise-managed environments (shim + direct install).
 # Params:
-#   $1 - Binary name (e.g., "eslint", "pytest")
+#   $1 - Binary name (e.g., "eslint", "pytest", "bats")
 # Returns:
-#   Absolute or relative path to the resolved binary, or empty if not found.
+#   Echoes the resolved path. Exit 0 on success, 1 if not found.
+# Environments:
+#   - Local dev (with/without mise cache)
+#   - CI runners (clean or pre-cached)
+#   - Windows (Git Bash/MSYS2), macOS, Linux
 # Examples:
 #   BIN=$(resolve_bin "eslint") || true
 resolve_bin() {
-  local _BIN_RES="$1"
-  [ -z "$_BIN_RES" ] && return 1
+  local _BIN="$1"
+  [ -z "$_BIN" ] && return 1
 
-  # 1. Check Python Venv
-  local _VENV_RES="${VENV:-.venv}"
-  if [ -x "$_VENV_RES/$_G_VENV_BIN/$_BIN_RES" ]; then
-    echo "$_VENV_RES/$_G_VENV_BIN/$_BIN_RES"
-    return 0
-  fi
+  # ── 1. Python Venv ──
+  local _VP="${VENV:-.venv}/$_G_VENV_BIN/$_BIN"
+  if [ -x "$_VP" ]; then echo "$_VP" && return 0; fi
+  # Windows: venv scripts use .exe suffix
+  if [ "$_G_OS" = "windows" ] && [ -x "${_VP}.exe" ]; then echo "${_VP}.exe" && return 0; fi
 
-  # 2. Check Node Modules
-  if [ -x "node_modules/.bin/$_BIN_RES" ]; then
-    echo "node_modules/.bin/$_BIN_RES"
-    return 0
-  fi
+  # ── 2. Node Modules ──
+  local _NP="node_modules/.bin/$_BIN"
+  if [ -x "$_NP" ]; then echo "$_NP" && return 0; fi
+  # Windows: npm generates .cmd wrappers
+  if [ "$_G_OS" = "windows" ] && [ -f "${_NP}.cmd" ]; then echo "${_NP}.cmd" && return 0; fi
 
-  # 3. Check System PATH
-  local _SYS_BIN
-  _SYS_BIN=$(command -v "$_BIN_RES" 2>/dev/null)
-  if [ -n "$_SYS_BIN" ]; then
-    # Guard: If it's a mise shim, verify it's not "hollow"
-    if echo "$_SYS_BIN" | grep -q "mise/shims"; then
-      local _M_BIN
-      _M_BIN=$(command -v mise 2>/dev/null || echo "$_G_MISE_BIN_BASE/mise")
-      # Improved JQ filter to correctly identify installed tools even with provider prefixes
-      if ! "$_M_BIN" ls --json 2>/dev/null | jq -e "to_entries[] | select(.key == \"$_BIN_RES\" or (.key | contains(\":$_BIN_RES\"))) | .value[] | select(.active==true or .installed==true)" >/dev/null 2>&1; then
-        # Also check if it's in our [env] section as a CI-only tool
-        if [ -n "$(get_mise_tool_version "$_BIN_RES")" ]; then
-          # It's a managed tool but not installed locally. Return 1 to indicate "not found".
-          return 1
-        fi
+  # ── 3. System PATH ──
+  local _SP
+  _SP=$(command -v "$_BIN" 2>/dev/null) || true
+  if [ -n "$_SP" ]; then
+    # Guard: If it resolves to a mise shim, verify the tool is actually installed.
+    # Shims exist for ALL tools in .mise.toml, even uninstalled ones ("hollow shims").
+    case "$_SP" in
+    *"$_G_MISE_SHIMS_BASE"*)
+      # Use 'mise which' — the lightweight, jq-free way to validate a shim.
+      # Returns the real binary path if installed, non-zero if not.
+      local _MW
+      _MW=$(mise which "$_BIN" 2>/dev/null) || true
+      if [ -n "$_MW" ] && [ -x "$_MW" ]; then
+        echo "$_MW" && return 0
       fi
-    fi
-    echo "$_SYS_BIN"
-    return 0
+      # Shim is hollow — fall through to Layer 4.
+      ;;
+    *)
+      # Not a shim — it's a real system binary.
+      echo "$_SP" && return 0
+      ;;
+    esac
+  fi
+
+  # ── 4. Mise direct lookup (no shim in PATH, e.g., fresh CI) ──
+  # Covers: mise installed the tool but shims/PATH not yet activated.
+  local _MW
+  _MW=$(mise which "$_BIN" 2>/dev/null) || true
+  if [ -n "$_MW" ] && [ -x "$_MW" ]; then
+    echo "$_MW" && return 0
   fi
 
   return 1
