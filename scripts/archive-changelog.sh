@@ -58,10 +58,13 @@ run_archival_cleanup() {
   local _NEW_CHANGELOG_CLN="$2"
   local _TMP_SUMMARY_CLN="$3"
   local _TMP_ARCH_DIR_CLN="$4"
-  local _DRY_RUN_CLN="$5"
+  local _TMP_FILT_CLN="$5"
+  local _TMP_SWAP_CLN="$6"
+  local _TMP_HIST_CLN="$7"
+  local _DRY_RUN_CLN="$8"
 
   log_debug "Cleaning up temporary files..."
-  rm -f "$_TMP_HEADER_CLN" "$_NEW_CHANGELOG_CLN" "$_TMP_SUMMARY_CLN"
+  rm -f "$_TMP_HEADER_CLN" "$_NEW_CHANGELOG_CLN" "$_TMP_SUMMARY_CLN" "$_TMP_FILT_CLN" "$_TMP_SWAP_CLN" "$_TMP_HIST_CLN"
   rm -rf "$_TMP_ARCH_DIR_CLN"
   if [ "${_DRY_RUN_CLN:-0}" -eq 0 ]; then
     rmdir "$LOCK_DIR" 2>/dev/null || true
@@ -112,13 +115,20 @@ main() {
   local _TMP_ARCH_PFX
   local _NEW_CHLOG
   local _TMP_SUM
+  local _FILTERED_CONTENT_ARCH
+  local _TMP_ARCH_SWAP
+  local _HISTORY_LINKS_SCRATCH
+
   _TMP_HDR=$(mktemp)
   _TMP_ARCH_PFX=$(mktemp -d)
   _NEW_CHLOG=$(mktemp)
   _TMP_SUM=$(mktemp)
+  _FILTERED_CONTENT_ARCH=$(mktemp)
+  _TMP_ARCH_SWAP=$(mktemp)
+  _HISTORY_LINKS_SCRATCH=$(mktemp)
 
   # Setup Trap for cleanup
-  trap 'run_archival_cleanup "$_TMP_HDR" "$_NEW_CHLOG" "$_TMP_SUM" "$_TMP_ARCH_PFX" "${DRY_RUN:-0}"' EXIT INT TERM
+  trap 'run_archival_cleanup "$_TMP_HDR" "$_NEW_CHLOG" "$_TMP_SUM" "$_TMP_ARCH_PFX" "$_FILTERED_CONTENT_ARCH" "$_TMP_ARCH_SWAP" "$_HISTORY_LINKS_SCRATCH" "${DRY_RUN:-0}"' EXIT INT TERM
 
   # Get current major version (Universal Source)
   local _RAW_VER_ARCH
@@ -228,8 +238,8 @@ main() {
     log_debug "Processing archival block for major version $_V_NUM_PROC..."
 
     if [ -f "$_FINAL_ARCH_FILE" ]; then
-      local _FILTERED_CONTENT_ARCH
-      _FILTERED_CONTENT_ARCH=$(mktemp)
+      # _FILTERED_CONTENT_ARCH is reused safely because we empty it
+      : >"$_FILTERED_CONTENT_ARCH"
       awk -v arch="$_FINAL_ARCH_FILE" '
         BEGIN {
           while ((getline line < arch) > 0) {
@@ -250,12 +260,12 @@ main() {
           printf "| v%s | Prepend (Dry Run) | %s |\n" "$_V_NUM_PROC" "$_FINAL_ARCH_FILE" >>"$_TMP_SUM"
         else
           log_info "Updating archive: $_FINAL_ARCH_FILE"
-          local _tmp_arch_swap
-          _tmp_arch_swap=$(mktemp)
-          cat "$_FILTERED_CONTENT_ARCH" >"$_tmp_arch_swap"
-          printf "\n" >>"$_tmp_arch_swap"
-          sed '1,2d' "$_FINAL_ARCH_FILE" >>"$_tmp_arch_swap"
-          atomic_swap "$_tmp_arch_swap" "$_FINAL_ARCH_FILE"
+          # _TMP_ARCH_SWAP is reused safely because we empty it
+          : >"$_TMP_ARCH_SWAP"
+          cat "$_FILTERED_CONTENT_ARCH" >"$_TMP_ARCH_SWAP"
+          printf "\n" >>"$_TMP_ARCH_SWAP"
+          sed '1,2d' "$_FINAL_ARCH_FILE" >>"$_TMP_ARCH_SWAP"
+          atomic_swap "$_TMP_ARCH_SWAP" "$_FINAL_ARCH_FILE"
           printf "| v%s | Updated | %s |\n" "$_V_NUM_PROC" "$_FINAL_ARCH_FILE" >>"$_TMP_SUM"
         fi
         _ARCHIVE_COUNT_ARCH=$((_ARCHIVE_COUNT_ARCH + 1))
@@ -284,8 +294,8 @@ main() {
 
   # 5. Rebuild History section in NEW_CHLOG (Sorted)
   log_info "Rebuilding History section (Archive Directory: $_REL_ARCHIVE_DIR)..."
-  local _HISTORY_LINKS_SCRATCH
-  _HISTORY_LINKS_SCRATCH=$(mktemp)
+  # _HISTORY_LINKS_SCRATCH is emptied for reuse
+  : >"$_HISTORY_LINKS_SCRATCH"
   # Check filesystem for existing archives in _REL_ARCHIVE_DIR
   local _f_hist
   for _f_hist in "$_REL_ARCHIVE_DIR"/CHANGELOG-v*.md; do

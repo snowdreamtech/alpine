@@ -679,6 +679,7 @@ main() {
   # Use a temporary file to avoid subshell variable loss with find | while read
   local _TMP_SCRIPTS
   _TMP_SCRIPTS=$(mktemp)
+  trap 'rm -f "$_TMP_SCRIPTS"' EXIT INT TERM
   find scripts -name "*.sh" -type f >"$_TMP_SCRIPTS"
   while read -r _s_chk; do
     if [ -f "$_s_chk" ]; then
