@@ -172,7 +172,7 @@ _mise_install_tier4() {
       return 1
     fi
     local _TMP_DIR
-    _TMP_DIR=$(mktemp -d 2>/dev/null || echo "/tmp/mise_win_extract")
+    _TMP_DIR=$(mktemp -d 2>/dev/null || echo "/tmp/mise_win_extract_$$")
     local _TMP_ZIP="${_TMP_DIR}/mise.zip"
 
     if _download "$_M_URL" "$_TMP_ZIP"; then
