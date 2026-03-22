@@ -123,6 +123,9 @@ project-root/
 - **问题**: Gitleaks 检测到误报。
   - **诊断**: 检查 `.gitleaks.toml` 白名单。
   - **解决方案**: 将特征码添加到 `.gitleaksignore`。
+- **问题**: `make install` 后，macOS 上的 Pre-commit 钩子出现 Python 报错。
+  - **诊断**: 检查 venv 是否存在：`ls .venv/bin/python`。
+  - **解决方案**: 重建 venv：`rm -rf .venv && make install`。
 
 ---
 
@@ -145,6 +148,28 @@ project-root/
 ---
 
 ## 🧑‍💻 第 5 节 — 开发者指南
+
+### 代码组织 (Code Organization)
+
+```text
+project-root/
+├── .agent/               # AI 配置（单一事实来源）
+│   ├── rules/            # 88 个 AI Agent 行为规则文件
+│   └── workflows/        # SpecKit 斜杠命令定义
+├── .github/              # GitHub 生态（Actions、模板、Dependabot）
+│   └── workflows/        # CI/CD 流水线（lint、verify、release、security）
+├── .devcontainer/        # DevContainer 配置，保障可复现的开发环境
+├── docs/                 # 项目文档
+│   ├── adr/              # 架构决策记录
+│   ├── runbooks/         # 运维与恢复手册
+│   └── glossary.md       # 中英文对照术语表
+├── scripts/              # POSIX Shell 自动化脚本（setup、install、verify）
+│   └── lib/              # 共享 Shell 库函数
+└── Makefile              # 任务编排（setup、install、lint、verify、audit）
+```
+
+**命名规范**：核心规则文件使用 `NN-短横线命名.md`，语言栈规则使用 `technology.md`，
+工作流文件使用 `namespace.verb.md`，Shell 脚本使用 `kebab-case.sh`。
 
 ### 扩展点
 
