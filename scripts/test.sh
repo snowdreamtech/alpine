@@ -76,7 +76,10 @@ _ensure_bats_vendor() {
 
   # Use GITHUB_PROXY for reliable access in restricted network environments.
   # Rule 01: All GitHub resource downloads MUST use the configured proxy prefix.
-  local _PROXY="${GITHUB_PROXY:-https://gh-proxy.sn0wdr1am.com/}"
+  local _PROXY=""
+  if [ "${ENABLE_GITHUB_PROXY:-0}" = "1" ] || [ "${ENABLE_GITHUB_PROXY:-0}" = "true" ]; then
+    _PROXY="${GITHUB_PROXY:-https://gh-proxy.sn0wdr1am.com/}"
+  fi
 
   # Helper: clone with up to 3 retries, using proxy-prefixed URL first,
   # then falling back to the bare mirror URL if proxy also fails.
