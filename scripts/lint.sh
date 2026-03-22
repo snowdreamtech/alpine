@@ -51,7 +51,7 @@ run_pre_commit_lint() {
   local _LV_FIX="$1"
   log_info "── Running pre-commit hooks (Pass 1/1) ──"
   local _PRE_COMMIT_LNT
-  _PRE_COMMIT_LNT=$(resolve_bin "pre-commit")
+  _PRE_COMMIT_LNT=$(resolve_bin "pre-commit") || true
 
   if [ -z "$_PRE_COMMIT_LNT" ]; then
     if [ "${DRY_RUN:-0}" -eq 1 ]; then

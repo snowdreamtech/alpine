@@ -96,7 +96,7 @@ main() {
     local _T0_ZM
     _T0_ZM=$(date +%s)
     local _ZIZMOR_BIN
-    _ZIZMOR_BIN=$(resolve_bin "zizmor")
+    _ZIZMOR_BIN=$(resolve_bin "zizmor") || true
     if [ -n "$_ZIZMOR_BIN" ]; then
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_success "DRY-RUN: Would run zizmor"
@@ -142,7 +142,7 @@ main() {
     _T0_PY_AUD=$(date +%s)
     log_info "\n── Auditing Python dependencies (pip-audit) ──"
     local _PIPAUDIT_BIN
-    _PIPAUDIT_BIN=$(resolve_bin "pip-audit")
+    _PIPAUDIT_BIN=$(resolve_bin "pip-audit") || true
 
     if [ -n "$_PIPAUDIT_BIN" ]; then
       if [ "${DRY_RUN:-0}" -eq 1 ]; then

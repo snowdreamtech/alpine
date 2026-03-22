@@ -87,7 +87,7 @@ main() {
   # 3. Go build (GoReleaser or native)
   if [ -f ".goreleaser.yaml" ] || [ -f ".goreleaser.yml" ]; then
     local _GORELEASER_BIN
-    _GORELEASER_BIN=$(resolve_bin "${GORELEASER:-goreleaser}")
+    _GORELEASER_BIN=$(resolve_bin "${GORELEASER:-goreleaser}") || true
     if [ -n "$_GORELEASER_BIN" ]; then
       run_build "$_GORELEASER_BIN build --snapshot --clean" "GoReleaser snapshot build"
     fi
@@ -101,7 +101,7 @@ main() {
   # 5. Python build
   if [ -f "pyproject.toml" ]; then
     local _PYTHON_BLD_BIN
-    _PYTHON_BLD_BIN=$(resolve_bin "python3")
+    _PYTHON_BLD_BIN=$(resolve_bin "python3") || true
 
     if [ -n "$_PYTHON_BLD_BIN" ]; then
       run_build "$_PYTHON_BLD_BIN -m build" "Python build"

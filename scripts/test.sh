@@ -124,7 +124,7 @@ run_shell_tests() {
   if [ -d "tests" ] && find tests -name "*.bats" 2>/dev/null | grep -q .; then
     log_info "── Running Shell Tests (bats) ──"
     local _BATS_BIN
-    _BATS_BIN=$(resolve_bin "bats")
+    _BATS_BIN=$(resolve_bin "bats") || true
 
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would run bats tests in tests/"
@@ -155,13 +155,13 @@ run_python_tests() {
     else
       local _PYTEST_BIN
       # We check for 'pytest' or 'python3 -m pytest'
-      _PYTEST_BIN=$(resolve_bin "pytest")
+      _PYTEST_BIN=$(resolve_bin "pytest") || true
 
       if [ -n "$_PYTEST_BIN" ]; then
         "$_PYTEST_BIN" --tb=short
       else
         local _PY_BIN
-        _PY_BIN=$(resolve_bin "python3")
+        _PY_BIN=$(resolve_bin "python3") || true
         if [ -n "$_PY_BIN" ]; then
           "$_PY_BIN" -m pytest --tb=short 2>/dev/null || log_warn "Warning: pytest not found. Skipping python tests."
         else

@@ -50,7 +50,7 @@ EOF
 run_shfmt_format() {
   log_info "── Formatting Shell Scripts (shfmt) ──"
   local _SHFMT_BIN
-  _SHFMT_BIN=$(resolve_bin "shfmt")
+  _SHFMT_BIN=$(resolve_bin "shfmt") || true
 
   if [ -n "$_SHFMT_BIN" ]; then
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
@@ -69,7 +69,7 @@ run_shfmt_format() {
 run_prettier_format() {
   log_info "── Formatting Web/General Files (Prettier) ──"
   local _PRETTIER_BIN
-  _PRETTIER_BIN=$(resolve_bin "prettier")
+  _PRETTIER_BIN=$(resolve_bin "prettier") || true
 
   if [ -z "$_PRETTIER_BIN" ]; then
     log_warn "Warning: prettier not found. Skipping web/general formatting."
@@ -89,7 +89,7 @@ run_prettier_format() {
 run_ruff_format() {
   log_info "── Formatting Python Files (Ruff) ──"
   local _RUFF_FMT_BIN
-  _RUFF_FMT_BIN=$(resolve_bin "ruff")
+  _RUFF_FMT_BIN=$(resolve_bin "ruff") || true
 
   if [ -z "$_RUFF_FMT_BIN" ]; then
     log_warn "Warning: ruff not found. Skipping python formatting."
