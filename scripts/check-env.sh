@@ -677,7 +677,9 @@ main() {
   log_info "── Script Permissions ──"
   local _s_chk _p_err=0
   # Use a temporary file to avoid subshell variable loss with find | while read
-  find scripts -name "*.sh" -type f >/tmp/scripts_to_check.txt
+  local _TMP_SCRIPTS
+  _TMP_SCRIPTS=$(mktemp)
+  find scripts -name "*.sh" -type f >"$_TMP_SCRIPTS"
   while read -r _s_chk; do
     if [ -f "$_s_chk" ]; then
       # Check if it has a shebang
@@ -689,8 +691,8 @@ main() {
         fi
       fi
     fi
-  done </tmp/scripts_to_check.txt
-  rm -f /tmp/scripts_to_check.txt
+  done <"$_TMP_SCRIPTS"
+  rm -f "$_TMP_SCRIPTS"
 
   if [ "$_p_err" -eq 0 ]; then
     log_success "✅ All automation scripts have correct executable permissions."
