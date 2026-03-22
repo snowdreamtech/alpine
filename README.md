@@ -11,6 +11,15 @@
 
 An enterprise-grade, foundational template designed for multi-AI IDE collaboration. This repository serves as a **Single Source of Truth** for AI agent rules, workflows, and project configurations, supporting over 50 different AI-assisted IDEs with massive multi-language support.
 
+## 🌟 Features
+
+- **Multi-IDE Compatibility**: Out-of-the-box support for Cursor, Windsurf, GitHub Copilot, Cline, Roo Code, Trae, Gemini, Claude Code, and 50+ other AI editors.
+- **Unified Rule System**: Centralized rule definitions in `.agent/rules/`. Changes propagate automatically to all supported IDEs via a secure symlink/redirect pattern.
+- **80+ Language & Framework Rules**: Pre-configured high-quality rules from Rust, Go, TypeScript, Python to Ansible, Kubernetes, and API design.
+- **Smart Workflows (SpecKit)**: Standardized `.agent/workflows/` commands (`speckit.plan`, `speckit.analyze`, `snowdreamtech.init`) that behave consistently across all supported environments.
+- **Triple Guarantee Quality**: 100% code purity enforced through Pre-commit and GitHub Actions integrated quality gates.
+- **Cross-Platform Ready**: Runs seamlessly on macOS (Homebrew/MacPorts), Linux, and Windows.
+
 ## 🏗️ Section 1 — Design & Architecture
 
 ### Overview
@@ -113,6 +122,9 @@ project-root/
 - **Problem**: Gitleaks detects false positives.
   - **Diagnosis**: Check `.gitleaks.toml` allowlist.
   - **Solution**: Add fingerprint to `.gitleaksignore`.
+- **Problem**: Pre-commit hooks fail on macOS after `make install` with Python errors.
+  - **Diagnosis**: Check if the venv exists: `ls .venv/bin/python`.
+  - **Solution**: Rebuild the venv: `rm -rf .venv && make install`.
 
 ---
 
@@ -135,6 +147,28 @@ project-root/
 ---
 
 ## 🧑‍💻 Section 5 — Development Guide
+
+### Code Organization
+
+```text
+project-root/
+├── .agent/               # AI configuration (Single Source of Truth)
+│   ├── rules/            # 88 behavioral rule files for AI agents
+│   └── workflows/        # SpecKit slash-command definitions
+├── .github/              # GitHub ecosystem (Actions, templates, Dependabot)
+│   └── workflows/        # CI/CD pipelines (lint, verify, release, security)
+├── .devcontainer/        # DevContainer configuration for reproducible environments
+├── docs/                 # Project documentation
+│   ├── adr/              # Architecture Decision Records
+│   ├── runbooks/         # Operations and recovery runbooks
+│   └── glossary.md       # Bilingual term glossary
+├── scripts/              # POSIX shell automation (setup, install, verify)
+│   └── lib/              # Shared shell library functions
+└── Makefile              # Task orchestration (setup, install, lint, verify, audit)
+```
+
+**Naming Conventions**: Rule files use `NN-kebab-case.md` (core rules) or `technology.md`
+(language stacks). Workflow files use `namespace.verb.md`. Shell scripts use `kebab-case.sh`.
 
 ### Extension Points
 
