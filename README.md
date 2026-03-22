@@ -13,7 +13,18 @@ An enterprise-grade, foundational template designed for multi-AI IDE collaborati
 
 ## 🏗️ Section 1 — Design & Architecture
 
-The Snowdream Tech Template is architected to solve the "N-IDE Fragmentation" problem, ensuring that rules and workflows remain consistent across all supported environments.
+### Overview
+
+The Snowdream Tech Template is a foundational scaffold engineered to solve the "N-IDE Fragmentation" problem. It standardizes the development environment, AI agent rules, and automation pipelines across varied platforms and languages.
+
+**Key Capabilities:**
+
+- Provides a **Unified Rule Engine** that governs AI behavior consistently across 50+ IDEs.
+- Enforces **Cross-Platform Portability** through dynamically adapting POSIX shell automation.
+- Implements a **Triple Guarantee Quality Gate** (IDE, CLI, CI) to prevent regressions.
+- Supports **Massive Multi-Language Stacks** with modular onboarding logic.
+
+### Architecture
 
 ```mermaid
 graph TD
