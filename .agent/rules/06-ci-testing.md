@@ -160,14 +160,16 @@
   - uses: pnpm/action-setup@v4.2.0
   ```
 
-  **Gold standard (security-critical workflows)**: Pin to the immutable commit SHA rather than a tag:
+  **Gold standard**: Pin to the **exact version tag** (e.g., `v6.0.2`). This is the required standard for all workflows in this project — auditable, reproducible, and sufficient for supply-chain safety when combined with Dependabot automatic updates.
 
   ```yaml
-  # ✅ GOLD STANDARD — SHA is truly immutable, tag is additional context
-  - uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v6.0.2
+  # ✅ GOLD STANDARD — exact version tag, auditable and reproducible
+  - uses: actions/checkout@v6.0.2
+  - uses: actions/setup-node@v6.3.0
+  - uses: pnpm/action-setup@v4.4.0
   ```
 
-  Use `dependabot` (with `version-updates` for GitHub Actions) or `Renovate` (with `pinDigests: true`) to automatically track and update pinned versions and SHAs.
+  Use `dependabot` (with `version-updates` for GitHub Actions) to automatically track and update pinned versions.
 
 - Use **OIDC (OpenID Connect)** for short-lived cloud credentials in CI instead of long-lived static secrets:
 
