@@ -82,7 +82,10 @@ plugin_autoupdate_last_check_duration = "1 week"
 # Environment variables for performance acceleration
 # ------------------------------------------------------------
 [env]
+# GitHub Proxy Acceleration
 ENABLE_GITHUB_PROXY = "{% if env.CI is defined %}0{% else %}1{% endif %}"
+GITHUB_PROXY = "{% if env.CI is defined %}{% else %}https://gh-proxy.sn0wdr1am.com/{% endif %}"
+
 PYTHONUTF8 = "1"
 # Corepack: bypass signature verification (fixes Windows Node 20 key mismatch)
 COREPACK_INTEGRITY_KEYS = "0"
@@ -106,6 +109,3 @@ GOPROXY = "{% if env.CI is defined %}https://proxy.golang.org,direct{% else %}ht
 # Rust & Cargo acceleration
 RUSTUP_DIST_SERVER = "{% if env.CI is defined %}https://static.rust-lang.org{% else %}https://mirrors.tuna.tsinghua.edu.cn/rustup{% endif %}"
 RUSTUP_UPDATE_ROOT = "{% if env.CI is defined %}https://static.rust-lang.org/rustup{% else %}https://mirrors.tuna.tsinghua.edu.cn/rustup/rustup{% endif %}"
-
-# GITHUB_PROXY variable for scripts
-GITHUB_PROXY = "{% if env.CI is defined %}{% else %}https://gh-proxy.sn0wdr1am.com/{% endif %}"
