@@ -35,6 +35,7 @@ As per the **Triple Guarantee** mechanism (`.agent/rules/02-coding-style.md`), I
 ## ✅ Final Checklist
 
 - [ ] My code follows the project's rule system (`.agent/rules/`).
-- [ ] I have updated the documentation accordingly (including bilingual sync).
+- [ ] If documentation was changed, the **English version** (`README.md`, `CONTRIBUTING.md`, etc.) is updated.
+- [ ] If documentation was changed, the **Chinese version** (`README_zh-CN.md`, `CONTRIBUTING_zh-CN.md`, etc.) is updated to maintain content parity (`12-docs.md §3`).
 - [ ] My changes generate no new warnings or linting errors.
 - [ ] I have updated the `CHANGELOG.md` (via Conventional Commits).
