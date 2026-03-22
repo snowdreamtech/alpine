@@ -47,3 +47,23 @@ To maintain a single source of truth for tool installation (`scripts/setup.sh`) 
 ### Negative
 
 - **Slight Asymmetry:** Developers may occasionally see a CI build fail for a rule (e.g., a `hadolint` specific best-practice) that their local environment (`dockerfile-utils`) did not complain about. This trade-off is accepted in favor of local commit speed.
+
+## Alternatives Considered
+
+### Option A: CI-Only Linting
+
+Run all linters exclusively in the CI pipeline and skip local pre-commit hooks entirely.
+
+- **Reason rejected:** Feedback loops are too slow. Developers only discover style or lint violations after pushing, which interrupts flow and can clog PR queues with trivial fix commits.
+
+### Option B: Full Local Linting (All-In Locally)
+
+Run every linter, including heavy ones like `golangci-lint` and `ansible-lint`, as part of every local commit hook.
+
+- **Reason rejected:** Unacceptably slow local commit times — `golangci-lint` alone can take 30–120 seconds on a cold cache, destroying developer velocity for frequent microcommits.
+
+### Option C: Lint-on-Save Only (IDE Integration)
+
+Rely on IDE plugins (ESLint, Pylance, etc.) for linting and abandon both pre-commit hooks and a CLI-driven CI strategy.
+
+- **Reason rejected:** Requires every developer to have identical IDE plugin configurations and active plugins, which cannot be enforced, breaking the "Zero Configuration" guarantee. It also does not serve terminal-only environments (CI, headless containers).
