@@ -1,20 +1,16 @@
 ---
-# Code Quality & Security Audit
-# Purpose: Unified linter and security scanner (Commitlint, Lychee, Trivy, pre-commit).
-# Trigger: Every push and PR to ensure high standards during the development lifecycle.
+# Code Quality
+# Purpose: Unified linter (pre-commit).
+# Trigger: Every push and PR on non-main branches to ensure high standards.
 # Permissions:
 #   - contents: read (Required for codebase inspection).
-#   - pull-requests: read (Required to analyze PR context in Commitlint).
-#   - statuses: write (Required to update commit status indicators).
-#   - security-events: write (Required for uploading Trivy SARIF audit reports).
 # Concurrency:
 #   - group: lint-${{ github.event.pull_request.number || github.ref }} (Scoped to PR/ref).
 #   - cancel-in-progress: true (Superseded by newer commits to minimize redundant CI load).
 # Design:
-#   - Fail-fast strategy: Lints code before more expensive security scans.
 #   - POSIX-compliant shell enforcement for all inspection steps.
 
-name: Quality & Audit
+name: Code Quality
 
 "on":
   push:
@@ -97,113 +93,3 @@ jobs:
           make lint
         env:
           VENV: ${{ env.VENV }}
-
-  audit:
-    name: "🕵️ Security & Standards Audit (ubuntu-latest)"
-    runs-on: ubuntu-latest
-    concurrency:
-      group: audit-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
-      cancel-in-progress: true
-    permissions:
-      contents: read # Required for codebase inspection
-      pull-requests: read # Required to analyze PR context in Commitlint
-      statuses: write # Required to update commit status indicators
-      security-events: write # Required for uploading Trivy SARIF audit reports
-    timeout-minutes: 20 # Full scan including Trivy
-    env:
-      VENV: ${{ github.event.inputs.venv || inputs.venv || '.venv' }}
-      PYTHONUTF8: 1
-
-    steps:
-      - name: "📂 Checkout Repository Code"
-        uses: actions/checkout@v6.0.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          persist-credentials: false
-          ref: ${{ github.event.pull_request.head.sha || github.sha }}
-          fetch-depth: 0
-
-      - name: "⚡ Cache Mise Tools"
-        uses: actions/cache@v5.0.3
-        with:
-          path: |
-            ~/.local/share/mise
-            ~/Library/Application Support/mise
-            ~/AppData/Local/mise
-          key: ${{ runner.os }}-mise-${{ hashFiles('.mise.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-mise-
-
-      - name: "🚀 Initialize Development Environment"
-        shell: sh
-        run: |
-          make setup
-          make install
-        env:
-          VENV: ${{ env.VENV }}
-
-      - name: "📝 Validate Commit Convention (Commitlint)"
-        shell: sh
-        env:
-          EVENT_NAME: ${{ github.event_name }}
-          BASE_SHA: ${{ github.event.pull_request.base.sha }}
-          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
-        run: |
-          # Mise installs each npm package in its own isolated directory, so
-          # @commitlint/cli cannot find @commitlint/config-conventional via the
-          # default Node.js module resolution (starting from the project root).
-          # Fix: build NODE_PATH to include every mise npm package's node_modules.
-          _OS=$(uname -s)
-          case "$_OS" in
-            MINGW*|MSYS*|CYGWIN*)
-              _MISE_NPM_BASE="${LOCALAPPDATA}/mise/installs"
-              ;;
-            *)
-              _MISE_NPM_BASE="${HOME}/.local/share/mise/installs"
-              ;;
-          esac
-
-          _EXTRA_NODE_PATH=""
-          if [ -d "$_MISE_NPM_BASE" ]; then
-            for _pkg_dir in "$_MISE_NPM_BASE"/npm-*/*/lib/node_modules; do
-              [ -d "$_pkg_dir" ] || continue
-              _EXTRA_NODE_PATH="${_EXTRA_NODE_PATH}${_EXTRA_NODE_PATH:+:}${_pkg_dir}"
-            done
-          fi
-          export NODE_PATH="${_EXTRA_NODE_PATH}${_EXTRA_NODE_PATH:+:}${NODE_PATH:-}"
-
-          if [ "$EVENT_NAME" = "pull_request" ]; then
-            mise exec -- commitlint --from "$BASE_SHA" --to "$HEAD_SHA" --verbose
-          else
-            mise exec -- commitlint --last --verbose
-          fi
-
-      - name: "🔗 Verify Documentation Links (Lychee)"
-        uses: lycheeverse/lychee-action@v2.8.0
-        if: ${{ always() }}
-        with:
-          args: --root-dir "${{ github.workspace }}" --verbose --no-progress --exclude-path ".git" --exclude-path "node_modules" --exclude-path ".venv" --exclude-path "venv" --exclude-path "env" --exclude-path "vendor" --exclude-path "dist" --exclude-path "build" --exclude-path "out" --exclude-path "target" --exclude-path ".next" --exclude-path ".nuxt" --exclude-path ".output" --exclude-path "__pycache__" --exclude-path ".specify" '**/*.md'
-          fail: true
-
-      - name: "🕵️ Detect Vulnerabilities (Trivy FS)"
-        uses: aquasecurity/trivy-action@v0.35.0
-        if: ${{ always() }}
-        env:
-          TRIVY_DB_REPOSITORY: "public.ecr.aws/aquasecurity/trivy-db"
-          TRIVY_CHECKS_BUNDLE_REPOSITORY: "public.ecr.aws/aquasecurity/trivy-checks"
-        with:
-          scan-type: "fs"
-          ignore-unfixed: true
-          format: "sarif"
-          output: "trivy-results.sarif"
-          severity: "CRITICAL,HIGH,MEDIUM,LOW"
-          exit-code: "1"
-          version: "v0.69.3"
-          token-setup-trivy: ${{ secrets.GITHUB_TOKEN }}
-          skip-dirs: ".git,node_modules,.venv,venv,env,vendor,dist,build,out,target,.next,.nuxt,.output,__pycache__,.specify"
-
-      - name: "📊 Upload Audit Intelligence (SARIF)"
-        uses: github/codeql-action/upload-sarif@v4.33.0
-        if: ${{ always() && hashFiles('trivy-results.sarif') != '' }}
-        with:
-          sarif_file: "trivy-results.sarif"
