@@ -75,7 +75,10 @@ check_tool_version() {
     return 0
   fi
 
-  if ! command -v "$_LV_CMD" >/dev/null 2>&1; then
+  local _LV_RESOLVED
+  _LV_RESOLVED=$(resolve_bin "$_LV_CMD") || true
+
+  if [ -z "$_LV_RESOLVED" ]; then
     log_warn "❌ $_LV_NAME: Not found."
     HEALTHY_ST=1
     [ "${_LV_CRITICAL:-0}" -eq 1 ] && CORE_HEALTHY_ST=1
@@ -129,7 +132,7 @@ main() {
   log_info "── Core Infrastructure ──"
   check_tool_version "Git" "git" "2.30.0" "git --version" 1
 
-  if command -v make >/dev/null 2>&1; then
+  if resolve_bin "make" >/dev/null 2>&1; then
     log_success "✅ Make: Installed"
   else
     log_error "❌ Make: Not found."
@@ -137,7 +140,7 @@ main() {
     CORE_HEALTHY_ST=1
   fi
 
-  if command -v docker >/dev/null 2>&1; then
+  if resolve_bin "docker" >/dev/null 2>&1; then
     log_success "✅ Docker: Installed"
   else
     log_warn "⚠️  Docker: Not found (optional for some tasks)"
@@ -621,7 +624,7 @@ main() {
   fi
 
   log_info "── Toolchain Manager ──"
-  if command -v mise >/dev/null 2>&1; then
+  if resolve_bin "mise" >/dev/null 2>&1; then
     log_success "✅ mise: Active ($(get_version mise))"
   else
     log_warn "❌ mise: Not found. (Mandatory for toolchain management)"
