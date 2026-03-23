@@ -993,22 +993,25 @@ get_version() {
     echo "$_MISE_VER_OUT" && return 0
   fi
 
-  # Fallback to system command
-  if [ -n "$_BIN_PATH" ]; then
+  # Fallback to system command or mise direct binary
+  local _LV_RESOLVED
+  _LV_RESOLVED=$(resolve_bin "$_CMD_VER") || true
+
+  if [ -n "$_LV_RESOLVED" ]; then
     # Special cases for tools with unusual version output or slow shims
     case "$_CMD_VER" in
-    python)
-      python --version 2>/dev/null | cut -d' ' -f2 && return 0
+    python*)
+      "$_LV_RESOLVED" --version 2>/dev/null | cut -d' ' -f2 && return 0
       ;;
     node)
-      "$_CMD_VER" --version 2>/dev/null | sed 's/^v//'
+      "$_LV_RESOLVED" --version 2>/dev/null | sed 's/^v//'
       ;;
     go)
-      "$_CMD_VER" version 2>/dev/null | awk '{print $3}' | sed 's/^go//'
+      "$_LV_RESOLVED" version 2>/dev/null | awk '{print $3}' | sed 's/^go//'
       ;;
     java)
       # java -version outputs to stderr and puts version in quotes
-      "$_CMD_VER" "$_ARG_VER" 2>&1 | sed -n 's/.*version "\([0-9][0-9.]*\).*/\1/p' | head -n 1
+      "$_LV_RESOLVED" "$_ARG_VER" 2>&1 | sed -n 's/.*version "\([0-9][0-9.]*\).*/\1/p' | head -n 1
       ;;
     vitepress | docusaurus)
       # Avoid running binaries that might start a dev server on --version/--help
@@ -1018,7 +1021,7 @@ get_version() {
       # For other binaries, try to get version from the output
       # We strip 'v' or 'V' prefix and focus on the version number
       # Use MISE_OFFLINE=1 to prevent shims from trying to resolve versions over network
-      MISE_OFFLINE=1 "$_CMD_VER" "$_ARG_VER" 2>/dev/null | sed 's/^[vV]//' | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15
+      MISE_OFFLINE=1 "$_LV_RESOLVED" "$_ARG_VER" 2>/dev/null | sed 's/^[vV]//' | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15 2>/dev/null || echo "-"
       ;;
     esac
   else
@@ -1130,8 +1133,8 @@ check_runtime() {
     return 0
   fi
 
-  # Priority 2: Standard Command Check (Fallback)
-  if ! command -v "$_RT_NAME" >/dev/null 2>&1; then
+  # Priority 2: Standard Command Check (Fallback using resolve_bin)
+  if ! resolve_bin "$_RT_NAME" >/dev/null 2>&1; then
     log_warn "Required runtime '$_RT_NAME' for $_TOOL_DESC is missing. Skipping."
     if [ "${_G_AUDIT_MODE:-0}" -eq 1 ]; then
       return 1

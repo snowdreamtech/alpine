@@ -69,7 +69,7 @@ install_trivy() {
   fi
   local _STAT_TRIVY="✅ mise"
   setup_registry_trivy
-  run_with_timeout 120 run_mise install "$_PROVIDER" || _STAT_TRIVY="❌ Failed"
+  run_mise install "$_PROVIDER" || _STAT_TRIVY="❌ Failed"
   log_summary "Security" "Trivy" "$_STAT_TRIVY" "$(get_version trivy)" "$(($(date +%s) - _T0_TRIVY))"
 }
 

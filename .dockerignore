@@ -343,6 +343,7 @@ project/boot/
 *.class
 
 ### C / C++ ###
+!**/entrypoint.d/
 *.d
 *.o
 *.ko
