@@ -15,22 +15,18 @@
 name: GoReleaser
 
 "on":
-  push:
-    tags:
-      - "*"
+  workflow_run:
+    workflows: ["Release Please"]
+    types: [completed]
 
 permissions: {}
 
 jobs:
-  verify:
-    # Reusable workflow for pre-flight checks
-    uses: ./.github/workflows/verify.yml
-    permissions:
-      contents: read
-
   goreleaser:
-    needs: [verify]
     name: "📦 Distribution Packaging"
+    # Only run if the upstream release workflow succeeded and it was on the main branch.
+    # Note: GoReleaser will handle tag detection internally during checkout.
+    if: ${{ github.event.workflow_run.conclusion == 'success' && (github.event.workflow_run.head_branch == 'main' || github.event.workflow_run.head_branch == null) }}
     runs-on: ubuntu-latest
     concurrency:
       group: goreleaser-${{ github.workflow }}-${{ github.ref }}
