@@ -52,7 +52,7 @@ setup_groovy() {
 #   check_runtime_groovy "Linter"
 check_runtime_groovy() {
   local _TOOL_DESC_GROOVY="${1:-Groovy}"
-  if ! command -v groovy >/dev/null 2>&1; then
+  if ! resolve_bin "groovy" >/dev/null 2>&1; then
     log_warn "Required runtime 'groovy' for $_TOOL_DESC_GROOVY is missing. Skipping."
     return 1
   fi

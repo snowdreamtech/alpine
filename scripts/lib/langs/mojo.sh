@@ -54,7 +54,7 @@ setup_mojo() {
 #   check_runtime_mojo "Linter"
 check_runtime_mojo() {
   local _TOOL_DESC_MOJ="${1:-Mojo}"
-  if ! command -v mojo >/dev/null 2>&1; then
+  if ! resolve_bin "mojo" >/dev/null 2>&1; then
     log_warn "Required runtime 'mojo' for $_TOOL_DESC_MOJ is missing. Skipping."
     return 1
   fi

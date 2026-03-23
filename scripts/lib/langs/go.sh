@@ -109,7 +109,7 @@ setup_go() {
 #   check_runtime_go "Linter"
 check_runtime_go() {
   local _TOOL_DESC_GO="${1:-Go}"
-  if ! command -v go >/dev/null 2>&1; then
+  if ! resolve_bin "go" >/dev/null 2>&1; then
     log_warn "Required runtime 'go' for $_TOOL_DESC_GO is missing. Skipping."
     return 1
   fi

@@ -51,7 +51,7 @@ setup_grain() {
 #   check_runtime_grain "Linter"
 check_runtime_grain() {
   local _TOOL_DESC_GRAIN="${1:-Grain}"
-  if ! command -v grain >/dev/null 2>&1; then
+  if ! resolve_bin "grain" >/dev/null 2>&1; then
     log_warn "Required runtime 'grain' for $_TOOL_DESC_GRAIN is missing. Skipping."
     return 1
   fi

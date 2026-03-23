@@ -346,7 +346,7 @@ setup_node() {
 #   check_runtime_node "Linter"
 check_runtime_node() {
   local _TOOL_DESC_NODE="${1:-Node.js}"
-  if ! command -v node >/dev/null 2>&1; then
+  if ! resolve_bin "node" >/dev/null 2>&1; then
     log_warn "Required runtime 'node' for $_TOOL_DESC_NODE is missing. Skipping."
     return 1
   fi

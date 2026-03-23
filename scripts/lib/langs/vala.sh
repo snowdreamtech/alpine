@@ -52,7 +52,7 @@ setup_vala() {
 #   check_runtime_vala "Linter"
 check_runtime_vala() {
   local _TOOL_DESC_VALA="${1:-Vala}"
-  if ! command -v valac >/dev/null 2>&1; then
+  if ! resolve_bin "valac" >/dev/null 2>&1; then
     log_warn "Required runtime 'valac' for $_TOOL_DESC_VALA is missing. Skipping."
     return 1
   fi

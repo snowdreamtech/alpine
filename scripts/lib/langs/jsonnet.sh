@@ -55,7 +55,7 @@ setup_jsonnet() {
 #   check_runtime_jsonnet "Linter"
 check_runtime_jsonnet() {
   local _TOOL_DESC_JSONNET="${1:-Jsonnet}"
-  if ! command -v jsonnet >/dev/null 2>&1; then
+  if ! resolve_bin "jsonnet" >/dev/null 2>&1; then
     log_warn "Required runtime 'jsonnet' for $_TOOL_DESC_JSONNET is missing. Skipping."
     return 1
   fi

@@ -51,7 +51,7 @@ setup_dart() {
 #   check_runtime_dart "Linter"
 check_runtime_dart() {
   local _TOOL_DESC_DART="${1:-Dart}"
-  if ! command -v dart >/dev/null 2>&1; then
+  if ! resolve_bin "dart" >/dev/null 2>&1; then
     log_warn "Required runtime 'dart' for $_TOOL_DESC_DART is missing. Skipping."
     return 1
   fi

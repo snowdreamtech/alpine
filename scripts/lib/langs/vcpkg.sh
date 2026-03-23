@@ -11,7 +11,7 @@ install_runtime_vcpkg() {
 
   # Note: vcpkg is often installed via git or system package manager.
   # Here we look for asdf/mise plugin or system command.
-  if ! command -v vcpkg >/dev/null 2>&1; then
+  if ! resolve_bin "vcpkg" >/dev/null 2>&1; then
     log_info "VCPKG not found. Attempting to install via mise (if plugin available)..."
     # shellcheck disable=SC2154
     run_mise install vcpkg || log_warn "Could not install vcpkg via mise. Please install it manually."
@@ -57,7 +57,7 @@ setup_vcpkg() {
 #   check_runtime_vcpkg "Linter"
 check_runtime_vcpkg() {
   local _TOOL_DESC_VCPKG="${1:-VCPKG}"
-  if ! command -v vcpkg >/dev/null 2>&1; then
+  if ! resolve_bin "vcpkg" >/dev/null 2>&1; then
     log_warn "Required tool 'vcpkg' for $_TOOL_DESC_VCPKG is missing. Skipping."
     return 1
   fi

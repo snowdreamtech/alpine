@@ -48,7 +48,7 @@ setup_kcl() {
 # Purpose: Checks if KCL is available.
 check_runtime_kcl() {
   local _TOOL_DESC_KCL="${1:-KCL}"
-  if ! command -v kcl >/dev/null 2>&1; then
+  if ! resolve_bin "kcl" >/dev/null 2>&1; then
     log_warn "Required runtime 'kcl' for $_TOOL_DESC_KCL is missing. Skipping."
     return 1
   fi

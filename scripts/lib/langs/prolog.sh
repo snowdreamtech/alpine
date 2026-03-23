@@ -54,7 +54,7 @@ setup_prolog() {
 #   check_runtime_prolog "Linter"
 check_runtime_prolog() {
   local _TOOL_DESC_PROLOG="${1:-Prolog}"
-  if ! command -v swipl >/dev/null 2>&1; then
+  if ! resolve_bin "swipl" >/dev/null 2>&1; then
     log_warn "Required runtime 'swipl' for $_TOOL_DESC_PROLOG is missing. Skipping."
     return 1
   fi

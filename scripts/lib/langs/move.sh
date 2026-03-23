@@ -54,7 +54,7 @@ setup_move() {
 #   check_runtime_move "Linter"
 check_runtime_move() {
   local _TOOL_DESC_MOVE="${1:-Move}"
-  if ! command -v aptos >/dev/null 2>&1; then
+  if ! resolve_bin "aptos" >/dev/null 2>&1; then
     log_warn "Required runtime 'aptos' for $_TOOL_DESC_MOVE is missing. Skipping."
     return 1
   fi

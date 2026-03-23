@@ -51,7 +51,7 @@ setup_tofu() {
 #   check_runtime_tofu "Linter"
 check_runtime_tofu() {
   local _TOOL_DESC_TOFU="${1:-OpenTofu}"
-  if ! command -v tofu >/dev/null 2>&1; then
+  if ! resolve_bin "tofu" >/dev/null 2>&1; then
     log_warn "Required runtime 'tofu' for $_TOOL_DESC_TOFU is missing. Skipping."
     return 1
   fi

@@ -54,7 +54,7 @@ setup_solidity() {
 #   check_runtime_solidity "Linter"
 check_runtime_solidity() {
   local _TOOL_DESC_SOL="${1:-Solidity}"
-  if ! command -v solc >/dev/null 2>&1; then
+  if ! resolve_bin "solc" >/dev/null 2>&1; then
     log_warn "Required runtime 'solc' for $_TOOL_DESC_SOL is missing. Skipping."
     return 1
   fi

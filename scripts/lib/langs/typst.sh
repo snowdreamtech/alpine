@@ -52,7 +52,7 @@ setup_typst() {
 #   check_runtime_typst "Linter"
 check_runtime_typst() {
   local _TOOL_DESC_TYPST="${1:-Typst}"
-  if ! command -v typst >/dev/null 2>&1; then
+  if ! resolve_bin "typst" >/dev/null 2>&1; then
     log_warn "Required tool 'typst' for $_TOOL_DESC_TYPST is missing. Skipping."
     return 1
   fi

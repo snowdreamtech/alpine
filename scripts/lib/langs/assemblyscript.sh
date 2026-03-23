@@ -52,7 +52,7 @@ setup_assemblyscript() {
 #   check_runtime_assemblyscript "Linter"
 check_runtime_assemblyscript() {
   local _TOOL_DESC_AS="${1:-AssemblyScript}"
-  if ! command -v asc >/dev/null 2>&1; then
+  if ! resolve_bin "asc" >/dev/null 2>&1; then
     log_warn "Required runtime 'asc' for $_TOOL_DESC_AS is missing. Skipping."
     return 1
   fi

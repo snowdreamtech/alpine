@@ -54,7 +54,7 @@ setup_fpc() {
 #   check_runtime_fpc "Linter"
 check_runtime_fpc() {
   local _TOOL_DESC_FPC="${1:-Free Pascal}"
-  if ! command -v fpc >/dev/null 2>&1; then
+  if ! resolve_bin "fpc" >/dev/null 2>&1; then
     log_warn "Required runtime 'fpc' for $_TOOL_DESC_FPC is missing. Skipping."
     return 1
   fi

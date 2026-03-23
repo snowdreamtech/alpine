@@ -84,7 +84,7 @@ setup_haskell() {
 #   check_runtime_haskell "Linter"
 check_runtime_haskell() {
   local _TOOL_DESC_GHC="${1:-Haskell}"
-  if ! command -v ghc >/dev/null 2>&1; then
+  if ! resolve_bin "ghc" >/dev/null 2>&1; then
     log_warn "Required runtime 'ghc' for $_TOOL_DESC_GHC is missing. Skipping."
     return 1
   fi

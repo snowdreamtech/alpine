@@ -54,7 +54,7 @@ setup_elm() {
 #   check_runtime_elm "Linter"
 check_runtime_elm() {
   local _TOOL_DESC_ELM="${1:-Elm}"
-  if ! command -v elm >/dev/null 2>&1; then
+  if ! resolve_bin "elm" >/dev/null 2>&1; then
     log_warn "Required runtime 'elm' for $_TOOL_DESC_ELM is missing. Skipping."
     return 1
   fi

@@ -64,7 +64,7 @@ install_dotnet_format() {
 #   check_runtime_dotnet "Linter"
 check_runtime_dotnet() {
   local _TOOL_DESC_DOTNET="${1:-.NET}"
-  if ! command -v dotnet >/dev/null 2>&1; then
+  if ! resolve_bin "dotnet" >/dev/null 2>&1; then
     log_warn "Required runtime 'dotnet' for $_TOOL_DESC_DOTNET is missing. Skipping."
     return 1
   fi

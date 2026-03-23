@@ -54,7 +54,7 @@ setup_wat() {
 #   check_runtime_wat "Linter"
 check_runtime_wat() {
   local _TOOL_DESC_WAT="${1:-WebAssembly}"
-  if ! command -v wasmtime >/dev/null 2>&1; then
+  if ! resolve_bin "wasmtime" >/dev/null 2>&1; then
     log_warn "Required runtime 'wasmtime' for $_TOOL_DESC_WAT is missing. Skipping."
     return 1
   fi

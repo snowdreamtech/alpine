@@ -8,7 +8,7 @@ install_pipx() {
   _T0_PIPX=$(date +%s)
   local _TITLE="Pipx"
   local _PROVIDER="pipx"
-  if command -v pipx >/dev/null 2>&1; then
+  if resolve_bin "pipx" >/dev/null 2>&1; then
     log_summary "Base" "Pipx" "✅ Exists" "$(get_version pipx)" "$(($(date +%s) - _T0_PIPX))"
     return 0
   fi

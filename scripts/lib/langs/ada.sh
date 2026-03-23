@@ -54,7 +54,7 @@ setup_ada() {
 #   check_runtime_ada "Linter"
 check_runtime_ada() {
   local _TOOL_DESC_ADA="${1:-Ada}"
-  if ! command -v gnat >/dev/null 2>&1; then
+  if ! resolve_bin "gnat" >/dev/null 2>&1; then
     log_warn "Required runtime 'gnat' for $_TOOL_DESC_ADA is missing. Skipping."
     return 1
   fi

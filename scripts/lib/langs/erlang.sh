@@ -51,7 +51,7 @@ setup_erlang() {
 # Purpose: Checks if Erlang is available.
 check_runtime_erlang() {
   local _TOOL_DESC_ERL="${1:-Erlang}"
-  if ! command -v erl >/dev/null 2>&1; then
+  if ! resolve_bin "erl" >/dev/null 2>&1; then
     log_warn "Required runtime 'erl' for $_TOOL_DESC_ERL is missing. Skipping."
     return 1
   fi

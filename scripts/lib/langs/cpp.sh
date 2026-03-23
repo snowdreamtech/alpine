@@ -14,7 +14,7 @@ install_runtime_cpp() {
   ensure_tool ninja || return 1
 
   # System level check for compiler
-  if ! command -v gcc >/dev/null 2>&1 && ! command -v clang >/dev/null 2>&1; then
+  if ! resolve_bin "gcc" >/dev/null 2>&1 && ! resolve_bin "clang" >/dev/null 2>&1; then
     log_warn "No C/C++ compiler (gcc/clang) detected. Please install build-essential or xcode-select."
     return 1
   fi
@@ -71,7 +71,7 @@ setup_cpp() {
       _DUR_CPP_RT=$(($(date +%s) - _T0_CPP_RT))
 
       local _CPP_VER
-      if command -v clang >/dev/null 2>&1; then
+      if resolve_bin "clang" >/dev/null 2>&1; then
         _CPP_VER=$(get_version clang | head -n 1)
       else
         _CPP_VER=$(get_version gcc | head -n 1)
@@ -90,7 +90,7 @@ setup_cpp() {
 #   check_runtime_cpp "Linter"
 check_runtime_cpp() {
   local _TOOL_DESC_CPP="${1:-C/C++}"
-  if ! command -v gcc >/dev/null 2>&1 && ! command -v clang >/dev/null 2>&1; then
+  if ! resolve_bin "gcc" >/dev/null 2>&1 && ! resolve_bin "clang" >/dev/null 2>&1; then
     log_warn "Required runtime 'gcc' or 'clang' for $_TOOL_DESC_CPP is missing. Skipping."
     return 1
   fi

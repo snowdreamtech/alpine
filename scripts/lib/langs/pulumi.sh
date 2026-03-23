@@ -50,7 +50,7 @@ setup_pulumi() {
 #   check_runtime_pulumi "Linter"
 check_runtime_pulumi() {
   local _TOOL_DESC_PULUMI="${1:-Pulumi}"
-  if ! command -v pulumi >/dev/null 2>&1; then
+  if ! resolve_bin "pulumi" >/dev/null 2>&1; then
     log_warn "Required runtime 'pulumi' for $_TOOL_DESC_PULUMI is missing. Skipping."
     return 1
   fi

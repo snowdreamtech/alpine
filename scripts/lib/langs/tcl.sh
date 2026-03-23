@@ -54,7 +54,7 @@ setup_tcl() {
 #   check_runtime_tcl "Linter"
 check_runtime_tcl() {
   local _TOOL_DESC_TCL="${1:-Tcl}"
-  if ! command -v tclsh >/dev/null 2>&1; then
+  if ! resolve_bin "tclsh" >/dev/null 2>&1; then
     log_warn "Required runtime 'tclsh' for $_TOOL_DESC_TCL is missing. Skipping."
     return 1
   fi

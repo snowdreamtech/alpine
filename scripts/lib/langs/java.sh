@@ -85,7 +85,7 @@ setup_java() {
 #   check_runtime_java "Linter"
 check_runtime_java() {
   local _TOOL_DESC_JAVA="${1:-Java}"
-  if ! command -v java >/dev/null 2>&1; then
+  if ! resolve_bin "java" >/dev/null 2>&1; then
     log_warn "Required runtime 'java' for $_TOOL_DESC_JAVA is missing. Skipping."
     return 1
   fi

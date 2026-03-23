@@ -55,7 +55,7 @@ setup_lean() {
 #   check_runtime_lean "Linter"
 check_runtime_lean() {
   local _TOOL_DESC_LEAN="${1:-Lean 4}"
-  if ! command -v lean >/dev/null 2>&1; then
+  if ! resolve_bin "lean" >/dev/null 2>&1; then
     log_warn "Required runtime 'lean' for $_TOOL_DESC_LEAN is missing. Skipping."
     return 1
   fi

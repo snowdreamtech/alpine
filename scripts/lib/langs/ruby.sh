@@ -41,7 +41,7 @@ install_ruby_lint() {
 
   # Detect gem installation
   if [ "$_CUR_VER" = "-" ]; then
-    if command -v gem >/dev/null 2>&1 && gem list -i "^rubocop$" >/dev/null 2>&1; then
+    if resolve_bin "gem" >/dev/null 2>&1 && gem list -i "^rubocop$" >/dev/null 2>&1; then
       _CUR_VER=$(rubocop --version 2>/dev/null || echo "exists")
     fi
   fi
@@ -60,7 +60,7 @@ install_ruby_lint() {
 
   local _STAT_RUBY="✅ Installed"
   # Support mise gem provider if possible, else fallback to direct gem
-  if command -v mise >/dev/null 2>&1; then
+  if resolve_bin "mise" >/dev/null 2>&1; then
     setup_registry_rubocop
     run_mise install "$_PROVIDER" || _STAT_RUBY="❌ Failed"
   else
@@ -112,7 +112,7 @@ setup_ruby() {
 #   check_runtime_ruby "Linter"
 check_runtime_ruby() {
   local _TOOL_DESC_RUBY="${1:-Ruby}"
-  if ! command -v ruby >/dev/null 2>&1; then
+  if ! resolve_bin "ruby" >/dev/null 2>&1; then
     log_warn "Required runtime 'ruby' for $_TOOL_DESC_RUBY is missing. Skipping."
     return 1
   fi

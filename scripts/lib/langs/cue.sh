@@ -55,7 +55,7 @@ setup_cue() {
 #   check_runtime_cue "Linter"
 check_runtime_cue() {
   local _TOOL_DESC_CUE="${1:-CUE}"
-  if ! command -v cue >/dev/null 2>&1; then
+  if ! resolve_bin "cue" >/dev/null 2>&1; then
     log_warn "Required runtime 'cue' for $_TOOL_DESC_CUE is missing. Skipping."
     return 1
   fi

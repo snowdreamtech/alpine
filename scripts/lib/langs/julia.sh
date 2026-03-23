@@ -51,7 +51,7 @@ setup_julia() {
 #   check_runtime_julia "Linter"
 check_runtime_julia() {
   local _TOOL_DESC_JULIA="${1:-Julia}"
-  if ! command -v julia >/dev/null 2>&1; then
+  if ! resolve_bin "julia" >/dev/null 2>&1; then
     log_warn "Required runtime 'julia' for $_TOOL_DESC_JULIA is missing. Skipping."
     return 1
   fi

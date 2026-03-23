@@ -54,7 +54,7 @@ setup_gleam() {
 #   check_runtime_gleam "Linter"
 check_runtime_gleam() {
   local _TOOL_DESC_GLM="${1:-Gleam}"
-  if ! command -v gleam >/dev/null 2>&1; then
+  if ! resolve_bin "gleam" >/dev/null 2>&1; then
     log_warn "Required runtime 'gleam' for $_TOOL_DESC_GLM is missing. Skipping."
     return 1
   fi

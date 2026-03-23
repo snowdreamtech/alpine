@@ -54,7 +54,7 @@ setup_raku() {
 #   check_runtime_raku "Linter"
 check_runtime_raku() {
   local _TOOL_DESC_RAKU="${1:-Raku}"
-  if ! command -v raku >/dev/null 2>&1; then
+  if ! resolve_bin "raku" >/dev/null 2>&1; then
     log_warn "Required runtime 'raku' for $_TOOL_DESC_RAKU is missing. Skipping."
     return 1
   fi

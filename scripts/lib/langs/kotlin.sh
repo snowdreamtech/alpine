@@ -79,7 +79,7 @@ setup_kotlin() {
 #   check_runtime_kotlin "Linter"
 check_runtime_kotlin() {
   local _TOOL_DESC_KOTLIN="${1:-Kotlin}"
-  if ! command -v kotlin >/dev/null 2>&1; then
+  if ! resolve_bin "kotlin" >/dev/null 2>&1; then
     log_warn "Required runtime 'kotlin' for $_TOOL_DESC_KOTLIN is missing. Skipping."
     return 1
   fi
