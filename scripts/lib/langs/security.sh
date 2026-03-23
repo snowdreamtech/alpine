@@ -33,7 +33,7 @@ install_osv_scanner() {
   fi
   local _STAT_OSV="✅ mise"
   setup_registry_osv_scanner
-  run_with_timeout 120 run_mise install "$_PROVIDER" || _STAT_OSV="❌ Failed"
+  run_mise install "$_PROVIDER" || _STAT_OSV="❌ Failed"
   log_summary "Security" "OSV-Scanner" "$_STAT_OSV" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV))"
 }
 
