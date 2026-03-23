@@ -75,7 +75,7 @@ experimental = true
 asdf_compat = true
 status.missing_tools = "never"
 legacy_version_file = false
-plugin_autoupdate_last_check_duration = "1 week"
+plugin_autoupdate_last_check_duration = "never"
 
 
 # ------------------------------------------------------------

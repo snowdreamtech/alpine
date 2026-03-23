@@ -103,6 +103,12 @@ export MISE_CHECK_FOR_UPDATES=0
 export MISE_GIT_ALWAYS_USE_GIX=0
 export MISE_GIX=0
 export MISE_USE_GIX=0
+# In CI, prevent mise from fetching remote version lists from GitHub.
+# All versions are pinned in .mise.toml / versions.sh, so remote lookups are unnecessary
+# and are the biggest hidden source of GitHub API calls during `mise install`.
+if [ "${CI:-}" = "true" ] || [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+  export MISE_FETCH_REMOTE_VERSIONS_TIMEOUT=0
+fi
 
 # Orchestration tracking (detect if we are running as a sub-script)
 if [ -z "$_SNOWDREAM_TOP_LEVEL_SCRIPT" ]; then
