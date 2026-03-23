@@ -183,7 +183,7 @@ run_powershell_tests() {
     log_info "── Running PowerShell Tests (Pester) ──"
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would run Pester tests in tests/"
-    elif command -v pwsh >/dev/null 2>&1; then
+    elif resolve_bin "pwsh" >/dev/null 2>&1; then
       pwsh -NoProfile -Command "Invoke-Pester tests/"
     else
       log_warn "Warning: pwsh not found. Skipping powershell tests."

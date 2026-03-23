@@ -616,7 +616,7 @@ main() {
       check_runtime "kotlin" "Kotlin (Modular)"
     fi
     if [ -f "pubspec.yaml" ] || has_lang_files "" "*.dart"; then
-      if command -v flutter >/dev/null 2>&1; then
+      if resolve_bin "flutter" >/dev/null 2>&1; then
         check_tool_version "Flutter" "flutter" "3.0.0" "flutter --version" 0
       else check_tool_version "Dart" "dart" "3.0.0" "dart --version" 0; fi
     fi
