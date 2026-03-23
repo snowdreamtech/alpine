@@ -102,10 +102,13 @@ main() {
         log_success "DRY-RUN: Would run zizmor"
         log_summary "GitHub" "zizmor" "⚖️ Previewed" "-" "0"
       else
-        if run_quiet zizmor . --format plain; then
-          log_summary "GitHub" "zizmor" "✅ Secure" "$(get_version zizmor)" "$(($(date +%s) - _T0_ZM))"
+        # zizmor requires GITHUB_TOKEN to fetch metadata about actions from GitHub API.
+        # Without it, it hits 403 Forbidden Rate Limit quickly.
+        export GH_TOKEN="${GITHUB_TOKEN:-}"
+        if run_quiet "$_ZIZMOR_BIN" . --format plain; then
+          log_summary "GitHub" "zizmor" "✅ Secure" "$(get_version "$_ZIZMOR_BIN")" "$(($(date +%s) - _T0_ZM))"
         else
-          log_summary "GitHub" "zizmor" "❌ Vulnerable" "$(get_version zizmor)" "$(($(date +%s) - _T0_ZM))"
+          log_summary "GitHub" "zizmor" "❌ Vulnerable" "$(get_version "$_ZIZMOR_BIN")" "$(($(date +%s) - _T0_ZM))"
           _OVERALL_EXIT_AUDIT=1
         fi
       fi
@@ -170,7 +173,9 @@ main() {
   for _lf in package-lock.json pnpm-lock.yaml yarn.lock go.sum Cargo.lock requirements.txt Pipfile.lock; do
     [ -f "$_lf" ] && _HAS_LOCKFILE=1 && break
   done
-  if is_ci_env && [ "$_HAS_LOCKFILE" -eq 1 ] && run_quiet command -v osv-scanner; then
+  local _OSV_BIN
+  _OSV_BIN=$(resolve_bin "osv-scanner") || true
+  if is_ci_env && [ "$_HAS_LOCKFILE" -eq 1 ] && [ -n "$_OSV_BIN" ]; then
     local _T0_OSV_AUD
     _T0_OSV_AUD=$(date +%s)
     log_info "\n── Generic Vulnerability Scan (osv-scanner) ──"
@@ -180,19 +185,19 @@ main() {
     else
       # Capture output to detect "No package sources found" which should be a skip/pass, not an error.
       local _OSV_OUT
-      _OSV_OUT=$(osv-scanner -r . 2>&1)
+      _OSV_OUT=$("$_OSV_BIN" -r . 2>&1)
       local _OSV_EXIT=$?
 
       if [ $_OSV_EXIT -eq 0 ]; then
-        log_summary "Security" "osv-scanner" "✅ Secure" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV_AUD))"
+        log_summary "Security" "osv-scanner" "✅ Secure" "$(get_version "$_OSV_BIN")" "$(($(date +%s) - _T0_OSV_AUD))"
       elif echo "$_OSV_OUT" | grep -q "No package sources found"; then
         log_info "osv-scanner: No package sources found. Skipping."
-        log_summary "Security" "osv-scanner" "⏭️  Skipped" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV_AUD))"
+        log_summary "Security" "osv-scanner" "⏭️  Skipped" "$(get_version "$_OSV_BIN")" "$(($(date +%s) - _T0_OSV_AUD))"
       else
         # Non-fatal: template project may have transitive CVEs in devDeps.
         # Downstream projects should run osv-scanner on their own codebase.
         echo "$_OSV_OUT"
-        log_summary "Security" "osv-scanner" "⚠️ Findings" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV_AUD))"
+        log_summary "Security" "osv-scanner" "⚠️ Findings" "$(get_version "$_OSV_BIN")" "$(($(date +%s) - _T0_OSV_AUD))"
       fi
     fi
   fi
@@ -202,15 +207,17 @@ main() {
     local _T0_GO_AUD
     _T0_GO_AUD=$(date +%s)
     log_info "\n── Auditing Go dependencies (govulncheck) ──"
-    if run_quiet command -v govulncheck; then
+    local _GOVULN_BIN
+    _GOVULN_BIN=$(resolve_bin "govulncheck") || true
+    if [ -n "$_GOVULN_BIN" ]; then
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_success "DRY-RUN: Would run govulncheck"
         log_summary "Go" "govulncheck" "⚖️ Previewed" "-" "0"
       else
-        if run_quiet govulncheck ./...; then
-          log_summary "Go" "govulncheck" "✅ Secure" "$(get_version govulncheck)" "$(($(date +%s) - _T0_GO_AUD))"
+        if run_quiet "$_GOVULN_BIN" ./...; then
+          log_summary "Go" "govulncheck" "✅ Secure" "$(get_version "$_GOVULN_BIN")" "$(($(date +%s) - _T0_GO_AUD))"
         else
-          log_summary "Go" "govulncheck" "❌ Vulnerable" "$(get_version govulncheck)" "$(($(date +%s) - _T0_GO_AUD))"
+          log_summary "Go" "govulncheck" "❌ Vulnerable" "$(get_version "$_GOVULN_BIN")" "$(($(date +%s) - _T0_GO_AUD))"
           _OVERALL_EXIT_AUDIT=1
         fi
       fi
@@ -224,15 +231,17 @@ main() {
     local _T0_RS_AUD
     _T0_RS_AUD=$(date +%s)
     log_info "\n── Auditing Rust dependencies (cargo audit) ──"
-    if run_quiet command -v cargo && run_quiet cargo audit --version; then
+    local _CARGO_AUDIT_BIN
+    _CARGO_AUDIT_BIN=$(resolve_bin "cargo-audit") || true
+    if [ -n "$_CARGO_AUDIT_BIN" ]; then
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_success "DRY-RUN: Would run cargo audit"
         log_summary "Rust" "cargo-audit" "⚖️ Previewed" "-" "0"
       else
-        if run_quiet cargo audit; then
-          log_summary "Rust" "cargo-audit" "✅ Secure" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_RS_AUD))"
+        if run_quiet "$_CARGO_AUDIT_BIN" audit; then
+          log_summary "Rust" "cargo-audit" "✅ Secure" "$(get_version "$_CARGO_AUDIT_BIN")" "$(($(date +%s) - _T0_RS_AUD))"
         else
-          log_summary "Rust" "cargo-audit" "❌ Vulnerable" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_RS_AUD))"
+          log_summary "Rust" "cargo-audit" "❌ Vulnerable" "$(get_version "$_CARGO_AUDIT_BIN")" "$(($(date +%s) - _T0_RS_AUD))"
           _OVERALL_EXIT_AUDIT=1
         fi
       fi
@@ -246,22 +255,25 @@ main() {
     local _T0_DKR_AUD
     _T0_DKR_AUD=$(date +%s)
     log_info "\n── Auditing Containers (trivy) ──"
-    if run_quiet command -v trivy; then
+    local _TRIVY_BIN
+    _TRIVY_BIN=$(resolve_bin "trivy") || true
+    if [ -n "$_TRIVY_BIN" ]; then
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
-        log_success "DRY-RUN: Would run trivy fs . and trivy license"
+        log_success "DRY-RUN: Would run trivy fs . and trivy config"
         log_summary "DevOps" "trivy" "⚖️ Previewed" "-" "0"
       else
+        export GH_TOKEN="${GITHUB_TOKEN:-}"
         log_info "Running dependency vulnerability scan..."
         local _TRIVY_OK=0
-        run_quiet trivy fs . && run_quiet trivy config . || _TRIVY_OK=1
+        run_quiet "$_TRIVY_BIN" fs . && run_quiet "$_TRIVY_BIN" config . || _TRIVY_OK=1
 
         log_info "Running license compliance audit..."
-        run_quiet trivy license . || _TRIVY_OK=1
+        run_quiet "$_TRIVY_BIN" license . || _TRIVY_OK=1
 
         if [ "$_TRIVY_OK" -eq 0 ]; then
-          log_summary "DevOps" "trivy" "✅ Secure" "$(get_version trivy)" "$(($(date +%s) - _T0_DKR_AUD))"
+          log_summary "DevOps" "trivy" "✅ Secure" "$(get_version "$_TRIVY_BIN")" "$(($(date +%s) - _T0_DKR_AUD))"
         else
-          log_summary "DevOps" "trivy" "❌ Issues Found" "$(get_version trivy)" "$(($(date +%s) - _T0_DKR_AUD))"
+          log_summary "DevOps" "trivy" "❌ Issues Found" "$(get_version "$_TRIVY_BIN")" "$(($(date +%s) - _T0_DKR_AUD))"
           _OVERALL_EXIT_AUDIT=1
         fi
       fi
