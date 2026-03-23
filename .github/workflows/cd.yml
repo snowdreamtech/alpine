@@ -1,54 +1,98 @@
 ---
-# Release Please (Automated Versioning & Changelogs)
-# Purpose: Manages the release lifecycle by automating PR creation, versioning, and CHANGELOG updates.
+# CD (Continuous Deployment)
+# Purpose: Unified release pipeline covering Project Verification and Automated Release Orchestration.
 # Trigger: Every push to the default branch (main).
-# Permissions:
-#   - contents: write (Required to create release tags and update the repository).
-#   - pull-requests: write (Required to create and manage release PRs).
-#   - statuses: write (Required to reflect release status in the GitHub UI).
-#   - security-events: write (Required for SARIF report association).
-# Concurrency:
-#   - group: release-${{ github.workflow }}-${{ github.ref }} (Ensures atomic release transitions).
-#   - cancel-in-progress: true (Superseded by newer merges to main).
 # Design:
-#   - Depends on 'verify' pre-flight checks to prevent broken releases.
-#   - Uses manifest approach for consistent monorepo or project versioning.
+#   - Sequential execution: Verify -> Release Please.
+#   - Atomic: Release only happens if verification passes.
+#   - Secure: Eliminates workflow_run risks by using internal job dependencies.
 
-name: Release Please
+name: CD
 
 "on":
-  workflow_run:
-    workflows: ["Project Verification"]
-    types: [completed]
+  push:
     branches:
-      - main
+      - "main"
+  workflow_dispatch:
+
+permissions: {}
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
+  # 1. Project Verification Stage (Verify)
+  verify:
+    name: "🏁 Pre-flight Integrity Check (${{ matrix.os }})"
+    runs-on: ${{ matrix.os }}
+    concurrency:
+      group: verify-${{ github.workflow }}-${{ matrix.os }}-${{ github.ref }}
+      cancel-in-progress: true
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, macos-latest, windows-latest]
+    permissions:
+      contents: read
+    timeout-minutes: 15
+    env:
+      PYTHONUTF8: 1
+    steps:
+      - name: "📂 Checkout Repository Code"
+        uses: actions/checkout@v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: "⚡ Cache Mise Tools"
+        uses: actions/cache@v5.0.3
+        with:
+          path: |
+            ~/.local/bin
+            ~/.local/share/mise
+            ~/Library/Application Support/mise
+            ~/AppData/Local/mise
+          key: ${{ runner.os }}-mise-${{ hashFiles('.mise.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-mise-
+            ${{ runner.os }}-
+
+      - name: "🚀 Initialize Development Environment"
+        shell: sh
+        run: |
+          make setup
+          make install
+        env:
+          VENV: ${{ env.VENV }}
+
+      - name: "🧪 Full Project Verification"
+        shell: sh
+        run: |
+          make verify
+
+  # 2. Release Orchestration Stage (Release Please)
   release-please:
     name: "🚀 Release Orchestration"
-    # Only run if the upstream verify workflow succeeded.
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    needs: [verify]
     runs-on: ubuntu-latest
     concurrency:
       group: release-${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
     permissions:
-      contents: write # Required to create release tags and update the repository
-      pull-requests: write # Required to create and manage release PRs
-      statuses: write # Required to reflect release status in the GitHub UI
-      security-events: write # Required for SARIF report association
+      contents: write
+      pull-requests: write
+      statuses: write
+      security-events: write
     timeout-minutes: 15
     steps:
       - name: "📝 Orchestrate Release Lifecycle (Release Please)"
         id: release
         uses: googleapis/release-please-action@v4.4.0
         with:
-          # Automates versioning, PR creation, and CHANGELOG updates based on Conventional Commits.
           token: ${{ secrets.GITHUB_TOKEN }}
-          # 'simple' release type is optimized for standard conventional commit projects.
           release-type: simple
           config-file: .release-please-config.json
-          # manifest-file: .release-please-manifest.json # Optional: Explicitly define the version registry for Manifest mode.
 
       - name: "🏗️ Checkout Release PR Branch"
         if: ${{ steps.release.outputs.pr }}
@@ -77,11 +121,8 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          # Git configuration for automated commit
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-
-          # 1. Sync Node lockfiles
           if [ -f "pnpm-lock.yaml" ]; then
             pnpm install --no-frozen-lockfile
           elif [ -f "yarn.lock" ]; then
@@ -89,11 +130,6 @@ jobs:
           elif [ -f "package-lock.json" ]; then
             npm install --package-lock-only
           fi
-
-          # 2. Sync other ecosystem lockfiles if tools are available
-          # Note: Add more specialized syncs here as the project grows.
-
-          # Commit and Push synchronization changes back to the PR
           git add .
           git commit -m "chore(release): synchronize lockfiles for version bump" || echo "No changes to sync"
           git push "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git" HEAD

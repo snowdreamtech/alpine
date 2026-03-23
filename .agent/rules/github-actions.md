@@ -302,30 +302,34 @@ fi
 - Use **`ossf/scorecard-action`** on the default branch to measure supply chain security: pinned actions, branch protection, vulnerability alerts, dependency review.
 - Periodically audit active workflows and disable/delete unused ones. Monitor Actions billing with `gh api /repos/{owner}/{repo}/actions/billing/usage`.
 
-## 6. Workflow Chaining & Sequencing (`workflow_run`)
+## 6. Workflow Chaining & Sequencing
 
-For complex pipelines where jobs are split across multiple files, use `workflow_run` to establish a sequential execution chain.
+For complex pipelines, prefer **Job Dependencies (`needs`)** within a single workflow file over cross-workflow `workflow_run` triggers. This is more secure and easier to manage.
 
-### Pattern: Sequential Fail-Fast Chain
+### Pattern: Internal Sequential Chain (Standard)
 
-Used in non-main branches to ensure stages run only after previous prerequisites are met.
+Used to ensure jobs run only after prerequisites are met within the same branch context.
 
 ```yaml
-# In test.yml
-on:
-  workflow_run:
-    workflows: ["Code Quality"]
-    types: [completed]
-    branches-ignore: [main]
-
+# In ci.yml
 jobs:
+  lint: ...
   test:
-    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    needs: [lint]
+    # ...
+  audit:
+    needs: [test]
     # ...
 ```
 
-- **Trigger Identity**: The `workflows:` value MUST match the `name:` of the upstream workflow exactly.
-- **Branch Scope**: Always use `branches:` or `branches-ignore:` to prevent chaining logic from interfering with the atomic `main` branch verification.
+- **Security**: Jobs run in the same security context (ref/SHA), avoiding the "dangerous-triggers" risk associated with `workflow_run`.
+- **Visibility**: GitHub UI displays a clear topological map of job dependencies.
+
+### Pattern: Cross-Workflow Triggers (Exception)
+
+Use `workflow_run` ONLY for logic that must post-process a completed run (e.g., uploading global telemetry or non-critical secondary deployments), and ONLY when `needs` cannot be used.
+
+- **Warning**: `workflow_run` executes in the context of the **default branch**. Never trust inputs from `head_sha` in a `workflow_run` triggered by an untrusted PR.
 
 ## 7. Automated Rollback & Cleanup
 
