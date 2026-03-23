@@ -104,10 +104,23 @@ main() {
         log_success "DRY-RUN: Would run zizmor"
         log_summary "GitHub" "zizmor" "⚖️ Previewed" "-" "0"
       else
-        # zizmor requires GITHUB_TOKEN to fetch metadata about actions from GitHub API.
-        # Without it, it hits 403 Forbidden Rate Limit quickly.
-        export GH_TOKEN="${GITHUB_TOKEN:-}"
-        if run_quiet "$_ZIZMOR_BIN" . --format plain; then
+        # zizmor's online rules (like ref-confusion) frequently trigger GitHub's Secondary Rate Limit
+        # (403 Forbidden) in CI when querying non-existent branches for multiple Action tags.
+        # To guarantee CI stability, we force offline mode in CI environments or when no token is present.
+        local _ZM_OK=0
+        if is_ci_env || [ -z "${GITHUB_TOKEN:-}" ]; then
+          log_info "Zizmor: Running in offline mode to prevent API 403 rate limits."
+          if run_quiet "$_ZIZMOR_BIN" . --format plain --offline; then
+            _ZM_OK=1
+          fi
+        else
+          export GH_TOKEN="$GITHUB_TOKEN"
+          if run_quiet "$_ZIZMOR_BIN" . --format plain --gh-token "$GITHUB_TOKEN"; then
+            _ZM_OK=1
+          fi
+        fi
+
+        if [ "$_ZM_OK" -eq 1 ]; then
           log_summary "GitHub" "zizmor" "✅ Secure" "$(get_version "$_ZIZMOR_BIN")" "$(($(date +%s) - _T0_ZM))"
         else
           log_summary "GitHub" "zizmor" "❌ Vulnerable" "$(get_version "$_ZIZMOR_BIN")" "$(($(date +%s) - _T0_ZM))"
