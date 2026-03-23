@@ -7,7 +7,7 @@ install_bats() {
   local _T0_BATS
   _T0_BATS=$(date +%s)
   local _TITLE="Bats"
-  local _PROVIDER="github:bats-core/bats-core"
+  local _PROVIDER="${VER_BATS_PROVIDER:-npm:bats}"
 
   if ! has_lang_files "" "*.bats"; then
     return 0
