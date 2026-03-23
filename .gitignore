@@ -350,6 +350,7 @@ project/boot/
 
 ### C / C++ ###
 *.d
+!**/entrypoint.d/
 *.o
 *.ko
 *.obj
