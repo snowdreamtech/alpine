@@ -2,6 +2,9 @@
 # Tool Registry - Centralized version management for dynamic registration
 
 # Purpose: Registers a tool in .mise.toml if it's not already present.
+#          Uses direct TOML injection (awk) instead of `mise use` to avoid
+#          hitting the GitHub API during registration. This prevents 403
+#          rate-limit errors when registering multiple GitHub-hosted tools.
 # Params:
 #   $1 - Tool name (internal)
 #   $2 - Mise provider/name (e.g. asdf:ghc)
@@ -10,14 +13,21 @@ register_mise_tool() {
   local _NAME="$1"
   local _PROVIDER="$2"
   local _VERSION="$3"
+  local _MISE_TOML
+  _MISE_TOML="$(get_project_root)/.mise.toml"
 
   # Check if already in .mise.toml
-  if grep -qE "^\"?${_PROVIDER}\"?[[:space:]]*=" "$(get_project_root)/.mise.toml" 2>/dev/null; then
+  if grep -qE "^\"?${_PROVIDER}\"?[[:space:]]*=" "$_MISE_TOML" 2>/dev/null; then
     return 0
   fi
 
   log_info "Dynamically registering ${_NAME} SDK (${_PROVIDER}@${_VERSION})..."
-  run_mise use "${_PROVIDER}@${_VERSION}"
+
+  # Inject directly into [tools] section via awk to avoid API calls.
+  awk -v inject="\"${_PROVIDER}\" = \"${_VERSION}\"" '
+    /^\[tools\]/ { print; print inject; next }
+    { print }
+  ' "$_MISE_TOML" >"${_MISE_TOML}.tmp" && mv "${_MISE_TOML}.tmp" "$_MISE_TOML"
 }
 
 # Purpose: Registers a tool in .mise.toml using a complex TOML value (e.g., dictionary with asset matches).

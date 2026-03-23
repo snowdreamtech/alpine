@@ -388,6 +388,13 @@ run_mise() {
   local _OLD_GITHUB_TOKEN="$GITHUB_TOKEN"
   if ! is_ci_env; then
     unset GITHUB_TOKEN
+  else
+    # Ensure MISE_GITHUB_TOKEN is set for mise's internal GitHub API calls.
+    # Workflows set this at env level, but ensure it survives subshell/export boundaries.
+    if [ -n "$GITHUB_TOKEN" ] && [ -z "$MISE_GITHUB_TOKEN" ]; then
+      export MISE_GITHUB_TOKEN="$GITHUB_TOKEN"
+      log_debug "Forwarded GITHUB_TOKEN -> MISE_GITHUB_TOKEN for mise."
+    fi
   fi
 
   local _M_BIN
@@ -460,8 +467,10 @@ run_mise() {
 
     _RETRY_COUNT=$((_RETRY_COUNT + 1))
     if [ $_RETRY_COUNT -lt $_MAX_RETRIES ]; then
-      log_warn "mise $_CMD failed (attempt $_RETRY_COUNT/$_MAX_RETRIES). Retrying..."
-      sleep 1
+      # Exponential backoff: 1s, 2s, 4s... to recover from transient rate limits.
+      local _BACKOFF=$((1 << (_RETRY_COUNT - 1)))
+      log_warn "mise $_CMD failed (attempt $_RETRY_COUNT/$_MAX_RETRIES). Retrying in ${_BACKOFF}s..."
+      sleep "$_BACKOFF"
     fi
   done
 
