@@ -282,7 +282,7 @@ optimize_network() {
   if [ "$_NETWORK_OPTIMIZED" = "true" ]; then return 0; fi
 
   local _TEMP_GIT_CONFIG
-  _TEMP_GIT_CONFIG="/tmp/.git_config_$(id -u)"
+  _TEMP_GIT_CONFIG="${TMPDIR:-/tmp}/.git_config_$(id -u)"
 
   log_debug "Detecting network connectivity and global proxy health..."
 
@@ -293,13 +293,14 @@ optimize_network() {
   # to avoid hitting the GitHub API on every script invocation.
   if [ -n "$GITHUB_TOKEN" ]; then
     local _TOKEN_CACHE
-    _TOKEN_CACHE="/tmp/.mise_token_verified_$(id -u)"
+    _TOKEN_CACHE="${TMPDIR:-/tmp}/.mise_token_verified_$(id -u)"
     local _SKIP_VERIFY=false
     if [ -f "$_TOKEN_CACHE" ]; then
       local _CACHE_AGE=0
-      if [ "$(uname -s)" = "Darwin" ]; then
+      if [ "$_G_OS" = "macos" ]; then
         _CACHE_AGE=$(($(date +%s) - $(stat -f %m "$_TOKEN_CACHE")))
       else
+        # Linux and Windows (Git Bash) both use GNU stat
         _CACHE_AGE=$(($(date +%s) - $(stat -c %Y "$_TOKEN_CACHE" 2>/dev/null || echo "0")))
       fi
       [ "$_CACHE_AGE" -lt 3600 ] && _SKIP_VERIFY=true
