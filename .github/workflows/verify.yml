@@ -56,6 +56,7 @@ jobs:
         uses: actions/cache@v5.0.3
         with:
           path: |
+            ~/.local/bin
             ~/.local/share/mise
             ~/Library/Application Support/mise
             ~/AppData/Local/mise
