@@ -97,6 +97,8 @@ DRY_RUN=${DRY_RUN:-0}
 export MISE_YES=true
 export MISE_NON_INTERACTIVE=true
 export MISE_QUIET=true
+# Suppress mise's built-in update checker to avoid GitHub API calls on every invocation.
+export MISE_CHECK_FOR_UPDATES=0
 # Force mise to use system git for better proxy/config compatibility
 export MISE_GIT_ALWAYS_USE_GIX=0
 export MISE_GIX=0
@@ -287,14 +289,37 @@ optimize_network() {
   # 1. Handle Git Protocols & Proxies
   # Guard: If GITHUB_TOKEN is set, verify it's not broken (avoid 401 errors).
   # Test via `/rate_limit` endpoint because GitHub Bot tokens lack `/user` access.
+  # Cache: Skip verification if already validated within the last hour (3600s)
+  # to avoid hitting the GitHub API on every script invocation.
   if [ -n "$GITHUB_TOKEN" ]; then
-    local _HTTP_CODE
-    _HTTP_CODE=$(curl -o /dev/null -s -w "%{http_code}" -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/rate_limit --connect-timeout 2 2>/dev/null || echo "000")
-    if [ "$_HTTP_CODE" = "401" ]; then
-      log_warn "Current GITHUB_TOKEN appears invalid or unauthorized ($_HTTP_CODE). Unsetting for this session..."
-      unset GITHUB_TOKEN
-    elif [ -z "$_HTTP_CODE" ] || [ "$_HTTP_CODE" = "000" ]; then
-      log_debug "Network timeout verifying GITHUB_TOKEN. Keeping token."
+    local _TOKEN_CACHE
+    _TOKEN_CACHE="/tmp/.mise_token_verified_$(id -u)"
+    local _SKIP_VERIFY=false
+    if [ -f "$_TOKEN_CACHE" ]; then
+      local _CACHE_AGE=0
+      if [ "$(uname -s)" = "Darwin" ]; then
+        _CACHE_AGE=$(($(date +%s) - $(stat -f %m "$_TOKEN_CACHE")))
+      else
+        _CACHE_AGE=$(($(date +%s) - $(stat -c %Y "$_TOKEN_CACHE" 2>/dev/null || echo "0")))
+      fi
+      [ "$_CACHE_AGE" -lt 3600 ] && _SKIP_VERIFY=true
+    fi
+
+    if [ "$_SKIP_VERIFY" = "true" ]; then
+      log_debug "GITHUB_TOKEN recently validated (cache age: ${_CACHE_AGE}s). Skipping API check."
+    else
+      local _HTTP_CODE
+      _HTTP_CODE=$(curl -o /dev/null -s -w "%{http_code}" -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/rate_limit --connect-timeout 2 2>/dev/null || echo "000")
+      if [ "$_HTTP_CODE" = "401" ]; then
+        log_warn "Current GITHUB_TOKEN appears invalid or unauthorized ($_HTTP_CODE). Unsetting for this session..."
+        unset GITHUB_TOKEN
+        rm -f "$_TOKEN_CACHE"
+      elif [ -z "$_HTTP_CODE" ] || [ "$_HTTP_CODE" = "000" ]; then
+        log_debug "Network timeout verifying GITHUB_TOKEN. Keeping token."
+      else
+        # Token is valid, cache the result
+        touch "$_TOKEN_CACHE"
+      fi
     fi
   fi
 
