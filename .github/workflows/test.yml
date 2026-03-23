@@ -1,12 +1,12 @@
 ---
 # Project Automated Test Runner
 # Purpose: Executes the full test matrix across multiple languages (Shell, PowerShell, Python, Go).
-# Trigger: Comprehensive coverage on every push and pull request.
+# Trigger: Sequential execution after Code Quality succeeds.
 # Permissions:
 #   - contents: read (Required for codebase checkout).
 #   - pull-requests: read (Required for PR context integration during testing).
 # Concurrency:
-#   - group: test-${{ github.event.pull_request.number || github.ref }} (Scoped to PR/ref).
+#   - group: test-${{ github.event.workflow_run.id || github.ref }} (Scoped to PR/ref).
 #   - cancel-in-progress: true (Immediate resource release when newer commits arrive).
 # Design:
 #   - Uses unified 'make test' interface for parity between local and CI.
@@ -15,22 +15,9 @@
 name: Test
 
 "on":
-  push:
-    branches:
-      - "dev"
-      - "feat/**"
-      - "branch/**"
-      - "feature/**"
-      - "fix/**"
-      - "pr/**"
-  pull_request:
-    branches:
-      - "dev"
-      - "feat/**"
-      - "branch/**"
-      - "feature/**"
-      - "fix/**"
-      - "pr/**"
+  workflow_run:
+    workflows: ["Code Quality"]
+    types: [completed]
   workflow_dispatch:
     inputs:
       venv:
@@ -48,9 +35,11 @@ env:
 jobs:
   test:
     name: "🧪 Automated Testing Suite (${{ matrix.os }})"
+    # Only run if the upstream Code Quality workflow succeeded.
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success') }}
     runs-on: ${{ matrix.os }}
     concurrency:
-      group: test-${{ github.workflow }}-${{ matrix.os }}-${{ github.event.pull_request.number || github.ref }}
+      group: test-${{ github.workflow }}-${{ matrix.os }}-${{ github.event.workflow_run.id || github.ref }}
       cancel-in-progress: true
     strategy:
       # Validates logic integrity across the complete project compatibility matrix.

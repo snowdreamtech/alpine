@@ -8,7 +8,7 @@
 #   - statuses: write (Required to update commit status indicators).
 #   - security-events: write (Required for uploading Trivy SARIF audit reports).
 # Concurrency:
-#   - group: audit-${{ github.event.pull_request.number || github.ref }} (Scoped to PR/ref).
+#   - group: audit-${{ github.event.workflow_run.id || github.ref }} (Scoped to PR/ref).
 #   - cancel-in-progress: true (Superseded by newer commits to minimize redundant CI load).
 # Design:
 #   - Fail-fast strategy: Lints code before more expensive security scans.
@@ -17,22 +17,9 @@
 name: Security & Audit
 
 "on":
-  push:
-    branches:
-      - "dev"
-      - "feat/**"
-      - "branch/**"
-      - "feature/**"
-      - "fix/**"
-      - "pr/**"
-  pull_request:
-    branches:
-      - "dev"
-      - "feat/**"
-      - "branch/**"
-      - "feature/**"
-      - "fix/**"
-      - "pr/**"
+  workflow_run:
+    workflows: ["Test"]
+    types: [completed]
   workflow_dispatch:
     inputs:
       venv:
@@ -50,9 +37,11 @@ env:
 jobs:
   audit:
     name: "🕵️ Security & Standards Audit (ubuntu-latest)"
+    # Only run if the upstream Test workflow succeeded.
+    if: ${{ github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success') }}
     runs-on: ubuntu-latest
     concurrency:
-      group: audit-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+      group: audit-${{ github.workflow }}-${{ github.event.workflow_run.id || github.ref }}
       cancel-in-progress: true
     permissions:
       contents: read # Required for codebase inspection
