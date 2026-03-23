@@ -298,7 +298,53 @@ if [ "$_SUMMARY_HEADER_SENTINEL" != "true" ] && ! check_ci_summary "### Project 
   # 2. Set environment sentinel for subsequent steps
   [ -n "$GITHUB_ENV" ] && echo "_SUMMARY_HEADER_SENTINEL=true" >> "$GITHUB_ENV"
 fi
-```
 
 - Use **`ossf/scorecard-action`** on the default branch to measure supply chain security: pinned actions, branch protection, vulnerability alerts, dependency review.
 - Periodically audit active workflows and disable/delete unused ones. Monitor Actions billing with `gh api /repos/{owner}/{repo}/actions/billing/usage`.
+
+## 6. Workflow Chaining & Sequencing (`workflow_run`)
+
+For complex pipelines where jobs are split across multiple files, use `workflow_run` to establish a sequential execution chain.
+
+### Pattern: Sequential Fail-Fast Chain
+
+Used in non-main branches to ensure stages run only after previous prerequisites are met.
+
+```yaml
+# In test.yml
+on:
+  workflow_run:
+    workflows: ["Code Quality"]
+    types: [completed]
+    branches-ignore: [main]
+
+jobs:
+  test:
+    if: ${{ github.event.workflow_run.conclusion == 'success' }}
+    # ...
+```
+
+- **Trigger Identity**: The `workflows:` value MUST match the `name:` of the upstream workflow exactly.
+- **Branch Scope**: Always use `branches:` or `branches-ignore:` to prevent chaining logic from interfering with the atomic `main` branch verification.
+
+## 7. Automated Rollback & Cleanup
+
+Critical release workflows MUST implement automated rollback logic to prevent the repository from being left in an inconsistent state (e.g., partial releases or orphaned tags).
+
+### Pattern: GoReleaser Rollback
+
+Use `if: failure()` in combination with the `gh` CLI to delete failed releases and tags.
+
+```yaml
+- name: "🧹 Cleanup on Failure (Rollback)"
+  if: failure() && startsWith(github.ref, 'refs/tags/')
+  shell: sh
+  run: |
+    echo "⚠️ Release process failed. Rolling back..."
+    gh release delete "${GITHUB_REF_NAME}" --yes --cleanup-tag
+  env:
+    GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+```
+
+- **Tag Deletion**: Use `--cleanup-tag` to ensure the local/remote tag is also removed, allowing for a clean retry after fixing the root cause.
+- **Permissions**: Ensure the `GITHUB_TOKEN` has `contents: write` permissions for the rollback step.
