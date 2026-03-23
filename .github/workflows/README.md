@@ -23,17 +23,16 @@ The GitHub Actions infrastructure provides a robust, multi-layered validation sy
 graph TD
     A[Local Commit] --> B{Pre-commit Hooks}
     B -- Pass --> C[GitHub Push/PR]
-    C --> D[CI Pipeline]
-    subgraph "CI Pipeline"
-        D1[verify.yml]
-        D2[lint.yml]
-        D3[test.yml]
-        D4[codeql.yml]
+    C --> D[CI/CD Pipelines]
+    subgraph "CI & CD Layer"
+        D1[ci.yml: Lint -> Test -> Audit]
+        D2[cd.yml: Verify -> Release]
+        D3[codeql.yml]
     end
-    D1 & D2 & D3 & D4 --> E{Release Ready?}
-    E -- Yes --> F[release-please.yml]
+    D1 & D2 & D3 --> E{Release Ready?}
+    D2 -- Tag v* --> F[goreleaser.yml]
     F --> G[Production Release]
-    F --> H[pages.yml]
+    D2 --> H[pages.yml]
     H --> I[GitHub Pages Docs]
 ```
 
@@ -84,11 +83,9 @@ graph TD
 .github/workflows/
 ├── README.md           # This guide
 ├── README_zh-CN.md     # Chinese version
-├── verify.yml          # Pre-flight environment check
-├── lint.yml            # Linting & Security audit
-├── test.yml            # Multi-stack test runner
+├── ci.yml              # Unified CI (Lint -> Test -> Audit)
+├── cd.yml              # Unified CD (Verify -> Release Please)
 ├── codeql.yml          # Deep security analysis
-├── release-please.yml  # Versioning automation
 ├── pages.yml           # Docs deployment
 ├── cache.yml           # Cache maintenance
 ├── labeler.yml         # PR categorization
