@@ -65,7 +65,9 @@ main() {
   init_summary_table "Security Audit Execution Summary"
 
   # 3. Secrets Scanning
-  if run_quiet command -v gitleaks; then
+  local _GITLEAKS_BIN
+  _GITLEAKS_BIN=$(resolve_bin "gitleaks") || true
+  if [ -n "$_GITLEAKS_BIN" ]; then
     local _T0_GL
     _T0_GL=$(date +%s)
     log_info "── Scanning for Secrets (gitleaks) ──"
@@ -82,10 +84,10 @@ main() {
         _GL_GIT_PARAMS="${GIT_CONFIG_PARAMETERS},'diff.renameLimit=5000'"
       fi
       if GIT_CONFIG_PARAMETERS="$_GL_GIT_PARAMS" \
-        run_quiet gitleaks detect --source . --no-banner; then
-        log_summary "Security" "gitleaks" "✅ Clean" "$(get_version gitleaks)" "$(($(date +%s) - _T0_GL))"
+        run_quiet "$_GITLEAKS_BIN" detect --source . --no-banner; then
+        log_summary "Security" "gitleaks" "✅ Clean" "$(get_version "$_GITLEAKS_BIN")" "$(($(date +%s) - _T0_GL))"
       else
-        log_summary "Security" "gitleaks" "❌ Leaks Found" "$(get_version gitleaks)" "$(($(date +%s) - _T0_GL))"
+        log_summary "Security" "gitleaks" "❌ Leaks Found" "$(get_version "$_GITLEAKS_BIN")" "$(($(date +%s) - _T0_GL))"
         _OVERALL_EXIT_AUDIT=1
       fi
     fi

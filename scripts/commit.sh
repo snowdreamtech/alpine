@@ -90,9 +90,9 @@ main() {
   # 4. Check for dependencies
   local _NPM_LOCAL_CMT
   _NPM_LOCAL_CMT="$NPM"
-  if ! command -v "$_NPM_LOCAL_CMT" >/dev/null 2>&1; then
-    log_error "Error: $_NPM_LOCAL_CMT client not found."
-    exit 1
+  if ! resolve_bin "$_NPM_LOCAL_CMT" >/dev/null 2>&1; then
+    log_info "Attempting to install commitizen locally..."
+    run_quiet "$NPM" install --save-dev commitizen cz-conventional-changelog
   fi
 
   # 5. Launch Commitizen

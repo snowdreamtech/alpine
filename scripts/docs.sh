@@ -79,8 +79,8 @@ main() {
       exit 1
     fi
 
-    if ! command -v "$NPM" >/dev/null 2>&1; then
-      log_error "Error: $NPM client not found."
+    if ! resolve_bin "$NPM" >/dev/null 2>&1; then
+      log_error "Error: $NPM not found. Please install it to build documentation."
       exit 1
     fi
 
