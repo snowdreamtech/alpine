@@ -154,12 +154,8 @@ else
 	@sh scripts/commit.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-verify:
-ifeq ($(OS_NAME),Windows)
-	@scripts/verify.bat $(SCRIPT_ARGS) $(ARGS)
-else
-	@sh scripts/verify.sh $(SCRIPT_ARGS) $(ARGS)
-endif
+.NOTPARALLEL: verify
+verify: check-env lint test audit  ## Run full local verification (env, lint, test, audit)
 
 release:
 ifeq ($(OS_NAME),Windows)

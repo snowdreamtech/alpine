@@ -74,14 +74,8 @@ jobs:
         env:
           VENV: ${{ env.VENV }}
 
-      - name: "🧪 Validate Project Health (Verify)"
+      - name: "🧪 Full Project Verification"
         shell: sh
         run: |
-          # Executes a rapid, high-level verification of environment, syntax, and logic.
+          # Executes a rapid, high-level verification: env check, linting, testing, and security auditing.
           make verify
-
-      - name: "🛡️ Audit Dependency Supply Chain"
-        shell: sh
-        run: |
-          # Scans for vulnerabilities to ensure the build pipeline remains secure.
-          make audit
