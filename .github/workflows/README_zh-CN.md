@@ -83,8 +83,8 @@ graph TD
 .github/workflows/
 ├── README.md           # 英文指南
 ├── README_zh-CN.md     # 中文指南（本文档）
-├── ci.yml              # 统一 CI (Lint -> Test -> Audit)
-├── cd.yml              # 统一 CD (Verify -> Release Please)
+├── ci.yml              # Continuous Integration (统一 CI)
+├── cd.yml              # Continuous Delivery (统一 CD)
 ├── codeql.yml          # 深度安全分析
 ├── pages.yml           # 文档部署
 ├── cache.yml           # 缓存清理维护

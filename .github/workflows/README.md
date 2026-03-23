@@ -83,8 +83,8 @@ graph TD
 .github/workflows/
 ├── README.md           # This guide
 ├── README_zh-CN.md     # Chinese version
-├── ci.yml              # Unified CI (Lint -> Test -> Audit)
-├── cd.yml              # Unified CD (Verify -> Release Please)
+├── ci.yml              # Continuous Integration (Lint -> Test -> Audit)
+├── cd.yml              # Continuous Delivery (Verify -> Release Please)
 ├── codeql.yml          # Deep security analysis
 ├── pages.yml           # Docs deployment
 ├── cache.yml           # Cache maintenance
