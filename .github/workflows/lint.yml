@@ -19,7 +19,6 @@ name: Quality & Audit
 "on":
   push:
     branches:
-      - "main"
       - "dev"
       - "feat/**"
       - "branch/**"
@@ -28,7 +27,6 @@ name: Quality & Audit
       - "pr/**"
   pull_request:
     branches:
-      - "main"
       - "dev"
       - "feat/**"
       - "branch/**"
@@ -40,13 +38,6 @@ name: Quality & Audit
       venv:
         description: "Virtual environment path"
         required: false
-        default: ".venv"
-  workflow_call:
-    inputs:
-      venv:
-        description: "Virtual environment path"
-        required: false
-        type: string
         default: ".venv"
 
 permissions: {}
@@ -186,13 +177,6 @@ jobs:
           else
             mise exec -- commitlint --last --verbose
           fi
-
-      - name: "🛡️ Perform Security Audit"
-        shell: sh
-        run: |
-          make audit
-        env:
-          VENV: ${{ env.VENV }}
 
       - name: "🔗 Verify Documentation Links (Lychee)"
         uses: lycheeverse/lychee-action@v2.8.0
