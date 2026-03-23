@@ -15,10 +15,11 @@ name: Project Verification
 
 "on":
   push:
-    branches: [main]
+    branches:
+      - main
   pull_request:
-    branches: [main]
-  workflow_call:
+    branches:
+      - main
   workflow_dispatch:
 
 permissions: {}
