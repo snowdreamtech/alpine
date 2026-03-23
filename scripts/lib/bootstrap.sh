@@ -206,7 +206,11 @@ _mise_setup_completions() {
   log_info "Setting up mise completions for ${_SHELL}..."
 
   # mise completion performs better when 'usage' is installed.
-  run_mise use --global usage >/dev/null 2>&1 || true
+  # However, it often hangs on Windows CI due to compilation or interactive prompts.
+  # We skip 'usage' installation entirely in CI to guarantee fast bootstrap.
+  if ! is_ci_env; then
+    run_quiet run_mise use --global usage || true
+  fi
 
   case "$_SHELL" in
   zsh)
