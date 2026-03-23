@@ -382,9 +382,13 @@ run_mise() {
   local _CMD="$1"
   shift
 
-  # Guard: Unset potentially invalid GITHUB_TOKEN to avoid 401 errors for GitHub-based tools.
+  # Guard: Only unset GITHUB_TOKEN if we are NOT in CI.
+  # In CI (GitHub Actions, etc.), we MUST keep the token to avoid 403 Rate Limit errors.
+  # optimize_network() has already verified the token's validity during bootstrap.
   local _OLD_GITHUB_TOKEN="$GITHUB_TOKEN"
-  unset GITHUB_TOKEN
+  if ! is_ci_env; then
+    unset GITHUB_TOKEN
+  fi
 
   local _M_BIN
   _M_BIN=$(command -v mise || echo "$HOME/.local/bin/mise")
