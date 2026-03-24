@@ -232,3 +232,9 @@ ifeq ($(OS_NAME),Windows)
 else
 	@sh scripts/cleanup.sh $(SCRIPT_ARGS) $(ARGS)
 endif
+
+fix: ## Automatically fix common issues (line endings, typos)
+	@printf "$(BLUE)Applying automated fixes...$(NC)\n"
+	@find scripts -name "*.bat" -o -name "*.ps1" | xargs perl -pi -e 's/\r\n/\n/g; s/\n/\r\n/g'
+	@git add --renormalize .
+	@printf "$(GREEN)Fixes applied!$(NC)\n"
