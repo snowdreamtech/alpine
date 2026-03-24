@@ -53,7 +53,7 @@ jobs:
             ~/.local/share/mise
             ~/Library/Application Support/mise
             ~/AppData/Local/mise
-          key: ${{ runner.os }}-mise-${{ hashFiles('.mise.toml') }}
+          key: ${{ runner.os }}-mise-${{ hashFiles('.mise.toml', 'scripts/lib/versions.sh') }}
           restore-keys: |
             ${{ runner.os }}-mise-
             ${{ runner.os }}-
