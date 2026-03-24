@@ -65,6 +65,10 @@ else
 	NC     := $(shell printf '\033[0m')
 endif
 
+# SSoT Project Metadata
+PROJECT_VERSION := $(shell cat VERSION 2>/dev/null || echo "unknown")
+GIT_BRANCH      := $(shell git branch --show-current 2>/dev/null || echo "not a git repo")
+
 # =============================================================================
 # Targets
 # =============================================================================
@@ -74,9 +78,10 @@ endif
 all: help
 
 help: ## Show this help message
-	@printf "$(BLUE)Snowdream Tech AI IDE Template$(NC)\n"
-	@printf "Detected OS: $(GREEN)$(OS_NAME)$(NC) ($(ARCH_NAME))\n"
-	@printf "Current Shell: $(GREEN)$(SHELL_NAME)$(NC)\n\n"
+	@printf "$(BLUE)Snowdream Tech AI IDE Template$(NC) ($(GREEN)v$(PROJECT_VERSION)$(NC))\n"
+	@printf "Detected OS:   $(GREEN)$(OS_NAME)$(NC) ($(ARCH_NAME))\n"
+	@printf "Current Shell: $(GREEN)$(SHELL_NAME)$(NC)\n"
+	@printf "Git Branch:    $(GREEN)$(GIT_BRANCH)$(NC)\n\n"
 	@printf "$(YELLOW)Usage:$(NC)\n"
 	@printf "  make $(GREEN)<target>$(NC) [ARGS=\"...\"] [V=1|2] [VARIABLE=value]\n\n"
 	@printf "$(YELLOW)Main Lifecycle Targets:$(NC)\n"
