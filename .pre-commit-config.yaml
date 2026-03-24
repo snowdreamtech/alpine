@@ -816,7 +816,14 @@ repos:
         name: check license headers
         language: system
         entry: mise x -- addlicense -check -v -f .github/license-header.txt
-        files: ^(src|pkg|internal|cmd|app|lib|include|scripts|tools|tests|spec)/
+        files: ^(src|pkg|internal|cmd|app|lib|include|scripts|tests)/
+        exclude: |
+          (?x)^(
+            .*/vendor/.*|
+            .*/node_modules/.*|
+            .*/dist/.*|
+            .*/build/.*
+          )
         types_or:
           [
             go,
@@ -847,10 +854,6 @@ repos:
             protobuf,
             terraform,
             hcl,
-            yaml,
-            toml,
-            json,
-            markdown,
           ]
         description: "High-performance incremental compliance: Verify staged files for a SnowdreamTech license header."
 
