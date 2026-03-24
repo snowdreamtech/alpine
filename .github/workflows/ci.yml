@@ -121,6 +121,24 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-mise-
 
+      - name: "📦 Cache Language Dependencies (Advanced)"
+        uses: actions/cache@v5.0.3
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+            ~/.npm
+            ~/.cache/pip
+            ~/.cargo/bin
+            ~/.cargo/registry/index
+            ~/.cargo/registry/cache
+            ~/.cargo/git/db
+            **/node_modules
+            **/target
+          key: ${{ runner.os }}-lang-${{ hashFiles('**/go.mod', '**/package-lock.json', '**/requirements.txt', '**/Cargo.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-lang-
+
       - name: "🚀 Initialize Development Environment"
         shell: sh
         run: |
