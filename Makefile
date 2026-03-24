@@ -226,9 +226,9 @@ endif
 
 sync-labels: ## Synchronize and brand repository labels
 ifeq ($(OS_NAME),Windows)
-	@scripts/sync-labels.bat $(SCRIPT_ARGS) $(ARGS)
+	@mise x -- scripts/sync-labels.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/sync-labels.sh $(SCRIPT_ARGS) $(ARGS)
+	@mise x -- sh scripts/sync-labels.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 archive-changelog: ## Archive major-version changelog entries
