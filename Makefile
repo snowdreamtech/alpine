@@ -186,16 +186,16 @@ else
 	@sh scripts/sync-docs.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-license-add: ## Add license headers to all source files (src, pkg, cmd, etc.)
+license-add: ## Add license headers to all source files (Comprehensive)
 	@mise x -- addlicense -v -f .github/license-header.txt \
 		$$(find src pkg internal cmd app lib include scripts tools tests spec -type f \
-		\( -name "*.go" -o -name "*.sh" -o -name "*.py" -o -name "*.js" -o -name "*.ts" -o -name "*.tsx" -o -name "*.java" -o -name "*.kt" -o -name "*.c" -o -name "*.cpp" -o -name "*.h" \) \
+		\( -name "*.go" -o -name "*.sh" -o -name "*.py" -o -name "*.js" -o -name "*.mjs" -o -name "*.ts" -o -name "*.tsx" -o -name "*.jsx" -o -name "*.vue" -o -name "*.svelte" -o -name "*.astro" -o -name "*.java" -o -name "*.kt" -o -name "*.swift" -o -name "*.m" -o -name "*.mm" -o -name "*.c" -o -name "*.cpp" -o -name "*.cc" -o -name "*.h" -o -name "*.hpp" -o -name "*.rs" -o -name "*.rb" -o -name "*.php" -o -name "*.cs" -o -name "*.fs" -o -name "*.dart" -o -name "*.rego" -o -name "*.proto" -o -name "*.tf" -o -name "*.tfvars" -o -name "*.kcl" -o -name "*.pkl" -o -name "*.cue" \) \
 		2>/dev/null)
 
 license-check: ## Check for missing license headers
 	@mise x -- addlicense -check -v -f .github/license-header.txt \
 		$$(find src pkg internal cmd app lib include scripts tools tests spec -type f \
-		\( -name "*.go" -o -name "*.sh" -o -name "*.py" -o -name "*.js" -o -name "*.ts" -o -name "*.tsx" -o -name "*.java" -o -name "*.kt" -o -name "*.c" -o -name "*.cpp" -o -name "*.h" \) \
+		\( -name "*.go" -o -name "*.sh" -o -name "*.py" -o -name "*.js" -o -name "*.mjs" -o -name "*.ts" -o -name "*.tsx" -o -name "*.jsx" -o -name "*.vue" -o -name "*.svelte" -o -name "*.astro" -o -name "*.java" -o -name "*.kt" -o -name "*.swift" -o -name "*.m" -o -name "*.mm" -o -name "*.c" -o -name "*.cpp" -o -name "*.cc" -o -name "*.h" -o -name "*.hpp" -o -name "*.rs" -o -name "*.rb" -o -name "*.php" -o -name "*.cs" -o -name "*.fs" -o -name "*.dart" -o -name "*.rego" -o -name "*.proto" -o -name "*.tf" -o -name "*.tfvars" -o -name "*.kcl" -o -name "*.pkl" -o -name "*.cue" \) \
 		2>/dev/null)
 
 docs: ## Documentation site manager (dev/build/preview)
