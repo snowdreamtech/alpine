@@ -815,10 +815,33 @@ repos:
       - id: license-check
         name: check license headers
         language: system
-        entry: make license-check
-        always_run: true
-        pass_filenames: false
-        description: "Zero-effort compliance: Verify all core source files have a SnowdreamTech license header."
+        entry: mise x -- addlicense -check -v -f .github/license-header.txt
+        types_or:
+          [
+            go,
+            shell,
+            python,
+            javascript,
+            jsx,
+            ts,
+            tsx,
+            c,
+            cpp,
+            c++,
+            java,
+            kotlin,
+            rust,
+            ruby,
+            php,
+            csharp,
+            dart,
+            proto,
+            yaml,
+            toml,
+            json,
+            markdown,
+          ]
+        description: "High-performance incremental compliance: Verify staged files for a SnowdreamTech license header."
 
       - id: forbidden-files
         name: check forbidden files
