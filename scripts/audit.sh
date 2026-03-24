@@ -83,8 +83,14 @@ main() {
       if [ -n "${GIT_CONFIG_PARAMETERS:-}" ]; then
         _GL_GIT_PARAMS="${GIT_CONFIG_PARAMETERS},'diff.renameLimit=5000'"
       fi
+      _GL_ARGS="detect --source . --no-banner"
+      if is_ci_env && [ -n "${GITHUB_BASE_REF:-}" ]; then
+        log_info "Gitleaks: Performing incremental PR scan (origin/${GITHUB_BASE_REF}..HEAD)..."
+        _GL_ARGS="detect --log-opts=origin/${GITHUB_BASE_REF}..HEAD --no-banner"
+      fi
+
       if GIT_CONFIG_PARAMETERS="$_GL_GIT_PARAMS" \
-        run_quiet "$_GITLEAKS_BIN" detect --source . --no-banner; then
+        run_quiet "$_GITLEAKS_BIN" $_GL_ARGS; then
         log_summary "Security" "gitleaks" "✅ Clean" "$(get_version "$_GITLEAKS_BIN")" "$(($(date +%s) - _T0_GL))"
       else
         log_summary "Security" "gitleaks" "❌ Leaks Found" "$(get_version "$_GITLEAKS_BIN")" "$(($(date +%s) - _T0_GL))"
