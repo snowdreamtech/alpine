@@ -72,7 +72,7 @@ GIT_BRANCH      := $(shell git branch --show-current 2>/dev/null || echo "not a 
 # =============================================================================
 # Targets
 # =============================================================================
-.PHONY: all help init setup install lint format test build clean commit verify release env update audit health bench docs archive-changelog check-env sync-docs precommit license-add license-check
+.PHONY: all help init setup install lint format test build clean commit verify release env update audit health bench docs archive-changelog check-env sync-docs precommit license-add license-check gen-dependabot
 
 # Default target: display help
 all: help
@@ -215,6 +215,13 @@ ifeq ($(OS_NAME),Windows)
 	@scripts/docs.bat $(SCRIPT_ARGS) $(ARGS)
 else
 	@sh scripts/docs.sh $(SCRIPT_ARGS) $(ARGS)
+endif
+
+gen-dependabot: ## Auto-generate dependabot.yml from detected ecosystems
+ifeq ($(OS_NAME),Windows)
+	@scripts/gen-dependabot.bat $(SCRIPT_ARGS) $(ARGS)
+else
+	@sh scripts/gen-dependabot.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 archive-changelog: ## Archive major-version changelog entries
