@@ -1,111 +1,39 @@
 ---
-name: 🐛 Bug Report
-description: Create a report to help us improve the template
+name: "🐛 Bug Report"
+description: "Report a bug to help us improve."
 labels: ["bug"]
 body:
-  - type: markdown
-    attributes:
-      value: |
-        Thanks for taking the time to report this!
-        Be sure to search [existing issues](https://github.com/snowdreamtech/template/issues) before opening a new one.
-  - type: textarea
-    id: description
-    attributes:
-      label: Description
-      description: A clear and concise description of what the bug is.
-      placeholder: Describe the issue...
-    validations:
-      required: true
-  - type: textarea
-    id: reproduction
-    attributes:
-      label: Reproduction Steps
-      description: How to reproduce the behavior?
-      placeholder: |
-        1. Go to '...'
-        2. Click on '....'
-        3. Scroll down to '....'
-    validations:
-      required: true
-  - type: textarea
-    id: expected
-    attributes:
-      label: Expected Behavior
-      description: A clear and concise description of what you expected to happen.
-    validations:
-      required: true
-  - type: dropdown
-    id: os
-    attributes:
-      label: Operating System
-      options:
-        - macOS
-        - Linux (Ubuntu/Debian)
-        - Linux (RedHat/Fedora)
-        - Linux (Alpine)
-        - Windows 11
-        - Windows 10
-        - Other
-    validations:
-      required: true
-  - type: dropdown
-    id: ide
-    attributes:
-      label: AI IDE / Editor
-      description: Which AI-powered IDE or editor are you using?
-      multiple: true
-      options:
-        - VS Code + Copilot
-        - Cursor
-        - Windsurf
-        - Trae
-        - PearAI
-        - Void
-        - Other VS Code Fork
-        - JetBrains AI
-        - Neovim + AI Plugin
-        - Other
-    validations:
-      required: true
-  - type: dropdown
-    id: agent
-    attributes:
-      label: AI Agent / Extension
-      description: Which AI agent or extension are you using?
-      multiple: true
-      options:
-        - Gemini (Antigravity)
-        - Claude (claude.ai)
-        - Cline
-        - Roo Code
-        - GitHub Copilot Chat
-        - Amazon Q Developer
-        - Cursor Agent
-        - Windsurf Cascade
-        - Codex CLI
-        - Aider
-        - Devin
-        - OpenHands
-        - Augment Code
-        - Continue
-        - Kiro
-        - Other
-    validations:
-      required: false
-  - type: input
-    id: rule-file
-    attributes:
-      label: Affected Rule / Workflow File (if applicable)
-      description: Which `.agent/rules/` or `.agent/workflows/` file is involved?
-      placeholder: "e.g. .agent/rules/shell.md or .agent/workflows/speckit.implement.md"
-    validations:
-      required: false
   - type: checkboxes
-    id: terms
     attributes:
-      label: Verification
+      label: "Is there an existing issue for this?"
+      description: "Please check if a similar issue already exists."
       options:
-        - label: I have searched the existing issues to make sure this bug has not been reported yet.
+        - label: "I have searched the existing issues"
           required: true
-        - label: I have read the project rules and constitution.
-          required: true
+  - type: textarea
+    attributes:
+      label: "Current Behavior"
+      description: "A concise description of what's happening."
+      placeholder: "e.g. 'make setup' fails on macOS 14."
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: "Expected Behavior"
+      description: "A concise description of what you expected to happen."
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: "Environment Information"
+      description: "OS version, AI IDE name/version, etc."
+      placeholder: "macOS 14.4, Windsurf 1.0.0"
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: "Steps to Reproduce"
+      description: "Steps to trigger the issue."
+      placeholder: "1. Run make setup\n2. ..."
+    validations:
+      required: true
