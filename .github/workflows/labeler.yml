@@ -20,6 +20,11 @@ name: Pull Request Labeler
 
 permissions: {}
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   label:
     name: "🏷️ Pull Request Categorization"

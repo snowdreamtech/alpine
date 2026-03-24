@@ -11,6 +11,11 @@ name: DCO
 
 permissions: {}
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   dco:
     name: "🛡️ Verify Signed-off-by"

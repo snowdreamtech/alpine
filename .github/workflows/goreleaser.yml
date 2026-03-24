@@ -22,6 +22,11 @@ name: GoReleaser
 
 permissions: {}
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   goreleaser:
     name: "📦 Distribution Packaging"
@@ -59,8 +64,6 @@ jobs:
           distribution: goreleaser
           version: "~> v2" # Pins to the latest stable v2 series binary
           args: ${{ startsWith(github.ref, 'refs/tags/') && 'release --clean' || 'release --snapshot --clean --skip=publish' }}
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "🧹 Cleanup on Failure (Rollback)"
         if: failure() && startsWith(github.ref, 'refs/tags/')
@@ -69,5 +72,3 @@ jobs:
           echo "⚠️ Release process failed for ${GITHUB_REF_NAME}. Rolling back partial release..."
           # Delete the partial GitHub release and the associated tag to allow for a clean retry.
           gh release delete "${GITHUB_REF_NAME}" --yes --cleanup-tag
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

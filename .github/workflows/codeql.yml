@@ -40,6 +40,11 @@ name: "CodeQL Analysis"
 
 permissions: {}
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   analyze:
     name: "🛡️ Deep Semantic Analysis (${{ matrix.language }})"

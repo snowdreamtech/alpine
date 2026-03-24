@@ -22,6 +22,11 @@ name: Cache Cleanup
 
 permissions: {}
 
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
 jobs:
   cleanup:
     name: "🧹 Cache Sanitation Maintenance"
@@ -53,6 +58,5 @@ jobs:
           done
           echo "Cleanup completed successfully."
         env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           BRANCH: ${{ github.ref }}
