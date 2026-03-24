@@ -70,6 +70,9 @@ jobs:
         shell: sh
         run: |
           sh scripts/gen-dependabot.sh
+          if [ -f "dependabot_summary.md" ]; then
+            cat dependabot_summary.md >> $GITHUB_STEP_SUMMARY
+          fi
 
       - name: "📝 Commit Changes (if any)"
         shell: sh
