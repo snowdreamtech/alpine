@@ -79,9 +79,9 @@ all: help
 
 help: ## Show this help message
 	@printf "$(BLUE)Snowdream Tech AI IDE Template$(NC) ($(GREEN)v$(PROJECT_VERSION)$(NC))\n"
-	@printf "Detected OS:   $(GREEN)$(OS_NAME)$(NC) ($(ARCH_NAME))\n"
-	@printf "Current Shell: $(GREEN)$(SHELL_NAME)$(NC)\n"
-	@printf "Git Branch:    $(GREEN)$(GIT_BRANCH)$(NC)\n\n"
+	@printf "%-16s $(GREEN)$(OS_NAME)$(NC) ($(ARCH_NAME))\n" "Detected OS:"
+	@printf "%-16s $(GREEN)$(SHELL_NAME)$(NC)\n" "Current Shell:"
+	@printf "%-16s $(GREEN)$(GIT_BRANCH)$(NC)\n\n" "Git Branch:"
 	@printf "$(YELLOW)Usage:$(NC)\n"
 	@printf "  make $(GREEN)<target>$(NC) [ARGS=\"...\"] [V=1|2] [VARIABLE=value]\n\n"
 	@printf "$(YELLOW)Main Lifecycle Targets:$(NC)\n"
