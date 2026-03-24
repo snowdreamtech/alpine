@@ -62,7 +62,7 @@ endif
 # =============================================================================
 # Targets
 # =============================================================================
-.PHONY: all help init setup install lint format test build clean commit verify release env update audit health bench docs archive-changelog check-env sync-docs precommit
+.PHONY: all help init setup install lint format test build clean commit verify release env update audit health bench docs archive-changelog check-env sync-docs precommit license-add license-check
 
 # Default target: display help
 all: help
@@ -185,6 +185,18 @@ ifeq ($(OS_NAME),Windows)
 else
 	@sh scripts/sync-docs.sh $(SCRIPT_ARGS) $(ARGS)
 endif
+
+license-add: ## Add license headers to all source files (src, pkg, cmd, etc.)
+	@mise x -- addlicense -v -f .github/license-header.txt \
+		$$(find src pkg internal cmd app lib include scripts tools tests spec -type f \
+		\( -name "*.go" -o -name "*.sh" -o -name "*.py" -o -name "*.js" -o -name "*.ts" -o -name "*.tsx" -o -name "*.java" -o -name "*.kt" -o -name "*.c" -o -name "*.cpp" -o -name "*.h" \) \
+		2>/dev/null)
+
+license-check: ## Check for missing license headers
+	@mise x -- addlicense -check -v -f .github/license-header.txt \
+		$$(find src pkg internal cmd app lib include scripts tools tests spec -type f \
+		\( -name "*.go" -o -name "*.sh" -o -name "*.py" -o -name "*.js" -o -name "*.ts" -o -name "*.tsx" -o -name "*.java" -o -name "*.kt" -o -name "*.c" -o -name "*.cpp" -o -name "*.h" \) \
+		2>/dev/null)
 
 docs: ## Documentation site manager (dev/build/preview)
 ifeq ($(OS_NAME),Windows)
