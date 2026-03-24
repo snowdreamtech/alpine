@@ -97,6 +97,8 @@ updates:
         update-types:
           - "patch"
           - "minor"
+      🐳-base-images:
+        patterns: ["alpine*", "ubuntu*", "debian*", "node*", "python*", "golang*"]
     schedule:
       interval: "weekly"
     commit-message:
@@ -117,6 +119,8 @@ updates:
         update-types:
           - "patch"
           - "minor"
+      🐳-base-images:
+        patterns: ["alpine*", "ubuntu*", "debian*", "node*", "python*", "golang*"]
     schedule:
       interval: "weekly"
     commit-message:
@@ -137,6 +141,8 @@ updates:
         update-types:
           - "patch"
           - "minor"
+      🧹-pre-commit-hooks:
+        patterns: ["*"]
     schedule:
       interval: "weekly"
     commit-message:

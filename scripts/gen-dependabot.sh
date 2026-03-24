@@ -156,6 +156,21 @@ EOF
       🔧-actions-updates:
         patterns: ["*"]
 EOF
+  elif [ "$_ecosystem" = "docker" ] || [ "$_ecosystem" = "devcontainers" ]; then
+    cat <<EOF
+      🐳-base-images:
+        patterns: ["alpine*", "ubuntu*", "debian*", "node*", "python*", "golang*"]
+EOF
+  elif [ "$_ecosystem" = "pre-commit" ]; then
+    cat <<EOF
+      🧹-pre-commit-hooks:
+        patterns: ["*"]
+EOF
+  elif [ "$_ecosystem" = "gomod" ]; then
+    cat <<EOF
+      🧪-go-cloud-suite:
+        patterns: ["google.golang.org/*", "github.com/aws/*", "github.com/azure/*"]
+EOF
   fi
 
   cat <<EOF
