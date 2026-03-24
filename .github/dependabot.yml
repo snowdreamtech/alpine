@@ -30,7 +30,7 @@ updates:
     schedule:
       interval: "weekly"
     commit-message:
-      prefix: "chore(deps):"
+      prefix: "ci(deps):"
     labels:
       - "dependencies"
       - "github-actions"
@@ -102,7 +102,7 @@ updates:
     schedule:
       interval: "weekly"
     commit-message:
-      prefix: "chore(deps):"
+      prefix: "build(deps):"
     labels:
       - "dependencies"
       - "docker"
@@ -124,7 +124,7 @@ updates:
     schedule:
       interval: "weekly"
     commit-message:
-      prefix: "chore(deps):"
+      prefix: "build(deps):"
     labels:
       - "dependencies"
       - "devcontainers"

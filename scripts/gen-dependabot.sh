@@ -116,6 +116,13 @@ emit_entry() {
     npm | gomod | bun | pip | uv) _interval="daily" ;;
   esac
 
+  # 4. Semantic Commit Prefixes: ci for actions, build for infra, chore for deps
+  _prefix="chore(deps):"
+  case "$_ecosystem" in
+    github-actions) _prefix="ci(deps):" ;;
+    docker | devcontainers) _prefix="build(deps):" ;;
+  esac
+
   # 3. Label Refinement: Add semantic labels
   _extra_labels=""
   case "$_ecosystem" in
@@ -179,7 +186,7 @@ EOF
     schedule:
       interval: "${_interval}"
     commit-message:
-      prefix: "chore(deps):"
+      prefix: "${_prefix}"
     labels:
       - "dependencies"
       - "${_label}"${_extra_labels}
