@@ -47,16 +47,14 @@ teardown() {
 # --- setup.sh tests ---
 
 @test "lifecycle: setup.sh dry-run reports planned tool setups" {
-  run sh scripts/setup.sh --dry-run
-  assert_success
-  assert_output --partial "Running in DRY-RUN mode"
+  local SETUP_OUTPUT
+  SETUP_OUTPUT=$(sh scripts/setup.sh --dry-run)
+  echo "$SETUP_OUTPUT" | grep -q "Running in DRY-RUN mode"
+
   # Support both fresh setup and pre-detected tools
-  run bash -c "sh scripts/setup.sh --dry-run | grep -Ei 'Setting up Node.js|Node.js.*(Detected|Previewed|Installed|Exists)'"
-  assert_success
-  run bash -c "sh scripts/setup.sh --dry-run | grep -Ei 'Setting up Python|Python.*(Detected|Previewed|Installed|Exists)'"
-  assert_success
-  run bash -c "sh scripts/setup.sh --dry-run | grep -Ei 'Setting up Pre-commit Hooks|Hooks.*(Activated|Previewed)'"
-  assert_success
+  echo "$SETUP_OUTPUT" | grep -Ei 'Setting up Node.js|Node.js.*(Detected|Previewed|Installed|Exists)'
+  echo "$SETUP_OUTPUT" | grep -Ei 'Setting up Python|Python.*(Detected|Previewed|Installed|Exists)'
+  echo "$SETUP_OUTPUT" | grep -Ei 'Setting up Pre-commit Hooks|Hooks.*(Activated|Previewed)'
 }
 
 # --- init-project.sh tests ---

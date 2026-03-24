@@ -78,11 +78,11 @@ VERSION text eol=lf
 *.cts text eol=lf
 
 # -----------------------------------------------------------------------------
-# 4. Windows Scripts (Unified to LF per user request)
+# 4. Windows Scripts (Enforce CRLF)
 # -----------------------------------------------------------------------------
-*.bat text eol=lf
-*.cmd text eol=lf
-*.ps1 text eol=lf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+*.ps1 text eol=crlf
 
 # -----------------------------------------------------------------------------
 # 5. Static Assets & Binary Files

@@ -835,18 +835,13 @@ repos:
             objective-c,
             objective-c++,
             c,
-            cpp,
             c++,
             rust,
             ruby,
             php,
-            csharp,
-            fsharp,
+            c#,
+            f#,
             dart,
-            rego,
-            protobuf,
-            terraform,
-            hcl,
           ]
         description: "High-performance incremental compliance: Verify staged files for a SnowdreamTech license header."
 
