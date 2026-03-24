@@ -55,9 +55,10 @@ jobs:
           fetch-depth: 0
           persist-credentials: false
 
-      # Buildx previously set here; removed to avoid cache-poisoning audit flags.
-      # If container builds are required later, add explicit cache-control
-      # arguments or a scoped builder to mitigate cache poisoning risks.
+      - name: "🐳 Set up Docker Buildx"
+        uses: docker/setup-buildx-action@v4.0.0
+        with:
+          buildkitd-flags: --oci-worker-no-cache
 
       - name: "🚀 Distribute Artifacts (GoReleaser)"
         uses: goreleaser/goreleaser-action@v7.0.0
