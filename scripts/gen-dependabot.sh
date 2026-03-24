@@ -159,7 +159,7 @@ EOF
   elif [ "$_ecosystem" = "docker" ] || [ "$_ecosystem" = "devcontainers" ]; then
     cat <<EOF
       🐳-base-images:
-        patterns: ["alpine*", "ubuntu*", "debian*", "rocky*", "rockylinux*", "node*", "python*", "golang*"]
+        patterns: ["alpine*", "ubuntu*", "debian*", "rocky*", "rockylinux*", "rhel*", "node*", "python*", "golang*"]
 EOF
   elif [ "$_ecosystem" = "pre-commit" ]; then
     cat <<EOF

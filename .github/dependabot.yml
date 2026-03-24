@@ -98,7 +98,7 @@ updates:
           - "patch"
           - "minor"
       🐳-base-images:
-        patterns: ["alpine*", "ubuntu*", "debian*", "rocky*", "rockylinux*", "node*", "python*", "golang*"]
+        patterns: ["alpine*", "ubuntu*", "debian*", "rocky*", "rockylinux*", "rhel*", "node*", "python*", "golang*"]
     schedule:
       interval: "weekly"
     commit-message:
@@ -120,7 +120,7 @@ updates:
           - "patch"
           - "minor"
       🐳-base-images:
-        patterns: ["alpine*", "ubuntu*", "debian*", "rocky*", "rockylinux*", "node*", "python*", "golang*"]
+        patterns: ["alpine*", "ubuntu*", "debian*", "rocky*", "rockylinux*", "rhel*", "node*", "python*", "golang*"]
     schedule:
       interval: "weekly"
     commit-message:
