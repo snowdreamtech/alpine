@@ -9,8 +9,16 @@
 # Target Branch: dev (Ensures updates are validated in development before production).
 # Design:
 #   - Only ecosystems with detected manifest files are included.
-#   - Semantic 'chore(deps)' prefixing for clean version history.
-#   - Automated labeling for improved maintenance visibility.
+#   - Semantic 'chore(deps)' / 'ci(deps)' / 'build(deps)' prefixing.
+#   - Automated labeling and group consolidation to reduce PR noise.
+#
+# Private Registries (Optional):
+# Uncomment and configure if using private npm/Go/Docker registries.
+# registries:
+#   github-pkg:
+#     type: npm-registry
+#     url: https://npm.pkg.github.com
+#     token: ${{secrets.GITHUB_TOKEN}}
 
 version: 2
 updates:
