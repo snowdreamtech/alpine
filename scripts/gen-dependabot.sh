@@ -145,6 +145,8 @@ emit_entry() {
     open-pull-requests-limit: 10
     # 6. Rebase Strategy: Auto-rebase to resolve conflicts
     rebase-strategy: "auto"
+    # 7. Security: Focus on High and Critical vulnerabilities
+    vulnerability-threshold: "high"
     # 5. Reviewers:
     ${_reviewers}
     # Consolidate updates to reduce PR noise
