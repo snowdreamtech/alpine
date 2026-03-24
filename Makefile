@@ -32,6 +32,8 @@ ifeq ($(OS),Windows_NT)
 	IS_POSIX := $(shell sh -c 'echo 1' 2>/dev/null)
 	ifeq ($(IS_POSIX),1)
 		OS_NAME := POSIX_WINDOWS
+		ARCH_NAME := $(shell uname -m)
+		SHELL_NAME := $(shell basename $$SHELL)
 		# Colors for POSIX
 		BLUE   := $(shell printf '\033[0;34m')
 		GREEN  := $(shell printf '\033[0;32m')
@@ -40,6 +42,8 @@ ifeq ($(OS),Windows_NT)
 		NC     := $(shell printf '\033[0m')
 	else
 		OS_NAME := Windows
+		ARCH_NAME := $(PROCESSOR_ARCHITECTURE)
+		SHELL_NAME := powershell.exe
 		SHELL   := powershell.exe
 		.SHELLFLAGS := -NoProfile -Command
 		# Colors for native Windows (PowerShell handles this, but for make echo)
@@ -51,6 +55,8 @@ ifeq ($(OS),Windows_NT)
 	endif
 else
 	OS_NAME := $(shell uname -s)
+	ARCH_NAME := $(shell uname -m)
+	SHELL_NAME := $(shell basename $$SHELL)
 	# Colors for POSIX
 	BLUE   := $(shell printf '\033[0;34m')
 	GREEN  := $(shell printf '\033[0;32m')
@@ -69,7 +75,8 @@ all: help
 
 help: ## Show this help message
 	@printf "$(BLUE)Snowdream Tech AI IDE Template$(NC)\n"
-	@printf "Detected OS: $(GREEN)$(OS_NAME)$(NC)\n\n"
+	@printf "Detected OS: $(GREEN)$(OS_NAME)$(NC) ($(ARCH_NAME))\n"
+	@printf "Current Shell: $(GREEN)$(SHELL_NAME)$(NC)\n\n"
 	@printf "$(YELLOW)Usage:$(NC)\n"
 	@printf "  make $(GREEN)<target>$(NC) [ARGS=\"...\"] [V=1|2] [VARIABLE=value]\n\n"
 	@printf "$(YELLOW)Main Lifecycle Targets:$(NC)\n"
