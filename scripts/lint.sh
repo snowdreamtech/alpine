@@ -107,7 +107,7 @@ main() {
 
   # Skip heavy tools locally
   if ! is_ci_env; then
-    export SKIP="${SKIP:+$SKIP,}zizmor,osv-scanner,govulncheck,cargo-audit,pip-audit,lychee"
+    export SKIP="${SKIP:+$SKIP,}zizmor,osv-scanner,govulncheck,cargo-audit,pip-audit"
   fi
 
   local _L_OK=0

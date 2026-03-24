@@ -60,8 +60,7 @@ VER_TASK_PROVIDER="github:go-task/task"
 
 VER_TYPST="0.13.0"
 VER_DUCKDB="1.5.0"
-VER_LYCHEE="lychee-v0.23.0"
-VER_LYCHEE_PROVIDER="github:lycheeverse/lychee"
+# NOTE: Lychee version removed — link checking delegated to lycheeverse/lychee-action in CI.
 
 # ── 🎨 Language Tooling (Linters/Formatters) ─────────────────────────────────
 VER_KTLINT="1.12.0"
