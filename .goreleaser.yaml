@@ -87,3 +87,7 @@ changelog:
       order: 700
     - title: "♻️ Miscellaneous Chores"
       order: 9999
+
+sboms:
+  - artifacts: archive
+    args: ["$@"]

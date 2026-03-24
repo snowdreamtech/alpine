@@ -96,18 +96,27 @@ main() {
   done
   parse_common_args "$@"
 
+  init_summary_table "Project Quality Audit Summary"
+  local _T0_LNT
+  _T0_LNT=$(date +%s)
+
   log_info "🔍 Starting Unified Project Linter...\n"
 
-  # Skip heavy tools locally to avoid mise shim errors and reduce overhead.
-  # These tools are managed via [env] in .mise.toml and only installed/used in CI.
+  # Skip heavy tools locally
   if ! is_ci_env; then
-    # Note: Using comma-separated list for pre-commit SKIP env var.
     export SKIP="${SKIP:+$SKIP,}zizmor,osv-scanner,trivy,govulncheck,cargo-audit,pip-audit,lychee"
   fi
 
-  run_pre_commit_lint "$_FIX_LNT"
+  local _L_OK=0
+  if run_pre_commit_lint "$_FIX_LNT"; then
+    _L_OK=1
+    log_summary "Quality" "pre-commit" "✅ Passed" "-" "$(($(date +%s) - _T0_LNT))"
+  else
+    log_summary "Quality" "pre-commit" "❌ Failed" "-" "$(($(date +%s) - _T0_LNT))"
+  fi
 
   log_success "\n✨ Linting complete!"
+  finalize_summary_table
 
   # 5. Standardized Next Actions
   if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then

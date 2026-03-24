@@ -213,18 +213,56 @@ main() {
   done
   parse_common_args "$@"
 
+  init_summary_table "Project Functional Test Summary"
+  local _T0_TST
+  _T0_TST=$(date +%s)
+
   log_info "🧪 Starting Unified Test Runner...\n"
 
   case "$_SUITE_TST" in
-  shell) run_shell_tests ;;
-  python) run_python_tests ;;
-  powershell) run_powershell_tests ;;
+  shell)
+    if run_shell_tests; then
+      log_summary "Test" "Shell (bats)" "✅ Passed" "-" "$(($(date +%s) - _T0_TST))"
+    else
+      log_summary "Test" "Shell (bats)" "❌ Failed" "-" "$(($(date +%s) - _T0_TST))"
+    fi
+    ;;
+  python)
+    if run_python_tests; then
+      log_summary "Test" "Python (pytest)" "✅ Passed" "-" "$(($(date +%s) - _T0_TST))"
+    else
+      log_summary "Test" "Python (pytest)" "❌ Failed" "-" "$(($(date +%s) - _T0_TST))"
+    fi
+    ;;
+  powershell)
+    if run_powershell_tests; then
+      log_summary "Test" "PowerShell (Pester)" "✅ Passed" "-" "$(($(date +%s) - _T0_TST))"
+    else
+      log_summary "Test" "PowerShell (Pester)" "❌ Failed" "-" "$(($(date +%s) - _T0_TST))"
+    fi
+    ;;
   all)
-    run_shell_tests
+    local _T_S _T_P _T_PS
+    _T_S=$(date +%s)
+    if run_shell_tests; then
+      log_summary "Test" "Shell (bats)" "✅ Passed" "-" "$(($(date +%s) - _T_S))"
+    else
+      log_summary "Test" "Shell (bats)" "❌ Failed" "-" "$(($(date +%s) - _T_S))"
+    fi
     printf "\n"
-    run_python_tests
+    _T_P=$(date +%s)
+    if run_python_tests; then
+      log_summary "Test" "Python (pytest)" "✅ Passed" "-" "$(($(date +%s) - _T_P))"
+    else
+      log_summary "Test" "Python (pytest)" "❌ Failed" "-" "$(($(date +%s) - _T_P))"
+    fi
     printf "\n"
-    run_powershell_tests
+    _T_PS=$(date +%s)
+    if run_powershell_tests; then
+      log_summary "Test" "PowerShell (Pester)" "✅ Passed" "-" "$(($(date +%s) - _T_PS))"
+    else
+      log_summary "Test" "PowerShell (Pester)" "❌ Failed" "-" "$(($(date +%s) - _T_PS))"
+    fi
     ;;
   esac
 
@@ -232,6 +270,7 @@ main() {
   # a redundant (and potentially recursive) loop back to this script.
 
   log_success "\n✨ All tests passed!"
+  finalize_summary_table
 
   # 5. Standardized Next Actions
   if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
