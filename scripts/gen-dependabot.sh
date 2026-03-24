@@ -114,6 +114,27 @@ emit_entry() {
   - package-ecosystem: "${_ecosystem}"
     directory: "${_directory}"
     target-branch: "${TARGET_BRANCH}"
+    # Consolidate updates to reduce PR noise
+    groups:
+      all-patch-minor:
+        update-types:
+          - "patch"
+          - "minor"
+EOF
+
+  # Add ecosystem-specific groups to further reduce noise
+  if [ "$_ecosystem" = "npm" ]; then
+    cat <<EOF
+      lint-dependencies:
+        patterns: ["eslint*", "prettier*", "stylelint*"]
+      testing-frameworks:
+        patterns: ["vitest*", "jest*", "playwright*", "cypress*"]
+      vite-suite:
+        patterns: ["vite*", "@vitejs/*"]
+EOF
+  fi
+
+  cat <<EOF
     schedule:
       interval: "weekly"
     commit-message:
