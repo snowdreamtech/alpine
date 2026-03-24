@@ -89,8 +89,4 @@ changelog:
       order: 9999
 
 sboms:
-  - artifacts: archive
-  - artifacts: binary
-  - artifacts: image
-  - artifacts: package
-  - artifacts: source
+  - artifacts: any
