@@ -2,11 +2,18 @@
 
 [![CI Pipeline](https://img.shields.io/github/actions/workflow/status/snowdreamtech/template/ci.yml?branch=main&label=CI%20Pipeline)](https://github.com/snowdreamtech/template/actions/workflows/ci.yml)
 [![CD Pipeline](https://img.shields.io/github/actions/workflow/status/snowdreamtech/template/cd.yml?branch=main&label=CD%20Pipeline)](https://github.com/snowdreamtech/template/actions/workflows/cd.yml)
+[![GitHub Pages](https://img.shields.io/github/actions/workflow/status/snowdreamtech/template/pages.yml?branch=main&label=Docs&logo=github)](https://github.com/snowdreamtech/template/actions/workflows/pages.yml)
+[![CodeQL](https://img.shields.io/github/actions/workflow/status/snowdreamtech/template/codeql.yml?branch=main&label=CodeQL&logo=github)](https://github.com/snowdreamtech/template/actions/workflows/codeql.yml)
 [![Multi-OS Verified](https://img.shields.io/badge/Verified-Linux%20%7C%20macOS%20%7C%20Windows-blue)](https://github.com/snowdreamtech/template/actions/workflows/ci.yml)
 [![Security Audit](https://img.shields.io/badge/Security-Zizmor%20%7C%20Trivy%20%7C%20Gitleaks-brightgreen)](https://github.com/snowdreamtech/template/actions/workflows/ci.yml)
 [![SBOM Available](https://img.shields.io/badge/SBOM-Available-success)](https://github.com/snowdreamtech/template/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/license/MIT)
+[![Release](https://img.shields.io/github/v/release/snowdreamtech/template?logo=github&sort=semver)](https://github.com/snowdreamtech/template/releases/latest)
 [![Dependabot Enabled](https://img.shields.io/badge/Dependabot-Enabled-brightgreen?logo=dependabot)](https://github.com/snowdreamtech/template/blob/main/.github/dependabot.yml)
+[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
+[![GitHub Stars](https://img.shields.io/github/stars/snowdreamtech/template?style=social)](https://github.com/snowdreamtech/template)
+[![GitHub Issues](https://img.shields.io/github/issues/snowdreamtech/template)](https://github.com/snowdreamtech/template/issues)
+[![Code Size](https://img.shields.io/github/languages/code-size/snowdreamtech/template)](https://github.com/snowdreamtech/template)
 
 [English](README.md) | [简体中文](README_zh-CN.md)
 
