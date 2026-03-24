@@ -220,11 +220,19 @@ jobs:
           VENV: ${{ env.VENV }}
           TRIVY_CACHE_DIR: .trivycache
 
+      - name: "⚡ Cache Documentation Links (Lychee)"
+        uses: actions/cache@v5.0.3
+        with:
+          path: .lycheecache
+          key: ${{ runner.os }}-lychee-${{ hashFiles('**/*.md') }}
+          restore-keys: |
+            ${{ runner.os }}-lychee-
+
       - name: "🔗 Verify Documentation Links (Lychee)"
         uses: lycheeverse/lychee-action@v2.8.0
         if: ${{ always() }}
         with:
-          args: --root-dir "${{ github.workspace }}" --verbose --no-progress --exclude-path ".git" --exclude-path "node_modules" --exclude-path ".venv" --exclude-path "venv" --exclude-path "env" --exclude-path "vendor" --exclude-path "dist" --exclude-path "build" --exclude-path "out" --exclude-path "target" --exclude-path ".next" --exclude-path ".nuxt" --exclude-path ".output" --exclude-path "__pycache__" --exclude-path ".specify" '**/*.md'
+          args: --root-dir "${{ github.workspace }}" --verbose --no-progress --cache --cache-dir .lycheecache --exclude-path ".git" --exclude-path "node_modules" --exclude-path ".venv" --exclude-path "venv" --exclude-path "env" --exclude-path "vendor" --exclude-path "dist" --exclude-path "build" --exclude-path "out" --exclude-path "target" --exclude-path ".next" --exclude-path ".nuxt" --exclude-path ".output" --exclude-path "__pycache__" --exclude-path ".specify" '**/*.md'
           fail: true
 
       - name: "🕵️ Detect Vulnerabilities (Trivy FS)"

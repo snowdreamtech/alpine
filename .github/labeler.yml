@@ -4,15 +4,15 @@
 "AI Rules 🤖":
   - changed-files:
       - any-glob-to-any-file:
-          - ".agent/rules/*"
-          - ".github/instructions/*"
-          - "prompts/*"
+          - ".agent/rules/**"
+          - ".github/instructions/**"
+          - "prompts/**"
           - ".*rules"
 
 "CI/CD ⚙️":
   - changed-files:
       - any-glob-to-any-file:
-          - ".github/workflows/*"
+          - ".github/workflows/**"
           - ".github/dependabot.yml"
           - ".pre-commit-config.yaml"
           - ".goreleaser.yaml"
@@ -20,9 +20,10 @@
 "Documentation 📝":
   - changed-files:
       - any-glob-to-any-file:
-          - "*.md"
+          - "**/*.md"
           - "LICENSE"
-          - ".github/ISSUE_TEMPLATE/*"
+          - ".github/ISSUE_TEMPLATE/**"
+          - ".github/PULL_REQUEST_TEMPLATE/**"
 
 "Dependencies 📦":
   - changed-files:
@@ -31,3 +32,17 @@
           - "requirements.txt"
           - "go.mod"
           - "Cargo.toml"
+          - "pnpm-lock.yaml"
+
+"Scripts 🛠️":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "scripts/**"
+          - "Makefile"
+
+"Tests 🧪":
+  - changed-files:
+      - any-glob-to-any-file:
+          - "tests/**"
+          - "**/*_test.go"
+          - "**/*.spec.ts"
