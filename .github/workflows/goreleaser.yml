@@ -37,7 +37,7 @@ jobs:
     timeout-minutes: 30 # Go compilation and asset upload usually completes in <10m
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
-        uses: step-security/harden-runner@v2.10.4
+        uses: step-security/harden-runner@v2.16.0
         with:
           egress-policy: audit # Change to 'block' to enable strict enforcement
 

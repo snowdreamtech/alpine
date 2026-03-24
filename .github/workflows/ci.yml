@@ -52,7 +52,7 @@ jobs:
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
         if: matrix.os == 'ubuntu-latest'
-        uses: step-security/harden-runner@v2.10.4
+        uses: step-security/harden-runner@v2.16.0
         with:
           egress-policy: audit # Change to 'block' to enable strict enforcement
 
@@ -112,7 +112,7 @@ jobs:
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
         if: matrix.os == 'ubuntu-latest'
-        uses: step-security/harden-runner@v2.10.4
+        uses: step-security/harden-runner@v2.16.0
         with:
           egress-policy: audit # Change to 'block' to enable strict enforcement
 
@@ -198,7 +198,7 @@ jobs:
       PYTHONUTF8: 1
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
-        uses: step-security/harden-runner@v2.10.4
+        uses: step-security/harden-runner@v2.16.0
         with:
           egress-policy: audit # Change to 'block' to enable strict enforcement
 
@@ -278,7 +278,7 @@ jobs:
         uses: lycheeverse/lychee-action@v2.8.0
         if: ${{ always() }}
         with:
-          args: --root-dir "${{ github.workspace }}" --verbose --no-progress --cache --cache-dir .lycheecache --exclude-path ".git" --exclude-path "node_modules" --exclude-path ".venv" --exclude-path "venv" --exclude-path "env" --exclude-path "vendor" --exclude-path "dist" --exclude-path "build" --exclude-path "out" --exclude-path "target" --exclude-path ".next" --exclude-path ".nuxt" --exclude-path ".output" --exclude-path "__pycache__" --exclude-path ".specify" '**/*.md'
+          args: --root-dir "${{ github.workspace }}" --verbose --no-progress --cache --exclude-path ".git" --exclude-path "node_modules" --exclude-path ".venv" --exclude-path "venv" --exclude-path "env" --exclude-path "vendor" --exclude-path "dist" --exclude-path "build" --exclude-path "out" --exclude-path "target" --exclude-path ".next" --exclude-path ".nuxt" --exclude-path ".output" --exclude-path "__pycache__" --exclude-path ".specify" '**/*.md'
           fail: true
 
       - name: "🕵️ Detect Vulnerabilities (Trivy FS)"
