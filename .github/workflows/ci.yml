@@ -214,6 +214,8 @@ jobs:
         shell: sh
         run: |
           MISE_OFFLINE=true make audit
+          # Extra SARIF export for GitHub Security Tab
+          zizmor . --format sarif > zizmor-results.sarif
         env:
           VENV: ${{ env.VENV }}
           TRIVY_CACHE_DIR: .trivycache
@@ -238,12 +240,9 @@ jobs:
           output: "trivy-results.sarif"
           severity: "CRITICAL,HIGH,MEDIUM,LOW"
           exit-code: "1"
-          version: "v0.69.3"
-          token-setup-trivy: ${{ secrets.GITHUB_TOKEN }}
-          skip-dirs: ".git,node_modules,.venv,venv,env,vendor,dist,build,out,target,.next,.nuxt,.output,__pycache__,.specify"
 
-      - name: "📊 Upload Audit Intelligence (SARIF)"
-        uses: github/codeql-action/upload-sarif@v4.33.0
-        if: ${{ always() && hashFiles('trivy-results.sarif') != '' }}
+      - name: "📤 Upload Security Audit (SARIF)"
+        uses: github/codeql-action/upload-sarif@v3.28.11
+        if: always()
         with:
-          sarif_file: "trivy-results.sarif"
+          sarif_file: "."
