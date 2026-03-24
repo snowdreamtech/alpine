@@ -5,14 +5,14 @@
 # Security Logic Module
 
 # Purpose: Installs osv-scanner for vulnerability scanning.
-# CI-only: Heavy GitHub Release binary (~40MB). Local dev skips to prevent stalling.
+# CI-only: Compiled via `go install` from Go proxy. Local dev skips to avoid build time.
 install_osv_scanner() {
   local _T0_OSV
   _T0_OSV=$(date +%s)
   local _TITLE="OSV-Scanner"
   local _PROVIDER="${VER_OSV_SCANNER_PROVIDER}"
 
-  # CI-only guard: skip on local dev to prevent 40MB download stall.
+  # CI-only guard: skip on local dev to avoid go install build time.
   if ! is_ci_env; then
     log_summary "Security" "OSV-Scanner" "⏭️ CI-only" "-" "0"
     return 0
