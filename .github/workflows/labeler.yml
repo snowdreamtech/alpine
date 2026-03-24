@@ -12,7 +12,7 @@
 #   - Configuration-driven via '.github/labeler.yml' for easy maintenance.
 #   - Lightweight, event-driven categorization with near-zero resource footprint.
 
-name: Pull Request Labeler
+name: "🏷️ Pull Request Labeler"
 
 "on":
   pull_request:

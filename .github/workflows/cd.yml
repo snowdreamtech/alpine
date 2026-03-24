@@ -7,7 +7,7 @@
 #   - Atomic: Release only happens if verification passes.
 #   - Secure: Eliminates workflow_run risks by using internal job dependencies.
 
-name: Continuous Delivery
+name: "🚀 Continuous Delivery"
 
 "on":
   push:

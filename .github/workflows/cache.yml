@@ -12,7 +12,7 @@
 #   - Uses POSIX-compliant shell for maximum compatibility with runner environments.
 #   - Implements safe-fail logic (set +e) for non-critical cleanup tasks.
 
-name: Cache Cleanup
+name: "🧹 Cache Cleanup"
 
 "on":
   schedule:

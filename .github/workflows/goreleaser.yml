@@ -12,7 +12,7 @@
 #   - Triggers automatically on release tags to ensure a high-velocity, reliable distribution.
 #   - Supports manual snapshot builds to verify configuration or extract bleeding-edge binaries.
 
-name: GoReleaser
+name: "📦 GoReleaser"
 
 "on":
   push:

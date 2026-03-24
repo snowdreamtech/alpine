@@ -12,7 +12,7 @@
 #   - Safeguards sensitive items by exempting 'pinned', 'security', and 'bug' labels.
 #   - Non-disruptive: Provides a 7-day grace period after stale marking.
 
-name: Mark Stale Issues and PRs
+name: "🕰️ Mark Stale Issues and PRs"
 
 "on":
   schedule:

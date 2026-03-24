@@ -7,7 +7,7 @@
 #   - Fail-fast: Stop early if early stages fail to save resources.
 #   - Secure: Runs in the context of the triggered ref, avoiding workflow_run risks.
 
-name: Continuous Integration
+name: "🔄 Continuous Integration"
 
 "on":
   push:

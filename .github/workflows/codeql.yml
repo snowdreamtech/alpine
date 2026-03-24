@@ -13,7 +13,7 @@
 #   - Utilizes advanced matrix strategy for multi-language support (Go, Python).
 #   - Leverages internal CodeQL autobuild for zero-config compilation where possible.
 
-name: "CodeQL Analysis"
+name: "🔬 CodeQL Analysis"
 
 "on":
   push:

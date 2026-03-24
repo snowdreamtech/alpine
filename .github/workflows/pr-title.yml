@@ -11,7 +11,7 @@
 #   - Uses 'pull_request_target' to allow linting even from fork contributions.
 #   - Near-instant global verification to maintain repository history purity.
 
-name: PR Title Check
+name: "✅ PR Title Check"
 
 "on":
   pull_request:

@@ -13,7 +13,7 @@
 #   - Decouples build and deployment jobs for enhanced traceability.
 #   - Uses specific semantic version tags for VitePress and setup actions.
 
-name: Deploy Docs to GitHub Pages
+name: "📄 Deploy Docs to GitHub Pages"
 
 "on":
   push:
