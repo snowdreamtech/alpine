@@ -1,0 +1,81 @@
+---
+# Dependabot Smart Sync
+# Purpose: Automatically regenerates .github/dependabot.yml based on detected ecosystems.
+# Trigger: Push to dev/main (manifest file changes), monthly schedule, or manual dispatch.
+# Design:
+#   - Uses scripts/gen-dependabot.sh to scan for manifest files via git ls-files.
+#   - Only commits if the generated config differs from the current one.
+#   - Uses native git commands — no third-party commit Actions.
+
+name: "🤖 Dependabot Smart Sync"
+
+"on":
+  push:
+    branches: ["dev", "main"]
+    paths:
+      # Trigger when manifest files or the generator script change
+      - "package.json"
+      - "**/package.json"
+      - "go.mod"
+      - "**/go.mod"
+      - "Cargo.toml"
+      - "**/Cargo.toml"
+      - "requirements.txt"
+      - "**/requirements.txt"
+      - "Dockerfile"
+      - "**/Dockerfile"
+      - "composer.json"
+      - "**/composer.json"
+      - "Gemfile"
+      - "**/Gemfile"
+      - "mix.exs"
+      - "pubspec.yaml"
+      - "Package.swift"
+      - "**/*.tf"
+      - "**/devcontainer.json"
+      - ".pre-commit-config.yaml"
+      - "Chart.yaml"
+      - "scripts/gen-dependabot.sh"
+  schedule:
+    # Weekly safety net: every Monday at 06:00 UTC
+    - cron: "0 6 * * 1"
+  workflow_dispatch:
+
+permissions: {}
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+jobs:
+  sync:
+    name: "🔄 Sync Dependabot Config"
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    timeout-minutes: 5
+    steps:
+      - name: "📂 Checkout Repository Code"
+        uses: actions/checkout@v6.0.2
+        with:
+          token: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
+          persist-credentials: true
+          ref: ${{ github.ref }}
+
+      - name: "🤖 Generate Dependabot Config"
+        shell: sh
+        run: |
+          sh scripts/gen-dependabot.sh
+
+      - name: "📝 Commit Changes (if any)"
+        shell: sh
+        run: |
+          if git diff --quiet .github/dependabot.yml 2>/dev/null; then
+            echo "✅ No changes detected. Dependabot config is up-to-date."
+          else
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add .github/dependabot.yml
+            git commit -m "chore(deps): sync dependabot config [skip ci]"
+            git push
+            echo "✅ Dependabot config updated and pushed."
+          fi
