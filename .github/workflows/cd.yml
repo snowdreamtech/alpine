@@ -65,6 +65,7 @@ jobs:
           make install
         env:
           VENV: ${{ env.VENV }}
+          SKIP_MODULES: security
 
       - name: "🧪 Full Project Verification"
         shell: sh

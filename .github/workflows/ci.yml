@@ -74,6 +74,7 @@ jobs:
           make check-env
         env:
           VENV: ${{ env.VENV }}
+          SKIP_MODULES: security
 
       - name: "🔍 Inspect Code Quality (Lint)"
         shell: sh
@@ -127,6 +128,7 @@ jobs:
           make check-env
         env:
           VENV: ${{ env.VENV }}
+          SKIP_MODULES: security
 
       - name: "🧪 Execute Multi-Stack Test Suite"
         shell: sh

@@ -33,7 +33,12 @@ install_osv_scanner() {
   fi
   local _STAT_OSV="✅ mise"
   setup_registry_osv_scanner
-  run_mise install "$_PROVIDER" || _STAT_OSV="❌ Failed"
+  if ! run_mise install "$_PROVIDER"; then
+    _STAT_OSV="❌ Failed"
+    if is_ci_env; then
+      log_warn "Optional security tool ($_TITLE) failed to install. Continuing..."
+    fi
+  fi
   log_summary "Security" "OSV-Scanner" "$_STAT_OSV" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV))"
 }
 
@@ -69,7 +74,12 @@ install_trivy() {
   fi
   local _STAT_TRIVY="✅ mise"
   setup_registry_trivy
-  run_mise install "$_PROVIDER" || _STAT_TRIVY="❌ Failed"
+  if ! run_mise install "$_PROVIDER"; then
+    _STAT_TRIVY="❌ Failed"
+    if is_ci_env; then
+      log_warn "Optional security tool ($_TITLE) failed to install. Continuing..."
+    fi
+  fi
   log_summary "Security" "Trivy" "$_STAT_TRIVY" "$(get_version trivy)" "$(($(date +%s) - _T0_TRIVY))"
 }
 
