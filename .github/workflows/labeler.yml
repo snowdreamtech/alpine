@@ -21,6 +21,7 @@ name: Pull Request Labeler
 permissions: {}
 
 env:
+  # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

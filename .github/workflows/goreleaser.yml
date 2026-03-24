@@ -23,6 +23,7 @@ name: GoReleaser
 permissions: {}
 
 env:
+  # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -49,8 +50,9 @@ jobs:
       - name: "📂 Checkout Repository Code"
         uses: actions/checkout@v6.0.2
         with:
-          # Required: Fetch all tags and historical context for GoReleaser to accurately determine the next version.
+          # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
           token: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
+          # Required: Fetch all tags and historical context for GoReleaser to accurately determine the next version.
           fetch-depth: 0
           persist-credentials: false
 

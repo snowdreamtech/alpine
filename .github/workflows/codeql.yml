@@ -41,6 +41,7 @@ name: "CodeQL Analysis"
 permissions: {}
 
 env:
+  # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -77,6 +78,8 @@ jobs:
       - name: "📂 Checkout Repository Code"
         uses: actions/checkout@v6.0.2
         with:
+          # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
+          token: ${{ secrets.GITHUB_TOKEN }}
           # Required to provide the full source tree for deep semantic analysis.
           persist-credentials: false
 
