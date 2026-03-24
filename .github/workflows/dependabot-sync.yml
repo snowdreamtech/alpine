@@ -61,6 +61,11 @@ jobs:
           persist-credentials: true
           ref: ${{ github.ref }}
 
+      - name: "🧪 Run Generator Smoke Test"
+        shell: sh
+        run: |
+          sh tests/smoke-test-gen-dependabot.sh
+
       - name: "🤖 Generate Dependabot Config"
         shell: sh
         run: |

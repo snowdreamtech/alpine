@@ -499,11 +499,9 @@ ${_ENTRIES}"
   else
     mkdir -p "$(dirname "$DEPENDABOT_FILE")"
     echo "$_OUTPUT" > "$DEPENDABOT_FILE"
-    echo "✅ Generated ${DEPENDABOT_FILE} successfully."
-
-    # Show summary
+    echo "✅ Generated ${DEPENDABOT_FILE} successfully." >&2
     _COUNT=$(echo "$_ENTRIES" | grep -c 'package-ecosystem' || true)
-    echo "   Ecosystems detected: ${_COUNT}"
+    echo "   Ecosystems detected: ${_COUNT}" >&2
   fi
 }
 
