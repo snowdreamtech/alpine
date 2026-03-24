@@ -266,8 +266,8 @@ jobs:
         shell: sh
         run: |
           MISE_OFFLINE=true make audit
-          # Extra SARIF export for GitHub Security Tab
-          mise exec -- zizmor . --format sarif > zizmor-results.sarif
+          # Extra SARIF export for GitHub Security Tab (Offline to prevent API rate limits)
+          mise exec -- zizmor . --format sarif --offline > zizmor-results.sarif
         env:
           VENV: ${{ env.VENV }}
           TRIVY_CACHE_DIR: .trivycache
