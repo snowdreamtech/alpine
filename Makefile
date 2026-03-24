@@ -67,87 +67,67 @@ endif
 # Default target: display help
 all: help
 
-help:
+help: ## Show this help message
 	@printf "$(BLUE)Snowdream Tech AI IDE Template$(NC)\n"
 	@printf "Detected OS: $(GREEN)$(OS_NAME)$(NC)\n\n"
 	@printf "$(YELLOW)Usage:$(NC)\n"
-	@printf "  make <target> [VARIABLE=value ...]\n\n"
-	@printf "$(YELLOW)Targets:$(NC)\n"
-	@printf "  $(GREEN)init$(NC)     Hydrate project from template (rename placeholders)\n"
-	@echo "  $(GREEN)setup$(NC)    Install system-level development tools"
-	@echo "  $(GREEN)install$(NC)  Install project-level dependencies (pip, npm)"
-	@echo "  $(GREEN)lint$(NC)     Run standardized linter (pre-commit)"
-	@echo "  $(GREEN)format$(NC)   Auto-format code (ruff, prettier, shfmt, etc.)"
-	@echo "  $(GREEN)test$(NC)     Run unified test suite"
-	@echo "  $(GREEN)build$(NC)    Build project artifacts"
-	@echo "  $(GREEN)commit$(NC)   Start the interactive Commitizen CLI"
-	@echo "  $(GREEN)precommit$(NC) Alias for lint (Run pre-commit hooks)"
-	@echo "  $(GREEN)verify$(NC)   Run full project verification (env, lint, test)"
-	@echo "  $(GREEN)release$(NC)  Standardized release manager (versioning & tagging)"
-	@echo "  $(GREEN)env$(NC)      Environment configuration manager (.env)"
-	@echo "  $(GREEN)docs$(NC)     Documentation site manager (dev/build/preview)"
-	@echo "  $(GREEN)archive-changelog$(NC) Archive major-version changelog entries"
-	@echo "  $(GREEN)check-env$(NC) Onboarding environment health check"
-	@echo "  $(GREEN)update$(NC)   Update global/project tools and hooks"
-	@echo "  $(GREEN)audit$(NC)    Run security audit and vulnerability scans"
-	@echo "  $(GREEN)health$(NC)   Generate unified project health dashboard"
-	@echo "  $(GREEN)bench$(NC)    Run performance benchmarks"
-	@echo "  $(GREEN)clean$(NC)    Remove temporary and generated files"
-	@echo "  $(GREEN)help$(NC)     Show this help message"
+	@printf "  make $(GREEN)<target>$(NC) [VARIABLE=value ...]\n\n"
+	@printf "$(YELLOW)Main Lifecycle Targets:$(NC)\n"
+	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(GREEN)%-18s$(NC) %s\n", $$1, $$2}'
 
 # Lifecycle Targets
-init:
+init: ## Hydrate project from template (rename placeholders)
 ifeq ($(OS_NAME),Windows)
 	@scripts/init-project.bat $(SCRIPT_ARGS) $(ARGS)
 else
 	@sh scripts/init-project.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-setup:
+setup: ## Install system-level development tools
 ifeq ($(OS_NAME),Windows)
 	@scripts/setup.bat $(SCRIPT_ARGS) $(ARGS)
 else
 	@sh scripts/setup.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-install: setup
+install: setup ## Install project-level dependencies (pip, npm)
 ifeq ($(OS_NAME),Windows)
 	@scripts/install.bat $(SCRIPT_ARGS) $(ARGS)
 else
 	@sh scripts/install.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-lint:
+lint: ## Run standardized linter (pre-commit)
 ifeq ($(OS_NAME),Windows)
 	@scripts/lint.bat $(SCRIPT_ARGS) $(ARGS)
 else
 	@sh scripts/lint.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-precommit: lint
+precommit: lint ## Alias for lint (Run pre-commit hooks)
 
-format:
+format: ## Auto-format code (ruff, prettier, shfmt, etc.)
 ifeq ($(OS_NAME),Windows)
 	@scripts/format.bat $(SCRIPT_ARGS) $(ARGS)
 else
 	@sh scripts/format.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-test:
+test: ## Run unified test suite
 ifeq ($(OS_NAME),Windows)
 	@scripts/test.bat $(SCRIPT_ARGS) $(ARGS)
 else
 	@sh scripts/test.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-build:
+build: ## Build project artifacts
 ifeq ($(OS_NAME),Windows)
 	@scripts/build.bat $(SCRIPT_ARGS) $(ARGS)
 else
 	@sh scripts/build.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-commit:
+commit: ## Start the interactive Commitizen CLI
 ifeq ($(OS_NAME),Windows)
 	@scripts/commit.bat $(SCRIPT_ARGS) $(ARGS)
 else
@@ -157,77 +137,77 @@ endif
 .NOTPARALLEL: verify
 verify: check-env lint test audit  ## Run full local verification (env, lint, test, audit)
 
-release:
+release: ## Standardized release manager (versioning & tagging)
 ifeq ($(OS_NAME),Windows)
 	@scripts/release.bat $(SCRIPT_ARGS) $(ARGS)
 else
 	@sh scripts/release.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-env:
+env: ## Environment configuration manager (.env)
 ifeq ($(OS_NAME),Windows)
 	@scripts/env.bat $(SCRIPT_ARGS) $(ARGS)
 else
 	@sh scripts/env.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-update:
+update: ## Update global/project tools and hooks
 ifeq ($(OS_NAME),Windows)
 	@scripts/update.bat $(SCRIPT_ARGS) $(ARGS)
 else
 	@sh scripts/update.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-audit:
+audit: ## Run security audit and vulnerability scans
 ifeq ($(OS_NAME),Windows)
 	@scripts/audit.bat $(SCRIPT_ARGS) $(ARGS)
 else
 	@sh scripts/audit.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-health:
+health: ## Generate unified project health dashboard
 ifeq ($(OS_NAME),Windows)
 	@scripts/health.bat $(SCRIPT_ARGS) $(ARGS)
 else
 	@sh scripts/health.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-bench:
+bench: ## Run performance benchmarks
 ifeq ($(OS_NAME),Windows)
 	@scripts/bench.bat $(SCRIPT_ARGS) $(ARGS)
 else
 	@sh scripts/bench.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-sync-docs:
+sync-docs: ## Synchronize documentation between versions
 ifeq ($(OS_NAME),Windows)
 	@scripts/sync-docs.bat $(SCRIPT_ARGS) $(ARGS)
 else
 	@sh scripts/sync-docs.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-docs:
+docs: ## Documentation site manager (dev/build/preview)
 ifeq ($(OS_NAME),Windows)
 	@scripts/docs.bat $(SCRIPT_ARGS) $(ARGS)
 else
 	@sh scripts/docs.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-archive-changelog:
+archive-changelog: ## Archive major-version changelog entries
 ifeq ($(OS_NAME),Windows)
 	@scripts/archive-changelog.bat $(SCRIPT_ARGS) $(ARGS)
 else
 	@sh scripts/archive-changelog.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-check-env:
+check-env: ## Onboarding environment health check
 ifeq ($(OS_NAME),Windows)
 	@scripts/check-env.bat $(SCRIPT_ARGS) $(ARGS)
 else
 	@sh scripts/check-env.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-clean:
+clean: ## Remove temporary and generated files
 ifeq ($(OS_NAME),Windows)
 	@scripts/cleanup.bat $(SCRIPT_ARGS) $(ARGS)
 else
