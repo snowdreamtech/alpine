@@ -1,0 +1,31 @@
+---
+name: "🏷️ Label Synchronization"
+
+"on":
+  push:
+    branches: ["main", "dev"]
+    paths:
+      - "scripts/sync-labels.sh"
+      - ".github/workflows/label-sync.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+  pull-requests: write
+
+jobs:
+  sync:
+    name: "🔄 Sync Repo Labels"
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'snowdreamtech'
+    steps:
+      - name: "📂 Checkout Code"
+        uses: actions/checkout@v6.0.2
+
+      - name: "🏷️ Sync Labels via gh CLI"
+        shell: sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          sh scripts/sync-labels.sh

@@ -1,0 +1,41 @@
+#!/usr/bin/env sh
+#
+# sync-labels.sh
+# Purpose: Synchronizes and brands repository labels using GitHub CLI (gh).
+# Design: Ensures consistent colors and descriptions for engineering labels.
+# Usage: GH_TOKEN=xxx sh scripts/sync-labels.sh
+
+set -e
+
+# Define SnowdreamTech Brand Colors & Labels
+# Format: "name:color:description"
+LABELS=$(cat <<EOF
+dependencies:0366d6:Dependencies and package updates
+devops:7d31b2:CI/CD, infrastructure and dev environment
+infrastructure:6b5aed:Core infrastructure, Docker, and system configs
+linting:ffcc00:Code style, linting, and formatting
+javascript:f7df1e:JavaScript/TypeScript ecosystem
+github-actions:2088ff:GitHub Actions workflow changes
+EOF
+)
+
+sync_label() {
+  _name=$1
+  _color=$2
+  _desc=$3
+
+  echo "🔄 Syncing label: [$_name] (#$_color)"
+  # Create or Edit the label
+  if gh label list --json name --jq ".[].name" | grep -qx "$_name"; then
+    gh label edit "$_name" --color "$_color" --description "$_desc"
+  else
+    gh label create "$_name" --color "$_color" --description "$_desc"
+  fi
+}
+
+# Main loop
+echo "$LABELS" | while IFS=: read -r name color desc; do
+  [ -n "$name" ] && sync_label "$name" "$color" "$desc"
+done
+
+echo "✅ Label synchronization complete."
