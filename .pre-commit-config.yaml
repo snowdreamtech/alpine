@@ -817,13 +817,6 @@ repos:
         language: system
         entry: mise x -- addlicense -check -v -f .github/license-header.txt
         files: ^(src|pkg|internal|cmd|app|lib|include|scripts|tests)/
-        exclude: |
-          (?x)^(
-            .*/vendor/.*|
-            .*/node_modules/.*|
-            .*/dist/.*|
-            .*/build/.*
-          )
         types_or:
           [
             go,
