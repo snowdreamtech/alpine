@@ -816,6 +816,7 @@ repos:
         name: check license headers
         language: system
         entry: mise x -- addlicense -check -v -f .github/license-header.txt
+        files: ^(src|pkg|internal|cmd|app|lib|include|scripts|tools|tests|spec)/
         types_or:
           [
             go,
@@ -825,17 +826,27 @@ repos:
             jsx,
             ts,
             tsx,
+            vue,
+            svelte,
+            astro,
+            java,
+            kotlin,
+            swift,
+            objective-c,
+            objective-c++,
             c,
             cpp,
             c++,
-            java,
-            kotlin,
             rust,
             ruby,
             php,
             csharp,
+            fsharp,
             dart,
-            proto,
+            rego,
+            protobuf,
+            terraform,
+            hcl,
             yaml,
             toml,
             json,
