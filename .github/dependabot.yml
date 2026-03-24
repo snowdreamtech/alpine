@@ -25,6 +25,8 @@ updates:
         update-types:
           - "patch"
           - "minor"
+      🔧-actions-updates:
+        patterns: ["*"]
     schedule:
       interval: "weekly"
     commit-message:

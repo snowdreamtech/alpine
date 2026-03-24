@@ -151,6 +151,11 @@ EOF
       ⚡-vite-suite:
         patterns: ["vite*", "@vitejs/*"]
 EOF
+  elif [ "$_ecosystem" = "github-actions" ]; then
+    cat <<EOF
+      🔧-actions-updates:
+        patterns: ["*"]
+EOF
   fi
 
   cat <<EOF
