@@ -71,7 +71,7 @@ jobs:
         run: |
           make setup
           make install
-          make check-env
+          MISE_OFFLINE=true make check-env
         env:
           VENV: ${{ env.VENV }}
           SKIP_MODULES: security
@@ -125,7 +125,7 @@ jobs:
         run: |
           make setup
           make install
-          make check-env
+          MISE_OFFLINE=true make check-env
         env:
           VENV: ${{ env.VENV }}
           SKIP_MODULES: security
@@ -179,7 +179,7 @@ jobs:
         run: |
           make setup
           make install
-          make check-env
+          MISE_OFFLINE=true make check-env
         env:
           VENV: ${{ env.VENV }}
 
