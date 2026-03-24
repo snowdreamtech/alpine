@@ -170,6 +170,8 @@ EOF
     cat <<EOF
       🧪-go-cloud-suite:
         patterns: ["google.golang.org/*", "github.com/aws/*", "github.com/azure/*"]
+      🌟-snowdreamtech-suite:
+        patterns: ["github.com/snowdreamtech/*"]
 EOF
   fi
 
