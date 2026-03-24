@@ -70,7 +70,7 @@ jobs:
       - name: "🧪 Full Project Verification"
         shell: sh
         run: |
-          make verify
+          MISE_OFFLINE=true make verify
 
   # 2. Release Orchestration Stage (Release Please)
   release-please:
