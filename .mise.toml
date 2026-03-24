@@ -20,6 +20,7 @@ gitleaks = "8.30.0"
 # Tools invoked by pre-commit hooks or universally needed.
 checkmake = "0.3.2"
 editorconfig-checker = "3.6.1"
+"go:github.com/google/addlicense" = "v1.1.1"
 
 # Git / commit workflow
 "npm:@commitlint/cli" = "20.5.0"
