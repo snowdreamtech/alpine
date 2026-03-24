@@ -133,9 +133,20 @@ jobs:
             ~/.cargo/registry/index
             ~/.cargo/registry/cache
             ~/.cargo/git/db
-            **/node_modules
-            **/target
-          key: ${{ runner.os }}-lang-${{ hashFiles('**/go.mod', '**/package-lock.json', '**/requirements.txt', '**/Cargo.lock') }}
+            ~/.bundle/cache
+            ~/.composer/cache
+            ~/.gradle/caches
+            ~/.gradle/wrapper
+            ~/.m2/repository
+            ~/.pub-cache
+            ~/.bun/install/cache
+            .build
+            _build
+            deps
+            vendor
+            node_modules
+            target
+          key: ${{ runner.os }}-lang-${{ hashFiles('**/go.mod', '**/package-lock.json', '**/requirements.txt', '**/Cargo.lock', '**/Gemfile.lock', '**/composer.lock', '**/build.gradle*', '**/pom.xml', '**/Package.resolved', '**/pubspec.lock', '**/mix.lock', '**/bun.lockb') }}
           restore-keys: |
             ${{ runner.os }}-lang-
 
