@@ -50,6 +50,12 @@ jobs:
       VENV: ${{ github.event.inputs.venv || inputs.venv || '.venv' }}
       PYTHONUTF8: 1
     steps:
+      - name: "🔒 Harden Runner (Security Egress Audit)"
+        if: matrix.os == 'ubuntu-latest'
+        uses: step-security/harden-runner@v2.10.4
+        with:
+          egress-policy: audit # Change to 'block' to enable strict enforcement
+
       - name: "📂 Checkout Repository Code"
         uses: actions/checkout@v6.0.2
         with:
@@ -104,6 +110,12 @@ jobs:
       VENV: ${{ github.event.inputs.venv || inputs.venv || '.venv' }}
       PYTHONUTF8: 1
     steps:
+      - name: "🔒 Harden Runner (Security Egress Audit)"
+        if: matrix.os == 'ubuntu-latest'
+        uses: step-security/harden-runner@v2.10.4
+        with:
+          egress-policy: audit # Change to 'block' to enable strict enforcement
+
       - name: "📂 Checkout Repository Code"
         uses: actions/checkout@v6.0.2
         with:
@@ -185,6 +197,11 @@ jobs:
       VENV: ${{ github.event.inputs.venv || inputs.venv || '.venv' }}
       PYTHONUTF8: 1
     steps:
+      - name: "🔒 Harden Runner (Security Egress Audit)"
+        uses: step-security/harden-runner@v2.10.4
+        with:
+          egress-policy: audit # Change to 'block' to enable strict enforcement
+
       - name: "📂 Checkout Repository Code"
         uses: actions/checkout@v6.0.2
         with:
