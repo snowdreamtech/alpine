@@ -80,7 +80,7 @@ sh scripts/verify.sh
 | `lint.sh`              | 执行代码静态检查   | pre-commit, 自动修复         |
 | `test.sh`              | 执行测试套件       | bats, pytest, vitest, pester |
 | `bench.sh`             | 执行性能基准测试   | pytest-benchmark, k6         |
-| `audit.sh`             | 安全与脆弱性扫描   | gitleaks, trivy, osv-scanner |
+| `audit.sh`             | 安全与脆弱性扫描   | gitleaks, osv-scanner        |
 | `commit.sh`            | 引导式规范化提交   | commitizen (cz)              |
 | `release.sh`           | 标准化标签发布     | git tag (v-prefix), 自动同步 |
 | `docs.sh`              | 文档网站管理       | vitepress                    |

@@ -64,7 +64,7 @@ editorconfig-checker = "3.6.1"
 # own _PROVIDER with an inline version and installs via run_mise when
 # the corresponding project files are detected.
 # Examples: rust, java, kotlin, grain, moonbit, helm, terraform, kcl, pkl,
-#           trivy, osv-scanner, cargo-audit, govulncheck, pip-audit, zizmor,
+#           osv-scanner, cargo-audit, govulncheck, pip-audit, zizmor,
 #           swiftlint, ktlint, spectral, kube-linter, stylelint, buf, opa,
 #           cue, pkl, bazel, pulumi, duckdb, typst, lychee, vitepress, bun,
 #           deno, zig, ruby, dotnet, yarn, bats, assemblyscript, etc.

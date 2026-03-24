@@ -45,46 +45,9 @@ install_osv_scanner() {
   log_summary "Security" "OSV-Scanner" "$_STAT_OSV" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV))"
 }
 
-# Purpose: Installs trivy for vulnerability scanning.
-# CI-only: Heavy GitHub Release binary (~80MB). Local dev skips to prevent stalling.
-install_trivy() {
-  local _T0_TRIVY
-  _T0_TRIVY=$(date +%s)
-  local _TITLE="Trivy"
-  local _PROVIDER="${VER_TRIVY_PROVIDER}"
-
-  # CI-only guard: skip on local dev to prevent 80MB download stall.
-  if ! is_ci_env; then
-    log_summary "Security" "Trivy" "⏭️ CI-only" "-" "0"
-    return 0
-  fi
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version trivy)
-  local _REQ_VER="${VER_TRIVY}"
-
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Security" "Trivy" "✅ Exists" "$_CUR_VER" "0"
-    return 0
-  fi
-
-  _log_setup "$_TITLE" "$_PROVIDER"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Security" "Trivy" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_TRIVY="✅ mise"
-  setup_registry_trivy
-  if ! run_mise install "$_PROVIDER"; then
-    _STAT_TRIVY="❌ Failed"
-    if is_ci_env; then
-      log_warn "Optional security tool ($_TITLE) failed to install. Continuing..."
-    fi
-  fi
-  log_summary "Security" "Trivy" "$_STAT_TRIVY" "$(get_version trivy)" "$(($(date +%s) - _T0_TRIVY))"
-}
+# NOTE: Trivy CLI installation removed. Vulnerability scanning is handled by
+# aquasecurity/trivy-action in CI workflows (ci.yml), which bundles its own binary.
+# This eliminates ~80MB GitHub Release downloads and prevents GitHub API 403 rate limits.
 
 # Purpose: Installs zizmor for GitHub Actions security linting.
 # Delegate: Managed by mise (.mise.toml)
@@ -163,7 +126,6 @@ install_cargo_audit() {
 # Purpose: Sets up Security audit environment.
 setup_security() {
   install_osv_scanner
-  install_trivy
   install_zizmor
   setup_rego # From rego.sh
   # Optional: logic for govulncheck/pip-audit can stay in go.sh/python.sh or be here

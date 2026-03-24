@@ -100,8 +100,7 @@ VER_VITEPRESS="1.6.4"
 VER_VITEPRESS_PROVIDER="npm:vitepress"
 
 # ── 🛡️ Security Scanning (CI-only by default) ─────────────────────────────────
-VER_TRIVY="0.69.3"
-VER_TRIVY_PROVIDER="github:aquasecurity/trivy"
+# NOTE: Trivy version removed — scanning delegated to aquasecurity/trivy-action in CI.
 
 VER_OSV_SCANNER="2.3.3"
 VER_OSV_SCANNER_PROVIDER="github:google/osv-scanner"

@@ -20,7 +20,7 @@
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Modularized toolchain installation.
 #   - Multi-language support (Node, Python, Go, Rust, Java, etc.).
-#   - JIT security toolchain (Trivy, OSV-Scanner).
+#   - JIT security toolchain (OSV-Scanner, Zizmor).
 
 set -e
 
@@ -386,7 +386,7 @@ EOF
     sqlfluff) setup_sql ;;
     markdownlint) setup_markdown ;;
     yamllint | dotenv-linter) setup_yaml ;;
-    osv-scanner | trivy | zizmor | cargo-audit) setup_security ;;
+    osv-scanner | zizmor | cargo-audit) setup_security ;;
     spectral) setup_openapi ;;
     buf) setup_protobuf ;;
     ghc | stack | cabal) setup_haskell ;;

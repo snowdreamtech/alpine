@@ -18,7 +18,7 @@
 #
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
-#   - Multi-stack scanning (Node.js, pip, go, cargo, osv, trivy).
+#   - Multi-stack scanning (Node.js, pip, go, cargo, osv).
 #   - Gitleaks integration for secrets detection.
 
 # Note: We do NOT set -e here because we want to run all audit modules even if some fail.
@@ -275,37 +275,9 @@ main() {
     fi
   fi
 
-  if is_ci_env && { [ -f "Dockerfile" ] || [ -f "docker-compose.yml" ]; }; then
-    local _T0_DKR_AUD
-    _T0_DKR_AUD=$(date +%s)
-    log_info "\n── Auditing Containers (trivy) ──"
-    local _TRIVY_BIN
-    _TRIVY_BIN=$(resolve_bin "trivy") || true
-    if [ -n "$_TRIVY_BIN" ]; then
-      if [ "${DRY_RUN:-0}" -eq 1 ]; then
-        log_success "DRY-RUN: Would run trivy fs . and trivy config"
-        log_summary "DevOps" "trivy" "⚖️ Previewed" "-" "0"
-      else
-        export GH_TOKEN="${GITHUB_TOKEN:-}"
-        log_info "Running dependency vulnerability scan..."
-        local _TRIVY_OK=0
-        run_quiet "$_TRIVY_BIN" fs . && run_quiet "$_TRIVY_BIN" config . || _TRIVY_OK=1
-
-        log_info "Running license compliance audit..."
-        run_quiet "$_TRIVY_BIN" license . || _TRIVY_OK=1
-
-        if [ "$_TRIVY_OK" -eq 0 ]; then
-          log_summary "DevOps" "trivy" "✅ Secure" "$(get_version "$_TRIVY_BIN")" "$(($(date +%s) - _T0_DKR_AUD))"
-        else
-          log_summary "DevOps" "trivy" "❌ Issues Found" "$(get_version "$_TRIVY_BIN")" "$(($(date +%s) - _T0_DKR_AUD))"
-          _OVERALL_EXIT_AUDIT=1
-        fi
-      fi
-    else
-      log_warn "trivy not found. Skipping container audit."
-      log_summary "DevOps" "trivy" "⚠️ Missing" "-" "0"
-    fi
-  fi
+  # NOTE: Trivy CLI container audit removed. Vulnerability scanning is handled by
+  # aquasecurity/trivy-action in CI workflows (ci.yml), which provides FS scan,
+  # config audit, and SARIF output natively without requiring a separate CLI install.
 
   # ── Final Report ─────────────────────────────────────────────────────────────
 

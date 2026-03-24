@@ -639,7 +639,7 @@ main() {
   log_info "── Security & Quality Tools ──"
   check_tool_version "Gitleaks" "gitleaks" "$(get_mise_tool_version gitleaks)" "gitleaks version" 0 0
   check_tool_version "OSV-scanner" "osv-scanner" "$(get_mise_tool_version osv-scanner)" "osv-scanner --version" 0 1
-  check_tool_version "Trivy" "trivy" "$(get_mise_tool_version trivy)" "trivy --version" 0 1
+  # NOTE: Trivy version check removed — scanning delegated to aquasecurity/trivy-action.
   check_tool_version "Zizmor" "zizmor" "$(get_mise_tool_version zizmor)" "zizmor --version" 0 1
 
   log_info "── Lint & Quality Tools ──"

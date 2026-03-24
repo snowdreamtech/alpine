@@ -125,7 +125,7 @@ setup_registry_ballerina() { register_mise_tool "Ballerina" "github:ballerina-pl
 setup_registry_kube_linter() { register_mise_tool "Kube-Linter" "${VER_KUBE_LINTER_PROVIDER:-github:stackrox/kube-linter}" "${VER_KUBE_LINTER:-latest}"; }
 setup_registry_spectral() { register_mise_tool "Spectral" "${VER_SPECTRAL_PROVIDER:-npm:@stoplight/spectral-cli}" "${VER_SPECTRAL:-latest}"; }
 setup_registry_buf() { register_mise_tool "Buf" "${VER_BUF_PROVIDER:-github:bufbuild/buf}" "${VER_BUF:-latest}"; }
-setup_registry_trivy() { register_mise_tool "Trivy" "${VER_TRIVY_PROVIDER:-github:aquasecurity/trivy}" "${VER_TRIVY:-latest}"; }
+# NOTE: setup_registry_trivy() removed — scanning delegated to aquasecurity/trivy-action.
 setup_registry_osv_scanner() { register_mise_tool "OSV-Scanner" "${VER_OSV_SCANNER_PROVIDER:-github:google/osv-scanner}" "${VER_OSV_SCANNER:-latest}"; }
 setup_registry_cargo_audit() { register_mise_tool "Cargo-Audit" "${VER_CARGO_AUDIT_PROVIDER:-cargo:cargo-audit}" "${VER_CARGO_AUDIT:-latest}"; }
 setup_registry_tflint() { register_mise_tool "TFLint" "${VER_TFLINT_PROVIDER:-github:terraform-linters/tflint}" "${VER_TFLINT:-latest}"; }
