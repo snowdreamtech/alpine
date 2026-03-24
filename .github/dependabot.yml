@@ -21,7 +21,7 @@ updates:
     open-pull-requests-limit: 10
     # Consolidate updates to reduce PR noise
     groups:
-      all-patch-minor:
+      📦-all-patch-minor:
         update-types:
           - "patch"
           - "minor"
@@ -41,15 +41,15 @@ updates:
     open-pull-requests-limit: 10
     # Consolidate updates to reduce PR noise
     groups:
-      all-patch-minor:
+      📦-all-patch-minor:
         update-types:
           - "patch"
           - "minor"
-      lint-dependencies:
+      🧹-lint-dependencies:
         patterns: ["eslint*", "prettier*", "stylelint*"]
-      testing-frameworks:
+      🧪-testing-frameworks:
         patterns: ["vitest*", "jest*", "playwright*", "cypress*"]
-      vite-suite:
+      ⚡-vite-suite:
         patterns: ["vite*", "@vitejs/*"]
     schedule:
       interval: "daily"
@@ -66,15 +66,15 @@ updates:
     open-pull-requests-limit: 10
     # Consolidate updates to reduce PR noise
     groups:
-      all-patch-minor:
+      📦-all-patch-minor:
         update-types:
           - "patch"
           - "minor"
-      lint-dependencies:
+      🧹-lint-dependencies:
         patterns: ["eslint*", "prettier*", "stylelint*"]
-      testing-frameworks:
+      🧪-testing-frameworks:
         patterns: ["vitest*", "jest*", "playwright*", "cypress*"]
-      vite-suite:
+      ⚡-vite-suite:
         patterns: ["vite*", "@vitejs/*"]
     schedule:
       interval: "daily"
@@ -91,7 +91,7 @@ updates:
     open-pull-requests-limit: 10
     # Consolidate updates to reduce PR noise
     groups:
-      all-patch-minor:
+      📦-all-patch-minor:
         update-types:
           - "patch"
           - "minor"
@@ -111,7 +111,7 @@ updates:
     open-pull-requests-limit: 10
     # Consolidate updates to reduce PR noise
     groups:
-      all-patch-minor:
+      📦-all-patch-minor:
         update-types:
           - "patch"
           - "minor"
@@ -131,7 +131,7 @@ updates:
     open-pull-requests-limit: 10
     # Consolidate updates to reduce PR noise
     groups:
-      all-patch-minor:
+      📦-all-patch-minor:
         update-types:
           - "patch"
           - "minor"

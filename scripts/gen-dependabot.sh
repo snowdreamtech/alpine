@@ -135,7 +135,7 @@ emit_entry() {
     open-pull-requests-limit: 10
     # Consolidate updates to reduce PR noise
     groups:
-      all-patch-minor:
+      📦-all-patch-minor:
         update-types:
           - "patch"
           - "minor"
@@ -144,11 +144,11 @@ EOF
   # Add ecosystem-specific groups to further reduce noise
   if [ "$_ecosystem" = "npm" ]; then
     cat <<EOF
-      lint-dependencies:
+      🧹-lint-dependencies:
         patterns: ["eslint*", "prettier*", "stylelint*"]
-      testing-frameworks:
+      🧪-testing-frameworks:
         patterns: ["vitest*", "jest*", "playwright*", "cypress*"]
-      vite-suite:
+      ⚡-vite-suite:
         patterns: ["vite*", "@vitejs/*"]
 EOF
   fi
