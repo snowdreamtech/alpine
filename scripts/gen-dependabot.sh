@@ -110,10 +110,29 @@ emit_entry() {
   _directory="$2"
   _label=$(get_label "$_ecosystem")
 
+  # 1. Frequency Tiering: Core ecosystems daily, others weekly
+  _interval="weekly"
+  case "$_ecosystem" in
+    npm | gomod | bun | pip | uv) _interval="daily" ;;
+  esac
+
+  # 3. Label Refinement: Add semantic labels
+  _extra_labels=""
+  case "$_ecosystem" in
+    github-actions) _extra_labels="
+      - \"devops\"" ;;
+    docker | devcontainers) _extra_labels="
+      - \"infrastructure\"" ;;
+    pre-commit) _extra_labels="
+      - \"linting\"" ;;
+  esac
+
   cat <<EOF
   - package-ecosystem: "${_ecosystem}"
     directory: "${_directory}"
     target-branch: "${TARGET_BRANCH}"
+    # 2. Open PR Limit: Prevent PR-bombing
+    open-pull-requests-limit: 10
     # Consolidate updates to reduce PR noise
     groups:
       all-patch-minor:
@@ -136,12 +155,12 @@ EOF
 
   cat <<EOF
     schedule:
-      interval: "weekly"
+      interval: "${_interval}"
     commit-message:
       prefix: "chore(deps):"
     labels:
       - "dependencies"
-      - "${_label}"
+      - "${_label}"${_extra_labels}
 
 EOF
 }

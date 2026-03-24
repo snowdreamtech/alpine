@@ -17,6 +17,8 @@ updates:
   - package-ecosystem: "github-actions"
     directory: "/"
     target-branch: "dev"
+    # 2. Open PR Limit: Prevent PR-bombing
+    open-pull-requests-limit: 10
     # Consolidate updates to reduce PR noise
     groups:
       all-patch-minor:
@@ -30,10 +32,13 @@ updates:
     labels:
       - "dependencies"
       - "github-actions"
+      - "devops"
 
   - package-ecosystem: "npm"
     directory: "/"
     target-branch: "dev"
+    # 2. Open PR Limit: Prevent PR-bombing
+    open-pull-requests-limit: 10
     # Consolidate updates to reduce PR noise
     groups:
       all-patch-minor:
@@ -47,7 +52,7 @@ updates:
       vite-suite:
         patterns: ["vite*", "@vitejs/*"]
     schedule:
-      interval: "weekly"
+      interval: "daily"
     commit-message:
       prefix: "chore(deps):"
     labels:
@@ -57,6 +62,8 @@ updates:
   - package-ecosystem: "npm"
     directory: "/docs"
     target-branch: "dev"
+    # 2. Open PR Limit: Prevent PR-bombing
+    open-pull-requests-limit: 10
     # Consolidate updates to reduce PR noise
     groups:
       all-patch-minor:
@@ -70,7 +77,7 @@ updates:
       vite-suite:
         patterns: ["vite*", "@vitejs/*"]
     schedule:
-      interval: "weekly"
+      interval: "daily"
     commit-message:
       prefix: "chore(deps):"
     labels:
@@ -80,6 +87,8 @@ updates:
   - package-ecosystem: "docker"
     directory: "/.devcontainer"
     target-branch: "dev"
+    # 2. Open PR Limit: Prevent PR-bombing
+    open-pull-requests-limit: 10
     # Consolidate updates to reduce PR noise
     groups:
       all-patch-minor:
@@ -93,10 +102,13 @@ updates:
     labels:
       - "dependencies"
       - "docker"
+      - "infrastructure"
 
   - package-ecosystem: "devcontainers"
     directory: "/.devcontainer"
     target-branch: "dev"
+    # 2. Open PR Limit: Prevent PR-bombing
+    open-pull-requests-limit: 10
     # Consolidate updates to reduce PR noise
     groups:
       all-patch-minor:
@@ -110,10 +122,13 @@ updates:
     labels:
       - "dependencies"
       - "devcontainers"
+      - "infrastructure"
 
   - package-ecosystem: "pre-commit"
     directory: "/"
     target-branch: "dev"
+    # 2. Open PR Limit: Prevent PR-bombing
+    open-pull-requests-limit: 10
     # Consolidate updates to reduce PR noise
     groups:
       all-patch-minor:
@@ -127,3 +142,4 @@ updates:
     labels:
       - "dependencies"
       - "pre-commit"
+      - "linting"
