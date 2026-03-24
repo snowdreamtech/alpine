@@ -65,7 +65,7 @@ jobs:
           persist-credentials: false
 
       - name: "⚡ Cache Mise Tools"
-        uses: actions/cache@v5.0.3
+        uses: actions/cache@v5.0.4
         with:
           path: |
             ~/.local/bin
@@ -127,7 +127,7 @@ jobs:
           persist-credentials: false
 
       - name: "⚡ Cache Mise Tools"
-        uses: actions/cache@v5.0.3
+        uses: actions/cache@v5.0.4
         with:
           path: |
             ~/.local/bin
@@ -139,7 +139,7 @@ jobs:
             ${{ runner.os }}-mise-
 
       - name: "📦 Cache Language Dependencies (Advanced)"
-        uses: actions/cache@v5.0.3
+        uses: actions/cache@v5.0.4
         with:
           path: |
             ~/go/pkg/mod
@@ -216,7 +216,7 @@ jobs:
           fetch-depth: 0
 
       - name: "⚡ Cache Mise Tools"
-        uses: actions/cache@v5.0.3
+        uses: actions/cache@v5.0.4
         with:
           path: |
             ~/.local/share/mise
@@ -273,7 +273,7 @@ jobs:
           TRIVY_CACHE_DIR: .trivycache
 
       - name: "⚡ Cache Documentation Links (Lychee)"
-        uses: actions/cache@v5.0.3
+        uses: actions/cache@v5.0.4
         with:
           path: .lycheecache
           key: ${{ runner.os }}-lychee-${{ hashFiles('**/*.md') }}
