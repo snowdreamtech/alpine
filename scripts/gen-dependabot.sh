@@ -123,6 +123,9 @@ emit_entry() {
     docker | devcontainers) _prefix="build(deps):" ;;
   esac
 
+  # 5. Reviewers: Auto-assign reviewers to Dependabot PRs
+  _reviewers="reviewers: [\"snowdream\"]"
+
   # 3. Label Refinement: Add semantic labels
   _extra_labels=""
   case "$_ecosystem" in
@@ -140,6 +143,10 @@ emit_entry() {
     target-branch: "${TARGET_BRANCH}"
     # 2. Open PR Limit: Prevent PR-bombing
     open-pull-requests-limit: 10
+    # 6. Rebase Strategy: Auto-rebase to resolve conflicts
+    rebase-strategy: "auto"
+    # 5. Reviewers:
+    ${_reviewers}
     # Consolidate updates to reduce PR noise
     groups:
       📦-all-patch-minor:

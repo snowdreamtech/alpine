@@ -19,6 +19,10 @@ updates:
     target-branch: "dev"
     # 2. Open PR Limit: Prevent PR-bombing
     open-pull-requests-limit: 10
+    # 6. Rebase Strategy: Auto-rebase to resolve conflicts
+    rebase-strategy: "auto"
+    # 5. Reviewers:
+    reviewers: ["snowdream"]
     # Consolidate updates to reduce PR noise
     groups:
       📦-all-patch-minor:
@@ -41,6 +45,10 @@ updates:
     target-branch: "dev"
     # 2. Open PR Limit: Prevent PR-bombing
     open-pull-requests-limit: 10
+    # 6. Rebase Strategy: Auto-rebase to resolve conflicts
+    rebase-strategy: "auto"
+    # 5. Reviewers:
+    reviewers: ["snowdream"]
     # Consolidate updates to reduce PR noise
     groups:
       📦-all-patch-minor:
@@ -66,6 +74,10 @@ updates:
     target-branch: "dev"
     # 2. Open PR Limit: Prevent PR-bombing
     open-pull-requests-limit: 10
+    # 6. Rebase Strategy: Auto-rebase to resolve conflicts
+    rebase-strategy: "auto"
+    # 5. Reviewers:
+    reviewers: ["snowdream"]
     # Consolidate updates to reduce PR noise
     groups:
       📦-all-patch-minor:
@@ -91,6 +103,10 @@ updates:
     target-branch: "dev"
     # 2. Open PR Limit: Prevent PR-bombing
     open-pull-requests-limit: 10
+    # 6. Rebase Strategy: Auto-rebase to resolve conflicts
+    rebase-strategy: "auto"
+    # 5. Reviewers:
+    reviewers: ["snowdream"]
     # Consolidate updates to reduce PR noise
     groups:
       📦-all-patch-minor:
@@ -113,6 +129,10 @@ updates:
     target-branch: "dev"
     # 2. Open PR Limit: Prevent PR-bombing
     open-pull-requests-limit: 10
+    # 6. Rebase Strategy: Auto-rebase to resolve conflicts
+    rebase-strategy: "auto"
+    # 5. Reviewers:
+    reviewers: ["snowdream"]
     # Consolidate updates to reduce PR noise
     groups:
       📦-all-patch-minor:
@@ -135,6 +155,10 @@ updates:
     target-branch: "dev"
     # 2. Open PR Limit: Prevent PR-bombing
     open-pull-requests-limit: 10
+    # 6. Rebase Strategy: Auto-rebase to resolve conflicts
+    rebase-strategy: "auto"
+    # 5. Reviewers:
+    reviewers: ["snowdream"]
     # Consolidate updates to reduce PR noise
     groups:
       📦-all-patch-minor:
