@@ -71,7 +71,7 @@ help: ## Show this help message
 	@printf "$(BLUE)Snowdream Tech AI IDE Template$(NC)\n"
 	@printf "Detected OS: $(GREEN)$(OS_NAME)$(NC)\n\n"
 	@printf "$(YELLOW)Usage:$(NC)\n"
-	@printf "  make $(GREEN)<target>$(NC) [VARIABLE=value ...]\n\n"
+	@printf "  make $(GREEN)<target>$(NC) [ARGS=\"...\"] [V=1|2] [VARIABLE=value]\n\n"
 	@printf "$(YELLOW)Main Lifecycle Targets:$(NC)\n"
 	@grep -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | sort | awk 'BEGIN {FS = ":.*?## "}; {printf "  $(GREEN)%-18s$(NC) %s\n", $$1, $$2}'
 
