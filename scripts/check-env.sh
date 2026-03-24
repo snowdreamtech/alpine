@@ -702,6 +702,8 @@ main() {
     log_success "✅ All automation scripts have correct executable permissions."
   fi
 
+  finalize_summary_table
+
   # Final combined health check
   if [ "${HEALTHY_ST:-0}" -eq 0 ]; then
     log_success "\n✨ Environment is HEALTHY! Ready for development."

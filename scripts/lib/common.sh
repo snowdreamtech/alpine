@@ -1331,6 +1331,15 @@ init_summary_table() {
   eval "export $_SENTINEL_TABLE=true"
 }
 
+# Purpose: Finalizes the summary table by flushing it to GITHUB_STEP_SUMMARY in CI.
+# Examples:
+#   finalize_summary_table
+finalize_summary_table() {
+  if [ -n "$GITHUB_STEP_SUMMARY" ] && [ -f "$SETUP_SUMMARY_FILE" ] && [ -w "$GITHUB_STEP_SUMMARY" ]; then
+    cat "$SETUP_SUMMARY_FILE" >>"$GITHUB_STEP_SUMMARY"
+  fi
+}
+
 # Purpose: Checks if the current tool version matches the required version (prefix match).
 # Params:
 #   $1 - Current version (detected)
