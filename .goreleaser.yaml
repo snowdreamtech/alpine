@@ -90,4 +90,7 @@ changelog:
 
 sboms:
   - artifacts: archive
-    args: ["$@"]
+  - artifacts: binary
+  - artifacts: image
+  - artifacts: package
+  - artifacts: source
