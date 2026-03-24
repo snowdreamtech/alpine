@@ -1,4 +1,7 @@
 #!/usr/bin/env sh
+# Copyright (c) 2026 SnowdreamTech. All rights reserved.
+# Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
 # WebAssembly Text (WAT) Logic Module
 
 # Purpose: Installs Wasmtime via mise.

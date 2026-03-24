@@ -1,4 +1,7 @@
 #!/usr/bin/env sh
+# Copyright (c) 2026 SnowdreamTech. All rights reserved.
+# Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
 # Tool Registry - Centralized version management for dynamic registration
 
 # Purpose: Registers a tool in .mise.toml if it's not already present.
