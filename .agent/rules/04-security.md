@@ -132,18 +132,27 @@ Never exclude `venv/` or `env/` entirely — a misplaced `.env` file in the root
   - **CodeQL** (GitHub) — supports C/C++, Go, Java, Python, Ruby, JavaScript
   - **Semgrep** — fast, rule-based, supports all major languages
   - **Bandit** (Python), **SpotBugs** (Java), **gosec** (Go), **Brakeman** (Rails)
-- Scan container images for OS and package vulnerabilities before pushing to any registry:
+  Pin base images to a specific SHA digest for reproducibility: `FROM node:22-alpine@sha256:<digest>`.
+- **Zero-Trust Network Egress Control (MANDATORY)**: All workflows MUST use `step-security/harden-runner` in `block` mode to prevent data exfiltration.
+  - Avoid broad wildcards like `*.amazonaws.com`.
+  - Use service-specific endpoints (e.g., `public.ecr.aws:443`, `registry.npmjs.org:443`).
+
+- Generate a **Software Bill of Materials (SBOM)** in CycloneDX or SPDX format for every production release:
+  - Use `trivy` or `syft` to generate SBOMs for filesystem or container images.
+  - Upload SBOMs as build artifacts for transparency.
 
   ```bash
-  trivy image --exit-code 1 --severity HIGH,CRITICAL myapp:latest
+  # Example SBOM generation via Trivy
+  trivy fs --format cyclonedx --output sbom.json .
   ```
 
-  Pin base images to a specific SHA digest for reproducibility: `FROM node:22-alpine@sha256:<digest>`.
-- Generate a **Software Bill of Materials (SBOM)** in CycloneDX or SPDX format for every production release:
+- **GitHub Artifact Attestations (SLSA)**: Sign build artifacts and container images in CI using GitHub's built-in attestation service (Sigstore):
 
-  ```bash
-  syft myapp:latest -o cyclonedx-json > sbom.json
-  cosign attest --type cyclonedx --predicate sbom.json myapp:latest
+  ```yaml
+  - name: Generate Artifact Attestation
+    uses: actions/attest-build-provenance@v2.2.3
+    with:
+      subject-path: 'dist/my-artifact.tar.gz'
   ```
 
 - CVE remediation SLA:

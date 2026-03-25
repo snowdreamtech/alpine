@@ -177,30 +177,17 @@ All CI workflows **MUST** invoke logic through `Makefile` targets rather than di
 
 ## 7. CI Security & Supply Chain
 
-- **Strict Action Version Pinning (MANDATORY)**: All GitHub Actions references MUST use **exact version tags** (e.g., `v4.2.2`). Never use mutable major version tags (`@v4`, `@v2`) — they can be silently overwritten by the action author, breaking reproducibility and enabling supply-chain attacks. Always use the **latest available exact version**.
+- **Immutable Action Pinning (SHA-1) - GOLD STANDARD**: All GitHub Actions references **MUST** use the 40-character commit SHA (e.g., `uses: actions/checkout@1d96...`). This is the only way to guarantee that the code being executed is the exact version that was audited.
+  - Tags (even exact versions like `v6.0.2`) are mutable and can be hijacked.
+  - SHAs are immutable and provide cryptographic proof of integrity.
 
   ```yaml
-  # ❌ WRONG — mutable major tag, non-deterministic
-  - uses: actions/checkout@v4
-  - uses: actions/setup-node@v4
-  - uses: pnpm/action-setup@v4
-
-  # ✅ CORRECT — exact version, auditable, reproducible
-  - uses: actions/checkout@v6.0.2
-  - uses: actions/setup-node@v6.3.0
-  - uses: pnpm/action-setup@v4.2.0
+  # ✅ GOLD STANDARD — Immutable SHA-1 pinning
+  - uses: actions/checkout@1d96c3a830132f11fdf16401030e64f2b380ed33 # v6.0.2
+  - uses: actions/setup-node@1d0ff469b7ec7b3c67d9115c28d015357348bd0a # v6.3.0
   ```
 
-  **Gold standard**: Pin to the **exact version tag** (e.g., `v6.0.2`). This is the required standard for all workflows in this project — auditable, reproducible, and sufficient for supply-chain safety when combined with Dependabot automatic updates.
-
-  ```yaml
-  # ✅ GOLD STANDARD — exact version tag, auditable and reproducible
-  - uses: actions/checkout@v6.0.2
-  - uses: actions/setup-node@v6.3.0
-  - uses: pnpm/action-setup@v4.4.0
-  ```
-
-  Use `dependabot` (with `version-updates` for GitHub Actions) to automatically track and update pinned versions.
+  Use `dependabot` (with `version-updates` for GitHub Actions) to automatically track and update these SHAs.
 
 - Use **OIDC (OpenID Connect)** for short-lived cloud credentials in CI instead of long-lived static secrets:
 
