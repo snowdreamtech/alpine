@@ -18,6 +18,10 @@ jobs:
   sync:
     name: "🔄 Sync Repo Labels"
     runs-on: ubuntu-latest
+    concurrency:
+      group: label-sync-${{ github.workflow }}-${{ github.ref }}
+      cancel-in-progress: true
+    timeout-minutes: 5
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
         uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0 # v2.10.4

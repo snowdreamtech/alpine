@@ -13,6 +13,10 @@ jobs:
   auto-merge:
     name: "🤖 Approve & Auto-Merge"
     runs-on: ubuntu-latest
+    concurrency:
+      group: auto-merge-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+      cancel-in-progress: true
+    timeout-minutes: 5
     # Only run for Dependabot PRs
     if: github.event.pull_request.user.login == 'dependabot[bot]'
     steps:
