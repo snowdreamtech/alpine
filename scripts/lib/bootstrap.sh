@@ -77,9 +77,14 @@ _mise_detect_os() {
 _mise_install_tier1() {
   local _SHELL="$1"
   log_info "Tier 1: Trying official shell-specific streamer for ${_SHELL}..."
-  if curl --retry 5 --retry-delay 2 --retry-connrefused -sS -L "https://mise.run/${_SHELL}" | sh; then
-    return 0
+  _TMP_SH="${TMPDIR:-/tmp}/mise_install_$$.sh"
+  if curl --retry 5 --retry-delay 2 --retry-connrefused -sS -L "https://mise.run/${_SHELL}" -o "$_TMP_SH"; then
+    if sh "$_TMP_SH"; then
+      rm -f "$_TMP_SH"
+      return 0
+    fi
   fi
+  rm -f "$_TMP_SH"
   return 1
 }
 
