@@ -14,8 +14,7 @@ name: "🔄 Continuous Integration"
     branches-ignore:
       - "main"
   pull_request:
-    branches-ignore:
-      - "main"
+    types: [opened, synchronize, reopened]
   workflow_dispatch:
     inputs:
       venv:
