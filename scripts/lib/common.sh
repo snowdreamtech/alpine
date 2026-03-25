@@ -106,11 +106,13 @@ export MISE_CHECK_FOR_UPDATES=0
 export MISE_GIT_ALWAYS_USE_GIX=0
 export MISE_GIX=0
 export MISE_USE_GIX=0
-# In CI, ensure GITHUB_TOKEN is forwarded for mise's GitHub API calls.
-# This MUST happen at bootstrap, before any direct `mise install` call
-# (including those inside register_mise_tool), not just inside run_mise().
-if [ -n "${GITHUB_TOKEN:-}" ] && [ -z "${MISE_GITHUB_TOKEN:-}" ]; then
-  export MISE_GITHUB_TOKEN="$GITHUB_TOKEN"
+# In CI, ensure GitHub tokens are correctly normalized for both mise and GitHub CLI (gh).
+# This MUST happen at bootstrap, before any direct tool invocation.
+if [ -n "${GITHUB_TOKEN:-}" ]; then
+  # mise-specific token variable
+  [ -z "${MISE_GITHUB_TOKEN:-}" ] && export MISE_GITHUB_TOKEN="$GITHUB_TOKEN"
+  # GitHub CLI (gh) preferred variable
+  [ -z "${GH_TOKEN:-}" ] && export GH_TOKEN="$GITHUB_TOKEN"
 fi
 # In CI, prevent mise from fetching remote version lists from GitHub.
 # All versions are pinned in .mise.toml / versions.sh, so remote lookups are unnecessary
