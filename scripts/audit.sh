@@ -128,14 +128,12 @@ main() {
               _ZM_OK=1
             fi
           fi
-        fi
-
         if [ "$_ZM_OK" -eq 1 ]; then
-          log_summary "GitHub" "zizmor" "✅ Secure" "$(get_version "$_ZIZMOR_BIN")" "$(($(date +%s) - _T0_ZM))"
+          log_summary "GitHub" "zizmor" "✅ Secure" "$(get_version "$_ZIZMOR_BIN")" "$(get_duration "$_T0_ZM")"
         else
           # Check if failure was due to 401/403 (Rate limit or invalid token)
           # We already try offline mode earlier, so if it still fails, it's a real issue
-          log_summary "GitHub" "zizmor" "❌ Vulnerable" "$(get_version "$_ZIZMOR_BIN")" "$(($(date +%s) - _T0_ZM))"
+          log_summary "GitHub" "zizmor" "❌ Vulnerable" "$(get_version "$_ZIZMOR_BIN")" "$(get_duration "$_T0_ZM")"
           _OVERALL_EXIT_AUDIT=1
         fi
       fi
