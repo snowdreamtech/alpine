@@ -43,9 +43,6 @@ name: "🤖 Dependabot Smart Sync"
 
 permissions: {}
 
-env:
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
 jobs:
   sync:
     name: "🔄 Sync Dependabot Config"
@@ -94,10 +91,6 @@ jobs:
             registry.terraform.io:443
             formulae.brew.sh:443
 
-
-
-
-
       - name: "📂 Checkout Repository Code"
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2 # v4.2.2
         with:
@@ -115,11 +108,13 @@ jobs:
         run: |
           sh scripts/gen-dependabot.sh
           if [ -f "dependabot_summary.md" ]; then
-            cat dependabot_summary.md >> $GITHUB_STEP_SUMMARY
+            cat dependabot_summary.md >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: "📝 Commit Changes (if any)"
         shell: sh
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           if git diff --quiet .github/dependabot.yml 2>/dev/null; then
             echo "✅ No changes detected. Dependabot config is up-to-date."

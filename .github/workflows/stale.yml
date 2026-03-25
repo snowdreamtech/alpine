@@ -23,10 +23,6 @@ name: "🕰️ Mark Stale Issues and PRs"
 permissions: {}
 
 env:
-  # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   MISE_LOCKED: 1
 
 jobs:
@@ -80,10 +76,6 @@ jobs:
             rubygems.org:443
             registry.terraform.io:443
             formulae.brew.sh:443
-
-
-
-
 
       - name: "🧹 Mark Inactive Issues & PRs (Stale)"
         uses: actions/stale@b5d41d4e1d5dceea10e7104786b73624c18a190f # v10.2.0 # v10.2.0

@@ -23,10 +23,6 @@ name: "🧹 Cache Cleanup"
 permissions: {}
 
 env:
-  # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   MISE_LOCKED: 1
 
 jobs:
@@ -81,10 +77,6 @@ jobs:
             registry.terraform.io:443
             formulae.brew.sh:443
 
-
-
-
-
       - name: "🧹 Prune Inactive GitHub Caches"
         shell: sh # POSIX compliant shell for better portability
         run: |
@@ -104,5 +96,6 @@ jobs:
           done
           echo "Cleanup completed successfully."
         env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           REPO: ${{ github.repository }}
           BRANCH: ${{ github.ref }}
