@@ -42,7 +42,7 @@ jobs:
     timeout-minutes: 30 # Go compilation and asset upload usually completes in <10m
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
-        uses: step-security/harden-runner@v2.16.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bdad212e5be703cd14 # v2.16.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -64,7 +64,7 @@ jobs:
             *.azurecr.io:443
 
       - name: "📂 Checkout Repository Code"
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@1d96c3a830132f11fdf16401030e64f2b380ed33 # v6.0.2
         with:
           # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
           token: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
@@ -73,13 +73,13 @@ jobs:
           persist-credentials: false
 
       - name: "🐳 Set up Docker Buildx"
-        uses: docker/setup-buildx-action@v4.0.0
+        uses: docker/setup-buildx-action@4d04d5d41496a94f31c26b80155b1112d1b09b52 # v4.0.0
         with:
           buildkitd-flags: --oci-worker-no-cache
           cache-binary: false
 
       - name: "🚀 Distribute Artifacts (GoReleaser)"
-        uses: goreleaser/goreleaser-action@v7.0.0
+        uses: goreleaser/goreleaser-action@ec59f472851d7c4915a77b8f9cf0f6c2084c8a5a # v7.0.0
         with:
           # Orchestrates the optimized build and distribution of cross-compiled Go binaries.
           distribution: goreleaser
