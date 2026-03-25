@@ -1,0 +1,54 @@
+---
+name: "🌙 Nightly Security Audit"
+
+"on":
+  schedule:
+    # Run at 00:00 UTC every day
+    - cron: "0 0 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  audit:
+    name: "🔍 Full Security Audit"
+    runs-on: ubuntu-latest
+    if: github.repository_owner == 'snowdreamtech'
+    steps:
+      - name: "📂 Checkout Code"
+        uses: actions/checkout@v6.0.2
+
+      - name: "⚡ Setup mise (Tool Manager)"
+        uses: jdx/mise-action@v2.1.11
+
+      - name: "🛡️ Run Security Audit"
+        shell: sh
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        run: |
+          # We run make audit which includes gitleaks, osv-scanner, etc.
+          make audit
+
+      - name: "🚨 Report Vulnerabilities"
+        if: failure()
+        shell: sh
+        env:
+          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+        run: |
+          _TITLE="🚨 Nightly Security Audit Failed: Vulnerabilities Detected"
+          _BODY="The scheduled nightly security audit detected vulnerabilities or secrets in the codebase.
+
+          **Run History:** ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}
+
+          Please run \`make audit\` locally to investigate and fix these issues."
+
+          # Check if an open issue with the same title already exists to avoid duplication
+          _EXISTS=$(gh issue list --search "$_TITLE" --state open --json number --jq ".[0].number")
+
+          if [ -z "$_EXISTS" ]; then
+            gh issue create --title "$_TITLE" --body "$_BODY" --label "security,bug"
+          else
+            echo "Issue already exists: #$_EXISTS. Skipping creation."
+          fi
