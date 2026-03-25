@@ -18,7 +18,6 @@ jobs:
   sync:
     name: "🔄 Sync Repo Labels"
     runs-on: ubuntu-latest
-    if: github.repository_owner == 'snowdreamtech'
     steps:
       - name: "📂 Checkout Code"
         uses: actions/checkout@v6.0.2
