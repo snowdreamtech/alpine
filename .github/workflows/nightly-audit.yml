@@ -18,6 +18,8 @@ jobs:
     steps:
       - name: "📂 Checkout Code"
         uses: actions/checkout@v6.0.2
+        with:
+          persist-credentials: false
 
       - name: "⚡ Setup mise (Tool Manager)"
         uses: jdx/mise-action@v2.1.11

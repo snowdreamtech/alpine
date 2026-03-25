@@ -21,6 +21,8 @@ jobs:
     steps:
       - name: "📂 Checkout Code"
         uses: actions/checkout@v6.0.2
+        with:
+          persist-credentials: false
 
       - name: "🏷️ Sync Labels via gh CLI"
         shell: sh
