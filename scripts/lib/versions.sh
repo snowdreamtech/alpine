@@ -98,8 +98,15 @@ VER_GOLANGCI_LINT="1.64.5"
 VER_VITEPRESS="1.6.4"
 VER_VITEPRESS_PROVIDER="npm:vitepress"
 
+VER_DOTENV_LINTER="4.0.0"
+VER_DOTENV_LINTER_PROVIDER="github:dotenv-linter/dotenv-linter"
+
+VER_CHECKMAKE="0.2.1"
+VER_CHECKMAKE_PROVIDER="github:checkmake/checkmake"
+
 # ── 🛡️ Security Scanning (CI-only by default) ─────────────────────────────────
-# NOTE: Trivy version removed — scanning delegated to aquasecurity/trivy-action in CI.
+VER_TRIVY="0.69.3"
+VER_TRIVY_PROVIDER="github:aquasecurity/trivy"
 
 VER_OSV_SCANNER="v2.3.5"
 VER_OSV_SCANNER_PROVIDER="go:github.com/google/osv-scanner/v2/cmd/osv-scanner"
