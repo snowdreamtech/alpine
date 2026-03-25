@@ -150,10 +150,17 @@ Never exclude `venv/` or `env/` entirely — a misplaced `.env` file in the root
 
   ```yaml
   - name: Generate Artifact Attestation
-    uses: actions/attest-build-provenance@v2.2.3
+    uses: actions/attest-build-provenance@52aa5ba130440536762391054ee55cb830c2c31e # v2.2.3
     with:
       subject-path: 'dist/my-artifact.tar.gz'
   ```
+
+### Mise Toolchain Integrity
+To prevent toolchain poisoning (Node.js, Go, Python, etc.):
+- **Exact Pinning**: All tools in `.mise.toml` MUST use exact versions (e.g., `20.18.3` instead of `20`).
+- **Official Registries**: Env vars like `NODEJS_ORG_MIRROR` MUST point to official sources in CI.
+- **MISE_LOCKED Mode**: All CI workflows MUST set `MISE_LOCKED: 1` to prevent unauthorized tool updates or remote resolution at runtime.
+- **Network Isolation**: `harden-runner` remains the final defense, blocking any unauthorized connection attempted by compromised plugins.
 
 - CVE remediation SLA:
 
