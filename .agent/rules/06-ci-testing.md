@@ -175,6 +175,19 @@ All CI workflows **MUST** invoke logic through `Makefile` targets rather than di
 - **Local-CI Parity**: Developers can run `make verify` locally to get the exact same result as the CI.
 - **Health Checks**: Every workflow initialization MUST include `make check-env` to validate the runner environment before execution.
 
+### 6.4 Matrix vs. Primary Runner Philosophy
+
+To balance **verification depth** with **resource efficiency (CI Credits)**, CI/CD jobs are categorized into two tiers:
+
+- **Tier 1: Cross-Platform Matrix (All OSs)**:
+  - **Applied to**: `test` (Unit/Integration), `lint` (Formatting/Style).
+  - **Rationale**: Code behavior, file systems (CRLF vs LF), and path handling vary significantly across Windows, macOS, and Linux.
+- **Tier 2: Primary Runner Only (Ubuntu-latest)**:
+  - **Applied to**: `audit` (Security/Vuln scans), `Commitlint` (Git history), `Lychee` (Link check), `Zizmor` (Workflow audit), and **SARIF Reporting**.
+  - **Rationale**: These are **"Environment-Abstract"** tasks. Logic/Security flaws are identical across all OSs for the same code.
+  - **Efficiency**: Linux runners are significantly cheaper and provide native Docker support for security actions.
+  - **Data Integrity**: Restricting SARIF uploads to a single runner prevents duplicate findings and noise in the GitHub Security Tab.
+
 ## 7. CI Security & Supply Chain
 
 - **Immutable Action Pinning (SHA-1) - GOLD STANDARD**: All GitHub Actions references **MUST** use the 40-character commit SHA (e.g., `uses: actions/checkout@1d96...`). This is the only way to guarantee that the code being executed is the exact version that was audited.
