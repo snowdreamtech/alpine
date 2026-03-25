@@ -19,6 +19,14 @@ jobs:
     name: "🔄 Sync Repo Labels"
     runs-on: ubuntu-latest
     steps:
+      - name: "🔒 Harden Runner (Security Egress Audit)"
+        uses: step-security/harden-runner@v2.16.0
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+
       - name: "📂 Checkout Code"
         uses: actions/checkout@v6.0.2
         with:
