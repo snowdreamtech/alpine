@@ -43,7 +43,7 @@ jobs:
       PYTHONUTF8: 1
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
-        uses: step-security/harden-runner@cb605e52c26070c328afc4562f0b4ada7618a84e # v2.10.4
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0 # v2.10.4
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -70,14 +70,14 @@ jobs:
             *.azurecr.io:443
 
       - name: "📂 Checkout Repository Code"
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2 # v4.2.2
         with:
           # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
           token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: false
 
       - name: "⚡ Cache Mise Tools"
-        uses: actions/cache@0c45773b623bec8c04719ee12026d36e2f694609 # v5.0.4
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4 # v5.0.4
         with:
           path: |
             ~/.local/bin
@@ -121,7 +121,7 @@ jobs:
     steps:
       - name: "📝 Orchestrate Release Lifecycle (Release Please)"
         id: release
-        uses: googleapis/release-please-action@16a9c9053805f15951a89c31405e6089c92257e2 # v4.4.0
+        uses: googleapis/release-please-action@16a9c90856f42705d54a6fda1823352bdc62cf38 # v4.4.0 # v4.4.0
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           release-type: simple
@@ -129,7 +129,7 @@ jobs:
 
       - name: "🏗️ Checkout Release PR Branch"
         if: ${{ steps.release.outputs.pr }}
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2 # v4.2.2
         with:
           ref: ${{ fromJson(steps.release.outputs.pr).headBranchName }}
           # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
@@ -138,13 +138,13 @@ jobs:
 
       - name: "📦 Setup Node Environment (Syncing)"
         if: ${{ steps.release.outputs.pr }}
-        uses: actions/setup-node@c899d45e526d5257ed5a40b90e9643486c55208b # v4.2.0
+        uses: actions/setup-node@53b83947a5a98c8d113130e565377fae1a50d02f # v6.3.0 # v4.2.0
         with:
           node-version: "20.18.3"
 
       - name: "📦 Setup pnpm Environment"
         if: ${{ steps.release.outputs.pr && hashFiles('pnpm-lock.yaml') != '' }}
-        uses: pnpm/action-setup@fc06bc14589d311915f470559f3c71306ac291f0 # v5.0.0
+        uses: pnpm/action-setup@b307475762933b98ed359c036b0e51f26b63b74b # v5.0.0 # v5.0.0
         with:
           run_install: false
 

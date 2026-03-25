@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
-        uses: step-security/harden-runner@cb605e52c26070c328afc4562f0b4ada7618a84e # v2.10.4
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0 # v2.10.4
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -48,12 +48,12 @@ jobs:
             *.azurecr.io:443
 
       - name: "📂 Checkout Code"
-        uses: actions/checkout@11bd71901bbe5b1630ceea73d27597364c9af683 # v4.2.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2 # v4.2.2
         with:
           persist-credentials: false
 
       - name: "⚡ Setup mise (Tool Manager)"
-        uses: jdx/mise-action@80026e6d15f79116e033f78a2e0eeb94917088b3 # v2.1.11
+        uses: jdx/mise-action@1648a7812b9aeae629881980618f079932869151 # v4.0.1 # v2.1.11
 
       - name: "🛡️ Run Security Audit"
         shell: sh
