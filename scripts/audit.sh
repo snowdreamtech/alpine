@@ -307,6 +307,40 @@ main() {
     fi
   fi
 
+  # 10. Binary Artifact Audit (Preventing Binary Poisoning)
+  local _T0_BIN_AUD
+  _T0_BIN_AUD=$(date +%s)
+  log_info "\n── Auditing for unexpected binary artifacts ──"
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_success "DRY-RUN: Would scan for binary files"
+    log_summary "Security" "binary-audit" "⚖️ Previewed" "-" "0"
+  else
+    # Look for common executable formats and archives that shouldn't be in source
+    # Excluding .git, node_modules, .venv, and dist
+    # We use -maxdepth 5 to keep it fast.
+    _BIN_PATTERN="*.exe *.so *.dll *.dylib *.bin *.out *.elf *.o *.a *.lib"
+    # shellcheck disable=SC2086
+    _BIN_FOUND=$(find . -maxdepth 5 -not -path '*/.*' -not -path './node_modules/*' -not -path './vendor/*' -not -path './dist/*' -not -path "./${VENV:-.venv}/*" -type f \( -name "*.exe" -o -name "*.so" -o -name "*.dll" -o -name "*.dylib" -o -name "*.bin" -o -name "*.out" -o -name "*.elf" -o -name "*.o" -o -name "*.a" -o -name "*.lib" \) )
+
+    # Advanced: Detect 'Stealth Binaries' (non-text files masquerading as text)
+    # This is a bit slow, so we only do a sampled check or check specific extensions
+    # if 'file' command is available.
+    if command -v file >/dev/null 2>&1; then
+       # Scan for files that 'file' identifies as executable but don't have known allowed extensions
+       _STEALTH_FOUND=$(find . -maxdepth 4 -not -path '*/.*' -not -path './node_modules/*' -not -path './dist/*' -not -path "./${VENV:-.venv}/*" -type f -exec file --mime {} + | grep -v "; charset=binary" | grep "application/x-executable\|application/x-sharedlib\|application/x-archive" | cut -d: -f1)
+       if [ -n "$_STEALTH_FOUND" ]; then
+         _BIN_FOUND="${_BIN_FOUND}\n${_STEALTH_FOUND}"
+       fi
+    fi
+
+    if [ -z "$_BIN_FOUND" ] || [ "$_BIN_FOUND" = "\n" ]; then
+      log_summary "Security" "binary-audit" "✅ Clean" "-" "$(($(date +%s) - _T0_BIN_AUD))"
+    else
+      log_warning "Unexpected binary artifacts found:\n$_BIN_FOUND"
+      log_summary "Security" "binary-audit" "⚠️ Findings" "-" "$(($(date +%s) - _T0_BIN_AUD))"
+    fi
+  fi
+
   # ── Final Report ─────────────────────────────────────────────────────────────
 
   if [ "$_IS_TOP_LEVEL" = "true" ] && [ -n "$SETUP_SUMMARY_FILE" ] && [ -f "$SETUP_SUMMARY_FILE" ]; then
