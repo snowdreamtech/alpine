@@ -20,11 +20,6 @@ name: "🔬 CodeQL Analysis"
     branches:
       - "main"
       - "dev"
-      - "feat/**"
-      - "branch/**"
-      - "feature/**"
-      - "fix/**"
-      - "pr/**"
   pull_request:
     branches:
       - "main"
@@ -34,9 +29,6 @@ name: "🔬 CodeQL Analysis"
       - "feature/**"
       - "fix/**"
       - "pr/**"
-  schedule:
-    # Staggered weekly scan to ensure deep coverage outside peak hours
-    - cron: "0 3 * * 1"
 
 permissions: {}
 
