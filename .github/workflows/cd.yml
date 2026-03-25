@@ -108,6 +108,7 @@ jobs:
           # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
           token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: false
+          fetch-depth: 0
 
       - name: "⚡ Cache Mise Tools"
         uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4 # v5.0.4
@@ -131,7 +132,6 @@ jobs:
         env:
           MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           VENV: ${{ env.VENV }}
-          SKIP_MODULES: security
 
       - name: "📝 Validate Commit Convention (Commitlint)"
         shell: sh
