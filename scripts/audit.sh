@@ -133,6 +133,8 @@ main() {
         if [ "$_ZM_OK" -eq 1 ]; then
           log_summary "GitHub" "zizmor" "✅ Secure" "$(get_version "$_ZIZMOR_BIN")" "$(($(date +%s) - _T0_ZM))"
         else
+          # Check if failure was due to 401/403 (Rate limit or invalid token)
+          # We already try offline mode earlier, so if it still fails, it's a real issue
           log_summary "GitHub" "zizmor" "❌ Vulnerable" "$(get_version "$_ZIZMOR_BIN")" "$(($(date +%s) - _T0_ZM))"
           _OVERALL_EXIT_AUDIT=1
         fi
@@ -333,10 +335,13 @@ main() {
        fi
     fi
 
-    if [ -z "$_BIN_FOUND" ] || [ "$_BIN_FOUND" = "\n" ]; then
+    # Combine results and strip leading/trailing whitespace/newlines
+    _FINAL_BIN_LIST=$(printf "%s\n%s" "$_BIN_FOUND" "$_STEALTH_FOUND" | sed '/^[[:space:]]*$/d')
+
+    if [ -z "$_FINAL_BIN_LIST" ]; then
       log_summary "Security" "binary-audit" "✅ Clean" "-" "$(($(date +%s) - _T0_BIN_AUD))"
     else
-      log_warning "Unexpected binary artifacts found:\n$_BIN_FOUND"
+      log_warning "Unexpected binary artifacts found:\n$_FINAL_BIN_LIST"
       log_summary "Security" "binary-audit" "⚠️ Findings" "-" "$(($(date +%s) - _T0_BIN_AUD))"
     fi
   fi
