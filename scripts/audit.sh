@@ -275,9 +275,29 @@ main() {
     fi
   fi
 
-  # NOTE: Trivy CLI container audit removed. Vulnerability scanning is handled by
-  # aquasecurity/trivy-action in CI workflows (ci.yml), which provides FS scan,
-  # config audit, and SARIF output natively without requiring a separate CLI install.
+  # NOTE: Trivy CLI container audit removed (handled by GHA).
+  # 9. SBOM Generation (CycloneDX)
+  if is_ci_env; then
+    local _T0_SBOM
+    _T0_SBOM=$(date +%s)
+    local _TRIVY_BIN
+    _TRIVY_BIN=$(resolve_bin "trivy") || true
+    if [ -n "$_TRIVY_BIN" ]; then
+      log_info "\n── Generating SBOM (trivy fs) ──"
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
+        log_success "DRY-RUN: Would generate CycloneDX SBOM"
+        log_summary "Security" "sbom" "⚖️ Previewed" "-" "0"
+      else
+        # Generate CycloneDX SBOM for the current filesystem
+        if run_quiet "$_TRIVY_BIN" fs --format cyclonedx --output sbom.json .; then
+          log_summary "Security" "sbom" "✅ Generated" "$(get_version "$_TRIVY_BIN")" "$(($(date +%s) - _T0_SBOM))"
+          log_success "SBOM generated at sbom.json"
+        else
+          log_summary "Security" "sbom" "⚠️ Failed" "$(get_version "$_TRIVY_BIN")" "$(($(date +%s) - _T0_SBOM))"
+        fi
+      fi
+    fi
+  fi
 
   # ── Final Report ─────────────────────────────────────────────────────────────
 
