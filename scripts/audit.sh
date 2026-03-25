@@ -288,10 +288,17 @@ main() {
         log_success "DRY-RUN: Would generate CycloneDX SBOM"
         log_summary "Security" "sbom" "⚖️ Previewed" "-" "0"
       else
-        # Generate CycloneDX SBOM for the current filesystem
         if run_quiet "$_TRIVY_BIN" fs --format cyclonedx --output sbom.json .; then
           log_summary "Security" "sbom" "✅ Generated" "$(get_version "$_TRIVY_BIN")" "$(($(date +%s) - _T0_SBOM))"
           log_success "SBOM generated at sbom.json"
+
+          # 9.1 SBOM Vulnerability Scan
+          log_info "── Auditing SBOM for vulnerabilities ──"
+          if run_quiet "$_TRIVY_BIN" sbom sbom.json; then
+            log_success "SBOM audit passed"
+          else
+            log_warning "SBOM contains known vulnerabilities (Review sbom.json)"
+          fi
         else
           log_summary "Security" "sbom" "⚠️ Failed" "$(get_version "$_TRIVY_BIN")" "$(($(date +%s) - _T0_SBOM))"
         fi

@@ -90,3 +90,12 @@ changelog:
 
 sboms:
   - artifacts: any
+
+signs:
+  - artifacts: checksum
+    args:
+      - "sign-blob"
+      - "--output-certificate=${certificate}"
+      - "--output-signature=${signature}"
+      - "${artifact}"
+      - "--yes" # Enables keyless signing via OIDC token
