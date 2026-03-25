@@ -37,6 +37,8 @@ jobs:
         os: [ubuntu-latest, macos-latest, windows-latest]
     permissions:
       contents: read
+      statuses: write
+      security-events: write
     timeout-minutes: 15
     env:
       PYTHONUTF8: 1
@@ -92,6 +94,11 @@ jobs:
             quay.io:443
             *.quay.io:443
             public.ecr.aws:443
+            osv-vulnerabilities.storage.googleapis.com:443
+            api.osv.dev:443
+            trivy-repo.aquasecurity.github.io:443
+            *.aquasecurity.github.io:443
+            pkg-containers.githubusercontent.com:443
             *.dkr.ecr.*.amazonaws.com:443
             *.azurecr.io:443
 
@@ -130,6 +137,50 @@ jobs:
         shell: sh
         run: |
           MISE_OFFLINE=true make verify
+          # Extra SARIF export for GitHub Security Tab (Offline to prevent API rate limits)
+          if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
+            mise exec -- zizmor . --format sarif --offline > zizmor-results.sarif
+          fi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          PYTHONUTF8: 1
+          TRIVY_CACHE_DIR: .trivycache
+
+      - name: "⚡ Cache Documentation Links (Lychee)"
+        if: matrix.os == 'ubuntu-latest'
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4 # v5.0.4
+        with:
+          path: .lycheecache
+          key: ${{ runner.os }}-lychee-${{ hashFiles('**/*.md') }}
+          restore-keys: |
+            ${{ runner.os }}-lychee-
+
+      - name: "🔗 Verify Documentation Links (Lychee)"
+        uses: lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411 # v2.8.0 # v2.8.0
+        if: ${{ always() && matrix.os == 'ubuntu-latest' }}
+        with:
+          args: --root-dir "${{ github.workspace }}" --verbose --no-progress --cache --exclude-path ".git" --exclude-path "node_modules" --exclude-path ".venv" --exclude-path "venv" --exclude-path "env" --exclude-path "vendor" --exclude-path "dist" --exclude-path "build" --exclude-path "out" --exclude-path "target" --exclude-path ".next" --exclude-path ".nuxt" --exclude-path ".output" --exclude-path "__pycache__" --exclude-path ".specify" '**/*.md'
+          fail: true
+
+      - name: "🕵️ Detect Vulnerabilities (Trivy FS)"
+        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v1.23.0 # v0.35.0
+        if: ${{ always() && matrix.os == 'ubuntu-latest' }}
+        env:
+          TRIVY_DB_REPOSITORY: "public.ecr.aws/aquasecurity/trivy-db"
+          TRIVY_CHECKS_BUNDLE_REPOSITORY: "public.ecr.aws/aquasecurity/trivy-checks"
+        with:
+          scan-type: "fs"
+          ignore-unfixed: true
+          format: "sarif"
+          output: "trivy-results.sarif"
+          severity: "CRITICAL,HIGH,MEDIUM,LOW"
+          exit-code: "1"
+
+      - name: "📤 Upload Security Audit (SARIF)"
+        uses: github/codeql-action/upload-sarif@38697555549f1db7851b81482ff19f1fa5c4fedc # v4.34.1 # v4.34.1
+        if: always() && matrix.os == 'ubuntu-latest'
+        with:
+          sarif_file: "."
 
   # 2. Release Orchestration Stage (Release Please)
   release-please:
