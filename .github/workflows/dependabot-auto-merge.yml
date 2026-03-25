@@ -5,14 +5,15 @@ name: "🚢 Dependabot Auto-Merge"
   pull_request:
     branches: ["dev"]
 
-permissions:
-  contents: write
-  pull-requests: write
+permissions: {}
 
 jobs:
   auto-merge:
     name: "🤖 Approve & Auto-Merge"
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
     concurrency:
       group: auto-merge-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: true

@@ -2,7 +2,7 @@
 # [Recommended] Microsoft's official devcontainer base image, optimized for VS Code.
 # If you need to use a custom or internal enterprise image, replace the FROM line below.
 # hadolint ignore=DL3026
-FROM mcr.microsoft.com/devcontainers/base:ubuntu-22.04
+FROM mcr.microsoft.com/devcontainers/base:ubuntu-22.04@sha256:81380e4c9c14e8a629ff39029639e4b7893e67400246fa7782a0fe7dc193a02a
 
 # Use pipefail for safer shell operations
 SHELL ["/bin/bash", "-o", "pipefail", "-c"]
