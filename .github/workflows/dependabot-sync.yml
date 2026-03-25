@@ -54,6 +54,14 @@ jobs:
       contents: write
     timeout-minutes: 5
     steps:
+      - name: "🔒 Harden Runner (Security Egress Audit)"
+        uses: step-security/harden-runner@v2.16.0
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+
       - name: "📂 Checkout Repository Code"
         uses: actions/checkout@v6.0.2
         with:

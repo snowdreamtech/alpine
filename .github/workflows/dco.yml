@@ -24,6 +24,14 @@ jobs:
     permissions:
       contents: read
     steps:
+      - name: "🔒 Harden Runner (Security Egress Audit)"
+        uses: step-security/harden-runner@v2.16.0
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+
       - name: "🛡️ Check DCO Signature"
         uses: tisonkun/actions-dco@v1.1
         # This action fails if any commit in the PR lacks a 'Signed-off-by' line.

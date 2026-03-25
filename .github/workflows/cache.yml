@@ -40,6 +40,14 @@ jobs:
       contents: read # Required for repository metadata access
     timeout-minutes: 10 # 10m is more than enough for cache list/delete operations
     steps:
+      - name: "🔒 Harden Runner (Security Egress Audit)"
+        uses: step-security/harden-runner@v2.16.0
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+
       - name: "🧹 Prune Inactive GitHub Caches"
         shell: sh # POSIX compliant shell for better portability
         run: |

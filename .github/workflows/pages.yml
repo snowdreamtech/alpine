@@ -53,6 +53,21 @@ jobs:
       PYTHONUTF8: 1
 
     steps:
+      - name: "🔒 Harden Runner (Security Egress Audit)"
+        uses: step-security/harden-runner@v2.16.0
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+            pypi.org:443
+            registry.npmjs.org:443
+            repo.yarnpkg.com:443
+            objects.githubusercontent.com:443
+            raw.githubusercontent.com:443
+            mise.jdx.dev:443
+            *.mise.jdx.dev:443
+
       - name: "📂 Checkout Repository Code"
         uses: actions/checkout@v6.0.2
         # Fetches source documentation and site assets for the build process.
@@ -107,6 +122,14 @@ jobs:
       cancel-in-progress: false
     timeout-minutes: 10
     steps:
+      - name: "🔒 Harden Runner (Security Egress Audit)"
+        uses: step-security/harden-runner@v2.16.0
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+
       - name: "🚀 Deploy to GitHub Pages"
         id: deployment
         uses: actions/deploy-pages@v4.0.5

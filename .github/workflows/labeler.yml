@@ -38,6 +38,14 @@ jobs:
       contents: read # Required to analyze changed files via the GitHub API
     timeout-minutes: 5 # Path-based labeling is extremely fast
     steps:
+      - name: "🔒 Harden Runner (Security Egress Audit)"
+        uses: step-security/harden-runner@v2.16.0
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+
       - name: "🔍 Triage Pull Request (Labeler)"
         uses: actions/labeler@v6.0.1
         with:
