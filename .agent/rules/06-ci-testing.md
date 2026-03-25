@@ -177,16 +177,21 @@ All CI workflows **MUST** invoke logic through `Makefile` targets rather than di
 
 ### 6.4 Matrix vs. Primary Runner Philosophy
 
-To balance **verification depth** with **resource efficiency (CI Credits)**, CI/CD jobs are categorized into two tiers:
+To optimize CI/CD performance and credit usage while maintaining high assurance:
 
-- **Tier 1: Cross-Platform Matrix (All OSs)**:
-  - **Applied to**: `test` (Unit/Integration), `lint` (Formatting/Style).
-  - **Rationale**: Code behavior, file systems (CRLF vs LF), and path handling vary significantly across Windows, macOS, and Linux.
-- **Tier 2: Primary Runner Only (Ubuntu-latest)**:
-  - **Applied to**: `audit` (Security/Vuln scans), `Commitlint` (Git history), `Lychee` (Link check), `Zizmor` (Workflow audit), and **SARIF Reporting**.
-  - **Rationale**: These are **"Environment-Abstract"** tasks. Logic/Security flaws are identical across all OSs for the same code.
-  - **Efficiency**: Linux runners are significantly cheaper and provide native Docker support for security actions.
-  - **Data Integrity**: Restricting SARIF uploads to a single runner prevents duplicate findings and noise in the GitHub Security Tab.
+- **Tier 1 (Matrix - All OSs)**: Functional verification (`test`, `lint`) MUST run on a matrix (Windows, Mac, Linux) to ensure cross-platform compatibility.
+- **Tier 2 (Primary - Ubuntu Only)**: Logical, secure, and metadata-heavy tasks (`audit`, `Commitlint`, `Zizmor`, `SARIF Upload`) MUST run ONLY on the primary `ubuntu-latest` runner. This prevents duplicate SARIF findings and conserves resources where platform-specific behavior is irrelevant.
+
+### 6.5 Token Management & Automation Security
+
+To ensure seamless automation flow (Chain-Triggering) and resilience against GitHub API rate limits:
+
+- **Token Fallback Pattern**: All critical automation steps (Release, Sync, History-heavy setup) MUST use the pattern: `token: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}`.
+- **Why WORKFLOW_SECRET?**:
+    - **Triggering**: Actions triggered by `GITHUB_TOKEN` do NOT trigger other workflows. To enable chain-triggering (e.g., `release-please` triggering `goreleaser`), an elevated Personal Access Token (stored as `WORKFLOW_SECRET`) MUST be used.
+    - **Bypassing Protection**: Allows automated pushes to bypass branch protection where necessary.
+    - **Rate Limits**: Authenticated requests via PAT provide significantly higher API rate limits than the default token.
+- **Minimal Privilege**: For Read-only/Unit-test jobs that do not need to trigger follow-on workflows, always use the default `GITHUB_TOKEN` to adhere to the principle of least privilege.
 
 ## 7. CI Security & Supply Chain
 
