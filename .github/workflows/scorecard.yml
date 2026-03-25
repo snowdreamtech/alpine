@@ -1,0 +1,72 @@
+---
+# 🛡️ OpenSSF Scorecard Monitoring
+# Purpose: Holistically evaluates the repository for security best practices.
+# Trigger: Weekly schedule and push to main.
+# Output: Results visible in the GitHub "Security" tab and as a public scorecard.
+
+name: "🛡️ Scorecard Security Audit"
+
+"on":
+  # For Branch-Protection check. Only the default branch is supported. See
+  # https://github.com/ossf/scorecard-action#removal-of-branch-protection-check
+  # on how to set up this check.
+  branch_protection_rule:
+  # Schedule every Monday at 00:00 UTC
+  schedule:
+    - cron: "0 0 * * 1"
+  push:
+    branches: ["main"]
+
+# Declare default permissions as read only.
+permissions: read-all
+
+jobs:
+  analysis:
+    name: "🔍 Scorecard Analysis"
+    runs-on: ubuntu-latest
+    permissions:
+      # Needed to upload the results to code-scanning dashboard.
+      security-events: write
+      # Needed to publish results and get a badge (see publish_results below).
+      id-token: write
+      # Required for checking repository contents.
+      contents: read
+      # Required for checking branch protection rules.
+      actions: read
+
+    steps:
+      - name: "🔒 Harden Runner (Security Egress Audit)"
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bdad212e5be703cd14 # v2.16.0
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.deps.dev:443
+            api.github.com:443
+            api.osv.dev:443
+            api.securityscorecards.dev:443
+            fulcio.sigstore.dev:443
+            github.com:443
+            oss-fuzz-build-logs.storage.googleapis.com:443
+            rekor.sigstore.dev:443
+            tuf-repo-cdn.sigstore.dev:443
+            www.bestpractices.dev:443
+
+      - name: "📂 Checkout Repository"
+        uses: actions/checkout@1d96c3a830132f11fdf16401030e64f2b380ed33 # v6.0.2
+        with:
+          persist-credentials: false
+
+      - name: "🔍 Run Scorecard Action"
+        uses: ossf/scorecard-action@f49ccf57c5a90a221f185d2cc786725287baae52 # v2.4.1
+        with:
+          results_file: results.sarif
+          results_format: sarif
+          # (Optional) "repo_token" is only needed for checking Branch-Protection of private repos.
+          # For public repos, this can be omitted or passed via secrets.GITHUB_TOKEN.
+          publish_results: true
+
+      # Upload the results to GitHub's code scanning dashboard.
+      - name: "📤 Upload SARIF Results"
+        uses: github/codeql-action/upload-sarif@b56ba49b26e50535fa1e7f7db0f4f7b4bf65d80d # v3.28.10
+        with:
+          sarif_file: results.sarif
