@@ -20,6 +20,7 @@
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Multi-stack scanning (Node.js, pip, go, cargo, osv).
 #   - Gitleaks integration for secrets detection.
+#   - Binary artifact discovery to prevent poisoning.
 
 # Note: We do NOT set -e here because we want to run all audit modules even if some fail.
 # We will track overall exit status manually.
