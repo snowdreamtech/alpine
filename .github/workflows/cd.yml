@@ -133,10 +133,12 @@ jobs:
           VENV: ${{ env.VENV }}
           SKIP_MODULES: security
 
-      - name: "🧪 Full Project Verification"
+      - name: "🧪 Execute Full Quality & Safety Verification"
         shell: sh
         run: |
-          MISE_OFFLINE=true make verify
+          MISE_OFFLINE=true make lint
+          MISE_OFFLINE=true make test
+          MISE_OFFLINE=true make audit
           # Extra SARIF export for GitHub Security Tab (Offline to prevent API rate limits)
           if [ "${{ matrix.os }}" = "ubuntu-latest" ]; then
             mise exec -- zizmor . --format sarif --offline > zizmor-results.sarif
