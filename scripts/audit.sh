@@ -118,16 +118,16 @@ main() {
         # (403 Forbidden) in CI when querying non-existent branches for multiple Action tags.
         # To guarantee CI stability, we force offline mode in CI environments or when no token is present.
         local _ZM_OK=0
-          log_info "Zizmor: Attempting authenticated scan..."
-          export GH_TOKEN="$GITHUB_TOKEN"
-          if run_quiet "$_ZIZMOR_BIN" . --format plain --gh-token "$GITHUB_TOKEN"; then
+        log_info "Zizmor: Attempting authenticated scan..."
+        export GH_TOKEN="$GITHUB_TOKEN"
+        if run_quiet "$_ZIZMOR_BIN" . --format plain --gh-token "$GITHUB_TOKEN"; then
+          _ZM_OK=1
+        else
+          log_warn "Zizmor: Authenticated scan failed (likely 401/403). Falling back to offline mode..."
+          if run_quiet "$_ZIZMOR_BIN" . --format plain --offline; then
             _ZM_OK=1
-          else
-            log_warn "Zizmor: Authenticated scan failed (likely 401/403). Falling back to offline mode..."
-            if run_quiet "$_ZIZMOR_BIN" . --format plain --offline; then
-              _ZM_OK=1
-            fi
           fi
+        fi
         if [ "$_ZM_OK" -eq 1 ]; then
           log_summary "GitHub" "zizmor" "✅ Secure" "$(get_version "$_ZIZMOR_BIN")" "$(($(date +%s) - _T0_ZM))"
         else
@@ -284,13 +284,25 @@ main() {
     local _TRIVY_BIN
     _TRIVY_BIN=$(resolve_bin "trivy") || true
     if [ -n "$_TRIVY_BIN" ]; then
+      local _T_VER
+      _T_VER=$(get_version "$_TRIVY_BIN")
+      local _R_VER
+      _R_VER=$(get_mise_tool_version "trivy")
+
       log_info "\n── Generating SBOM (trivy fs) ──"
+      log_info "Trivy: Using version $_T_VER (Required: $_R_VER)"
+
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_success "DRY-RUN: Would generate CycloneDX SBOM"
         log_summary "Security" "sbom" "⚖️ Previewed" "-" "0"
+      elif [ "$_T_VER" != "$_R_VER" ] && [ "$_R_VER" != "latest" ]; then
+        log_error "SECURITY ERROR: Trivy version mismatch! Found: $_T_VER, Expected: $_R_VER"
+        log_error "This may indicate a compromised binary (Ref: March 2026 Incident)."
+        log_summary "Security" "sbom" "⛔ Version Mismatch" "$_T_VER" "0"
+        _OVERALL_EXIT_AUDIT=1
       else
         if run_quiet "$_TRIVY_BIN" fs --format cyclonedx --output sbom.json .; then
-          log_summary "Security" "sbom" "✅ Generated" "$(get_version "$_TRIVY_BIN")" "$(($(date +%s) - _T0_SBOM))"
+          log_summary "Security" "sbom" "✅ Generated" "$_T_VER" "$(($(date +%s) - _T0_SBOM))"
           log_success "SBOM generated at sbom.json"
 
           # 9.1 SBOM Vulnerability Scan
@@ -301,7 +313,7 @@ main() {
             log_warning "SBOM contains known vulnerabilities (Review sbom.json)"
           fi
         else
-          log_summary "Security" "sbom" "⚠️ Failed" "$(get_version "$_TRIVY_BIN")" "$(($(date +%s) - _T0_SBOM))"
+          log_summary "Security" "sbom" "⚠️ Failed" "$_T_VER" "$(($(date +%s) - _T0_SBOM))"
         fi
       fi
     fi
@@ -320,17 +332,17 @@ main() {
     # We use -maxdepth 5 to keep it fast.
     _BIN_PATTERN="*.exe *.so *.dll *.dylib *.bin *.out *.elf *.o *.a *.lib"
     # shellcheck disable=SC2086
-    _BIN_FOUND=$(find . -maxdepth 5 -not -path '*/.*' -not -path './node_modules/*' -not -path './vendor/*' -not -path './dist/*' -not -path "./${VENV:-.venv}/*" -type f \( -name "*.exe" -o -name "*.so" -o -name "*.dll" -o -name "*.dylib" -o -name "*.bin" -o -name "*.out" -o -name "*.elf" -o -name "*.o" -o -name "*.a" -o -name "*.lib" \) )
+    _BIN_FOUND=$(find . -maxdepth 5 -not -path '*/.*' -not -path './node_modules/*' -not -path './vendor/*' -not -path './dist/*' -not -path "./${VENV:-.venv}/*" -type f \( -name "*.exe" -o -name "*.so" -o -name "*.dll" -o -name "*.dylib" -o -name "*.bin" -o -name "*.out" -o -name "*.elf" -o -name "*.o" -o -name "*.a" -o -name "*.lib" \))
 
     # Advanced: Detect 'Stealth Binaries' (non-text files masquerading as text)
     # This is a bit slow, so we only do a sampled check or check specific extensions
     # if 'file' command is available.
     if command -v file >/dev/null 2>&1; then
-       # Scan for files that 'file' identifies as executable but don't have known allowed extensions
-       _STEALTH_FOUND=$(find . -maxdepth 4 -not -path '*/.*' -not -path './node_modules/*' -not -path './dist/*' -not -path "./${VENV:-.venv}/*" -type f -exec file --mime {} + | grep -v "; charset=binary" | grep "application/x-executable\|application/x-sharedlib\|application/x-archive" | cut -d: -f1)
-       if [ -n "$_STEALTH_FOUND" ]; then
-         _BIN_FOUND="${_BIN_FOUND}\n${_STEALTH_FOUND}"
-       fi
+      # Scan for files that 'file' identifies as executable but don't have known allowed extensions
+      _STEALTH_FOUND=$(find . -maxdepth 4 -not -path '*/.*' -not -path './node_modules/*' -not -path './dist/*' -not -path "./${VENV:-.venv}/*" -type f -exec file --mime {} + | grep -v "; charset=binary" | grep "application/x-executable\|application/x-sharedlib\|application/x-archive" | cut -d: -f1)
+      if [ -n "$_STEALTH_FOUND" ]; then
+        _BIN_FOUND="${_BIN_FOUND}\n${_STEALTH_FOUND}"
+      fi
     fi
 
     # Combine results and strip leading/trailing whitespace/newlines
