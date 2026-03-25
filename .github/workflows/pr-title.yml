@@ -23,10 +23,6 @@ name: "✅ PR Title Check"
 permissions: {}
 
 env:
-  # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   MISE_LOCKED: 1
 
 jobs:
@@ -81,12 +77,10 @@ jobs:
             registry.terraform.io:443
             formulae.brew.sh:443
 
-
-
-
-
       - name: "🔍 Validate PR Title Integrity"
         uses: amannn/action-semantic-pull-request@48f256284bd46cdaab1048c3721360e808335d50 # v6.1.1 # v6.1.1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           # Ensures PR titles follow Conventional Commits to maintain repository history purity.
           requireScope: false

@@ -12,10 +12,6 @@ name: "✍️ DCO"
 permissions: {}
 
 env:
-  # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   MISE_LOCKED: 1
 
 jobs:
@@ -64,10 +60,6 @@ jobs:
             rubygems.org:443
             registry.terraform.io:443
             formulae.brew.sh:443
-
-
-
-
 
       - name: "🛡️ Check DCO Signature"
         uses: tisonkun/actions-dco@6d1f8a197db1b04df1769707b46b9366b1eca902 # v1.1 # v1.1

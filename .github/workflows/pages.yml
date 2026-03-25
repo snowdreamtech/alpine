@@ -33,10 +33,6 @@ name: "📄 Deploy Docs to GitHub Pages"
 permissions: {}
 
 env:
-  # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
-  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   MISE_LOCKED: 1
 
 jobs:
@@ -96,10 +92,6 @@ jobs:
             repo.yarnpkg.com:443
             mise.jdx.dev:443
 
-
-
-
-
       - name: "📂 Checkout Repository Code"
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2 # v4.2.2
         # Fetches source documentation and site assets for the build process.
@@ -123,6 +115,8 @@ jobs:
 
       - name: "🚀 Initialize Development Environment"
         shell: sh # POSIX compliant
+        env:
+          MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           make setup
           make install
@@ -193,10 +187,6 @@ jobs:
             rubygems.org:443
             registry.terraform.io:443
             formulae.brew.sh:443
-
-
-
-
 
       - name: "🚀 Deploy to GitHub Pages"
         id: deployment
