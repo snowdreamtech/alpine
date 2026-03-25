@@ -57,12 +57,23 @@ jobs:
             packages.microsoft.com:443
             *.ubuntu.com:80
             *.ubuntu.com:443
+            *.redhat.com:443
+            *.centos.org:443
+            *.rockylinux.org:443
+            *.debian.org:443
+            *.debian.org:80
+            security.debian.org:443
+            security.debian.org:80
+            deb.debian.org:443
+            deb.debian.org:80
+            dl-cdn.alpinelinux.org:443
             registry.yarnpkg.com:443
             index.crates.io:443
             static.rust-lang.org:443
             files.pythonhosted.org:443
             proxy.golang.org:443
             sum.golang.org:443
+
 
 
       - name: "📂 Checkout Repository Code"
@@ -109,6 +120,16 @@ jobs:
             packages.microsoft.com:443
             *.ubuntu.com:80
             *.ubuntu.com:443
+            *.redhat.com:443
+            *.centos.org:443
+            *.rockylinux.org:443
+            *.debian.org:443
+            *.debian.org:80
+            security.debian.org:443
+            security.debian.org:80
+            deb.debian.org:443
+            deb.debian.org:80
+            dl-cdn.alpinelinux.org:443
             registry.yarnpkg.com:443
             index.crates.io:443
             static.rust-lang.org:443
@@ -132,6 +153,7 @@ jobs:
             public.ecr.aws:443
             *.dkr.ecr.*.amazonaws.com:443
             *.azurecr.io:443
+
 
 
       - name: "📂 Checkout Repository Code"
@@ -207,6 +229,16 @@ jobs:
             packages.microsoft.com:443
             *.ubuntu.com:80
             *.ubuntu.com:443
+            *.redhat.com:443
+            *.centos.org:443
+            *.rockylinux.org:443
+            *.debian.org:443
+            *.debian.org:80
+            security.debian.org:443
+            security.debian.org:80
+            deb.debian.org:443
+            deb.debian.org:80
+            dl-cdn.alpinelinux.org:443
             registry.yarnpkg.com:443
             index.crates.io:443
             static.rust-lang.org:443
@@ -229,6 +261,7 @@ jobs:
             public.ecr.aws:443
             *.dkr.ecr.*.amazonaws.com:443
             *.azurecr.io:443
+
 
 
       - name: "📂 Checkout Repository Code"
@@ -330,6 +363,16 @@ jobs:
             packages.microsoft.com:443
             *.ubuntu.com:80
             *.ubuntu.com:443
+            *.redhat.com:443
+            *.centos.org:443
+            *.rockylinux.org:443
+            *.debian.org:443
+            *.debian.org:80
+            security.debian.org:443
+            security.debian.org:80
+            deb.debian.org:443
+            deb.debian.org:80
+            dl-cdn.alpinelinux.org:443
             registry.yarnpkg.com:443
             index.crates.io:443
             static.rust-lang.org:443
@@ -355,6 +398,7 @@ jobs:
             *.quay.io:443
             *.dkr.ecr.*.amazonaws.com:443
             *.azurecr.io:443
+
 
 
       - name: "📂 Checkout Repository Code"
