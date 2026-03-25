@@ -41,7 +41,7 @@ jobs:
     timeout-minutes: 10 # Maintenance tasks are usually fast API operations
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
-        uses: step-security/harden-runner@v2.16.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bdad212e5be703cd14 # v2.16.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -49,7 +49,7 @@ jobs:
             github.com:443
 
       - name: "🧹 Mark Inactive Issues & PRs (Stale)"
-        uses: actions/stale@v10.2.0
+        uses: actions/stale@b5d41d4410a019d14690740a6b5712170b02e078 # v10.2.0
         with:
           # Automatically identifies and labels stagnant items to maintain repository focus.
           repo-token: ${{ secrets.GITHUB_TOKEN }}

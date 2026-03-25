@@ -54,7 +54,7 @@ jobs:
 
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
-        uses: step-security/harden-runner@v2.16.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bdad212e5be703cd14 # v2.16.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -69,7 +69,7 @@ jobs:
             *.mise.jdx.dev:443
 
       - name: "📂 Checkout Repository Code"
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@1d96c3a830132f11fdf16401030e64f2b380ed33 # v6.0.2
         # Fetches source documentation and site assets for the build process.
         with:
           # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
@@ -78,7 +78,7 @@ jobs:
           persist-credentials: false
 
       - name: "⚡ Cache Mise Tools"
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@0c45773b623bec8c04719ee12026d36e2f694609 # v5.0.4
         with:
           path: |
             ~/.local/bin
@@ -102,7 +102,7 @@ jobs:
           make docs ARGS="build"
 
       - name: "📦 Stage Assets for Web Deployment"
-        uses: actions/upload-pages-artifact@v4.0.0
+        uses: actions/upload-pages-artifact@e8f4f6b8109d9418ac934094a9a08e1329c41793 # v4.0.0
         with:
           # Bundles the compiled static site into a secure artifact for GitHub Pages.
           path: docs/.vitepress/dist
@@ -123,7 +123,7 @@ jobs:
     timeout-minutes: 10
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
-        uses: step-security/harden-runner@v2.16.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bdad212e5be703cd14 # v2.16.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -132,5 +132,5 @@ jobs:
 
       - name: "🚀 Deploy to GitHub Pages"
         id: deployment
-        uses: actions/deploy-pages@v4.0.5
+        uses: actions/deploy-pages@d6db901d84813589b9101c59080c655dd094f9b8 # v4.0.5
         # Finalizes the deployment, making the new documentation live.

@@ -17,7 +17,7 @@ jobs:
     if: github.event.pull_request.user.login == 'dependabot[bot]'
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
-        uses: step-security/harden-runner@v2.16.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bdad212e5be703cd14 # v2.16.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -25,13 +25,13 @@ jobs:
             github.com:443
 
       - name: "📂 Checkout Code"
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@1d96c3a830132f11fdf16401030e64f2b380ed33 # v6.0.2
         with:
           persist-credentials: false
 
       - name: "📊 Fetch Dependabot Metadata"
         id: metadata
-        uses: dependabot/fetch-metadata@v2.3.0
+        uses: dependabot/fetch-metadata@d7267f6f1969a531d2797e84180d04c10ac25528 # v2.3.0
         with:
           github-token: "${{ secrets.GITHUB_TOKEN }}"
 

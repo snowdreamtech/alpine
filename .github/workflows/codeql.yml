@@ -76,7 +76,7 @@ jobs:
 
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
-        uses: step-security/harden-runner@v2.16.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bdad212e5be703cd14 # v2.16.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -88,7 +88,7 @@ jobs:
             pipelines.actions.githubusercontent.com:443
 
       - name: "📂 Checkout Repository Code"
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@1d96c3a830132f11fdf16401030e64f2b380ed33 # v6.0.2
         with:
           # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -96,18 +96,18 @@ jobs:
           persist-credentials: false
 
       - name: "🛡️ Initialize CodeQL Engine"
-        uses: github/codeql-action/init@v4.34.1
+        uses: github/codeql-action/init@8dc2e5d16f86018336210f52d0b5033ca82cf19c # v4.34.1
         with:
           # Sets up the CodeQL database for the specified technical stack (e.g., Python, Go).
           languages: ${{ matrix.language }}
           config-file: .github/codeql/codeql-config.yml
 
       - name: "🚀 Bootstrap Target Build"
-        uses: github/codeql-action/autobuild@v4.34.1
+        uses: github/codeql-action/autobuild@8dc2e5d16f86018336210f52d0b5033ca82cf19c # v4.34.1
         # Attempts to automatically compile the project to enable full-trace analysis.
 
       - name: "🔍 Perform Deep Security Analysis"
-        uses: github/codeql-action/analyze@v4.34.1
+        uses: github/codeql-action/analyze@8dc2e5d16f86018336210f52d0b5033ca82cf19c # v4.34.1
         with:
           # Executes the semantic queries and generates the final vulnerability report.
           category: "/language:${{ matrix.language }}"

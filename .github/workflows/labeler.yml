@@ -39,7 +39,7 @@ jobs:
     timeout-minutes: 5 # Path-based labeling is extremely fast
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
-        uses: step-security/harden-runner@v2.16.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bdad212e5be703cd14 # v2.16.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -47,7 +47,7 @@ jobs:
             github.com:443
 
       - name: "🔍 Triage Pull Request (Labeler)"
-        uses: actions/labeler@v6.0.1
+        uses: actions/labeler@634933e08f219156f7127e7040490b830d67683d # v6.0.1
         with:
           # Automatically applies labels based on file path changes to improve maintenance visibility.
           repo-token: ${{ secrets.GITHUB_TOKEN }}

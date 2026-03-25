@@ -41,7 +41,7 @@ jobs:
     timeout-minutes: 5 # Title linting is near-instant
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
-        uses: step-security/harden-runner@v2.16.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bdad212e5be703cd14 # v2.16.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -49,7 +49,7 @@ jobs:
             github.com:443
 
       - name: "🔍 Validate PR Title Integrity"
-        uses: amannn/action-semantic-pull-request@v6.1.1
+        uses: amannn/action-semantic-pull-request@59942a632731818d6cf08dd4429f5f643e1d145c # v6.1.1
         with:
           # Ensures PR titles follow Conventional Commits to maintain repository history purity.
           requireScope: false
