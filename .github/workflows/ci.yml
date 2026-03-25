@@ -33,6 +33,28 @@ env:
   MISE_LOCKED: 1
 
 jobs:
+  # 0. Security Guard Stage (PR Only)
+  dependency-review:
+    name: "🛡️ Dependency Review"
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: "🔒 Harden Runner (Security Egress Audit)"
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bdad212e5be703cd14 # v2.16.0
+        with:
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+
+      - name: "📂 Checkout Repository Code"
+        uses: actions/checkout@1d96c3a830132f11fdf16401030e64f2b380ed33 # v6.0.2
+
+      - name: "🔍 Dependency Review"
+        uses: actions/dependency-review-action@3b1597519630bcc44ee6f06fd368297d09613ed8 # v4.5.0
+
   # 1. Code Quality Stage (Lint)
   lint:
     name: "🛡️ Quality Assurance Gate (${{ matrix.os }})"
