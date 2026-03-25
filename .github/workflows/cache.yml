@@ -47,10 +47,23 @@ jobs:
           egress-policy: block
           allowed-endpoints: >
             api.github.com:443
+            github.com:443
+            objects.githubusercontent.com:443
+            raw.githubusercontent.com:443
+            release-assets.githubusercontent.com:443
             mise.run:443
             install.mise.jdx.dev:443
             *.mise.jdx.dev:443
-            github.com:443
+            packages.microsoft.com:443
+            *.ubuntu.com:80
+            *.ubuntu.com:443
+            registry.yarnpkg.com:443
+            index.crates.io:443
+            static.rust-lang.org:443
+            files.pythonhosted.org:443
+            proxy.golang.org:443
+            sum.golang.org:443
+
 
       - name: "🧹 Prune Inactive GitHub Caches"
         shell: sh # POSIX compliant shell for better portability
