@@ -53,7 +53,7 @@ jobs:
           persist-credentials: false
 
       - name: "⚡ Setup mise (Tool Manager)"
-        uses: jdx/mise-action@v2.1.11
+        uses: jdx/mise-action@80026e6d15f79116e033f78a2e0eeb94917088b3 # v2.1.11
 
       - name: "🛡️ Run Security Audit"
         shell: sh
