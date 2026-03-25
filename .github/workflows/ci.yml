@@ -138,7 +138,7 @@ jobs:
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
         if: matrix.os == 'ubuntu-latest'
-        uses: step-security/harden-runner@v2.16.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bdad212e5be703cd14 # v2.16.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -186,7 +186,7 @@ jobs:
             ${{ runner.os }}-mise-
 
       - name: "📦 Cache Language Dependencies (Advanced)"
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@0c45773b623bec8c04719ee12026d36e2f694609 # v5.0.4
         with:
           path: |
             ~/go/pkg/mod
@@ -250,7 +250,7 @@ jobs:
       PYTHONUTF8: 1
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
-        uses: step-security/harden-runner@v2.16.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bdad212e5be703cd14 # v2.16.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -346,7 +346,7 @@ jobs:
           TRIVY_CACHE_DIR: .trivycache
 
       - name: "⚡ Cache Documentation Links (Lychee)"
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@0c45773b623bec8c04719ee12026d36e2f694609 # v5.0.4
         with:
           path: .lycheecache
           key: ${{ runner.os }}-lychee-${{ hashFiles('**/*.md') }}
