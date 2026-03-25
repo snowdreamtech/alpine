@@ -73,4 +73,4 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          sh scripts/sync-labels.sh
+          make sync-labels

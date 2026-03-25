@@ -114,13 +114,14 @@ jobs:
             uploads.github.com:443
             pipelines.actions.githubusercontent.com:443
 
-      - name: "📂 Checkout Repository Code"
+      - name: "📂 Checkout Repository"
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2 # v4.2.2
         with:
+          fetch-depth: 0
+          persist-credentials: false
           # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
           token: ${{ secrets.GITHUB_TOKEN }}
           # Required to provide the full source tree for deep semantic analysis.
-          persist-credentials: false
 
       - name: "🛡️ Initialize CodeQL Engine"
         uses: github/codeql-action/init@38697555549f1db7851b81482ff19f1fa5c4fedc # v4.34.1 # v4.34.1

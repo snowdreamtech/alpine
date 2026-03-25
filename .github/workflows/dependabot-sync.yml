@@ -106,7 +106,7 @@ jobs:
       - name: "🤖 Generate Dependabot Config"
         shell: sh
         run: |
-          sh scripts/gen-dependabot.sh
+          make gen-dependabot
           if [ -f "dependabot_summary.md" ]; then
             cat dependabot_summary.md >> "$GITHUB_STEP_SUMMARY"
           fi
