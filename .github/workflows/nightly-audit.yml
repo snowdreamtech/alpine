@@ -87,7 +87,7 @@ jobs:
       - name: "🛡️ Run Security Audit"
         shell: sh
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
         run: |
           # We run make audit which includes gitleaks, osv-scanner, etc.
           make audit
@@ -96,7 +96,7 @@ jobs:
         if: failure()
         shell: sh
         env:
-          GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
         run: |
           _TITLE="🚨 Nightly Security Audit Failed: Vulnerabilities Detected"
           _BODY="The scheduled nightly security audit detected vulnerabilities or secrets in the codebase.
