@@ -118,15 +118,15 @@ main() {
         # (403 Forbidden) in CI when querying non-existent branches for multiple Action tags.
         # To guarantee CI stability, we force offline mode in CI environments or when no token is present.
         local _ZM_OK=0
-        if is_ci_env || [ -z "${GITHUB_TOKEN:-}" ]; then
-          log_info "Zizmor: Running in offline mode to prevent API 403 rate limits."
-          if run_quiet "$_ZIZMOR_BIN" . --format plain --offline; then
-            _ZM_OK=1
-          fi
-        else
+          log_info "Zizmor: Attempting authenticated scan..."
           export GH_TOKEN="$GITHUB_TOKEN"
           if run_quiet "$_ZIZMOR_BIN" . --format plain --gh-token "$GITHUB_TOKEN"; then
             _ZM_OK=1
+          else
+            log_warn "Zizmor: Authenticated scan failed (likely 401/403). Falling back to offline mode..."
+            if run_quiet "$_ZIZMOR_BIN" . --format plain --offline; then
+              _ZM_OK=1
+            fi
           fi
         fi
 
@@ -336,12 +336,13 @@ main() {
     fi
 
     # Combine results and strip leading/trailing whitespace/newlines
-    _FINAL_BIN_LIST=$(printf "%s\n%s" "$_BIN_FOUND" "$_STEALTH_FOUND" | sed '/^[[:space:]]*$/d')
+    _FINAL_BIN_LIST=$(printf "%s\n%s" "$_BIN_FOUND" "$_STEALTH_FOUND" | tr -d '\r' | sed '/^[[:space:]]*$/d')
 
     if [ -z "$_FINAL_BIN_LIST" ]; then
       log_summary "Security" "binary-audit" "✅ Clean" "-" "$(($(date +%s) - _T0_BIN_AUD))"
     else
-      log_warning "Unexpected binary artifacts found:\n$_FINAL_BIN_LIST"
+      log_warning "Unexpected binary artifacts found:"
+      echo "$_FINAL_BIN_LIST"
       log_summary "Security" "binary-audit" "⚠️ Findings" "-" "$(($(date +%s) - _T0_BIN_AUD))"
     fi
   fi
