@@ -53,7 +53,7 @@ jobs:
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
         if: matrix.os == 'ubuntu-latest'
-        uses: step-security/harden-runner@v2.16.0
+        uses: step-security/harden-runner@17d0e2bd7d51742c71671bdad212e5be703cd14 # v2.16.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -81,14 +81,14 @@ jobs:
             *.azurecr.io:443
 
       - name: "📂 Checkout Repository Code"
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@1d96c3a830132f11fdf16401030e64f2b380ed33 # v6.0.2
         with:
           # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
           token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: false
 
       - name: "⚡ Cache Mise Tools"
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@0c45773b623bec8c04719ee12026d36e2f694609 # v5.0.4
         with:
           path: |
             ~/.local/bin
@@ -167,14 +167,14 @@ jobs:
             *.azurecr.io:443
 
       - name: "📂 Checkout Repository Code"
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@1d96c3a830132f11fdf16401030e64f2b380ed33 # v6.0.2
         with:
           # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
           token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: false
 
       - name: "⚡ Cache Mise Tools"
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@0c45773b623bec8c04719ee12026d36e2f694609 # v5.0.4
         with:
           path: |
             ~/.local/bin
@@ -281,7 +281,7 @@ jobs:
             *.azurecr.io:443
 
       - name: "📂 Checkout Repository Code"
-        uses: actions/checkout@v6.0.2
+        uses: actions/checkout@1d96c3a830132f11fdf16401030e64f2b380ed33 # v6.0.2
         with:
           # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
           token: ${{ secrets.GITHUB_TOKEN }}
@@ -289,7 +289,7 @@ jobs:
           fetch-depth: 0
 
       - name: "⚡ Cache Mise Tools"
-        uses: actions/cache@v5.0.4
+        uses: actions/cache@0c45773b623bec8c04719ee12026d36e2f694609 # v5.0.4
         with:
           path: |
             ~/.local/share/mise
@@ -354,14 +354,14 @@ jobs:
             ${{ runner.os }}-lychee-
 
       - name: "🔗 Verify Documentation Links (Lychee)"
-        uses: lycheeverse/lychee-action@v2.8.0
+        uses: lycheeverse/lychee-action@646f281e7d806553258c49e25d2153545dfc79bd # v2.8.0
         if: ${{ always() }}
         with:
           args: --root-dir "${{ github.workspace }}" --verbose --no-progress --cache --exclude-path ".git" --exclude-path "node_modules" --exclude-path ".venv" --exclude-path "venv" --exclude-path "env" --exclude-path "vendor" --exclude-path "dist" --exclude-path "build" --exclude-path "out" --exclude-path "target" --exclude-path ".next" --exclude-path ".nuxt" --exclude-path ".output" --exclude-path "__pycache__" --exclude-path ".specify" '**/*.md'
           fail: true
 
       - name: "🕵️ Detect Vulnerabilities (Trivy FS)"
-        uses: aquasecurity/trivy-action@v0.35.0
+        uses: aquasecurity/trivy-action@18f2514ee9060368538b962c03036e73273e5fbf # v0.35.0
         if: ${{ always() }}
         env:
           TRIVY_DB_REPOSITORY: "public.ecr.aws/aquasecurity/trivy-db"
@@ -375,7 +375,7 @@ jobs:
           exit-code: "1"
 
       - name: "📤 Upload Security Audit (SARIF)"
-        uses: github/codeql-action/upload-sarif@v4.34.1
+        uses: github/codeql-action/upload-sarif@3e070868f0802c114e9f7832822a9693ed3ef5b9 # v4.34.1
         if: always()
         with:
           sarif_file: "."
