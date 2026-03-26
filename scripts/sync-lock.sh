@@ -8,37 +8,44 @@
 #   Synchronizes mise.lock with the comprehensive manifest (Tier 1 + Tier 2).
 #   Ensures all tools are cryptographically locked for all supported platforms.
 
-set -eu
-
-# 1. Housekeeping
+# ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
-PROJECT_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
-cd "$PROJECT_ROOT"
+. "$SCRIPT_DIR/lib/common.sh"
 
-# Ensure mise is available
-if ! command -v mise >/dev/null 2>&1; then
-  echo "Error: mise not found in PATH."
-  exit 1
-fi
+# ── Functions ────────────────────────────────────────────────────────────────
 
-echo "Synchronizing mise.lock for all platforms..."
+# Purpose: Synchronizes mise.lock for all supported platforms.
+# Params:
+#   $@ - Optional additional tools to lock
+# Examples:
+#   run_sync_lock
+run_sync_lock() {
+  log_info "Synchronizing mise.lock for all platforms..."
 
-# 2. Manifest Aggregation
-# We use a temporary file to avoid corrupting .mise.toml if the process is interrupted.
-TMP_MANIFEST=".mise.toml.lock.temp"
-./scripts/gen-full-manifest.sh >"$TMP_MANIFEST"
+  # 1. Manifest Aggregation
+  local _TMP_MANIFEST=".mise.toml.lock.temp"
+  ./scripts/gen-full-manifest.sh >"$_TMP_MANIFEST"
 
-# 3. List Extraction
-# We must explicitly list tools to force mise to update/add them for all platforms.
-_TOOLS=$(grep "=" "$TMP_MANIFEST" | cut -d= -f1 | tr -d '" ' | xargs)
+  # 2. List Extraction
+  local _TOOLS
+  _TOOLS=$(grep "=" "$_TMP_MANIFEST" | cut -d= -f1 | tr -d '" ' | xargs)
 
-# 4. Multi-Platform Locking
-# We point mise to the temporary manifest.
-# Platforms: Ubuntu/Debian (glibc), Alpine (musl), macOS (x64/arm64), Windows (x64).
-# shellcheck disable=SC2086
-MISE_CONFIG="$TMP_MANIFEST" mise lock --platform linux-x64,linux-arm64,linux-x64-musl,linux-arm64-musl,macos-x64,macos-arm64,windows-x64 $_TOOLS
+  # 3. Multi-Platform Locking
+  # Platforms: Ubuntu/Debian (glibc), Alpine (musl), macOS (x64/arm64), Windows (x64).
+  # shellcheck disable=SC2086
+  MISE_CONFIG="$_TMP_MANIFEST" mise lock --platform linux-x64,linux-arm64,linux-x64-musl,linux-arm64-musl,macos-x64,macos-arm64,windows-x64 $_TOOLS "$@"
 
-# 5. Cleanup
-rm -f "$TMP_MANIFEST"
+  # 4. Cleanup
+  rm -f "$_TMP_MANIFEST"
 
-echo "mise.lock synchronized successfully for all platforms."
+  log_success "mise.lock synchronized successfully for all platforms."
+}
+
+# ── Main ─────────────────────────────────────────────────────────────────────
+
+main() {
+  guard_project_root
+  run_sync_lock "$@"
+}
+
+main "$@"

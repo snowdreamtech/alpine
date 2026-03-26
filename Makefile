@@ -233,9 +233,9 @@ endif
 
 sync-lock: ## Synchronize and verify the mise.lock file across all platforms
 ifeq ($(OS_NAME),Windows)
-	@powershell -ExecutionPolicy Bypass -File scripts/sync-lock.ps1
+	@scripts/sync-lock.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/sync-lock.sh
+	@sh scripts/sync-lock.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 archive-changelog: ## Archive major-version changelog entries
