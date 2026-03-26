@@ -259,7 +259,6 @@ MISE_VERSION="${MISE_VERSION:-2026.3.8}"
 # by the project's .mise.toml file. Do not add hardcoded version variables here.
 # Any tool added below MUST have a corresponding entry in .mise.toml Tools section.
 
-
 # Standardized library directory reference
 _G_LIB_DIR="${_G_PROJECT_ROOT}/scripts/lib"
 export _G_LIB_DIR

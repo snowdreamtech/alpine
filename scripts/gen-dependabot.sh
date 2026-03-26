@@ -2,7 +2,7 @@
 # Copyright (c) 2026 SnowdreamTech. All rights reserved.
 # Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
-# scripts/gen-dependabot.sh - Smart Dependabot Configuration Generator
+# scripts/gen-dependabot.sh - Automated Dependabot Configuration Generator.
 #
 # Purpose:
 #   Scans the repository for manifest/lockfiles across all supported ecosystems

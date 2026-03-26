@@ -9,10 +9,10 @@
 [tools]
 
 # ── 🏗️ Core Runtimes ──────────────────────────────────────────────────────────
-go = "1.26.1"
-node = "25.8.2"
+go = "1.24.1"
+node = "20.18.3"
 "npm:pnpm" = "10.30.3"
-python = "3.14.3"
+python = "3.12.9"
 
 # ── 🔐 Security & Engineering (always needed) ──────────────────────────────────
 gitleaks = "8.30.1"
@@ -59,6 +59,7 @@ editorconfig-checker = "3.6.1"
 "github:goreleaser/goreleaser" = "2.14.3"
 "pipx:zizmor" = "1.23.1"
 "npm:vitepress" = "1.6.4"
+pipx = "1.11.0"
 
 # ------------------------------------------------------------
 # Global settings

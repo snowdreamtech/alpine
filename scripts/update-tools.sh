@@ -2,7 +2,7 @@
 # Copyright (c) 2026 SnowdreamTech. All rights reserved.
 # Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
-# scripts/update-tools.sh — Intelligent Mise Tool Version Upgrader
+# scripts/update-tools.sh - Intelligent Mise Tool Version Upgrader
 #
 # Purpose:
 #   Automatically detects the latest upstream versions for all Mise-managed tools

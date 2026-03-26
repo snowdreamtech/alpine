@@ -2,7 +2,7 @@
 # Copyright (c) 2026 SnowdreamTech. All rights reserved.
 # Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
-# scripts/lib/versions.sh — Tier 2 Tool Version Registry
+# scripts/lib/versions.sh - Tier 2 Tool Version Registry
 #
 # Purpose:
 #   Single Source of Truth for all on-demand (Tier 2) tool versions.
@@ -17,7 +17,7 @@
 # (Variables are used by sourcing scripts: lang modules and setup.sh)
 
 # ── 🏗️ Language Runtimes ──────────────────────────────────────────────────────
-VER_GO="1.23.6"
+VER_GO="1.24.1"
 VER_KOTLIN="2.1.20"
 VER_RUST="1.85.0"
 VER_BUN="1.2.4"

@@ -2,7 +2,7 @@
 # Copyright (c) 2026 SnowdreamTech. All rights reserved.
 # Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
-# scripts/sync-lock.sh — Mise Lockfile Synchronizer
+# scripts/sync-lock.sh - Mise Lockfile Synchronizer
 #
 # Purpose:
 #   Synchronizes mise.lock with the comprehensive manifest (Tier 1 + Tier 2).
