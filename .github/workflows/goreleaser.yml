@@ -20,7 +20,9 @@ name: "📦 GoReleaser"
       - "v*" # Standard SemVer (v1.2.3)
       - "V*" # Capitalized (V1.2.3)
       - "[0-9]*" # Numeric start (1.2.3)
-      - "**/v*" # Monorepo/Scoped (lib/v1.0)
+      - "**/v*" # Monorepo/Scoped v (lib/v1.0)
+      - "**/V*" # Monorepo/Scoped V (lib/V1.0)
+      - "**/[0-9]*" # Monorepo/Scoped numeric (lib/1.0)
       - "release-*" # Release prefix
       - "stable-*" # Stability prefix
       - "alpha-*" # Pre-release: Alpha
