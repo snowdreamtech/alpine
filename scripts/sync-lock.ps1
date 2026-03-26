@@ -33,10 +33,9 @@ $Tools = Get-Content $TmpManifest | Where-Object { $_ -match "=" } | ForEach-Obj
 }
 $ToolList = $Tools -join " "
 
-# 4. Multi-Platform Locking
-# We point mise to the temporary manifest.
+# Platforms: Ubuntu/Debian (glibc), Alpine (musl), macOS (x64/arm64), Windows (x64).
 $env:MISE_CONFIG = $TmpManifest
-& mise lock --platform linux-x64,linux-arm64,macos-x64,macos-arm64,windows-x64 $ToolList
+& mise lock --platform linux-x64,linux-arm64,linux-x64-musl,linux-arm64-musl,macos-x64,macos-arm64,windows-x64 $ToolList
 
 # 5. Cleanup
 Remove-Item -Path $TmpManifest -Force

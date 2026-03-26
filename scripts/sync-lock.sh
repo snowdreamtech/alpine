@@ -34,10 +34,9 @@ _TOOLS=$(grep "=" "$TMP_MANIFEST" | cut -d= -f1 | tr -d '" ' | xargs)
 
 # 4. Multi-Platform Locking
 # We point mise to the temporary manifest.
-# Platforms: Ubuntu (x64/arm64), macOS (x64/arm64), Windows (x64).
-# We omit windows-arm64 as most tools don't provide it yet, but can be added if needed.
+# Platforms: Ubuntu/Debian (glibc), Alpine (musl), macOS (x64/arm64), Windows (x64).
 # shellcheck disable=SC2086
-MISE_CONFIG="$TMP_MANIFEST" mise lock --platform linux-x64,linux-arm64,macos-x64,macos-arm64,windows-x64 $_TOOLS
+MISE_CONFIG="$TMP_MANIFEST" mise lock --platform linux-x64,linux-arm64,linux-x64-musl,linux-arm64-musl,macos-x64,macos-arm64,windows-x64 $_TOOLS
 
 # 5. Cleanup
 rm -f "$TMP_MANIFEST"

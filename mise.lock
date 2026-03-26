@@ -60,7 +60,15 @@ backend = "aqua:mrtazz/checkmake"
 checksum = "sha256:409167c4abb99407bd232c3bbd351b8a39df57997feafde5a08bddffb0f2dcb4"
 url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake-v0.3.2.linux.arm64"
 
+[tools.checkmake."platforms.linux-arm64-musl"]
+checksum = "sha256:409167c4abb99407bd232c3bbd351b8a39df57997feafde5a08bddffb0f2dcb4"
+url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake-v0.3.2.linux.arm64"
+
 [tools.checkmake."platforms.linux-x64"]
+checksum = "sha256:e2effb876913f3ee2caef0ba35f6202c5e8a3cd55a077d8d2b9ce2034257b6af"
+url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake-v0.3.2.linux.amd64"
+
+[tools.checkmake."platforms.linux-x64-musl"]
 checksum = "sha256:e2effb876913f3ee2caef0ba35f6202c5e8a3cd55a077d8d2b9ce2034257b6af"
 url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake-v0.3.2.linux.amd64"
 
@@ -132,7 +140,15 @@ backend = "aqua:editorconfig-checker/editorconfig-checker"
 checksum = "sha256:a471181b0741982afa4f3dbc1e433b6caa0c5e6daad580572841884fd9957220"
 url = "https://github.com/editorconfig-checker/editorconfig-checker/releases/download/v3.6.1/ec-linux-arm64.tar.gz"
 
+[tools.editorconfig-checker."platforms.linux-arm64-musl"]
+checksum = "sha256:a471181b0741982afa4f3dbc1e433b6caa0c5e6daad580572841884fd9957220"
+url = "https://github.com/editorconfig-checker/editorconfig-checker/releases/download/v3.6.1/ec-linux-arm64.tar.gz"
+
 [tools.editorconfig-checker."platforms.linux-x64"]
+checksum = "sha256:cd32084fce5f3d49ba49697f362ac3a114989715c98819303247dd54c1f368b0"
+url = "https://github.com/editorconfig-checker/editorconfig-checker/releases/download/v3.6.1/ec-linux-amd64.tar.gz"
+
+[tools.editorconfig-checker."platforms.linux-x64-musl"]
 checksum = "sha256:cd32084fce5f3d49ba49697f362ac3a114989715c98819303247dd54c1f368b0"
 url = "https://github.com/editorconfig-checker/editorconfig-checker/releases/download/v3.6.1/ec-linux-amd64.tar.gz"
 
@@ -519,7 +535,19 @@ url = "https://github.com/cli/cli/releases/download/v2.88.1/gh_2.88.1_linux_arm6
 url_api = "https://api.github.com/repos/cli/cli/releases/assets/372317913"
 provenance = "github-attestations"
 
+[tools."github:cli/cli"."platforms.linux-arm64-musl"]
+checksum = "sha256:039ce25aab0cfa0ea5160e3db75ed44699bde4b20ff63ec5991f82201f1b33b8"
+url = "https://github.com/cli/cli/releases/download/v2.88.1/gh_2.88.1_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/372317913"
+provenance = "github-attestations"
+
 [tools."github:cli/cli"."platforms.linux-x64"]
+checksum = "sha256:36352a993b97e9758793cdb87f9ba674bd6d88c914488e122be78a1962203803"
+url = "https://github.com/cli/cli/releases/download/v2.88.1/gh_2.88.1_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/372317909"
+provenance = "github-attestations"
+
+[tools."github:cli/cli"."platforms.linux-x64-musl"]
 checksum = "sha256:36352a993b97e9758793cdb87f9ba674bd6d88c914488e122be78a1962203803"
 url = "https://github.com/cli/cli/releases/download/v2.88.1/gh_2.88.1_linux_amd64.tar.gz"
 url_api = "https://api.github.com/repos/cli/cli/releases/assets/372317909"
@@ -787,7 +815,19 @@ url = "https://github.com/goreleaser/goreleaser/releases/download/v2.14.1/gorele
 url_api = "https://api.github.com/repos/goreleaser/goreleaser/releases/assets/362259739"
 provenance = "github-attestations"
 
+[tools."github:goreleaser/goreleaser"."platforms.linux-arm64-musl"]
+checksum = "sha256:a84d3b27f052c12ad5c8342d7caf1450a7174a305730aed21d72db09301e49a5"
+url = "https://github.com/goreleaser/goreleaser/releases/download/v2.14.1/goreleaser_Linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/goreleaser/goreleaser/releases/assets/362259739"
+provenance = "github-attestations"
+
 [tools."github:goreleaser/goreleaser"."platforms.linux-x64"]
+checksum = "sha256:2df975a7acbfdeaf888d596cab0024d48ec7fb7d747e1d08b90948b791f40a5f"
+url = "https://github.com/goreleaser/goreleaser/releases/download/v2.14.1/goreleaser_Linux_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/goreleaser/goreleaser/releases/assets/362259765"
+provenance = "github-attestations"
+
+[tools."github:goreleaser/goreleaser"."platforms.linux-x64-musl"]
 checksum = "sha256:2df975a7acbfdeaf888d596cab0024d48ec7fb7d747e1d08b90948b791f40a5f"
 url = "https://github.com/goreleaser/goreleaser/releases/download/v2.14.1/goreleaser_Linux_x86_64.tar.gz"
 url_api = "https://api.github.com/repos/goreleaser/goreleaser/releases/assets/362259765"
@@ -824,7 +864,17 @@ checksum = "sha256:331f1d3511b84a4f1e3d18d52fec284723e4019552f4f47b19322a53ce9a4
 url = "https://github.com/hadolint/hadolint/releases/download/v2.14.0/hadolint-linux-arm64"
 url_api = "https://api.github.com/repos/hadolint/hadolint/releases/assets/295944081"
 
+[tools."github:hadolint/hadolint"."platforms.linux-arm64-musl"]
+checksum = "sha256:331f1d3511b84a4f1e3d18d52fec284723e4019552f4f47b19322a53ce9a40ed"
+url = "https://github.com/hadolint/hadolint/releases/download/v2.14.0/hadolint-linux-arm64"
+url_api = "https://api.github.com/repos/hadolint/hadolint/releases/assets/295944081"
+
 [tools."github:hadolint/hadolint"."platforms.linux-x64"]
+checksum = "sha256:6bf226944684f56c84dd014e8b979d27425c0148f61b3bd99bcc6f39e9dc5a47"
+url = "https://github.com/hadolint/hadolint/releases/download/v2.14.0/hadolint-linux-x86_64"
+url_api = "https://api.github.com/repos/hadolint/hadolint/releases/assets/295944080"
+
+[tools."github:hadolint/hadolint"."platforms.linux-x64-musl"]
 checksum = "sha256:6bf226944684f56c84dd014e8b979d27425c0148f61b3bd99bcc6f39e9dc5a47"
 url = "https://github.com/hadolint/hadolint/releases/download/v2.14.0/hadolint-linux-x86_64"
 url_api = "https://api.github.com/repos/hadolint/hadolint/releases/assets/295944080"
@@ -979,7 +1029,15 @@ backend = "aqua:gitleaks/gitleaks"
 checksum = "sha256:b4cbbb6ddf7d1b2a603088cd03a4e3f7ce48ee7fd449b51f7de6ee2906f5fa2f"
 url = "https://github.com/gitleaks/gitleaks/releases/download/v8.30.0/gitleaks_8.30.0_linux_arm64.tar.gz"
 
+[tools.gitleaks."platforms.linux-arm64-musl"]
+checksum = "sha256:b4cbbb6ddf7d1b2a603088cd03a4e3f7ce48ee7fd449b51f7de6ee2906f5fa2f"
+url = "https://github.com/gitleaks/gitleaks/releases/download/v8.30.0/gitleaks_8.30.0_linux_arm64.tar.gz"
+
 [tools.gitleaks."platforms.linux-x64"]
+checksum = "sha256:79a3ab579b53f71efd634f3aaf7e04a0fa0cf206b7ed434638d1547a2470a66e"
+url = "https://github.com/gitleaks/gitleaks/releases/download/v8.30.0/gitleaks_8.30.0_linux_x64.tar.gz"
+
+[tools.gitleaks."platforms.linux-x64-musl"]
 checksum = "sha256:79a3ab579b53f71efd634f3aaf7e04a0fa0cf206b7ed434638d1547a2470a66e"
 url = "https://github.com/gitleaks/gitleaks/releases/download/v8.30.0/gitleaks_8.30.0_linux_x64.tar.gz"
 
@@ -1003,7 +1061,15 @@ backend = "core:go"
 checksum = "sha256:8df5750ffc0281017fb6070fba450f5d22b600a02081dceef47966ffaf36a3af"
 url = "https://dl.google.com/go/go1.24.1.linux-arm64.tar.gz"
 
+[tools.go."platforms.linux-arm64-musl"]
+checksum = "sha256:8df5750ffc0281017fb6070fba450f5d22b600a02081dceef47966ffaf36a3af"
+url = "https://dl.google.com/go/go1.24.1.linux-arm64.tar.gz"
+
 [tools.go."platforms.linux-x64"]
+checksum = "sha256:cb2396bae64183cdccf81a9a6df0aea3bce9511fc21469fb89a0c00470088073"
+url = "https://dl.google.com/go/go1.24.1.linux-amd64.tar.gz"
+
+[tools.go."platforms.linux-x64-musl"]
 checksum = "sha256:cb2396bae64183cdccf81a9a6df0aea3bce9511fc21469fb89a0c00470088073"
 url = "https://dl.google.com/go/go1.24.1.linux-amd64.tar.gz"
 
@@ -1140,7 +1206,15 @@ backend = "core:node"
 checksum = "sha256:93a9df19238adfaa289f4784041d03edaf2fdd89fbb247faffca2fe4a1000703"
 url = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/v20.18.3/node-v20.18.3-linux-arm64.tar.gz"
 
+[tools.node."platforms.linux-arm64-musl"]
+checksum = "sha256:93a9df19238adfaa289f4784041d03edaf2fdd89fbb247faffca2fe4a1000703"
+url = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/v20.18.3/node-v20.18.3-linux-arm64.tar.gz"
+
 [tools.node."platforms.linux-x64"]
+checksum = "sha256:9fc3952da39b20d1fcfdb777b198cc035485afbbb1004b4df93f35245d61151e"
+url = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/v20.18.3/node-v20.18.3-linux-x64.tar.gz"
+
+[tools.node."platforms.linux-x64-musl"]
 checksum = "sha256:9fc3952da39b20d1fcfdb777b198cc035485afbbb1004b4df93f35245d61151e"
 url = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/v20.18.3/node-v20.18.3-linux-x64.tar.gz"
 
@@ -1284,7 +1358,15 @@ backend = "core:python"
 checksum = "sha256:0354f70e7d3e2d0c36308edc1815c563d9bae1a3221830f7e222f6bb0a7e1a3a"
 url = "https://github.com/astral-sh/python-build-standalone/releases/download/20250317/cpython-3.12.9+20250317-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz"
 
+[tools.python."platforms.linux-arm64-musl"]
+checksum = "sha256:0354f70e7d3e2d0c36308edc1815c563d9bae1a3221830f7e222f6bb0a7e1a3a"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20250317/cpython-3.12.9+20250317-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz"
+
 [tools.python."platforms.linux-x64"]
+checksum = "sha256:a36bc60c38fe146e908e2e71fc21266c8558b24a9407226b1d887212839437ef"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20250317/cpython-3.12.9+20250317-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
+
+[tools.python."platforms.linux-x64-musl"]
 checksum = "sha256:a36bc60c38fe146e908e2e71fc21266c8558b24a9407226b1d887212839437ef"
 url = "https://github.com/astral-sh/python-build-standalone/releases/download/20250317/cpython-3.12.9+20250317-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
 
