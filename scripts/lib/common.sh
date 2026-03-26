@@ -139,16 +139,18 @@ fi
 # Ref: Rule 09 (Interaction/Summary Integration)
 if [ -n "${GITHUB_STEP_SUMMARY:-}" ] && [ -z "${GITEA_ACTIONS:-}" ] && [ -z "${FORGEJO_ACTIONS:-}" ]; then
   # GitHub Actions: Native summary file
-  export CI_STEP_SUMMARY="$GITHUB_STEP_SUMMARY"
+  CI_STEP_SUMMARY="$GITHUB_STEP_SUMMARY"
 elif [ -n "${GITEA_ACTIONS:-}" ] || [ -n "${FORGEJO_ACTIONS:-}" ]; then
   # Gitea/Forgejo: Often follows GitHub conventions but may need fallback
-  export CI_STEP_SUMMARY="${GITHUB_STEP_SUMMARY:-${_G_PROJECT_ROOT}/.ci_summary.log}"
+  CI_STEP_SUMMARY="${GITHUB_STEP_SUMMARY:-${_G_PROJECT_ROOT}/.ci_summary.log}"
 elif [ -n "${GITLAB_CI:-}" ]; then
   # GitLab: Use a standard log file that can be rendered as an artifact
-  export CI_STEP_SUMMARY="${_G_PROJECT_ROOT}/ci_summary.md"
-else
-  # Local: Use a temporary log file (ignored by git)
-  [ -z "${CI_STEP_SUMMARY:-}" ] && export CI_STEP_SUMMARY="${_G_PROJECT_ROOT}/.ci_summary.log"
+  CI_STEP_SUMMARY="${_G_PROJECT_ROOT}/ci_summary.md"
+fi
+
+# Mandatory Fallback: Ensure CI_STEP_SUMMARY is NEVER empty (fixes "cannot create : Directory nonexistent")
+if [ -z "${CI_STEP_SUMMARY:-}" ]; then
+  CI_STEP_SUMMARY="${_G_PROJECT_ROOT:-.}/.ci_summary.log"
 fi
 export CI_STEP_SUMMARY
 
