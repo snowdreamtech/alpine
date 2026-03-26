@@ -4,9 +4,41 @@
 version = "0.3.2"
 backend = "aqua:mrtazz/checkmake"
 
+[tools.checkmake."platforms.linux-x64"]
+checksum = "sha256:e2effb876913f3ee2caef0ba35f6202c5e8a3cd55a077d8d2b9ce2034257b6af"
+url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake-v0.3.2.linux.amd64"
+
+[tools.checkmake."platforms.macos-arm64"]
+checksum = "sha256:d5dab7169d1cb246b380ed5e7fc1e6aded301d453db258f858e774422d25961f"
+url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake-v0.3.2.darwin.arm64"
+
+[tools.checkmake."platforms.macos-x64"]
+checksum = "sha256:82942043a4766b9fb3ffe6c77584df7d6c832bfa00571f234d257799f492fdd7"
+url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake-v0.3.2.darwin.amd64"
+
+[tools.checkmake."platforms.windows-x64"]
+checksum = "sha256:6adf4bde2dbfe8001ecf2918abfe02f7a57191568f1d185537eccd9c59625dca"
+url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake-v0.3.2.windows.amd64.exe"
+
 [[tools.editorconfig-checker]]
 version = "3.6.1"
 backend = "aqua:editorconfig-checker/editorconfig-checker"
+
+[tools.editorconfig-checker."platforms.linux-x64"]
+checksum = "sha256:cd32084fce5f3d49ba49697f362ac3a114989715c98819303247dd54c1f368b0"
+url = "https://github.com/editorconfig-checker/editorconfig-checker/releases/download/v3.6.1/ec-linux-amd64.tar.gz"
+
+[tools.editorconfig-checker."platforms.macos-arm64"]
+checksum = "sha256:64f6006e4ae880ef140ac175f30b5b4cab72fa92b3708d9104006441fb7ed723"
+url = "https://github.com/editorconfig-checker/editorconfig-checker/releases/download/v3.6.1/ec-darwin-arm64.tar.gz"
+
+[tools.editorconfig-checker."platforms.macos-x64"]
+checksum = "sha256:6d7882e2f8a0884953f6bb8782b482ce8a6dd4ab2f25086a57046ef937f7625d"
+url = "https://github.com/editorconfig-checker/editorconfig-checker/releases/download/v3.6.1/ec-darwin-amd64.tar.gz"
+
+[tools.editorconfig-checker."platforms.windows-x64"]
+checksum = "sha256:cdd3899ebd60277b10e188c78915ea098a10a1a441a04e3ed2a5a99eb968a838"
+url = "https://github.com/editorconfig-checker/editorconfig-checker/releases/download/v3.6.1/ec-windows-amd64.zip"
 
 [[tools."github:cli/cli"]]
 version = "2.88.1"
@@ -16,33 +48,97 @@ backend = "github:cli/cli"
 checksum = "sha256:36352a993b97e9758793cdb87f9ba674bd6d88c914488e122be78a1962203803"
 url = "https://github.com/cli/cli/releases/download/v2.88.1/gh_2.88.1_linux_amd64.tar.gz"
 url_api = "https://api.github.com/repos/cli/cli/releases/assets/372317909"
+provenance = "github-attestations"
 
 [tools."github:cli/cli"."platforms.macos-arm64"]
 checksum = "sha256:bdbeed4821d450ef0d14821d856c05b308ab449fbf60527f298d96fbf5d2447b"
 url = "https://github.com/cli/cli/releases/download/v2.88.1/gh_2.88.1_macOS_arm64.zip"
 url_api = "https://api.github.com/repos/cli/cli/releases/assets/372317935"
+provenance = "github-attestations"
 
 [tools."github:cli/cli"."platforms.macos-x64"]
 checksum = "sha256:ff0fc4bdb9699f0c02e5bcdcbd09d0f8e4c4659aa5d30bcd39a3557ed7379b2e"
 url = "https://github.com/cli/cli/releases/download/v2.88.1/gh_2.88.1_macOS_amd64.zip"
 url_api = "https://api.github.com/repos/cli/cli/releases/assets/372317933"
+provenance = "github-attestations"
 
 [tools."github:cli/cli"."platforms.windows-x64"]
 checksum = "sha256:8fdaac525d8919f9f8c265f99ffa26189e5f1fd3a35636adad4fd890a141a555"
 url = "https://github.com/cli/cli/releases/download/v2.88.1/gh_2.88.1_windows_amd64.zip"
 url_api = "https://api.github.com/repos/cli/cli/releases/assets/372317959"
+provenance = "github-attestations"
 
 [[tools."github:goreleaser/goreleaser"]]
 version = "2.14.1"
 backend = "github:goreleaser/goreleaser"
 
+[tools."github:goreleaser/goreleaser"."platforms.linux-x64"]
+checksum = "sha256:2df975a7acbfdeaf888d596cab0024d48ec7fb7d747e1d08b90948b791f40a5f"
+url = "https://github.com/goreleaser/goreleaser/releases/download/v2.14.1/goreleaser_Linux_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/goreleaser/goreleaser/releases/assets/362259765"
+provenance = "github-attestations"
+
+[tools."github:goreleaser/goreleaser"."platforms.macos-arm64"]
+checksum = "sha256:ece9b4772b0f61d4dcd826430da026d1d9760c37b118da0d55c6692319f90340"
+url = "https://github.com/goreleaser/goreleaser/releases/download/v2.14.1/goreleaser_Darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/goreleaser/goreleaser/releases/assets/362259760"
+provenance = "github-attestations"
+
+[tools."github:goreleaser/goreleaser"."platforms.macos-x64"]
+checksum = "sha256:33511239d3c0cea96ceb4d57e488aafe1389852915b65b7777611e1a67e28e84"
+url = "https://github.com/goreleaser/goreleaser/releases/download/v2.14.1/goreleaser_Darwin_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/goreleaser/goreleaser/releases/assets/362259767"
+provenance = "github-attestations"
+
+[tools."github:goreleaser/goreleaser"."platforms.windows-x64"]
+checksum = "sha256:d7a3d8ba795e97ab8c4f8003630d300da164adf21fde5a4049440c20f15c3137"
+url = "https://github.com/goreleaser/goreleaser/releases/download/v2.14.1/goreleaser_Windows_x86_64.zip"
+url_api = "https://api.github.com/repos/goreleaser/goreleaser/releases/assets/362259806"
+provenance = "github-attestations"
+
 [[tools."github:hadolint/hadolint"]]
 version = "2.14.0"
 backend = "github:hadolint/hadolint"
 
+[tools."github:hadolint/hadolint"."platforms.linux-x64"]
+checksum = "sha256:6bf226944684f56c84dd014e8b979d27425c0148f61b3bd99bcc6f39e9dc5a47"
+url = "https://github.com/hadolint/hadolint/releases/download/v2.14.0/hadolint-linux-x86_64"
+url_api = "https://api.github.com/repos/hadolint/hadolint/releases/assets/295944080"
+
+[tools."github:hadolint/hadolint"."platforms.macos-arm64"]
+checksum = "sha256:3625e2e9f43dcfe7bd38738a5f5520ed50ce39ed28485266e6803dd7bc197b10"
+url = "https://github.com/hadolint/hadolint/releases/download/v2.14.0/hadolint-macos-arm64"
+url_api = "https://api.github.com/repos/hadolint/hadolint/releases/assets/295944077"
+
+[tools."github:hadolint/hadolint"."platforms.macos-x64"]
+checksum = "sha256:2b69a853433f1eca522ffb921cd490bd1321424d03331fd8390f93b7fb4a02e9"
+url = "https://github.com/hadolint/hadolint/releases/download/v2.14.0/hadolint-macos-x86_64"
+url_api = "https://api.github.com/repos/hadolint/hadolint/releases/assets/295944082"
+
+[tools."github:hadolint/hadolint"."platforms.windows-x64"]
+checksum = "sha256:8e0ee174f88edb14f207a68430c7a53c2883ed509cdbde9a3a26fffa140fa5e4"
+url = "https://github.com/hadolint/hadolint/releases/download/v2.14.0/hadolint-windows-x86_64.exe"
+url_api = "https://api.github.com/repos/hadolint/hadolint/releases/assets/295944079"
+
 [[tools.gitleaks]]
 version = "8.30.0"
 backend = "aqua:gitleaks/gitleaks"
+
+[tools.gitleaks."platforms.linux-x64"]
+checksum = "sha256:79a3ab579b53f71efd634f3aaf7e04a0fa0cf206b7ed434638d1547a2470a66e"
+url = "https://github.com/gitleaks/gitleaks/releases/download/v8.30.0/gitleaks_8.30.0_linux_x64.tar.gz"
+
+[tools.gitleaks."platforms.macos-arm64"]
+checksum = "sha256:b251ab2bcd4cd8ba9e56ff37698c033ebf38582b477d21ebd86586d927cf87e7"
+url = "https://github.com/gitleaks/gitleaks/releases/download/v8.30.0/gitleaks_8.30.0_darwin_arm64.tar.gz"
+
+[tools.gitleaks."platforms.macos-x64"]
+checksum = "sha256:ca221d012d247080c2f6f61f4b7a83bffa2453806b0c195c795bbe9a8c775ed5"
+url = "https://github.com/gitleaks/gitleaks/releases/download/v8.30.0/gitleaks_8.30.0_darwin_x64.tar.gz"
+
+[tools.gitleaks."platforms.windows-x64"]
+checksum = "sha256:54fe94f644b832dd08e8c3a5915efb3bfa862386d59fb27ca0792cb687a83573"
+url = "https://github.com/gitleaks/gitleaks/releases/download/v8.30.0/gitleaks_8.30.0_windows_x64.zip"
 
 [[tools.go]]
 version = "1.24.1"
