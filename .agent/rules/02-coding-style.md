@@ -38,7 +38,21 @@
 - Breaking changes MUST include a `BREAKING CHANGE:` footer: `BREAKING CHANGE: removed /api/v1/users endpoint, use /api/v2/users`.
 - Sign commits with GPG where the repository policy requires it (`git commit -S`). Enforce on protected branches.
 
-## 2. Code Quality Principles
+## 2. AI Agent Operational Standards (AI 代理执行规范)
+
+AI agents (including Antigravity, Cursor, etc.) MUST strictly follow these execution and commit standards to ensure repository integrity and developer control:
+
+- **Atomic Execution & Commit (原子化执行，原子化提交)**:
+  - Every independent logical change (e.g., a bug fix, a new feature, a configuration update) MUST be executed and committed as a single, atomic unit.
+  - Avoid "mega-commits" that bundle unrelated changes.
+  - Avoid partial commits that leave the repository in a broken or inconsistent state.
+- **Auto-Commit, NO Auto-Push (自动提交，严禁自动推送)**:
+  - AI agents SHOULD automatically `git commit` verified changes to record progress and maintain an audit trail.
+  - AI agents **MUST NOT** automatically `git push` to remote repositories unless explicitly and specifically requested by the user for a particular task.
+  - This ensures the developer retains final control over the remote state and can perform a final local review/test before sharing changes.
+- **Dependency Awareness**: Before committing changes to dependency managers or lockfiles, agents MUST verify that the changes do not block legitimate users in restricted network environments (e.g., China). Heavy or optional tools should remain "On-demand" (Tier 2).
+
+## 3. Code Quality Principles
 
 - **DRY (Don't Repeat Yourself)**: Extract shared logic into reusable functions, modules, or helpers. Duplicated code is a bug waiting to diverge — every copy needs to be kept in sync.
 - **KISS (Keep It Simple, Stupid)**: Prefer simple, readable solutions over clever or overly abstract ones. Complexity must earn its keep with measurable benefit.
