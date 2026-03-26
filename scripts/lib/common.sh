@@ -114,6 +114,26 @@ if [ -n "${GITHUB_TOKEN:-}" ]; then
   # GitHub CLI (gh) preferred variable
   [ -z "${GH_TOKEN:-}" ] && export GH_TOKEN="$GITHUB_TOKEN"
 fi
+
+# ──  Project Context Detection ──────────────────────────────────────────────
+# Robustly identify the project root directory before defining summary paths.
+if [ -z "$_G_PROJECT_ROOT" ]; then
+  _G_PROJECT_ROOT=$(pwd)
+  # Basic verification: Ensure we are in a project-like directory
+  if [ ! -f "$_G_PROJECT_ROOT/package.json" ] && [ ! -d "$_G_PROJECT_ROOT/.git" ]; then
+    # Fallback: if we are deeper in the tree, try to find the root
+    _cur_check_dir="$_G_PROJECT_ROOT"
+    while [ "$_cur_check_dir" != "/" ] && [ "$_cur_check_dir" != "." ]; do
+      if [ -f "$_cur_check_dir/package.json" ] || [ -d "$_cur_check_dir/.git" ]; then
+        _G_PROJECT_ROOT="$_cur_check_dir"
+        break
+      fi
+      _cur_check_dir=$(dirname "$_cur_check_dir")
+    done
+    unset _cur_check_dir
+  fi
+  export _G_PROJECT_ROOT
+fi
 # ── 📊 CI Step Summary Abstraction (Cross-Platform) ──────────────────────────
 # Detect and unify CI summary reporting paths (GitHub, GitLab, Gitea, Local).
 # Ref: Rule 09 (Interaction/Summary Integration)
@@ -237,26 +257,6 @@ MISE_VERSION="${MISE_VERSION:-2026.3.8}"
 # by the project's .mise.toml file. Do not add hardcoded version variables here.
 # Any tool added below MUST have a corresponding entry in .mise.toml Tools section.
 
-# ──  Project Context Detection ──────────────────────────────────────────────
-
-# Robustly identify the project root directory
-if [ -z "$_G_PROJECT_ROOT" ]; then
-  _G_PROJECT_ROOT=$(pwd)
-  # Basic verification: Ensure we are in a project-like directory
-  if [ ! -f "$_G_PROJECT_ROOT/package.json" ] && [ ! -d "$_G_PROJECT_ROOT/.git" ]; then
-    # Fallback: if we are deeper in the tree, try to find the root
-    _cur_check_dir="$_G_PROJECT_ROOT"
-    while [ "$_cur_check_dir" != "/" ] && [ "$_cur_check_dir" != "." ]; do
-      if [ -f "$_cur_check_dir/package.json" ] || [ -d "$_cur_check_dir/.git" ]; then
-        _G_PROJECT_ROOT="$_cur_check_dir"
-        break
-      fi
-      _cur_check_dir=$(dirname "$_cur_check_dir")
-    done
-    unset _cur_check_dir
-  fi
-  export _G_PROJECT_ROOT
-fi
 
 # Standardized library directory reference
 _G_LIB_DIR="${_G_PROJECT_ROOT}/scripts/lib"
