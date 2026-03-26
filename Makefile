@@ -233,7 +233,11 @@ endif
 
 sync-lock: ## Synchronize and verify the mise.lock file
 	@printf "$(BLUE)Synchronizing mise.lock...$(NC)\n"
+	@# Temporarily uncomment Tier 2 tools for locking
+	@perl -pi -e 's/^# "#/"/g' .mise.toml
 	@mise lock
+	@# Re-comment Tier 2 tools to protect local bootstrap
+	@perl -pi -e 's/^"/# "#/g' .mise.toml
 	@printf "$(GREEN)mise.lock synchronized!$(NC)\n"
 
 archive-changelog: ## Archive major-version changelog entries
