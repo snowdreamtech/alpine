@@ -36,8 +36,6 @@ name: "🤖 Dependabot Smart Sync"
       - ".pre-commit-config.yaml"
       - "Chart.yaml"
       - "scripts/gen-dependabot.sh"
-      - ".mise.toml"
-      - "mise.lock"
   schedule:
     # Weekly safety net: every Monday at 06:00 UTC
     - cron: "0 6 * * 1"
@@ -130,23 +128,25 @@ jobs:
         shell: sh
         run: |
           make gen-dependabot
+
+      - name: "🔧 Update Mise Toolchain & Lockfile"
+        shell: sh
+        run: |
+          make update-tools
           make sync-lock
-          if [ -f "dependabot_summary.md" ]; then
-            cat dependabot_summary.md >> "$GITHUB_STEP_SUMMARY"
-          fi
 
       - name: "📝 Commit Changes (if any)"
         shell: sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if git diff --quiet .github/dependabot.yml mise.lock 2>/dev/null; then
-            echo "✅ No changes detected. Dependabot config and mise.lock are up-to-date."
+          if git diff --quiet .github/dependabot.yml mise.lock scripts/lib/versions.sh .mise.toml 2>/dev/null; then
+            echo "✅ No changes detected. Dependabot config and Mise toolchain are up-to-date."
           else
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add .github/dependabot.yml mise.lock
-            git commit -m "chore(deps): sync dependabot config and mise.lock [skip ci]"
+            git add .github/dependabot.yml mise.lock scripts/lib/versions.sh .mise.toml
+            git commit -m "chore(deps): sync dependabot config and mise toolchain [skip ci]"
             git push
-            echo "✅ Dependabot config and mise.lock updated and pushed."
+            echo "✅ Dependabot config and Mise toolchain updated and pushed."
           fi

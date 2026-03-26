@@ -9,13 +9,13 @@
 [tools]
 
 # ── 🏗️ Core Runtimes ──────────────────────────────────────────────────────────
-go = "1.24.1"
-node = "20.18.3"
+go = "1.26.1"
+node = "25.8.2"
 "npm:pnpm" = "10.30.3"
-python = "3.12.9"
+python = "3.14.3"
 
 # ── 🔐 Security & Engineering (always needed) ──────────────────────────────────
-gitleaks = "8.30.0"
+gitleaks = "8.30.1"
 "github:cli/cli" = "2.88.1"
 
 # ── 💎 Core Quality & Commit Tooling ──────────────────────────────────────────
@@ -45,19 +45,19 @@ editorconfig-checker = "3.6.1"
 # Shell & scripting linters (pre-commit hooks)
 "pipx:actionlint-py" = "1.7.11.24"
 "pipx:pre-commit" = "4.5.1"
-"pipx:ruff" = "0.15.4"
+"pipx:ruff" = "0.15.7"
 "pipx:shellcheck-py" = "0.11.0.1"
 "pipx:shfmt-py" = "3.12.0.2"
 "pipx:yamllint" = "1.38.0"
 
 # Additional linters invoked by pre-commit hooks
-"pipx:clang-format" = "19.1.7"
+"pipx:clang-format" = "22.1.1"
 "pipx:dotenv-linter" = "0.7.0"
 "pipx:sqlfluff" = "4.0.4"
 
 # ── DevOps/release tools used globally ──────────────────────────────────────────
-"github:goreleaser/goreleaser" = "2.14.1"
-"pipx:zizmor" = "1.3.1"
+"github:goreleaser/goreleaser" = "2.14.3"
+"pipx:zizmor" = "1.23.1"
 "npm:vitepress" = "1.6.4"
 
 # ------------------------------------------------------------
