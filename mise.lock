@@ -343,6 +343,16 @@ checksum = "sha256:1c53fa85a8c021ce7b19814e1a5e1dc0aa10c04bddca75196f7ab6db6130d
 url = "https://github.com/casey/just/releases/download/1.39.0/just-1.39.0-x86_64-unknown-linux-musl.tar.gz"
 url_api = "https://api.github.com/repos/casey/just/releases/assets/222536820"
 
+[tools."github:casey/just"."platforms.linux-x64-baseline"]
+checksum = "sha256:1c53fa85a8c021ce7b19814e1a5e1dc0aa10c04bddca75196f7ab6db6130d2cd"
+url = "https://github.com/casey/just/releases/download/1.39.0/just-1.39.0-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/casey/just/releases/assets/222536820"
+
+[tools."github:casey/just"."platforms.linux-x64-musl"]
+checksum = "sha256:1c53fa85a8c021ce7b19814e1a5e1dc0aa10c04bddca75196f7ab6db6130d2cd"
+url = "https://github.com/casey/just/releases/download/1.39.0/just-1.39.0-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/casey/just/releases/assets/222536820"
+
 [tools."github:casey/just"."platforms.linux-x64-musl-baseline"]
 checksum = "sha256:1c53fa85a8c021ce7b19814e1a5e1dc0aa10c04bddca75196f7ab6db6130d2cd"
 url = "https://github.com/casey/just/releases/download/1.39.0/just-1.39.0-x86_64-unknown-linux-musl.tar.gz"
@@ -354,6 +364,11 @@ url = "https://github.com/casey/just/releases/download/1.39.0/just-1.39.0-aarch6
 url_api = "https://api.github.com/repos/casey/just/releases/assets/222536786"
 
 [tools."github:casey/just"."platforms.macos-x64"]
+checksum = "sha256:6c786ac5646e643cc21e4d7d2f5da12b690a54c32d35307224db34879344ad4c"
+url = "https://github.com/casey/just/releases/download/1.39.0/just-1.39.0-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/casey/just/releases/assets/222536810"
+
+[tools."github:casey/just"."platforms.macos-x64-baseline"]
 checksum = "sha256:6c786ac5646e643cc21e4d7d2f5da12b690a54c32d35307224db34879344ad4c"
 url = "https://github.com/casey/just/releases/download/1.39.0/just-1.39.0-x86_64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/casey/just/releases/assets/222536810"
@@ -526,6 +541,64 @@ url_api = "https://api.github.com/repos/google/go-jsonnet/releases/assets/104116
 [[tools."github:google/google-java-format"]]
 version = "1.35.0"
 backend = "github:google/google-java-format"
+
+[[tools."github:google/osv-scanner"]]
+version = "2.3.5"
+backend = "github:google/osv-scanner"
+
+[tools."github:google/osv-scanner"."platforms.linux-x64"]
+checksum = "sha256:bb30c580afe5e757d3e959f4afd08a4795ea505ef84c46962b9a738aa573b41b"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_linux_amd64"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248788"
+provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.linux-x64-baseline"]
+checksum = "sha256:bb30c580afe5e757d3e959f4afd08a4795ea505ef84c46962b9a738aa573b41b"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_linux_amd64"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248788"
+provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.linux-x64-musl"]
+checksum = "sha256:bb30c580afe5e757d3e959f4afd08a4795ea505ef84c46962b9a738aa573b41b"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_linux_amd64"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248788"
+provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.linux-x64-musl-baseline"]
+checksum = "sha256:bb30c580afe5e757d3e959f4afd08a4795ea505ef84c46962b9a738aa573b41b"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_linux_amd64"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248788"
+provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.macos-arm64"]
+checksum = "sha256:b740efe0b08fb817865e818a498997d5f042f14b8eeafb6393176ce84dd09cf6"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_darwin_arm64"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248752"
+provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.macos-x64"]
+checksum = "sha256:3b1c72d59dcbad99fa4eb2c72bf2e82017f83e0268340e4b00af76a1fea32c85"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_darwin_amd64"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248790"
+provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.macos-x64-baseline"]
+checksum = "sha256:3b1c72d59dcbad99fa4eb2c72bf2e82017f83e0268340e4b00af76a1fea32c85"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_darwin_amd64"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248790"
+provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.windows-x64"]
+checksum = "sha256:b165d33c08bda663119a459f5187e096d2525f888503495f5f34925741e981a2"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_windows_amd64.exe"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248754"
+provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.windows-x64-baseline"]
+checksum = "sha256:b165d33c08bda663119a459f5187e096d2525f888503495f5f34925741e981a2"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_windows_amd64.exe"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248754"
+provenance = "slsa"
 
 [[tools."github:grain-lang/grain"]]
 version = "0.7.2"
@@ -708,10 +781,6 @@ url = "https://dl.google.com/go/go1.23.6.windows-amd64.zip"
 [tools.go."platforms.windows-x64-baseline"]
 checksum = "sha256:53fec1586850b2cf5ad6438341ff7adc5f6700dd3ec1cfa3f5e8b141df190243"
 url = "https://dl.google.com/go/go1.23.6.windows-amd64.zip"
-
-[[tools."go:github.com/google/osv-scanner/v2/cmd/osv-scanner"]]
-version = "2.3.5"
-backend = "go:github.com/google/osv-scanner/v2/cmd/osv-scanner"
 
 [[tools."go:golang.org/x/vuln/cmd/govulncheck"]]
 version = "1.1.4"

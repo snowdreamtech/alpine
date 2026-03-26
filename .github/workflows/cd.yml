@@ -108,13 +108,18 @@ jobs:
           persist-credentials: false
           fetch-depth: 0
 
-      - name: "⚡ Setup Mise Toolchain (Core/Tier 1)"
-        uses: jdx/mise-action@50831a47387cc8bf9828236113f3607062137996 # v2.1.11
+      - name: "⚡ Cache Mise Tools"
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v4.2.0
         with:
-          install: true
-          version: 2026.3.8
-          cache: true
-          cache-key: ${{ runner.os }}-mise-${{ hashFiles('.mise.toml', 'scripts/lib/versions.sh') }}
+          path: |
+            ~/.local/bin
+            ~/.local/share/mise
+            ~/Library/Application Support/mise
+            ~/AppData/Local/mise
+          key: ${{ runner.os }}-mise-${{ hashFiles('.mise.toml', 'scripts/lib/versions.sh') }}
+          restore-keys: |
+            ${{ runner.os }}-mise-
+            ${{ runner.os }}-
 
       - name: "🚀 Initialize Development Environment"
         shell: sh
@@ -180,7 +185,7 @@ jobs:
         uses: lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411 # v2.1.0
         if: ${{ always() && matrix.os == 'ubuntu-latest' }}
         with:
-          args: --root-dir "${{ github.workspace }}" --verbose --no-progress --cache --exclude-path ".git" --exclude-path "node_modules" --exclude-path ".venv" --exclude-path "venv" --exclude-path "env" --exclude-path "vendor" --exclude-path "dist" --exclude-path "build" --exclude-path "out" --exclude-path "target" --exclude-path ".next" --exclude-path ".nuxt" --exclude-path ".output" --exclude-path "__pycache__" --exclude-path ".specify" --exclude-scheme file '**/*.md'
+          args: --root-dir "${{ github.workspace }}" --verbose --no-progress --cache --exclude-path ".git" --exclude-path "node_modules" --exclude-path ".venv" --exclude-path "venv" --exclude-path "env" --exclude-path "vendor" --exclude-path "dist" --exclude-path "build" --exclude-path "out" --exclude-path "target" --exclude-path ".next" --exclude-path ".nuxt" --exclude-path ".output" --exclude-path "__pycache__" --exclude-path ".specify" '**/*.md'
           fail: true
 
       - name: "🕵️ Detect Vulnerabilities (Trivy FS)"

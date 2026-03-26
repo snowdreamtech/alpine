@@ -33,11 +33,11 @@
 
   | Tier | Classification | Storage | Management |
   | :--- | :--- | :--- | :--- |
-  | **Tier 1** | **Core/Global** | [.mise.toml](file:///Users/snowdream/Workspace/snowdreamtech/template/.mise.toml) | Statically defined; local `mise install` default. |
-  | **Tier 2** | **On-Demand** | [versions.sh](file:///Users/snowdream/Workspace/snowdreamtech/template/scripts/lib/versions.sh) | Defined as shell variables; JIT-installed by scripts. |
+  | **Tier 1** | **Core/Global** | [.mise.toml](../../.mise.toml) | Statically defined; local `mise install` default. |
+  | **Tier 2** | **On-Demand** | [versions.sh](../../scripts/lib/versions.sh) | Defined as shell variables; JIT-installed by scripts. |
 
 - **Manifest Aggregation & Locking**:
-  - To ensure Tier 2 tools are cryptographically locked in `mise.lock` without bloating the root config, the project uses a **Manifest Aggregator** ([scripts/gen-full-manifest.sh](file:///Users/snowdream/Workspace/snowdreamtech/template/scripts/gen-full-manifest.sh)).
+  - To ensure Tier 2 tools are cryptographically locked in `mise.lock` without bloating the root config, the project uses a **Manifest Aggregator** ([scripts/gen-full-manifest.sh](../../scripts/gen-full-manifest.sh)).
   - **The Lock Ritual**: Running `make sync-lock` dynamically merges Tier 1 and Tier 2 definitions into a temporary "Full Manifest" to update the global `mise.lock`.
   - **CI/Audit Compliance**: All security audits and CI workflows MUST use the locked versions defined in `mise.lock` by activating the tiered configuration via `MISE_CONFIG`.
 

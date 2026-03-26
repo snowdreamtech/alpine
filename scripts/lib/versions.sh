@@ -109,7 +109,7 @@ VER_TRIVY="0.69.3"
 VER_TRIVY_PROVIDER="github:aquasecurity/trivy"
 
 VER_OSV_SCANNER="v2.3.5"
-VER_OSV_SCANNER_PROVIDER="go:github.com/google/osv-scanner/v2/cmd/osv-scanner"
+VER_OSV_SCANNER_PROVIDER="github:google/osv-scanner"
 
 VER_GOVULNCHECK="v1.1.4"
 VER_GOVULNCHECK_PROVIDER="go:golang.org/x/vuln/cmd/govulncheck"
