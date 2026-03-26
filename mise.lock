@@ -4,6 +4,14 @@
 version = "1.2.4"
 backend = "core:bun"
 
+[tools.bun."platforms.linux-arm64"]
+checksum = "sha256:694a1b39ad3560f3fc7c8e0ac42df277d7ac4f28fe373646104000ddff9ae85c"
+url = "https://github.com/oven-sh/bun/releases/download/bun-v1.2.4/bun-linux-aarch64.zip"
+
+[tools.bun."platforms.linux-arm64-musl"]
+checksum = "sha256:6178b1bbda24e8708b0232feb2e8365b30002ce306950153f5a9e4095d86fce6"
+url = "https://github.com/oven-sh/bun/releases/download/bun-v1.2.4/bun-linux-aarch64-musl.zip"
+
 [tools.bun."platforms.linux-x64"]
 checksum = "sha256:8adcbd74cf1af07dc3607ebee32bfe5a53353b1aef9515963781183d5c401586"
 url = "https://github.com/oven-sh/bun/releases/download/bun-v1.2.4/bun-linux-x64.zip"
@@ -44,9 +52,37 @@ url = "https://github.com/oven-sh/bun/releases/download/bun-v1.2.4/bun-windows-x
 version = "0.20.1"
 backend = "cargo:cargo-audit"
 
+[[tools.checkmake]]
+version = "0.3.2"
+backend = "aqua:mrtazz/checkmake"
+
+[tools.checkmake."platforms.linux-arm64"]
+checksum = "sha256:409167c4abb99407bd232c3bbd351b8a39df57997feafde5a08bddffb0f2dcb4"
+url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake-v0.3.2.linux.arm64"
+
+[tools.checkmake."platforms.linux-x64"]
+checksum = "sha256:e2effb876913f3ee2caef0ba35f6202c5e8a3cd55a077d8d2b9ce2034257b6af"
+url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake-v0.3.2.linux.amd64"
+
+[tools.checkmake."platforms.macos-arm64"]
+checksum = "sha256:d5dab7169d1cb246b380ed5e7fc1e6aded301d453db258f858e774422d25961f"
+url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake-v0.3.2.darwin.arm64"
+
+[tools.checkmake."platforms.macos-x64"]
+checksum = "sha256:82942043a4766b9fb3ffe6c77584df7d6c832bfa00571f234d257799f492fdd7"
+url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake-v0.3.2.darwin.amd64"
+
+[tools.checkmake."platforms.windows-x64"]
+checksum = "sha256:6adf4bde2dbfe8001ecf2918abfe02f7a57191568f1d185537eccd9c59625dca"
+url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake-v0.3.2.windows.amd64.exe"
+
 [[tools.deno]]
 version = "2.2.2"
 backend = "core:deno"
+
+[tools.deno."platforms.linux-arm64"]
+checksum = "sha256:8c72c81ad3e521ed4efb89f7d21bb4c08a801479cf94b34525e6892cd5c4b4bb"
+url = "https://dl.deno.land/release/v2.2.2/deno-aarch64-unknown-linux-gnu.zip"
 
 [tools.deno."platforms.linux-x64"]
 checksum = "sha256:cc47c1fa8b3ca23057b7c89c69511557a0f2eefc94516c38bc96ea97d619b491"
@@ -88,9 +124,37 @@ url = "https://dl.deno.land/release/v2.2.2/deno-x86_64-pc-windows-msvc.zip"
 version = "9.0.201"
 backend = "core:dotnet"
 
+[[tools.editorconfig-checker]]
+version = "3.6.1"
+backend = "aqua:editorconfig-checker/editorconfig-checker"
+
+[tools.editorconfig-checker."platforms.linux-arm64"]
+checksum = "sha256:a471181b0741982afa4f3dbc1e433b6caa0c5e6daad580572841884fd9957220"
+url = "https://github.com/editorconfig-checker/editorconfig-checker/releases/download/v3.6.1/ec-linux-arm64.tar.gz"
+
+[tools.editorconfig-checker."platforms.linux-x64"]
+checksum = "sha256:cd32084fce5f3d49ba49697f362ac3a114989715c98819303247dd54c1f368b0"
+url = "https://github.com/editorconfig-checker/editorconfig-checker/releases/download/v3.6.1/ec-linux-amd64.tar.gz"
+
+[tools.editorconfig-checker."platforms.macos-arm64"]
+checksum = "sha256:64f6006e4ae880ef140ac175f30b5b4cab72fa92b3708d9104006441fb7ed723"
+url = "https://github.com/editorconfig-checker/editorconfig-checker/releases/download/v3.6.1/ec-darwin-arm64.tar.gz"
+
+[tools.editorconfig-checker."platforms.macos-x64"]
+checksum = "sha256:6d7882e2f8a0884953f6bb8782b482ce8a6dd4ab2f25086a57046ef937f7625d"
+url = "https://github.com/editorconfig-checker/editorconfig-checker/releases/download/v3.6.1/ec-darwin-amd64.tar.gz"
+
+[tools.editorconfig-checker."platforms.windows-x64"]
+checksum = "sha256:cdd3899ebd60277b10e188c78915ea098a10a1a441a04e3ed2a5a99eb968a838"
+url = "https://github.com/editorconfig-checker/editorconfig-checker/releases/download/v3.6.1/ec-windows-amd64.zip"
+
 [[tools."github:JohnnyMorganz/StyLua"]]
 version = "2.0.2"
 backend = "github:JohnnyMorganz/StyLua"
+
+[tools."github:JohnnyMorganz/StyLua"."platforms.linux-arm64"]
+url = "https://github.com/JohnnyMorganz/StyLua/releases/download/v2.0.2/stylua-linux-aarch64.zip"
+url_api = "https://api.github.com/repos/JohnnyMorganz/StyLua/releases/assets/211753236"
 
 [tools."github:JohnnyMorganz/StyLua"."platforms.linux-x64"]
 url = "https://github.com/JohnnyMorganz/StyLua/releases/download/v2.0.2/stylua-linux-x86_64.zip"
@@ -181,6 +245,11 @@ url_api = "https://api.github.com/repos/apple/pkl/releases/assets/362961758"
 version = "0.69.3"
 backend = "github:aquasecurity/trivy"
 
+[tools."github:aquasecurity/trivy"."platforms.linux-arm64"]
+checksum = "sha256:7e3924a974e912e57b4a99f65ece7931f8079584dae12eb7845024f97087bdfd"
+url = "https://github.com/aquasecurity/trivy/releases/download/v0.69.3/trivy_0.69.3_Linux-ARM64.tar.gz"
+url_api = "https://api.github.com/repos/aquasecurity/trivy/releases/assets/366055001"
+
 [tools."github:aquasecurity/trivy"."platforms.linux-x64"]
 checksum = "sha256:cf79e4a3c3af0dd8e0cbf092c2586e9a4f877a5d9ea924cb4c2a1e863e9e925d"
 url = "https://github.com/aquasecurity/trivy/releases/download/v0.69.3/trivy_0.69.3_Linux-32bit.tar.gz"
@@ -229,6 +298,10 @@ url_api = "https://api.github.com/repos/aquasecurity/trivy/releases/assets/36605
 [[tools."github:ballerina-platform/ballerina-distribution"]]
 version = "2201.11.0"
 backend = "github:ballerina-platform/ballerina-distribution"
+
+[tools."github:ballerina-platform/ballerina-distribution"."platforms.linux-arm64"]
+url = "https://github.com/ballerina-platform/ballerina-distribution/releases/download/v2201.11.0/ballerina-2201.11.0-swan-lake-linux.zip"
+url_api = "https://api.github.com/repos/ballerina-platform/ballerina-distribution/releases/assets/228195536"
 
 [tools."github:ballerina-platform/ballerina-distribution"."platforms.linux-x64"]
 url = "https://github.com/ballerina-platform/ballerina-distribution/releases/download/v2201.11.0/ballerina-2201.11.0-swan-lake-linux-arm-x64.deb"
@@ -312,6 +385,10 @@ url_api = "https://api.github.com/repos/bazelbuild/bazel/releases/assets/3709962
 [[tools."github:bufbuild/buf"]]
 version = "1.50.0"
 backend = "github:bufbuild/buf"
+
+[tools."github:bufbuild/buf"."platforms.linux-arm64"]
+url = "https://github.com/bufbuild/buf/releases/download/v1.50.0/buf-Linux-aarch64.tar.gz"
+url_api = "https://api.github.com/repos/bufbuild/buf/releases/assets/221228498"
 
 [tools."github:bufbuild/buf"."platforms.linux-x64"]
 url = "https://github.com/bufbuild/buf/releases/download/v1.50.0/buf-Linux-x86_64.tar.gz"
@@ -432,9 +509,48 @@ checksum = "sha256:9a8730bb7249fbd6e775689f51b215a9d960a90d33e2c9aace53b552c83da
 url = "https://github.com/checkmake/checkmake/releases/download/0.2.1/checkmake-0.2.1.freebsd.amd64"
 url_api = "https://api.github.com/repos/checkmake/checkmake/releases/assets/57281589"
 
+[[tools."github:cli/cli"]]
+version = "2.88.1"
+backend = "github:cli/cli"
+
+[tools."github:cli/cli"."platforms.linux-arm64"]
+checksum = "sha256:039ce25aab0cfa0ea5160e3db75ed44699bde4b20ff63ec5991f82201f1b33b8"
+url = "https://github.com/cli/cli/releases/download/v2.88.1/gh_2.88.1_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/372317913"
+provenance = "github-attestations"
+
+[tools."github:cli/cli"."platforms.linux-x64"]
+checksum = "sha256:36352a993b97e9758793cdb87f9ba674bd6d88c914488e122be78a1962203803"
+url = "https://github.com/cli/cli/releases/download/v2.88.1/gh_2.88.1_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/372317909"
+provenance = "github-attestations"
+
+[tools."github:cli/cli"."platforms.macos-arm64"]
+checksum = "sha256:bdbeed4821d450ef0d14821d856c05b308ab449fbf60527f298d96fbf5d2447b"
+url = "https://github.com/cli/cli/releases/download/v2.88.1/gh_2.88.1_macOS_arm64.zip"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/372317935"
+provenance = "github-attestations"
+
+[tools."github:cli/cli"."platforms.macos-x64"]
+checksum = "sha256:ff0fc4bdb9699f0c02e5bcdcbd09d0f8e4c4659aa5d30bcd39a3557ed7379b2e"
+url = "https://github.com/cli/cli/releases/download/v2.88.1/gh_2.88.1_macOS_amd64.zip"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/372317933"
+provenance = "github-attestations"
+
+[tools."github:cli/cli"."platforms.windows-x64"]
+checksum = "sha256:8fdaac525d8919f9f8c265f99ffa26189e5f1fd3a35636adad4fd890a141a555"
+url = "https://github.com/cli/cli/releases/download/v2.88.1/gh_2.88.1_windows_amd64.zip"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/372317959"
+provenance = "github-attestations"
+
 [[tools."github:cue-lang/cue"]]
 version = "0.12.0"
 backend = "github:cue-lang/cue"
+
+[tools."github:cue-lang/cue"."platforms.linux-arm64"]
+checksum = "sha256:488012bb0e5c080e2a9694ef8765403dd1075a4ec373dda618efa2d37b47f14f"
+url = "https://github.com/cue-lang/cue/releases/download/v0.12.0/cue_v0.12.0_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/cue-lang/cue/releases/assets/224862317"
 
 [tools."github:cue-lang/cue"."platforms.linux-x64"]
 checksum = "sha256:e55cd5abd98a592c110f87a7da9ef15bc72515200aecfe1bed04bf86311f5ba1"
@@ -489,6 +605,11 @@ backend = "github:dotenv-linter/dotenv-linter"
 version = "3.41.0"
 backend = "github:go-task/task"
 
+[tools."github:go-task/task"."platforms.linux-arm64"]
+checksum = "sha256:dbe5b4aa21bdc7f00b232ebec5b2ffc8f6d1fc5bfb342597730c8aaca1217296"
+url = "https://github.com/go-task/task/releases/download/v3.41.0/task_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/go-task/task/releases/assets/221404407"
+
 [tools."github:go-task/task"."platforms.linux-x64"]
 checksum = "sha256:0a2595f7fa3c15a62f8d0c244121a4977018b3bfdec7c1542ac2a8cf079978b8"
 url = "https://github.com/go-task/task/releases/download/v3.41.0/task_linux_amd64.tar.gz"
@@ -537,6 +658,11 @@ url_api = "https://api.github.com/repos/go-task/task/releases/assets/221404414"
 [[tools."github:google/go-jsonnet"]]
 version = "0.20.0"
 backend = "github:google/go-jsonnet"
+
+[tools."github:google/go-jsonnet"."platforms.linux-arm64"]
+checksum = "sha256:49fbc99c91dcd2be53fa856307de3b8708c91dc5c74740714fdf9317957322e0"
+url = "https://github.com/google/go-jsonnet/releases/download/v0.20.0/go-jsonnet_0.20.0_Linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/google/go-jsonnet/releases/assets/104116599"
 
 [tools."github:google/go-jsonnet"."platforms.linux-x64"]
 checksum = "sha256:a137c5e969609c3995c4d05817a247cfef8a92760c5306c3ad7df0355dd62970"
@@ -590,6 +716,12 @@ backend = "github:google/google-java-format"
 [[tools."github:google/osv-scanner"]]
 version = "2.3.5"
 backend = "github:google/osv-scanner"
+
+[tools."github:google/osv-scanner"."platforms.linux-arm64"]
+checksum = "sha256:fa46ad2b3954db5d5335303d45de921613393285d9a93c140b63b40e35e9ce50"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_linux_arm64"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248755"
+provenance = "slsa"
 
 [tools."github:google/osv-scanner"."platforms.linux-x64"]
 checksum = "sha256:bb30c580afe5e757d3e959f4afd08a4795ea505ef84c46962b9a738aa573b41b"
@@ -645,13 +777,80 @@ url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanne
 url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248754"
 provenance = "slsa"
 
+[[tools."github:goreleaser/goreleaser"]]
+version = "2.14.1"
+backend = "github:goreleaser/goreleaser"
+
+[tools."github:goreleaser/goreleaser"."platforms.linux-arm64"]
+checksum = "sha256:a84d3b27f052c12ad5c8342d7caf1450a7174a305730aed21d72db09301e49a5"
+url = "https://github.com/goreleaser/goreleaser/releases/download/v2.14.1/goreleaser_Linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/goreleaser/goreleaser/releases/assets/362259739"
+provenance = "github-attestations"
+
+[tools."github:goreleaser/goreleaser"."platforms.linux-x64"]
+checksum = "sha256:2df975a7acbfdeaf888d596cab0024d48ec7fb7d747e1d08b90948b791f40a5f"
+url = "https://github.com/goreleaser/goreleaser/releases/download/v2.14.1/goreleaser_Linux_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/goreleaser/goreleaser/releases/assets/362259765"
+provenance = "github-attestations"
+
+[tools."github:goreleaser/goreleaser"."platforms.macos-arm64"]
+checksum = "sha256:ece9b4772b0f61d4dcd826430da026d1d9760c37b118da0d55c6692319f90340"
+url = "https://github.com/goreleaser/goreleaser/releases/download/v2.14.1/goreleaser_Darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/goreleaser/goreleaser/releases/assets/362259760"
+provenance = "github-attestations"
+
+[tools."github:goreleaser/goreleaser"."platforms.macos-x64"]
+checksum = "sha256:33511239d3c0cea96ceb4d57e488aafe1389852915b65b7777611e1a67e28e84"
+url = "https://github.com/goreleaser/goreleaser/releases/download/v2.14.1/goreleaser_Darwin_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/goreleaser/goreleaser/releases/assets/362259767"
+provenance = "github-attestations"
+
+[tools."github:goreleaser/goreleaser"."platforms.windows-x64"]
+checksum = "sha256:d7a3d8ba795e97ab8c4f8003630d300da164adf21fde5a4049440c20f15c3137"
+url = "https://github.com/goreleaser/goreleaser/releases/download/v2.14.1/goreleaser_Windows_x86_64.zip"
+url_api = "https://api.github.com/repos/goreleaser/goreleaser/releases/assets/362259806"
+provenance = "github-attestations"
+
 [[tools."github:grain-lang/grain"]]
 version = "0.7.2"
 backend = "github:grain-lang/grain"
 
+[[tools."github:hadolint/hadolint"]]
+version = "2.14.0"
+backend = "github:hadolint/hadolint"
+
+[tools."github:hadolint/hadolint"."platforms.linux-arm64"]
+checksum = "sha256:331f1d3511b84a4f1e3d18d52fec284723e4019552f4f47b19322a53ce9a40ed"
+url = "https://github.com/hadolint/hadolint/releases/download/v2.14.0/hadolint-linux-arm64"
+url_api = "https://api.github.com/repos/hadolint/hadolint/releases/assets/295944081"
+
+[tools."github:hadolint/hadolint"."platforms.linux-x64"]
+checksum = "sha256:6bf226944684f56c84dd014e8b979d27425c0148f61b3bd99bcc6f39e9dc5a47"
+url = "https://github.com/hadolint/hadolint/releases/download/v2.14.0/hadolint-linux-x86_64"
+url_api = "https://api.github.com/repos/hadolint/hadolint/releases/assets/295944080"
+
+[tools."github:hadolint/hadolint"."platforms.macos-arm64"]
+checksum = "sha256:3625e2e9f43dcfe7bd38738a5f5520ed50ce39ed28485266e6803dd7bc197b10"
+url = "https://github.com/hadolint/hadolint/releases/download/v2.14.0/hadolint-macos-arm64"
+url_api = "https://api.github.com/repos/hadolint/hadolint/releases/assets/295944077"
+
+[tools."github:hadolint/hadolint"."platforms.macos-x64"]
+checksum = "sha256:2b69a853433f1eca522ffb921cd490bd1321424d03331fd8390f93b7fb4a02e9"
+url = "https://github.com/hadolint/hadolint/releases/download/v2.14.0/hadolint-macos-x86_64"
+url_api = "https://api.github.com/repos/hadolint/hadolint/releases/assets/295944082"
+
+[tools."github:hadolint/hadolint"."platforms.windows-x64"]
+checksum = "sha256:8e0ee174f88edb14f207a68430c7a53c2883ed509cdbde9a3a26fffa140fa5e4"
+url = "https://github.com/hadolint/hadolint/releases/download/v2.14.0/hadolint-windows-x86_64.exe"
+url_api = "https://api.github.com/repos/hadolint/hadolint/releases/assets/295944079"
+
 [[tools."github:kcl-lang/kcl"]]
 version = "0.11.2"
 backend = "github:kcl-lang/kcl"
+
+[tools."github:kcl-lang/kcl"."platforms.linux-arm64"]
+url = "https://github.com/kcl-lang/kcl/releases/download/v0.11.2/kclvm-v0.11.2-linux-arm64.tar.gz"
+url_api = "https://api.github.com/repos/kcl-lang/kcl/releases/assets/247659807"
 
 [tools."github:kcl-lang/kcl"."platforms.linux-x64"]
 url = "https://github.com/kcl-lang/kcl/releases/download/v0.11.2/kclvm-v0.11.2-linux-amd64.tar.gz"
@@ -722,6 +921,11 @@ backend = "github:stackrox/kube-linter"
 version = "0.61.0"
 backend = "github:terraform-linters/tflint"
 
+[tools."github:terraform-linters/tflint"."platforms.linux-arm64"]
+checksum = "sha256:999c25cfdb5208fe1133dec6b219e666a39fc2a7a0786a781dc9924ea5945ebf"
+url = "https://github.com/terraform-linters/tflint/releases/download/v0.61.0/tflint_linux_arm64.zip"
+url_api = "https://api.github.com/repos/terraform-linters/tflint/releases/assets/352087726"
+
 [tools."github:terraform-linters/tflint"."platforms.linux-x64"]
 checksum = "sha256:ca4e4e8cb7cc3436f2b6979e9c4fd4e2623a66fcca1ad1fe12f8669967636ae2"
 url = "https://github.com/terraform-linters/tflint/releases/download/v0.61.0/tflint_linux_amd64.zip"
@@ -767,9 +971,37 @@ checksum = "sha256:f114a26a519f580a9d27204b1210ba5869ed8219d7e23a732d41774d612af
 url = "https://github.com/terraform-linters/tflint/releases/download/v0.61.0/tflint_windows_amd64.zip"
 url_api = "https://api.github.com/repos/terraform-linters/tflint/releases/assets/352087725"
 
+[[tools.gitleaks]]
+version = "8.30.0"
+backend = "aqua:gitleaks/gitleaks"
+
+[tools.gitleaks."platforms.linux-arm64"]
+checksum = "sha256:b4cbbb6ddf7d1b2a603088cd03a4e3f7ce48ee7fd449b51f7de6ee2906f5fa2f"
+url = "https://github.com/gitleaks/gitleaks/releases/download/v8.30.0/gitleaks_8.30.0_linux_arm64.tar.gz"
+
+[tools.gitleaks."platforms.linux-x64"]
+checksum = "sha256:79a3ab579b53f71efd634f3aaf7e04a0fa0cf206b7ed434638d1547a2470a66e"
+url = "https://github.com/gitleaks/gitleaks/releases/download/v8.30.0/gitleaks_8.30.0_linux_x64.tar.gz"
+
+[tools.gitleaks."platforms.macos-arm64"]
+checksum = "sha256:b251ab2bcd4cd8ba9e56ff37698c033ebf38582b477d21ebd86586d927cf87e7"
+url = "https://github.com/gitleaks/gitleaks/releases/download/v8.30.0/gitleaks_8.30.0_darwin_arm64.tar.gz"
+
+[tools.gitleaks."platforms.macos-x64"]
+checksum = "sha256:ca221d012d247080c2f6f61f4b7a83bffa2453806b0c195c795bbe9a8c775ed5"
+url = "https://github.com/gitleaks/gitleaks/releases/download/v8.30.0/gitleaks_8.30.0_darwin_x64.tar.gz"
+
+[tools.gitleaks."platforms.windows-x64"]
+checksum = "sha256:54fe94f644b832dd08e8c3a5915efb3bfa862386d59fb27ca0792cb687a83573"
+url = "https://github.com/gitleaks/gitleaks/releases/download/v8.30.0/gitleaks_8.30.0_windows_x64.zip"
+
 [[tools.go]]
 version = "1.24.1"
 backend = "core:go"
+
+[tools.go."platforms.linux-arm64"]
+checksum = "sha256:8df5750ffc0281017fb6070fba450f5d22b600a02081dceef47966ffaf36a3af"
+url = "https://dl.google.com/go/go1.24.1.linux-arm64.tar.gz"
 
 [tools.go."platforms.linux-x64"]
 checksum = "sha256:cb2396bae64183cdccf81a9a6df0aea3bce9511fc21469fb89a0c00470088073"
@@ -790,6 +1022,10 @@ url = "https://dl.google.com/go/go1.24.1.windows-amd64.zip"
 [[tools.go]]
 version = "1.23.6"
 backend = "core:go"
+
+[tools.go."platforms.linux-arm64"]
+checksum = "sha256:561c780e8f4a8955d32bf72e46af0b5ee5e0debe1e4633df9a03781878219202"
+url = "https://dl.google.com/go/go1.23.6.linux-arm64.tar.gz"
 
 [tools.go."platforms.linux-x64"]
 checksum = "sha256:9379441ea310de000f33a4dc767bd966e72ab2826270e038e78b2c53c2e7802d"
@@ -827,6 +1063,10 @@ url = "https://dl.google.com/go/go1.23.6.windows-amd64.zip"
 checksum = "sha256:53fec1586850b2cf5ad6438341ff7adc5f6700dd3ec1cfa3f5e8b141df190243"
 url = "https://dl.google.com/go/go1.23.6.windows-amd64.zip"
 
+[[tools."go:github.com/google/addlicense"]]
+version = "v1.1.1"
+backend = "go:github.com/google/addlicense"
+
 [[tools."go:golang.org/x/vuln/cmd/govulncheck"]]
 version = "1.1.4"
 backend = "go:golang.org/x/vuln/cmd/govulncheck"
@@ -841,6 +1081,11 @@ backend = "github:JetBrains/kotlin"
 
 [tools.kotlin.options]
 asset_pattern = "kotlin-compiler-*.zip"
+
+[tools.kotlin."platforms.linux-arm64"]
+checksum = "sha256:a118197b0de55ffab2bc8d5cd03a5e39033cfb53383d6931bc761dec0784891a"
+url = "https://github.com/JetBrains/kotlin/releases/download/v2.1.20/kotlin-compiler-2.1.20.zip"
+url_api = "https://api.github.com/repos/JetBrains/kotlin/releases/assets/238971897"
 
 [tools.kotlin."platforms.linux-x64"]
 checksum = "sha256:a118197b0de55ffab2bc8d5cd03a5e39033cfb53383d6931bc761dec0784891a"
@@ -887,6 +1132,38 @@ checksum = "sha256:a118197b0de55ffab2bc8d5cd03a5e39033cfb53383d6931bc761dec07848
 url = "https://github.com/JetBrains/kotlin/releases/download/v2.1.20/kotlin-compiler-2.1.20.zip"
 url_api = "https://api.github.com/repos/JetBrains/kotlin/releases/assets/238971897"
 
+[[tools.node]]
+version = "20.18.3"
+backend = "core:node"
+
+[tools.node."platforms.linux-arm64"]
+checksum = "sha256:93a9df19238adfaa289f4784041d03edaf2fdd89fbb247faffca2fe4a1000703"
+url = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/v20.18.3/node-v20.18.3-linux-arm64.tar.gz"
+
+[tools.node."platforms.linux-x64"]
+checksum = "sha256:9fc3952da39b20d1fcfdb777b198cc035485afbbb1004b4df93f35245d61151e"
+url = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/v20.18.3/node-v20.18.3-linux-x64.tar.gz"
+
+[tools.node."platforms.macos-arm64"]
+checksum = "sha256:1f15b7ed18a580af31cf32bc126572292d820f547bf55bf9cdce08041a24e1d9"
+url = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/v20.18.3/node-v20.18.3-darwin-arm64.tar.gz"
+
+[tools.node."platforms.macos-x64"]
+checksum = "sha256:ba668f64df9239843fefcef095ee539f5ac5aa1b0fc15a71f1ecca16abedec7a"
+url = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/v20.18.3/node-v20.18.3-darwin-x64.tar.gz"
+
+[tools.node."platforms.windows-x64"]
+checksum = "sha256:11d483dfba711bc7c9bcb513e80a2941be0c2e7cbf62753755785b9a6e80a731"
+url = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/v20.18.3/node-v20.18.3-win-x64.zip"
+
+[[tools."npm:@commitlint/cli"]]
+version = "20.5.0"
+backend = "npm:@commitlint/cli"
+
+[[tools."npm:@commitlint/config-conventional"]]
+version = "20.5.0"
+backend = "npm:@commitlint/config-conventional"
+
 [[tools."npm:@naturalcycles/ktlint"]]
 version = "1.12.0"
 backend = "npm:@naturalcycles/ktlint"
@@ -895,6 +1172,10 @@ backend = "npm:@naturalcycles/ktlint"
 version = "6.15.0"
 backend = "npm:@stoplight/spectral-cli"
 
+[[tools."npm:@taplo/cli"]]
+version = "0.7.0"
+backend = "npm:@taplo/cli"
+
 [[tools."npm:assemblyscript"]]
 version = "0.27.31"
 backend = "npm:assemblyscript"
@@ -902,6 +1183,38 @@ backend = "npm:assemblyscript"
 [[tools."npm:bats"]]
 version = "1.13.0"
 backend = "npm:bats"
+
+[[tools."npm:commitizen"]]
+version = "4.3.1"
+backend = "npm:commitizen"
+
+[[tools."npm:cz-conventional-changelog"]]
+version = "3.3.0"
+backend = "npm:cz-conventional-changelog"
+
+[[tools."npm:dockerfile-utils"]]
+version = "0.16.3"
+backend = "npm:dockerfile-utils"
+
+[[tools."npm:eslint"]]
+version = "10.0.3"
+backend = "npm:eslint"
+
+[[tools."npm:markdownlint-cli2"]]
+version = "0.21.0"
+backend = "npm:markdownlint-cli2"
+
+[[tools."npm:pnpm"]]
+version = "10.30.3"
+backend = "npm:pnpm"
+
+[[tools."npm:prettier"]]
+version = "3.8.1"
+backend = "npm:prettier"
+
+[[tools."npm:sort-package-json"]]
+version = "3.6.1"
+backend = "npm:sort-package-json"
 
 [[tools."npm:stylelint"]]
 version = "16.26.1"
@@ -915,21 +1228,85 @@ backend = "npm:stylelint-config-standard"
 version = "1.6.4"
 backend = "npm:vitepress"
 
+[[tools."pipx:actionlint-py"]]
+version = "1.7.11.24"
+backend = "pipx:actionlint-py"
+
 [[tools."pipx:ansible-lint"]]
 version = "26.1.1"
 backend = "pipx:ansible-lint"
+
+[[tools."pipx:clang-format"]]
+version = "19.1.7"
+backend = "pipx:clang-format"
+
+[[tools."pipx:dotenv-linter"]]
+version = "0.7.0"
+backend = "pipx:dotenv-linter"
 
 [[tools."pipx:pip-audit"]]
 version = "2.8.0"
 backend = "pipx:pip-audit"
 
+[[tools."pipx:pre-commit"]]
+version = "4.5.1"
+backend = "pipx:pre-commit"
+
+[[tools."pipx:ruff"]]
+version = "0.15.4"
+backend = "pipx:ruff"
+
+[[tools."pipx:shellcheck-py"]]
+version = "0.11.0.1"
+backend = "pipx:shellcheck-py"
+
+[[tools."pipx:shfmt-py"]]
+version = "3.12.0.2"
+backend = "pipx:shfmt-py"
+
+[[tools."pipx:sqlfluff"]]
+version = "4.0.4"
+backend = "pipx:sqlfluff"
+
+[[tools."pipx:yamllint"]]
+version = "1.38.0"
+backend = "pipx:yamllint"
+
 [[tools."pipx:zizmor"]]
 version = "1.3.1"
 backend = "pipx:zizmor"
 
+[[tools.python]]
+version = "3.12.9"
+backend = "core:python"
+
+[tools.python."platforms.linux-arm64"]
+checksum = "sha256:0354f70e7d3e2d0c36308edc1815c563d9bae1a3221830f7e222f6bb0a7e1a3a"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20250317/cpython-3.12.9+20250317-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz"
+
+[tools.python."platforms.linux-x64"]
+checksum = "sha256:a36bc60c38fe146e908e2e71fc21266c8558b24a9407226b1d887212839437ef"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20250317/cpython-3.12.9+20250317-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
+
+[tools.python."platforms.macos-arm64"]
+checksum = "sha256:0a4647b7df3c8eca11071d6cea68a14a4b102bd6fc6afae314e9852510654b7d"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20250317/cpython-3.12.9+20250317-aarch64-apple-darwin-install_only_stripped.tar.gz"
+
+[tools.python."platforms.macos-x64"]
+checksum = "sha256:1a414bf392a7afe08c742502a82edd41893a1144ccbceb184dc5ee6ee9c069c0"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20250317/cpython-3.12.9+20250317-x86_64-apple-darwin-install_only_stripped.tar.gz"
+
+[tools.python."platforms.windows-x64"]
+checksum = "sha256:ee338839315bdd8af5fc935f9595eca20ebebdd250726c5816b2d0cf94d1e661"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20250317/cpython-3.12.9+20250317-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+
 [[tools.ruby]]
 version = "3.2.10"
 backend = "core:ruby"
+
+[tools.ruby."platforms.linux-arm64"]
+checksum = "sha256:880acb05e08da8c559c56a13e512bae1b472da67c72ebb750c765f9c2134e689"
+url = "https://cache.ruby-lang.org/pub/ruby/3.2/ruby-3.2.10.tar.gz"
 
 [tools.ruby."platforms.linux-x64"]
 checksum = "sha256:880acb05e08da8c559c56a13e512bae1b472da67c72ebb750c765f9c2134e689"
@@ -974,6 +1351,10 @@ backend = "core:rust"
 [[tools.zig]]
 version = "0.14.0"
 backend = "core:zig"
+
+[tools.zig."platforms.linux-arm64"]
+checksum = "sha256:ab64e3ea277f6fc5f3d723dcd95d9ce1ab282c8ed0f431b4de880d30df891e4f"
+url = "https://ziglang.org/download/0.14.0/zig-linux-aarch64-0.14.0.tar.xz"
 
 [tools.zig."platforms.linux-x64"]
 checksum = "sha256:473ec26806133cf4d1918caf1a410f8403a13d979726a9045b421b685031a982"

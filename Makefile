@@ -231,17 +231,12 @@ else
 	@mise x -- sh scripts/sync-labels.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-sync-lock: ## Synchronize and verify the mise.lock file
-	@printf "$(BLUE)Synchronizing mise.lock...$(NC)\n"
-	@# Backup original config
-	@cp .mise.toml .mise.toml.bak
-	@# Generate a comprehensive manifest for locking
-	@./scripts/gen-full-manifest.sh > .mise.toml
-	@# Update mise.lock using the full manifest
-	@mise lock
-	@# Restore original config
-	@mv .mise.toml.bak .mise.toml
-	@printf "$(GREEN)mise.lock synchronized!$(NC)\n"
+sync-lock: ## Synchronize and verify the mise.lock file across all platforms
+ifeq ($(OS_NAME),Windows)
+	@powershell -ExecutionPolicy Bypass -File scripts/sync-lock.ps1
+else
+	@sh scripts/sync-lock.sh
+endif
 
 archive-changelog: ## Archive major-version changelog entries
 ifeq ($(OS_NAME),Windows)
