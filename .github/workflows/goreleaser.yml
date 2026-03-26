@@ -83,6 +83,10 @@ name: "📦 GoReleaser"
       - "riscv64-*" # Arch: RISC-V 64
       - "s390x-*" # Arch: System/390x
       - "loong64-*" # Arch: LoongArch 64
+      - "mips-*" # Arch: MIPS (Big Endian)
+      - "mipsle-*" # Arch: MIPS (Little Endian)
+      - "mips64-*" # Arch: MIPS64 (Big Endian)
+      - "mips64le-*" # Arch: MIPS64 (Little Endian)
 
       # --- Ecosystem & Channels ---
       - "tip" # Go standard: Tip/Latest
