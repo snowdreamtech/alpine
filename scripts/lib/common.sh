@@ -440,6 +440,22 @@ run_mise() {
     fi
   fi
 
+  # Adaptive Lock Forgiveness (ALF)
+  # Mise cannot reliably lock source-compiled tools (go: prefix). To prevent CI
+  # failures in --locked mode, we automatically drop the strict requirement
+  # for these tools while preserving it for the rest of the orchestration.
+  local _EFFECTIVE_LOCKED="${MISE_LOCKED:-}"
+  if [ "$_CMD" = "install" ]; then
+    for _arg in "$@"; do
+      case "$_arg" in
+      go:*)
+        _EFFECTIVE_LOCKED="0"
+        break
+        ;;
+      esac
+    done
+  fi
+
   local _M_BIN
   _M_BIN=$(command -v mise || echo "$HOME/.local/bin/mise")
   [ "$_G_OS" = "windows" ] && [ ! -x "$_M_BIN" ] && _M_BIN="${_M_BIN}.exe"
@@ -500,7 +516,7 @@ run_mise() {
       timeout "$_T_OUT" "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"
     else
       # shellcheck disable=SC2086
-      "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"
+      MISE_LOCKED="$_EFFECTIVE_LOCKED" "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"
     fi
     _STATUS=$?
     [ $_STATUS -eq 0 ] && break

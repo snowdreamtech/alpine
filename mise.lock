@@ -294,6 +294,16 @@ checksum = "sha256:d216b18ee8a225a38610d23ab49cb62df5488bafdbd5f59d3f1f78ec59778
 url = "https://github.com/bazelbuild/bazel/releases/download/9.0.1/bazel-9.0.1-installer-linux-x86_64.sh"
 url_api = "https://api.github.com/repos/bazelbuild/bazel/releases/assets/370996065"
 
+[tools."github:bazelbuild/bazel"."platforms.macos-arm64"]
+checksum = "sha256:2e504b99739a1b2f04fdafed08fe89eba27c9b75f6383703310b7f7071c15841"
+url = "https://github.com/bazelbuild/bazel/releases/download/9.0.1/bazel-9.0.1-darwin-arm64"
+url_api = "https://api.github.com/repos/bazelbuild/bazel/releases/assets/370995922"
+
+[tools."github:bazelbuild/bazel"."platforms.macos-x64"]
+checksum = "sha256:46af6aa5d365b8a28faa1cd7e9f01fbac7e563ce9e1405c6c4dda31812f1b964"
+url = "https://github.com/bazelbuild/bazel/releases/download/9.0.1/bazel-9.0.1-darwin-x86_64"
+url_api = "https://api.github.com/repos/bazelbuild/bazel/releases/assets/370995957"
+
 [[tools."github:bufbuild/buf"]]
 version = "1.50.0"
 backend = "github:bufbuild/buf"
@@ -381,6 +391,36 @@ url_api = "https://api.github.com/repos/casey/just/releases/assets/222537246"
 [[tools."github:checkmake/checkmake"]]
 version = "0.2.1"
 backend = "github:checkmake/checkmake"
+
+[tools."github:checkmake/checkmake"."platforms.linux-x64"]
+checksum = "sha256:a89b4c5e84040439649bcbbcee9ab82306a7412a09020a7288d8bf9870b52a49"
+url = "https://github.com/checkmake/checkmake/releases/download/0.2.1/checkmake-0.2.1.linux.amd64"
+url_api = "https://api.github.com/repos/checkmake/checkmake/releases/assets/57281590"
+
+[tools."github:checkmake/checkmake"."platforms.linux-x64-baseline"]
+checksum = "sha256:a89b4c5e84040439649bcbbcee9ab82306a7412a09020a7288d8bf9870b52a49"
+url = "https://github.com/checkmake/checkmake/releases/download/0.2.1/checkmake-0.2.1.linux.amd64"
+url_api = "https://api.github.com/repos/checkmake/checkmake/releases/assets/57281590"
+
+[tools."github:checkmake/checkmake"."platforms.linux-x64-musl"]
+checksum = "sha256:a89b4c5e84040439649bcbbcee9ab82306a7412a09020a7288d8bf9870b52a49"
+url = "https://github.com/checkmake/checkmake/releases/download/0.2.1/checkmake-0.2.1.linux.amd64"
+url_api = "https://api.github.com/repos/checkmake/checkmake/releases/assets/57281590"
+
+[tools."github:checkmake/checkmake"."platforms.linux-x64-musl-baseline"]
+checksum = "sha256:a89b4c5e84040439649bcbbcee9ab82306a7412a09020a7288d8bf9870b52a49"
+url = "https://github.com/checkmake/checkmake/releases/download/0.2.1/checkmake-0.2.1.linux.amd64"
+url_api = "https://api.github.com/repos/checkmake/checkmake/releases/assets/57281590"
+
+[tools."github:checkmake/checkmake"."platforms.macos-x64"]
+checksum = "sha256:ca36ff252020115b186fff6dc28e1b3952e8a4147f62a8350833e82d6464ade9"
+url = "https://github.com/checkmake/checkmake/releases/download/0.2.1/checkmake-0.2.1.darwin.amd64"
+url_api = "https://api.github.com/repos/checkmake/checkmake/releases/assets/57281586"
+
+[tools."github:checkmake/checkmake"."platforms.macos-x64-baseline"]
+checksum = "sha256:ca36ff252020115b186fff6dc28e1b3952e8a4147f62a8350833e82d6464ade9"
+url = "https://github.com/checkmake/checkmake/releases/download/0.2.1/checkmake-0.2.1.darwin.amd64"
+url_api = "https://api.github.com/repos/checkmake/checkmake/releases/assets/57281586"
 
 [tools."github:checkmake/checkmake"."platforms.windows-x64"]
 checksum = "sha256:9a8730bb7249fbd6e775689f51b215a9d960a90d33e2c9aace53b552c83dabf0"
