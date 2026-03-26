@@ -72,7 +72,7 @@ GIT_BRANCH      := $(shell git branch --show-current 2>/dev/null || echo "not a 
 # =============================================================================
 # Targets
 # =============================================================================
-.PHONY: all help init setup install lint format test build clean commit verify release env update audit health bench docs archive-changelog check-env sync-docs precommit license-add license-check gen-dependabot sync-labels
+.PHONY: all help init setup install lint format test build clean commit verify release env update audit health bench docs archive-changelog check-env sync-docs precommit license-add license-check gen-dependabot sync-labels sync-lock
 
 # Default target: display help
 all: help
@@ -230,6 +230,11 @@ ifeq ($(OS_NAME),Windows)
 else
 	@mise x -- sh scripts/sync-labels.sh $(SCRIPT_ARGS) $(ARGS)
 endif
+
+sync-lock: ## Synchronize and verify the mise.lock file
+	@printf "$(BLUE)Synchronizing mise.lock...$(NC)\n"
+	@mise lock
+	@printf "$(GREEN)mise.lock synchronized!$(NC)\n"
 
 archive-changelog: ## Archive major-version changelog entries
 ifeq ($(OS_NAME),Windows)
