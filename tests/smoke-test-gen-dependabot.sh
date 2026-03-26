@@ -43,7 +43,7 @@ git commit -m "initial" -q
 # Run the script and capture output (using --dry-run to get STDOUT)
 echo "🏃 Running generator..."
 OUTPUT_FILE="$TEMP_DIR/dependabot.yml"
-sh "$GEN_SCRIPT" --dry-run > "$OUTPUT_FILE"
+sh "$GEN_SCRIPT" --dry-run >"$OUTPUT_FILE"
 
 # Debug: Show generated file if test fails
 on_failure() {
@@ -69,15 +69,15 @@ assert_contains() {
 }
 
 echo "🔍 Verifying generated content..."
-assert_contains "package-ecosystem: \"npm\""
-assert_contains "directory: \"/\""
-assert_contains "directory: \"/docs\""
-assert_contains "package-ecosystem: \"docker\""
-assert_contains "package-ecosystem: \"pre-commit\""
+assert_contains 'package-ecosystem: "npm"'
+assert_contains 'directory: "/"'
+assert_contains 'directory: "/docs"'
+assert_contains 'package-ecosystem: "docker"'
+assert_contains 'package-ecosystem: "pre-commit"'
 assert_contains "📦-all-patch-minor"
 assert_contains "🧹-lint-dependencies"
 assert_contains "🔧-actions-updates"
-assert_contains "rebase-strategy: \"auto\""
+assert_contains 'rebase-strategy: "auto"'
 assert_contains "reviewers: \[\"snowdream\"\]"
 
 echo "✨ Smoke test PASSED successfully!"

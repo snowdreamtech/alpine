@@ -10,17 +10,12 @@
 name: "🔄 Continuous Integration"
 
 "on":
-  push:
-    branches-ignore:
-      - "main"
   pull_request:
+    branches:
+      - "main"
+      - "dev"
     types: [opened, synchronize, reopened]
   workflow_dispatch:
-    inputs:
-      venv:
-        description: "Virtual environment path"
-        required: false
-        default: ".venv"
 
 permissions: {}
 
@@ -101,7 +96,7 @@ jobs:
       security-events: write
     timeout-minutes: 15
     env:
-      VENV: ${{ github.event.inputs.venv || inputs.venv || '.venv' }}
+      VENV: ".venv"
       PYTHONUTF8: 1
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
@@ -214,7 +209,7 @@ jobs:
       pull-requests: read
     timeout-minutes: 30
     env:
-      VENV: ${{ github.event.inputs.venv || inputs.venv || '.venv' }}
+      VENV: ".venv"
       PYTHONUTF8: 1
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
@@ -353,7 +348,7 @@ jobs:
       security-events: write
     timeout-minutes: 20
     env:
-      VENV: ${{ github.event.inputs.venv || inputs.venv || '.venv' }}
+      VENV: ".venv"
       PYTHONUTF8: 1
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"

@@ -156,7 +156,9 @@ Never exclude `venv/` or `env/` entirely — a misplaced `.env` file in the root
   ```
 
 ### Mise Toolchain Integrity
+
 To prevent toolchain poisoning (Node.js, Go, Python, etc.):
+
 - **Exact Pinning**: All tools in `.mise.toml` MUST use exact versions (e.g., `20.18.3` instead of `20`).
 - **Official Registries**: Env vars like `NODEJS_ORG_MIRROR` MUST point to official sources in CI.
 - **MISE_LOCKED Mode**: All CI workflows MUST set `MISE_LOCKED: 1` to prevent unauthorized tool updates or remote resolution at runtime.
@@ -164,6 +166,7 @@ To prevent toolchain poisoning (Node.js, Go, Python, etc.):
 - **Network Isolation**: `harden-runner` remains the final defense, blocking any unauthorized connection attempted by compromised plugins.
 
 ### Dependency Governance (Final Shields Up)
+
 - **PR Dependency Review**: All Pull Requests MUST pass the `dependency-review` check. This prevents the introduction of known vulnerabilities before they are merged.
 - **Semantic Scanning**: `osv-scanner` MUST be enabled in `audit.sh` to provide deep vulnerability detection for all supported ecosystems (Go, npm, Python, etc.).
 - **Artifact Signing**: All production binaries MUST be signed with `cosign` using OIDC-based keyless signing.

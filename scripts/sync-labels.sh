@@ -9,7 +9,8 @@ set -e
 
 # Define SnowdreamTech Brand Colors & Labels
 # Format: "name:color:description"
-LABELS=$(cat <<EOF
+LABELS=$(
+  cat <<EOF
 dependencies:0366d6:Dependencies and package updates
 devops:7d31b2:CI/CD, infrastructure and dev environment
 infrastructure:6b5aed:Core infrastructure, Docker, and system configs

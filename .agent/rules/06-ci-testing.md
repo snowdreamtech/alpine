@@ -191,7 +191,25 @@ To ensure seamless automation flow (Chain-Triggering) and resilience against Git
     - **Triggering**: Actions triggered by `GITHUB_TOKEN` do NOT trigger other workflows. To enable chain-triggering (e.g., `release-please` triggering `goreleaser`), an elevated Personal Access Token (stored as `WORKFLOW_SECRET`) MUST be used.
     - **Bypassing Protection**: Allows automated pushes to bypass branch protection where necessary.
     - **Rate Limits**: Authenticated requests via PAT provide significantly higher API rate limits than the default token.
-- **Minimal Privilege**: For Read-only/Unit-test jobs that do not need to trigger follow-on workflows, always use the default `GITHUB_TOKEN` to adhere to the principle of least privilege.
+    - **Minimal Privilege**: For Read-only/Unit-test jobs that do not need to trigger follow-on workflows, always use the default `GITHUB_TOKEN` to adhere to the principle of least privilege.
+
+### 6.6 Single Source of Truth (SSoT) Check Model
+
+To eliminate redundant CI/CD execution and maximize resource efficiency, the project follows a strict **"Check-before-Merge"** and **"Deliver-on-Push"** separation:
+
+- **CI (Integration Check)**: Triggered ONLY on `pull_request` (targeting `main` or `dev`).
+    - **Goal**: Rapid feedback to ensure code is "Merge-Ready".
+- **CD (Delivery Check)**: Triggered ONLY on `push` to core branches (`main`, `dev`). (Explicitly NOT triggered on `pull_request`).
+    - **Goal**: Final baseline verification of the integrated code + Artifact Delivery (Release, Docker, etc.).
+- **Rationale**: Since code arriving on core branches has already passed CI during the PR phase, we do NOT trigger CI on `push`. Instead, CD performs a final integrity check before proceeding to delivery, avoiding any duplication of work during the PR stage.
+
+### 6.7 Unified Release Orchestration
+
+All core integration and stability branches MUST follow a unified release standard to ensure traceability:
+
+- **Core Branches**: Both `main` (Stable) and `dev` (Beta/Integration) are considered primary.
+- **Release Please**: Every push to a Core Branch MUST trigger `release-please` orchestration to automate versioning, changelog generation, and Gitleaks/Security auditing.
+- **Delivery Parity**: Whether on `main` or `dev`, the delivery pipeline (CD) must ensure 100% parity in verification depth (Lint -> Test -> Audit).
 
 ## 7. CI Security & Supply Chain
 
