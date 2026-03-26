@@ -74,9 +74,14 @@ name: "📦 GoReleaser"
       - "audit-*" # Maintenance: Audit
 
       # --- Architecture Specific ---
+      - "386-*" # Arch: x86 32-bit
+      - "amd64-*" # Arch: x86 64-bit
+      - "armv6-*" # Arch: ARMv6
+      - "armv7-*" # Arch: ARMv7
       - "arm64-*" # Arch: ARM64
-      - "amd64-*" # Arch: AMD64
+      - "ppc64le-*" # Arch: PowerPC 64LE
       - "riscv64-*" # Arch: RISC-V 64
+      - "s390x-*" # Arch: System/390x
       - "loong64-*" # Arch: LoongArch 64
 
       # --- Ecosystem & Channels ---
