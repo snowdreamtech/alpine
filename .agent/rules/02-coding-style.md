@@ -50,7 +50,12 @@ AI agents (including Antigravity, Cursor, etc.) MUST strictly follow these execu
   - AI agents SHOULD automatically `git commit` verified changes to record progress and maintain an audit trail.
   - AI agents **MUST NOT** automatically `git push` to remote repositories unless explicitly and specifically requested by the user for a particular task.
   - This ensures the developer retains final control over the remote state and can perform a final local review/test before sharing changes.
-- **Dependency Awareness**: Before committing changes to dependency managers or lockfiles, agents MUST verify that the changes do not block legitimate users in restricted network environments (e.g., China). Heavy or optional tools should remain "On-demand" (Tier 2).
+- **Universal Tiered Mise Protocol (UTTP - 分层工具协议)**:
+  - The project uses a tiered toolchain strategy to balance performance and security:
+    - **Tier 1 (Core)**: Minimal set of essential tools defined statically in [.mise.toml](file:///Users/snowdream/Workspace/snowdreamtech/template/.mise.toml). Installed by default.
+    - **Tier 2 (On-demand)**: 80+ language runtimes and security scanners defined in [scripts/lib/versions.sh](file:///Users/snowdream/Workspace/snowdreamtech/template/scripts/lib/versions.sh). Installed only when needed.
+  - **Lock Ritual Protocol**: AI agents MUST NOT manually edit lockfiles for Tier 2 tools. Instead, they MUST use the `make sync-lock` command, which uses a **Manifest Aggregator** to generate a unified, secure `mise.lock` for all tiers.
+  - **Minimal Local Bootstrap**: AI agents MUST ensure that standard local installations remain fast by keeping the root `.mise.toml` lean.
 
 ## 3. Code Quality Principles
 

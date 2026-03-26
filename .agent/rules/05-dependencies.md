@@ -29,26 +29,24 @@
   "express": "4.18.3"
   ```
 
-- Pin tool and runtime versions in version manager config files committed to the repository. The project follows a **strict orchestration role model** based on runtime priority:
+- Pin tool and runtime versions in version manager config files committed to the repository. The project follows a **Universal Tiered Tool Strategy (UTTP)** to ensure reproducibility without local bootstrap friction:
 
-  | Tool | Role | Priority | Scope |
+  | Tier | Classification | Storage | Management |
   | :--- | :--- | :--- | :--- |
-  | **mise** | **Toolchain Orchestrator** | - | Installation and version switching of all runtimes and Tool Executors. |
-  | **Node.js** | **Primary Runtime** | **High** | Host for the majority of CLI tools and JS/TS business logic. |
-  | **Python** | **Primary Runtime** | **High** | Host for `pipx`-based tools and Python business logic. |
-  | **pnpm** | **Node.js Manager** | - | Dedicated management of **Node.js business libraries**. |
-  | **uv** | **Python Manager** | - | Dedicated management of **Python business libraries** and venvs. |
-  | **Go/Rust/etc.**| **Secondary Runtime** | **On-Demand**| Installed only if project source code requires it. |
+  | **Tier 1** | **Core/Global** | [.mise.toml](file:///Users/snowdream/Workspace/snowdreamtech/template/.mise.toml) | Statically defined; local `mise install` default. |
+  | **Tier 2** | **On-Demand** | [versions.sh](file:///Users/snowdream/Workspace/snowdreamtech/template/scripts/lib/versions.sh) | Defined as shell variables; JIT-installed by scripts. |
+
+- **Manifest Aggregation & Locking**:
+  - To ensure Tier 2 tools are cryptographically locked in `mise.lock` without bloating the root config, the project uses a **Manifest Aggregator** ([scripts/gen-full-manifest.sh](file:///Users/snowdream/Workspace/snowdreamtech/template/scripts/gen-full-manifest.sh)).
+  - **The Lock Ritual**: Running `make sync-lock` dynamically merges Tier 1 and Tier 2 definitions into a temporary "Full Manifest" to update the global `mise.lock`.
+  - **CI/Audit Compliance**: All security audits and CI workflows MUST use the locked versions defined in `mise.lock` by activating the tiered configuration via `MISE_CONFIG`.
 
   ```toml
-  # .mise.toml — polyglot version manager (Single Source of Truth)
+  # .mise.toml — Standard Tier 1 config (example)
   [tools]
   node   = "20.18.3"
   pnpm   = "10.5.2"
   python = "3.12.9"
-  uv     = "0.6.3"
-  # Secondary runtimes are listed for version pinning but handled on-demand by setup scripts.
-  go     = "1.23.6"
   ```
 
 - Do not upgrade dependencies speculatively. Use automated tools (Dependabot, Renovate) with a scheduled review cadence:
