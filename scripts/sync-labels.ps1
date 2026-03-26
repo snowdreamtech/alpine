@@ -1,4 +1,4 @@
-# sync-labels.ps1
+﻿﻿# sync-labels.ps1
 # Purpose: Synchronizes and brands repository labels using GitHub CLI (gh) on Windows.
 # Design: Ensures consistent colors and descriptions for engineering labels.
 
@@ -21,7 +21,7 @@ function Sync-Label {
         [string]$Description
     )
 
-    Write-Host "🔄 Syncing label: [$Name] (#$Color)" -ForegroundColor Blue
+    Write-Output
 
     $ExistingLabels = gh label list --json name | ConvertFrom-Json
     $Exists = $ExistingLabels | Where-Object { $_.name -eq $Name }
@@ -38,4 +38,4 @@ foreach ($Label in $Labels) {
     Sync-Label -Name $Label.Name -Color $Label.Color -Description $Label.Description
 }
 
-Write-Host "✅ Label synchronization complete." -ForegroundColor Green
+Write-Output

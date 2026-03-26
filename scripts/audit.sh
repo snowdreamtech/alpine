@@ -93,6 +93,7 @@ main() {
         _GL_ARGS="detect --log-opts=origin/${GITHUB_BASE_REF}..HEAD --no-banner"
       fi
 
+      # shellcheck disable=SC2086
       if GIT_CONFIG_PARAMETERS="$_GL_GIT_PARAMS" \
         run_quiet "$_GITLEAKS_BIN" $_GL_ARGS; then
         log_summary "Security" "gitleaks" "✅ Clean" "$(get_version "$_GITLEAKS_BIN")" "$(($(date +%s) - _T0_GL))"

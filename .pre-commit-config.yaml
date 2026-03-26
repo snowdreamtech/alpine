@@ -178,6 +178,7 @@ repos:
           "
         language: system
         types: [text]
+        exclude: scripts/sync-labels\.ps1$
         description: "Prevent illegal Byte Order Mark (BOM) in UTF-8 files."
 
       # -- Data & Configuration Hygiene ---------------------------------------
