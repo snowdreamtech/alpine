@@ -64,10 +64,31 @@ jobs:
             formulae.brew.sh:443
 
       - name: "📂 Checkout Repository Code"
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2 # v4.2.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.2.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: false
+
+      - name: "⚡ Cache Mise Tools"
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v4.2.0
+        with:
+          path: |
+            ~/.local/bin
+            ~/.local/share/mise
+            ~/Library/Application Support/mise
+            ~/AppData/Local/mise
+          key: ${{ runner.os }}-mise-${{ hashFiles('.mise.toml', 'scripts/lib/versions.sh') }}
+          restore-keys: |
+            ${{ runner.os }}-mise-
+
+      - name: "🚀 Initialize Development Environment"
+        shell: sh
+        run: |
+          make setup
+          make install
+          MISE_OFFLINE=true make check-env
+        env:
+          MISE_GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
 
       - name: "🏷️ Sync Labels via gh CLI"
         shell: sh
