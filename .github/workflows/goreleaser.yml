@@ -17,18 +17,45 @@ name: "📦 GoReleaser"
 "on":
   push:
     tags:
-      - "v*" # Standard SemVer (v1.2.3)
-      - "V*" # Capitalized (V1.2.3)
-      - "[0-9]*" # Numeric start (1.2.3)
-      - "**/v*" # Monorepo/Scoped v (lib/v1.0)
-      - "**/V*" # Monorepo/Scoped V (lib/V1.0)
-      - "**/[0-9]*" # Monorepo/Scoped numeric (lib/1.0)
-      - "release-*" # Release prefix
-      - "stable-*" # Stability prefix
+      # --- Standard & Scoped SemVer ---
+      - "v*" # v1.2.3
+      - "V*" # V1.2.3
+      - "[0-9]*" # 1.2.3
+      - "**/v*" # module/v1.2 (Monorepo)
+      - "**/V*" # module/V1.2
+      - "**/[0-9]*" # module/1.2
+
+      # --- Folder-based / Scoped ---
+      - "v/*" # v/1.2 (Structured)
+      - "V/*" # V/1.2
+      - "[0-9]/*" # 1.2/3
+      - "@*" # @1.0.0 (Scoped / npm-style)
+
+      # --- Semantic & Pre-release Prefixes ---
+      - "release-*" # release-v1.0
+      - "stable-*" # stable-1.0
+      - "exp-*" # experimental
+      - "nightly-*" # nightly-build
       - "alpha-*" # Pre-release: Alpha
       - "beta-*" # Pre-release: Beta
       - "rc-*" # Pre-release: RC
       - "canary-*" # Pre-release: Canary
+
+      # --- OS & Infrastructure Specific ---
+      - "windows-*" # Platform: Windows
+      - "linux-*" # Platform: Linux
+      - "macos-*" # Platform: MacOS
+      - "android-*" # Platform: Android
+      - "ios-*" # Platform: iOS
+
+      # --- Linux Distribution Specific ---
+      - "ubuntu-*" # Distro: Ubuntu
+      - "debian-*" # Distro: Debian
+      - "alpine-*" # Distro: Alpine
+      - "centos-*" # Distro: CentOS
+      - "rhel-*" # Distro: RHEL
+      - "rocky-*" # Distro: Rocky Linux
+      - "fedora-*" # Distro: Fedora
 
 permissions: {}
 
