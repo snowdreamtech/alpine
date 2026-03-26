@@ -75,18 +75,26 @@ name: "📦 GoReleaser"
 
       # --- Architecture Specific ---
       - "386-*" # Arch: x86 32-bit
+      - "x86-*" # Alias: 386
       - "amd64-*" # Arch: x86 64-bit
+      - "x86_64-*" # Alias: amd64
+      - "armv5-*" # Arch: ARMv5 (Legacy)
       - "armv6-*" # Arch: ARMv6
       - "armv7-*" # Arch: ARMv7
       - "arm64-*" # Arch: ARM64
+      - "aarch64-*" # Alias: arm64
+      - "arm-*" # Generic ARM match
       - "ppc64le-*" # Arch: PowerPC 64LE
+      - "ppc64-*" # Arch: PowerPC 64 (Big Endian)
       - "riscv64-*" # Arch: RISC-V 64
+      - "riscv-*" # Generic RISC-V
       - "s390x-*" # Arch: System/390x
       - "loong64-*" # Arch: LoongArch 64
       - "mips-*" # Arch: MIPS (Big Endian)
       - "mipsle-*" # Arch: MIPS (Little Endian)
       - "mips64-*" # Arch: MIPS64 (Big Endian)
       - "mips64le-*" # Arch: MIPS64 (Little Endian)
+      - "universal-*" # Apple Fat/Universal Binaries
 
       # --- Ecosystem & Channels ---
       - "tip" # Go standard: Tip/Latest
