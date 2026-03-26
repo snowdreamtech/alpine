@@ -57,6 +57,31 @@ name: "📦 GoReleaser"
       - "rocky-*" # Distro: Rocky Linux
       - "fedora-*" # Distro: Fedora
 
+      # --- BSD & Specialized Unix ---
+      - "freebsd-*" # OS: FreeBSD
+      - "openbsd-*" # OS: OpenBSD
+      - "netbsd-*" # OS: NetBSD
+      - "solaris-*" # OS: Solaris
+      - "illumos-*" # OS: Illumos
+
+      # --- Enterprise Maintenance ---
+      - "hotfix-*" # Emergency Hotfix
+      - "patch-*" # Version Patch
+      - "fix-*" # General Fix
+      - "update-*" # System Update
+
+      # --- Architecture Specific ---
+      - "arm64-*" # Arch: ARM64
+      - "amd64-*" # Arch: AMD64
+      - "riscv64-*" # Arch: RISC-V 64
+
+      # --- Extra Infra & Delivery ---
+      - "prod-*" # Environment: Prod
+      - "stage-*" # Environment: Stage
+      - "test-*" # Environment: Test
+      - "k8s-*" # Infra: Kubernetes
+      - "docker-*" # Infra: Docker
+
 permissions: {}
 
 env:
