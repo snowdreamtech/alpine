@@ -36,6 +36,8 @@ name: "🤖 Dependabot Smart Sync"
       - ".pre-commit-config.yaml"
       - "Chart.yaml"
       - "scripts/gen-dependabot.sh"
+      - ".mise.toml"
+      - "mise.lock"
   schedule:
     # Weekly safety net: every Monday at 06:00 UTC
     - cron: "0 6 * * 1"
@@ -52,7 +54,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
-        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0 # v2.10.4
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.10.4
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -92,11 +94,32 @@ jobs:
             formulae.brew.sh:443
 
       - name: "📂 Checkout Repository Code"
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2 # v4.2.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.2.2
         with:
           token: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           persist-credentials: true
           ref: ${{ github.ref }}
+
+      - name: "⚡ Cache Mise Tools"
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v4.2.0
+        with:
+          path: |
+            ~/.local/bin
+            ~/.local/share/mise
+            ~/Library/Application Support/mise
+            ~/AppData/Local/mise
+          key: ${{ runner.os }}-mise-${{ hashFiles('.mise.toml', 'scripts/lib/versions.sh') }}
+          restore-keys: |
+            ${{ runner.os }}-mise-
+
+      - name: "🚀 Initialize Development Environment"
+        shell: sh
+        run: |
+          make setup
+          make install
+          MISE_OFFLINE=true make check-env
+        env:
+          MISE_GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
 
       - name: "🧪 Run Generator Smoke Test"
         shell: sh
@@ -107,6 +130,7 @@ jobs:
         shell: sh
         run: |
           make gen-dependabot
+          make sync-lock
           if [ -f "dependabot_summary.md" ]; then
             cat dependabot_summary.md >> "$GITHUB_STEP_SUMMARY"
           fi
@@ -116,13 +140,13 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          if git diff --quiet .github/dependabot.yml 2>/dev/null; then
-            echo "✅ No changes detected. Dependabot config is up-to-date."
+          if git diff --quiet .github/dependabot.yml mise.lock 2>/dev/null; then
+            echo "✅ No changes detected. Dependabot config and mise.lock are up-to-date."
           else
             git config user.name "github-actions[bot]"
             git config user.email "github-actions[bot]@users.noreply.github.com"
-            git add .github/dependabot.yml
-            git commit -m "chore(deps): sync dependabot config [skip ci]"
+            git add .github/dependabot.yml mise.lock
+            git commit -m "chore(deps): sync dependabot config and mise.lock [skip ci]"
             git push
-            echo "✅ Dependabot config updated and pushed."
+            echo "✅ Dependabot config and mise.lock updated and pushed."
           fi
