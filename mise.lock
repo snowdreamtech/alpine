@@ -298,11 +298,52 @@ url_api = "https://api.github.com/repos/bazelbuild/bazel/releases/assets/3709960
 version = "1.50.0"
 backend = "github:bufbuild/buf"
 
+[tools."github:bufbuild/buf"."platforms.linux-x64"]
+url = "https://github.com/bufbuild/buf/releases/download/v1.50.0/buf-Linux-x86_64.tar.gz"
+url_api = "https://api.github.com/repos/bufbuild/buf/releases/assets/221228507"
+
+[tools."github:bufbuild/buf"."platforms.linux-x64-baseline"]
+url = "https://github.com/bufbuild/buf/releases/download/v1.50.0/buf-Linux-x86_64.tar.gz"
+url_api = "https://api.github.com/repos/bufbuild/buf/releases/assets/221228507"
+
+[tools."github:bufbuild/buf"."platforms.linux-x64-musl"]
+url = "https://github.com/bufbuild/buf/releases/download/v1.50.0/buf-Linux-x86_64.tar.gz"
+url_api = "https://api.github.com/repos/bufbuild/buf/releases/assets/221228507"
+
+[tools."github:bufbuild/buf"."platforms.linux-x64-musl-baseline"]
+url = "https://github.com/bufbuild/buf/releases/download/v1.50.0/buf-Linux-x86_64.tar.gz"
+url_api = "https://api.github.com/repos/bufbuild/buf/releases/assets/221228507"
+
+[tools."github:bufbuild/buf"."platforms.macos-arm64"]
+url = "https://github.com/bufbuild/buf/releases/download/v1.50.0/buf-Darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/bufbuild/buf/releases/assets/221228496"
+
+[tools."github:bufbuild/buf"."platforms.macos-x64"]
+url = "https://github.com/bufbuild/buf/releases/download/v1.50.0/buf-Darwin-x86_64.tar.gz"
+url_api = "https://api.github.com/repos/bufbuild/buf/releases/assets/221228493"
+
+[tools."github:bufbuild/buf"."platforms.macos-x64-baseline"]
+url = "https://github.com/bufbuild/buf/releases/download/v1.50.0/buf-Darwin-x86_64.tar.gz"
+url_api = "https://api.github.com/repos/bufbuild/buf/releases/assets/221228493"
+
+[tools."github:bufbuild/buf"."platforms.windows-x64"]
+url = "https://github.com/bufbuild/buf/releases/download/v1.50.0/buf-Windows-x86_64.zip"
+url_api = "https://api.github.com/repos/bufbuild/buf/releases/assets/221228511"
+
+[tools."github:bufbuild/buf"."platforms.windows-x64-baseline"]
+url = "https://github.com/bufbuild/buf/releases/download/v1.50.0/buf-Windows-x86_64.zip"
+url_api = "https://api.github.com/repos/bufbuild/buf/releases/assets/221228511"
+
 [[tools."github:casey/just"]]
 version = "1.39.0"
 backend = "github:casey/just"
 
 [tools."github:casey/just"."platforms.linux-x64"]
+checksum = "sha256:1c53fa85a8c021ce7b19814e1a5e1dc0aa10c04bddca75196f7ab6db6130d2cd"
+url = "https://github.com/casey/just/releases/download/1.39.0/just-1.39.0-x86_64-unknown-linux-musl.tar.gz"
+url_api = "https://api.github.com/repos/casey/just/releases/assets/222536820"
+
+[tools."github:casey/just"."platforms.linux-x64-musl-baseline"]
 checksum = "sha256:1c53fa85a8c021ce7b19814e1a5e1dc0aa10c04bddca75196f7ab6db6130d2cd"
 url = "https://github.com/casey/just/releases/download/1.39.0/just-1.39.0-x86_64-unknown-linux-musl.tar.gz"
 url_api = "https://api.github.com/repos/casey/just/releases/assets/222536820"
@@ -340,6 +381,21 @@ checksum = "sha256:e55cd5abd98a592c110f87a7da9ef15bc72515200aecfe1bed04bf86311f5
 url = "https://github.com/cue-lang/cue/releases/download/v0.12.0/cue_v0.12.0_linux_amd64.tar.gz"
 url_api = "https://api.github.com/repos/cue-lang/cue/releases/assets/224862318"
 
+[tools."github:cue-lang/cue"."platforms.linux-x64-baseline"]
+checksum = "sha256:e55cd5abd98a592c110f87a7da9ef15bc72515200aecfe1bed04bf86311f5ba1"
+url = "https://github.com/cue-lang/cue/releases/download/v0.12.0/cue_v0.12.0_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/cue-lang/cue/releases/assets/224862318"
+
+[tools."github:cue-lang/cue"."platforms.linux-x64-musl"]
+checksum = "sha256:e55cd5abd98a592c110f87a7da9ef15bc72515200aecfe1bed04bf86311f5ba1"
+url = "https://github.com/cue-lang/cue/releases/download/v0.12.0/cue_v0.12.0_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/cue-lang/cue/releases/assets/224862318"
+
+[tools."github:cue-lang/cue"."platforms.linux-x64-musl-baseline"]
+checksum = "sha256:e55cd5abd98a592c110f87a7da9ef15bc72515200aecfe1bed04bf86311f5ba1"
+url = "https://github.com/cue-lang/cue/releases/download/v0.12.0/cue_v0.12.0_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/cue-lang/cue/releases/assets/224862318"
+
 [tools."github:cue-lang/cue"."platforms.macos-arm64"]
 checksum = "sha256:7055a6423f753c8ea763699d48d78d341e8543397399daee281c66ecdc9ec5a5"
 url = "https://github.com/cue-lang/cue/releases/download/v0.12.0/cue_v0.12.0_darwin_arm64.tar.gz"
@@ -350,7 +406,17 @@ checksum = "sha256:8474e522a978ecadef49b06d706ff276cd07629b1aa107b88adfc1284d3f9
 url = "https://github.com/cue-lang/cue/releases/download/v0.12.0/cue_v0.12.0_darwin_amd64.tar.gz"
 url_api = "https://api.github.com/repos/cue-lang/cue/releases/assets/224862322"
 
+[tools."github:cue-lang/cue"."platforms.macos-x64-baseline"]
+checksum = "sha256:8474e522a978ecadef49b06d706ff276cd07629b1aa107b88adfc1284d3f93cc"
+url = "https://github.com/cue-lang/cue/releases/download/v0.12.0/cue_v0.12.0_darwin_amd64.tar.gz"
+url_api = "https://api.github.com/repos/cue-lang/cue/releases/assets/224862322"
+
 [tools."github:cue-lang/cue"."platforms.windows-x64"]
+checksum = "sha256:268bf95f4767b37d5db01450d55ca9d10e9a8bd8a1417c31dff456b5f9775abf"
+url = "https://github.com/cue-lang/cue/releases/download/v0.12.0/cue_v0.12.0_windows_amd64.zip"
+url_api = "https://api.github.com/repos/cue-lang/cue/releases/assets/224862315"
+
+[tools."github:cue-lang/cue"."platforms.windows-x64-baseline"]
 checksum = "sha256:268bf95f4767b37d5db01450d55ca9d10e9a8bd8a1417c31dff456b5f9775abf"
 url = "https://github.com/cue-lang/cue/releases/download/v0.12.0/cue_v0.12.0_windows_amd64.zip"
 url_api = "https://api.github.com/repos/cue-lang/cue/releases/assets/224862315"
@@ -368,16 +434,91 @@ checksum = "sha256:0a2595f7fa3c15a62f8d0c244121a4977018b3bfdec7c1542ac2a8cf07997
 url = "https://github.com/go-task/task/releases/download/v3.41.0/task_linux_amd64.tar.gz"
 url_api = "https://api.github.com/repos/go-task/task/releases/assets/221404423"
 
+[tools."github:go-task/task"."platforms.linux-x64-baseline"]
+checksum = "sha256:0a2595f7fa3c15a62f8d0c244121a4977018b3bfdec7c1542ac2a8cf079978b8"
+url = "https://github.com/go-task/task/releases/download/v3.41.0/task_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/go-task/task/releases/assets/221404423"
+
+[tools."github:go-task/task"."platforms.linux-x64-musl"]
+checksum = "sha256:0a2595f7fa3c15a62f8d0c244121a4977018b3bfdec7c1542ac2a8cf079978b8"
+url = "https://github.com/go-task/task/releases/download/v3.41.0/task_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/go-task/task/releases/assets/221404423"
+
+[tools."github:go-task/task"."platforms.linux-x64-musl-baseline"]
+checksum = "sha256:0a2595f7fa3c15a62f8d0c244121a4977018b3bfdec7c1542ac2a8cf079978b8"
+url = "https://github.com/go-task/task/releases/download/v3.41.0/task_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/go-task/task/releases/assets/221404423"
+
 [tools."github:go-task/task"."platforms.macos-arm64"]
 checksum = "sha256:78083ab7b4c99455448d3dd0dcce2be857789ae80c176350804305021aa7f582"
 url = "https://github.com/go-task/task/releases/download/v3.41.0/task_darwin_arm64.tar.gz"
 url_api = "https://api.github.com/repos/go-task/task/releases/assets/221404416"
 
+[tools."github:go-task/task"."platforms.macos-x64"]
+checksum = "sha256:a328b3cd98dbbae5844dd336c6ea8a52a7704d626089b6bbd92c163325a93885"
+url = "https://github.com/go-task/task/releases/download/v3.41.0/task_darwin_amd64.tar.gz"
+url_api = "https://api.github.com/repos/go-task/task/releases/assets/221404419"
+
+[tools."github:go-task/task"."platforms.macos-x64-baseline"]
+checksum = "sha256:a328b3cd98dbbae5844dd336c6ea8a52a7704d626089b6bbd92c163325a93885"
+url = "https://github.com/go-task/task/releases/download/v3.41.0/task_darwin_amd64.tar.gz"
+url_api = "https://api.github.com/repos/go-task/task/releases/assets/221404419"
+
+[tools."github:go-task/task"."platforms.windows-x64"]
+checksum = "sha256:0847915b3b51dbd296a510873fb9b62050ddddb818f6346840f3e1b4ce37d448"
+url = "https://github.com/go-task/task/releases/download/v3.41.0/task_windows_amd64.zip"
+url_api = "https://api.github.com/repos/go-task/task/releases/assets/221404414"
+
+[tools."github:go-task/task"."platforms.windows-x64-baseline"]
+checksum = "sha256:0847915b3b51dbd296a510873fb9b62050ddddb818f6346840f3e1b4ce37d448"
+url = "https://github.com/go-task/task/releases/download/v3.41.0/task_windows_amd64.zip"
+url_api = "https://api.github.com/repos/go-task/task/releases/assets/221404414"
+
 [[tools."github:google/go-jsonnet"]]
 version = "0.20.0"
 backend = "github:google/go-jsonnet"
 
+[tools."github:google/go-jsonnet"."platforms.linux-x64"]
+checksum = "sha256:a137c5e969609c3995c4d05817a247cfef8a92760c5306c3ad7df0355dd62970"
+url = "https://github.com/google/go-jsonnet/releases/download/v0.20.0/go-jsonnet_0.20.0_Linux_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/google/go-jsonnet/releases/assets/104116606"
+
+[tools."github:google/go-jsonnet"."platforms.linux-x64-baseline"]
+checksum = "sha256:a137c5e969609c3995c4d05817a247cfef8a92760c5306c3ad7df0355dd62970"
+url = "https://github.com/google/go-jsonnet/releases/download/v0.20.0/go-jsonnet_0.20.0_Linux_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/google/go-jsonnet/releases/assets/104116606"
+
+[tools."github:google/go-jsonnet"."platforms.linux-x64-musl"]
+checksum = "sha256:a137c5e969609c3995c4d05817a247cfef8a92760c5306c3ad7df0355dd62970"
+url = "https://github.com/google/go-jsonnet/releases/download/v0.20.0/go-jsonnet_0.20.0_Linux_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/google/go-jsonnet/releases/assets/104116606"
+
+[tools."github:google/go-jsonnet"."platforms.linux-x64-musl-baseline"]
+checksum = "sha256:a137c5e969609c3995c4d05817a247cfef8a92760c5306c3ad7df0355dd62970"
+url = "https://github.com/google/go-jsonnet/releases/download/v0.20.0/go-jsonnet_0.20.0_Linux_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/google/go-jsonnet/releases/assets/104116606"
+
+[tools."github:google/go-jsonnet"."platforms.macos-arm64"]
+checksum = "sha256:a15a699a58eb172c6d91f4cbddf3681095a649008628e0cfd84f564db4244ee3"
+url = "https://github.com/google/go-jsonnet/releases/download/v0.20.0/go-jsonnet_0.20.0_Darwin_arm64.tar.gz"
+url_api = "https://api.github.com/repos/google/go-jsonnet/releases/assets/104116604"
+
+[tools."github:google/go-jsonnet"."platforms.macos-x64"]
+checksum = "sha256:76901637f60589bb9bf91b3481d4aecbc31efcd35ca99ae72bcb510b00270ad9"
+url = "https://github.com/google/go-jsonnet/releases/download/v0.20.0/go-jsonnet_0.20.0_Darwin_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/google/go-jsonnet/releases/assets/104116603"
+
+[tools."github:google/go-jsonnet"."platforms.macos-x64-baseline"]
+checksum = "sha256:76901637f60589bb9bf91b3481d4aecbc31efcd35ca99ae72bcb510b00270ad9"
+url = "https://github.com/google/go-jsonnet/releases/download/v0.20.0/go-jsonnet_0.20.0_Darwin_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/google/go-jsonnet/releases/assets/104116603"
+
 [tools."github:google/go-jsonnet"."platforms.windows-x64"]
+checksum = "sha256:82440a646a8d29487a243afc880db245f612a205d3eccbb900bc76d7a4049ad1"
+url = "https://github.com/google/go-jsonnet/releases/download/v0.20.0/go-jsonnet_0.20.0_Windows_x86_64.tar.gz"
+url_api = "https://api.github.com/repos/google/go-jsonnet/releases/assets/104116607"
+
+[tools."github:google/go-jsonnet"."platforms.windows-x64-baseline"]
 checksum = "sha256:82440a646a8d29487a243afc880db245f612a205d3eccbb900bc76d7a4049ad1"
 url = "https://github.com/google/go-jsonnet/releases/download/v0.20.0/go-jsonnet_0.20.0_Windows_x86_64.tar.gz"
 url_api = "https://api.github.com/repos/google/go-jsonnet/releases/assets/104116607"
@@ -394,7 +535,39 @@ backend = "github:grain-lang/grain"
 version = "0.11.2"
 backend = "github:kcl-lang/kcl"
 
+[tools."github:kcl-lang/kcl"."platforms.linux-x64"]
+url = "https://github.com/kcl-lang/kcl/releases/download/v0.11.2/kclvm-v0.11.2-linux-amd64.tar.gz"
+url_api = "https://api.github.com/repos/kcl-lang/kcl/releases/assets/247518283"
+
+[tools."github:kcl-lang/kcl"."platforms.linux-x64-baseline"]
+url = "https://github.com/kcl-lang/kcl/releases/download/v0.11.2/kclvm-v0.11.2-linux-amd64.tar.gz"
+url_api = "https://api.github.com/repos/kcl-lang/kcl/releases/assets/247518283"
+
+[tools."github:kcl-lang/kcl"."platforms.linux-x64-musl"]
+url = "https://github.com/kcl-lang/kcl/releases/download/v0.11.2/kclvm-v0.11.2-linux-musl-amd64.tar.gz"
+url_api = "https://api.github.com/repos/kcl-lang/kcl/releases/assets/247518617"
+
+[tools."github:kcl-lang/kcl"."platforms.linux-x64-musl-baseline"]
+url = "https://github.com/kcl-lang/kcl/releases/download/v0.11.2/kclvm-v0.11.2-linux-amd64.tar.gz"
+url_api = "https://api.github.com/repos/kcl-lang/kcl/releases/assets/247518283"
+
+[tools."github:kcl-lang/kcl"."platforms.macos-arm64"]
+url = "https://github.com/kcl-lang/kcl/releases/download/v0.11.2/kclvm-v0.11.2-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/kcl-lang/kcl/releases/assets/247518245"
+
+[tools."github:kcl-lang/kcl"."platforms.macos-x64"]
+url = "https://github.com/kcl-lang/kcl/releases/download/v0.11.2/kclvm-v0.11.2-darwin-amd64.tar.gz"
+url_api = "https://api.github.com/repos/kcl-lang/kcl/releases/assets/247518204"
+
+[tools."github:kcl-lang/kcl"."platforms.macos-x64-baseline"]
+url = "https://github.com/kcl-lang/kcl/releases/download/v0.11.2/kclvm-v0.11.2-darwin-amd64.tar.gz"
+url_api = "https://api.github.com/repos/kcl-lang/kcl/releases/assets/247518204"
+
 [tools."github:kcl-lang/kcl"."platforms.windows-x64"]
+url = "https://github.com/kcl-lang/kcl/releases/download/v0.11.2/kclvm-v0.11.2-windows-mingw.zip"
+url_api = "https://api.github.com/repos/kcl-lang/kcl/releases/assets/247518659"
+
+[tools."github:kcl-lang/kcl"."platforms.windows-x64-baseline"]
 url = "https://github.com/kcl-lang/kcl/releases/download/v0.11.2/kclvm-v0.11.2-windows-mingw.zip"
 url_api = "https://api.github.com/repos/kcl-lang/kcl/releases/assets/247518659"
 
@@ -436,6 +609,21 @@ checksum = "sha256:ca4e4e8cb7cc3436f2b6979e9c4fd4e2623a66fcca1ad1fe12f8669967636
 url = "https://github.com/terraform-linters/tflint/releases/download/v0.61.0/tflint_linux_amd64.zip"
 url_api = "https://api.github.com/repos/terraform-linters/tflint/releases/assets/352087742"
 
+[tools."github:terraform-linters/tflint"."platforms.linux-x64-baseline"]
+checksum = "sha256:ca4e4e8cb7cc3436f2b6979e9c4fd4e2623a66fcca1ad1fe12f8669967636ae2"
+url = "https://github.com/terraform-linters/tflint/releases/download/v0.61.0/tflint_linux_amd64.zip"
+url_api = "https://api.github.com/repos/terraform-linters/tflint/releases/assets/352087742"
+
+[tools."github:terraform-linters/tflint"."platforms.linux-x64-musl"]
+checksum = "sha256:ca4e4e8cb7cc3436f2b6979e9c4fd4e2623a66fcca1ad1fe12f8669967636ae2"
+url = "https://github.com/terraform-linters/tflint/releases/download/v0.61.0/tflint_linux_amd64.zip"
+url_api = "https://api.github.com/repos/terraform-linters/tflint/releases/assets/352087742"
+
+[tools."github:terraform-linters/tflint"."platforms.linux-x64-musl-baseline"]
+checksum = "sha256:ca4e4e8cb7cc3436f2b6979e9c4fd4e2623a66fcca1ad1fe12f8669967636ae2"
+url = "https://github.com/terraform-linters/tflint/releases/download/v0.61.0/tflint_linux_amd64.zip"
+url_api = "https://api.github.com/repos/terraform-linters/tflint/releases/assets/352087742"
+
 [tools."github:terraform-linters/tflint"."platforms.macos-arm64"]
 checksum = "sha256:6593fa24cb6e14d2d0cf7af7fd02a271242f1038af6ecb5384f6738e105a0fea"
 url = "https://github.com/terraform-linters/tflint/releases/download/v0.61.0/tflint_darwin_arm64.zip"
@@ -446,7 +634,17 @@ checksum = "sha256:9cd3106c7b74f83cbcd90e0593dfaa1ce14dc5260fe32d946915fd0004aec
 url = "https://github.com/terraform-linters/tflint/releases/download/v0.61.0/tflint_darwin_amd64.zip"
 url_api = "https://api.github.com/repos/terraform-linters/tflint/releases/assets/352087741"
 
+[tools."github:terraform-linters/tflint"."platforms.macos-x64-baseline"]
+checksum = "sha256:9cd3106c7b74f83cbcd90e0593dfaa1ce14dc5260fe32d946915fd0004aec2f4"
+url = "https://github.com/terraform-linters/tflint/releases/download/v0.61.0/tflint_darwin_amd64.zip"
+url_api = "https://api.github.com/repos/terraform-linters/tflint/releases/assets/352087741"
+
 [tools."github:terraform-linters/tflint"."platforms.windows-x64"]
+checksum = "sha256:f114a26a519f580a9d27204b1210ba5869ed8219d7e23a732d41774d612af3b0"
+url = "https://github.com/terraform-linters/tflint/releases/download/v0.61.0/tflint_windows_amd64.zip"
+url_api = "https://api.github.com/repos/terraform-linters/tflint/releases/assets/352087725"
+
+[tools."github:terraform-linters/tflint"."platforms.windows-x64-baseline"]
 checksum = "sha256:f114a26a519f580a9d27204b1210ba5869ed8219d7e23a732d41774d612af3b0"
 url = "https://github.com/terraform-linters/tflint/releases/download/v0.61.0/tflint_windows_amd64.zip"
 url_api = "https://api.github.com/repos/terraform-linters/tflint/releases/assets/352087725"
@@ -535,6 +733,21 @@ checksum = "sha256:a118197b0de55ffab2bc8d5cd03a5e39033cfb53383d6931bc761dec07848
 url = "https://github.com/JetBrains/kotlin/releases/download/v2.1.20/kotlin-compiler-2.1.20.zip"
 url_api = "https://api.github.com/repos/JetBrains/kotlin/releases/assets/238971897"
 
+[tools.kotlin."platforms.linux-x64-baseline"]
+checksum = "sha256:a118197b0de55ffab2bc8d5cd03a5e39033cfb53383d6931bc761dec0784891a"
+url = "https://github.com/JetBrains/kotlin/releases/download/v2.1.20/kotlin-compiler-2.1.20.zip"
+url_api = "https://api.github.com/repos/JetBrains/kotlin/releases/assets/238971897"
+
+[tools.kotlin."platforms.linux-x64-musl"]
+checksum = "sha256:a118197b0de55ffab2bc8d5cd03a5e39033cfb53383d6931bc761dec0784891a"
+url = "https://github.com/JetBrains/kotlin/releases/download/v2.1.20/kotlin-compiler-2.1.20.zip"
+url_api = "https://api.github.com/repos/JetBrains/kotlin/releases/assets/238971897"
+
+[tools.kotlin."platforms.linux-x64-musl-baseline"]
+checksum = "sha256:a118197b0de55ffab2bc8d5cd03a5e39033cfb53383d6931bc761dec0784891a"
+url = "https://github.com/JetBrains/kotlin/releases/download/v2.1.20/kotlin-compiler-2.1.20.zip"
+url_api = "https://api.github.com/repos/JetBrains/kotlin/releases/assets/238971897"
+
 [tools.kotlin."platforms.macos-arm64"]
 checksum = "sha256:a118197b0de55ffab2bc8d5cd03a5e39033cfb53383d6931bc761dec0784891a"
 url = "https://github.com/JetBrains/kotlin/releases/download/v2.1.20/kotlin-compiler-2.1.20.zip"
@@ -545,7 +758,17 @@ checksum = "sha256:a118197b0de55ffab2bc8d5cd03a5e39033cfb53383d6931bc761dec07848
 url = "https://github.com/JetBrains/kotlin/releases/download/v2.1.20/kotlin-compiler-2.1.20.zip"
 url_api = "https://api.github.com/repos/JetBrains/kotlin/releases/assets/238971897"
 
+[tools.kotlin."platforms.macos-x64-baseline"]
+checksum = "sha256:a118197b0de55ffab2bc8d5cd03a5e39033cfb53383d6931bc761dec0784891a"
+url = "https://github.com/JetBrains/kotlin/releases/download/v2.1.20/kotlin-compiler-2.1.20.zip"
+url_api = "https://api.github.com/repos/JetBrains/kotlin/releases/assets/238971897"
+
 [tools.kotlin."platforms.windows-x64"]
+checksum = "sha256:a118197b0de55ffab2bc8d5cd03a5e39033cfb53383d6931bc761dec0784891a"
+url = "https://github.com/JetBrains/kotlin/releases/download/v2.1.20/kotlin-compiler-2.1.20.zip"
+url_api = "https://api.github.com/repos/JetBrains/kotlin/releases/assets/238971897"
+
+[tools.kotlin."platforms.windows-x64-baseline"]
 checksum = "sha256:a118197b0de55ffab2bc8d5cd03a5e39033cfb53383d6931bc761dec0784891a"
 url = "https://github.com/JetBrains/kotlin/releases/download/v2.1.20/kotlin-compiler-2.1.20.zip"
 url_api = "https://api.github.com/repos/JetBrains/kotlin/releases/assets/238971897"
@@ -627,6 +850,7 @@ checksum = "sha256:ea3e293100399dc56c8c18eebbd081d638857f1066a8951d97f0e00af4137
 url = "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-3.2.10-1/rubyinstaller-3.2.10-1-x64.7z"
 
 [tools.ruby."platforms.windows-x64-baseline"]
+checksum = "sha256:ea3e293100399dc56c8c18eebbd081d638857f1066a8951d97f0e00af4137d30"
 url = "https://github.com/oneclick/rubyinstaller2/releases/download/RubyInstaller-3.2.10-1/rubyinstaller-3.2.10-1-x64.7z"
 
 [[tools.rust]]
