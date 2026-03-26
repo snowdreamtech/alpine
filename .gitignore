@@ -29,6 +29,8 @@ hadolint-*/
 golangci-lint-*
 health_report_*.md
 lint_output.txt
+.ci_summary.log
+ci_summary.md
 
 # =============================================================================
 # Mise Temporary Artifacts (for Universal Tiered Strategy)
