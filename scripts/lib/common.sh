@@ -146,7 +146,11 @@ elif [ -n "${GITEA_ACTIONS:-}" ] || [ -n "${FORGEJO_ACTIONS:-}" ]; then
 elif [ -n "${GITLAB_CI:-}" ]; then
   # GitLab: Use a standard log file that can be rendered as an artifact
   CI_STEP_SUMMARY="${_G_PROJECT_ROOT}/ci_summary.md"
+else
+  # Local Development / Other environments: Default to a local log file
+  CI_STEP_SUMMARY="${_G_PROJECT_ROOT}/.ci_summary.log"
 fi
+export CI_STEP_SUMMARY
 
 # Mandatory Fallback: Ensure CI_STEP_SUMMARY is NEVER empty (fixes "cannot create : Directory nonexistent")
 if [ -z "${CI_STEP_SUMMARY:-}" ]; then

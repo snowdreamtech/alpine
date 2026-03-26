@@ -20,6 +20,10 @@
 
 set -e
 
+# ── Common Library ───────────────────────────────────────────────────────────
+SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+. "$SCRIPT_DIR/lib/common.sh"
+
 # ── Configuration ────────────────────────────────────────────────────────────
 TARGET_BRANCH="dev"
 DEPENDABOT_FILE=".github/dependabot.yml"
