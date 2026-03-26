@@ -152,9 +152,10 @@ To balance **development velocity**, **release stability**, and **security**, th
 
 Designed for high-frequency iteration on `feat/**`, `fix/**`, and `dev` branches.
 
-- **CI Trigger**: Every `push` or `PR` update (using `branches-ignore: [main]`).
+- **CI Trigger**: Triggered ONLY on `pull_request` (targeting `main` or `dev`).
+- **Goal**: Rapid feedback to ensure code is "Merge-Ready" before it reaches core branches.
 - **Job Dependency Chaining**: Uses internal `needs` to chain `lint` → `test` → `audit` within a single `ci.yml`.
-- **Security & Isolation**: Since it runs in the PR/Branch context, it is naturally isolated from the `main` branch secrets and environment.
+- **Security & Isolation**: Since it runs in the PR context, it is naturally isolated from the `main` branch secrets and environment.
 - **Fail-Fast Principle**: Each stage only runs if the previous one succeeds. This prevents expensive tests or audits from running on code that fails basic linting.
 
 ### 6.2 Release Flow (Main & Tags)
