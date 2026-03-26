@@ -69,11 +69,26 @@ name: "📦 GoReleaser"
       - "patch-*" # Version Patch
       - "fix-*" # General Fix
       - "update-*" # System Update
+      - "backport-*" # Maintenance: Backport
+      - "security-*" # Maintenance: Security
+      - "audit-*" # Maintenance: Audit
 
       # --- Architecture Specific ---
       - "arm64-*" # Arch: ARM64
       - "amd64-*" # Arch: AMD64
       - "riscv64-*" # Arch: RISC-V 64
+      - "loong64-*" # Arch: LoongArch 64
+
+      # --- Ecosystem & Channels ---
+      - "tip" # Go standard: Tip/Latest
+      - "wasm-*" # WebAssembly
+      - "wasip1-*" # WASI
+      - "latest" # Channel: Latest
+      - "stable" # Channel: Stable
+      - "edge" # Channel: Edge/Experimental
+      - "next" # Channel: Next/Preview
+      - "preview" # Channel: UI/UX Preview
+      - "LTS-*" # Channel: Long Term Support
 
       # --- Extra Infra & Delivery ---
       - "prod-*" # Environment: Prod
@@ -81,6 +96,9 @@ name: "📦 GoReleaser"
       - "test-*" # Environment: Test
       - "k8s-*" # Infra: Kubernetes
       - "docker-*" # Infra: Docker
+
+      # --- Scoped & Multilevel ---
+      - "@**/*" # Scoped Tags (@org/pkg or @org/pkg/v1)
 
 permissions: {}
 
