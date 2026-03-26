@@ -104,7 +104,6 @@ name: "📦 GoReleaser"
       - "stable" # Channel: Stable
       - "edge" # Channel: Edge/Experimental
       - "next" # Channel: Next/Preview
-      - "preview" # Channel: UI/UX Preview
       - "LTS-*" # Channel: Long Term Support
 
       # --- Extra Infra & Delivery ---
@@ -113,6 +112,33 @@ name: "📦 GoReleaser"
       - "test-*" # Environment: Test
       - "k8s-*" # Infra: Kubernetes
       - "docker-*" # Infra: Docker
+
+      # --- Project & Functional Scopes ---
+      - "cli-*" # Component: CLI
+      - "sdk-*" # Component: SDK
+      - "app-*" # Component: App
+      - "api-*" # Component: API
+      - "tool-*" # Component: Tool
+      - "service-* " # Component: Service
+      - "lib-*" # Component: Library
+
+      # --- License & Edition Scopes ---
+      - "oss-*" # Open Source Edition
+      - "ee-*" # Enterprise Edition
+      - "pro-*" # Professional Edition
+      - "lite-*" # Lite/Free Edition
+
+      # --- Locality & Compliance ---
+      - "cn-*" # Region: China
+      - "us-*" # Region: USA
+      - "eu-*" # Region: Europe
+      - "global-*" # Global Release
+      - "compliant-*" # Compliance Release
+
+      # --- Action-Oriented ---
+      - "build-*" # Action: Build-only
+      - "dist-*" # Action: Distribution
+      - "artifact-*" # Action: Artifact generation
 
       # --- Scoped & Multilevel ---
       - "@**/*" # Scoped Tags (@org/pkg or @org/pkg/v1)
