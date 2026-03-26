@@ -20,6 +20,8 @@ name: "📦 GoReleaser"
       - "v*"
       - "V*"
       - "[0-9]*"
+      - "**/v*"
+      - "release-*"
 
 permissions: {}
 
