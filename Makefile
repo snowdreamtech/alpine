@@ -233,11 +233,14 @@ endif
 
 sync-lock: ## Synchronize and verify the mise.lock file
 	@printf "$(BLUE)Synchronizing mise.lock...$(NC)\n"
-	@# Surgical uncommenting of Tier 2 tools (only within the BEGIN/END block)
-	@perl -pi -e '$$in=1 if /TIER 2 BEGIN/; $$in=0 if /TIER 2 END/; s/^# "#/"/g if $$in' .mise.toml
+	@# Backup original config
+	@cp .mise.toml .mise.toml.bak
+	@# Generate a comprehensive manifest for locking
+	@./scripts/gen-full-manifest.sh > .mise.toml
+	@# Update mise.lock using the full manifest
 	@mise lock
-	@# Surgical re-commenting of Tier 2 tools
-	@perl -pi -e '$$in=1 if /TIER 2 BEGIN/; $$in=0 if /TIER 2 END/; s/^"/# "#/g if $$in' .mise.toml
+	@# Restore original config
+	@mv .mise.toml.bak .mise.toml
 	@printf "$(GREEN)mise.lock synchronized!$(NC)\n"
 
 archive-changelog: ## Archive major-version changelog entries

@@ -31,7 +31,12 @@ health_report_*.md
 lint_output.txt
 
 # =============================================================================
-# Operating Systems
+# Mise Temporary Artifacts (for Universal Tiered Strategy)
+# =============================================================================
+.mise.*.toml
+.mise.toml.bak
+.test.toml
+.setup.lock
 # =============================================================================
 
 ### macOS ###
