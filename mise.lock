@@ -304,6 +304,11 @@ checksum = "sha256:46af6aa5d365b8a28faa1cd7e9f01fbac7e563ce9e1405c6c4dda31812f1b
 url = "https://github.com/bazelbuild/bazel/releases/download/9.0.1/bazel-9.0.1-darwin-x86_64"
 url_api = "https://api.github.com/repos/bazelbuild/bazel/releases/assets/370995957"
 
+[tools."github:bazelbuild/bazel"."platforms.windows-x64"]
+checksum = "sha256:171e74649c87483f586089edfe4b07c50189c5b0670ad8b4ae26714f7dff0c77"
+url = "https://github.com/bazelbuild/bazel/releases/download/9.0.1/bazel-9.0.1-windows-x86_64.zip"
+url_api = "https://api.github.com/repos/bazelbuild/bazel/releases/assets/370996259"
+
 [[tools."github:bufbuild/buf"]]
 version = "1.50.0"
 backend = "github:bufbuild/buf"
