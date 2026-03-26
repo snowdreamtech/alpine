@@ -208,23 +208,21 @@ main() {
   fi
 
   # 4. Handle archives with deduplication
-  if [ "$_ARCH_SUMMARY_INITIALIZED" != "true" ] && ! check_ci_summary "### Archival Execution Summary"; then
+  if [ "${_ARCH_SUMMARY_INITIALIZED:-false}" != "true" ] && ! check_ci_summary "### Archival Execution Summary"; then
     {
       printf "### Archival Execution Summary\n\n"
-    } >"$_TMP_SUM"
-    [ -n "$GITHUB_ENV" ] && echo "_ARCH_SUMMARY_INITIALIZED=true" >>"$GITHUB_ENV"
+    } >>"$CI_STEP_SUMMARY"
+    [ -n "${GITHUB_ENV:-}" ] && echo "_ARCH_SUMMARY_INITIALIZED=true" >>"$GITHUB_ENV"
     export _ARCH_SUMMARY_INITIALIZED=true
-  else
-    touch "$_TMP_SUM"
   fi
 
   # Provide table header if not already present
-  if [ "$_SUMMARY_TABLE_HEADER_SENTINEL" != "true" ] && ! check_ci_summary "| Major Version | Action | Destination |"; then
+  if [ "${_SUMMARY_TABLE_HEADER_SENTINEL:-false}" != "true" ] && ! check_ci_summary "| Major Version | Action | Destination |"; then
     {
       printf "| Major Version | Action | Destination |\n"
       printf "| :--- | :--- | :--- |\n"
-    } >>"$_TMP_SUM"
-    [ -n "$GITHUB_ENV" ] && echo "_SUMMARY_TABLE_HEADER_SENTINEL=true" >>"$GITHUB_ENV"
+    } >>"$CI_STEP_SUMMARY"
+    [ -n "${GITHUB_ENV:-}" ] && echo "_SUMMARY_TABLE_HEADER_SENTINEL=true" >>"$GITHUB_ENV"
     export _SUMMARY_TABLE_HEADER_SENTINEL=true
   fi
   local _ARCHIVE_COUNT_ARCH=0
@@ -260,7 +258,7 @@ main() {
       if [ -s "$_FILTERED_CONTENT_ARCH" ]; then
         if [ "${DRY_RUN:-0}" -eq 1 ]; then
           log_warn "DRY-RUN: Would prepend new entries to $_FINAL_ARCH_FILE"
-          printf "| v%s | Prepend (Dry Run) | %s |\n" "$_V_NUM_PROC" "$_FINAL_ARCH_FILE" >>"$_TMP_SUM"
+          printf "| v%s | Prepend (Dry Run) | %s |\n" "$_V_NUM_PROC" "$_FINAL_ARCH_FILE" >>"$CI_STEP_SUMMARY"
         else
           log_info "Updating archive: $_FINAL_ARCH_FILE"
           # _TMP_ARCH_SWAP is reused safely because we empty it
@@ -269,7 +267,7 @@ main() {
           printf "\n" >>"$_TMP_ARCH_SWAP"
           sed '1,2d' "$_FINAL_ARCH_FILE" >>"$_TMP_ARCH_SWAP"
           atomic_swap "$_TMP_ARCH_SWAP" "$_FINAL_ARCH_FILE"
-          printf "| v%s | Updated | %s |\n" "$_V_NUM_PROC" "$_FINAL_ARCH_FILE" >>"$_TMP_SUM"
+          printf "| v%s | Updated | %s |\n" "$_V_NUM_PROC" "$_FINAL_ARCH_FILE" >>"$CI_STEP_SUMMARY"
         fi
         _ARCHIVE_COUNT_ARCH=$((_ARCHIVE_COUNT_ARCH + 1))
       else
@@ -279,13 +277,13 @@ main() {
     else
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_warn "DRY-RUN: Would create $_FINAL_ARCH_FILE"
-        printf "| v%s | Create (Dry Run) | %s |\n" "$_V_NUM_PROC" "$_FINAL_ARCH_FILE" >>"$_TMP_SUM"
+        printf "| v%s | Create (Dry Run) | %s |\n" "$_V_NUM_PROC" "$_FINAL_ARCH_FILE" >>"$CI_STEP_SUMMARY"
       else
         log_success "Creating new archive: $_FINAL_ARCH_FILE"
         mkdir -p "$_REL_ARCHIVE_DIR"
         printf "# Changelog Archive v%s\n\n" "$_V_NUM_PROC" >"$_FINAL_ARCH_FILE"
         cat "$_arch_file_iter" >>"$_FINAL_ARCH_FILE"
-        printf "| v%s | Created | %s |\n" "$_V_NUM_PROC" "$_FINAL_ARCH_FILE" >>"$_TMP_SUM"
+        printf "| v%s | Created | %s |\n" "$_V_NUM_PROC" "$_FINAL_ARCH_FILE" >>"$CI_STEP_SUMMARY"
       fi
       _ARCHIVE_COUNT_ARCH=$((_ARCHIVE_COUNT_ARCH + 1))
     fi
@@ -339,10 +337,10 @@ main() {
     log_success "Successfully updated $CHANGELOG"
   fi
 
-  # 7. Write to GITHUB_STEP_SUMMARY if available
-  if [ -n "$GITHUB_STEP_SUMMARY" ]; then
-    log_debug "Writing to GITHUB_STEP_SUMMARY..."
-    cat "$_TMP_SUM" >>"$GITHUB_STEP_SUMMARY"
+  # 7. Write Summary Log
+  if [ -n "$CI_STEP_SUMMARY" ]; then
+    log_debug "Writing archival logs to $CI_STEP_SUMMARY..."
+    cat "$_TMP_SUM" >>"$CI_STEP_SUMMARY" 2>/dev/null || true
   fi
 
   # 8. Standardized Next Actions

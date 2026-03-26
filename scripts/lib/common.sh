@@ -114,6 +114,24 @@ if [ -n "${GITHUB_TOKEN:-}" ]; then
   # GitHub CLI (gh) preferred variable
   [ -z "${GH_TOKEN:-}" ] && export GH_TOKEN="$GITHUB_TOKEN"
 fi
+# ── 📊 CI Step Summary Abstraction (Cross-Platform) ──────────────────────────
+# Detect and unify CI summary reporting paths (GitHub, GitLab, Gitea, Local).
+# Ref: Rule 09 (Interaction/Summary Integration)
+if [ -n "${GITHUB_STEP_SUMMARY:-}" ] && [ -z "${GITEA_ACTIONS:-}" ] && [ -z "${FORGEJO_ACTIONS:-}" ]; then
+  # GitHub Actions: Native summary file
+  export CI_STEP_SUMMARY="$GITHUB_STEP_SUMMARY"
+elif [ -n "${GITEA_ACTIONS:-}" ] || [ -n "${FORGEJO_ACTIONS:-}" ]; then
+  # Gitea/Forgejo: Often follows GitHub conventions but may need fallback
+  export CI_STEP_SUMMARY="${GITHUB_STEP_SUMMARY:-${_G_PROJECT_ROOT}/.ci_summary.log}"
+elif [ -n "${GITLAB_CI:-}" ]; then
+  # GitLab: Use a standard log file that can be rendered as an artifact
+  export CI_STEP_SUMMARY="${_G_PROJECT_ROOT}/ci_summary.md"
+else
+  # Local: Use a temporary log file (ignored by git)
+  [ -z "${CI_STEP_SUMMARY:-}" ] && export CI_STEP_SUMMARY="${_G_PROJECT_ROOT}/.ci_summary.log"
+fi
+export CI_STEP_SUMMARY
+
 # In CI, prevent mise from fetching remote version lists from GitHub.
 # All versions are pinned in .mise.toml / versions.sh, so remote lookups are unnecessary
 # and are the biggest hidden source of GitHub API calls during `mise install`.
@@ -720,7 +738,7 @@ guard_project_root() {
 # Examples:
 #   if ! check_ci_summary "### Summary"; then ...; fi
 check_ci_summary() {
-  [ -n "$GITHUB_STEP_SUMMARY" ] && [ -f "$GITHUB_STEP_SUMMARY" ] && grep -qF "$1" "$GITHUB_STEP_SUMMARY"
+  [ -n "$CI_STEP_SUMMARY" ] && [ -f "$CI_STEP_SUMMARY" ] && grep -qF "$1" "$CI_STEP_SUMMARY"
 }
 
 # Purpose: Detects the current CI platform by inspecting well-known environment variables.
@@ -1332,33 +1350,29 @@ run_npm_script() {
 #   init_summary_table "Setup Execution Summary"
 init_summary_table() {
   local _TITLE_TABLE="${1:-Execution Summary}"
-  if [ -z "$SETUP_SUMMARY_FILE" ]; then
-    SETUP_SUMMARY_FILE=$(mktemp)
-    export SETUP_SUMMARY_FILE
-  fi
 
+  # Sentinel to prevent duplicate headers in the same summary stream
   local _SENTINEL_TABLE
   _SENTINEL_TABLE="_SUMMARY_TABLE_INITIALIZED_$(echo "$_TITLE_TABLE" | tr ' ' '_')"
   if [ "$(eval echo "\$$_SENTINEL_TABLE")" = "true" ]; then
     return 0
   fi
 
+  # Ensure the summary file exists
+  touch "$CI_STEP_SUMMARY"
+
   {
     printf "### %s\n\n" "$_TITLE_TABLE"
     printf "| Category | Module | Status | Version | Time |\n"
     printf "| :--- | :--- | :--- | :--- | :--- |\n"
-  } >>"$SETUP_SUMMARY_FILE"
+  } >>"$CI_STEP_SUMMARY"
 
   eval "export $_SENTINEL_TABLE=true"
 }
 
-# Purpose: Finalizes the summary table by flushing it to GITHUB_STEP_SUMMARY in CI.
-# Examples:
-#   finalize_summary_table
+# Purpose: Finalizes the summary table. (Deprecated: Writes are now direct).
 finalize_summary_table() {
-  if [ -n "$GITHUB_STEP_SUMMARY" ] && [ -f "$SETUP_SUMMARY_FILE" ] && [ -w "$GITHUB_STEP_SUMMARY" ]; then
-    cat "$SETUP_SUMMARY_FILE" >>"$GITHUB_STEP_SUMMARY"
-  fi
+  log_debug "Summary table finalized in $CI_STEP_SUMMARY"
 }
 
 # Purpose: Checks if the current tool version matches the required version (prefix match).

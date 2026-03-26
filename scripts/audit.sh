@@ -364,17 +364,16 @@ main() {
 
   # ── Final Report ─────────────────────────────────────────────────────────────
 
-  if [ "$_IS_TOP_LEVEL" = "true" ] && [ -n "$SETUP_SUMMARY_FILE" ] && [ -f "$SETUP_SUMMARY_FILE" ]; then
+  if [ "$_IS_TOP_LEVEL" = "true" ]; then
     local _TOTAL_DUR_AUD
     _TOTAL_DUR_AUD=$(($(date +%s) - _START_TIME_AUDIT))
-    printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR_AUD" >>"$SETUP_SUMMARY_FILE"
+    printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR_AUD" >>"$CI_STEP_SUMMARY"
 
     printf "\n"
-    cat "$SETUP_SUMMARY_FILE"
-    if [ -n "$GITHUB_STEP_SUMMARY" ]; then
-      cat "$SETUP_SUMMARY_FILE" >>"$GITHUB_STEP_SUMMARY"
+    if ! is_ci_env; then
+      cat "$CI_STEP_SUMMARY"
     fi
-    rm -f "$SETUP_SUMMARY_FILE"
+    finalize_summary_table
   fi
 
   if [ "$_IS_TOP_LEVEL" = "true" ]; then

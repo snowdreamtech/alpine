@@ -182,13 +182,11 @@ EOF
           log_summary "Runtime" "rust" "✅ Detected" "$_vrust" "0"
         fi
       fi
-    } >"$SETUP_SUMMARY_FILE"
+    } >>"$CI_STEP_SUMMARY"
 
     # Set master sentinel for subsequent steps in CI
-    [ -n "$GITHUB_ENV" ] && echo "_SETUP_SUMMARY_INITIALIZED=true" >>"$GITHUB_ENV"
+    [ -n "${GITHUB_ENV:-}" ] && echo "_SETUP_SUMMARY_INITIALIZED=true" >>"$GITHUB_ENV"
     export _SETUP_SUMMARY_INITIALIZED=true
-  else
-    touch "$SETUP_SUMMARY_FILE"
   fi
 
   # Provide table header if not already present in the summary
@@ -196,8 +194,8 @@ EOF
     {
       printf "| Category | Module | Status | Version | Time |\n"
       printf "| :--- | :--- | :--- | :--- | :--- |\n"
-    } >>"$SETUP_SUMMARY_FILE"
-    [ -n "$GITHUB_ENV" ] && echo "_SUMMARY_TABLE_HEADER_SENTINEL=true" >>"$GITHUB_ENV"
+    } >>"$CI_STEP_SUMMARY"
+    [ -n "${GITHUB_ENV:-}" ] && echo "_SUMMARY_TABLE_HEADER_SENTINEL=true" >>"$GITHUB_ENV"
     export _SUMMARY_TABLE_HEADER_SENTINEL=true
   fi
 
@@ -407,13 +405,14 @@ EOF
   done
 
   # ── Final Output Management ──
-  if [ "${_IS_TOP_LEVEL:-true}" = "true" ] && [ -n "$SETUP_SUMMARY_FILE" ] && [ -f "$SETUP_SUMMARY_FILE" ]; then
+  if [ "${_IS_TOP_LEVEL:-true}" = "true" ]; then
     local _TOTAL_DUR_MAIN=$(($(date +%s) - _START_TIME_MAIN))
-    printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR_MAIN" >>"$SETUP_SUMMARY_FILE"
+    printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR_MAIN" >>"$CI_STEP_SUMMARY"
     printf "\n"
-    cat "$SETUP_SUMMARY_FILE"
-    [ -n "$GITHUB_STEP_SUMMARY" ] && cat "$SETUP_SUMMARY_FILE" >>"$GITHUB_STEP_SUMMARY"
-    rm -f "$SETUP_SUMMARY_FILE"
+    if ! is_ci_env; then
+      cat "$CI_STEP_SUMMARY"
+    fi
+    finalize_summary_table
     log_info "\n✨ Setup step complete!"
 
     if [ "${DRY_RUN:-0}" -eq 0 ]; then

@@ -212,34 +212,26 @@ main() {
   local _START_TIME_M
   _START_TIME_M=$(date +%s)
 
-  # Initialize Summary File if not already done
-  local _CREATED_SUMMARY_M=false
-  if [ -z "$SETUP_SUMMARY_FILE" ]; then
-    SETUP_SUMMARY_FILE=$(mktemp)
-    # Ensure this script cleans up the file it created if it exits early
-    trap 'rm -f "$SETUP_SUMMARY_FILE"' EXIT INT TERM
-    export SETUP_SUMMARY_FILE
-    _CREATED_SUMMARY_M=true
+  # Initialize Summary File correctly
+  init_summary_table "Update Execution Summary"
 
-    if [ "$_UPDATE_SUMMARY_INITIALIZED" != "true" ] && ! check_ci_summary "### Update Execution Summary"; then
-      {
-        printf "### Update Execution Summary\n\n"
-      } >"$SETUP_SUMMARY_FILE"
-      [ -n "$GITHUB_ENV" ] && echo "_UPDATE_SUMMARY_INITIALIZED=true" >>"$GITHUB_ENV"
-      export _UPDATE_SUMMARY_INITIALIZED=true
-    else
-      touch "$SETUP_SUMMARY_FILE"
-    fi
+  # Initialize Summary Legend (Only once per CI Job or first call)
+  if [ "${_UPDATE_SUMMARY_INITIALIZED:-false}" != "true" ] && ! check_ci_summary "### Update Execution Summary"; then
+    {
+      printf "### Update Execution Summary\n\n"
+    } >>"$CI_STEP_SUMMARY"
+    [ -n "${GITHUB_ENV:-}" ] && echo "_UPDATE_SUMMARY_INITIALIZED=true" >>"$GITHUB_ENV"
+    export _UPDATE_SUMMARY_INITIALIZED=true
+  fi
 
-    # Provide table header if not already present
-    if [ "$_SUMMARY_TABLE_HEADER_SENTINEL" != "true" ] && ! check_ci_summary "| Category | Module | Status |"; then
-      {
-        printf "| Category | Module | Status | Version | Time |\n"
-        printf "| :--- | :--- | :--- | :--- | :--- |\n"
-      } >>"$SETUP_SUMMARY_FILE"
-      [ -n "$GITHUB_ENV" ] && echo "_SUMMARY_TABLE_HEADER_SENTINEL=true" >>"$GITHUB_ENV"
-      export _SUMMARY_TABLE_HEADER_SENTINEL=true
-    fi
+  # Provide table header if not already present
+  if [ "${_SUMMARY_TABLE_HEADER_SENTINEL:-false}" != "true" ] && ! check_ci_summary "| Category | Module | Status |"; then
+    {
+      printf "| Category | Module | Status | Version | Time |\n"
+      printf "| :--- | :--- | :--- | :--- | :--- |\n"
+    } >>"$CI_STEP_SUMMARY"
+    [ -n "${GITHUB_ENV:-}" ] && echo "_SUMMARY_TABLE_HEADER_SENTINEL=true" >>"$GITHUB_ENV"
+    export _SUMMARY_TABLE_HEADER_SENTINEL=true
   fi
 
   update_homebrew
@@ -256,17 +248,16 @@ main() {
   run_npm_script "update"
 
   # Final Output Management
-  if [ "$_CREATED_SUMMARY_M" = "true" ]; then
+  if [ "${_IS_TOP_LEVEL:-true}" = "true" ]; then
     local _TOTAL_DUR_M
     _TOTAL_DUR_M=$(($(date +%s) - _START_TIME_M))
-    printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR_M" >>"$SETUP_SUMMARY_FILE"
+    printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR_M" >>"$CI_STEP_SUMMARY"
 
     printf "\n\n"
-    cat "$SETUP_SUMMARY_FILE"
-    if [ -n "$GITHUB_STEP_SUMMARY" ]; then
-      cat "$SETUP_SUMMARY_FILE" >>"$GITHUB_STEP_SUMMARY"
+    if ! is_ci_env; then
+      cat "$CI_STEP_SUMMARY"
     fi
-    rm -f "$SETUP_SUMMARY_FILE"
+    finalize_summary_table
   fi
 
   if [ "$_IS_TOP_LEVEL" = "true" ]; then
