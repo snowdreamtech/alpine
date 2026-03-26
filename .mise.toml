@@ -11,63 +11,65 @@
 # ── 🏗️ Core Runtimes ──────────────────────────────────────────────────────────
 go = "1.24.1"
 node = "20.18.3"
-# "#npm:pnpm" = "10.30.3"
+"npm:pnpm" = "10.30.3"
 python = "3.12.9"
 
 # ── 🔐 Security & Engineering (always needed) ──────────────────────────────────
 gitleaks = "8.30.0"
-# "#github:cli/cli" = "2.88.1"
+"github:cli/cli" = "2.88.1"
 
 # ── 💎 Core Quality & Commit Tooling ──────────────────────────────────────────
 # Tools invoked by pre-commit hooks or universally needed.
 checkmake = "0.3.2"
 editorconfig-checker = "3.6.1"
-# "#go:github.com/google/addlicense" = "v1.1.1"
+"go:github.com/google/addlicense" = "v1.1.1"
 
 # Git / commit workflow
-# "#npm:@commitlint/cli" = "20.5.0"
-# "#npm:@commitlint/config-conventional" = "20.5.0"
-# "#npm:bats" = "1.13.0"
-# "#npm:commitizen" = "4.3.1"
-# "#npm:cz-conventional-changelog" = "3.3.0"
+"npm:@commitlint/cli" = "20.5.0"
+"npm:@commitlint/config-conventional" = "20.5.0"
+"npm:bats" = "1.13.0"
+"npm:commitizen" = "4.3.1"
+"npm:cz-conventional-changelog" = "3.3.0"
 
 # Formatting & linting (invoked by pre-commit hooks)
-# "#npm:eslint" = "10.0.3"
-# "#npm:markdownlint-cli2" = "0.21.0"
-# "#npm:prettier" = "3.8.1"
-# "#npm:sort-package-json" = "3.6.1"
-# "#npm:@taplo/cli" = "0.7.0"
+"npm:eslint" = "10.0.3"
+"npm:markdownlint-cli2" = "0.21.0"
+"npm:prettier" = "3.8.1"
+"npm:sort-package-json" = "3.6.1"
+"npm:@taplo/cli" = "0.7.0"
 
 # Docker / Infrastructure linters (invoked by pre-commit hooks)
-# "#github:hadolint/hadolint" = "2.14.0"
-# "#npm:dockerfile-utils" = "0.16.3"
+"github:hadolint/hadolint" = "2.14.0"
+"npm:dockerfile-utils" = "0.16.3"
 
 # Shell & scripting linters (pre-commit hooks)
-# "#pipx:actionlint-py" = "1.7.11.24"
-# "#pipx:pre-commit" = "4.5.1"
-# "#pipx:ruff" = "0.15.4"
-# "#pipx:shellcheck-py" = "0.11.0.1"
-# "#pipx:shfmt-py" = "3.12.0.2"
-# "#pipx:yamllint" = "1.38.0"
+"pipx:actionlint-py" = "1.7.11.24"
+"pipx:pre-commit" = "4.5.1"
+"pipx:ruff" = "0.15.4"
+"pipx:shellcheck-py" = "0.11.0.1"
+"pipx:shfmt-py" = "3.12.0.2"
+"pipx:yamllint" = "1.38.0"
 
 # Additional linters invoked by pre-commit hooks
-# "#pipx:clang-format" = "19.1.7"
-# "#pipx:dotenv-linter" = "0.7.0"
-# "#pipx:sqlfluff" = "4.0.4"
+"pipx:clang-format" = "19.1.7"
+"pipx:dotenv-linter" = "0.7.0"
+"pipx:sqlfluff" = "4.0.4"
 
 # DevOps/release tools used globally
-# "#github:goreleaser/goreleaser" = "2.14.1"
-# "#pipx:zizmor" = "1.3.1"
-# "#npm:vitepress" = "1.6.4"
+"github:goreleaser/goreleaser" = "2.14.1"
+"pipx:zizmor" = "1.3.1"
+"npm:vitepress" = "1.6.4"
 
 # ── TIER 2 (Security/On-demand) ──────────────────────────────────────────────
 # These are only uncommented during 'make sync-lock' to update mise.lock.
 # Local 'mise install' will ignore them while they are commented.
+# TIER 2 BEGIN
 # "#github:google/osv-scanner" = "2.3.5"
 # "#github:aquasecurity/trivy" = "0.59.1"
 # "#go:golang.org/x/vuln/cmd/govulncheck" = "latest"
 # "#pipx:pip-audit" = "2.8.2"
 # "#cargo:cargo-audit" = "0.20.0"
+# TIER 2 END
 
 # ------------------------------------------------------------
 # Global settings

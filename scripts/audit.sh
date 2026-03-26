@@ -56,9 +56,9 @@ EOF
 #   main --verbose
 main() {
   # 1. Execution Context Guard (On-demand Tier 2 activation)
-  # Temporarily uncomment Tier 2 tools so mise can resolve their locked versions.
-  perl -pi -e 's/^# "#/"/g' .mise.toml
-  trap "perl -pi -e 's/^\"/# \"#/g' .mise.toml" EXIT INT TERM
+  # Surgically uncomment Tier 2 tools so mise can resolve their locked versions.
+  perl -pi -e '$in=1 if /TIER 2 BEGIN/; $in=0 if /TIER 2 END/; s/^# "#/"/g if $in' .mise.toml
+  trap "perl -pi -e '\$in=1 if /TIER 2 BEGIN/; \$in=0 if /TIER 2 END/; s/^\"/# \"#/g if \$in' .mise.toml" EXIT INT TERM
   guard_project_root
 
   # 2. Argument Parsing
