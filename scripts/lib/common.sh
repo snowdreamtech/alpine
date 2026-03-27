@@ -1142,8 +1142,13 @@ get_version() {
       # For other binaries, try to get version from the output
       # We strip 'v' or 'V' prefix and focus on the version number
       # Use MISE_OFFLINE=1 to prevent shims from trying to resolve versions over network
-      MISE_OFFLINE=1 "$_LV_RESOLVED" "$_ARG_VER" 2>/dev/null | sed 's/^[vV]//' | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15 2>/dev/null || echo "-"
+      # On Windows, ensures we don't hang on interactive prompts or external lookups.
+      # shellcheck disable=SC2155
+      local _VERSION_RAW
+      _VERSION_RAW="$(MISE_OFFLINE=1 "$_LV_RESOLVED" "$_ARG_VER" 2>/dev/null | tr -d '\r' | sed 's/^[vV]//' | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15 2>/dev/null)"
+      echo "${_VERSION_RAW:--}" && return 0
       ;;
+
     esac
   else
     echo "-"
@@ -1181,6 +1186,12 @@ resolve_bin() {
   # ── 3. System PATH ──
   local _SP
   _SP=$(command -v "$_BIN" 2>/dev/null) || true
+
+  # Windows: command -v might miss extensions or return sh wrappers
+  if [ -z "$_SP" ] && [ "$_G_OS" = "windows" ]; then
+    _SP=$(command -v "${_BIN}.exe" 2>/dev/null) || _SP=$(command -v "${_BIN}.cmd" 2>/dev/null) || true
+  fi
+
   if [ -n "$_SP" ]; then
     # Guard: If it resolves to a mise shim, verify the tool is actually installed.
     # Shims exist for ALL tools in .mise.toml, even uninstalled ones ("hollow shims").

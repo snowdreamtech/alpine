@@ -18,12 +18,52 @@ install_pipx() {
 
   _log_setup "$_TITLE" "$_PROVIDER"
 
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "Pipx" '⚖️ Previewed' "-" '0'
-    return 0
+  # Proactive pipx installation via pip (Universal fallback)
+  # This ensures pipx is available regardless of mise's provider compatibility.
+  if ! resolve_bin "pipx" >/dev/null 2>&1; then
+    log_info "Ensuring pipx is available via pip..."
+    # Use python -m pip to ensure we use the correct python instance
+    # Note: --user may fail inside a virtualenv, so we try with it first and fallback if needed.
+    if ! "$PYTHON" -m pip install --user pipx --quiet 2>/dev/null; then
+      log_debug "Pipx: --user install failed or not available, trying standard install..."
+      "$PYTHON" -m pip install pipx --quiet || true
+    fi
+
+    # Add user scripts to PATH immediately if not present
+    local _USER_BIN
+    local _PY_PREFIX
+    _PY_PREFIX=$("$PYTHON" -c "import sys; print(sys.prefix)" | tr -d '\r')
+    if [ "$_G_OS" = "windows" ]; then
+      [ -d "$_PY_PREFIX/Scripts" ] && _USER_BIN="$_PY_PREFIX/Scripts"
+    else
+      [ -d "$_PY_PREFIX/bin" ] && _USER_BIN="$_PY_PREFIX/bin"
+    fi
+
+    # Fallback to User Base (for --user installs) if not found in prefix
+    if [ -z "$_USER_BIN" ]; then
+      if [ "$_G_OS" = "windows" ]; then
+        local _USER_BASE
+        _USER_BASE=$("$PYTHON" -m site --user-base 2>/dev/null | tr -d '\r')
+        [ -n "$_USER_BASE" ] && _USER_BIN="$_USER_BASE/Scripts"
+      else
+        # On macOS/Linux, pipx usually installs to ~/.local/bin or similar
+        # shellcheck disable=SC2155
+        _USER_BIN=$(python3 -m site --user-base 2>/dev/null)/bin
+      fi
+    fi
+
+    if [ -n "${_USER_BIN:-}" ]; then
+      case ":$PATH:" in
+      *":$_USER_BIN:"*) ;;
+      *) export PATH="$_USER_BIN:$PATH" ;;
+      esac
+    fi
+
   fi
+
   local _STAT_PIPX="✅ mise"
   run_mise install pipx || _STAT_PIPX="❌ Failed"
+
   log_summary "Base" "Pipx" "$_STAT_PIPX" "$(get_version pipx)" "$(($(date +%s) - _T0_PIPX))"
 }
 

@@ -59,7 +59,8 @@ editorconfig-checker = "3.6.1"
 "github:goreleaser/goreleaser" = "2.14.3"
 "pipx:zizmor" = "1.23.1"
 "npm:vitepress" = "1.6.4"
-pipx = "1.11.0"
+# pipx = "1.11.0" # Removed to let mise handle pipx natively on Windows/Linux/Mac
+
 
 # ------------------------------------------------------------
 # Global settings
