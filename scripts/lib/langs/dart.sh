@@ -30,8 +30,8 @@ setup_dart() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "dart")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Dart" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Dart" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -47,7 +47,7 @@ setup_dart() {
 
   local _DUR_DART_RT
   _DUR_DART_RT=$(($(date +%s) - _T0_DART_RT))
-  log_summary "Runtime" "Dart" "$_STAT_DART_RT" "$(get_version dart --version | head -n 1)" "$_DUR_DART_RT"
+  log_summary "Runtime" "Dart" "${_STAT_DART_RT:-}" "$(get_version dart --version | head -n 1)" "${_DUR_DART_RT:-}"
 }
 # Purpose: Checks if Dart runtime is available.
 # Examples:

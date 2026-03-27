@@ -32,8 +32,8 @@ setup_haxe() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "haxe")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Haxe" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Haxe" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -49,7 +49,7 @@ setup_haxe() {
 
   local _DUR_HX_RT
   _DUR_HX_RT=$(($(date +%s) - _T0_HX_RT))
-  log_summary "Runtime" "Haxe" "$_STAT_HX_RT" "$(get_version haxe -version | head -n 1)" "$_DUR_HX_RT"
+  log_summary "Runtime" "Haxe" "${_STAT_HX_RT:-}" "$(get_version haxe -version | head -n 1)" "${_DUR_HX_RT:-}"
 }
 
 # Purpose: Checks if Haxe is available.

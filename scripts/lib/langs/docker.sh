@@ -20,22 +20,22 @@ install_hadolint() {
   local _CUR_VER
   _CUR_VER=$(get_version hadolint)
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Docker" "Hadolint" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Docker" "Hadolint" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Docker" "Hadolint" '⚖️ Previewed' "-" '0'
     return 0
   fi
   local _STAT_HADO="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_HADO="❌ Failed"
-  log_summary "Docker" "Hadolint" "$_STAT_HADO" "$(get_version hadolint)" "$(($(date +%s) - _T0_HADO))"
+  run_mise install "${_PROVIDER:-}" || _STAT_HADO="❌ Failed"
+  log_summary "Docker" "Hadolint" "${_STAT_HADO:-}" "$(get_version hadolint)" "$(($(date +%s) - _T0_HADO))"
 }
 
 # Purpose: Installs dockerfile-utils for Dockerfile management.
@@ -54,22 +54,22 @@ install_dockerfile_utils() {
   local _CUR_VER
   _CUR_VER=$(get_version dockerfile-utils)
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Docker" "dockerfile-utils" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Docker" "dockerfile-utils" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Docker" "dockerfile-utils" '⚖️ Previewed' "-" '0'
     return 0
   fi
   local _STAT_DU="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_DU="❌ Failed"
-  log_summary "Docker" "dockerfile-utils" "$_STAT_DU" "$(get_version dockerfile-utils)" "$(($(date +%s) - _T0_DU))"
+  run_mise install "${_PROVIDER:-}" || _STAT_DU="❌ Failed"
+  log_summary "Docker" "dockerfile-utils" "${_STAT_DU:-}" "$(get_version dockerfile-utils)" "$(($(date +%s) - _T0_DU))"
 }
 
 # Purpose: Sets up Docker environment.

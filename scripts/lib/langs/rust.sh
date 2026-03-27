@@ -35,14 +35,14 @@ setup_rust() {
   local _CUR_VER
   _CUR_VER=$(get_version rust)
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Rust" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Rust" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Runtime" "Rust" "⚖️ Previewed" "-" "0"
@@ -54,7 +54,7 @@ setup_rust() {
 
   local _DUR_RUST_RT
   _DUR_RUST_RT=$(($(date +%s) - _T0_RUST_RT))
-  log_summary "Runtime" "Rust" "$_STAT_RUST_RT" "$(get_version rustc)" "$_DUR_RUST_RT"
+  log_summary "Runtime" "Rust" "${_STAT_RUST_RT:-}" "$(get_version rustc)" "${_DUR_RUST_RT:-}"
 }
 # Purpose: Checks if Rust runtime is available.
 # Examples:

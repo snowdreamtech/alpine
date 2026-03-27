@@ -32,8 +32,8 @@ setup_lisp() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "sbcl")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Common Lisp" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Common Lisp" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -49,7 +49,7 @@ setup_lisp() {
 
   local _DUR_LISP_RT
   _DUR_LISP_RT=$(($(date +%s) - _T0_LISP_RT))
-  log_summary "Runtime" "Common Lisp" "$_STAT_LISP_RT" "$(get_version sbcl --version | awk '{print $NF}')" "$_DUR_LISP_RT"
+  log_summary "Runtime" "Common Lisp" "${_STAT_LISP_RT:-}" "$(get_version sbcl --version | awk '{print $NF}')" "${_DUR_LISP_RT:-}"
 }
 
 # Purpose: Checks if SBCL is available.

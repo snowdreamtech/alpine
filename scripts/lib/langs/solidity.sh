@@ -32,8 +32,8 @@ setup_solidity() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "solc")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Solidity" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Solidity" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -49,7 +49,7 @@ setup_solidity() {
 
   local _DUR_SOL_RT
   _DUR_SOL_RT=$(($(date +%s) - _T0_SOL_RT))
-  log_summary "Runtime" "Solidity" "$_STAT_SOL_RT" "$(get_version solc)" "$_DUR_SOL_RT"
+  log_summary "Runtime" "Solidity" "${_STAT_SOL_RT:-}" "$(get_version solc)" "${_DUR_SOL_RT:-}"
 }
 
 # Purpose: Checks if Solidity compiler is available.

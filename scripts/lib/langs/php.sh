@@ -38,8 +38,8 @@ setup_php() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "php")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "PHP" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "PHP" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -55,7 +55,7 @@ setup_php() {
 
   local _DUR_PHP_RT
   _DUR_PHP_RT=$(($(date +%s) - _T0_PHP_RT))
-  log_summary "Runtime" "PHP" "$_STAT_PHP_RT" "$(get_version php)" "$_DUR_PHP_RT"
+  log_summary "Runtime" "PHP" "${_STAT_PHP_RT:-}" "$(get_version php)" "${_DUR_PHP_RT:-}"
 }
 # Purpose: Checks if PHP runtime is available.
 # Examples:

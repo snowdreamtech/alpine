@@ -33,8 +33,8 @@ setup_elixir() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "elixir")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Elixir" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Elixir" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -50,7 +50,7 @@ setup_elixir() {
 
   local _DUR_ELIXIR_RT
   _DUR_ELIXIR_RT=$(($(date +%s) - _T0_ELIXIR_RT))
-  log_summary "Runtime" "Elixir" "$_STAT_ELIXIR_RT" "$(get_version elixir --version | grep 'Elixir' | head -n 1)" "$_DUR_ELIXIR_RT"
+  log_summary "Runtime" "Elixir" "${_STAT_ELIXIR_RT:-}" "$(get_version elixir --version | grep 'Elixir' | head -n 1)" "${_DUR_ELIXIR_RT:-}"
 }
 # Purpose: Checks if Elixir runtime is available.
 # Examples:

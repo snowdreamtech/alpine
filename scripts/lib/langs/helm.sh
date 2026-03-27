@@ -27,10 +27,10 @@ install_kube_linter() {
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
   local _STAT_KL="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_KL="❌ Failed"
-  log_summary "IaC" "Kube-Linter" "$_STAT_KL" "$(get_version kube-linter version)" "$(($(date +%s) - _T0_KL))"
+  run_mise install "${_PROVIDER:-}" || _STAT_KL="❌ Failed"
+  log_summary "IaC" "Kube-Linter" "${_STAT_KL:-}" "$(get_version kube-linter version)" "$(($(date +%s) - _T0_KL))"
 }
 
 # Purpose: Sets up Helm environment for project.
@@ -47,8 +47,8 @@ setup_helm() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "helm")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "IaC" "Helm" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "IaC" "Helm" "✅ Detected" "${_CUR_VER:-}" "0"
   else
     _log_setup "Helm" "helm"
 
@@ -60,7 +60,7 @@ setup_helm() {
 
       local _DUR_HELM
       _DUR_HELM=$(($(date +%s) - _T0_HELM))
-      log_summary "IaC" "Helm" "$_STAT_HELM_RT" "$(get_version helm version --short)" "$_DUR_HELM"
+      log_summary "IaC" "Helm" "${_STAT_HELM_RT:-}" "$(get_version helm version --short)" "${_DUR_HELM:-}"
     fi
   fi
 

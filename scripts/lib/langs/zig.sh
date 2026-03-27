@@ -31,8 +31,8 @@ setup_zig() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "zig")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Zig" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Zig" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -48,7 +48,7 @@ setup_zig() {
 
   local _DUR_ZIG_RT
   _DUR_ZIG_RT=$(($(date +%s) - _T0_ZIG_RT))
-  log_summary "Runtime" "Zig" "$_STAT_ZIG_RT" "$(get_version zig version)" "$_DUR_ZIG_RT"
+  log_summary "Runtime" "Zig" "${_STAT_ZIG_RT:-}" "$(get_version zig version)" "${_DUR_ZIG_RT:-}"
 }
 # Purpose: Checks if Zig runtime is available.
 # Examples:

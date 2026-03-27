@@ -32,8 +32,8 @@ setup_move() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "aptos")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Move" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Move" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -49,7 +49,7 @@ setup_move() {
 
   local _DUR_MOVE_RT
   _DUR_MOVE_RT=$(($(date +%s) - _T0_MOVE_RT))
-  log_summary "Runtime" "Move" "$_STAT_MOVE_RT" "$(get_version aptos --version | awk '{print $NF}')" "$_DUR_MOVE_RT"
+  log_summary "Runtime" "Move" "${_STAT_MOVE_RT:-}" "$(get_version aptos --version | awk '{print $NF}')" "${_DUR_MOVE_RT:-}"
 }
 
 # Purpose: Checks if Move (aptos) is available.

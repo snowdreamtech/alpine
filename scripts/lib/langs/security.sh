@@ -23,12 +23,12 @@ install_osv_scanner() {
   _CUR_VER=$(get_version osv-scanner)
   local _REQ_VER="${VER_OSV_SCANNER}"
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Security" "OSV-Scanner" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Security" "OSV-Scanner" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Security" "OSV-Scanner" '⚖️ Previewed' "-" '0'
@@ -36,13 +36,13 @@ install_osv_scanner() {
   fi
   local _STAT_OSV="✅ mise"
   setup_registry_osv_scanner
-  if ! run_mise install "$_PROVIDER"; then
+  if ! run_mise install "${_PROVIDER:-}"; then
     _STAT_OSV="❌ Failed"
     if is_ci_env; then
       log_warn "Optional security tool ($_TITLE) failed to install. Continuing..."
     fi
   fi
-  log_summary "Security" "OSV-Scanner" "$_STAT_OSV" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV))"
+  log_summary "Security" "OSV-Scanner" "${_STAT_OSV:-}" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV))"
 }
 
 # NOTE: Trivy CLI installation removed. Vulnerability scanning is handled by
@@ -66,20 +66,20 @@ install_zizmor() {
   _CUR_VER=$(get_version zizmor)
   local _REQ_VER="${VER_ZIZMOR}"
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Security" "Zizmor" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Security" "Zizmor" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Security" "Zizmor" '⚖️ Previewed' "-" '0'
     return 0
   fi
   local _STAT_ZIZ="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_ZIZ="❌ Failed"
-  log_summary "Security" "Zizmor" "$_STAT_ZIZ" "$(get_version zizmor)" "$(($(date +%s) - _T0_ZIZ))"
+  run_mise install "${_PROVIDER:-}" || _STAT_ZIZ="❌ Failed"
+  log_summary "Security" "Zizmor" "${_STAT_ZIZ:-}" "$(get_version zizmor)" "$(($(date +%s) - _T0_ZIZ))"
 }
 
 # Purpose: Installs cargo-audit for Rust vulnerability scanning.
@@ -106,12 +106,12 @@ install_cargo_audit() {
   _CUR_VER=$(get_version cargo-audit)
   local _REQ_VER="${VER_CARGO_AUDIT}"
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Security" "Cargo-Audit" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Security" "Cargo-Audit" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Security" "Cargo-Audit" '⚖️ Previewed' "-" '0'
@@ -119,8 +119,8 @@ install_cargo_audit() {
   fi
   local _STAT_CA="✅ mise"
   setup_registry_cargo_audit
-  run_mise install "$_PROVIDER" || _STAT_CA="❌ Failed"
-  log_summary "Security" "Cargo-Audit" "$_STAT_CA" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_CA))"
+  run_mise install "${_PROVIDER:-}" || _STAT_CA="❌ Failed"
+  log_summary "Security" "Cargo-Audit" "${_STAT_CA:-}" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_CA))"
 }
 
 # Purpose: Sets up Security audit environment.

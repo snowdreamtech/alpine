@@ -29,8 +29,8 @@ setup_pulumi() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "pulumi")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "IaC" "Pulumi" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "IaC" "Pulumi" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -46,7 +46,7 @@ setup_pulumi() {
 
   local _DUR_PULUMI_RT
   _DUR_PULUMI_RT=$(($(date +%s) - _T0_PULUMI))
-  log_summary "IaC" "Pulumi" "$_STAT_PULUMI_RT" "$(get_version pulumi version)" "$_DUR_PULUMI_RT"
+  log_summary "IaC" "Pulumi" "${_STAT_PULUMI_RT:-}" "$(get_version pulumi version)" "${_DUR_PULUMI_RT:-}"
 }
 # Purpose: Checks if Pulumi CLI is available.
 # Examples:

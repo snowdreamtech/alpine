@@ -46,7 +46,7 @@ install_runtime_node() {
   fi
 
   # 2. Dependency resolution
-  if [ -f "$PACKAGE_JSON" ]; then
+  if [ -f "${PACKAGE_JSON:-}" ]; then
     # We use 'install' explicitly to bypass manager detection overhead for bootstrap
     # but still use run_npm_script to leverage its guards.
     run_npm_script install
@@ -68,22 +68,22 @@ install_sort_package_json() {
   local _CUR_VER
   _CUR_VER=$(get_version sort-package-json)
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Node" "sort-package-json" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Node" "sort-package-json" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Node" "sort-package-json" '⚖️ Previewed' "-" '0'
     return 0
   fi
   local _STAT_SPJ="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_SPJ="❌ Failed"
-  log_summary "Node" "sort-package-json" "$_STAT_SPJ" "$(get_version sort-package-json)" "$(($(date +%s) - _T0_SPJ))"
+  run_mise install "${_PROVIDER:-}" || _STAT_SPJ="❌ Failed"
+  log_summary "Node" "sort-package-json" "${_STAT_SPJ:-}" "$(get_version sort-package-json)" "$(($(date +%s) - _T0_SPJ))"
 }
 
 # Purpose: Installs eslint.
@@ -103,20 +103,20 @@ install_eslint() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "npm:eslint")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Node" "ESLint" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Node" "ESLint" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Node" "ESLint" '⚖️ Previewed' "-" '0'
     return 0
   fi
   local _STAT_ES="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_ES="❌ Failed"
-  log_summary "Node" "ESLint" "$_STAT_ES" "$(get_version eslint)" "$(($(date +%s) - _T0_ES))"
+  run_mise install "${_PROVIDER:-}" || _STAT_ES="❌ Failed"
+  log_summary "Node" "ESLint" "${_STAT_ES:-}" "$(get_version eslint)" "$(($(date +%s) - _T0_ES))"
 }
 
 # Purpose: Installs stylelint.
@@ -135,22 +135,22 @@ install_stylelint() {
   local _CUR_VER
   _CUR_VER=$(get_version stylelint)
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Node" "Stylelint" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Node" "Stylelint" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Node" "Stylelint" '⚖️ Previewed' "-" '0'
     return 0
   fi
   local _STAT_SL="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_SL="❌ Failed"
-  log_summary "Node" "Stylelint" "$_STAT_SL" "$(get_version stylelint)" "$(($(date +%s) - _T0_SL))"
+  run_mise install "${_PROVIDER:-}" || _STAT_SL="❌ Failed"
+  log_summary "Node" "Stylelint" "${_STAT_SL:-}" "$(get_version stylelint)" "$(($(date +%s) - _T0_SL))"
 }
 
 # Purpose: Installs vitepress.
@@ -161,7 +161,7 @@ install_vitepress() {
   local _TITLE="VitePress"
   local _PROVIDER="npm:vitepress"
 
-  if [ ! -d docs ] && ! grep -q '"vitepress"' "$PACKAGE_JSON" 2>/dev/null; then
+  if [ ! -d docs ] && ! grep -q '"vitepress"' "${PACKAGE_JSON:-}" 2>/dev/null; then
     return 0
   fi
 
@@ -169,22 +169,22 @@ install_vitepress() {
   local _CUR_VER
   _CUR_VER=$(get_version vitepress "" "vitepress")
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Docs" "VitePress" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Docs" "VitePress" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Docs" "VitePress" '⚖️ Previewed' "-" '0'
     return 0
   fi
   local _STAT_VP="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_VP="❌ Failed"
-  log_summary "Docs" "VitePress" "$_STAT_VP" "$(get_version vitepress)" "$(($(date +%s) - _T0_VP))"
+  run_mise install "${_PROVIDER:-}" || _STAT_VP="❌ Failed"
+  log_summary "Docs" "VitePress" "${_STAT_VP:-}" "$(get_version vitepress)" "$(($(date +%s) - _T0_VP))"
 }
 
 # Purpose: Installs prettier.
@@ -199,22 +199,22 @@ install_prettier() {
   local _CUR_VER
   _CUR_VER=$(get_version prettier)
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Base" "Prettier" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Base" "Prettier" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Base" "Prettier" '⚖️ Previewed' "-" '0'
     return 0
   fi
   local _STAT_PR="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_PR="❌ Failed"
-  log_summary "Base" "Prettier" "$_STAT_PR" "$(get_version prettier)" "$(($(date +%s) - _T0_PR))"
+  run_mise install "${_PROVIDER:-}" || _STAT_PR="❌ Failed"
+  log_summary "Base" "Prettier" "${_STAT_PR:-}" "$(get_version prettier)" "$(($(date +%s) - _T0_PR))"
 }
 
 # Purpose: Installs commitlint.
@@ -229,22 +229,22 @@ install_commitlint() {
   local _CUR_VER
   _CUR_VER=$(get_version commitlint "" "@commitlint/cli")
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Base" "Commitlint" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Base" "Commitlint" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Base" "Commitlint" '⚖️ Previewed' "-" '0'
     return 0
   fi
   local _STAT_CL="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_CL="❌ Failed"
-  log_summary "Base" "Commitlint" "$_STAT_CL" "$(get_version commitlint)" "$(($(date +%s) - _T0_CL))"
+  run_mise install "${_PROVIDER:-}" || _STAT_CL="❌ Failed"
+  log_summary "Base" "Commitlint" "${_STAT_CL:-}" "$(get_version commitlint)" "$(($(date +%s) - _T0_CL))"
 }
 
 # Purpose: Installs commitizen.
@@ -263,22 +263,22 @@ install_commitizen() {
   local _CUR_VER
   _CUR_VER=$(get_version commitizen "" "commitizen")
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Base" "Commitizen" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Base" "Commitizen" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Base" "Commitizen" '⚖️ Previewed' "-" '0'
     return 0
   fi
   local _STAT_CZ="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_CZ="❌ Failed"
-  log_summary "Base" "Commitizen" "$_STAT_CZ" "$(get_version commitizen)" "$(($(date +%s) - _T0_CZ))"
+  run_mise install "${_PROVIDER:-}" || _STAT_CZ="❌ Failed"
+  log_summary "Base" "Commitizen" "${_STAT_CZ:-}" "$(get_version commitizen)" "$(($(date +%s) - _T0_CZ))"
 }
 
 # Purpose: Sets up Node.js runtime for project.
@@ -297,12 +297,12 @@ setup_node() {
   local _CUR_VER
   _CUR_VER=$(get_version node)
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Node.js" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Node.js" "✅ Detected" "${_CUR_VER:-}" "0"
   else
-    _log_setup "$_TITLE" "$_PROVIDER"
+    _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_summary "Runtime" "Node.js" "⚖️ Previewed" "-" "0"
@@ -312,17 +312,17 @@ setup_node() {
 
       local _DUR_NODE_RT
       _DUR_NODE_RT=$(($(date +%s) - _T0_NODE_RT))
-      log_summary "Runtime" "Node.js" "$_STAT_NODE_RT" "$(get_version node)" "$_DUR_NODE_RT"
+      log_summary "Runtime" "Node.js" "${_STAT_NODE_RT:-}" "$(get_version node)" "${_DUR_NODE_RT:-}"
     fi
   fi
 
-  if [ -f "$PACKAGE_JSON" ]; then
+  if [ -f "${PACKAGE_JSON:-}" ]; then
     # Detect Frameworks from package.json for summary
-    if grep -q '"vue"' "$PACKAGE_JSON"; then log_summary "Framework" "Vue" "✅ Detected" "-" "0"; fi
-    if grep -q '"react"' "$PACKAGE_JSON"; then log_summary "Framework" "React" "✅ Detected" "-" "0"; fi
-    if grep -q '"astro"' "$PACKAGE_JSON"; then log_summary "Framework" "Astro" "✅ Detected" "-" "0"; fi
-    if grep -q '"svelte"' "$PACKAGE_JSON"; then log_summary "Framework" "Svelte" "✅ Detected" "-" "0"; fi
-    if grep -q '"tailwindcss"' "$PACKAGE_JSON"; then log_summary "Framework" "Tailwind" "✅ Detected" "-" "0"; fi
+    if grep -q '"vue"' "${PACKAGE_JSON:-}"; then log_summary "Framework" "Vue" "✅ Detected" "-" "0"; fi
+    if grep -q '"react"' "${PACKAGE_JSON:-}"; then log_summary "Framework" "React" "✅ Detected" "-" "0"; fi
+    if grep -q '"astro"' "${PACKAGE_JSON:-}"; then log_summary "Framework" "Astro" "✅ Detected" "-" "0"; fi
+    if grep -q '"svelte"' "${PACKAGE_JSON:-}"; then log_summary "Framework" "Svelte" "✅ Detected" "-" "0"; fi
+    if grep -q '"tailwindcss"' "${PACKAGE_JSON:-}"; then log_summary "Framework" "Tailwind" "✅ Detected" "-" "0"; fi
   fi
 
   # Detect Bun if bun.lockb exists

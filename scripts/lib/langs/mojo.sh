@@ -32,8 +32,8 @@ setup_mojo() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "mojo")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Mojo" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Mojo" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -49,7 +49,7 @@ setup_mojo() {
 
   local _DUR_MOJ_RT
   _DUR_MOJ_RT=$(($(date +%s) - _T0_MOJ_RT))
-  log_summary "Runtime" "Mojo" "$_STAT_MOJ_RT" "$(get_version mojo --version | head -n 1)" "$_DUR_MOJ_RT"
+  log_summary "Runtime" "Mojo" "${_STAT_MOJ_RT:-}" "$(get_version mojo --version | head -n 1)" "${_DUR_MOJ_RT:-}"
 }
 
 # Purpose: Checks if Mojo is available.

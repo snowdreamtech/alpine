@@ -32,8 +32,8 @@ setup_elm() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "elm")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Elm" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Elm" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -49,7 +49,7 @@ setup_elm() {
 
   local _DUR_ELM_RT
   _DUR_ELM_RT=$(($(date +%s) - _T0_ELM_RT))
-  log_summary "Runtime" "Elm" "$_STAT_ELM_RT" "$(get_version elm --version)" "$_DUR_ELM_RT"
+  log_summary "Runtime" "Elm" "${_STAT_ELM_RT:-}" "$(get_version elm --version)" "${_DUR_ELM_RT:-}"
 }
 
 # Purpose: Checks if Elm is available.

@@ -31,8 +31,8 @@ setup_deno() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "deno")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Deno" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Deno" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -48,7 +48,7 @@ setup_deno() {
 
   local _DUR_DENO_RT
   _DUR_DENO_RT=$(($(date +%s) - _T0_DENO_RT))
-  log_summary "Runtime" "Deno" "$_STAT_DENO_RT" "$(get_version deno --version | head -n 1 | awk '{print $2}')" "$_DUR_DENO_RT"
+  log_summary "Runtime" "Deno" "${_STAT_DENO_RT:-}" "$(get_version deno --version | head -n 1 | awk '{print $2}')" "${_DUR_DENO_RT:-}"
 }
 # Purpose: Checks if Deno runtime is available.
 # Examples:

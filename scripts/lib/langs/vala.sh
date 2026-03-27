@@ -30,8 +30,8 @@ setup_vala() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "valac")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Vala" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Vala" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -47,7 +47,7 @@ setup_vala() {
 
   local _DUR_VALA_RT
   _DUR_VALA_RT=$(($(date +%s) - _T0_VALA_RT))
-  log_summary "Runtime" "Vala" "$_STAT_VALA_RT" "$(get_version valac --version | head -n 1 | awk '{print $NF}')" "$_DUR_VALA_RT"
+  log_summary "Runtime" "Vala" "${_STAT_VALA_RT:-}" "$(get_version valac --version | head -n 1 | awk '{print $NF}')" "${_DUR_VALA_RT:-}"
 }
 
 # Purpose: Checks if Vala (valac) is available.

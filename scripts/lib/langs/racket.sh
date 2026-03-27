@@ -32,8 +32,8 @@ setup_racket() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "racket")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Racket" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Racket" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -49,7 +49,7 @@ setup_racket() {
 
   local _DUR_RACKET_RT
   _DUR_RACKET_RT=$(($(date +%s) - _T0_RACKET_RT))
-  log_summary "Runtime" "Racket" "$_STAT_RACKET_RT" "$(get_version racket --version | head -n 1 | awk '{print $NF}')" "$_DUR_RACKET_RT"
+  log_summary "Runtime" "Racket" "${_STAT_RACKET_RT:-}" "$(get_version racket --version | head -n 1 | awk '{print $NF}')" "${_DUR_RACKET_RT:-}"
 }
 
 # Purpose: Checks if Racket is available.

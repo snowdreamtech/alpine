@@ -33,8 +33,8 @@ setup_jsonnet() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "jsonnet")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Jsonnet" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Jsonnet" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -50,7 +50,7 @@ setup_jsonnet() {
 
   local _DUR_JSONNET_RT
   _DUR_JSONNET_RT=$(($(date +%s) - _T0_JSONNET_RT))
-  log_summary "Runtime" "Jsonnet" "$_STAT_JSONNET_RT" "$(get_version jsonnet --version | head -n 1 | awk '{print $NF}')" "$_DUR_JSONNET_RT"
+  log_summary "Runtime" "Jsonnet" "${_STAT_JSONNET_RT:-}" "$(get_version jsonnet --version | head -n 1 | awk '{print $NF}')" "${_DUR_JSONNET_RT:-}"
 }
 
 # Purpose: Checks if Jsonnet is available.

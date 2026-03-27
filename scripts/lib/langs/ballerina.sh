@@ -32,8 +32,8 @@ setup_ballerina() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "bal")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Ballerina" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Ballerina" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -49,7 +49,7 @@ setup_ballerina() {
 
   local _DUR_BAL_RT
   _DUR_BAL_RT=$(($(date +%s) - _T0_BAL_RT))
-  log_summary "Runtime" "Ballerina" "$_STAT_BAL_RT" "$(get_version bal version | head -n 1 | awk '{print $NF}')" "$_DUR_BAL_RT"
+  log_summary "Runtime" "Ballerina" "${_STAT_BAL_RT:-}" "$(get_version bal version | head -n 1 | awk '{print $NF}')" "${_DUR_BAL_RT:-}"
 }
 
 # Purpose: Checks if Ballerina is available.

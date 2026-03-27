@@ -32,8 +32,8 @@ setup_wat() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "wasmtime")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "WebAssembly" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "WebAssembly" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -49,7 +49,7 @@ setup_wat() {
 
   local _DUR_WAT_RT
   _DUR_WAT_RT=$(($(date +%s) - _T0_WAT_RT))
-  log_summary "Runtime" "WebAssembly" "$_STAT_WAT_RT" "$(get_version wasmtime --version | head -n 1 | awk '{print $NF}')" "$_DUR_WAT_RT"
+  log_summary "Runtime" "WebAssembly" "${_STAT_WAT_RT:-}" "$(get_version wasmtime --version | head -n 1 | awk '{print $NF}')" "${_DUR_WAT_RT:-}"
 }
 
 # Purpose: Checks if Wasmtime is available.

@@ -31,8 +31,8 @@ setup_bun() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "bun")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Bun" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Bun" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -48,7 +48,7 @@ setup_bun() {
 
   local _DUR_BUN_RT
   _DUR_BUN_RT=$(($(date +%s) - _T0_BUN_RT))
-  log_summary "Runtime" "Bun" "$_STAT_BUN_RT" "$(get_version bun --version)" "$_DUR_BUN_RT"
+  log_summary "Runtime" "Bun" "${_STAT_BUN_RT:-}" "$(get_version bun --version)" "${_DUR_BUN_RT:-}"
 }
 # Purpose: Checks if Bun runtime is available.
 # Examples:

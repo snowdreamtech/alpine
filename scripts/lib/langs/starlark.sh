@@ -32,8 +32,8 @@ setup_starlark() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "bazel")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Starlark" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Starlark" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -49,7 +49,7 @@ setup_starlark() {
 
   local _DUR_STAR_RT
   _DUR_STAR_RT=$(($(date +%s) - _T0_STAR_RT))
-  log_summary "Runtime" "Starlark" "$_STAT_STAR_RT" "$(get_version bazel --version | awk '{print $NF}')" "$_DUR_STAR_RT"
+  log_summary "Runtime" "Starlark" "${_STAT_STAR_RT:-}" "$(get_version bazel --version | awk '{print $NF}')" "${_DUR_STAR_RT:-}"
 }
 
 # Purpose: Checks if Bazel is available.

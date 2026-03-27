@@ -32,8 +32,8 @@ setup_nim() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "nim")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Nim" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Nim" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -49,7 +49,7 @@ setup_nim() {
 
   local _DUR_NIM_RT
   _DUR_NIM_RT=$(($(date +%s) - _T0_NIM_RT))
-  log_summary "Runtime" "Nim" "$_STAT_NIM_RT" "$(get_version nim --version | head -n 1)" "$_DUR_NIM_RT"
+  log_summary "Runtime" "Nim" "${_STAT_NIM_RT:-}" "$(get_version nim --version | head -n 1)" "${_DUR_NIM_RT:-}"
 }
 
 # Purpose: Checks if Nim compiler is available.

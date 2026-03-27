@@ -31,8 +31,8 @@ setup_groovy() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "groovy")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Groovy" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Groovy" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -48,7 +48,7 @@ setup_groovy() {
 
   local _DUR_GROOVY_RT
   _DUR_GROOVY_RT=$(($(date +%s) - _T0_GROOVY_RT))
-  log_summary "Runtime" "Groovy" "$_STAT_GROOVY_RT" "$(get_version groovy -v | grep 'Groovy Version' | head -n 1)" "$_DUR_GROOVY_RT"
+  log_summary "Runtime" "Groovy" "${_STAT_GROOVY_RT:-}" "$(get_version groovy -v | grep 'Groovy Version' | head -n 1)" "${_DUR_GROOVY_RT:-}"
 }
 # Purpose: Checks if Groovy runtime is available.
 # Examples:

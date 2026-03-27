@@ -28,8 +28,8 @@ setup_moonbit() {
   _CUR_VER=$(get_version moon)
   local _REQ_VER="${VER_MOONBIT}"
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "MoonBit" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "MoonBit" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -45,7 +45,7 @@ setup_moonbit() {
 
   local _DUR_MOON_RT
   _DUR_MOON_RT=$(($(date +%s) - _T0_MOON_RT))
-  log_summary "Runtime" "MoonBit" "$_STAT_MOON_RT" "$(get_version moon version | head -n 1 | awk '{print $NF}')" "$_DUR_MOON_RT"
+  log_summary "Runtime" "MoonBit" "${_STAT_MOON_RT:-}" "$(get_version moon version | head -n 1 | awk '{print $NF}')" "${_DUR_MOON_RT:-}"
 }
 
 # Purpose: Checks if MoonBit is available.

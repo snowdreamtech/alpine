@@ -15,15 +15,15 @@ install_rego() {
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Security" "Rego" '⚖️ Previewed' "-" '0'
     return 0
   fi
   local _STAT_REGO="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_REGO="❌ Failed"
-  log_summary "Security" "Rego" "$_STAT_REGO" "$(get_version opa version | grep Version | awk '{print $NF}')" "$(($(date +%s) - _T0_REGO))"
+  run_mise install "${_PROVIDER:-}" || _STAT_REGO="❌ Failed"
+  log_summary "Security" "Rego" "${_STAT_REGO:-}" "$(get_version opa version | grep Version | awk '{print $NF}')" "$(($(date +%s) - _T0_REGO))"
 }
 
 # Purpose: Sets up Rego environment for project.

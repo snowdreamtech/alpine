@@ -19,14 +19,14 @@ install_just() {
   local _CUR_VER
   _CUR_VER=$(get_version just --version)
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Base" "Just" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Base" "Just" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Base" "Just" '⚖️ Previewed' "-" '0'
@@ -34,8 +34,8 @@ install_just() {
   fi
   local _STAT_JUST="✅ mise"
   setup_registry_just
-  run_mise install "$_PROVIDER" || _STAT_JUST="❌ Failed"
-  log_summary "Base" "Just" "$_STAT_JUST" "$(get_version just --version)" "$(($(date +%s) - _T0_JUST))"
+  run_mise install "${_PROVIDER:-}" || _STAT_JUST="❌ Failed"
+  log_summary "Base" "Just" "${_STAT_JUST:-}" "$(get_version just --version)" "$(($(date +%s) - _T0_JUST))"
 }
 
 # Purpose: Installs Task (modern runner).
@@ -53,14 +53,14 @@ install_task() {
   local _CUR_VER
   _CUR_VER=$(get_version task --version)
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Base" "Task" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Base" "Task" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Base" "Task" '⚖️ Previewed' "-" '0'
@@ -68,8 +68,8 @@ install_task() {
   fi
   local _STAT_TASK="✅ mise"
   setup_registry_task
-  run_mise install "$_PROVIDER" || _STAT_TASK="❌ Failed"
-  log_summary "Base" "Task" "$_STAT_TASK" "$(get_version task --version)" "$(($(date +%s) - _T0_TASK))"
+  run_mise install "${_PROVIDER:-}" || _STAT_TASK="❌ Failed"
+  log_summary "Base" "Task" "${_STAT_TASK:-}" "$(get_version task --version)" "$(($(date +%s) - _T0_TASK))"
 }
 
 # Purpose: Sets up Runners environment.

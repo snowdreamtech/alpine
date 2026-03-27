@@ -20,22 +20,22 @@ install_bats() {
   local _CUR_VER
   _CUR_VER=$(get_version bats --version)
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Testing" "Bats" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Testing" "Bats" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Testing" "Bats" '⚖️ Previewed' "-" '0'
     return 0
   fi
   local _STAT_BATS="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_BATS="❌ Failed"
-  log_summary "Testing" "Bats" "$_STAT_BATS" "$(get_version bats --version)" "$(($(date +%s) - _T0_BATS))"
+  run_mise install "${_PROVIDER:-}" || _STAT_BATS="❌ Failed"
+  log_summary "Testing" "Bats" "${_STAT_BATS:-}" "$(get_version bats --version)" "$(($(date +%s) - _T0_BATS))"
 }
 
 # Purpose: Installs bats-libs (helper libraries for bats).

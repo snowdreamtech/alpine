@@ -32,8 +32,8 @@ setup_dlang() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "dmd")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Dlang" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Dlang" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -49,7 +49,7 @@ setup_dlang() {
 
   local _DUR_D_RT
   _DUR_D_RT=$(($(date +%s) - _T0_D_RT))
-  log_summary "Runtime" "Dlang" "$_STAT_D_RT" "$(get_version dmd --version | head -n 1 | awk '{print $4}')" "$_DUR_D_RT"
+  log_summary "Runtime" "Dlang" "${_STAT_D_RT:-}" "$(get_version dmd --version | head -n 1 | awk '{print $4}')" "${_DUR_D_RT:-}"
 }
 
 # Purpose: Checks if Dlang is available.

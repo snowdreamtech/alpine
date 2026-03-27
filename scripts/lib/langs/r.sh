@@ -31,8 +31,8 @@ setup_r() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "R")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "R" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "R" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -48,7 +48,7 @@ setup_r() {
 
   local _DUR_R_RT
   _DUR_R_RT=$(($(date +%s) - _T0_R_RT))
-  log_summary "Runtime" "R" "$_STAT_R_RT" "$(get_version R --version | head -n 1)" "$_DUR_R_RT"
+  log_summary "Runtime" "R" "${_STAT_R_RT:-}" "$(get_version R --version | head -n 1)" "${_DUR_R_RT:-}"
 }
 # Purpose: Checks if R runtime is available.
 # Examples:

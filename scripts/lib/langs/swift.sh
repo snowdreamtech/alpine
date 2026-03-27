@@ -32,8 +32,8 @@ setup_swift() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "swift")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Swift" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Swift" "✅ Detected" "${_CUR_VER:-}" "0"
   else
     _log_setup "Swift Runtime" "swift"
 
@@ -65,18 +65,18 @@ install_swiftformat() {
   local _CUR_VER
   _CUR_VER=$(get_version swiftformat)
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Swift" "SwiftFormat" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Swift" "SwiftFormat" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
   local _STAT_SF="✅ mise"
   setup_registry_swiftformat
-  run_mise install "$_PROVIDER" || _STAT_SF="❌ Failed"
-  log_summary "Swift" "SwiftFormat" "$_STAT_SF" "$(get_version swiftformat)" "$(($(date +%s) - _T0_SF))"
+  run_mise install "${_PROVIDER:-}" || _STAT_SF="❌ Failed"
+  log_summary "Swift" "SwiftFormat" "${_STAT_SF:-}" "$(get_version swiftformat)" "$(($(date +%s) - _T0_SF))"
 }
 
 # Purpose: Installs swiftlint for Swift linting.
@@ -95,18 +95,18 @@ install_swiftlint() {
   local _CUR_VER
   _CUR_VER=$(get_version swiftlint)
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Swift" "SwiftLint" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Swift" "SwiftLint" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
   local _STAT_SL="✅ mise"
   setup_registry_swiftlint
-  run_mise install "$_PROVIDER" || _STAT_SL="❌ Failed"
-  log_summary "Swift" "SwiftLint" "$_STAT_SL" "$(get_version swiftlint)" "$(($(date +%s) - _T0_SL))"
+  run_mise install "${_PROVIDER:-}" || _STAT_SL="❌ Failed"
+  log_summary "Swift" "SwiftLint" "${_STAT_SL:-}" "$(get_version swiftlint)" "$(($(date +%s) - _T0_SL))"
 }
 
 # Purpose: Checks if Swift runtime is available.

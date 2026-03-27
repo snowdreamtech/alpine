@@ -32,8 +32,8 @@ setup_pkl() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "pkl")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Pkl" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Pkl" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -49,7 +49,7 @@ setup_pkl() {
 
   local _DUR_PKL_RT
   _DUR_PKL_RT=$(($(date +%s) - _T0_PKL_RT))
-  log_summary "Runtime" "Pkl" "$_STAT_PKL_RT" "$(get_version pkl --version)" "$_DUR_PKL_RT"
+  log_summary "Runtime" "Pkl" "${_STAT_PKL_RT:-}" "$(get_version pkl --version)" "${_DUR_PKL_RT:-}"
 }
 
 # Purpose: Checks if Pkl is available.

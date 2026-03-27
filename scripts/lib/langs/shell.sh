@@ -18,25 +18,25 @@ install_shfmt() {
 
   # Fast-path: Check version-aware existence (prefix match to handle pkg vs binary diffs)
   _CUR_VER=$(get_version shfmt "" "shfmt-py")
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if [ "$_CUR_VER" != "-" ] && [ -n "$_REQ_VER" ]; then
-    case "$_REQ_VER" in "$_CUR_VER"*)
-      log_summary "Base" "Shfmt" "✅ Exists" "$_CUR_VER" "0"
+  if [ "${_CUR_VER:-}" != "-" ] && [ -n "${_REQ_VER:-}" ]; then
+    case "${_REQ_VER:-}" in "${_CUR_VER:-}"*)
+      log_summary "Base" "Shfmt" "✅ Exists" "${_CUR_VER:-}" "0"
       return 0
       ;;
     esac
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Base" "Shfmt" '⚖️ Previewed' "-" '0'
     return 0
   fi
   local _STAT_SHF="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_SHF="❌ Failed"
-  log_summary "Base" "Shfmt" "$_STAT_SHF" "$(get_version shfmt)" "$(($(date +%s) - _T0_SHF))"
+  run_mise install "${_PROVIDER:-}" || _STAT_SHF="❌ Failed"
+  log_summary "Base" "Shfmt" "${_STAT_SHF:-}" "$(get_version shfmt)" "$(($(date +%s) - _T0_SHF))"
 }
 
 # Purpose: Installs Shellcheck.
@@ -53,29 +53,29 @@ install_shellcheck() {
 
   # Fast-path: Check version-aware existence
   _CUR_VER=$(get_version shellcheck "" "shellcheck-py")
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if [ "$_CUR_VER" != "-" ]; then
-    if [ "$_REQ_VER" = "latest" ]; then
-      log_summary "Base" "Shellcheck" "✅ Exists" "$_CUR_VER" "0"
+  if [ "${_CUR_VER:-}" != "-" ]; then
+    if [ "${_REQ_VER:-}" = "latest" ]; then
+      log_summary "Base" "Shellcheck" "✅ Exists" "${_CUR_VER:-}" "0"
       return 0
     fi
-    case "$_REQ_VER" in "$_CUR_VER"*)
-      log_summary "Base" "Shellcheck" "✅ Exists" "$_CUR_VER" "0"
+    case "${_REQ_VER:-}" in "${_CUR_VER:-}"*)
+      log_summary "Base" "Shellcheck" "✅ Exists" "${_CUR_VER:-}" "0"
       return 0
       ;;
     esac
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Base" "Shellcheck" '⚖️ Previewed' "-" '0'
     return 0
   fi
   local _STAT_SHC="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_SHC="❌ Failed"
-  log_summary "Base" "Shellcheck" "$_STAT_SHC" "$(get_version shellcheck)" "$(($(date +%s) - _T0_SHC))"
+  run_mise install "${_PROVIDER:-}" || _STAT_SHC="❌ Failed"
+  log_summary "Base" "Shellcheck" "${_STAT_SHC:-}" "$(get_version shellcheck)" "$(($(date +%s) - _T0_SHC))"
 }
 
 # Purpose: Installs Actionlint.
@@ -91,25 +91,25 @@ install_actionlint() {
 
   # Fast-path: Check version-aware existence
   _CUR_VER=$(get_version actionlint "" "actionlint-py")
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if [ "$_CUR_VER" != "-" ] && [ -n "$_REQ_VER" ]; then
-    case "$_REQ_VER" in "$_CUR_VER"*)
-      log_summary "Base" "Actionlint" "✅ Exists" "$_CUR_VER" "0"
+  if [ "${_CUR_VER:-}" != "-" ] && [ -n "${_REQ_VER:-}" ]; then
+    case "${_REQ_VER:-}" in "${_CUR_VER:-}"*)
+      log_summary "Base" "Actionlint" "✅ Exists" "${_CUR_VER:-}" "0"
       return 0
       ;;
     esac
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Base" "Actionlint" '⚖️ Previewed' "-" '0'
     return 0
   fi
   local _STAT_ACT="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_ACT="❌ Failed"
-  log_summary "Base" "Actionlint" "$_STAT_ACT" "$(get_version actionlint)" "$(($(date +%s) - _T0_ACT))"
+  run_mise install "${_PROVIDER:-}" || _STAT_ACT="❌ Failed"
+  log_summary "Base" "Actionlint" "${_STAT_ACT:-}" "$(get_version actionlint)" "$(($(date +%s) - _T0_ACT))"
 }
 
 # Purpose: Sets up Shell environment.

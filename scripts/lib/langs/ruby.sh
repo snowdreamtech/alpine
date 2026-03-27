@@ -40,21 +40,21 @@ install_ruby_lint() {
   local _CUR_VER
   _CUR_VER=$(get_version rubocop)
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
   # Detect gem installation
-  if [ "$_CUR_VER" = "-" ]; then
+  if [ "${_CUR_VER:-}" = "-" ]; then
     if resolve_bin "gem" >/dev/null 2>&1 && gem list -i "^rubocop$" >/dev/null 2>&1; then
       _CUR_VER=$(rubocop --version 2>/dev/null || echo "exists")
     fi
   fi
 
-  if [ "$_CUR_VER" != "-" ] && { [ "$_CUR_VER" = "$_REQ_VER" ] || [ "$_REQ_VER" = "" ]; }; then
-    log_summary "Ruby" "Rubocop" "✅ Exists" "$_CUR_VER" "0"
+  if [ "${_CUR_VER:-}" != "-" ] && { [ "${_CUR_VER:-}" = "${_REQ_VER:-}" ] || [ "${_REQ_VER:-}" = "" ]; }; then
+    log_summary "Ruby" "Rubocop" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Ruby" "Rubocop" '⚖️ Previewed' "-" '0'
@@ -65,12 +65,12 @@ install_ruby_lint() {
   # Support mise gem provider if possible, else fallback to direct gem
   if resolve_bin "mise" >/dev/null 2>&1; then
     setup_registry_rubocop
-    run_mise install "$_PROVIDER" || _STAT_RUBY="❌ Failed"
+    run_mise install "${_PROVIDER:-}" || _STAT_RUBY="❌ Failed"
   else
     gem install rubocop --no-document || _STAT_RUBY="❌ Failed"
   fi
 
-  log_summary "Ruby" "Rubocop" "$_STAT_RUBY" "$(get_version rubocop)" "$(($(date +%s) - _T0_RUBY))"
+  log_summary "Ruby" "Rubocop" "${_STAT_RUBY:-}" "$(get_version rubocop)" "$(($(date +%s) - _T0_RUBY))"
 }
 
 # Purpose: Sets up Ruby runtime and mandatory linting tools.
@@ -90,8 +90,8 @@ setup_ruby() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "ruby")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Ruby" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Ruby" "✅ Detected" "${_CUR_VER:-}" "0"
   else
     _log_setup "Ruby Runtime" "ruby"
 
@@ -103,7 +103,7 @@ setup_ruby() {
 
       local _DUR_RUBY_RT
       _DUR_RUBY_RT=$(($(date +%s) - _T0_RUBY_RT))
-      log_summary "Runtime" "Ruby" "$_STAT_RUBY_RT" "$(get_version ruby)" "$_DUR_RUBY_RT"
+      log_summary "Runtime" "Ruby" "${_STAT_RUBY_RT:-}" "$(get_version ruby)" "${_DUR_RUBY_RT:-}"
     fi
   fi
 

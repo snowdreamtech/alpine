@@ -28,8 +28,8 @@ setup_kcl() {
   _CUR_VER=$(get_version kcl)
   local _REQ_VER="${VER_KCL}"
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "KCL" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "KCL" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -45,7 +45,7 @@ setup_kcl() {
 
   local _DUR_KCL_RT
   _DUR_KCL_RT=$(($(date +%s) - _T0_KCL_RT))
-  log_summary "Runtime" "KCL" "$_STAT_KCL_RT" "$(get_version kcl --version | head -n 1 | awk '{print $3}')" "$_DUR_KCL_RT"
+  log_summary "Runtime" "KCL" "${_STAT_KCL_RT:-}" "$(get_version kcl --version | head -n 1 | awk '{print $3}')" "${_DUR_KCL_RT:-}"
 }
 
 # Purpose: Checks if KCL is available.

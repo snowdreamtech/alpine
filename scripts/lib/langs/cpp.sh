@@ -34,15 +34,15 @@ install_clang_format() {
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "CPP" "clang-format" '⚖️ Previewed' "-" '0'
     return 0
   fi
   local _STAT_CF="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_CF="❌ Failed"
-  log_summary "CPP" "clang-format" "$_STAT_CF" "$(get_version clang-format)" "$(($(date +%s) - _T0_CF))"
+  run_mise install "${_PROVIDER:-}" || _STAT_CF="❌ Failed"
+  log_summary "CPP" "clang-format" "${_STAT_CF:-}" "$(get_version clang-format)" "$(($(date +%s) - _T0_CF))"
 }
 
 # Purpose: Sets up C/C++ environment for project.
@@ -59,8 +59,8 @@ setup_cpp() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "cpp")
 
-  if [ "$_CUR_VER" != "-" ] && { [ "$_REQ_VER" = "latest" ] || [ "$_CUR_VER" = "$_REQ_VER" ]; }; then
-    log_summary "Runtime" "C/C++" "✅ Detected" "$_CUR_VER" "0"
+  if [ "${_CUR_VER:-}" != "-" ] && { [ "${_REQ_VER:-}" = "latest" ] || [ "${_CUR_VER:-}" = "${_REQ_VER:-}" ]; }; then
+    log_summary "Runtime" "C/C++" "✅ Detected" "${_CUR_VER:-}" "0"
   else
     _log_setup "C/C++ Toolchain" "cpp"
 
@@ -80,7 +80,7 @@ setup_cpp() {
         _CPP_VER=$(get_version gcc | head -n 1)
       fi
 
-      log_summary "Runtime" "C/C++" "$_STAT_CPP_RT" "$_CPP_VER" "$_DUR_CPP_RT"
+      log_summary "Runtime" "C/C++" "${_STAT_CPP_RT:-}" "${_CPP_VER:-}" "${_DUR_CPP_RT:-}"
     fi
   fi
 

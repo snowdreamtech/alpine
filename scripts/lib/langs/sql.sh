@@ -20,22 +20,22 @@ install_sqlfluff() {
   local _CUR_VER
   _CUR_VER=$(get_version sqlfluff)
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Data" "Sqlfluff" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Data" "Sqlfluff" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Data" "Sqlfluff" '⚖️ Previewed' "-" '0'
     return 0
   fi
   local _STAT_SQL="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_SQL="❌ Failed"
-  log_summary "Data" "Sqlfluff" "$_STAT_SQL" "$(get_version sqlfluff)" "$(($(date +%s) - _T0_SQL))"
+  run_mise install "${_PROVIDER:-}" || _STAT_SQL="❌ Failed"
+  log_summary "Data" "Sqlfluff" "${_STAT_SQL:-}" "$(get_version sqlfluff)" "$(($(date +%s) - _T0_SQL))"
 }
 
 # Purpose: Sets up SQL environment.

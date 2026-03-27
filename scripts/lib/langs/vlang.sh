@@ -32,8 +32,8 @@ setup_vlang() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "v")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Vlang" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Vlang" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -49,7 +49,7 @@ setup_vlang() {
 
   local _DUR_VLG_RT
   _DUR_VLG_RT=$(($(date +%s) - _T0_VLG_RT))
-  log_summary "Runtime" "Vlang" "$_STAT_VLG_RT" "$(get_version v version | head -n 1)" "$_DUR_VLG_RT"
+  log_summary "Runtime" "Vlang" "${_STAT_VLG_RT:-}" "$(get_version v version | head -n 1)" "${_DUR_VLG_RT:-}"
 }
 
 # Purpose: Checks if V compiler is available.

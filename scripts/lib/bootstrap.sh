@@ -222,7 +222,7 @@ _mise_setup_completions() {
 
   case "${_SHELL:-}" in
   zsh)
-    local _DIR="${ZDOTDIR:-$HOME}/.zsh/completions"
+    local _DIR="${ZDOTDIR:-${HOME:-}}/.zsh/completions"
     mkdir -p "${_DIR:-}"
     mise completion zsh >"$_DIR/_mise" 2>/dev/null || true
     ;;

@@ -32,8 +32,8 @@ setup_luau() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "luau")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Luau" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Luau" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -49,7 +49,7 @@ setup_luau() {
 
   local _DUR_LUAU_RT
   _DUR_LUAU_RT=$(($(date +%s) - _T0_LUAU_RT))
-  log_summary "Runtime" "Luau" "$_STAT_LUAU_RT" "$(get_version luau --version)" "$_DUR_LUAU_RT"
+  log_summary "Runtime" "Luau" "${_STAT_LUAU_RT:-}" "$(get_version luau --version)" "${_DUR_LUAU_RT:-}"
 }
 
 # Purpose: Checks if Luau is available.

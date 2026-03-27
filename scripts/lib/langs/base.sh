@@ -16,7 +16,7 @@ install_pipx() {
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   # Proactive pipx installation via pip (Universal fallback)
   # This ensures pipx is available regardless of mise's provider compatibility.
@@ -24,27 +24,27 @@ install_pipx() {
     log_info "Ensuring pipx is available via pip..."
     # Use python -m pip to ensure we use the correct python instance
     # Note: --user may fail inside a virtualenv, so we try with it first and fallback if needed.
-    if ! "$PYTHON" -m pip install --user pipx --quiet 2>/dev/null; then
+    if ! "${PYTHON:-}" -m pip install --user pipx --quiet 2>/dev/null; then
       log_debug "Pipx: --user install failed or not available, trying standard install..."
-      "$PYTHON" -m pip install pipx --quiet || true
+      "${PYTHON:-}" -m pip install pipx --quiet || true
     fi
 
     # Add user scripts to PATH immediately if not present
     local _USER_BIN
     local _PY_PREFIX
-    _PY_PREFIX=$("$PYTHON" -c "import sys; print(sys.prefix)" | tr -d '\r')
-    if [ "$_G_OS" = "windows" ]; then
+    _PY_PREFIX=$("${PYTHON:-}" -c "import sys; print(sys.prefix)" | tr -d '\r')
+    if [ "${_G_OS:-}" = "windows" ]; then
       [ -d "$_PY_PREFIX/Scripts" ] && _USER_BIN="$_PY_PREFIX/Scripts"
     else
       [ -d "$_PY_PREFIX/bin" ] && _USER_BIN="$_PY_PREFIX/bin"
     fi
 
     # Fallback to User Base (for --user installs) if not found in prefix
-    if [ -z "$_USER_BIN" ]; then
-      if [ "$_G_OS" = "windows" ]; then
+    if [ -z "${_USER_BIN:-}" ]; then
+      if [ "${_G_OS:-}" = "windows" ]; then
         local _USER_BASE
-        _USER_BASE=$("$PYTHON" -m site --user-base 2>/dev/null | tr -d '\r')
-        [ -n "$_USER_BASE" ] && _USER_BIN="$_USER_BASE/Scripts"
+        _USER_BASE=$("${PYTHON:-}" -m site --user-base 2>/dev/null | tr -d '\r')
+        [ -n "${_USER_BASE:-}" ] && _USER_BIN="$_USER_BASE/Scripts"
       else
         # On macOS/Linux, pipx usually installs to ~/.local/bin or similar
         # shellcheck disable=SC2155
@@ -64,7 +64,7 @@ install_pipx() {
   local _STAT_PIPX="✅ mise"
   run_mise install pipx || _STAT_PIPX="❌ Failed"
 
-  log_summary "Base" "Pipx" "$_STAT_PIPX" "$(get_version pipx)" "$(($(date +%s) - _T0_PIPX))"
+  log_summary "Base" "Pipx" "${_STAT_PIPX:-}" "$(get_version pipx)" "$(($(date +%s) - _T0_PIPX))"
 }
 
 # Purpose: Installs Gitleaks for secrets scanning.
@@ -83,17 +83,17 @@ install_gitleaks() {
   local _CUR_VER
   _CUR_VER=$(get_version gitleaks)
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Base" "Gitleaks" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Base" "Gitleaks" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
   local _STAT_GITL="✅ mise"
   run_mise install gitleaks || _STAT_GITL="❌ Failed"
-  log_summary "Base" "Gitleaks" "$_STAT_GITL" "$(get_version gitleaks)" "$(($(date +%s) - _T0_GITL))"
+  log_summary "Base" "Gitleaks" "${_STAT_GITL:-}" "$(get_version gitleaks)" "$(($(date +%s) - _T0_GITL))"
 }
 
 # Purpose: Installs checkmake for Makefile linting.
@@ -112,17 +112,17 @@ install_checkmake() {
   local _CUR_VER
   _CUR_VER=$(get_version checkmake)
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Base" "Checkmake" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Base" "Checkmake" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
   local _STAT_CM="✅ mise"
   run_mise install checkmake || _STAT_CM="❌ Failed"
-  log_summary "Base" "Checkmake" "$_STAT_CM" "$(get_version checkmake)" "$(($(date +%s) - _T0_CM))"
+  log_summary "Base" "Checkmake" "${_STAT_CM:-}" "$(get_version checkmake)" "$(($(date +%s) - _T0_CM))"
 }
 
 # Purpose: Installs pre-commit runtime via pipx.
@@ -156,7 +156,7 @@ setup_hooks() {
 
   local _DUR_HOOK
   _DUR_HOOK=$(($(date +%s) - _T0_HOOK))
-  log_summary "Base" "Hooks" "$_STAT_HOOK" "$(get_version pre-commit --version)" "$_DUR_HOOK"
+  log_summary "Base" "Hooks" "${_STAT_HOOK:-}" "$(get_version pre-commit --version)" "${_DUR_HOOK:-}"
 }
 
 # Purpose: Installs editorconfig-checker.
@@ -175,22 +175,22 @@ install_editorconfig_checker() {
   local _CUR_VER
   _CUR_VER=$(get_version editorconfig-checker)
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Base" "Editorconfig-Checker" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Base" "Editorconfig-Checker" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Base" "Editorconfig-Checker" '⚖️ Previewed' "-" '0'
     return 0
   fi
   local _STAT_EC="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_EC="❌ Failed"
-  log_summary "Base" "Editorconfig-Checker" "$_STAT_EC" "$(get_version editorconfig-checker)" "$(($(date +%s) - _T0_EC))"
+  run_mise install "${_PROVIDER:-}" || _STAT_EC="❌ Failed"
+  log_summary "Base" "Editorconfig-Checker" "${_STAT_EC:-}" "$(get_version editorconfig-checker)" "$(($(date +%s) - _T0_EC))"
 }
 
 # Purpose: Installs GoReleaser as a universal release automation tool.
@@ -206,22 +206,22 @@ install_goreleaser() {
   local _CUR_VER
   _CUR_VER=$(get_version goreleaser "")
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Base" "GoReleaser" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Base" "GoReleaser" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Base" "GoReleaser" '⚖️ Previewed' "-" '0'
     return 0
   fi
   local _STAT_GR="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_GR="❌ Failed"
-  log_summary "Base" "GoReleaser" "$_STAT_GR" "$(get_version goreleaser)" "$(($(date +%s) - _T0_GR))"
+  run_mise install "${_PROVIDER:-}" || _STAT_GR="❌ Failed"
+  log_summary "Base" "GoReleaser" "${_STAT_GR:-}" "$(get_version goreleaser)" "$(($(date +%s) - _T0_GR))"
 }
 
 # Purpose: Sets up Base environment.

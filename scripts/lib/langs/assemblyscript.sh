@@ -30,8 +30,8 @@ setup_assemblyscript() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "asc")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "AssemblyScript" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "AssemblyScript" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -47,7 +47,7 @@ setup_assemblyscript() {
 
   local _DUR_AS_RT
   _DUR_AS_RT=$(($(date +%s) - _T0_AS_RT))
-  log_summary "Runtime" "AssemblyScript" "$_STAT_AS_RT" "$(get_version asc --version)" "$_DUR_AS_RT"
+  log_summary "Runtime" "AssemblyScript" "${_STAT_AS_RT:-}" "$(get_version asc --version)" "${_DUR_AS_RT:-}"
 }
 
 # Purpose: Checks if AssemblyScript is available.

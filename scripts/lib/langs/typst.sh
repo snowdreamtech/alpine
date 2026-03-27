@@ -30,8 +30,8 @@ setup_typst() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "typst")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Docs" "Typst" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Docs" "Typst" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -47,7 +47,7 @@ setup_typst() {
 
   local _DUR_TYPST
   _DUR_TYPST=$(($(date +%s) - _T0_TYPST))
-  log_summary "Docs" "Typst" "$_STAT_TYPST" "$(get_version typst --version | awk '{print $2}')" "$_DUR_TYPST"
+  log_summary "Docs" "Typst" "${_STAT_TYPST:-}" "$(get_version typst --version | awk '{print $2}')" "${_DUR_TYPST:-}"
 }
 
 # Purpose: Checks if Typst is available.

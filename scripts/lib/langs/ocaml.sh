@@ -32,8 +32,8 @@ setup_ocaml() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "ocaml")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "OCaml" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "OCaml" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -49,7 +49,7 @@ setup_ocaml() {
 
   local _DUR_OCM_RT
   _DUR_OCM_RT=$(($(date +%s) - _T0_OCM_RT))
-  log_summary "Runtime" "OCaml" "$_STAT_OCM_RT" "$(get_version ocaml --version | head -n 1)" "$_DUR_OCM_RT"
+  log_summary "Runtime" "OCaml" "${_STAT_OCM_RT:-}" "$(get_version ocaml --version | head -n 1)" "${_DUR_OCM_RT:-}"
 }
 
 # Purpose: Checks if OCaml is available.

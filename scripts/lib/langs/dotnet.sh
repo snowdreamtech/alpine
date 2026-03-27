@@ -33,8 +33,8 @@ setup_dotnet() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "dotnet")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" ".NET" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" ".NET" "✅ Detected" "${_CUR_VER:-}" "0"
   else
 
     _log_setup ".NET Runtime" "dotnet"
@@ -60,7 +60,7 @@ install_dotnet_format() {
   if ! dotnet format --version >/dev/null 2>&1; then
     _STAT_DNF="❌ Missing"
   fi
-  log_summary "Dotnet" "Dotnet Format" "$_STAT_DNF" "$(dotnet format --version 2>/dev/null || echo "-")" "$(($(date +%s) - _T0_DNF))"
+  log_summary "Dotnet" "Dotnet Format" "${_STAT_DNF:-}" "$(dotnet format --version 2>/dev/null || echo "-")" "$(($(date +%s) - _T0_DNF))"
 }
 # Purpose: Checks if .NET runtime is available.
 # Examples:

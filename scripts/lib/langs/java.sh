@@ -29,12 +29,12 @@ install_java_lint() {
   local _CUR_VER
   _CUR_VER=$(get_version google-java-format)
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Java" "Java Lint" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Java" "Java Lint" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Java" "Java Lint" "⚖️ Previewed" "-" "0"
@@ -42,8 +42,8 @@ install_java_lint() {
   fi
   local _STAT_JAVA="✅ mise"
   setup_registry_google_java_format
-  run_mise install "$_PROVIDER" || _STAT_JAVA="❌ Failed"
-  log_summary "Java" "Java Lint" "$_STAT_JAVA" "$(get_version google-java-format)" "$(($(date +%s) - _T0_JAVA))"
+  run_mise install "${_PROVIDER:-}" || _STAT_JAVA="❌ Failed"
+  log_summary "Java" "Java Lint" "${_STAT_JAVA:-}" "$(get_version google-java-format)" "$(($(date +%s) - _T0_JAVA))"
 }
 
 # Purpose: Sets up Java runtime and mandatory linting tools.
@@ -63,8 +63,8 @@ setup_java() {
   _CUR_VER=$(get_version java)
   local _REQ_VER="${VER_JAVA}"
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Java" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Java" "✅ Detected" "${_CUR_VER:-}" "0"
   else
     _log_setup "Java Runtime" "java"
 
@@ -76,7 +76,7 @@ setup_java() {
 
       local _DUR_JAVA_RT
       _DUR_JAVA_RT=$(($(date +%s) - _T0_JAVA_RT))
-      log_summary "Runtime" "Java" "$_STAT_JAVA_RT" "$(get_version java)" "$_DUR_JAVA_RT"
+      log_summary "Runtime" "Java" "${_STAT_JAVA_RT:-}" "$(get_version java)" "${_DUR_JAVA_RT:-}"
     fi
   fi
 

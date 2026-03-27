@@ -32,8 +32,8 @@ setup_crystal() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "crystal")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Crystal" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Crystal" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -49,7 +49,7 @@ setup_crystal() {
 
   local _DUR_CRY_RT
   _DUR_CRY_RT=$(($(date +%s) - _T0_CRY_RT))
-  log_summary "Runtime" "Crystal" "$_STAT_CRY_RT" "$(get_version crystal --version | head -n 1 | awk '{print $2}')" "$_DUR_CRY_RT"
+  log_summary "Runtime" "Crystal" "${_STAT_CRY_RT:-}" "$(get_version crystal --version | head -n 1 | awk '{print $2}')" "${_DUR_CRY_RT:-}"
 }
 
 # Purpose: Checks if Crystal is available.

@@ -32,8 +32,8 @@ setup_spark() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "spark-shell")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Apache Spark" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Apache Spark" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -49,7 +49,7 @@ setup_spark() {
 
   local _DUR_SPARK_RT
   _DUR_SPARK_RT=$(($(date +%s) - _T0_SPARK_RT))
-  log_summary "Runtime" "Apache Spark" "$_STAT_SPARK_RT" "$(get_version spark-shell --version 2>&1 | grep "version" | head -1 | awk '{print $NF}')" "$_DUR_SPARK_RT"
+  log_summary "Runtime" "Apache Spark" "${_STAT_SPARK_RT:-}" "$(get_version spark-shell --version 2>&1 | grep "version" | head -1 | awk '{print $NF}')" "${_DUR_SPARK_RT:-}"
 }
 
 # Purpose: Checks if Apache Spark is available.

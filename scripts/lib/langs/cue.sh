@@ -33,8 +33,8 @@ setup_cue() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "cue")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "CUE" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "CUE" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -50,7 +50,7 @@ setup_cue() {
 
   local _DUR_CUE_RT
   _DUR_CUE_RT=$(($(date +%s) - _T0_CUE_RT))
-  log_summary "Runtime" "CUE" "$_STAT_CUE_RT" "$(get_version cue version | head -n 1)" "$_DUR_CUE_RT"
+  log_summary "Runtime" "CUE" "${_STAT_CUE_RT:-}" "$(get_version cue version | head -n 1)" "${_DUR_CUE_RT:-}"
 }
 
 # Purpose: Checks if CUE is available.

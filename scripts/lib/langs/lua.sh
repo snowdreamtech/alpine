@@ -23,7 +23,7 @@ install_stylua() {
   local _TITLE="StyLua"
   local _PROVIDER="github:JohnnyMorganz/StyLua"
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Lua" "StyLua" '⚖️ Previewed' "-" '0'
@@ -31,8 +31,8 @@ install_stylua() {
   fi
   local _STAT_LUA="✅ mise"
   setup_registry_stylua
-  run_mise install "$_PROVIDER" || _STAT_LUA="❌ Failed"
-  log_summary "Lua" "StyLua" "$_STAT_LUA" "$(get_version stylua --version)" "$(($(date +%s) - _T0_LUA))"
+  run_mise install "${_PROVIDER:-}" || _STAT_LUA="❌ Failed"
+  log_summary "Lua" "StyLua" "${_STAT_LUA:-}" "$(get_version stylua --version)" "$(($(date +%s) - _T0_LUA))"
 }
 
 # Purpose: Sets up Lua runtime and mandatory linting tools.
@@ -51,8 +51,8 @@ setup_lua() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "lua")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Lua" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Lua" "✅ Detected" "${_CUR_VER:-}" "0"
   else
     _log_setup "Lua Runtime" "lua"
 
@@ -64,7 +64,7 @@ setup_lua() {
 
       local _DUR_LUA_RT
       _DUR_LUA_RT=$(($(date +%s) - _T0_LUA_RT))
-      log_summary "Runtime" "Lua" "$_STAT_LUA_RT" "$(get_version lua -v | head -n 1)" "$_DUR_LUA_RT"
+      log_summary "Runtime" "Lua" "${_STAT_LUA_RT:-}" "$(get_version lua -v | head -n 1)" "${_DUR_LUA_RT:-}"
     fi
   fi
 

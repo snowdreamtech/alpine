@@ -30,8 +30,8 @@ setup_julia() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "julia")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Julia" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Julia" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -47,7 +47,7 @@ setup_julia() {
 
   local _DUR_JULIA_RT
   _DUR_JULIA_RT=$(($(date +%s) - _T0_JULIA_RT))
-  log_summary "Runtime" "Julia" "$_STAT_JULIA_RT" "$(get_version julia -v)" "$_DUR_JULIA_RT"
+  log_summary "Runtime" "Julia" "${_STAT_JULIA_RT:-}" "$(get_version julia -v)" "${_DUR_JULIA_RT:-}"
 }
 # Purpose: Checks if Julia runtime is available.
 # Examples:

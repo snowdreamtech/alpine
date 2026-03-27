@@ -25,12 +25,12 @@ install_ktlint() {
   _CUR_VER=$(get_version ktlint --version)
   local _REQ_VER="${VER_KTLINT}"
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Kotlin" "ktlint" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Kotlin" "ktlint" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Kotlin" "ktlint" '⚖️ Previewed' "-" '0'
@@ -38,8 +38,8 @@ install_ktlint() {
   fi
   local _STAT_KT="✅ mise"
   setup_registry_ktlint
-  run_mise install "$_PROVIDER" || _STAT_KT="❌ Failed"
-  log_summary "Kotlin" "ktlint" "$_STAT_KT" "$(get_version ktlint --version)" "$(($(date +%s) - _T0_KT))"
+  run_mise install "${_PROVIDER:-}" || _STAT_KT="❌ Failed"
+  log_summary "Kotlin" "ktlint" "${_STAT_KT:-}" "$(get_version ktlint --version)" "$(($(date +%s) - _T0_KT))"
 }
 
 # Purpose: Sets up Kotlin runtime and mandatory linting tools.
@@ -57,8 +57,8 @@ setup_kotlin() {
   _CUR_VER=$(get_version kotlin)
   local _REQ_VER="${VER_KOTLIN}"
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Kotlin" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Kotlin" "✅ Detected" "${_CUR_VER:-}" "0"
   else
     _log_setup "Kotlin Runtime" "kotlin"
 
@@ -70,7 +70,7 @@ setup_kotlin() {
 
       local _DUR_KOTLIN_RT
       _DUR_KOTLIN_RT=$(($(date +%s) - _T0_KOTLIN_RT))
-      log_summary "Runtime" "Kotlin" "$_STAT_KOTLIN_RT" "$(get_version kotlin -version | head -n 1)" "$_DUR_KOTLIN_RT"
+      log_summary "Runtime" "Kotlin" "${_STAT_KOTLIN_RT:-}" "$(get_version kotlin -version | head -n 1)" "${_DUR_KOTLIN_RT:-}"
     fi
   fi
 

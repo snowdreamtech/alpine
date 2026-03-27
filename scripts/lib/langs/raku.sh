@@ -32,8 +32,8 @@ setup_raku() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "raku")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Raku" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Raku" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -49,7 +49,7 @@ setup_raku() {
 
   local _DUR_RAKU_RT
   _DUR_RAKU_RT=$(($(date +%s) - _T0_RAKU_RT))
-  log_summary "Runtime" "Raku" "$_STAT_RAKU_RT" "$(get_version raku --version | head -n 1 | awk '{print $2}')" "$_DUR_RAKU_RT"
+  log_summary "Runtime" "Raku" "${_STAT_RAKU_RT:-}" "$(get_version raku --version | head -n 1 | awk '{print $2}')" "${_DUR_RAKU_RT:-}"
 }
 
 # Purpose: Checks if Raku is available.

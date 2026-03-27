@@ -30,8 +30,8 @@ setup_fortran() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "gfortran")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Fortran" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Fortran" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -47,7 +47,7 @@ setup_fortran() {
 
   local _DUR_FORT_RT
   _DUR_FORT_RT=$(($(date +%s) - _T0_FORT_RT))
-  log_summary "Runtime" "Fortran" "$_STAT_FORT_RT" "$(get_version gfortran --version | head -n 1 | awk '{print $NF}')" "$_DUR_FORT_RT"
+  log_summary "Runtime" "Fortran" "${_STAT_FORT_RT:-}" "$(get_version gfortran --version | head -n 1 | awk '{print $NF}')" "${_DUR_FORT_RT:-}"
 }
 
 # Purpose: Checks if GFortran is available.

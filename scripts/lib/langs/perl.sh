@@ -31,8 +31,8 @@ setup_perl() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "perl")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Perl" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Perl" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -48,7 +48,7 @@ setup_perl() {
 
   local _DUR_PERL_RT
   _DUR_PERL_RT=$(($(date +%s) - _T0_PERL_RT))
-  log_summary "Runtime" "Perl" "$_STAT_PERL_RT" "$(get_version perl -v | grep 'v[0-9]' | head -n 1)" "$_DUR_PERL_RT"
+  log_summary "Runtime" "Perl" "${_STAT_PERL_RT:-}" "$(get_version perl -v | grep 'v[0-9]' | head -n 1)" "${_DUR_PERL_RT:-}"
 }
 # Purpose: Checks if Perl runtime is available.
 # Examples:

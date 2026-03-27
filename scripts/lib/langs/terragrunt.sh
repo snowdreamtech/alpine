@@ -30,8 +30,8 @@ setup_terragrunt() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "terragrunt")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Terragrunt" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Terragrunt" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -47,7 +47,7 @@ setup_terragrunt() {
 
   local _DUR_TERRA_RT
   _DUR_TERRA_RT=$(($(date +%s) - _T0_TERRA_RT))
-  log_summary "Runtime" "Terragrunt" "$_STAT_TERRA_RT" "$(get_version terragrunt --version | awk '{print $NF}')" "$_DUR_TERRA_RT"
+  log_summary "Runtime" "Terragrunt" "${_STAT_TERRA_RT:-}" "$(get_version terragrunt --version | awk '{print $NF}')" "${_DUR_TERRA_RT:-}"
 }
 
 # Purpose: Checks if Terragrunt is available.

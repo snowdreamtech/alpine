@@ -26,19 +26,19 @@ install_go_lint() {
   _CUR_VER=$(get_version golangci-lint)
   local _REQ_VER="${VER_GOLANGCI_LINT}"
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Go" "Go Lint" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Go" "Go Lint" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Go" "Go Lint" "⚖️ Previewed" "-" "0"
     return 0
   fi
   local _STAT_GO="✅ mise"
   run_mise install golangci-lint || _STAT_GO="❌ Failed"
-  log_summary "Go" "Go Lint" "$_STAT_GO" "$(get_version golangci-lint)" "$(($(date +%s) - _T0_GO))"
+  log_summary "Go" "Go Lint" "${_STAT_GO:-}" "$(get_version golangci-lint)" "$(($(date +%s) - _T0_GO))"
 }
 
 # Purpose: Installs govulncheck for Go project vulnerability scanning.
@@ -52,15 +52,15 @@ install_govulncheck() {
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Go" "Govulncheck" '⚖️ Previewed' "-" '0'
     return 0
   fi
   local _STAT_GOVC="✅ mise"
-  run_mise install "$_PROVIDER" || _STAT_GOVC="❌ Failed"
-  log_summary "Go" "Govulncheck" "$_STAT_GOVC" "$(get_version govulncheck)" "$(($(date +%s) - _T0_GOVC))"
+  run_mise install "${_PROVIDER:-}" || _STAT_GOVC="❌ Failed"
+  log_summary "Go" "Govulncheck" "${_STAT_GOVC:-}" "$(get_version govulncheck)" "$(($(date +%s) - _T0_GOVC))"
 }
 
 # Purpose: Sets up Go runtime for project.
@@ -84,12 +84,12 @@ setup_go() {
   local _CUR_VER
   _CUR_VER=$(get_version go)
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Go" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Go" "✅ Detected" "${_CUR_VER:-}" "0"
   else
-    _log_setup "$_TITLE" "$_PROVIDER"
+    _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_summary "Runtime" "Go" "⚖️ Previewed" "-" "0"
@@ -99,7 +99,7 @@ setup_go() {
 
       local _DUR_GO_RT
       _DUR_GO_RT=$(($(date +%s) - _T0_GO_RT))
-      log_summary "Runtime" "Go" "$_STAT_GO_RT" "$(get_version go)" "$_DUR_GO_RT"
+      log_summary "Runtime" "Go" "${_STAT_GO_RT:-}" "$(get_version go)" "${_DUR_GO_RT:-}"
     fi
   fi
 

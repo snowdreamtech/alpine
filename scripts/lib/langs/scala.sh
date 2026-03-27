@@ -22,16 +22,16 @@ install_scala_lint() {
   local _TITLE="Scala Lint"
   local _PROVIDER="scalafmt"
   local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "$_PROVIDER")
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
   local _CUR_VER
-  _CUR_VER=$(get_version "$_PROVIDER")
+  _CUR_VER=$(get_version "${_PROVIDER:-}")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Scala" "Scala Lint" "✅ Exists" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Scala" "Scala Lint" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
-  _log_setup "$_TITLE" "$_PROVIDER"
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "Scala" "Scala Lint" "⚖️ Previewed" "-" "0"
@@ -41,7 +41,7 @@ install_scala_lint() {
   local _STAT_SCALA="✅ Installed"
   run_mise install "${_PROVIDER}@${_REQ_VER}" || _STAT_SCALA="❌ Failed"
 
-  log_summary "Scala" "Scala Lint" "$_STAT_SCALA" "$(get_version scalafmt)" "$(($(date +%s) - _T0_SCALA))"
+  log_summary "Scala" "Scala Lint" "${_STAT_SCALA:-}" "$(get_version scalafmt)" "$(($(date +%s) - _T0_SCALA))"
 }
 
 # Purpose: Sets up Scala runtime.
@@ -60,8 +60,8 @@ setup_scala() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "scala")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Scala" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Scala" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -77,7 +77,7 @@ setup_scala() {
 
   local _DUR_SCALA_RT
   _DUR_SCALA_RT=$(($(date +%s) - _T0_SCALA_RT))
-  log_summary "Runtime" "Scala" "$_STAT_SCALA_RT" "$(get_version scala -version | head -n 1)" "$_DUR_SCALA_RT"
+  log_summary "Runtime" "Scala" "${_STAT_SCALA_RT:-}" "$(get_version scala -version | head -n 1)" "${_DUR_SCALA_RT:-}"
 
   setup_registry_scalafmt
   install_scala_lint

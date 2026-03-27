@@ -32,8 +32,8 @@ setup_tcl() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "tclsh")
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Tcl" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Tcl" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -49,7 +49,7 @@ setup_tcl() {
 
   local _DUR_TCL_RT
   _DUR_TCL_RT=$(($(date +%s) - _T0_TCL_RT))
-  log_summary "Runtime" "Tcl" "$_STAT_TCL_RT" "$(get_version tclsh "echo 'puts [info patchlevel]' | tclsh" | awk '{print $NF}')" "$_DUR_TCL_RT"
+  log_summary "Runtime" "Tcl" "${_STAT_TCL_RT:-}" "$(get_version tclsh "echo 'puts [info patchlevel]' | tclsh" | awk '{print $NF}')" "${_DUR_TCL_RT:-}"
 }
 
 # Purpose: Checks if Tcl is available.

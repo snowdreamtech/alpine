@@ -29,8 +29,8 @@ setup_grain() {
   _CUR_VER=$(get_version grain)
   local _REQ_VER="${VER_GRAIN}"
 
-  if is_version_match "$_CUR_VER" "$_REQ_VER"; then
-    log_summary "Runtime" "Grain" "✅ Detected" "$_CUR_VER" "0"
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Runtime" "Grain" "✅ Detected" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -46,7 +46,7 @@ setup_grain() {
 
   local _DUR_GRAIN_RT
   _DUR_GRAIN_RT=$(($(date +%s) - _T0_GRAIN_RT))
-  log_summary "Runtime" "Grain" "$_STAT_GRAIN_RT" "$(get_version grain --version | head -n 1 | awk '{print $NF}')" "$_DUR_GRAIN_RT"
+  log_summary "Runtime" "Grain" "${_STAT_GRAIN_RT:-}" "$(get_version grain --version | head -n 1 | awk '{print $NF}')" "${_DUR_GRAIN_RT:-}"
 }
 
 # Purpose: Checks if Grain is available.
