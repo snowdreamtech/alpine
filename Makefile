@@ -170,7 +170,7 @@ else
 	@sh scripts/update-tools.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-update: update-tools ## Update all tools, dependencies, and hooks
+update: ## Update all tools, dependencies, and hooks (Inc. Mise tool versions)
 ifeq ($(OS_NAME),Windows)
 	@scripts/update.bat $(SCRIPT_ARGS) $(ARGS)
 else
