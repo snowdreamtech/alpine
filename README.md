@@ -220,3 +220,7 @@ The `GITHUB_PROXY` (default: `https://gh-proxy.sn0wdr1am.com/`) is optimized for
 This project is licensed under the **MIT License**.
 Copyright (c) 2026-present [SnowdreamTech Inc.](https://github.com/snowdreamtech)
 See the [LICENSE](./LICENSE) file for the full license text.
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/image?repos=snowdreamtech/template&type=date&legend=top-left)](https://www.star-history.com/?repos=snowdreamtech%2Ftemplate&type=date&legend=top-left)

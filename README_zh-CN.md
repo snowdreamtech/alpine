@@ -223,3 +223,7 @@ make install
 本项目采用 **MIT 许可证** 授权。
 版权所有 (c) 2026-现在 [SnowdreamTech Inc.](https://github.com/snowdreamtech)
 详见 [LICENSE](./LICENSE) 文件。
+
+## Star History
+
+[![Star History Chart](https://api.star-history.com/image?repos=snowdreamtech/template&type=date&legend=top-left)](https://www.star-history.com/?repos=snowdreamtech%2Ftemplate&type=date&legend=top-left)
