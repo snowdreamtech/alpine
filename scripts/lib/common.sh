@@ -118,26 +118,40 @@ fi
 # ──  Project Context Detection ──────────────────────────────────────────────
 # robustly identify the project root directory relative to the script location.
 if [ -z "$_G_PROJECT_ROOT" ]; then
-  # Unified Context Detection: Prioritize physical location via SCRIPT_DIR sentinel.
-  # This block robustly handles both standard execution (scripts/) and mock tests (root/).
-  if [ -n "$SCRIPT_DIR" ]; then
-    if [ -f "$SCRIPT_DIR/lib/common.sh" ]; then
-      # Caller defines SCRIPT_DIR as the 'scripts/' directory (Standard).
-      _G_LIB_DIR="$SCRIPT_DIR/lib"
-      _G_PROJECT_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
-    elif [ -f "$SCRIPT_DIR/scripts/lib/common.sh" ]; then
-      # Caller defines SCRIPT_DIR as the project root (Common in bats tests).
-      _G_LIB_DIR="$SCRIPT_DIR/scripts/lib"
-      _G_PROJECT_ROOT="$SCRIPT_DIR"
-    elif [ -f "$SCRIPT_DIR/common.sh" ]; then
-      # Caller is inside 'scripts/lib/' itself.
-      _G_LIB_DIR="$SCRIPT_DIR"
-      _G_PROJECT_ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
-    fi
-    [ -n "$_G_PROJECT_ROOT" ] && export _G_LIB_DIR
+  # Unified Context Detection: Prioritize physical location of the CALLING script ($0).
+  # This avoids dependency on caller-defined variables like SCRIPT_DIR.
+  _G_CALLER_DIR=$(cd "$(dirname "$0")" && pwd)
+  if [ -f "$_G_CALLER_DIR/lib/common.sh" ]; then
+    # Caller is in 'scripts/' folder (Standard Orchestration pattern).
+    _G_LIB_DIR="$_G_CALLER_DIR/lib"
+    _G_PROJECT_ROOT=$(cd "$_G_CALLER_DIR/.." && pwd)
+  elif [ -f "$_G_CALLER_DIR/scripts/lib/common.sh" ]; then
+    # Caller is in project root (Mock tests or direct root execution).
+    _G_LIB_DIR="$_G_CALLER_DIR/scripts/lib"
+    _G_PROJECT_ROOT="$_G_CALLER_DIR"
+  elif [ -f "$_G_CALLER_DIR/common.sh" ]; then
+    # Caller is inside 'scripts/lib/' folder itself.
+    _G_LIB_DIR="$_G_CALLER_DIR"
+    _G_PROJECT_ROOT=$(cd "$_G_CALLER_DIR/../.." && pwd)
   fi
 
-  # Fallback: Multi-marker traversal (Satisfies direct library sourcing or missing SCRIPT_DIR)
+  # Fallback: Multi-Marker Sentinel (If $0 doesn't lead to library or for direct sourcing)
+  if [ -z "$_G_PROJECT_ROOT" ]; then
+    if [ -n "$SCRIPT_DIR" ]; then
+      if [ -f "$SCRIPT_DIR/lib/common.sh" ]; then
+        _G_LIB_DIR="$SCRIPT_DIR/lib"
+        _G_PROJECT_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
+      elif [ -f "$SCRIPT_DIR/scripts/lib/common.sh" ]; then
+        _G_LIB_DIR="$SCRIPT_DIR/scripts/lib"
+        _G_PROJECT_ROOT="$SCRIPT_DIR"
+      elif [ -f "$SCRIPT_DIR/common.sh" ]; then
+        _G_LIB_DIR="$SCRIPT_DIR"
+        _G_PROJECT_ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
+      fi
+    fi
+  fi
+
+  # Final Fallback: Traverse upwards from PWD (for direct library sourcing or missing markers)
   if [ -z "$_G_PROJECT_ROOT" ]; then
     # Try markers starting from PWD traversal
     _G_PROJECT_ROOT=$(pwd)
