@@ -1251,6 +1251,32 @@ resolve_bin() {
     echo "${_MW:-}" && return 0
   fi
 
+  # ── 5. Mise Cache Fallback (Metadata-aware) ──
+  # Handles tools installed JIT (e.g., Tier 2) but not in active .mise.toml
+  # which causes 'mise which' to fail even if the tool exists on disk.
+  local _MC_PATH
+  _MC_PATH=$(echo "${_G_MISE_LS_JSON_CACHE:-}" | jq -r "
+    (to_entries[] | select(.key == \"${_BIN:-}\")) //
+    (to_entries[] | select(.key | endswith(\":${_BIN:-}\") or endswith(\"/${_BIN:-}\")))
+    | .value[0].install_path // empty" 2>/dev/null || true)
+
+  if [ -n "${_MC_PATH:-}" ] && [ "${_MC_PATH:-}" != "null" ]; then
+    # Standard mise structure: bin/tool or tool
+    if [ -x "${_MC_PATH:-}/bin/${_BIN:-}" ]; then
+      echo "${_MC_PATH:-}/bin/${_BIN:-}" && return 0
+    elif [ -x "${_MC_PATH:-}/${_BIN:-}" ]; then
+      echo "${_MC_PATH:-}/${_BIN:-}" && return 0
+    fi
+    # Windows: .exe suffix
+    if [ "${_G_OS:-}" = "windows" ]; then
+      if [ -x "${_MC_PATH:-}/bin/${_BIN:-}.exe" ]; then
+        echo "${_MC_PATH:-}/bin/${_BIN:-}.exe" && return 0
+      elif [ -x "${_MC_PATH:-}/${_BIN:-}.exe" ]; then
+        echo "${_MC_PATH:-}/${_BIN:-}.exe" && return 0
+      fi
+    fi
+  fi
+
   return 1
 }
 
