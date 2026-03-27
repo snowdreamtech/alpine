@@ -7,11 +7,12 @@
 # ------------------------------------------------------------
 
 [tools]
+"github:google/osv-scanner" = "2.3.5"
 
 # ── 🏗️ Core Runtimes ──────────────────────────────────────────────────────────
 go = "1.26.1"
 node = "25.8.2"
-"npm:pnpm" = "10.30.3"
+"npm:pnpm" = "10.33.0"
 python = "3.14.3"
 
 # ── 🔐 Security & Engineering (always needed) ──────────────────────────────────
@@ -32,8 +33,8 @@ editorconfig-checker = "3.6.1"
 "npm:cz-conventional-changelog" = "3.3.0"
 
 # Formatting & linting (invoked by pre-commit hooks)
-"npm:eslint" = "10.0.3"
-"npm:markdownlint-cli2" = "0.21.0"
+"npm:eslint" = "10.1.0"
+"npm:markdownlint-cli2" = "0.22.0"
 "npm:prettier" = "3.8.1"
 "npm:sort-package-json" = "3.6.1"
 "npm:@taplo/cli" = "0.7.0"

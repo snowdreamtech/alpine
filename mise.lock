@@ -156,6 +156,52 @@ url = "https://github.com/cli/cli/releases/download/v2.89.0/gh_2.89.0_windows_am
 url_api = "https://api.github.com/repos/cli/cli/releases/assets/382152866"
 provenance = "github-attestations"
 
+[[tools."github:google/osv-scanner"]]
+version = "2.3.5"
+backend = "github:google/osv-scanner"
+
+[tools."github:google/osv-scanner"."platforms.linux-arm64"]
+checksum = "sha256:fa46ad2b3954db5d5335303d45de921613393285d9a93c140b63b40e35e9ce50"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_linux_arm64"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248755"
+provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.linux-arm64-musl"]
+checksum = "sha256:fa46ad2b3954db5d5335303d45de921613393285d9a93c140b63b40e35e9ce50"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_linux_arm64"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248755"
+provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.linux-x64"]
+checksum = "sha256:bb30c580afe5e757d3e959f4afd08a4795ea505ef84c46962b9a738aa573b41b"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_linux_amd64"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248788"
+provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.linux-x64-musl"]
+checksum = "sha256:bb30c580afe5e757d3e959f4afd08a4795ea505ef84c46962b9a738aa573b41b"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_linux_amd64"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248788"
+provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.macos-arm64"]
+checksum = "sha256:b740efe0b08fb817865e818a498997d5f042f14b8eeafb6393176ce84dd09cf6"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_darwin_arm64"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248752"
+provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.macos-x64"]
+checksum = "sha256:3b1c72d59dcbad99fa4eb2c72bf2e82017f83e0268340e4b00af76a1fea32c85"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_darwin_amd64"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248790"
+provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.windows-x64"]
+checksum = "sha256:b165d33c08bda663119a459f5187e096d2525f888503495f5f34925741e981a2"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_windows_amd64.exe"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248754"
+provenance = "slsa"
+
 [[tools."github:goreleaser/goreleaser"]]
 version = "2.14.3"
 backend = "github:goreleaser/goreleaser"
@@ -379,31 +425,31 @@ backend = "core:node"
 
 [tools.node."platforms.linux-arm64"]
 checksum = "sha256:2f823ecd4f9331d6492fedbe50c5a610be3084521f3a5af146875e00a52f2e63"
-url = "https://npmmirror.com/mirrors/node/v25.8.2/node-v25.8.2-linux-arm64.tar.gz"
+url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-linux-arm64.tar.gz"
 
 [tools.node."platforms.linux-arm64-musl"]
 checksum = "sha256:2f823ecd4f9331d6492fedbe50c5a610be3084521f3a5af146875e00a52f2e63"
-url = "https://npmmirror.com/mirrors/node/v25.8.2/node-v25.8.2-linux-arm64.tar.gz"
+url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-linux-arm64.tar.gz"
 
 [tools.node."platforms.linux-x64"]
 checksum = "sha256:e06c7069012d40914c57b31157c69d4ce83ea1fe9d63bbb7d26e0509a4535d21"
-url = "https://npmmirror.com/mirrors/node/v25.8.2/node-v25.8.2-linux-x64.tar.gz"
+url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-linux-x64.tar.gz"
 
 [tools.node."platforms.linux-x64-musl"]
 checksum = "sha256:e06c7069012d40914c57b31157c69d4ce83ea1fe9d63bbb7d26e0509a4535d21"
-url = "https://npmmirror.com/mirrors/node/v25.8.2/node-v25.8.2-linux-x64.tar.gz"
+url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-linux-x64.tar.gz"
 
 [tools.node."platforms.macos-arm64"]
 checksum = "sha256:fb8dabfda3232ef90d992e6439824fc3237356c04d182f3fa883bebeef31e871"
-url = "https://npmmirror.com/mirrors/node/v25.8.2/node-v25.8.2-darwin-arm64.tar.gz"
+url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-darwin-arm64.tar.gz"
 
 [tools.node."platforms.macos-x64"]
 checksum = "sha256:530ffb419789f843215375a65b8fcf4cf010735e99276f512a241a31ba8e5e13"
-url = "https://npmmirror.com/mirrors/node/v25.8.2/node-v25.8.2-darwin-x64.tar.gz"
+url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-darwin-x64.tar.gz"
 
 [tools.node."platforms.windows-x64"]
 checksum = "sha256:51815d5b0256b947d27d614de04060fcfdbdb830d2c86e63e6f33dbf7964cca7"
-url = "https://npmmirror.com/mirrors/node/v25.8.2/node-v25.8.2-win-x64.zip"
+url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-win-x64.zip"
 
 [[tools."npm:@commitlint/cli"]]
 version = "20.5.0"
@@ -437,12 +483,24 @@ backend = "npm:dockerfile-utils"
 version = "10.0.3"
 backend = "npm:eslint"
 
+[[tools."npm:eslint"]]
+version = "10.1.0"
+backend = "npm:eslint"
+
 [[tools."npm:markdownlint-cli2"]]
 version = "0.21.0"
 backend = "npm:markdownlint-cli2"
 
+[[tools."npm:markdownlint-cli2"]]
+version = "0.22.0"
+backend = "npm:markdownlint-cli2"
+
 [[tools."npm:pnpm"]]
 version = "10.30.3"
+backend = "npm:pnpm"
+
+[[tools."npm:pnpm"]]
+version = "10.33.0"
 backend = "npm:pnpm"
 
 [[tools."npm:prettier"]]

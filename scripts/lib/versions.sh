@@ -40,7 +40,7 @@ VER_MOONBIT_REF="v0.7.2+c12686398"
 VER_KCL="0.11.2"
 VER_KCL_PROVIDER="github:kcl-lang/kcl"
 
-VER_PKL="0.31.0"
+VER_PKL="0.31.1"
 VER_PKL_PROVIDER="github:apple/pkl"
 
 VER_BAZEL="9.0.1"
@@ -81,7 +81,7 @@ VER_STYLELINT_CONFIG_PROVIDER="npm:stylelint-config-standard"
 VER_ASSEMBLYSCRIPT="0.28.10"
 VER_ASSEMBLYSCRIPT_PROVIDER="npm:assemblyscript"
 
-VER_OPA="1.14.1"
+VER_OPA="1.15.0"
 VER_OPA_PROVIDER="github:open-policy-agent/opa"
 
 VER_BUF="1.66.1"
