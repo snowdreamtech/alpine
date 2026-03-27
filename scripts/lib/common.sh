@@ -118,22 +118,28 @@ fi
 # ──  Project Context Detection ──────────────────────────────────────────────
 # robustly identify the project root directory relative to the script location.
 if [ -z "$_G_PROJECT_ROOT" ]; then
-  # SCRIPT_DIR is assumed to be defined by the caller.
-  # We verify its location against known project markers.
+  # Unified Context Detection: Prioritize physical location via SCRIPT_DIR sentinel.
+  # This block robustly handles both standard execution (scripts/) and mock tests (root/).
   if [ -n "$SCRIPT_DIR" ]; then
-    # Check if SCRIPT_DIR itself is the project root (common in mock tests)
-    if [ -f "$SCRIPT_DIR/package.json" ] || [ -f "$SCRIPT_DIR/Makefile" ] || [ -d "$SCRIPT_DIR/.git" ]; then
-      _G_PROJECT_ROOT="$SCRIPT_DIR"
-    # Check if SCRIPT_DIR is 'scripts/' (common project layout)
-    elif [ -f "$SCRIPT_DIR/../package.json" ] || [ -f "$SCRIPT_DIR/../Makefile" ] || [ -d "$SCRIPT_DIR/../.git" ]; then
+    if [ -f "$SCRIPT_DIR/lib/common.sh" ]; then
+      # Caller defines SCRIPT_DIR as the 'scripts/' directory (Standard).
+      _G_LIB_DIR="$SCRIPT_DIR/lib"
       _G_PROJECT_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
-    # Check if SCRIPT_DIR is 'scripts/lib/' (deep nesting)
-    elif [ -f "$SCRIPT_DIR/../../package.json" ] || [ -f "$SCRIPT_DIR/../../Makefile" ] || [ -d "$SCRIPT_DIR/../../.git" ]; then
+    elif [ -f "$SCRIPT_DIR/scripts/lib/common.sh" ]; then
+      # Caller defines SCRIPT_DIR as the project root (Common in bats tests).
+      _G_LIB_DIR="$SCRIPT_DIR/scripts/lib"
+      _G_PROJECT_ROOT="$SCRIPT_DIR"
+    elif [ -f "$SCRIPT_DIR/common.sh" ]; then
+      # Caller is inside 'scripts/lib/' itself.
+      _G_LIB_DIR="$SCRIPT_DIR"
       _G_PROJECT_ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
     fi
+    [ -n "$_G_PROJECT_ROOT" ] && export _G_LIB_DIR
   fi
-  # Fallback: if SCRIPT_DIR is missing or doesn't lead to a root, use PWD heuristic
+
+  # Fallback: Multi-marker traversal (Satisfies direct library sourcing or missing SCRIPT_DIR)
   if [ -z "$_G_PROJECT_ROOT" ]; then
+    # Try markers starting from PWD traversal
     _G_PROJECT_ROOT=$(pwd)
     while [ "$_G_PROJECT_ROOT" != "/" ] && [ "$_G_PROJECT_ROOT" != "." ]; do
       if [ -f "$_G_PROJECT_ROOT/package.json" ] || [ -f "$_G_PROJECT_ROOT/Makefile" ] || [ -d "$_G_PROJECT_ROOT/.git" ]; then
@@ -273,8 +279,8 @@ MISE_VERSION="${MISE_VERSION:-2026.3.8}"
 # by the project's .mise.toml file. Do not add hardcoded version variables here.
 # Any tool added below MUST have a corresponding entry in .mise.toml Tools section.
 
-# Standardized library directory reference
-_G_LIB_DIR="${_G_PROJECT_ROOT}/scripts/lib"
+# Standardized library directory reference (calculated during early detection)
+_G_LIB_DIR="${_G_LIB_DIR:-${_G_PROJECT_ROOT}/scripts/lib}"
 export _G_LIB_DIR
 
 # ── 🛣️ CI Persistence (GitHub Actions) ───────────────────────────────────────
