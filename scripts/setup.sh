@@ -256,8 +256,7 @@ EOF
     export MISE_GIT_ALWAYS_USE_GIX=0
 
     # Performance Opt: Cache mise state once per session
-    export _G_MISE_LS_JSON_CACHE
-    _G_MISE_LS_JSON_CACHE=$(run_mise ls --json 2>/dev/null || echo "{}")
+    refresh_mise_cache
 
     if [ "${_IS_ALL_MODULES:-}" = "true" ] && [ "$(uname -s)" != "Windows_NT" ]; then
       log_info "Performing full toolchain synchronization via mise..."

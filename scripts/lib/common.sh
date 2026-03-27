@@ -170,7 +170,7 @@ fi
 # ── 🔍 Tooling Metadata Cache (Mise LS) ──────────────────────────────────────
 # Caching 'mise ls --json' results provides a massive performance boost for
 # scripts that perform multiple version checks (like setup and check-env).
-# Initialized once at bootstrap, can be manually refreshed after tool installs.
+# Initialized LAZILY at first tool resolution, or manually refreshed after installs.
 # shellcheck disable=SC2120
 refresh_mise_cache() {
   if command -v mise >/dev/null 2>&1; then
@@ -182,8 +182,8 @@ refresh_mise_cache() {
   export _G_MISE_LS_JSON_CACHE
 }
 
-# Initial population
-refresh_mise_cache
+# Initial state: Empty (triggers lazy load on first resolution)
+_G_MISE_LS_JSON_CACHE=""
 # ── 📊 CI Step Summary Abstraction (Cross-Platform) ──────────────────────────
 # Detect and unify CI summary reporting paths (GitHub, GitLab, Gitea, Local).
 # Ref: Rule 09 (Interaction/Summary Integration)
@@ -1126,6 +1126,7 @@ get_version() {
 
   # 1. Try Mise First (Fast & Reliable for JIT tools)
   # Check mise via cache first (fastest)
+  if [ -z "${_G_MISE_LS_JSON_CACHE:-}" ]; then refresh_mise_cache; fi
   local _MISE_VER_OUT
   # Optimization: Prefer the currently active version; fall back to any installed version
   # to avoid slow shim fallbacks. Using 'first(select(...))' or sort ensures active wins.
@@ -1254,6 +1255,7 @@ resolve_bin() {
   # ── 5. Mise Cache Fallback (Metadata-aware) ──
   # Handles tools installed JIT (e.g., Tier 2) but not in active .mise.toml
   # which causes 'mise which' to fail even if the tool exists on disk.
+  if [ -z "${_G_MISE_LS_JSON_CACHE:-}" ]; then refresh_mise_cache; fi
   local _MC_PATH
   _MC_PATH=$(echo "${_G_MISE_LS_JSON_CACHE:-}" | jq -r "
     (to_entries[] | select(.key == \"${_BIN:-}\")) //
