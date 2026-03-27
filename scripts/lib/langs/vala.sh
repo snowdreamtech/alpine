@@ -57,7 +57,7 @@ setup_vala() {
 check_runtime_vala() {
   local _TOOL_DESC_VALA="${1:-Vala}"
   if ! resolve_bin "valac" >/dev/null 2>&1; then
-    log_warn "Required runtime 'valac' for $_TOOL_DESC_VALA is missing. Skipping."
+    log_warn "Required runtime 'valac' for ${_TOOL_DESC_VALA:-} is missing. Skipping."
     return 1
   fi
   return 0

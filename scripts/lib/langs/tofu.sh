@@ -56,7 +56,7 @@ setup_tofu() {
 check_runtime_tofu() {
   local _TOOL_DESC_TOFU="${1:-OpenTofu}"
   if ! resolve_bin "tofu" >/dev/null 2>&1; then
-    log_warn "Required runtime 'tofu' for $_TOOL_DESC_TOFU is missing. Skipping."
+    log_warn "Required runtime 'tofu' for ${_TOOL_DESC_TOFU:-} is missing. Skipping."
     return 1
   fi
   return 0

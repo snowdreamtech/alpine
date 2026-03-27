@@ -116,7 +116,7 @@ install_swiftlint() {
 check_runtime_swift() {
   local _TOOL_DESC_SWIFT="${1:-Swift}"
   if ! resolve_bin "swift" >/dev/null 2>&1; then
-    log_warn "Required runtime 'swift' for $_TOOL_DESC_SWIFT is missing. Skipping."
+    log_warn "Required runtime 'swift' for ${_TOOL_DESC_SWIFT:-} is missing. Skipping."
     return 1
   fi
   return 0

@@ -59,7 +59,7 @@ setup_ballerina() {
 check_runtime_ballerina() {
   local _TOOL_DESC_BAL="${1:-Ballerina}"
   if ! resolve_bin "bal" >/dev/null 2>&1; then
-    log_warn "Required runtime 'bal' for $_TOOL_DESC_BAL is missing. Skipping."
+    log_warn "Required runtime 'bal' for ${_TOOL_DESC_BAL:-} is missing. Skipping."
     return 1
   fi
   return 0

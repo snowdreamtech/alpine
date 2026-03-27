@@ -40,7 +40,7 @@ install_osv_scanner() {
   if ! run_mise install "${_PROVIDER:-}"; then
     _STAT_OSV="❌ Failed"
     if is_ci_env; then
-      log_warn "Optional security tool ($_TITLE) failed to install. Continuing..."
+      log_warn "Optional security tool (${_TITLE:-}) failed to install. Continuing..."
     fi
   fi
   log_summary "Security" "OSV-Scanner" "${_STAT_OSV:-}" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV))"

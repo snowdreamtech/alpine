@@ -60,7 +60,7 @@ setup_clojure() {
 check_runtime_clojure() {
   local _TOOL_DESC_CLJ="${1:-Clojure}"
   if ! resolve_bin "clojure" >/dev/null 2>&1; then
-    log_warn "Required runtime 'clojure' for $_TOOL_DESC_CLJ is missing. Skipping."
+    log_warn "Required runtime 'clojure' for ${_TOOL_DESC_CLJ:-} is missing. Skipping."
     return 1
   fi
   return 0

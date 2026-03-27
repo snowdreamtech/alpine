@@ -57,7 +57,7 @@ setup_terragrunt() {
 check_runtime_terragrunt() {
   local _TOOL_DESC_TERRA="${1:-Terragrunt}"
   if ! resolve_bin "terragrunt" >/dev/null 2>&1; then
-    log_warn "Required tool 'terragrunt' for $_TOOL_DESC_TERRA is missing. Skipping."
+    log_warn "Required tool 'terragrunt' for ${_TOOL_DESC_TERRA:-} is missing. Skipping."
     return 1
   fi
   return 0

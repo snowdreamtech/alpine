@@ -139,7 +139,7 @@ EOF
   if [ "${DRY_RUN:-0}" -eq 0 ]; then
     cp "${_TMP_REPORT:-}" "${_HEALTH_REPORT:-}"
     rm "${_TMP_REPORT:-}"
-    log_success "\n✨ Health check complete! Report saved to: $_HEALTH_REPORT"
+    log_success "\n✨ Health check complete! Report saved to: ${_HEALTH_REPORT:-}"
 
     # Print the table to console
     printf "\n"

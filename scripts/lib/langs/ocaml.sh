@@ -59,7 +59,7 @@ setup_ocaml() {
 check_runtime_ocaml() {
   local _TOOL_DESC_OCM="${1:-OCaml}"
   if ! resolve_bin "ocaml" >/dev/null 2>&1; then
-    log_warn "Required runtime 'ocaml' for $_TOOL_DESC_OCM is missing. Skipping."
+    log_warn "Required runtime 'ocaml' for ${_TOOL_DESC_OCM:-} is missing. Skipping."
     return 1
   fi
   return 0

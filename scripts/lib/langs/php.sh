@@ -64,7 +64,7 @@ setup_php() {
 check_runtime_php() {
   local _TOOL_DESC_PHP="${1:-PHP}"
   if ! resolve_bin "php" >/dev/null 2>&1; then
-    log_warn "Required runtime 'php' for $_TOOL_DESC_PHP is missing. Skipping."
+    log_warn "Required runtime 'php' for ${_TOOL_DESC_PHP:-} is missing. Skipping."
     return 1
   fi
   return 0

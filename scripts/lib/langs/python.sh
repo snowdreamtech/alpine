@@ -25,11 +25,11 @@ install_runtime_python() {
   if [ -d "${VENV:-}" ]; then
     # Standard requirements
     if [ -f "${REQUIREMENTS_TXT:-}" ]; then
-      run_quiet "$VENV/$_G_VENV_BIN/pip" install -r "${REQUIREMENTS_TXT:-}"
+      run_quiet "$VENV/${_G_VENV_BIN:-}/pip" install -r "${REQUIREMENTS_TXT:-}"
     fi
     # Dev requirements (setup.sh specific but safe here)
     if [ -f "requirements-dev.txt" ]; then
-      run_quiet "$VENV/$_G_VENV_BIN/pip" install -r "requirements-dev.txt"
+      run_quiet "$VENV/${_G_VENV_BIN:-}/pip" install -r "requirements-dev.txt"
     fi
   fi
 }
@@ -144,7 +144,7 @@ setup_python() {
 check_runtime_python() {
   local _TOOL_DESC_PY="${1:-Python}"
   if ! command -v "${PYTHON:-}" >/dev/null 2>&1; then
-    log_warn "Required runtime 'python' for $_TOOL_DESC_PY is missing. Skipping."
+    log_warn "Required runtime 'python' for ${_TOOL_DESC_PY:-} is missing. Skipping."
     return 1
   fi
   return 0

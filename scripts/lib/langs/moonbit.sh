@@ -55,7 +55,7 @@ setup_moonbit() {
 check_runtime_moonbit() {
   local _TOOL_DESC_MOON="${1:-MoonBit}"
   if ! resolve_bin "moon" >/dev/null 2>&1; then
-    log_warn "Required runtime 'moon' for $_TOOL_DESC_MOON is missing. Skipping."
+    log_warn "Required runtime 'moon' for ${_TOOL_DESC_MOON:-} is missing. Skipping."
     return 1
   fi
   return 0

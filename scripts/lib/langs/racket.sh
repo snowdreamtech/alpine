@@ -59,7 +59,7 @@ setup_racket() {
 check_runtime_racket() {
   local _TOOL_DESC_RACKET="${1:-Racket}"
   if ! resolve_bin "racket" >/dev/null 2>&1; then
-    log_warn "Required runtime 'racket' for $_TOOL_DESC_RACKET is missing. Skipping."
+    log_warn "Required runtime 'racket' for ${_TOOL_DESC_RACKET:-} is missing. Skipping."
     return 1
   fi
   return 0

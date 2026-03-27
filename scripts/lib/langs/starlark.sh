@@ -59,7 +59,7 @@ setup_starlark() {
 check_runtime_starlark() {
   local _TOOL_DESC_STAR="${1:-Starlark}"
   if ! resolve_bin "bazel" >/dev/null 2>&1; then
-    log_warn "Required runtime 'bazel' for $_TOOL_DESC_STAR is missing. Skipping."
+    log_warn "Required runtime 'bazel' for ${_TOOL_DESC_STAR:-} is missing. Skipping."
     return 1
   fi
   return 0

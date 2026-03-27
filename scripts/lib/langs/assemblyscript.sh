@@ -57,7 +57,7 @@ setup_assemblyscript() {
 check_runtime_assemblyscript() {
   local _TOOL_DESC_AS="${1:-AssemblyScript}"
   if ! resolve_bin "asc" >/dev/null 2>&1; then
-    log_warn "Required runtime 'asc' for $_TOOL_DESC_AS is missing. Skipping."
+    log_warn "Required runtime 'asc' for ${_TOOL_DESC_AS:-} is missing. Skipping."
     return 1
   fi
   return 0

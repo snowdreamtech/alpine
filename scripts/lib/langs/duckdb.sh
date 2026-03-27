@@ -57,7 +57,7 @@ setup_duckdb() {
 check_runtime_duckdb() {
   local _TOOL_DESC_DUCK="${1:-DuckDB}"
   if ! resolve_bin "duckdb" >/dev/null 2>&1; then
-    log_warn "Required runtime 'duckdb' for $_TOOL_DESC_DUCK is missing. Skipping."
+    log_warn "Required runtime 'duckdb' for ${_TOOL_DESC_DUCK:-} is missing. Skipping."
     return 1
   fi
   return 0

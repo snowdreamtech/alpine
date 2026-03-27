@@ -59,7 +59,7 @@ setup_luau() {
 check_runtime_luau() {
   local _TOOL_DESC_LUAU="${1:-Luau}"
   if ! resolve_bin "luau" >/dev/null 2>&1; then
-    log_warn "Required runtime 'luau' for $_TOOL_DESC_LUAU is missing. Skipping."
+    log_warn "Required runtime 'luau' for ${_TOOL_DESC_LUAU:-} is missing. Skipping."
     return 1
   fi
   return 0

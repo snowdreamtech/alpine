@@ -62,14 +62,14 @@ _ensure_bats_vendor() {
   # bats resolves load paths relative to the test file's directory (tests/).
   # So 'vendor/...' → tests/vendor/ (kept inside tests/ for locality).
   local _VENDOR_DIR="tests/vendor"
-  local _BATS_SUPPORT_DIR="$_VENDOR_DIR/bats-support"
-  local _BATS_ASSERT_DIR="$_VENDOR_DIR/bats-assert"
+  local _BATS_SUPPORT_DIR="${_VENDOR_DIR:-}/bats-support"
+  local _BATS_ASSERT_DIR="${_VENDOR_DIR:-}/bats-assert"
 
-  if [ -f "$_BATS_SUPPORT_DIR/load.bash" ] && [ -f "$_BATS_ASSERT_DIR/load.bash" ]; then
+  if [ -f "${_BATS_SUPPORT_DIR:-}/load.bash" ] && [ -f "${_BATS_ASSERT_DIR:-}/load.bash" ]; then
     return 0
   fi
 
-  log_info "Installing bats test helper libraries into $_VENDOR_DIR ..."
+  log_info "Installing bats test helper libraries into ${_VENDOR_DIR:-} ..."
   mkdir -p "${_VENDOR_DIR:-}"
 
   if ! command -v git >/dev/null 2>&1; then
@@ -92,27 +92,27 @@ _ensure_bats_vendor() {
     local _ATTEMPT=0
     local _MAX_ATTEMPTS=3
 
-    while [ $_ATTEMPT -lt $_MAX_ATTEMPTS ]; do
+    while [ ${_ATTEMPT:-} -lt ${_MAX_ATTEMPTS:-} ]; do
       _ATTEMPT=$((_ATTEMPT + 1))
       if git clone --depth=1 --quiet "${_PROXY:-}https://github.com/${_REPO:-}.git" "${_DEST:-}" 2>/dev/null; then
         return 0
       fi
-      log_warn "Clone attempt $_ATTEMPT/$_MAX_ATTEMPTS failed for $_REPO. Retrying..."
+      log_warn "Clone attempt ${_ATTEMPT:-}/${_MAX_ATTEMPTS:-} failed for ${_REPO:-}. Retrying..."
       sleep 2
     done
 
     # Final fallback: bare GitHub URL (without proxy) for environments where proxy is not needed
-    log_warn "Proxy clone failed. Falling back to direct GitHub URL for $_REPO ..."
+    log_warn "Proxy clone failed. Falling back to direct GitHub URL for ${_REPO:-} ..."
     git clone --depth=1 --quiet "https://github.com/${_REPO:-}.git" "${_DEST:-}"
   }
 
   # bats-support
-  if [ ! -f "$_BATS_SUPPORT_DIR/load.bash" ]; then
+  if [ ! -f "${_BATS_SUPPORT_DIR:-}/load.bash" ]; then
     _clone_with_retry "bats-core/bats-support" "${_BATS_SUPPORT_DIR:-}"
   fi
 
   # bats-assert
-  if [ ! -f "$_BATS_ASSERT_DIR/load.bash" ]; then
+  if [ ! -f "${_BATS_ASSERT_DIR:-}/load.bash" ]; then
     _clone_with_retry "bats-core/bats-assert" "${_BATS_ASSERT_DIR:-}"
   fi
 

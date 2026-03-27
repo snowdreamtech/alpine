@@ -225,23 +225,23 @@ _mise_setup_completions() {
   zsh)
     local _DIR="${ZDOTDIR:-${HOME:-}}/.zsh/completions"
     mkdir -p "${_DIR:-}"
-    mise completion zsh >"$_DIR/_mise" 2>/dev/null || true
+    mise completion zsh >"${_DIR:-}/_mise" 2>/dev/null || true
     ;;
   bash)
     local _DIR="$HOME/.local/share/bash-completion/completions"
     mkdir -p "${_DIR:-}"
-    mise completion bash >"$_DIR/mise" 2>/dev/null || true
+    mise completion bash >"${_DIR:-}/mise" 2>/dev/null || true
     ;;
   fish)
     local _DIR="$HOME/.config/fish/completions"
     mkdir -p "${_DIR:-}"
-    mise completion fish >"$_DIR/mise.fish" 2>/dev/null || true
+    mise completion fish >"${_DIR:-}/mise.fish" 2>/dev/null || true
     ;;
   pwsh | powershell)
     local _DIR="$HOME/Documents/PowerShell/Completions"
     mkdir -p "${_DIR:-}"
     # mise completion supports 'powershell' (or 'pwsh' as alias in newer versions)
-    mise completion powershell >"$_DIR/mise-completion.ps1" 2>/dev/null || true
+    mise completion powershell >"${_DIR:-}/mise-completion.ps1" 2>/dev/null || true
     ;;
   esac
 }
@@ -336,7 +336,7 @@ _mise_apply_activation() {
 
   # 2. Ephemeral Session Activation
   local _M_BIN
-  _M_BIN=$(command -v mise || echo "$_G_MISE_BIN_BASE/mise")
+  _M_BIN=$(command -v mise || echo "${_G_MISE_BIN_BASE:-}/mise")
   # shellcheck disable=SC2153
   [ "${_G_OS:-}" = "windows" ] && [ ! -x "${_M_BIN:-}" ] && _M_BIN="${_M_BIN:-}.exe"
 
@@ -345,7 +345,7 @@ _mise_apply_activation() {
     # We focus on the most impactful session update: shims.
     case "${_SHELL:-}" in
     pwsh | powershell | nu | nushell)
-      export PATH="$_G_MISE_SHIMS_BASE:$PATH"
+      export PATH="${_G_MISE_SHIMS_BASE:-}:$PATH"
       ;;
     *)
       eval "$("${_M_BIN:-}" activate "${_SHELL:-}" --shims)"
@@ -396,8 +396,8 @@ bootstrap_mise() {
 
   # Path Refresh: Ensure MISE is available for immediate setup
   [ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
-  [ -d "${_G_MISE_BIN_BASE:-}" ] && export PATH="$_G_MISE_BIN_BASE:$PATH"
-  [ -d "${_G_MISE_SHIMS_BASE:-}" ] && export PATH="$_G_MISE_SHIMS_BASE:$PATH"
+  [ -d "${_G_MISE_BIN_BASE:-}" ] && export PATH="${_G_MISE_BIN_BASE:-}:$PATH"
+  [ -d "${_G_MISE_SHIMS_BASE:-}" ] && export PATH="${_G_MISE_SHIMS_BASE:-}:$PATH"
 
   # ── 🏗️ Post-Install Configuration ──
 

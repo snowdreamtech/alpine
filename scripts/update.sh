@@ -61,7 +61,7 @@ _execute_update() {
   local _T0
   _T0=$(date +%s)
 
-  log_info "Updating $_TOOL..."
+  log_info "Updating ${_TOOL:-}..."
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_summary "${_CATEGORY:-}" "${_TOOL:-}" "⚖️ Previewed" "-" "0"
   else
@@ -122,7 +122,7 @@ update_python_venv() {
   if [ -d "${VENV:-}" ] && [ -x "$VENV/bin/pip" ]; then
     local _CMD_PY="\"$VENV/bin/pip\" install --upgrade pip"
     if [ -f "${REQUIREMENTS_TXT:-}" ]; then
-      _CMD_PY="$_CMD_PY && \"$VENV/bin/pip\" install -r \"$REQUIREMENTS_TXT\" --upgrade"
+      _CMD_PY="${_CMD_PY:-} && \"$VENV/bin/pip\" install -r \"$REQUIREMENTS_TXT\" --upgrade"
     fi
     _execute_update "Project" "Python-Venv" "${_CMD_PY:-}" "\$(get_version \"$VENV/bin/pip\")"
   fi
@@ -165,7 +165,7 @@ update_pre_commit() {
   elif command -v pre-commit >/dev/null 2>&1; then _BIN_PC="pre-commit"; fi
 
   if [ -n "${_BIN_PC:-}" ] && [ -f ".pre-commit-config.yaml" ]; then
-    _execute_update "Other" "Hooks" "\"$_BIN_PC\" autoupdate" "\$(get_version \"$_BIN_PC\")"
+    _execute_update "Other" "Hooks" "\"${_BIN_PC:-}\" autoupdate" "\$(get_version \"${_BIN_PC:-}\")"
   fi
 }
 

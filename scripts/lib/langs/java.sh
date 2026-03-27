@@ -90,7 +90,7 @@ setup_java() {
 check_runtime_java() {
   local _TOOL_DESC_JAVA="${1:-Java}"
   if ! resolve_bin "java" >/dev/null 2>&1; then
-    log_warn "Required runtime 'java' for $_TOOL_DESC_JAVA is missing. Skipping."
+    log_warn "Required runtime 'java' for ${_TOOL_DESC_JAVA:-} is missing. Skipping."
     return 1
   fi
   return 0

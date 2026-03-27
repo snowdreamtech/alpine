@@ -59,7 +59,7 @@ setup_spark() {
 check_runtime_spark() {
   local _TOOL_DESC_SPARK="${1:-Apache Spark}"
   if ! resolve_bin "spark-shell" >/dev/null 2>&1; then
-    log_warn "Required tool 'spark-shell' for $_TOOL_DESC_SPARK is missing. Skipping."
+    log_warn "Required tool 'spark-shell' for ${_TOOL_DESC_SPARK:-} is missing. Skipping."
     return 1
   fi
   return 0

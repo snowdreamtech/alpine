@@ -57,7 +57,7 @@ setup_fortran() {
 check_runtime_fortran() {
   local _TOOL_DESC_FORT="${1:-Fortran}"
   if ! resolve_bin "gfortran" >/dev/null 2>&1; then
-    log_warn "Required runtime 'gfortran' for $_TOOL_DESC_FORT is missing. Skipping."
+    log_warn "Required runtime 'gfortran' for ${_TOOL_DESC_FORT:-} is missing. Skipping."
     return 1
   fi
   return 0

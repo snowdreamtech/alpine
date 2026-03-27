@@ -35,9 +35,9 @@ install_pipx() {
     local _PY_PREFIX
     _PY_PREFIX=$("${PYTHON:-}" -c "import sys; print(sys.prefix)" | tr -d '\r')
     if [ "${_G_OS:-}" = "windows" ]; then
-      [ -d "$_PY_PREFIX/Scripts" ] && _USER_BIN="$_PY_PREFIX/Scripts"
+      [ -d "${_PY_PREFIX:-}/Scripts" ] && _USER_BIN="${_PY_PREFIX:-}/Scripts"
     else
-      [ -d "$_PY_PREFIX/bin" ] && _USER_BIN="$_PY_PREFIX/bin"
+      [ -d "${_PY_PREFIX:-}/bin" ] && _USER_BIN="${_PY_PREFIX:-}/bin"
     fi
 
     # Fallback to User Base (for --user installs) if not found in prefix
@@ -45,7 +45,7 @@ install_pipx() {
       if [ "${_G_OS:-}" = "windows" ]; then
         local _USER_BASE
         _USER_BASE=$("${PYTHON:-}" -m site --user-base 2>/dev/null | tr -d '\r')
-        [ -n "${_USER_BASE:-}" ] && _USER_BIN="$_USER_BASE/Scripts"
+        [ -n "${_USER_BASE:-}" ] && _USER_BIN="${_USER_BASE:-}/Scripts"
       else
         # On macOS/Linux, pipx usually installs to ~/.local/bin or similar
         # shellcheck disable=SC2155
@@ -55,8 +55,8 @@ install_pipx() {
 
     if [ -n "${_USER_BIN:-}" ]; then
       case ":$PATH:" in
-      *":$_USER_BIN:"*) ;;
-      *) export PATH="$_USER_BIN:$PATH" ;;
+      *":${_USER_BIN:-}:"*) ;;
+      *) export PATH="${_USER_BIN:-}:$PATH" ;;
       esac
     fi
 

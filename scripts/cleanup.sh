@@ -59,13 +59,13 @@ clean_item() {
 
   if [ -e "${_PATH_CLN:-}" ]; then
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
-      log_success "DRY-RUN: Would remove $_DESC_CLN ($_PATH_CLN)"
+      log_success "DRY-RUN: Would remove ${_DESC_CLN:-} (${_PATH_CLN:-})"
     else
-      log_info "Removing $_DESC_CLN ($_PATH_CLN)..."
+      log_info "Removing ${_DESC_CLN:-} (${_PATH_CLN:-})..."
       rm -rf "${_PATH_CLN:-}"
     fi
   else
-    log_debug "Skipping $_DESC_CLN ($_PATH_CLN) - Not found."
+    log_debug "Skipping ${_DESC_CLN:-} (${_PATH_CLN:-}) - Not found."
   fi
 }
 

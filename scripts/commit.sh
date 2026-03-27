@@ -94,7 +94,7 @@ main() {
   local _NPM_LOCAL_CMT
   _NPM_LOCAL_CMT="${NPM:-}"
   if ! resolve_bin "${_NPM_LOCAL_CMT:-}" >/dev/null 2>&1; then
-    log_error "Error: $_NPM_LOCAL_CMT client not found."
+    log_error "Error: ${_NPM_LOCAL_CMT:-} client not found."
     exit 1
   fi
 
@@ -102,9 +102,9 @@ main() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_success "DRY-RUN: Would launch interactive Commitizen CLI."
     if [ -f "package.json" ] && grep -q '"commit":' package.json; then
-      log_info "Command: $_NPM_LOCAL_CMT run commit"
+      log_info "Command: ${_NPM_LOCAL_CMT:-} run commit"
     else
-      log_info "Command: $_NPM_LOCAL_CMT exec cz"
+      log_info "Command: ${_NPM_LOCAL_CMT:-} exec cz"
     fi
     exit 0
   fi

@@ -62,7 +62,7 @@ setup_vcpkg() {
 check_runtime_vcpkg() {
   local _TOOL_DESC_VCPKG="${1:-VCPKG}"
   if ! resolve_bin "vcpkg" >/dev/null 2>&1; then
-    log_warn "Required tool 'vcpkg' for $_TOOL_DESC_VCPKG is missing. Skipping."
+    log_warn "Required tool 'vcpkg' for ${_TOOL_DESC_VCPKG:-} is missing. Skipping."
     return 1
   fi
   return 0

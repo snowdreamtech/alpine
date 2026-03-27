@@ -59,7 +59,7 @@ setup_nim() {
 check_runtime_nim() {
   local _TOOL_DESC_NIM="${1:-Nim}"
   if ! resolve_bin "nim" >/dev/null 2>&1; then
-    log_warn "Required runtime 'nim' for $_TOOL_DESC_NIM is missing. Skipping."
+    log_warn "Required runtime 'nim' for ${_TOOL_DESC_NIM:-} is missing. Skipping."
     return 1
   fi
   return 0

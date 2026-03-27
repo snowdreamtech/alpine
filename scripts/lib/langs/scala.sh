@@ -89,7 +89,7 @@ setup_scala() {
 check_runtime_scala() {
   local _TOOL_DESC_SCALA="${1:-Scala}"
   if ! resolve_bin "scala" >/dev/null 2>&1; then
-    log_warn "Required runtime 'scala' for $_TOOL_DESC_SCALA is missing. Skipping."
+    log_warn "Required runtime 'scala' for ${_TOOL_DESC_SCALA:-} is missing. Skipping."
     return 1
   fi
   return 0

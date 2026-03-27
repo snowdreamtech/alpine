@@ -75,7 +75,7 @@ setup_helm() {
 check_runtime_helm() {
   local _TOOL_DESC_HELM="${1:-Helm}"
   if ! resolve_bin "helm" >/dev/null 2>&1; then
-    log_warn "Required tool 'helm' for $_TOOL_DESC_HELM is missing. Skipping."
+    log_warn "Required tool 'helm' for ${_TOOL_DESC_HELM:-} is missing. Skipping."
     return 1
   fi
   return 0

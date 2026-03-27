@@ -152,12 +152,12 @@ main() {
   # Input Validation
   case "${_CURRENT_MAJOR_ARCH:-}" in
   '' | *[!0-9]*)
-    log_error "Error: Could not determine a valid numeric major version (Found: '$_CURRENT_MAJOR_ARCH' from '$_RAW_VER_ARCH')"
+    log_error "Error: Could not determine a valid numeric major version (Found: '${_CURRENT_MAJOR_ARCH:-}' from '${_RAW_VER_ARCH:-}')"
     exit 1
     ;;
   esac
 
-  log_info "Targeting major version: $_CURRENT_MAJOR_ARCH"
+  log_info "Targeting major version: ${_CURRENT_MAJOR_ARCH:-}"
 
   # 1. Extract the header (everything up to the first version header)
   local _FIRST_H2_LINE_ARCH
@@ -167,7 +167,7 @@ main() {
     return 0
   fi
 
-  log_debug "Header ends at line $_FIRST_H2_LINE_ARCH"
+  log_debug "Header ends at line ${_FIRST_H2_LINE_ARCH:-}"
   head -n "$((_FIRST_H2_LINE_ARCH - 1))" "${CHANGELOG:-}" >"${_TMP_HDR:-}"
 
   # 2. Process all versions using a portable awk approach
@@ -202,9 +202,9 @@ main() {
 
   # 3. Preparation for rebuild (Atomic)
   cat "${_TMP_HDR:-}" >"${_NEW_CHLOG:-}"
-  if [ -f "$_TMP_ARCH_PFX/current.md" ]; then
+  if [ -f "${_TMP_ARCH_PFX:-}/current.md" ]; then
     log_debug "Preserving current major version content."
-    cat "$_TMP_ARCH_PFX/current.md" >>"${_NEW_CHLOG:-}"
+    cat "${_TMP_ARCH_PFX:-}/current.md" >>"${_NEW_CHLOG:-}"
   fi
 
   # 4. Handle archives with deduplication
@@ -235,8 +235,8 @@ main() {
     _V_TAG_PROC=$(basename "${_arch_file_iter:-}" .md)
     local _V_NUM_PROC
     _V_NUM_PROC=$(echo "${_V_TAG_PROC:-}" | sed 's/^v//')
-    local _FINAL_ARCH_FILE="$_REL_ARCHIVE_DIR/CHANGELOG-v$_V_NUM_PROC.md"
-    log_debug "Processing archival block for major version $_V_NUM_PROC..."
+    local _FINAL_ARCH_FILE="${_REL_ARCHIVE_DIR:-}/CHANGELOG-v${_V_NUM_PROC:-}.md"
+    log_debug "Processing archival block for major version ${_V_NUM_PROC:-}..."
 
     if [ -f "${_FINAL_ARCH_FILE:-}" ]; then
       # _FILTERED_CONTENT_ARCH is reused safely because we empty it
@@ -257,10 +257,10 @@ main() {
 
       if [ -s "${_FILTERED_CONTENT_ARCH:-}" ]; then
         if [ "${DRY_RUN:-0}" -eq 1 ]; then
-          log_warn "DRY-RUN: Would prepend new entries to $_FINAL_ARCH_FILE"
+          log_warn "DRY-RUN: Would prepend new entries to ${_FINAL_ARCH_FILE:-}"
           printf "| v%s | Prepend (Dry Run) | %s |\n" "${_V_NUM_PROC:-}" "${_FINAL_ARCH_FILE:-}" >>"${CI_STEP_SUMMARY:-}"
         else
-          log_info "Updating archive: $_FINAL_ARCH_FILE"
+          log_info "Updating archive: ${_FINAL_ARCH_FILE:-}"
           # _TMP_ARCH_SWAP is reused safely because we empty it
           : >"${_TMP_ARCH_SWAP:-}"
           cat "${_FILTERED_CONTENT_ARCH:-}" >"${_TMP_ARCH_SWAP:-}"
@@ -271,15 +271,15 @@ main() {
         fi
         _ARCHIVE_COUNT_ARCH=$((_ARCHIVE_COUNT_ARCH + 1))
       else
-        log_debug "No new entries for v$_V_NUM_PROC, skipping."
+        log_debug "No new entries for v${_V_NUM_PROC:-}, skipping."
       fi
       rm -f "${_FILTERED_CONTENT_ARCH:-}"
     else
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
-        log_warn "DRY-RUN: Would create $_FINAL_ARCH_FILE"
+        log_warn "DRY-RUN: Would create ${_FINAL_ARCH_FILE:-}"
         printf "| v%s | Create (Dry Run) | %s |\n" "${_V_NUM_PROC:-}" "${_FINAL_ARCH_FILE:-}" >>"${CI_STEP_SUMMARY:-}"
       else
-        log_success "Creating new archive: $_FINAL_ARCH_FILE"
+        log_success "Creating new archive: ${_FINAL_ARCH_FILE:-}"
         mkdir -p "${_REL_ARCHIVE_DIR:-}"
         printf "# Changelog Archive v%s\n\n" "${_V_NUM_PROC:-}" >"${_FINAL_ARCH_FILE:-}"
         cat "${_arch_file_iter:-}" >>"${_FINAL_ARCH_FILE:-}"
@@ -294,7 +294,7 @@ main() {
   fi
 
   # 5. Rebuild History section in NEW_CHLOG (Sorted)
-  log_info "Rebuilding History section (Archive Directory: $_REL_ARCHIVE_DIR)..."
+  log_info "Rebuilding History section (Archive Directory: ${_REL_ARCHIVE_DIR:-})..."
   # _HISTORY_LINKS_SCRATCH is emptied for reuse
   : >"${_HISTORY_LINKS_SCRATCH:-}"
   # Check filesystem for existing archives in _REL_ARCHIVE_DIR
@@ -305,7 +305,7 @@ main() {
     _F_NAME_HIST=$(basename "${_f_hist:-}")
     local _V_NUM_HIST
     _V_NUM_HIST=$(echo "${_F_NAME_HIST:-}" | sed 's/^CHANGELOG-v//;s/\.md$//')
-    printf "%s|%s\n" "${_V_NUM_HIST:-}" "- [v$_V_NUM_HIST.x.x Archive](./$_f_hist)" >>"${_HISTORY_LINKS_SCRATCH:-}"
+    printf "%s|%s\n" "${_V_NUM_HIST:-}" "- [v${_V_NUM_HIST:-}.x.x Archive](./$_f_hist)" >>"${_HISTORY_LINKS_SCRATCH:-}"
   done
 
   # Merge with newly planned archives from _TMP_ARCH_PFX
@@ -314,7 +314,7 @@ main() {
     local _V_NUM_HIST
     _V_NUM_HIST=$(echo "${_f_hist:-}" | sed 's|^.*/v||;s/.md$//')
     local _LINK_HIST
-    _LINK_HIST="- [v$_V_NUM_HIST.x.x Archive](./$_REL_ARCHIVE_DIR/CHANGELOG-v$_V_NUM_HIST.md)"
+    _LINK_HIST="- [v${_V_NUM_HIST:-}.x.x Archive](./${_REL_ARCHIVE_DIR:-}/CHANGELOG-v${_V_NUM_HIST:-}.md)"
     # Normalize link paths (remove repeated ./)
     _LINK_HIST=$(echo "${_LINK_HIST:-}" | sed 's|\./\./|\./|g')
     if ! grep -qF -- "${_LINK_HIST:-}" "${_HISTORY_LINKS_SCRATCH:-}" 2>/dev/null; then

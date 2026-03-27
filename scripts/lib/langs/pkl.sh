@@ -59,7 +59,7 @@ setup_pkl() {
 check_runtime_pkl() {
   local _TOOL_DESC_PKL="${1:-Pkl}"
   if ! resolve_bin "pkl" >/dev/null 2>&1; then
-    log_warn "Required runtime 'pkl' for $_TOOL_DESC_PKL is missing. Skipping."
+    log_warn "Required runtime 'pkl' for ${_TOOL_DESC_PKL:-} is missing. Skipping."
     return 1
   fi
   return 0

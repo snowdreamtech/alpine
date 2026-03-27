@@ -74,7 +74,7 @@ run_upgrade() {
 
   # --- Phase 1: Update versions.sh (SSoT for Tier 2) ---
   if [ -f "${_VERSIONS_FILE:-}" ]; then
-    log_debug "Scanning $_VERSIONS_FILE..."
+    log_debug "Scanning ${_VERSIONS_FILE:-}..."
     # shellcheck source=scripts/lib/versions.sh
     . "${_VERSIONS_FILE:-}"
 
@@ -91,7 +91,7 @@ run_upgrade() {
       esac
 
       _PROV_VAR="${_VAR_NAME:-}_PROVIDER"
-      _PROV_VAL=$(eval "echo \${$_PROV_VAR:-}")
+      _PROV_VAL=$(eval "echo \${${_PROV_VAR:-}:-}")
 
       if [ -z "${_PROV_VAL:-}" ]; then
         _TOOL_NAME=$(echo "${_VAR_NAME:-}" | sed 's/^VER_//' | tr '[:upper:]' '[:lower:]' | tr '_' '-')
@@ -103,13 +103,13 @@ run_upgrade() {
 
       _LATEST_VER=$(_get_latest_version "${_PROV_VAL:-}")
       if [ -n "${_LATEST_VER:-}" ] && [ "${_CUR_VER:-}" != "${_LATEST_VER:-}" ]; then
-        log_success "✨ Upgrade [$_VERSIONS_FILE]: $_VAR_NAME ($_PROV_VAL) $_CUR_VER -> $_LATEST_VER"
-        _SUMMARY_DATA="${_SUMMARY_DATA:-}| \`$_PROV_VAL\` | \`$_CUR_VER\` | \`$_LATEST_VER\` | \`versions.sh\` |\n"
+        log_success "✨ Upgrade [${_VERSIONS_FILE:-}]: ${_VAR_NAME:-} (${_PROV_VAL:-}) ${_CUR_VER:-} -> ${_LATEST_VER:-}"
+        _SUMMARY_DATA="${_SUMMARY_DATA:-}| \`${_PROV_VAL:-}\` | \`${_CUR_VER:-}\` | \`${_LATEST_VER:-}\` | \`versions.sh\` |\n"
         if [ "${DRY_RUN:-0}" -eq 0 ]; then
           if [ "$(uname -s)" = "Darwin" ]; then
-            sed -i '' "s/$_VAR_NAME=\"$_CUR_VER\"/$_VAR_NAME=\"$_LATEST_VER\"/" "${_VERSIONS_FILE:-}"
+            sed -i '' "s/${_VAR_NAME:-}=\"${_CUR_VER:-}\"/${_VAR_NAME:-}=\"${_LATEST_VER:-}\"/" "${_VERSIONS_FILE:-}"
           else
-            sed -i "s/$_VAR_NAME=\"$_CUR_VER\"/$_VAR_NAME=\"$_LATEST_VER\"/" "${_VERSIONS_FILE:-}"
+            sed -i "s/${_VAR_NAME:-}=\"${_CUR_VER:-}\"/${_VAR_NAME:-}=\"${_LATEST_VER:-}\"/" "${_VERSIONS_FILE:-}"
           fi
         fi
         _UPDATED_COUNT=$((_UPDATED_COUNT + 1))
@@ -121,7 +121,7 @@ run_upgrade() {
 
   # --- Phase 2: Update .mise.toml (Tier 1 & Static Global Tools) ---
   if [ -f "${_MISE_FILE:-}" ]; then
-    log_debug "Scanning $_MISE_FILE..."
+    log_debug "Scanning ${_MISE_FILE:-}..."
     # We look for lines in the [tools] section: tool = "version"
     # Note: We only process lines that look like Assignments until we hit the next section
     _IN_TOOLS=0
@@ -144,16 +144,16 @@ run_upgrade() {
 
         _LATEST_VER=$(_get_latest_version "${_PROV_VAL:-}")
         if [ -n "${_LATEST_VER:-}" ] && [ "${_CUR_VER:-}" != "${_LATEST_VER:-}" ]; then
-          log_success "✨ Upgrade [$_MISE_FILE]: $_TOOL_IDENT $_CUR_VER -> $_LATEST_VER"
-          _SUMMARY_DATA="${_SUMMARY_DATA:-}| \`$_TOOL_IDENT\` | \`$_CUR_VER\` | \`$_LATEST_VER\` | \`.mise.toml\` |\n"
+          log_success "✨ Upgrade [${_MISE_FILE:-}]: ${_TOOL_IDENT:-} ${_CUR_VER:-} -> ${_LATEST_VER:-}"
+          _SUMMARY_DATA="${_SUMMARY_DATA:-}| \`${_TOOL_IDENT:-}\` | \`${_CUR_VER:-}\` | \`${_LATEST_VER:-}\` | \`.mise.toml\` |\n"
           if [ "${DRY_RUN:-0}" -eq 0 ]; then
             if [ "$(uname -s)" = "Darwin" ]; then
-              sed -i '' "s#$_TOOL_IDENT = \"$_CUR_VER\"#$_TOOL_IDENT = \"$_LATEST_VER\"#" "${_MISE_FILE:-}"
+              sed -i '' "s#${_TOOL_IDENT:-} = \"${_CUR_VER:-}\"#${_TOOL_IDENT:-} = \"${_LATEST_VER:-}\"#" "${_MISE_FILE:-}"
               # Also handle quoted variant if any
-              sed -i '' "s#\"$_TOOL_IDENT\" = \"$_CUR_VER\"#\"$_TOOL_IDENT\" = \"$_LATEST_VER\"#" "${_MISE_FILE:-}"
+              sed -i '' "s#\"${_TOOL_IDENT:-}\" = \"${_CUR_VER:-}\"#\"${_TOOL_IDENT:-}\" = \"${_LATEST_VER:-}\"#" "${_MISE_FILE:-}"
             else
-              sed -i "s#$_TOOL_IDENT = \"$_CUR_VER\"#$_TOOL_IDENT = \"$_LATEST_VER\"#" "${_MISE_FILE:-}"
-              sed -i "s#\"$_TOOL_IDENT\" = \"$_CUR_VER\"#\"$_TOOL_IDENT\" = \"$_LATEST_VER\"#" "${_MISE_FILE:-}"
+              sed -i "s#${_TOOL_IDENT:-} = \"${_CUR_VER:-}\"#${_TOOL_IDENT:-} = \"${_LATEST_VER:-}\"#" "${_MISE_FILE:-}"
+              sed -i "s#\"${_TOOL_IDENT:-}\" = \"${_CUR_VER:-}\"#\"${_TOOL_IDENT:-}\" = \"${_LATEST_VER:-}\"#" "${_MISE_FILE:-}"
             fi
           fi
           _UPDATED_COUNT=$((_UPDATED_COUNT + 1))
@@ -180,13 +180,13 @@ run_upgrade() {
 
   if [ "${_UPDATED_COUNT:-}" -gt 0 ]; then
     if [ "${DRY_RUN:-0}" -eq 0 ]; then
-      log_success "\n✅ Successfully updated $_UPDATED_COUNT tool(s) across registry and config."
+      log_success "\n✅ Successfully updated ${_UPDATED_COUNT:-} tool(s) across registry and config."
       log_info "💡 Next: Run 'make sync-lock' to update cryptographic hashes."
     else
-      log_info "\n[DRY-RUN] Process completed. $_UPDATED_COUNT tool(s) have pending updates."
+      log_info "\n[DRY-RUN] Process completed. ${_UPDATED_COUNT:-} tool(s) have pending updates."
     fi
   else
-    log_success "\n🎉 All tools are up to date! ($_CHECK_COUNT checks performed)"
+    log_success "\n🎉 All tools are up to date! (${_CHECK_COUNT:-} checks performed)"
   fi
 }
 

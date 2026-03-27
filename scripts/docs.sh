@@ -73,7 +73,7 @@ main() {
   done
   parse_common_args "$@"
 
-  log_info "📖 Documentation Manager ($_COMMAND_DOC)...\n"
+  log_info "📖 Documentation Manager (${_COMMAND_DOC:-})...\n"
 
   # 3. Dependency checks — skipped in dry-run (environment may not have docs/ or vitepress)
   if [ "${DRY_RUN:-0}" -eq 0 ]; then

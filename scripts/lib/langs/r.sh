@@ -57,7 +57,7 @@ setup_r() {
 check_runtime_r() {
   local _TOOL_DESC_R="${1:-R}"
   if ! command -v R >/dev/null 2>&1; then
-    log_warn "Required runtime 'R' for $_TOOL_DESC_R is missing. Skipping."
+    log_warn "Required runtime 'R' for ${_TOOL_DESC_R:-} is missing. Skipping."
     return 1
   fi
   return 0

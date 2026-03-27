@@ -59,7 +59,7 @@ setup_elixir() {
 check_runtime_elixir() {
   local _TOOL_DESC_ELIXIR="${1:-Elixir}"
   if ! resolve_bin "elixir" >/dev/null 2>&1; then
-    log_warn "Required runtime 'elixir' for $_TOOL_DESC_ELIXIR is missing. Skipping."
+    log_warn "Required runtime 'elixir' for ${_TOOL_DESC_ELIXIR:-} is missing. Skipping."
     return 1
   fi
   return 0

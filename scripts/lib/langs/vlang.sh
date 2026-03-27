@@ -59,7 +59,7 @@ setup_vlang() {
 check_runtime_vlang() {
   local _TOOL_DESC_VLG="${1:-Vlang}"
   if ! resolve_bin "v" >/dev/null 2>&1; then
-    log_warn "Required runtime 'v' for $_TOOL_DESC_VLG is missing. Skipping."
+    log_warn "Required runtime 'v' for ${_TOOL_DESC_VLG:-} is missing. Skipping."
     return 1
   fi
   return 0

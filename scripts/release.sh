@@ -68,9 +68,9 @@ run_release_verify() {
   log_info "── Verification: Running pre-flight checks ──"
   if [ -f "scripts/verify.sh" ]; then
     local _VFY_ARGS="--quiet"
-    [ "${DRY_RUN:-0}" -eq 1 ] && _VFY_ARGS="$_VFY_ARGS --dry-run"
+    [ "${DRY_RUN:-0}" -eq 1 ] && _VFY_ARGS="${_VFY_ARGS:-} --dry-run"
     # shellcheck disable=SC2086
-    sh scripts/verify.sh $_VFY_ARGS || {
+    sh scripts/verify.sh ${_VFY_ARGS:-} || {
       log_error "Error: Verification failed. Cannot proceed with release."
       exit 1
     }
@@ -99,10 +99,10 @@ perform_git_release() {
   if echo "${_LV_RAW_VERSION:-}" | grep -q "^v"; then
     _LV_TAG_VERSION="${_LV_RAW_VERSION:-}"
   else
-    _LV_TAG_VERSION="v$_LV_RAW_VERSION"
+    _LV_TAG_VERSION="v${_LV_RAW_VERSION:-}"
   fi
 
-  log_info "── Target Release: $_LV_TAG_VERSION ──"
+  log_info "── Target Release: ${_LV_TAG_VERSION:-} ──"
 
   if [ "${_LV_DO_TAG:-}" -eq 0 ]; then
     log_info "Default mode: Local verification only. Skipping git tag operation."
@@ -111,14 +111,14 @@ perform_git_release() {
   fi
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_info "DRY-RUN: Would tag version $_LV_TAG_VERSION and push to origin."
+    log_info "DRY-RUN: Would tag version ${_LV_TAG_VERSION:-} and push to origin."
   else
     # Safety Gate: Check if tag already exists
     if git rev-parse "${_LV_TAG_VERSION:-}" >/dev/null 2>&1; then
-      log_warn "Warning: Git tag $_LV_TAG_VERSION already exists. Skipping tagging."
+      log_warn "Warning: Git tag ${_LV_TAG_VERSION:-} already exists. Skipping tagging."
     else
-      log_info "Tagging local repository as $_LV_TAG_VERSION..."
-      git tag -a "${_LV_TAG_VERSION:-}" -m "chore(release): $_LV_TAG_VERSION"
+      log_info "Tagging local repository as ${_LV_TAG_VERSION:-}..."
+      git tag -a "${_LV_TAG_VERSION:-}" -m "chore(release): ${_LV_TAG_VERSION:-}"
       log_info "Pushing tag to origin..."
       git push origin "${_LV_TAG_VERSION:-}"
     fi

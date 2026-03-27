@@ -70,12 +70,12 @@ check_tool_version() {
   local _LV_CRITICAL="${5:-0}"
   local _LV_CI_ONLY="${6:-0}"
 
-  log_debug "Checking $_LV_NAME (min: $_LV_MIN_VER)..."
+  log_debug "Checking ${_LV_NAME:-} (min: ${_LV_MIN_VER:-})..."
 
   # CI-only guard: skip entirely in local environments BEFORE touching command -v,
   # which could trigger a mise shim installation attempt and stall the process.
   if [ "${_LV_CI_ONLY:-}" -eq 1 ] && ! is_ci_env; then
-    log_info "⏭️  $_LV_NAME: CI-only (skipped locally)"
+    log_info "⏭️  ${_LV_NAME:-}: CI-only (skipped locally)"
     return 0
   fi
 
@@ -83,7 +83,7 @@ check_tool_version() {
   _LV_RESOLVED=$(resolve_bin "${_LV_CMD:-}") || true
 
   if [ -z "${_LV_RESOLVED:-}" ]; then
-    log_warn "❌ $_LV_NAME: Not found."
+    log_warn "❌ ${_LV_NAME:-}: Not found."
     HEALTHY_ST=1
     [ "${_LV_CRITICAL:-0}" -eq 1 ] && CORE_HEALTHY_ST=1
     return 1
@@ -96,7 +96,7 @@ check_tool_version() {
 
   # If requirement is empty or -, allow anything
   if [ -z "${_LV_MIN_VER:-}" ] || [ "${_LV_MIN_VER:-}" = "-" ]; then
-    log_success "✅ $_LV_NAME: v$_LV_CURRENT_VER (detected)"
+    log_success "✅ ${_LV_NAME:-}: v${_LV_CURRENT_VER:-} (detected)"
     return 0
   fi
 
@@ -109,9 +109,9 @@ check_tool_version() {
   _LV_LOWER_VER=$(printf "%s\n%s" "${_LV_MIN_CANON:-}" "${_LV_CUR_CANON:-}" | sort -n -t. -k1,1 -k2,2 -k3,3 | head -n1)
 
   if [ "${_LV_LOWER_VER:-}" = "${_LV_MIN_CANON:-}" ] || [ "${_LV_CUR_CANON:-}" = "${_LV_MIN_CANON:-}" ]; then
-    log_success "✅ $_LV_NAME: v$_LV_CURRENT_VER (matches/exceeds v$_LV_MIN_VER)"
+    log_success "✅ ${_LV_NAME:-}: v${_LV_CURRENT_VER:-} (matches/exceeds v${_LV_MIN_VER:-})"
   else
-    log_warn "⚠️  $_LV_NAME: v$_LV_CURRENT_VER (below recommended v$_LV_MIN_VER)"
+    log_warn "⚠️  ${_LV_NAME:-}: v${_LV_CURRENT_VER:-} (below recommended v${_LV_MIN_VER:-})"
     HEALTHY_ST=1
     [ "${_LV_CRITICAL:-0}" -eq 1 ] && CORE_HEALTHY_ST=1
   fi

@@ -56,7 +56,7 @@ setup_erlang() {
 check_runtime_erlang() {
   local _TOOL_DESC_ERL="${1:-Erlang}"
   if ! resolve_bin "erl" >/dev/null 2>&1; then
-    log_warn "Required runtime 'erl' for $_TOOL_DESC_ERL is missing. Skipping."
+    log_warn "Required runtime 'erl' for ${_TOOL_DESC_ERL:-} is missing. Skipping."
     return 1
   fi
   return 0

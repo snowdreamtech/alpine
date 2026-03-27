@@ -101,7 +101,7 @@ main() {
 
       # shellcheck disable=SC2086
       if GIT_CONFIG_PARAMETERS="${_GL_GIT_PARAMS:-}" \
-        run_quiet "${_GITLEAKS_BIN:-}" $_GL_ARGS; then
+        run_quiet "${_GITLEAKS_BIN:-}" ${_GL_ARGS:-}; then
         log_summary "Security" "gitleaks" "✅ Clean" "$(get_version "${_GITLEAKS_BIN:-}")" "$(($(date +%s) - _T0_GL))"
       else
         log_summary "Security" "gitleaks" "❌ Leaks Found" "$(get_version "${_GITLEAKS_BIN:-}")" "$(($(date +%s) - _T0_GL))"
@@ -185,7 +185,7 @@ main() {
 
     if [ -n "${_PIPAUDIT_BIN:-}" ]; then
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
-        log_success "DRY-RUN: Would run $_PIPAUDIT_BIN"
+        log_success "DRY-RUN: Would run ${_PIPAUDIT_BIN:-}"
         log_summary "Python" "pip-audit" "⚖️ Previewed" "-" "0"
       else
         local _V_PY_AUD
@@ -224,7 +224,7 @@ main() {
       _OSV_OUT=$("${_OSV_BIN:-}" -r . 2>&1)
       local _OSV_EXIT=$?
 
-      if [ $_OSV_EXIT -eq 0 ]; then
+      if [ ${_OSV_EXIT:-} -eq 0 ]; then
         log_summary "Security" "osv-scanner" "✅ Secure" "$(get_version "${_OSV_BIN:-}")" "$(($(date +%s) - _T0_OSV_AUD))"
       elif echo "${_OSV_OUT:-}" | grep -q "No package sources found"; then
         log_info "osv-scanner: No package sources found. Skipping."
@@ -301,13 +301,13 @@ main() {
       _R_VER=$(get_mise_tool_version "trivy")
 
       log_info "\n── Generating SBOM (trivy fs) ──"
-      log_info "Trivy: Using version $_T_VER (Required: $_R_VER)"
+      log_info "Trivy: Using version ${_T_VER:-} (Required: ${_R_VER:-})"
 
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_success "DRY-RUN: Would generate CycloneDX SBOM"
         log_summary "Security" "sbom" "⚖️ Previewed" "-" "0"
       elif [ "${_T_VER:-}" != "${_R_VER:-}" ] && [ "${_R_VER:-}" != "latest" ]; then
-        log_error "SECURITY ERROR: Trivy version mismatch! Found: $_T_VER, Expected: $_R_VER"
+        log_error "SECURITY ERROR: Trivy version mismatch! Found: ${_T_VER:-}, Expected: ${_R_VER:-}"
         log_error "This may indicate a compromised binary (Ref: March 2026 Incident)."
         log_summary "Security" "sbom" "⛔ Version Mismatch" "${_T_VER:-}" "0"
         _OVERALL_EXIT_AUDIT=1

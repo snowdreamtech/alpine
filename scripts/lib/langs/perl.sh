@@ -57,7 +57,7 @@ setup_perl() {
 check_runtime_perl() {
   local _TOOL_DESC_PERL="${1:-Perl}"
   if ! resolve_bin "perl" >/dev/null 2>&1; then
-    log_warn "Required runtime 'perl' for $_TOOL_DESC_PERL is missing. Skipping."
+    log_warn "Required runtime 'perl' for ${_TOOL_DESC_PERL:-} is missing. Skipping."
     return 1
   fi
   return 0

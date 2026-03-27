@@ -59,7 +59,7 @@ setup_dlang() {
 check_runtime_dlang() {
   local _TOOL_DESC_D="${1:-Dlang}"
   if ! resolve_bin "dmd" >/dev/null 2>&1; then
-    log_warn "Required runtime 'dmd' for $_TOOL_DESC_D is missing. Skipping."
+    log_warn "Required runtime 'dmd' for ${_TOOL_DESC_D:-} is missing. Skipping."
     return 1
   fi
   return 0

@@ -59,7 +59,7 @@ setup_crystal() {
 check_runtime_crystal() {
   local _TOOL_DESC_CRY="${1:-Crystal}"
   if ! resolve_bin "crystal" >/dev/null 2>&1; then
-    log_warn "Required runtime 'crystal' for $_TOOL_DESC_CRY is missing. Skipping."
+    log_warn "Required runtime 'crystal' for ${_TOOL_DESC_CRY:-} is missing. Skipping."
     return 1
   fi
   return 0

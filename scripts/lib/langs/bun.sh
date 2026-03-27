@@ -57,7 +57,7 @@ setup_bun() {
 check_runtime_bun() {
   local _TOOL_DESC_BUN="${1:-Bun}"
   if ! resolve_bin "bun" >/dev/null 2>&1; then
-    log_warn "Required runtime 'bun' for $_TOOL_DESC_BUN is missing. Skipping."
+    log_warn "Required runtime 'bun' for ${_TOOL_DESC_BUN:-} is missing. Skipping."
     return 1
   fi
   return 0

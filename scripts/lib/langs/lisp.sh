@@ -59,7 +59,7 @@ setup_lisp() {
 check_runtime_lisp() {
   local _TOOL_DESC_LISP="${1:-Common Lisp}"
   if ! resolve_bin "sbcl" >/dev/null 2>&1; then
-    log_warn "Required runtime 'sbcl' for $_TOOL_DESC_LISP is missing. Skipping."
+    log_warn "Required runtime 'sbcl' for ${_TOOL_DESC_LISP:-} is missing. Skipping."
     return 1
   fi
   return 0

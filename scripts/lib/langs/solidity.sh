@@ -59,7 +59,7 @@ setup_solidity() {
 check_runtime_solidity() {
   local _TOOL_DESC_SOL="${1:-Solidity}"
   if ! resolve_bin "solc" >/dev/null 2>&1; then
-    log_warn "Required runtime 'solc' for $_TOOL_DESC_SOL is missing. Skipping."
+    log_warn "Required runtime 'solc' for ${_TOOL_DESC_SOL:-} is missing. Skipping."
     return 1
   fi
   return 0

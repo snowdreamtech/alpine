@@ -95,7 +95,7 @@ setup_cpp() {
 check_runtime_cpp() {
   local _TOOL_DESC_CPP="${1:-C/C++}"
   if ! resolve_bin "gcc" >/dev/null 2>&1 && ! resolve_bin "clang" >/dev/null 2>&1; then
-    log_warn "Required runtime 'gcc' or 'clang' for $_TOOL_DESC_CPP is missing. Skipping."
+    log_warn "Required runtime 'gcc' or 'clang' for ${_TOOL_DESC_CPP:-} is missing. Skipping."
     return 1
   fi
   return 0

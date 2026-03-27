@@ -83,9 +83,9 @@ _log_setup() {
   [ -n "${_LOOKUP:-}" ] && _VER=$(get_mise_tool_version "${_LOOKUP:-}")
 
   if [ -n "${_VER:-}" ]; then
-    log_info "── Setting up $_TITLE ($_VER) ──"
+    log_info "── Setting up ${_TITLE:-} (${_VER:-}) ──"
   else
-    log_info "── Setting up $_TITLE ──"
+    log_info "── Setting up ${_TITLE:-} ──"
   fi
 }
 
@@ -103,19 +103,19 @@ main() {
     local _PID
     _PID=$(cat "${_LOCKFILE:-}")
     if ps -p "${_PID:-}" >/dev/null 2>&1; then
-      log_error "Setup already in progress (PID: $_PID)."
+      log_error "Setup already in progress (PID: ${_PID:-})."
       log_info "If you are sure no other setup is running, you can:"
-      log_info "  1. Kill the process: kill -9 $_PID"
-      log_info "  2. Remove the lock: rm -f $_LOCKFILE"
+      log_info "  1. Kill the process: kill -9 ${_PID:-}"
+      log_info "  2. Remove the lock: rm -f ${_LOCKFILE:-}"
       exit 1
     else
-      log_warn "Stale lockfile detected (PID: $_PID is dead). Cleaning up..."
+      log_warn "Stale lockfile detected (PID: ${_PID:-} is dead). Cleaning up..."
       rm -f "${_LOCKFILE:-}"
     fi
   fi
   echo "$$" >"${_LOCKFILE:-}"
   # shellcheck disable=SC2064
-  trap "rm -f $_LOCKFILE" EXIT INT TERM
+  trap "rm -f ${_LOCKFILE:-}" EXIT INT TERM
 
   # 3. Network Optimization
   optimize_network
@@ -223,20 +223,20 @@ EOF
     # These can still be installed on-demand via: sh scripts/setup.sh <module>
     local _HEAVY_MODULES="markdown yaml toml security docs testing ai helm k8s terragrunt grain moonbit move luau rescript starlark tcl wat pkl kcl ada assemblyscript ballerina fpc lean lisp racket prolog fortran typst"
     local _SMART_LIST=""
-    for _m in $_MODULES_LIST; do
+    for _m in ${_MODULES_LIST:-}; do
       case " ${_HEAVY_MODULES:-} " in *" ${_m} "*)
         log_debug "Skipping heavyweight module in local dev: $_m"
         ;;
       *) _SMART_LIST="${_SMART_LIST:-} ${_m}" ;;
       esac
     done
-    _MODULES_LIST=$_SMART_LIST
+    _MODULES_LIST=${_SMART_LIST:-}
   fi
 
   # ── Module Skipping & Filtering (SKIP_MODULES) ──
   if [ -n "${SKIP_MODULES:-}" ]; then
     local _NEW_LIST=""
-    for _m in $_MODULES_LIST; do
+    for _m in ${_MODULES_LIST:-}; do
       case " ${SKIP_MODULES:-} " in *" ${_m} "*)
         log_warn "Skipping module per SKIP_MODULES: $_m"
         log_summary "Skipped" "${_m:-}" "⏭️ Stopped" "-" "0"
@@ -244,7 +244,7 @@ EOF
       *) _NEW_LIST="${_NEW_LIST:-} ${_m}" ;;
       esac
     done
-    _MODULES_LIST=$_NEW_LIST
+    _MODULES_LIST=${_NEW_LIST:-}
   fi
 
   # 5. Bootstrap Toolchain Manager
@@ -269,7 +269,7 @@ EOF
 
   # 7. Execution Loop
   local _cur_grp=""
-  for _cur_module in $_MODULES_LIST; do
+  for _cur_module in ${_MODULES_LIST:-}; do
     # Visual Grouping Headers
     if [ "${_IS_ALL_MODULES:-}" = "true" ]; then
       case " ${_BASE_LIST:-} " in *" ${_cur_module} "*)

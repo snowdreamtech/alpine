@@ -57,7 +57,7 @@ setup_zig() {
 check_runtime_zig() {
   local _TOOL_DESC_ZIG="${1:-Zig}"
   if ! resolve_bin "zig" >/dev/null 2>&1; then
-    log_warn "Required runtime 'zig' for $_TOOL_DESC_ZIG is missing. Skipping."
+    log_warn "Required runtime 'zig' for ${_TOOL_DESC_ZIG:-} is missing. Skipping."
     return 1
   fi
   return 0

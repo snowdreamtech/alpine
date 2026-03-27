@@ -157,7 +157,7 @@ if [ -z "${_G_PROJECT_ROOT:-}" ]; then
     # Try markers starting from PWD traversal
     _G_PROJECT_ROOT=$(pwd)
     while [ "${_G_PROJECT_ROOT:-}" != "/" ] && [ "${_G_PROJECT_ROOT:-}" != "." ]; do
-      if [ -f "$_G_PROJECT_ROOT/package.json" ] || [ -f "$_G_PROJECT_ROOT/Makefile" ] || [ -d "$_G_PROJECT_ROOT/.git" ]; then
+      if [ -f "${_G_PROJECT_ROOT:-}/package.json" ] || [ -f "${_G_PROJECT_ROOT:-}/Makefile" ] || [ -d "${_G_PROJECT_ROOT:-}/.git" ]; then
         break
       fi
       _G_PROJECT_ROOT=$(dirname "${_G_PROJECT_ROOT:-}")
@@ -222,23 +222,23 @@ _LOCAL_MISE_SHIMS="${_G_MISE_SHIMS_BASE:-}"
 # Resilience: Always attempt to add these paths to ensure toolchain availability
 # even if directories are created later (like during setup JIT).
 case ":$PATH:" in
-*":$_LOCAL_MISE_BIN:"*) ;;
-*) export PATH="$_LOCAL_MISE_BIN:$PATH" ;;
+*":${_LOCAL_MISE_BIN:-}:"*) ;;
+*) export PATH="${_LOCAL_MISE_BIN:-}:$PATH" ;;
 esac
 
 case ":$PATH:" in
-*":$_LOCAL_MISE_SHIMS:"*) ;;
-*) export PATH="$_LOCAL_MISE_SHIMS:$PATH" ;;
+*":${_LOCAL_MISE_SHIMS:-}:"*) ;;
+*) export PATH="${_LOCAL_MISE_SHIMS:-}:$PATH" ;;
 esac
 
 case ":$PATH:" in
-*":$_LOCAL_BIN_VENV:"*) ;;
-*) export PATH="$_LOCAL_BIN_VENV:$PATH" ;;
+*":${_LOCAL_BIN_VENV:-}:"*) ;;
+*) export PATH="${_LOCAL_BIN_VENV:-}:$PATH" ;;
 esac
 
 case ":$PATH:" in
-*":$_LOCAL_BIN_NODE:"*) ;;
-*) export PATH="$_LOCAL_BIN_NODE:$PATH" ;;
+*":${_LOCAL_BIN_NODE:-}:"*) ;;
+*) export PATH="${_LOCAL_BIN_NODE:-}:$PATH" ;;
 esac
 
 # Purpose: Dynamically detects the Node.js package manager based on lockfiles.
@@ -312,12 +312,12 @@ if [ "${GITHUB_ACTIONS:-}" = "true" ] && [ -n "${GITHUB_PATH:-}" ]; then
   fi
 
   case ":$PATH:" in
-  *":$_G_MISE_BIN_BASE:"*) ;;
+  *":${_G_MISE_BIN_BASE:-}:"*) ;;
   *) echo "${_M_BIN_CI:-}" >>"${GITHUB_PATH:-}" ;;
   esac
 
   case ":$PATH:" in
-  *":$_G_MISE_SHIMS_BASE:"*) ;;
+  *":${_G_MISE_SHIMS_BASE:-}:"*) ;;
   *) echo "${_M_SHIMS_CI:-}" >>"${GITHUB_PATH:-}" ;;
   esac
 fi
@@ -383,7 +383,7 @@ optimize_network() {
       local _HTTP_CODE
       _HTTP_CODE=$(curl -o /dev/null -s -w "%{http_code}" -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/rate_limit --connect-timeout 2 2>/dev/null || echo "000")
       if [ "${_HTTP_CODE:-}" = "401" ]; then
-        log_warn "Current GITHUB_TOKEN appears invalid or unauthorized ($_HTTP_CODE). Unsetting for this session..."
+        log_warn "Current GITHUB_TOKEN appears invalid or unauthorized (${_HTTP_CODE:-}). Unsetting for this session..."
         unset GITHUB_TOKEN
         rm -f "${_TOKEN_CACHE:-}"
       elif [ -z "${_HTTP_CODE:-}" ] || [ "${_HTTP_CODE:-}" = "000" ]; then
@@ -533,17 +533,17 @@ run_mise() {
     case "${_T_CHECK:-}" in
     cargo:*)
       if ! command -v cargo >/dev/null 2>&1; then
-        log_error "Cannot install '$_T_CHECK': 'cargo' (Rust) is missing." && return 1
+        log_error "Cannot install '${_T_CHECK:-}': 'cargo' (Rust) is missing." && return 1
       fi
       ;;
     go:*)
       if ! command -v go >/dev/null 2>&1; then
-        log_error "Cannot install '$_T_CHECK': 'go' (Golang) is missing." && return 1
+        log_error "Cannot install '${_T_CHECK:-}': 'go' (Golang) is missing." && return 1
       fi
       ;;
     npm:*)
       if ! command -v npm >/dev/null 2>&1; then
-        log_error "Cannot install '$_T_CHECK': 'npm' (Node.js) is missing." && return 1
+        log_error "Cannot install '${_T_CHECK:-}': 'npm' (Node.js) is missing." && return 1
       fi
       ;;
     esac
@@ -560,29 +560,29 @@ run_mise() {
   local _MISE_OPTS=""
   if [ "${VERBOSE:-1}" -ge 2 ]; then _MISE_OPTS="--verbose"; fi
 
-  while [ $_RETRY_COUNT -lt $_MAX_RETRIES ]; do
+  while [ ${_RETRY_COUNT:-} -lt ${_MAX_RETRIES:-} ]; do
     # Wrap in timeout if available
     if command -v gtimeout >/dev/null 2>&1; then
       # shellcheck disable=SC2086
-      gtimeout "${_T_OUT:-}" "${_M_BIN:-}" $_MISE_OPTS "${_CMD:-}" "$@"
+      gtimeout "${_T_OUT:-}" "${_M_BIN:-}" ${_MISE_OPTS:-} "${_CMD:-}" "$@"
     elif command -v timeout >/dev/null 2>&1; then
       # shellcheck disable=SC2086
-      timeout "${_T_OUT:-}" "${_M_BIN:-}" $_MISE_OPTS "${_CMD:-}" "$@"
+      timeout "${_T_OUT:-}" "${_M_BIN:-}" ${_MISE_OPTS:-} "${_CMD:-}" "$@"
     else
       # shellcheck disable=SC2086
-      MISE_LOCKED="${_EFFECTIVE_LOCKED:-}" "${_M_BIN:-}" $_MISE_OPTS "${_CMD:-}" "$@"
+      MISE_LOCKED="${_EFFECTIVE_LOCKED:-}" "${_M_BIN:-}" ${_MISE_OPTS:-} "${_CMD:-}" "$@"
     fi
     _STATUS=$?
-    [ $_STATUS -eq 0 ] && break
+    [ ${_STATUS:-} -eq 0 ] && break
     # Exit code 124 = timeout expiry; treat as retryable network failure.
     # Exit codes > 128 = signal (SIGTERM/SIGKILL); abort immediately.
-    if [ $_STATUS -gt 128 ] && [ $_STATUS -ne 124 ]; then break; fi
+    if [ ${_STATUS:-} -gt 128 ] && [ ${_STATUS:-} -ne 124 ]; then break; fi
 
     _RETRY_COUNT=$((_RETRY_COUNT + 1))
-    if [ $_RETRY_COUNT -lt $_MAX_RETRIES ]; then
+    if [ ${_RETRY_COUNT:-} -lt ${_MAX_RETRIES:-} ]; then
       # Exponential backoff: 1s, 2s, 4s... to recover from transient rate limits.
       local _BACKOFF=$((1 << (_RETRY_COUNT - 1)))
-      log_warn "mise $_CMD failed (attempt $_RETRY_COUNT/$_MAX_RETRIES). Retrying in ${_BACKOFF:-}s..."
+      log_warn "mise ${_CMD:-} failed (attempt ${_RETRY_COUNT:-}/${_MAX_RETRIES:-}). Retrying in ${_BACKOFF:-}s..."
       sleep "${_BACKOFF:-}"
     fi
   done
@@ -593,7 +593,7 @@ run_mise() {
   else
     unset GITHUB_TOKEN
   fi
-  return $_STATUS
+  return ${_STATUS:-}
 }
 
 # ── 📢 Standardized Logging ──────────────────────────────────────────────────
@@ -648,7 +648,7 @@ log_error() {
 ensure_manager() {
   local _MGR="${1:-}"
   if ! command -v "${_MGR:-}" >/dev/null 2>&1; then
-    log_error "Error: Toolchain manager '$_MGR' is missing but required for this installation."
+    log_error "Error: Toolchain manager '${_MGR:-}' is missing but required for this installation."
     exit 1
   fi
 }
@@ -676,34 +676,34 @@ install_native_tool() {
   case "${_G_OS:-}" in
   macos)
     if command -v brew >/dev/null 2>&1; then
-      log_info "Installing $_PKG via Homebrew..."
+      log_info "Installing ${_PKG:-} via Homebrew..."
       brew install "${_PKG:-}" && return 0
     elif command -v port >/dev/null 2>&1; then
-      log_info "Installing $_PKG via MacPorts..."
+      log_info "Installing ${_PKG:-} via MacPorts..."
       sudo port install "${_PKG:-}" && return 0
     fi
     ;;
   linux)
     if command -v apt-get >/dev/null 2>&1; then
-      log_info "Installing $_PKG via apt..."
+      log_info "Installing ${_PKG:-} via apt..."
       sudo apt-get update -y && sudo apt-get install -y "${_PKG:-}" && return 0
     elif command -v dnf >/dev/null 2>&1; then
-      log_info "Installing $_PKG via dnf..."
+      log_info "Installing ${_PKG:-} via dnf..."
       sudo dnf install -y "${_PKG:-}" && return 0
     elif command -v pacman >/dev/null 2>&1; then
-      log_info "Installing $_PKG via pacman..."
+      log_info "Installing ${_PKG:-} via pacman..."
       sudo pacman -S --noconfirm "${_PKG:-}" && return 0
     fi
     ;;
   windows)
     if command -v choco >/dev/null 2>&1; then
-      log_info "Installing $_PKG via Chocolatey..."
+      log_info "Installing ${_PKG:-} via Chocolatey..."
       choco install -y "${_PKG:-}" && return 0
     elif command -v scoop >/dev/null 2>&1; then
-      log_info "Installing $_PKG via Scoop..."
+      log_info "Installing ${_PKG:-} via Scoop..."
       scoop install "${_PKG:-}" && return 0
     elif command -v winget >/dev/null 2>&1; then
-      log_info "Installing $_PKG via Winget..."
+      log_info "Installing ${_PKG:-} via Winget..."
       winget install "${_PKG:-}" && return 0
     fi
     ;;
@@ -744,7 +744,7 @@ get_project_root() {
   local _DIR
   _DIR=$(pwd)
   while [ "${_DIR:-}" != "/" ]; do
-    if [ -f "$_DIR/Makefile" ] || [ -f "$_DIR/package.json" ] || [ -d "$_DIR/.git" ] || [ -f "$_DIR/.mise.toml" ]; then
+    if [ -f "${_DIR:-}/Makefile" ] || [ -f "${_DIR:-}/package.json" ] || [ -d "${_DIR:-}/.git" ] || [ -f "${_DIR:-}/.mise.toml" ]; then
       echo "${_DIR:-}"
       return 0
     fi
@@ -843,7 +843,7 @@ has_lang_files() {
 
   # 1. Check for specific config files in root
   local _f_lang
-  for _f_lang in $_FILES_LANG; do
+  for _f_lang in ${_FILES_LANG:-}; do
     [ -f "${_f_lang:-}" ] && return 0
   done
 
@@ -851,7 +851,7 @@ has_lang_files() {
   # Exclude common build/dependency/cache directories to avoid false positives and improve speed
 
   local _ext_lang
-  for _ext_lang in $_EXTS_LANG; do
+  for _ext_lang in ${_EXTS_LANG:-}; do
     # Specialty cases for common multi-file structures
     case "${_ext_lang:-}" in
     CHARTS)
@@ -998,7 +998,7 @@ atomic_swap() {
   local _SRC_ATOMIC="${1:-}"
   local _DST_ATOMIC="${2:-}"
   if [ ! -f "${_SRC_ATOMIC:-}" ]; then
-    log_warn "atomic_swap: Source file $_SRC_ATOMIC does not exist."
+    log_warn "atomic_swap: Source file ${_SRC_ATOMIC:-} does not exist."
     return 1
   fi
   # Use mv for atomic operation on the same filesystem
@@ -1105,8 +1105,8 @@ get_version() {
     # Priority 2: Provider suffix match (e.g. ':go' or '/go' at end of key)
     # This prevents false positives where short names like 'go' match unrelated
     # tools such as 'github:go-task/task' via substring contains().
-    (to_entries[] | select(.key == \"$_M_PLUGIN\")) //
-    (to_entries[] | select(.key | endswith(\":$_M_PLUGIN\") or endswith(\"/$_M_PLUGIN\")))
+    (to_entries[] | select(.key == \"${_M_PLUGIN:-}\")) //
+    (to_entries[] | select(.key | endswith(\":${_M_PLUGIN:-}\") or endswith(\"/${_M_PLUGIN:-}\")))
     | .value
     | (map(select(.active==true))[0] // map(select(.installed==true))[0])
     | .version // empty" 2>/dev/null | head -n 1 || true)
@@ -1173,13 +1173,13 @@ resolve_bin() {
   [ -z "${_BIN:-}" ] && return 1
 
   # ── 1. Python Venv ──
-  local _VP="${VENV:-.venv}/$_G_VENV_BIN/$_BIN"
+  local _VP="${VENV:-.venv}/${_G_VENV_BIN:-}/${_BIN:-}"
   if [ -x "${_VP:-}" ]; then echo "${_VP:-}" && return 0; fi
   # Windows: venv scripts use .exe suffix
   if [ "${_G_OS:-}" = "windows" ] && [ -x "${_VP:-}.exe" ]; then echo "${_VP:-}.exe" && return 0; fi
 
   # ── 2. Node Modules ──
-  local _NP="node_modules/.bin/$_BIN"
+  local _NP="node_modules/.bin/${_BIN:-}"
   if [ -x "${_NP:-}" ]; then echo "${_NP:-}" && return 0; fi
   # Windows: npm generates .cmd wrappers
   if [ "${_G_OS:-}" = "windows" ] && [ -f "${_NP:-}.cmd" ]; then echo "${_NP:-}.cmd" && return 0; fi
@@ -1268,7 +1268,7 @@ check_runtime() {
 
   # Priority 2: Standard Command Check (Fallback using resolve_bin)
   if ! resolve_bin "${_RT_NAME:-}" >/dev/null 2>&1; then
-    log_warn "Required runtime '$_RT_NAME' for $_TOOL_DESC is missing. Skipping."
+    log_warn "Required runtime '${_RT_NAME:-}' for ${_TOOL_DESC:-} is missing. Skipping."
     if [ "${_G_AUDIT_MODE:-0}" -eq 1 ]; then
       return 1
     fi
@@ -1357,34 +1357,34 @@ run_npm_script() {
     _NODE_MGR="${NPM:-}"
 
     if ! command -v "${_NODE_MGR:-}" >/dev/null 2>&1; then
-      log_warn "Warning: $_NODE_MGR command not found and no fallback available. Skipping Node.js task: $_SCRIPT_NAME_NPM."
+      log_warn "Warning: ${_NODE_MGR:-} command not found and no fallback available. Skipping Node.js task: ${_SCRIPT_NAME_NPM:-}."
       return 0
     fi
 
     # 2. Package.json Integrity check (Avoid empty/invalid JSON crashes)
     if [ ! -s "package.json" ] || ! grep -q "{" "package.json"; then
-      log_debug "package.json is empty or invalid. Skipping Node.js task: $_SCRIPT_NAME_NPM."
+      log_debug "package.json is empty or invalid. Skipping Node.js task: ${_SCRIPT_NAME_NPM:-}."
       return 0
     fi
 
     # 3. Check for script in package.json
     local _CMD_NPM
-    _CMD_NPM=$(grep "\"$_SCRIPT_NAME_NPM\":" "package.json" | sed "s/.*\"$_SCRIPT_NAME_NPM\":[[:space:]]*\"//;s/\".*//" || true)
+    _CMD_NPM=$(grep "\"${_SCRIPT_NAME_NPM:-}\":" "package.json" | sed "s/.*\"${_SCRIPT_NAME_NPM:-}\":[[:space:]]*\"//;s/\".*//" || true)
 
     if [ -n "${_CMD_NPM:-}" ]; then
       # Avoid infinite loop if the command points back to this script
       if echo "${_CMD_NPM:-}" | grep -q "${_CURRENT_BASENAME_NPM:-}"; then
-        log_debug "Node script '$_SCRIPT_NAME_NPM' is a self-reference to '$_CURRENT_BASENAME_NPM'. Skipping."
+        log_debug "Node script '${_SCRIPT_NAME_NPM:-}' is a self-reference to '${_CURRENT_BASENAME_NPM:-}'. Skipping."
         return 0
       fi
-      log_info "── Running Node.js script: $_NODE_MGR $_SCRIPT_NAME_NPM $_EXTRA_ARGS_NPM ──"
+      log_info "── Running Node.js script: ${_NODE_MGR:-} ${_SCRIPT_NAME_NPM:-} ${_EXTRA_ARGS_NPM:-} ──"
       # shellcheck disable=SC2086
-      "${_NODE_MGR:-}" run "${_SCRIPT_NAME_NPM:-}" $_EXTRA_ARGS_NPM
+      "${_NODE_MGR:-}" run "${_SCRIPT_NAME_NPM:-}" ${_EXTRA_ARGS_NPM:-}
     elif [ "${_SCRIPT_NAME_NPM:-}" = "install" ] || [ "${_SCRIPT_NAME_NPM:-}" = "update" ]; then
       # 4. Special Fallback for native commands if not defined in package.json scripts
-      log_info "── Node.js standard command: $_NODE_MGR $_SCRIPT_NAME_NPM $_EXTRA_ARGS_NPM ──"
+      log_info "── Node.js standard command: ${_NODE_MGR:-} ${_SCRIPT_NAME_NPM:-} ${_EXTRA_ARGS_NPM:-} ──"
       # shellcheck disable=SC2086
-      run_quiet "${_NODE_MGR:-}" "${_SCRIPT_NAME_NPM:-}" $_EXTRA_ARGS_NPM
+      run_quiet "${_NODE_MGR:-}" "${_SCRIPT_NAME_NPM:-}" ${_EXTRA_ARGS_NPM:-}
     fi
   fi
   return 0
@@ -1401,7 +1401,7 @@ init_summary_table() {
   # Sentinel to prevent duplicate headers in the same summary stream
   local _SENTINEL_TABLE
   _SENTINEL_TABLE="_SUMMARY_TABLE_INITIALIZED_$(echo "${_TITLE_TABLE:-}" | tr ' ' '_')"
-  if [ "$(eval echo "\${$_SENTINEL_TABLE:-}")" = "true" ]; then
+  if [ "$(eval echo "\${${_SENTINEL_TABLE:-}:-}")" = "true" ]; then
     return 0
   fi
 
@@ -1414,7 +1414,7 @@ init_summary_table() {
     printf "| :--- | :--- | :--- | :--- | :--- |\n"
   } >>"${CI_STEP_SUMMARY:-}"
 
-  eval "export $_SENTINEL_TABLE=true"
+  eval "export ${_SENTINEL_TABLE:-}=true"
 }
 
 # Purpose: Finalizes the summary table. (Deprecated: Writes are now direct).

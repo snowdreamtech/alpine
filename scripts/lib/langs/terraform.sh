@@ -92,7 +92,7 @@ setup_terraform() {
 check_runtime_terraform() {
   local _TOOL_DESC_TF="${1:-Terraform}"
   if ! resolve_bin "terraform" >/dev/null 2>&1; then
-    log_warn "Required runtime 'terraform' for $_TOOL_DESC_TF is missing. Skipping."
+    log_warn "Required runtime 'terraform' for ${_TOOL_DESC_TF:-} is missing. Skipping."
     return 1
   fi
   return 0

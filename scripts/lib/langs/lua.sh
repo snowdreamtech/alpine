@@ -78,7 +78,7 @@ setup_lua() {
 check_runtime_lua() {
   local _TOOL_DESC_LUA="${1:-Lua}"
   if ! resolve_bin "lua" >/dev/null 2>&1; then
-    log_warn "Required runtime 'lua' for $_TOOL_DESC_LUA is missing. Skipping."
+    log_warn "Required runtime 'lua' for ${_TOOL_DESC_LUA:-} is missing. Skipping."
     return 1
   fi
   return 0

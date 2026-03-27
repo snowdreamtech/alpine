@@ -63,7 +63,7 @@ setup_rust() {
 check_runtime_rust() {
   local _TOOL_DESC_RUST="${1:-Rust}"
   if ! resolve_bin "cargo" >/dev/null 2>&1; then
-    log_warn "Required runtime 'rust' for $_TOOL_DESC_RUST is missing. Skipping."
+    log_warn "Required runtime 'rust' for ${_TOOL_DESC_RUST:-} is missing. Skipping."
     return 1
   fi
   return 0

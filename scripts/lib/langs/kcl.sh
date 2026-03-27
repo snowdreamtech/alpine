@@ -53,7 +53,7 @@ setup_kcl() {
 check_runtime_kcl() {
   local _TOOL_DESC_KCL="${1:-KCL}"
   if ! resolve_bin "kcl" >/dev/null 2>&1; then
-    log_warn "Required runtime 'kcl' for $_TOOL_DESC_KCL is missing. Skipping."
+    log_warn "Required runtime 'kcl' for ${_TOOL_DESC_KCL:-} is missing. Skipping."
     return 1
   fi
   return 0

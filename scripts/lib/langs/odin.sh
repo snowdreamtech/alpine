@@ -59,7 +59,7 @@ setup_odin() {
 check_runtime_odin() {
   local _TOOL_DESC_ODIN="${1:-Odin}"
   if ! resolve_bin "odin" >/dev/null 2>&1; then
-    log_warn "Required runtime 'odin' for $_TOOL_DESC_ODIN is missing. Skipping."
+    log_warn "Required runtime 'odin' for ${_TOOL_DESC_ODIN:-} is missing. Skipping."
     return 1
   fi
   return 0

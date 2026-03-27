@@ -59,7 +59,7 @@ setup_rescript() {
 check_runtime_rescript() {
   local _TOOL_DESC_RES="${1:-ReScript}"
   if ! resolve_bin "rescript" >/dev/null 2>&1; then
-    log_warn "Required runtime 'rescript' for $_TOOL_DESC_RES is missing. Skipping."
+    log_warn "Required runtime 'rescript' for ${_TOOL_DESC_RES:-} is missing. Skipping."
     return 1
   fi
   return 0

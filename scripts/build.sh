@@ -63,9 +63,9 @@ run_build() {
   local _CMD_BLD="${1:-}"
   local _DESC_BLD="${2:-}"
 
-  log_info "── Step: $_DESC_BLD ──"
+  log_info "── Step: ${_DESC_BLD:-} ──"
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_success "DRY-RUN: Would run: $_CMD_BLD"
+    log_success "DRY-RUN: Would run: ${_CMD_BLD:-}"
   else
     # shellcheck disable=SC2086
     eval "${_CMD_BLD:-}"
@@ -92,7 +92,7 @@ main() {
     local _GORELEASER_BIN
     _GORELEASER_BIN=$(resolve_bin "${GORELEASER:-goreleaser}") || true
     if [ -n "${_GORELEASER_BIN:-}" ]; then
-      run_build "$_GORELEASER_BIN build --snapshot --clean" "GoReleaser snapshot build"
+      run_build "${_GORELEASER_BIN:-} build --snapshot --clean" "GoReleaser snapshot build"
     fi
   elif [ -f "go.mod" ]; then
     run_build "go build ./..." "Go build (native)"
@@ -107,7 +107,7 @@ main() {
     _PYTHON_BLD_BIN=$(resolve_bin "python3") || true
 
     if [ -n "${_PYTHON_BLD_BIN:-}" ]; then
-      run_build "$_PYTHON_BLD_BIN -m build" "Python build"
+      run_build "${_PYTHON_BLD_BIN:-} -m build" "Python build"
     fi
   fi
 

@@ -90,16 +90,16 @@ _process_env_template() {
 
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
       if [ "${_MODE:-}" = "check" ]; then
-        log_debug "DRY-RUN: Would check if $_KEY_PARSED exists in .env"
+        log_debug "DRY-RUN: Would check if ${_KEY_PARSED:-} exists in .env"
       else
-        log_info "DRY-RUN: Would add $_KEY_PARSED to .env"
+        log_info "DRY-RUN: Would add ${_KEY_PARSED:-} to .env"
       fi
       continue
     fi
 
     if ! grep -q "^${_KEY_PARSED:-}=" ".env" && ! grep -q "^${_KEY_PARSED:-} =" ".env"; then
       if [ "${_MODE:-}" = "check" ]; then
-        log_warn "Missing key: $_KEY_PARSED"
+        log_warn "Missing key: ${_KEY_PARSED:-}"
         _MISSING_COUNT=$((_MISSING_COUNT + 1))
       elif [ "${_MODE:-}" = "sync" ]; then
         printf "Missing key found: %b%s%b. Add to .env? (y/N): " "${YELLOW:-}" "${_KEY_PARSED:-}" "${NC:-}"
@@ -108,10 +108,10 @@ _process_env_template() {
         case "${_CONFIRM_SYNC:-}" in
         [yY]*)
           echo "${line_parsed:-}" >>.env
-          log_success "Added $_KEY_PARSED"
+          log_success "Added ${_KEY_PARSED:-}"
           _ADDED_COUNT=$((_ADDED_COUNT + 1))
           ;;
-        *) log_info "Skipped $_KEY_PARSED" ;;
+        *) log_info "Skipped ${_KEY_PARSED:-}" ;;
         esac
       fi
     fi
@@ -121,12 +121,12 @@ _process_env_template() {
     if [ "${_MISSING_COUNT:-}" -eq 0 ]; then
       log_success "All environment keys are present."
     else
-      log_error "Validation failed: $_MISSING_COUNT keys missing from .env"
+      log_error "Validation failed: ${_MISSING_COUNT:-} keys missing from .env"
       log_info "💡 Run 'scripts/env.sh sync' to add missing keys (interactive)."
       exit 1
     fi
   elif [ "${_MODE:-}" = "sync" ]; then
-    log_success "Sync complete. $_ADDED_COUNT keys added."
+    log_success "Sync complete. ${_ADDED_COUNT:-} keys added."
   fi
 }
 
@@ -184,7 +184,7 @@ main() {
   done
   parse_common_args "$@"
 
-  log_info "🔧 Environment Configuration Manager ($_COMMAND_ENV)...\n"
+  log_info "🔧 Environment Configuration Manager (${_COMMAND_ENV:-})...\n"
 
   case "${_COMMAND_ENV:-}" in
   setup) run_env_setup ;;

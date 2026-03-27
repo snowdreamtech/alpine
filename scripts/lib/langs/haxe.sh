@@ -59,7 +59,7 @@ setup_haxe() {
 check_runtime_haxe() {
   local _TOOL_DESC_HX="${1:-Haxe}"
   if ! resolve_bin "haxe" >/dev/null 2>&1; then
-    log_warn "Required runtime 'haxe' for $_TOOL_DESC_HX is missing. Skipping."
+    log_warn "Required runtime 'haxe' for ${_TOOL_DESC_HX:-} is missing. Skipping."
     return 1
   fi
   return 0

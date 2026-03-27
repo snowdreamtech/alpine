@@ -60,7 +60,7 @@ setup_cue() {
 check_runtime_cue() {
   local _TOOL_DESC_CUE="${1:-CUE}"
   if ! resolve_bin "cue" >/dev/null 2>&1; then
-    log_warn "Required runtime 'cue' for $_TOOL_DESC_CUE is missing. Skipping."
+    log_warn "Required runtime 'cue' for ${_TOOL_DESC_CUE:-} is missing. Skipping."
     return 1
   fi
   return 0

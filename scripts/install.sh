@@ -88,19 +88,19 @@ main() {
     local _PID
     _PID=$(cat "${_LOCKFILE:-}")
     if ps -p "${_PID:-}" >/dev/null 2>&1; then
-      log_error "Setup or installation already in progress (PID: $_PID)."
+      log_error "Setup or installation already in progress (PID: ${_PID:-})."
       log_info "If you are sure no other task is running, you can:"
-      log_info "  1. Kill the process: kill -9 $_PID"
-      log_info "  2. Remove the lock: rm -f $_LOCKFILE"
+      log_info "  1. Kill the process: kill -9 ${_PID:-}"
+      log_info "  2. Remove the lock: rm -f ${_LOCKFILE:-}"
       exit 1
     else
-      log_warn "Stale lockfile detected (PID: $_PID is dead). Cleaning up..."
+      log_warn "Stale lockfile detected (PID: ${_PID:-} is dead). Cleaning up..."
       rm -f "${_LOCKFILE:-}"
     fi
   fi
   echo "$$" >"${_LOCKFILE:-}"
   # shellcheck disable=SC2064
-  trap "rm -f $_LOCKFILE" EXIT INT TERM
+  trap "rm -f ${_LOCKFILE:-}" EXIT INT TERM
 
   # 2. Argument Parsing
   parse_common_args "$@"

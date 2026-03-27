@@ -117,7 +117,7 @@ setup_ruby() {
 check_runtime_ruby() {
   local _TOOL_DESC_RUBY="${1:-Ruby}"
   if ! resolve_bin "ruby" >/dev/null 2>&1; then
-    log_warn "Required runtime 'ruby' for $_TOOL_DESC_RUBY is missing. Skipping."
+    log_warn "Required runtime 'ruby' for ${_TOOL_DESC_RUBY:-} is missing. Skipping."
     return 1
   fi
   return 0

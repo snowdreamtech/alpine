@@ -146,7 +146,7 @@ main() {
   log_info "\nStep 1: Replacing placeholders in files..."
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_warn "DRY-RUN: Would replace '$_OLD_PROJ_REF' with '$_PROJECT_NAME_HYD' and '$_OLD_ORG_REF/$_OLD_USER_REF' with '$_GITHUB_ORG_HYD' in matching files."
+    log_warn "DRY-RUN: Would replace '${_OLD_PROJ_REF:-}' with '${_PROJECT_NAME_HYD:-}' and '${_OLD_ORG_REF:-}/${_OLD_USER_REF:-}' with '${_GITHUB_ORG_HYD:-}' in matching files."
   else
     # Use perl for cross-platform compatibility
     find . -type f \
@@ -154,7 +154,7 @@ main() {
       ! -path "./node_modules/*" \
       ! -path "./.venv/*" \
       ! -path "./scripts/init-project.sh" \
-      -exec perl -pi -e "s~$_OLD_PROJ_REF~$_PROJECT_NAME_HYD~g" {} +
+      -exec perl -pi -e "s~${_OLD_PROJ_REF:-}~${_PROJECT_NAME_HYD:-}~g" {} +
 
     find . -type f \
       ! -path "*/.git/*" \
@@ -163,12 +163,12 @@ main() {
       ! -path "./scripts/init-project.sh" \
       ! -path "./scripts/init-project.ps1" \
       ! -path "./scripts/init-project.bat" \
-      -exec perl -pi -e "s~$_OLD_ORG_REF|$_OLD_USER_REF~$_GITHUB_ORG_HYD~g" {} +
+      -exec perl -pi -e "s~${_OLD_ORG_REF:-}|${_OLD_USER_REF:-}~${_GITHUB_ORG_HYD:-}~g" {} +
 
     # Replace description if provided
     if [ -n "${_PROJECT_DESC_HYD:-}" ]; then
       local _OLD_DESC="An enterprise-grade, foundational template designed for multi-AI IDE collaboration."
-      find . -name "*.md" -exec perl -pi -e "s~\Q$_OLD_DESC\E~$_PROJECT_DESC_HYD~g" {} +
+      find . -name "*.md" -exec perl -pi -e "s~\Q${_OLD_DESC:-}\E~${_PROJECT_DESC_HYD:-}~g" {} +
     fi
   fi
 
@@ -177,9 +177,9 @@ main() {
   local _CUR_YEAR_HYD
   _CUR_YEAR_HYD=$(date +%Y)
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_warn "DRY-RUN: Would update LICENSE copyright to $_CUR_YEAR_HYD and $_AUTHOR_NAME_HYD."
+    log_warn "DRY-RUN: Would update LICENSE copyright to ${_CUR_YEAR_HYD:-} and ${_AUTHOR_NAME_HYD:-}."
   else
-    perl -pi -e "s~Copyright \(c\) \d{4}-present SnowdreamTech Inc\.~Copyright (c) $_CUR_YEAR_HYD-present $_AUTHOR_NAME_HYD~g" LICENSE
+    perl -pi -e "s~Copyright \(c\) \d{4}-present SnowdreamTech Inc\.~Copyright (c) ${_CUR_YEAR_HYD:-}-present ${_AUTHOR_NAME_HYD:-}~g" LICENSE
   fi
 
   # 7. Infrastructure Synchronization (New Branding Architecture)
