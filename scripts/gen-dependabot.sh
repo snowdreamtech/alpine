@@ -231,7 +231,7 @@ scan_ecosystems() {
   _npm_dirs=$(find_dirs_for_patterns "package.json" "**/package.json")
   if [ -n "${_npm_dirs:-}" ]; then
     echo "${_npm_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "npm" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "npm" "${_d:-}"; fi
     done
   fi
 
@@ -239,7 +239,7 @@ scan_ecosystems() {
   _pip_dirs=$(find_dirs_for_patterns "requirements.txt" "requirements-dev.txt" "setup.py" "setup.cfg" "Pipfile" "**/requirements.txt" "**/Pipfile")
   if [ -n "${_pip_dirs:-}" ]; then
     echo "${_pip_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "pip" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "pip" "${_d:-}"; fi
     done
   fi
 
@@ -247,7 +247,7 @@ scan_ecosystems() {
   _go_dirs=$(find_dirs_for_patterns "go.mod" "**/go.mod")
   if [ -n "${_go_dirs:-}" ]; then
     echo "${_go_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "gomod" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "gomod" "${_d:-}"; fi
     done
   fi
 
@@ -255,7 +255,7 @@ scan_ecosystems() {
   _cargo_dirs=$(find_dirs_for_patterns "Cargo.toml" "**/Cargo.toml")
   if [ -n "${_cargo_dirs:-}" ]; then
     echo "${_cargo_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "cargo" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "cargo" "${_d:-}"; fi
     done
   fi
 
@@ -263,7 +263,7 @@ scan_ecosystems() {
   _composer_dirs=$(find_dirs_for_patterns "composer.json" "**/composer.json")
   if [ -n "${_composer_dirs:-}" ]; then
     echo "${_composer_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "composer" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "composer" "${_d:-}"; fi
     done
   fi
 
@@ -271,7 +271,7 @@ scan_ecosystems() {
   _bundler_dirs=$(find_dirs_for_patterns "Gemfile" "**/Gemfile")
   if [ -n "${_bundler_dirs:-}" ]; then
     echo "${_bundler_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "bundler" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "bundler" "${_d:-}"; fi
     done
   fi
 
@@ -279,7 +279,7 @@ scan_ecosystems() {
   _docker_dirs=$(find_dirs_for_patterns "Dockerfile" "**/Dockerfile" "Dockerfile.*" "**/Dockerfile.*")
   if [ -n "${_docker_dirs:-}" ]; then
     echo "${_docker_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "docker" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "docker" "${_d:-}"; fi
     done
   fi
 
@@ -287,7 +287,7 @@ scan_ecosystems() {
   _mix_dirs=$(find_dirs_for_patterns "mix.exs" "**/mix.exs")
   if [ -n "${_mix_dirs:-}" ]; then
     echo "${_mix_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "mix" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "mix" "${_d:-}"; fi
     done
   fi
 
@@ -295,7 +295,7 @@ scan_ecosystems() {
   _elm_dirs=$(find_dirs_for_patterns "elm.json" "**/elm.json")
   if [ -n "${_elm_dirs:-}" ]; then
     echo "${_elm_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "elm" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "elm" "${_d:-}"; fi
     done
   fi
 
@@ -308,7 +308,7 @@ scan_ecosystems() {
   _gradle_dirs=$(find_dirs_for_patterns "build.gradle" "build.gradle.kts" "**/build.gradle" "**/build.gradle.kts")
   if [ -n "${_gradle_dirs:-}" ]; then
     echo "${_gradle_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "gradle" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "gradle" "${_d:-}"; fi
     done
   fi
 
@@ -316,7 +316,7 @@ scan_ecosystems() {
   _maven_dirs=$(find_dirs_for_patterns "pom.xml" "**/pom.xml")
   if [ -n "${_maven_dirs:-}" ]; then
     echo "${_maven_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "maven" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "maven" "${_d:-}"; fi
     done
   fi
 
@@ -328,7 +328,7 @@ scan_ecosystems() {
       [ "${_d:-}" = "." ] && echo "/" || echo "/$_d"
     done | sort -u)
     echo "${_nuget_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "nuget" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "nuget" "${_d:-}"; fi
     done
   fi
 
@@ -336,7 +336,7 @@ scan_ecosystems() {
   _pub_dirs=$(find_dirs_for_patterns "pubspec.yaml" "**/pubspec.yaml")
   if [ -n "${_pub_dirs:-}" ]; then
     echo "${_pub_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "pub" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "pub" "${_d:-}"; fi
     done
   fi
 
@@ -344,7 +344,7 @@ scan_ecosystems() {
   _swift_dirs=$(find_dirs_for_patterns "Package.swift" "**/Package.swift")
   if [ -n "${_swift_dirs:-}" ]; then
     echo "${_swift_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "swift" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "swift" "${_d:-}"; fi
     done
   fi
 
@@ -356,7 +356,7 @@ scan_ecosystems() {
       [ "${_d:-}" = "." ] && echo "/" || echo "/$_d"
     done | sort -u)
     echo "${_tf_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "terraform" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "terraform" "${_d:-}"; fi
     done
   fi
 
@@ -364,7 +364,7 @@ scan_ecosystems() {
   _dc_dirs=$(find_dirs_for_patterns "devcontainer.json" ".devcontainer.json" "**/devcontainer.json" "**/.devcontainer.json")
   if [ -n "${_dc_dirs:-}" ]; then
     echo "${_dc_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "devcontainers" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "devcontainers" "${_d:-}"; fi
     done
   fi
 
@@ -372,7 +372,7 @@ scan_ecosystems() {
   _bazel_dirs=$(find_dirs_for_patterns "MODULE.bazel" "WORKSPACE" "**/MODULE.bazel" "**/WORKSPACE")
   if [ -n "${_bazel_dirs:-}" ]; then
     echo "${_bazel_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "bazel" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "bazel" "${_d:-}"; fi
     done
   fi
 
@@ -380,7 +380,7 @@ scan_ecosystems() {
   _bun_dirs=$(find_dirs_for_patterns "bun.lockb" "bunfig.toml" "**/bun.lockb" "**/bunfig.toml")
   if [ -n "${_bun_dirs:-}" ]; then
     echo "${_bun_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "bun" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "bun" "${_d:-}"; fi
     done
   fi
 
@@ -388,7 +388,7 @@ scan_ecosystems() {
   _conda_dirs=$(find_dirs_for_patterns "environment.yml" "environment.yaml" "**/environment.yml" "**/environment.yaml")
   if [ -n "${_conda_dirs:-}" ]; then
     echo "${_conda_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "conda" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "conda" "${_d:-}"; fi
     done
   fi
 
@@ -396,7 +396,7 @@ scan_ecosystems() {
   _helm_dirs=$(find_dirs_for_patterns "Chart.yaml" "**/Chart.yaml")
   if [ -n "${_helm_dirs:-}" ]; then
     echo "${_helm_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "helm" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "helm" "${_d:-}"; fi
     done
   fi
 
@@ -404,7 +404,7 @@ scan_ecosystems() {
   _julia_dirs=$(find_dirs_for_patterns "Project.toml" "**/Project.toml")
   if [ -n "${_julia_dirs:-}" ]; then
     echo "${_julia_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "julia" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "julia" "${_d:-}"; fi
     done
   fi
 
@@ -417,12 +417,11 @@ scan_ecosystems() {
   if has_tracked_file "rust-toolchain.toml" "rust-toolchain"; then
     _emit_unique "rust-toolchain" "/"
   fi
-
   # ── 26. UV (Python) ─────────────────────────────────────────────────────
   _uv_dirs=$(find_dirs_for_patterns "uv.lock" "**/uv.lock")
   if [ -n "${_uv_dirs:-}" ]; then
     echo "${_uv_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "uv" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "uv" "${_d:-}"; fi
     done
   fi
 
@@ -430,7 +429,7 @@ scan_ecosystems() {
   _vcpkg_dirs=$(find_dirs_for_patterns "vcpkg.json" "**/vcpkg.json")
   if [ -n "${_vcpkg_dirs:-}" ]; then
     echo "${_vcpkg_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "vcpkg" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "vcpkg" "${_d:-}"; fi
     done
   fi
 
@@ -438,7 +437,7 @@ scan_ecosystems() {
   _dotnetsdk_dirs=$(find_dirs_for_patterns "global.json" "**/global.json")
   if [ -n "${_dotnetsdk_dirs:-}" ]; then
     echo "${_dotnetsdk_dirs:-}" | while IFS= read -r _d; do
-      [ -n "${_d:-}" ] && _emit_unique "dotnet-sdk" "${_d:-}"
+      if [ -n "${_d:-}" ]; then _emit_unique "dotnet-sdk" "${_d:-}"; fi
     done
   fi
 }

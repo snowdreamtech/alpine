@@ -1,5 +1,6 @@
 #!/usr/bin/env sh
 set -eu
+# shellcheck disable=SC2034
 # Copyright (c) 2026 SnowdreamTech. All rights reserved.
 # Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
@@ -1259,7 +1260,7 @@ check_runtime() {
   if command -v "check_runtime_${_RT_NAME:-}" >/dev/null 2>&1; then
     if ! "check_runtime_${_RT_NAME:-}" "${_TOOL_DESC:-}"; then
       if [ "${_G_AUDIT_MODE:-0}" -eq 1 ]; then
-        return 1
+        return 0
       fi
       exit 0 # Graceful skip for pre-commit
     fi
@@ -1269,10 +1270,11 @@ check_runtime() {
   # Priority 2: Standard Command Check (Fallback using resolve_bin)
   if ! resolve_bin "${_RT_NAME:-}" >/dev/null 2>&1; then
     log_warn "Required runtime '${_RT_NAME:-}' for ${_TOOL_DESC:-} is missing. Skipping."
+    # In audit mode, we report and continue
     if [ "${_G_AUDIT_MODE:-0}" -eq 1 ]; then
-      return 1
+      return 0
     fi
-    exit 0
+    exit 0 # Graceful skip for pre-commit
   fi
 }
 

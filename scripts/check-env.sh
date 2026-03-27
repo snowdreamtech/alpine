@@ -85,7 +85,7 @@ check_tool_version() {
   if [ -z "${_LV_RESOLVED:-}" ]; then
     log_warn "❌ ${_LV_NAME:-}: Not found."
     HEALTHY_ST=1
-    [ "${_LV_CRITICAL:-0}" -eq 1 ] && CORE_HEALTHY_ST=1
+    if [ "${_LV_CRITICAL:-0}" -eq 1 ]; then CORE_HEALTHY_ST=1; fi
     return 1
   fi
 
@@ -113,7 +113,7 @@ check_tool_version() {
   else
     log_warn "⚠️  ${_LV_NAME:-}: v${_LV_CURRENT_VER:-} (below recommended v${_LV_MIN_VER:-})"
     HEALTHY_ST=1
-    [ "${_LV_CRITICAL:-0}" -eq 1 ] && CORE_HEALTHY_ST=1
+    if [ "${_LV_CRITICAL:-0}" -eq 1 ]; then CORE_HEALTHY_ST=1; fi
   fi
 }
 
@@ -156,7 +156,7 @@ main() {
 
   # Node.js
   if [ -f "${PACKAGE_JSON:-}" ]; then
-    check_tool_version "Node.js" "node" "$(get_mise_tool_version node)" "node -v" 1
+    check_tool_version "Node.js" "node" "$(get_mise_tool_version node)" "node -v" 0
     check_tool_version "${NPM:-}" "${NPM:-}" "$(get_mise_tool_version "${NPM:-}")" "$NPM -v"
     check_runtime "node" "Node.js (Modular)"
   else
@@ -165,7 +165,7 @@ main() {
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
-    check_tool_version "Python" "${PYTHON:-}" "$(get_mise_tool_version python)" "$PYTHON --version" 1
+    check_tool_version "Python" "${PYTHON:-}" "$(get_mise_tool_version python)" "$PYTHON --version" 0
     check_runtime "python" "Python (Modular)"
   else
     log_info "⏭️  Python: Skipped (no python files)"

@@ -154,13 +154,13 @@ _mise_install_tier4() {
 
   local _M_BIN_NAME="mise-v${_VER:-}-${_OS:-}-${_ARCH:-}"
   local _EXT=""
-  [ "${_OS:-}" = "windows" ] && _EXT=".zip"
+  if [ "${_OS:-}" = "windows" ]; then _EXT=".zip"; fi
   local _M_URL="https://github.com/jdx/mise/releases/download/v${_VER:-}/${_M_BIN_NAME:-}${_EXT:-}"
   if [ "${ENABLE_GITHUB_PROXY:-}" = "1" ] || [ "${ENABLE_GITHUB_PROXY:-}" = "true" ]; then
     _M_URL="${GITHUB_PROXY:-}${_M_URL:-}"
   fi
   local _DEST="$HOME/.local/bin/mise"
-  [ "${_OS:-}" = "windows" ] && _DEST="${_DEST:-}.exe"
+  if [ "${_OS:-}" = "windows" ]; then _DEST="${_DEST:-}.exe"; fi
 
   mkdir -p "$(dirname "${_DEST:-}")"
 
@@ -193,7 +193,7 @@ _mise_install_tier4() {
           mv "${_FOUND_BIN:-}" "${_DEST:-}"
           local _FOUND_SHIM
           _FOUND_SHIM=$(find "${_TMP_DIR:-}" -maxdepth 3 -name "mise-shim.exe" | head -n 1)
-          [ -n "${_FOUND_SHIM:-}" ] && mv "${_FOUND_SHIM:-}" "$(dirname "${_DEST:-}")/mise-shim.exe"
+          if [ -n "${_FOUND_SHIM:-}" ]; then mv "${_FOUND_SHIM:-}" "$(dirname "${_DEST:-}")/mise-shim.exe"; fi
           rm -rf "${_TMP_DIR:-}"
           return 0
         fi
@@ -395,9 +395,9 @@ bootstrap_mise() {
   fi
 
   # Path Refresh: Ensure MISE is available for immediate setup
-  [ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
-  [ -d "${_G_MISE_BIN_BASE:-}" ] && export PATH="${_G_MISE_BIN_BASE:-}:$PATH"
-  [ -d "${_G_MISE_SHIMS_BASE:-}" ] && export PATH="${_G_MISE_SHIMS_BASE:-}:$PATH"
+  if [ -d "$HOME/.local/bin" ]; then export PATH="$HOME/.local/bin:$PATH"; fi
+  if [ -d "${_G_MISE_BIN_BASE:-}" ]; then export PATH="${_G_MISE_BIN_BASE:-}:$PATH"; fi
+  if [ -d "${_G_MISE_SHIMS_BASE:-}" ]; then export PATH="${_G_MISE_SHIMS_BASE:-}:$PATH"; fi
 
   # ── 🏗️ Post-Install Configuration ──
 

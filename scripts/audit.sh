@@ -23,8 +23,8 @@ set -eu
 #   - Gitleaks integration for secrets detection.
 #   - Binary artifact discovery to prevent poisoning.
 
-# Note: We do NOT set -e here because we want to run all audit modules even if some fail.
-# We will track overall exit status manually.
+# Note: We use set -eu but ensure that each audit module handles its own failure
+# status via '|| true' or 'if' blocks to allow the full audit to complete.
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
@@ -220,11 +220,10 @@ main() {
       log_summary "Security" "osv-scanner" "⚖️ Previewed" "-" "0"
     else
       # Capture output to detect "No package sources found" which should be a skip/pass, not an error.
-      local _OSV_OUT
-      _OSV_OUT=$("${_OSV_BIN:-}" -r . 2>&1)
-      local _OSV_EXIT=$?
+      _OSV_OUT=$("${_OSV_BIN:-}" -r . 2>&1) || _OSV_EXIT=$?
+      [ -n "${_OSV_EXIT:-}" ] || _OSV_EXIT=0
 
-      if [ ${_OSV_EXIT:-} -eq 0 ]; then
+      if [ "${_OSV_EXIT:-}" -eq 0 ]; then
         log_summary "Security" "osv-scanner" "✅ Secure" "$(get_version "${_OSV_BIN:-}")" "$(($(date +%s) - _T0_OSV_AUD))"
       elif echo "${_OSV_OUT:-}" | grep -q "No package sources found"; then
         log_info "osv-scanner: No package sources found. Skipping."

@@ -1,9 +1,10 @@
 #!/usr/bin/env sh
 set -eu
+# shellcheck disable=SC2034
 # Copyright (c) 2026 SnowdreamTech. All rights reserved.
 # Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
-# scripts/lib/versions.sh - Tier 2 Tool Version Registry
+# Tool Registry - Centralized version management for dynamic registration
 #
 # Purpose:
 #   Single Source of Truth for all on-demand (Tier 2) tool versions.

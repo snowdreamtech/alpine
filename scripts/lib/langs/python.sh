@@ -18,7 +18,7 @@ install_runtime_python() {
 
   # 2. Virtualenv management
   if [ ! -d "${VENV:-}" ]; then
-    run_quiet "${PYTHON:-}" -m venv "${VENV:-}"
+    run_quiet "${PYTHON:-python3}" -m venv "${VENV:-}"
   fi
 
   # 3. Dependency resolution
@@ -143,7 +143,7 @@ setup_python() {
 #   check_runtime_python "Linter"
 check_runtime_python() {
   local _TOOL_DESC_PY="${1:-Python}"
-  if ! command -v "${PYTHON:-}" >/dev/null 2>&1; then
+  if ! command -v "${PYTHON:-python3}" >/dev/null 2>&1; then
     log_warn "Required runtime 'python' for ${_TOOL_DESC_PY:-} is missing. Skipping."
     return 1
   fi

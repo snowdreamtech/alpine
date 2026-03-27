@@ -18,7 +18,9 @@ install_shfmt() {
   fi
 
   # Fast-path: Check version-aware existence (prefix match to handle pkg vs binary diffs)
+  local _CUR_VER
   _CUR_VER=$(get_version shfmt "" "shfmt-py")
+  local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
   if [ "${_CUR_VER:-}" != "-" ] && [ -n "${_REQ_VER:-}" ]; then
@@ -53,7 +55,9 @@ install_shellcheck() {
   fi
 
   # Fast-path: Check version-aware existence
+  local _CUR_VER
   _CUR_VER=$(get_version shellcheck "" "shellcheck-py")
+  local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
   if [ "${_CUR_VER:-}" != "-" ]; then
@@ -91,7 +95,9 @@ install_actionlint() {
   fi
 
   # Fast-path: Check version-aware existence
+  local _CUR_VER
   _CUR_VER=$(get_version actionlint "" "actionlint-py")
+  local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
   if [ "${_CUR_VER:-}" != "-" ] && [ -n "${_REQ_VER:-}" ]; then
