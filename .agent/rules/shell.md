@@ -28,7 +28,7 @@ To ensure consistency in logging, colors, and argument parsing, ALL functional s
 
 ```sh
 #!/usr/bin/env sh
-set -e
+set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
@@ -57,6 +57,9 @@ By sourcing this library, your script automatically gains:
 set -euo pipefail
 IFS=$'\n\t'
 ```
+
+> [!NOTE]
+> **`pipefail` and POSIX**: `set -o pipefail` is NOT supported by strictly POSIX-compliant shells (like `dash`). It SHOULD only be used in Bash scripts (`#!/usr/bin/env bash`). For POSIX scripts, rely on `set -eu` and avoid complex pipes that require intermediate status tracking.
 
 ### Shebang Selection
 
@@ -157,10 +160,9 @@ IFS=$'\n\t'
 - Declare constants with **`readonly`**: `readonly MAX_RETRIES=3 TIMEOUT=30`
 - Use **`UPPER_SNAKE_CASE`** for exported/environment variables and `lower_snake_case` for local function variables.
 
-### POSIX Null-Parameter Hardening
-
-- Under strict mode (`set -e`), integer comparisons (`-eq`, `-ne`, etc.) against empty variables cause fatal syntax errors.
-- **Always use parameter expansion** with a default fallback (usually `:-0`) for numeric evaluations to prevent container crashes from null inputs:
+- Under strict mode (`set -eu`), accessing an unset variable results in a fatal error.
+- **Always use parameter expansion** (`"${VAR:-}"`) for variables that might be optionally set or environment-provided.
+- **Numeric Comparisons**: Use a default fallback (usually `:-0`) for numeric evaluations to prevent crashes:
 
   ```sh
   # ✅ Safe: defaults to 0 if PUID is null or unset
