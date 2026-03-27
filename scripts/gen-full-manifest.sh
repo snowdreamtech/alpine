@@ -11,8 +11,11 @@
 
 set -eu
 
-# 1. Load Tier 2 registry
-. "scripts/lib/versions.sh"
+# 1. Boilerplate & Context Detection
+SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
+
+# 2. Load Tier 2 registry
+. "${SCRIPT_DIR:-}/lib/versions.sh"
 
 echo "# ------------------------------------------------------------"
 echo "# AUTO-GENERATED FULL MANIFEST — DO NOT EDIT"
@@ -29,7 +32,7 @@ perl -ne '
   if ($in_tools && /^\s*([^#\s][^=\s]*)\s*=\s*(.*)/) {
     print "$1 = $2\n";
   }
-' .mise.toml
+' "${SCRIPT_DIR:-}/../.mise.toml"
 
 # 3. Add Tier 2 tools from versions.sh
 # We parse versions.sh for VER_*_PROVIDER variables.
@@ -37,7 +40,7 @@ perl -ne '
 # Otherwise, we use the name derived from VER_*.
 
 # Get all VER_* variables from versions.sh
-grep -E "^VER_[A-Z0-9_]+=" scripts/lib/versions.sh | while IFS= read -r line; do
+grep -E "^VER_[A-Z0-9_]+=" "${SCRIPT_DIR:-}/lib/versions.sh" | while IFS= read -r line; do
   var_name=$(echo "${line:-}" | cut -d= -f1)
   var_val=$(echo "${line:-}" | cut -d= -f2- | tr -d '"')
 
@@ -53,7 +56,7 @@ grep -E "^VER_[A-Z0-9_]+=" scripts/lib/versions.sh | while IFS= read -r line; do
 
   if [ -n "${provider_val:-}" ]; then
     # Use the explicit provider (e.g., github:aquasecurity/trivy)
-    echo "\"$provider_val\" = \"$var_val\""
+    echo "\"${provider_val:-}\" = \"${var_val:-}\""
   else
     # Fallback to simple name (e.g., go, rust) if it's a core tool not in .mise.toml
     # Usually these are already in Tier 1, so we avoid duplicates if they exist there.
@@ -62,8 +65,8 @@ grep -E "^VER_[A-Z0-9_]+=" scripts/lib/versions.sh | while IFS= read -r line; do
     case "${tool_name:-}" in
     go | node | python | ruby | java | rust | kotlin | dotnet | bun | deno | zig)
       # Only add if NOT already in .mise.toml Tier 1
-      if ! grep -q "^\s*$tool_name\s*=" .mise.toml; then
-        echo "$tool_name = \"$var_val\""
+      if ! grep -q "^\s*${tool_name:-}\s*=" "${SCRIPT_DIR:-}/../.mise.toml"; then
+        echo "${tool_name:-} = \"${var_val:-}\""
       fi
       ;;
     *)
