@@ -22,7 +22,7 @@
 #   - Multi-language support (Node, Python, Go, Rust, Java, etc.).
 #   - JIT security toolchain (OSV-Scanner, Zizmor).
 
-set -e
+set -eu
 
 # ── 🎒 Library Sourcing ──────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)

@@ -21,7 +21,7 @@
 #   - Pre-commit verification before guided entry.
 #   - Node.js dependency detection and routing.
 
-set -e
+set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)

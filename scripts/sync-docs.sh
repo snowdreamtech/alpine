@@ -15,7 +15,7 @@
 #   - POSIX-compliant sh logic.
 #   - Rule 01 (General), Rule 03 (Architecture).
 
-set -e
+set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)

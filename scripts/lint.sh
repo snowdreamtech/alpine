@@ -21,7 +21,7 @@
 #   - Orchestrated linting for all supported language stacks.
 #   - CI-optimized execution with strict error checking.
 
-set -e
+set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)

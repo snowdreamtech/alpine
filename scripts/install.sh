@@ -21,7 +21,7 @@
 #   - Multi-stack dependency resolution and installation.
 #   - Virtualenv aware for Python environments.
 
-set -e
+set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)

@@ -20,7 +20,7 @@
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Unified reporting for multi-stack toolchain maintenance.
 
-set -e
+set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)

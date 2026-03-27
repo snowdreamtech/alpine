@@ -21,7 +21,7 @@
 #   - Atomic Operations & Safety Traps (atomic_swap).
 #   - Deduplication and History Sorting logic.
 
-set -e
+set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)

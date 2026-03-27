@@ -21,7 +21,7 @@
 #   - Automated discovery of language-specific benchmarking tools.
 #   - Modular execution for multiple language stacks.
 
-set -e
+set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)

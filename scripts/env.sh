@@ -21,7 +21,7 @@
 #   - Safe template extraction and missing variable detection.
 #   - Conditional overwrite protection for local secrets.
 
-set -e
+set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)

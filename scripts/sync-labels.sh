@@ -8,7 +8,7 @@
 # Design: Ensures consistent colors and descriptions for engineering labels.
 # Usage: GH_TOKEN=xxx sh scripts/sync-labels.sh
 
-set -e
+set -eu
 
 # Define SnowdreamTech Brand Colors & Labels
 # Format: "name:color:description"

@@ -21,7 +21,7 @@
 #   - Automated VitePress installation checks.
 #   - Environment-aware routing for local and CI docs.
 
-set -e
+set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)

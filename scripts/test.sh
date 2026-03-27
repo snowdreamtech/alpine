@@ -21,7 +21,7 @@
 #   - Automated test-discovery for all project components.
 #   - Cross-platform support (Shell, Python, Node.js, PowerShell).
 
-set -e
+set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)

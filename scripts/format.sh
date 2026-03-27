@@ -21,7 +21,7 @@
 #   - Multi-stack auto-formatting (Shell, JS/TS, Python, Go, Rust, etc.).
 #   - Safe dry-run support to preview changes without applying.
 
-set -e
+set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)

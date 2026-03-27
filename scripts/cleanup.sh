@@ -21,7 +21,7 @@
 #   - Cross-stack cleanup (node, python, go, rust, iac).
 #   - Safe dry-run support for destructive operations.
 
-set -e
+set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)

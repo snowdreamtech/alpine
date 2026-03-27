@@ -22,7 +22,7 @@
 #
 # shellcheck disable=SC2034
 
-set -e
+set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)

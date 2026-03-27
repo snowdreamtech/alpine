@@ -21,7 +21,7 @@
 #   - Multi-language artifact generation.
 #   - Environment-aware build routing.
 
-set -e
+set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)

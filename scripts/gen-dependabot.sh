@@ -18,7 +18,7 @@
 #   - POSIX-compliant sh logic (no bash-isms).
 #   - Idempotent: same input always produces same output.
 
-set -e
+set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)

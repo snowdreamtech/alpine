@@ -21,7 +21,7 @@
 #   - Safe placeholder replacement across the entire codebase.
 #   - Integrated Git re-initialization and remote cleanup.
 
-set -e
+set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)

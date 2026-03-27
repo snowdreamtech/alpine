@@ -22,7 +22,7 @@
 #   - Works with release-please for automated versioning.
 #   - Guarded git operations with dry-run support.
 
-set -e
+set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
