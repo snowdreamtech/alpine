@@ -121,32 +121,32 @@ if [ -z "${_G_PROJECT_ROOT:-}" ]; then
   # Unified Context Detection: Prioritize physical location of the CALLING script ($0).
   # This avoids dependency on caller-defined variables like SCRIPT_DIR.
   _G_CALLER_DIR=$(cd "$(dirname "${0:-}")" && pwd)
-  if [ -f "$_G_CALLER_DIR/lib/common.sh" ]; then
+  if [ -f "${_G_CALLER_DIR:-}/lib/common.sh" ]; then
     # Caller is in 'scripts/' folder (Standard Orchestration pattern).
-    _G_LIB_DIR="$_G_CALLER_DIR/lib"
-    _G_PROJECT_ROOT=$(cd "$_G_CALLER_DIR/.." && pwd)
-  elif [ -f "$_G_CALLER_DIR/scripts/lib/common.sh" ]; then
+    _G_LIB_DIR="${_G_CALLER_DIR:-}/lib"
+    _G_PROJECT_ROOT=$(cd "${_G_CALLER_DIR:-}/.." && pwd)
+  elif [ -f "${_G_CALLER_DIR:-}/scripts/lib/common.sh" ]; then
     # Caller is in project root (Mock tests or direct root execution).
-    _G_LIB_DIR="$_G_CALLER_DIR/scripts/lib"
+    _G_LIB_DIR="${_G_CALLER_DIR:-}/scripts/lib"
     _G_PROJECT_ROOT="${_G_CALLER_DIR:-}"
-  elif [ -f "$_G_CALLER_DIR/common.sh" ]; then
+  elif [ -f "${_G_CALLER_DIR:-}/common.sh" ]; then
     # Caller is inside 'scripts/lib/' folder itself.
     _G_LIB_DIR="${_G_CALLER_DIR:-}"
-    _G_PROJECT_ROOT=$(cd "$_G_CALLER_DIR/../.." && pwd)
+    _G_PROJECT_ROOT=$(cd "${_G_CALLER_DIR:-}/../.." && pwd)
   fi
 
   # Fallback: Multi-Marker Sentinel (If $0 doesn't lead to library or for direct sourcing)
   if [ -z "${_G_PROJECT_ROOT:-}" ]; then
     if [ -n "${SCRIPT_DIR:-}" ]; then
-      if [ -f "$SCRIPT_DIR/lib/common.sh" ]; then
-        _G_LIB_DIR="$SCRIPT_DIR/lib"
-        _G_PROJECT_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
-      elif [ -f "$SCRIPT_DIR/scripts/lib/common.sh" ]; then
-        _G_LIB_DIR="$SCRIPT_DIR/scripts/lib"
+      if [ -f "${SCRIPT_DIR:-}/lib/common.sh" ]; then
+        _G_LIB_DIR="${SCRIPT_DIR:-}/lib"
+        _G_PROJECT_ROOT=$(cd "${SCRIPT_DIR:-}/.." && pwd)
+      elif [ -f "${SCRIPT_DIR:-}/scripts/lib/common.sh" ]; then
+        _G_LIB_DIR="${SCRIPT_DIR:-}/scripts/lib"
         _G_PROJECT_ROOT="${SCRIPT_DIR:-}"
-      elif [ -f "$SCRIPT_DIR/common.sh" ]; then
+      elif [ -f "${SCRIPT_DIR:-}/common.sh" ]; then
         _G_LIB_DIR="${SCRIPT_DIR:-}"
-        _G_PROJECT_ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
+        _G_PROJECT_ROOT=$(cd "${SCRIPT_DIR:-}/../.." && pwd)
       fi
     fi
   fi
@@ -175,10 +175,10 @@ elif [ -n "${GITEA_ACTIONS:-}" ] || [ -n "${FORGEJO_ACTIONS:-}" ]; then
   CI_STEP_SUMMARY="${GITHUB_STEP_SUMMARY:-${_G_PROJECT_ROOT:-}/.ci_summary.log}"
 elif [ -n "${GITLAB_CI:-}" ]; then
   # GitLab: Use a standard log file that can be rendered as an artifact
-  CI_STEP_SUMMARY="${_G_PROJECT_ROOT}/ci_summary.md"
+  CI_STEP_SUMMARY="${_G_PROJECT_ROOT:-}/ci_summary.md"
 else
   # Local Development / Other environments: Default to a local log file
-  CI_STEP_SUMMARY="${_G_PROJECT_ROOT}/.ci_summary.log"
+  CI_STEP_SUMMARY="${_G_PROJECT_ROOT:-}/.ci_summary.log"
 fi
 export CI_STEP_SUMMARY
 
@@ -213,7 +213,7 @@ PYTHON="${PYTHON:-python3}"
 
 # Automatically add local bin directories to PATH to ensure orchestrated tools
 # are prioritized over system globals without requiring manual activation.
-_LOCAL_BIN_VENV=$(pwd)/${VENV}/${_G_VENV_BIN}
+_LOCAL_BIN_VENV=$(pwd)/${VENV:-}/${_G_VENV_BIN:-}
 _LOCAL_BIN_NODE=$(pwd)/node_modules/.bin
 _LOCAL_MISE_BIN="${_G_MISE_BIN_BASE:-}"
 _LOCAL_MISE_SHIMS="${_G_MISE_SHIMS_BASE:-}"
@@ -324,7 +324,7 @@ fi
 # ── 🪄 Mise Bootstrap ────────────────────────────────────────────────────────
 # Logic extracted to ./lib/bootstrap.sh
 # shellcheck source=/dev/null
-. "${_G_LIB_DIR}/bootstrap.sh"
+. "${_G_LIB_DIR:-}/bootstrap.sh"
 
 # Purpose: Runs a command with a timeout, handling gtimeout (macOS) and timeout (Linux).
 # Params:
@@ -377,7 +377,7 @@ optimize_network() {
     fi
 
     if [ "${_SKIP_VERIFY:-}" = "true" ]; then
-      log_debug "GITHUB_TOKEN recently validated (cache age: ${_CACHE_AGE}s). Skipping API check."
+      log_debug "GITHUB_TOKEN recently validated (cache age: ${_CACHE_AGE:-}s). Skipping API check."
     else
       local _HTTP_CODE
       _HTTP_CODE=$(curl -o /dev/null -s -w "%{http_code}" -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/rate_limit --connect-timeout 2 2>/dev/null || echo "000")
@@ -396,7 +396,7 @@ optimize_network() {
 
   # Apply Git optimization and GitHub Proxy if ENABLE_GITHUB_PROXY is active.
   # Registry mirrors (npm, pip, etc.) are now always active via .mise.toml [env].
-  if [ "${ENABLE_GITHUB_PROXY}" = "1" ] || [ "${ENABLE_GITHUB_PROXY}" = "true" ]; then
+  if [ "${ENABLE_GITHUB_PROXY:-}" = "1" ] || [ "${ENABLE_GITHUB_PROXY:-}" = "true" ]; then
     log_info "Bypassing broken global git proxies and applying network optimization..."
 
     mkdir -p "$(dirname "${_TEMP_GIT_CONFIG:-}")"
@@ -437,14 +437,14 @@ get_mise_tool_version() {
 
   if [ -f "${_MISE_TOM_PATH:-}" ]; then
     # 1. Try exact match (including quotes and provider prefix if provider string given)
-    _VER=$(grep -E "^\"?${_TOOL_NAME_MISE}\"?[[:space:]]*=" "${_MISE_TOM_PATH:-}" 2>/dev/null |
+    _VER=$(grep -E "^\"?${_TOOL_NAME_MISE:-}\"?[[:space:]]*=" "${_MISE_TOM_PATH:-}" 2>/dev/null |
       sed -E 's/^[^=]*=[[:space:]]*"([^"]*)".*/\1/' | head -n 1 || true)
 
     # 2. Try matching the "basename" of the tool (e.g. github:foo/bar -> bar)
     if [ -z "${_VER:-}" ]; then
       local _SHORT_NAME
       _SHORT_NAME=$(echo "${_TOOL_NAME_MISE:-}" | sed -E 's/^[^:]+://; s/.*\///')
-      _VER=$(grep -E "^\"?([^:]+:)?${_SHORT_NAME}\"?[[:space:]]*=" "${_MISE_TOM_PATH:-}" 2>/dev/null |
+      _VER=$(grep -E "^\"?([^:]+:)?${_SHORT_NAME:-}\"?[[:space:]]*=" "${_MISE_TOM_PATH:-}" 2>/dev/null |
         sed -E 's/^[^=]*=[[:space:]]*"([^"]*)".*/\1/' | head -n 1 || true)
     fi
   fi
@@ -461,7 +461,7 @@ get_mise_tool_version() {
     # Safety: Only eval if key is a valid shell variable name (A-Z, 0-9, _)
     case "${_VAR_KEY:-}" in
     *[!A-Z0-9_]*) ;;
-    *) eval "_VER=\${VER_${_VAR_KEY}:-}" ;;
+    *) eval "_VER=\${VER_${_VAR_KEY:-}:-}" ;;
     esac
   fi
 
@@ -511,7 +511,7 @@ run_mise() {
 
   local _M_BIN
   _M_BIN=$(command -v mise || echo "$HOME/.local/bin/mise")
-  [ "${_G_OS:-}" = "windows" ] && [ ! -x "${_M_BIN:-}" ] && _M_BIN="${_M_BIN}.exe"
+  [ "${_G_OS:-}" = "windows" ] && [ ! -x "${_M_BIN:-}" ] && _M_BIN="${_M_BIN:-}.exe"
 
   # Performance Opt: Skip installation if version already matches SSoT
   if [ "${_CMD:-}" = "install" ] && [ -n "${1:-}" ]; then
@@ -581,7 +581,7 @@ run_mise() {
     if [ $_RETRY_COUNT -lt $_MAX_RETRIES ]; then
       # Exponential backoff: 1s, 2s, 4s... to recover from transient rate limits.
       local _BACKOFF=$((1 << (_RETRY_COUNT - 1)))
-      log_warn "mise $_CMD failed (attempt $_RETRY_COUNT/$_MAX_RETRIES). Retrying in ${_BACKOFF}s..."
+      log_warn "mise $_CMD failed (attempt $_RETRY_COUNT/$_MAX_RETRIES). Retrying in ${_BACKOFF:-}s..."
       sleep "${_BACKOFF:-}"
     fi
   done
@@ -1069,7 +1069,7 @@ log_summary() {
     ;;
   esac
 
-  printf "| %-12s | %-15s | %-20s | %-15s | %-6s |\n" "${_CAT_SUM:-}" "${_MOD_SUM:-}" "${_STAT_SUM:-}" "${_VER_SUM:-}" "${_DUR_SUM}s" >>"${_FILE_SUM:-}"
+  printf "| %-12s | %-15s | %-20s | %-15s | %-6s |\n" "${_CAT_SUM:-}" "${_MOD_SUM:-}" "${_STAT_SUM:-}" "${_VER_SUM:-}" "${_DUR_SUM:-}s" >>"${_FILE_SUM:-}"
 }
 
 # Purpose: Safely extracts version strings from various command outputs.
@@ -1175,13 +1175,13 @@ resolve_bin() {
   local _VP="${VENV:-.venv}/$_G_VENV_BIN/$_BIN"
   if [ -x "${_VP:-}" ]; then echo "${_VP:-}" && return 0; fi
   # Windows: venv scripts use .exe suffix
-  if [ "${_G_OS:-}" = "windows" ] && [ -x "${_VP}.exe" ]; then echo "${_VP}.exe" && return 0; fi
+  if [ "${_G_OS:-}" = "windows" ] && [ -x "${_VP:-}.exe" ]; then echo "${_VP:-}.exe" && return 0; fi
 
   # ── 2. Node Modules ──
   local _NP="node_modules/.bin/$_BIN"
   if [ -x "${_NP:-}" ]; then echo "${_NP:-}" && return 0; fi
   # Windows: npm generates .cmd wrappers
-  if [ "${_G_OS:-}" = "windows" ] && [ -f "${_NP}.cmd" ]; then echo "${_NP}.cmd" && return 0; fi
+  if [ "${_G_OS:-}" = "windows" ] && [ -f "${_NP:-}.cmd" ]; then echo "${_NP:-}.cmd" && return 0; fi
 
   # ── 3. System PATH ──
   local _SP
@@ -1189,7 +1189,7 @@ resolve_bin() {
 
   # Windows: command -v might miss extensions or return sh wrappers
   if [ -z "${_SP:-}" ] && [ "${_G_OS:-}" = "windows" ]; then
-    _SP=$(command -v "${_BIN}.exe" 2>/dev/null) || _SP=$(command -v "${_BIN}.cmd" 2>/dev/null) || true
+    _SP=$(command -v "${_BIN:-}.exe" 2>/dev/null) || _SP=$(command -v "${_BIN:-}.cmd" 2>/dev/null) || true
   fi
 
   if [ -n "${_SP:-}" ]; then
@@ -1255,8 +1255,8 @@ check_runtime() {
 
   # Priority 1: Modular Check Delegation
   # If check_runtime_<name> exists in the environment, delegate to it.
-  if command -v "check_runtime_${_RT_NAME}" >/dev/null 2>&1; then
-    if ! "check_runtime_${_RT_NAME}" "${_TOOL_DESC:-}"; then
+  if command -v "check_runtime_${_RT_NAME:-}" >/dev/null 2>&1; then
+    if ! "check_runtime_${_RT_NAME:-}" "${_TOOL_DESC:-}"; then
       if [ "${_G_AUDIT_MODE:-0}" -eq 1 ]; then
         return 1
       fi

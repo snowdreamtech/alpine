@@ -10,7 +10,7 @@ install_osv_scanner() {
   local _T0_OSV
   _T0_OSV=$(date +%s)
   local _TITLE="OSV-Scanner"
-  local _PROVIDER="${VER_OSV_SCANNER_PROVIDER}"
+  local _PROVIDER="${VER_OSV_SCANNER_PROVIDER:-}"
 
   # CI-only guard: skip on local dev to avoid go install build time.
   if ! is_ci_env; then
@@ -21,7 +21,7 @@ install_osv_scanner() {
   # Fast-path: Check version-aware existence
   local _CUR_VER
   _CUR_VER=$(get_version osv-scanner)
-  local _REQ_VER="${VER_OSV_SCANNER}"
+  local _REQ_VER="${VER_OSV_SCANNER:-}"
 
   if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
     log_summary "Security" "OSV-Scanner" "✅ Exists" "${_CUR_VER:-}" "0"
@@ -55,7 +55,7 @@ install_zizmor() {
   local _T0_ZIZ
   _T0_ZIZ=$(date +%s)
   local _TITLE="Zizmor"
-  local _PROVIDER="${VER_ZIZMOR_PROVIDER}"
+  local _PROVIDER="${VER_ZIZMOR_PROVIDER:-}"
 
   if ! has_lang_files ".github/workflows" "*.yaml *.yml"; then
     return 0
@@ -64,7 +64,7 @@ install_zizmor() {
   # Fast-path: Check version-aware existence
   local _CUR_VER
   _CUR_VER=$(get_version zizmor)
-  local _REQ_VER="${VER_ZIZMOR}"
+  local _REQ_VER="${VER_ZIZMOR:-}"
 
   if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
     log_summary "Security" "Zizmor" "✅ Exists" "${_CUR_VER:-}" "0"
@@ -89,7 +89,7 @@ install_cargo_audit() {
   local _T0_CA
   _T0_CA=$(date +%s)
   local _TITLE="Cargo-Audit"
-  local _PROVIDER="${VER_CARGO_AUDIT_PROVIDER}"
+  local _PROVIDER="${VER_CARGO_AUDIT_PROVIDER:-}"
 
   if ! has_lang_files "Cargo.toml Cargo.lock" ""; then
     return 0
@@ -104,7 +104,7 @@ install_cargo_audit() {
   # Fast-path: Check version-aware existence
   local _CUR_VER
   _CUR_VER=$(get_version cargo-audit)
-  local _REQ_VER="${VER_CARGO_AUDIT}"
+  local _REQ_VER="${VER_CARGO_AUDIT:-}"
 
   if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
     log_summary "Security" "Cargo-Audit" "✅ Exists" "${_CUR_VER:-}" "0"

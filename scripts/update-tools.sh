@@ -90,7 +90,7 @@ run_upgrade() {
       *_PROVIDER | *_REF | *_URL | *_SHA* | *_PROVIDER_REF_*) continue ;;
       esac
 
-      _PROV_VAR="${_VAR_NAME}_PROVIDER"
+      _PROV_VAR="${_VAR_NAME:-}_PROVIDER"
       _PROV_VAL=$(eval "echo \${$_PROV_VAR:-}")
 
       if [ -z "${_PROV_VAL:-}" ]; then
@@ -104,7 +104,7 @@ run_upgrade() {
       _LATEST_VER=$(_get_latest_version "${_PROV_VAL:-}")
       if [ -n "${_LATEST_VER:-}" ] && [ "${_CUR_VER:-}" != "${_LATEST_VER:-}" ]; then
         log_success "✨ Upgrade [$_VERSIONS_FILE]: $_VAR_NAME ($_PROV_VAL) $_CUR_VER -> $_LATEST_VER"
-        _SUMMARY_DATA="${_SUMMARY_DATA}| \`$_PROV_VAL\` | \`$_CUR_VER\` | \`$_LATEST_VER\` | \`versions.sh\` |\n"
+        _SUMMARY_DATA="${_SUMMARY_DATA:-}| \`$_PROV_VAL\` | \`$_CUR_VER\` | \`$_LATEST_VER\` | \`versions.sh\` |\n"
         if [ "${DRY_RUN:-0}" -eq 0 ]; then
           if [ "$(uname -s)" = "Darwin" ]; then
             sed -i '' "s/$_VAR_NAME=\"$_CUR_VER\"/$_VAR_NAME=\"$_LATEST_VER\"/" "${_VERSIONS_FILE:-}"
@@ -145,7 +145,7 @@ run_upgrade() {
         _LATEST_VER=$(_get_latest_version "${_PROV_VAL:-}")
         if [ -n "${_LATEST_VER:-}" ] && [ "${_CUR_VER:-}" != "${_LATEST_VER:-}" ]; then
           log_success "✨ Upgrade [$_MISE_FILE]: $_TOOL_IDENT $_CUR_VER -> $_LATEST_VER"
-          _SUMMARY_DATA="${_SUMMARY_DATA}| \`$_TOOL_IDENT\` | \`$_CUR_VER\` | \`$_LATEST_VER\` | \`.mise.toml\` |\n"
+          _SUMMARY_DATA="${_SUMMARY_DATA:-}| \`$_TOOL_IDENT\` | \`$_CUR_VER\` | \`$_LATEST_VER\` | \`.mise.toml\` |\n"
           if [ "${DRY_RUN:-0}" -eq 0 ]; then
             if [ "$(uname -s)" = "Darwin" ]; then
               sed -i '' "s#$_TOOL_IDENT = \"$_CUR_VER\"#$_TOOL_IDENT = \"$_LATEST_VER\"#" "${_MISE_FILE:-}"

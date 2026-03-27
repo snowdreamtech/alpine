@@ -97,12 +97,12 @@ _process_env_template() {
       continue
     fi
 
-    if ! grep -q "^${_KEY_PARSED}=" ".env" && ! grep -q "^${_KEY_PARSED} =" ".env"; then
+    if ! grep -q "^${_KEY_PARSED:-}=" ".env" && ! grep -q "^${_KEY_PARSED:-} =" ".env"; then
       if [ "${_MODE:-}" = "check" ]; then
         log_warn "Missing key: $_KEY_PARSED"
         _MISSING_COUNT=$((_MISSING_COUNT + 1))
       elif [ "${_MODE:-}" = "sync" ]; then
-        printf "Missing key found: %b%s%b. Add to .env? (y/N): " "${YELLOW}" "${_KEY_PARSED:-}" "${NC}"
+        printf "Missing key found: %b%s%b. Add to .env? (y/N): " "${YELLOW:-}" "${_KEY_PARSED:-}" "${NC:-}"
         local _CONFIRM_SYNC
         read -r _CONFIRM_SYNC
         case "${_CONFIRM_SYNC:-}" in
@@ -196,9 +196,9 @@ main() {
 
   # 4. Standardized Next Actions
   if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
-    printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    printf "  - Run %bmake setup%b to prepare your development environment.\n" "${GREEN}" "${NC}"
-    printf "  - Run %bmake install%b to synchronize project dependencies.\n" "${GREEN}" "${NC}"
+    printf "\n%bNext Actions:%b\n" "${YELLOW:-}" "${NC:-}"
+    printf "  - Run %bmake setup%b to prepare your development environment.\n" "${GREEN:-}" "${NC:-}"
+    printf "  - Run %bmake install%b to synchronize project dependencies.\n" "${GREEN:-}" "${NC:-}"
   fi
 }
 

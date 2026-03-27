@@ -10,7 +10,7 @@ install_runtime_go() {
     log_debug "DRY_RUN: Would install Go runtime."
     return 0
   fi
-  run_mise install "go@${VER_GO}"
+  run_mise install "go@${VER_GO:-}"
 }
 
 # Purpose: Installs golangci-lint for Go projects (version pinned in versions.sh).
@@ -24,7 +24,7 @@ install_go_lint() {
   # GitHub-released binary (~50MB) on every local setup run.
   local _CUR_VER
   _CUR_VER=$(get_version golangci-lint)
-  local _REQ_VER="${VER_GOLANGCI_LINT}"
+  local _REQ_VER="${VER_GOLANGCI_LINT:-}"
 
   if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
     log_summary "Go" "Go Lint" "✅ Exists" "${_CUR_VER:-}" "0"
@@ -47,7 +47,7 @@ install_govulncheck() {
   local _T0_GOVC
   _T0_GOVC=$(date +%s)
   local _TITLE="Govulncheck"
-  local _PROVIDER="${VER_GOVULNCHECK_PROVIDER}"
+  local _PROVIDER="${VER_GOVULNCHECK_PROVIDER:-}"
   if ! is_ci_env; then
     return 0
   fi

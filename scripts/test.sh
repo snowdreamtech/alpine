@@ -94,7 +94,7 @@ _ensure_bats_vendor() {
 
     while [ $_ATTEMPT -lt $_MAX_ATTEMPTS ]; do
       _ATTEMPT=$((_ATTEMPT + 1))
-      if git clone --depth=1 --quiet "${_PROXY}https://github.com/${_REPO}.git" "${_DEST:-}" 2>/dev/null; then
+      if git clone --depth=1 --quiet "${_PROXY:-}https://github.com/${_REPO:-}.git" "${_DEST:-}" 2>/dev/null; then
         return 0
       fi
       log_warn "Clone attempt $_ATTEMPT/$_MAX_ATTEMPTS failed for $_REPO. Retrying..."
@@ -103,7 +103,7 @@ _ensure_bats_vendor() {
 
     # Final fallback: bare GitHub URL (without proxy) for environments where proxy is not needed
     log_warn "Proxy clone failed. Falling back to direct GitHub URL for $_REPO ..."
-    git clone --depth=1 --quiet "https://github.com/${_REPO}.git" "${_DEST:-}"
+    git clone --depth=1 --quiet "https://github.com/${_REPO:-}.git" "${_DEST:-}"
   }
 
   # bats-support
@@ -277,9 +277,9 @@ main() {
 
   # 5. Standardized Next Actions
   if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
-    printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    printf "  - Run %bmake audit%b to verify security and licensing compliance.\n" "${GREEN}" "${NC}"
-    printf "  - Run %bmake commit%b to record your verified changes.\n" "${GREEN}" "${NC}"
+    printf "\n%bNext Actions:%b\n" "${YELLOW:-}" "${NC:-}"
+    printf "  - Run %bmake audit%b to verify security and licensing compliance.\n" "${GREEN:-}" "${NC:-}"
+    printf "  - Run %bmake commit%b to record your verified changes.\n" "${GREEN:-}" "${NC:-}"
   fi
 }
 

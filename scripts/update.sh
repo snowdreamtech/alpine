@@ -277,9 +277,9 @@ main() {
 
     # 6. Standardized Next Actions
     if [ "${DRY_RUN:-0}" -eq 0 ]; then
-      printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-      printf "  - Run %bmake install%b to synchronize project dependencies.\n" "${GREEN}" "${NC}"
-      printf "  - Run %bmake verify%b to ensure environment health and stability.\n" "${GREEN}" "${NC}"
+      printf "\n%bNext Actions:%b\n" "${YELLOW:-}" "${NC:-}"
+      printf "  - Run %bmake install%b to synchronize project dependencies.\n" "${GREEN:-}" "${NC:-}"
+      printf "  - Run %bmake verify%b to ensure environment health and stability.\n" "${GREEN:-}" "${NC:-}"
     fi
   fi
 }

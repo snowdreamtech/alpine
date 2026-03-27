@@ -90,12 +90,12 @@ main() {
       # GIT_CONFIG_PARAMETERS format requires "'key=value'" per entry, comma-separated.
       _GL_GIT_PARAMS="'diff.renameLimit=5000'"
       if [ -n "${GIT_CONFIG_PARAMETERS:-}" ]; then
-        _GL_GIT_PARAMS="${GIT_CONFIG_PARAMETERS},'diff.renameLimit=5000'"
+        _GL_GIT_PARAMS="${GIT_CONFIG_PARAMETERS:-},'diff.renameLimit=5000'"
       fi
       _GL_ARGS="detect --source . --no-banner"
       if is_ci_env && [ -n "${GITHUB_BASE_REF:-}" ]; then
-        log_info "Gitleaks: Performing incremental PR scan (origin/${GITHUB_BASE_REF}..HEAD)..."
-        _GL_ARGS="detect --log-opts=origin/${GITHUB_BASE_REF}..HEAD --no-banner"
+        log_info "Gitleaks: Performing incremental PR scan (origin/${GITHUB_BASE_REF:-}..HEAD)..."
+        _GL_ARGS="detect --log-opts=origin/${GITHUB_BASE_REF:-}..HEAD --no-banner"
       fi
 
       # shellcheck disable=SC2086
@@ -164,7 +164,7 @@ main() {
       local _AUDIT_REGISTRY="https://registry.npmjs.org"
 
       # shellcheck disable=SC2086
-      if run_quiet "${NPM:-}" audit --registry="${_AUDIT_REGISTRY}"; then
+      if run_quiet "${NPM:-}" audit --registry="${_AUDIT_REGISTRY:-}"; then
         log_summary "Node.js" "$NPM-audit" "✅ Secure" "$(get_version "${NPM:-}")" "$(($(date +%s) - _T0_JS))"
       else
         log_summary "Node.js" "$NPM-audit" "⚠️ Vulnerabilities" "$(get_version "${NPM:-}")" "$(($(date +%s) - _T0_JS))"
@@ -351,7 +351,7 @@ main() {
       # Scan for files that 'file' identifies as executable but don't have known allowed extensions
       _STEALTH_FOUND=$(find . -maxdepth 4 -not -path '*/.*' -not -path './node_modules/*' -not -path './dist/*' -not -path "./${VENV:-.venv}/*" -type f -exec file --mime {} + | grep -v "; charset=binary" | grep "application/x-executable\|application/x-sharedlib\|application/x-archive" | cut -d: -f1)
       if [ -n "${_STEALTH_FOUND:-}" ]; then
-        _BIN_FOUND="${_BIN_FOUND}\n${_STEALTH_FOUND}"
+        _BIN_FOUND="${_BIN_FOUND:-}\n${_STEALTH_FOUND:-}"
       fi
     fi
 
@@ -385,9 +385,9 @@ main() {
     if [ "${_OVERALL_EXIT_AUDIT:-}" -eq 0 ]; then
       log_success "\n✨ Security audit finished successfully."
       if [ "${DRY_RUN:-0}" -eq 0 ]; then
-        printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-        printf "  - Run %bmake commit%b to record your verified changes.\n" "${GREEN}" "${NC}"
-        printf "  - Run %bmake build%b to generate production artifacts.\n" "${GREEN}" "${NC}"
+        printf "\n%bNext Actions:%b\n" "${YELLOW:-}" "${NC:-}"
+        printf "  - Run %bmake commit%b to record your verified changes.\n" "${GREEN:-}" "${NC:-}"
+        printf "  - Run %bmake build%b to generate production artifacts.\n" "${GREEN:-}" "${NC:-}"
       fi
     else
       log_error "\n⚠️ Security audit finished with vulnerabilities or leaks found."

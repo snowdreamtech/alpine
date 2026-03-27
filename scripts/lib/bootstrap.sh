@@ -57,7 +57,7 @@ _mise_detect_arch() {
   if [ "${_OS:-}" = "linux" ]; then
     # Detect musl libc (common in Alpine and minimal Docker images)
     if (ldd "$(command -v ls)" 2>&1 | grep -q "musl") || [ -f /lib/ld-musl-x86_64.so.1 ] || [ -f /lib/ld-musl-aarch64.so.1 ] || [ -f /lib/ld-musl-armhf.so.1 ]; then
-      _ARCH="${_ARCH}-musl"
+      _ARCH="${_ARCH:-}-musl"
     fi
   fi
   echo "${_ARCH:-}"
@@ -76,9 +76,9 @@ _mise_detect_os() {
 # Tier 1: Shell-specific streamers (mise.run) - Includes auto-activation.
 _mise_install_tier1() {
   local _SHELL="${1:-}"
-  log_info "Tier 1: Trying official shell-specific streamer for ${_SHELL}..."
+  log_info "Tier 1: Trying official shell-specific streamer for ${_SHELL:-}..."
   _TMP_SH="${TMPDIR:-/tmp}/mise_install_$$.sh"
-  if curl --retry 5 --retry-delay 2 --retry-connrefused -sS -L "https://mise.run/${_SHELL}" -o "${_TMP_SH:-}"; then
+  if curl --retry 5 --retry-delay 2 --retry-connrefused -sS -L "https://mise.run/${_SHELL:-}" -o "${_TMP_SH:-}"; then
     if sh "${_TMP_SH:-}"; then
       rm -f "${_TMP_SH:-}"
       return 0
@@ -149,17 +149,17 @@ _mise_install_tier4() {
   local _OS="${1:-}"
   local _ARCH="${2:-}"
   local _VER="${3:-}"
-  log_info "Tier 4: Performing manual binary download for ${_OS}-${_ARCH} (v${_VER})..."
+  log_info "Tier 4: Performing manual binary download for ${_OS:-}-${_ARCH:-} (v${_VER:-})..."
 
-  local _M_BIN_NAME="mise-v${_VER}-${_OS}-${_ARCH}"
+  local _M_BIN_NAME="mise-v${_VER:-}-${_OS:-}-${_ARCH:-}"
   local _EXT=""
   [ "${_OS:-}" = "windows" ] && _EXT=".zip"
-  local _M_URL="https://github.com/jdx/mise/releases/download/v${_VER}/${_M_BIN_NAME}${_EXT}"
-  if [ "${ENABLE_GITHUB_PROXY}" = "1" ] || [ "${ENABLE_GITHUB_PROXY}" = "true" ]; then
-    _M_URL="${GITHUB_PROXY}${_M_URL}"
+  local _M_URL="https://github.com/jdx/mise/releases/download/v${_VER:-}/${_M_BIN_NAME:-}${_EXT:-}"
+  if [ "${ENABLE_GITHUB_PROXY:-}" = "1" ] || [ "${ENABLE_GITHUB_PROXY:-}" = "true" ]; then
+    _M_URL="${GITHUB_PROXY:-}${_M_URL:-}"
   fi
   local _DEST="$HOME/.local/bin/mise"
-  [ "${_OS:-}" = "windows" ] && _DEST="${_DEST}.exe"
+  [ "${_OS:-}" = "windows" ] && _DEST="${_DEST:-}.exe"
 
   mkdir -p "$(dirname "${_DEST:-}")"
 
@@ -181,7 +181,7 @@ _mise_install_tier4() {
     fi
     local _TMP_DIR
     _TMP_DIR=$(mktemp -d 2>/dev/null || echo "/tmp/mise_win_extract_$$")
-    local _TMP_ZIP="${_TMP_DIR}/mise.zip"
+    local _TMP_ZIP="${_TMP_DIR:-}/mise.zip"
 
     if _download "${_M_URL:-}" "${_TMP_ZIP:-}"; then
       if unzip -q "${_TMP_ZIP:-}" -d "${_TMP_DIR:-}"; then
@@ -211,7 +211,7 @@ _mise_install_tier4() {
 # Setup shell completions.
 _mise_setup_completions() {
   local _SHELL="${1:-}"
-  log_info "Setting up mise completions for ${_SHELL}..."
+  log_info "Setting up mise completions for ${_SHELL:-}..."
 
   # mise completion performs better when 'usage' is installed.
   # However, it often hangs on Windows CI due to compilation or interactive prompts.
@@ -288,9 +288,9 @@ _mise_activate_nu() {
   # Nushell requires env.nu and config.nu updates.
   local _NU_DIR="$HOME/.config/nushell"
   [ -d "${_NU_DIR:-}" ] || return 0
-  local _ENV="${_NU_DIR}/env.nu"
-  local _CONF="${_NU_DIR}/config.nu"
-  local _MISE_NU="${_NU_DIR}/mise.nu"
+  local _ENV="${_NU_DIR:-}/env.nu"
+  local _CONF="${_NU_DIR:-}/config.nu"
+  local _MISE_NU="${_NU_DIR:-}/mise.nu"
 
   if [ ! -f "${_MISE_NU:-}" ]; then
     mise activate nu >"${_MISE_NU:-}" 2>/dev/null || true
@@ -319,7 +319,7 @@ _mise_activate_elvish() {
 # Helper to ensure mise is activated in the current session and RC files.
 _mise_apply_activation() {
   local _SHELL="${1:-}"
-  log_info "Synchronizing mise activation for ${_SHELL}..."
+  log_info "Synchronizing mise activation for ${_SHELL:-}..."
 
   # 1. Permanent RC File Injection
   case "${_SHELL:-}" in
@@ -337,7 +337,7 @@ _mise_apply_activation() {
   local _M_BIN
   _M_BIN=$(command -v mise || echo "$_G_MISE_BIN_BASE/mise")
   # shellcheck disable=SC2153
-  [ "${_G_OS:-}" = "windows" ] && [ ! -x "${_M_BIN:-}" ] && _M_BIN="${_M_BIN}.exe"
+  [ "${_G_OS:-}" = "windows" ] && [ ! -x "${_M_BIN:-}" ] && _M_BIN="${_M_BIN:-}.exe"
 
   if [ -x "${_M_BIN:-}" ]; then
     # PowerShell and Nushell activation in POSIX sh is complex/limited to shims.

@@ -123,9 +123,9 @@ main() {
 
   # 5. Standardized Next Actions
   if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
-    printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    printf "  - Run %bmake test%b to execute functional test suites.\n" "${GREEN}" "${NC}"
-    printf "  - Run %bmake verify%b to ensure full project stability.\n" "${GREEN}" "${NC}"
+    printf "\n%bNext Actions:%b\n" "${YELLOW:-}" "${NC:-}"
+    printf "  - Run %bmake test%b to execute functional test suites.\n" "${GREEN:-}" "${NC:-}"
+    printf "  - Run %bmake verify%b to ensure full project stability.\n" "${GREEN:-}" "${NC:-}"
   fi
 }
 

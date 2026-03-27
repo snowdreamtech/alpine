@@ -49,7 +49,7 @@ main() {
   done
 
   # 3. Inform User
-  printf "%b🚀 Generating Unified Project Health Dashboard...%b\n\n" "${BLUE}" "${NC}"
+  printf "%b🚀 Generating Unified Project Health Dashboard...%b\n\n" "${BLUE:-}" "${NC:-}"
 
   # 4. Define Check Functions
   # Each check returns a Status (Passed/Failed/Skipped) and a brief Detail.

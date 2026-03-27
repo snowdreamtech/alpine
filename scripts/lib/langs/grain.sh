@@ -11,7 +11,7 @@ install_runtime_grain() {
     return 0
   fi
   # Version pinned in scripts/lib/versions.sh (VER_GRAIN_PROVIDER, VER_GRAIN)
-  run_mise install "${VER_GRAIN_PROVIDER}@${VER_GRAIN}"
+  run_mise install "${VER_GRAIN_PROVIDER:-}@${VER_GRAIN:-}"
 }
 
 # Purpose: Sets up Grain environment for project.
@@ -27,7 +27,7 @@ setup_grain() {
   # Fast-path: Check version-aware existence
   local _CUR_VER
   _CUR_VER=$(get_version grain)
-  local _REQ_VER="${VER_GRAIN}"
+  local _REQ_VER="${VER_GRAIN:-}"
 
   if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
     log_summary "Runtime" "Grain" "✅ Detected" "${_CUR_VER:-}" "0"

@@ -20,17 +20,17 @@ register_mise_tool() {
   _MISE_TOML="$(get_project_root)/.mise.toml"
 
   # Check if already in .mise.toml
-  if grep -qE "^\"?${_PROVIDER}\"?[[:space:]]*=" "${_MISE_TOML:-}" 2>/dev/null; then
+  if grep -qE "^\"?${_PROVIDER:-}\"?[[:space:]]*=" "${_MISE_TOML:-}" 2>/dev/null; then
     return 0
   fi
 
-  log_info "Dynamically registering ${_NAME} SDK (${_PROVIDER}@${_VERSION})..."
+  log_info "Dynamically registering ${_NAME:-} SDK (${_PROVIDER:-}@${_VERSION:-})..."
 
   # Inject directly into [tools] section via awk to avoid API calls.
-  awk -v inject="\"${_PROVIDER}\" = \"${_VERSION}\"" '
+  awk -v inject="\"${_PROVIDER:-}\" = \"${_VERSION:-}\"" '
     /^\[tools\]/ { print; print inject; next }
     { print }
-  ' "${_MISE_TOML:-}" >"${_MISE_TOML}.tmp" && mv "${_MISE_TOML}.tmp" "${_MISE_TOML:-}"
+  ' "${_MISE_TOML:-}" >"${_MISE_TOML:-}.tmp" && mv "${_MISE_TOML:-}.tmp" "${_MISE_TOML:-}"
 }
 
 # Purpose: Registers a tool in .mise.toml using a complex TOML value (e.g., dictionary with asset matches).
@@ -44,18 +44,18 @@ register_mise_tool_complex() {
   local _TOML_VALUE="${3:-}"
 
   # Check if already in .mise.toml
-  if grep -qE "^\"?${_TOOL}\"?[[:space:]]*=" "$(get_project_root)/.mise.toml" 2>/dev/null; then
+  if grep -qE "^\"?${_TOOL:-}\"?[[:space:]]*=" "$(get_project_root)/.mise.toml" 2>/dev/null; then
     return 0
   fi
 
-  log_info "Dynamically registering ${_NAME} SDK (${_TOOL}) with complex assets..."
+  log_info "Dynamically registering ${_NAME:-} SDK (${_TOOL:-}) with complex assets..."
 
-  awk -v inject="\"${_TOOL}\" = ${_TOML_VALUE}" '
+  awk -v inject="\"${_TOOL:-}\" = ${_TOML_VALUE:-}" '
     /^\[tools\]/ { print; print inject; next }
     { print }
   ' "$(get_project_root)/.mise.toml" >"$(get_project_root)/.mise.toml.tmp" && mv "$(get_project_root)/.mise.toml.tmp" "$(get_project_root)/.mise.toml"
 
-  run_mise install "${_TOOL}"
+  run_mise install "${_TOOL:-}"
 }
 
 # --- Registry Data ---
@@ -63,13 +63,13 @@ register_mise_tool_complex() {
 # Secondary runtimes (Go, Rust, Java, etc.) are dynamically registered
 # only when their source files are detected or explicitly requested.
 
-setup_registry_go() { register_mise_tool "Go" "go" "${VER_GO}"; }
-setup_registry_rust() { register_mise_tool "Rust" "rust" "${VER_RUST}"; }
-setup_registry_java() { register_mise_tool "Java" "java" "${VER_JAVA}"; }
-setup_registry_dotnet() { register_mise_tool ".NET" "dotnet" "${VER_DOTNET}"; }
-setup_registry_zig() { register_mise_tool "Zig" "zig" "${VER_ZIG}"; }
-setup_registry_bun() { register_mise_tool "Bun" "bun" "${VER_BUN}"; }
-setup_registry_deno() { register_mise_tool "Deno" "deno" "${VER_DENO}"; }
+setup_registry_go() { register_mise_tool "Go" "go" "${VER_GO:-}"; }
+setup_registry_rust() { register_mise_tool "Rust" "rust" "${VER_RUST:-}"; }
+setup_registry_java() { register_mise_tool "Java" "java" "${VER_JAVA:-}"; }
+setup_registry_dotnet() { register_mise_tool ".NET" "dotnet" "${VER_DOTNET:-}"; }
+setup_registry_zig() { register_mise_tool "Zig" "zig" "${VER_ZIG:-}"; }
+setup_registry_bun() { register_mise_tool "Bun" "bun" "${VER_BUN:-}"; }
+setup_registry_deno() { register_mise_tool "Deno" "deno" "${VER_DENO:-}"; }
 
 setup_registry_ada() { register_mise_tool "Ada" "asdf:ada" "14.2.0"; }
 setup_registry_clojure() { register_mise_tool "Clojure" "asdf:clojure" "1.12.0.1479"; }

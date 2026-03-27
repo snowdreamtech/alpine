@@ -36,7 +36,7 @@ SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 # ── Extension Modules Sourcing ───────────────────────────────────────────────
 # Dynamically load all language-specific setup modules.
 # shellcheck source=/dev/null
-for _lang_mod in "${SCRIPT_DIR}/lib/langs"/*.sh; do
+for _lang_mod in "${SCRIPT_DIR:-}/lib/langs"/*.sh; do
   if [ -f "${_lang_mod:-}" ]; then
     # shellcheck disable=SC1090
     . "${_lang_mod:-}"
@@ -98,7 +98,7 @@ main() {
 
   # ── Concurrency Guard (Lockfile) ──
   # Using project-local lock to allow concurrent setup in different clones/test environments
-  local _LOCKFILE="${_G_PROJECT_ROOT}/.setup.lock"
+  local _LOCKFILE="${_G_PROJECT_ROOT:-}/.setup.lock"
   if [ -f "${_LOCKFILE:-}" ]; then
     local _PID
     _PID=$(cat "${_LOCKFILE:-}")
@@ -126,7 +126,7 @@ main() {
   for _arg in "$@"; do
     case "${_arg:-}" in
     -q | --quiet | -v | --verbose | --dry-run | -h | --help) ;;
-    *) _RAW_ARGS="${_RAW_ARGS} ${_arg}" ;;
+    *) _RAW_ARGS="${_RAW_ARGS:-} ${_arg}" ;;
     esac
   done
 
@@ -201,23 +201,23 @@ EOF
 
   # ── Mode & Module Selection ──
   local _IS_ALL_MODULES=false
-  if echo " ${_RAW_ARGS} " | grep -q " all "; then
+  if echo " ${_RAW_ARGS:-} " | grep -q " all "; then
     _IS_ALL_MODULES=true
   fi
 
   local _MODULES_LIST
-  if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "${_IS_ALL_MODULES:-}" = "true" ]; then
+  if [ -z "$(echo "${_RAW_ARGS:-}" | tr -d ' ')" ] || [ "${_IS_ALL_MODULES:-}" = "true" ]; then
     # Grouped list for "On-demand" (default) or "All" (explicit)
     local _BASE_LIST="base shell toml yaml markdown node python go rust java kotlin php ruby dart swift lua cpp terraform solidity perl julia r groovy dotnet zig elixir haskell scala ada assemblyscript ballerina bun clojure crystal deno dlang duckdb elm erlang fortran fpc gleam grain haxe jsonnet kcl lean lisp luau mojo moonbit move nim ocaml odin pkl prolog pulumi racket raku rescript starlark tcl tofu typst vala vcpkg vlang wat"
     local _DOMAIN_LIST="docker sql openapi protobuf security runners testing docs ai helm k8s terraform terragrunt tofu pulumi"
-    _MODULES_LIST="${_BASE_LIST} ${_DOMAIN_LIST}"
+    _MODULES_LIST="${_BASE_LIST:-} ${_DOMAIN_LIST:-}"
   else
-    _MODULES_LIST="${_RAW_ARGS}"
+    _MODULES_LIST="${_RAW_ARGS:-}"
   fi
 
   # ── CI/Local Environment Filtering ──
   # Skip heavyweight tools in local dev unless explicitly requested or 'all' is specified.
-  if ! is_ci_env && [ "${_IS_ALL_MODULES:-}" != "true" ] && [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ]; then
+  if ! is_ci_env && [ "${_IS_ALL_MODULES:-}" != "true" ] && [ -z "$(echo "${_RAW_ARGS:-}" | tr -d ' ')" ]; then
     # Skip heavyweight and rarely-needed modules in local dev to prevent
     # long network downloads (especially GitHub-released binaries).
     # These can still be installed on-demand via: sh scripts/setup.sh <module>
@@ -227,7 +227,7 @@ EOF
       case " ${_HEAVY_MODULES:-} " in *" ${_m} "*)
         log_debug "Skipping heavyweight module in local dev: $_m"
         ;;
-      *) _SMART_LIST="${_SMART_LIST} ${_m}" ;;
+      *) _SMART_LIST="${_SMART_LIST:-} ${_m}" ;;
       esac
     done
     _MODULES_LIST=$_SMART_LIST
@@ -241,7 +241,7 @@ EOF
         log_warn "Skipping module per SKIP_MODULES: $_m"
         log_summary "Skipped" "${_m:-}" "⏭️ Stopped" "-" "0"
         ;;
-      *) _NEW_LIST="${_NEW_LIST} ${_m}" ;;
+      *) _NEW_LIST="${_NEW_LIST:-} ${_m}" ;;
       esac
     done
     _MODULES_LIST=$_NEW_LIST
@@ -289,7 +289,7 @@ EOF
     # is essential for pre-provisioning (like DevContainer building) where
     # tools are installed before source code exists.
     export FORCE_SETUP=0
-    if [ "${_IS_ALL_MODULES:-}" = "false" ] && [ -n "$(echo "${_RAW_ARGS}" | tr -d ' ')" ]; then
+    if [ "${_IS_ALL_MODULES:-}" = "false" ] && [ -n "$(echo "${_RAW_ARGS:-}" | tr -d ' ')" ]; then
       case " ${_RAW_ARGS:-} " in *" ${_cur_module} "*)
         export FORCE_SETUP=1
         log_debug "Force setup enabled for explicitly requested module: $_cur_module"
@@ -419,9 +419,9 @@ EOF
       if ! command -v mise >/dev/null 2>&1; then
         log_warn "Warning: mise binary not found on PATH. You may need to restart your shell."
       fi
-      printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-      printf "  - Run %bmake install%b to install project dependencies.\n" "${GREEN}" "${NC}"
-      printf "  - Run %bmake verify%b to ensure environment health.\n" "${GREEN}" "${NC}"
+      printf "\n%bNext Actions:%b\n" "${YELLOW:-}" "${NC:-}"
+      printf "  - Run %bmake install%b to install project dependencies.\n" "${GREEN:-}" "${NC:-}"
+      printf "  - Run %bmake verify%b to ensure environment health.\n" "${GREEN:-}" "${NC:-}"
     fi
   fi
 }

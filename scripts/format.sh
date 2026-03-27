@@ -134,9 +134,9 @@ main() {
 
   # 4. Standardized Next Actions
   if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
-    printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    printf "  - Run %bmake lint%b to verify code quality standards.\n" "${GREEN}" "${NC}"
-    printf "  - Run %bmake test%b to ensure functional integrity.\n" "${GREEN}" "${NC}"
+    printf "\n%bNext Actions:%b\n" "${YELLOW:-}" "${NC:-}"
+    printf "  - Run %bmake lint%b to verify code quality standards.\n" "${GREEN:-}" "${NC:-}"
+    printf "  - Run %bmake test%b to ensure functional integrity.\n" "${GREEN:-}" "${NC:-}"
   fi
 }
 

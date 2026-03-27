@@ -10,7 +10,7 @@ install_runtime_java() {
     log_debug "DRY_RUN: Would install Java runtime."
     return 0
   fi
-  run_mise install "java@${VER_JAVA}"
+  run_mise install "java@${VER_JAVA:-}"
 }
 
 # Purpose: Installs google-java-format for Java project linting (version in versions.sh).
@@ -20,8 +20,8 @@ install_java_lint() {
   local _T0_JAVA
   _T0_JAVA=$(date +%s)
   local _TITLE="Java Lint"
-  local _PROVIDER="${VER_JAVA_FORMAT_PROVIDER}"
-  local _REQ_VER="${VER_JAVA_FORMAT}"
+  local _PROVIDER="${VER_JAVA_FORMAT_PROVIDER:-}"
+  local _REQ_VER="${VER_JAVA_FORMAT:-}"
 
   # Rely natively on mise's asset mapping from registry.sh for arm64/windows fallbacks
 
@@ -61,7 +61,7 @@ setup_java() {
   # Fast-path: Check version-aware existence
   local _CUR_VER
   _CUR_VER=$(get_version java)
-  local _REQ_VER="${VER_JAVA}"
+  local _REQ_VER="${VER_JAVA:-}"
 
   if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
     log_summary "Runtime" "Java" "✅ Detected" "${_CUR_VER:-}" "0"

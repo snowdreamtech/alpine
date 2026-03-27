@@ -115,9 +115,9 @@ main() {
 
   # 6. Standardized Next Actions
   if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
-    printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    printf "  - Run %bmake release%b to create a production version tag.\n" "${GREEN}" "${NC}"
-    printf "  - Run %bmake verify%b to perform final artifact validation.\n" "${GREEN}" "${NC}"
+    printf "\n%bNext Actions:%b\n" "${YELLOW:-}" "${NC:-}"
+    printf "  - Run %bmake release%b to create a production version tag.\n" "${GREEN:-}" "${NC:-}"
+    printf "  - Run %bmake verify%b to perform final artifact validation.\n" "${GREEN:-}" "${NC:-}"
   fi
 }
 

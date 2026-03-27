@@ -52,10 +52,10 @@ main() {
   # 2. Check Existence
   if [ -z "${_RESOLVED_BIN_WRAP:-}" ]; then
     if [ "${_G_AUDIT_MODE:-0}" -eq 1 ]; then
-      log_error "❌ ${_LINTER_WRAP} not found but required in AUDIT mode. Failing."
+      log_error "❌ ${_LINTER_WRAP:-} not found but required in AUDIT mode. Failing."
       exit 1
     fi
-    log_warn "⚠️  ${_LINTER_WRAP} not found. Skipping linting for this module."
+    log_warn "⚠️  ${_LINTER_WRAP:-} not found. Skipping linting for this module."
     log_info "💡 Run 'make setup' to install required tools."
     exit 0
   fi
@@ -82,7 +82,7 @@ main() {
     ;;
   swiftformat | swiftlint)
     if [ "$(uname -s)" != "Darwin" ]; then
-      log_info "⏭️  ${_LINTER_WRAP} is only supported on macOS. Skipping."
+      log_info "⏭️  ${_LINTER_WRAP:-} is only supported on macOS. Skipping."
       exit 0
     fi
     check_runtime swift "${_LINTER_WRAP:-}"

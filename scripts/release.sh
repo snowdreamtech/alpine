@@ -197,9 +197,9 @@ main() {
 
   # 7. Standardized Next Actions
   if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
-    printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    printf "  - Run %bgit push --tags%b to synchronize version tags with the remote.\n" "${GREEN}" "${NC}"
-    printf "  - Run %bmake cleanup%b to remove temporary release artifacts.\n" "${GREEN}" "${NC}"
+    printf "\n%bNext Actions:%b\n" "${YELLOW:-}" "${NC:-}"
+    printf "  - Run %bgit push --tags%b to synchronize version tags with the remote.\n" "${GREEN:-}" "${NC:-}"
+    printf "  - Run %bmake cleanup%b to remove temporary release artifacts.\n" "${GREEN:-}" "${NC:-}"
   fi
 }
 

@@ -10,7 +10,7 @@ install_runtime_moonbit() {
     log_debug "DRY_RUN: Would install MoonBit via mise."
     return 0
   fi
-  run_mise install "${VER_MOONBIT_PROVIDER}@${VER_MOONBIT}"
+  run_mise install "${VER_MOONBIT_PROVIDER:-}@${VER_MOONBIT:-}"
 }
 
 # Purpose: Sets up MoonBit environment for project.
@@ -26,7 +26,7 @@ setup_moonbit() {
   # Fast-path: Check version-aware existence
   local _CUR_VER
   _CUR_VER=$(get_version moon)
-  local _REQ_VER="${VER_MOONBIT}"
+  local _REQ_VER="${VER_MOONBIT:-}"
 
   if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
     log_summary "Runtime" "MoonBit" "✅ Detected" "${_CUR_VER:-}" "0"

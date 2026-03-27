@@ -39,7 +39,7 @@ install_haskell_lint() {
   fi
 
   local _STAT_HASKELL="✅ Installed"
-  run_mise install "${_PROVIDER}@${_REQ_VER}" || _STAT_HASKELL="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_REQ_VER:-}" || _STAT_HASKELL="❌ Failed"
 
   log_summary "Haskell" "Haskell Lint" "${_STAT_HASKELL:-}" "$(get_version ormolu)" "$(($(date +%s) - _T0_HASKELL))"
 }

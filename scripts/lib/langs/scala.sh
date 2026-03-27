@@ -39,7 +39,7 @@ install_scala_lint() {
   fi
 
   local _STAT_SCALA="✅ Installed"
-  run_mise install "${_PROVIDER}@${_REQ_VER}" || _STAT_SCALA="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_REQ_VER:-}" || _STAT_SCALA="❌ Failed"
 
   log_summary "Scala" "Scala Lint" "${_STAT_SCALA:-}" "$(get_version scalafmt)" "$(($(date +%s) - _T0_SCALA))"
 }

@@ -10,7 +10,7 @@ install_runtime_kotlin() {
     log_debug "DRY_RUN: Would install Kotlin runtime."
     return 0
   fi
-  run_mise install "kotlin@${VER_KOTLIN}"
+  run_mise install "kotlin@${VER_KOTLIN:-}"
 }
 
 # Purpose: Installs ktlint (version pinned in scripts/lib/versions.sh).
@@ -18,12 +18,12 @@ install_ktlint() {
   local _T0_KT
   _T0_KT=$(date +%s)
   local _TITLE="ktlint"
-  local _PROVIDER="${VER_KTLINT_PROVIDER}"
+  local _PROVIDER="${VER_KTLINT_PROVIDER:-}"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
   _CUR_VER=$(get_version ktlint --version)
-  local _REQ_VER="${VER_KTLINT}"
+  local _REQ_VER="${VER_KTLINT:-}"
 
   if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
     log_summary "Kotlin" "ktlint" "✅ Exists" "${_CUR_VER:-}" "0"
@@ -55,7 +55,7 @@ setup_kotlin() {
   # Fast-path: Check version-aware existence
   local _CUR_VER
   _CUR_VER=$(get_version kotlin)
-  local _REQ_VER="${VER_KOTLIN}"
+  local _REQ_VER="${VER_KOTLIN:-}"
 
   if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
     log_summary "Runtime" "Kotlin" "✅ Detected" "${_CUR_VER:-}" "0"

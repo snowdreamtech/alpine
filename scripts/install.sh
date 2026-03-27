@@ -29,7 +29,7 @@ SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 
 # ── Extension Modules Sourcing ───────────────────────────────────────────────
 # Dynamically load all language-specific setup modules.
-for _lang_mod in "${SCRIPT_DIR}/lib/langs"/*.sh; do
+for _lang_mod in "${SCRIPT_DIR:-}/lib/langs"/*.sh; do
   if [ -f "${_lang_mod:-}" ]; then
     # shellcheck disable=SC1090
     . "${_lang_mod:-}"
@@ -83,7 +83,7 @@ main() {
 
   # ── Concurrency Guard (Lockfile) ──
   # Using project-local lock to allow concurrent setup in different clones/test environments
-  local _LOCKFILE="${_G_PROJECT_ROOT}/.setup.lock"
+  local _LOCKFILE="${_G_PROJECT_ROOT:-}/.setup.lock"
   if [ -f "${_LOCKFILE:-}" ]; then
     local _PID
     _PID=$(cat "${_LOCKFILE:-}")
@@ -116,9 +116,9 @@ main() {
 
   # 4. Standardized Next Actions
   if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
-    printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    printf "  - Run %bmake verify%b to ensure environment and project health.\n" "${GREEN}" "${NC}"
-    printf "  - Run %bmake test%b to execute the functional test suite.\n" "${GREEN}" "${NC}"
+    printf "\n%bNext Actions:%b\n" "${YELLOW:-}" "${NC:-}"
+    printf "  - Run %bmake verify%b to ensure environment and project health.\n" "${GREEN:-}" "${NC:-}"
+    printf "  - Run %bmake test%b to execute the functional test suite.\n" "${GREEN:-}" "${NC:-}"
   fi
 }
 

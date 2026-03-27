@@ -66,7 +66,7 @@ main() {
   [ -t 0 ] && _IS_TTY_HYD=1
 
   if [ "${VERBOSE:-0}" -ge 1 ]; then
-    printf "%b💧 Project Onboarding: Converting Template to Project...%b\n\n" "${BLUE}" "${NC}"
+    printf "%b💧 Project Onboarding: Converting Template to Project...%b\n\n" "${BLUE:-}" "${NC:-}"
   fi
 
   # 3. Input Collection (Interactive fallback or validation)
@@ -120,11 +120,11 @@ main() {
 
   # 4. Confirmation
   if [ "${VERBOSE:-0}" -ge 1 ]; then
-    printf "\n%bConfiguration Summary:%b\n" "${YELLOW}" "${NC}"
-    printf "  Project:     %b%s%b\n" "${GREEN}" "${_PROJECT_NAME_HYD:-}" "${NC}"
-    printf "  Description: %b%s%b\n" "${GREEN}" "${_PROJECT_DESC_HYD:-}" "${NC}"
-    printf "  Author:      %b%s (%s)%b\n" "${GREEN}" "${_AUTHOR_NAME_HYD:-}" "${_AUTHOR_EMAIL_HYD:-}" "${NC}"
-    printf "  GitHub:      %b%s%b\n" "${GREEN}" "${_GITHUB_ORG_HYD:-}" "${NC}"
+    printf "\n%bConfiguration Summary:%b\n" "${YELLOW:-}" "${NC:-}"
+    printf "  Project:     %b%s%b\n" "${GREEN:-}" "${_PROJECT_NAME_HYD:-}" "${NC:-}"
+    printf "  Description: %b%s%b\n" "${GREEN:-}" "${_PROJECT_DESC_HYD:-}" "${NC:-}"
+    printf "  Author:      %b%s (%s)%b\n" "${GREEN:-}" "${_AUTHOR_NAME_HYD:-}" "${_AUTHOR_EMAIL_HYD:-}" "${NC:-}"
+    printf "  GitHub:      %b%s%b\n" "${GREEN:-}" "${_GITHUB_ORG_HYD:-}" "${NC:-}"
   fi
 
   if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${VERBOSE:-0}" -ge 1 ] && [ "${_AUTO_CON_HYD:-0}" -eq 0 ]; then
@@ -224,7 +224,7 @@ main() {
 
   # 9. Automated Environment Setup
   if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ] && [ "${_AUTO_CON_HYD:-0}" -eq 0 ]; then
-    printf "\n%bWould you like to run 'make setup' and 'make install' now? (y/N): %b" "${YELLOW}" "${NC}"
+    printf "\n%bWould you like to run 'make setup' and 'make install' now? (y/N): %b" "${YELLOW:-}" "${NC:-}"
     local _DO_SETUP_HYD
     read -r _DO_SETUP_HYD
     case "${_DO_SETUP_HYD:-}" in
@@ -240,9 +240,9 @@ main() {
 
   # 10. Standardized Next Actions
   if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
-    printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    printf "  - Run %bmake verify%b to validate the project state.\n" "${GREEN}" "${NC}"
-    printf "  - Start coding in the %bsrc/%b directory.\n" "${GREEN}" "${NC}"
+    printf "\n%bNext Actions:%b\n" "${YELLOW:-}" "${NC:-}"
+    printf "  - Run %bmake verify%b to validate the project state.\n" "${GREEN:-}" "${NC:-}"
+    printf "  - Start coding in the %bsrc/%b directory.\n" "${GREEN:-}" "${NC:-}"
   fi
 }
 

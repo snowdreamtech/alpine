@@ -94,7 +94,7 @@ find_dirs_for_patterns() {
           echo "/$_dir"
         fi
       done)
-      _FOUND_DIRS="${_FOUND_DIRS}${_FOUND_DIRS:+
+      _FOUND_DIRS="${_FOUND_DIRS:-}${_FOUND_DIRS:+
 }${_new_dirs}"
     fi
   done
@@ -144,7 +144,7 @@ emit_entry() {
   cat <<EOF
   - package-ecosystem: "${_ecosystem}"
     directory: "${_directory}"
-    target-branch: "${TARGET_BRANCH}"
+    target-branch: "${TARGET_BRANCH:-}"
     # 2. Open PR Limit: Prevent PR-bombing
     open-pull-requests-limit: 10
     # 6. Rebase Strategy: Auto-rebase to resolve conflicts
@@ -214,11 +214,11 @@ scan_ecosystems() {
 
   # Helper: emit only if not already emitted
   _emit_unique() {
-    _key="${1}:${2}"
+    _key="${1:-}:${2:-}"
     case "${_EMITTED:-}" in
     *"|${_key}|"*) return ;; # Already emitted
     esac
-    _EMITTED="${_EMITTED}|${_key}|"
+    _EMITTED="${_EMITTED:-}|${_key}|"
     emit_entry "${1:-}" "${2:-}"
   }
 
@@ -495,18 +495,18 @@ HEADER
     echo "WARNING: No ecosystems detected. The generated file will have no update entries." >&2
   fi
 
-  _OUTPUT="${_HEADER}
-${_ENTRIES}"
+  _OUTPUT="${_HEADER:-}
+${_ENTRIES:-}"
 
   if [ "${DRY_RUN:-}" -eq 1 ]; then
-    echo "# [DRY-RUN] Would write to ${DEPENDABOT_FILE}:"
+    echo "# [DRY-RUN] Would write to ${DEPENDABOT_FILE:-}:"
     echo "${_OUTPUT:-}"
   else
     mkdir -p "$(dirname "${DEPENDABOT_FILE:-}")"
     echo "${_OUTPUT:-}" >"${DEPENDABOT_FILE:-}"
-    echo "✅ Generated ${DEPENDABOT_FILE} successfully." >&2
+    echo "✅ Generated ${DEPENDABOT_FILE:-} successfully." >&2
     _COUNT=$(echo "${_ENTRIES:-}" | grep -c 'package-ecosystem' || true)
-    echo "   Ecosystems detected: ${_COUNT}" >&2
+    echo "   Ecosystems detected: ${_COUNT:-}" >&2
 
     # Generate Markdown Summary for CI
     {

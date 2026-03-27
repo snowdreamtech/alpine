@@ -91,7 +91,7 @@ install_pip_audit() {
   local _V_PA
   _V_PA=$(get_mise_tool_version pip-audit)
   if [ -n "${_V_PA:-}" ]; then
-    run_mise install "${_PROVIDER}@${_V_PA}" || _STAT_PA="❌ Failed"
+    run_mise install "${_PROVIDER:-}@${_V_PA:-}" || _STAT_PA="❌ Failed"
   else
     run_mise install "${_PROVIDER:-}" || _STAT_PA="❌ Failed"
   fi

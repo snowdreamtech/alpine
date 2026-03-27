@@ -142,11 +142,11 @@ main() {
 
   # 5. Standardized Next Actions
   if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
-    printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
+    printf "\n%bNext Actions:%b\n" "${YELLOW:-}" "${NC:-}"
     if [ "${_COMMAND_DOC:-}" = "build" ]; then
-      printf "  - Run %bmake release%b to publish the documentation and project.\n" "${GREEN}" "${NC}"
+      printf "  - Run %bmake release%b to publish the documentation and project.\n" "${GREEN:-}" "${NC:-}"
     else
-      printf "  - Run %bmake docs build%b to generate production-ready documentation.\n" "${GREEN}" "${NC}"
+      printf "  - Run %bmake docs build%b to generate production-ready documentation.\n" "${GREEN:-}" "${NC:-}"
     fi
   fi
 }
