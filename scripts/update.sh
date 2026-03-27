@@ -197,6 +197,17 @@ update_cargo_deps() {
   fi
 }
 
+# Purpose: Upgrades Mise-managed tool versions in registry and config.
+# Examples:
+#   update_mise_tool_versions
+update_mise_tool_versions() {
+  if [ -f "$SCRIPT_DIR/update-tools.sh" ]; then
+    log_info "Upgrading Mise tool versions..."
+    # Delegate to update-tools.sh, passing through relevant flags
+    sh "$SCRIPT_DIR/update-tools.sh" "$@" || log_warn "Mise tool version upgrade failed."
+  fi
+}
+
 # Purpose: Main entry point for the toolchain update manager.
 # Params:
 #   $@ - Command line arguments
@@ -243,6 +254,7 @@ main() {
   update_cargo_deps
   update_ruby_gems
   update_pre_commit
+  update_mise_tool_versions "$@"
 
   # Optional: run npm update if defined
   run_npm_script "update"
