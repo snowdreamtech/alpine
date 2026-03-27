@@ -19,7 +19,7 @@ set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
-. "$SCRIPT_DIR/lib/common.sh"
+. "${SCRIPT_DIR:-}/lib/common.sh"
 
 main() {
   guard_project_root
@@ -30,9 +30,9 @@ main() {
   fi
 
   if command -v python3 >/dev/null 2>&1; then
-    python3 "$SCRIPT_DIR/sync-docs.py"
+    python3 "${SCRIPT_DIR:-}/sync-docs.py"
   elif command -v python >/dev/null 2>&1; then
-    python "$SCRIPT_DIR/sync-docs.py"
+    python "${SCRIPT_DIR:-}/sync-docs.py"
   else
     log_error "Error: Python 3 not found."
     exit 1

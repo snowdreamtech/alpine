@@ -25,7 +25,7 @@ set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
-. "$SCRIPT_DIR/lib/common.sh"
+. "${SCRIPT_DIR:-}/lib/common.sh"
 
 # Purpose: Main entry point for project hydration.
 #          Collects project metadata and performs global placeholder replacement.
@@ -191,14 +191,14 @@ main() {
     if resolve_bin "gh" >/dev/null 2>&1; then
       log_info "  - Synchronizing repository labels (SnowdreamTech Branded)..."
       # Try to sync, but don't fail if repo doesn't exist yet on GitHub
-      sh "$SCRIPT_DIR/sync-labels.sh" || log_warn "Label sync skipped (repository might not be on GitHub yet)."
+      sh "${SCRIPT_DIR:-}/sync-labels.sh" || log_warn "Label sync skipped (repository might not be on GitHub yet)."
     else
       log_warn "  - GitHub CLI (gh) not found. Skipping label sync."
     fi
 
     # Sync Dependabot
     log_info "  - Generating tailored Dependabot configuration..."
-    sh "$SCRIPT_DIR/gen-dependabot.sh"
+    sh "${SCRIPT_DIR:-}/gen-dependabot.sh"
   fi
 
   # 8. Git Initialization

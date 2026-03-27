@@ -26,7 +26,7 @@ set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
-. "$SCRIPT_DIR/lib/common.sh"
+. "${SCRIPT_DIR:-}/lib/common.sh"
 
 # Purpose: Main entry point for the health dashboard aggregation engine.
 # Params:
@@ -79,7 +79,7 @@ EOF
   printf "Checking Environment... "
   local _ENV_STATUS="✅ Passed"
   local _ENV_DETAIL="Validated via check-env.sh"
-  if ! sh "$SCRIPT_DIR/check-env.sh" >/dev/null 2>&1; then
+  if ! sh "${SCRIPT_DIR:-}/check-env.sh" >/dev/null 2>&1; then
     _ENV_STATUS="❌ Failed"
     # shellcheck disable=SC2016
     _ENV_DETAIL='Run `make check-env` for details'
@@ -92,7 +92,7 @@ EOF
   printf "Checking Standards... "
   local _LINT_STATUS="✅ Passed"
   local _LINT_DETAIL="All pre-commit hooks passed"
-  if ! sh "$SCRIPT_DIR/lint.sh" >/dev/null 2>&1; then
+  if ! sh "${SCRIPT_DIR:-}/lint.sh" >/dev/null 2>&1; then
     _LINT_STATUS="❌ Failed"
     # shellcheck disable=SC2016
     _LINT_DETAIL='Run `make lint` to fix issues'
@@ -105,7 +105,7 @@ EOF
   printf "Checking Logic... "
   local _TEST_STATUS="✅ Passed"
   local _TEST_DETAIL="Unified test suite passed"
-  if ! sh "$SCRIPT_DIR/test.sh" >/dev/null 2>&1; then
+  if ! sh "${SCRIPT_DIR:-}/test.sh" >/dev/null 2>&1; then
     _TEST_STATUS="❌ Failed"
     # shellcheck disable=SC2016
     _TEST_DETAIL='Run `make test` for failure logs'
@@ -118,7 +118,7 @@ EOF
   printf "Checking Security... "
   local _AUDIT_STATUS="✅ Passed"
   local _AUDIT_DETAIL="No critical vulnerabilities found"
-  if ! sh "$SCRIPT_DIR/audit.sh" >/dev/null 2>&1; then
+  if ! sh "${SCRIPT_DIR:-}/audit.sh" >/dev/null 2>&1; then
     _AUDIT_STATUS="⚠️  Warning"
     _AUDIT_DETAIL="Vulnerabilities or leaks detected"
   fi

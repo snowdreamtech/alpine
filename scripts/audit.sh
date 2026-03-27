@@ -1,4 +1,5 @@
 #!/usr/bin/env sh
+set -eu
 # Copyright (c) 2026 SnowdreamTech. All rights reserved.
 # Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
@@ -27,7 +28,7 @@
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
-. "$SCRIPT_DIR/lib/common.sh"
+. "${SCRIPT_DIR:-}/lib/common.sh"
 
 # Purpose: Displays usage information for the security auditor.
 # Examples:

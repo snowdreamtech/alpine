@@ -25,7 +25,7 @@ set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
-. "$SCRIPT_DIR/lib/common.sh"
+. "${SCRIPT_DIR:-}/lib/common.sh"
 
 # Purpose: Displays usage information for the documentation manager.
 # Examples:

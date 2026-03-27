@@ -27,11 +27,11 @@ set -eu
 # ── 🎒 Library Sourcing ──────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 # shellcheck source=/dev/null
-. "$SCRIPT_DIR/lib/common.sh"
+. "${SCRIPT_DIR:-}/lib/common.sh"
 # shellcheck source=/dev/null
-. "$SCRIPT_DIR/lib/registry.sh"
+. "${SCRIPT_DIR:-}/lib/registry.sh"
 # shellcheck source=/dev/null
-. "$SCRIPT_DIR/lib/versions.sh"
+. "${SCRIPT_DIR:-}/lib/versions.sh"
 
 # ── Extension Modules Sourcing ───────────────────────────────────────────────
 # Dynamically load all language-specific setup modules.

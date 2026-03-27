@@ -24,7 +24,7 @@ set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
-. "$SCRIPT_DIR/lib/common.sh"
+. "${SCRIPT_DIR:-}/lib/common.sh"
 
 # ── Configuration ────────────────────────────────────────────────────────────
 
@@ -201,10 +201,10 @@ update_cargo_deps() {
 # Examples:
 #   update_mise_tool_versions
 update_mise_tool_versions() {
-  if [ -f "$SCRIPT_DIR/update-tools.sh" ]; then
+  if [ -f "${SCRIPT_DIR:-}/update-tools.sh" ]; then
     log_info "Upgrading Mise tool versions..."
     # Delegate to update-tools.sh, passing through relevant flags
-    sh "$SCRIPT_DIR/update-tools.sh" "$@" || log_warn "Mise tool version upgrade failed."
+    sh "${SCRIPT_DIR:-}/update-tools.sh" "$@" || log_warn "Mise tool version upgrade failed."
   fi
 }
 

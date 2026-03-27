@@ -24,7 +24,7 @@ set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
 SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
-. "$SCRIPT_DIR/common.sh"
+. "${SCRIPT_DIR:-}/common.sh"
 
 # ── Functions ────────────────────────────────────────────────────────────────
 
