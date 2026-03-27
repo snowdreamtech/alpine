@@ -25,7 +25,7 @@ run_sync_lock() {
 
   # 1. Manifest Aggregation
   local _TMP_MANIFEST=".mise.toml.lock.temp"
-  ./scripts/gen-full-manifest.sh >"${_TMP_MANIFEST:-}"
+  "${_G_PROJECT_ROOT:-.}/scripts/gen-full-manifest.sh" >"${_TMP_MANIFEST:-}"
 
   # 2. List Extraction
   local _TOOLS
