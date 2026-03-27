@@ -163,7 +163,14 @@ else
 	@sh scripts/env.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
-update: ## Update global/project tools and hooks
+update-tools: ## Upgrade Mise-managed tool versions (Tier 1 & 2)
+ifeq ($(OS_NAME),Windows)
+	@scripts/update-tools.bat $(SCRIPT_ARGS) $(ARGS)
+else
+	@sh scripts/update-tools.sh $(SCRIPT_ARGS) $(ARGS)
+endif
+
+update: update-tools ## Update all tools, dependencies, and hooks
 ifeq ($(OS_NAME),Windows)
 	@scripts/update.bat $(SCRIPT_ARGS) $(ARGS)
 else
