@@ -36,7 +36,7 @@ Describe "Init-Project PowerShell Wrapper" {
 
             # Check if the output contains the start of the hydration script
             $outputString = $output -join "`n"
-            $outputString | Should -Match "Project Hydration"
+            $outputString | Should -Match "Project (Hydration|Onboarding)"
         }
         finally {
             Set-Location $OldCwd

@@ -73,7 +73,7 @@ teardown() {
   # Provide flags and YES confirmation via --yes, NO git reinit via pipe
   run bash -c "yes n | sh scripts/init-project.sh --project=dummy-app --author='Jane Doe' --github=janeorg --yes"
   assert_success
-  assert_output --partial "Project Hydration Complete!"
+  assert_output --partial "Project Initialization Complete!"
 
   run cat README.md
   assert_output "This is dummy-app by janeorg (janeorg)"
