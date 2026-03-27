@@ -62,7 +62,7 @@ teardown() {
   printf '#!/usr/bin/env sh\nexit 1\n' >"$TEMP_DIR/bin/mise"
   chmod +x "$TEMP_DIR/bin/"*
 
-  NO_COLOR=1 run sh scripts/check-env.sh --verbose
+  NO_COLOR=1 PATH="$TEMP_DIR/bin:$PATH" run sh scripts/check-env.sh --verbose
   assert_output --partial "pnpm: v9.0.0 (below recommended v10.30.3)"
 }
 
@@ -84,6 +84,6 @@ teardown() {
   printf '#!/usr/bin/env sh\nexit 1\n' >"$TEMP_DIR/bin/mise"
   chmod +x "$TEMP_DIR/bin/"*
 
-  NO_COLOR=1 run sh scripts/check-env.sh --verbose
+  NO_COLOR=1 PATH="$TEMP_DIR/bin:$PATH" run sh scripts/check-env.sh --verbose
   assert_output --partial "Python: v3.7.0 (below recommended v3.12.9)"
 }
