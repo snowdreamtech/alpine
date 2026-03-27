@@ -87,8 +87,8 @@ COREPACK_INTEGRITY_KEYS = "0"
 
 # Node.js & npm acceleration
 NPM_CONFIG_REGISTRY = "{% if env.CI is defined %}https://registry.npmjs.org{% else %}https://registry.npmmirror.com{% endif %}"
-NODEJS_ORG_MIRROR = "{% if env.CI is defined %}https://nodejs.org/dist/{% else %}https://mirrors.aliyun.com/nodejs-release/{% endif %}"
-MISE_NODE_MIRROR_URL = "{% if env.CI is defined %}https://nodejs.org/dist/{% else %}https://mirrors.aliyun.com/nodejs-release/{% endif %}"
+NODEJS_ORG_MIRROR = "{% if env.CI is defined %}https://nodejs.org/dist/{% else %}https://npmmirror.com/mirrors/node/{% endif %}"
+MISE_NODE_MIRROR_URL = "{% if env.CI is defined %}https://nodejs.org/dist/{% else %}https://npmmirror.com/mirrors/node/{% endif %}"
 
 # Python & pip acceleration
 PIP_INDEX_URL = "{% if env.CI is defined %}https://pypi.org/simple{% else %}https://mirrors.aliyun.com/pypi/simple{% endif %}"
