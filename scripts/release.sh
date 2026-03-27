@@ -25,7 +25,7 @@
 set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
 # ── Functions ────────────────────────────────────────────────────────────────
@@ -86,25 +86,25 @@ run_release_verify() {
 # Examples:
 #   perform_git_release "v1.0.0" 0
 perform_git_release() {
-  local _LV_RAW_VERSION="$1"
+  local _LV_RAW_VERSION="${1:-}"
   local _LV_DO_TAG="${2:-0}"
 
-  if [ -z "$_LV_RAW_VERSION" ]; then
+  if [ -z "${_LV_RAW_VERSION:-}" ]; then
     log_info "Synchronizing with manifest version..."
     _LV_RAW_VERSION=$(get_project_version)
   fi
 
   # Normalize version: Manifests use numeric, Git Tags use 'v' prefix
   local _LV_TAG_VERSION
-  if echo "$_LV_RAW_VERSION" | grep -q "^v"; then
-    _LV_TAG_VERSION="$_LV_RAW_VERSION"
+  if echo "${_LV_RAW_VERSION:-}" | grep -q "^v"; then
+    _LV_TAG_VERSION="${_LV_RAW_VERSION:-}"
   else
     _LV_TAG_VERSION="v$_LV_RAW_VERSION"
   fi
 
   log_info "── Target Release: $_LV_TAG_VERSION ──"
 
-  if [ "$_LV_DO_TAG" -eq 0 ]; then
+  if [ "${_LV_DO_TAG:-}" -eq 0 ]; then
     log_info "Default mode: Local verification only. Skipping git tag operation."
     log_info "Tip: Run with --git-tag to perform actual tagging and pushing."
     return 0
@@ -114,13 +114,13 @@ perform_git_release() {
     log_info "DRY-RUN: Would tag version $_LV_TAG_VERSION and push to origin."
   else
     # Safety Gate: Check if tag already exists
-    if git rev-parse "$_LV_TAG_VERSION" >/dev/null 2>&1; then
+    if git rev-parse "${_LV_TAG_VERSION:-}" >/dev/null 2>&1; then
       log_warn "Warning: Git tag $_LV_TAG_VERSION already exists. Skipping tagging."
     else
       log_info "Tagging local repository as $_LV_TAG_VERSION..."
-      git tag -a "$_LV_TAG_VERSION" -m "chore(release): $_LV_TAG_VERSION"
+      git tag -a "${_LV_TAG_VERSION:-}" -m "chore(release): $_LV_TAG_VERSION"
       log_info "Pushing tag to origin..."
-      git push origin "$_LV_TAG_VERSION"
+      git push origin "${_LV_TAG_VERSION:-}"
     fi
   fi
 }
@@ -158,7 +158,7 @@ main() {
   local _SYNC_LOCKFILES=0
   local _arg_rel
   for _arg_rel in "$@"; do
-    case "$_arg_rel" in
+    case "${_arg_rel:-}" in
     --git-tag)
       _DO_TAG_MAIN=1
       ;;
@@ -166,7 +166,7 @@ main() {
       _SYNC_LOCKFILES=1
       ;;
     [0-9]* | v[0-9]*)
-      _REL_TARGET_VERSION="$_arg_rel"
+      _REL_TARGET_VERSION="${_arg_rel:-}"
       ;;
     esac
   done
@@ -175,7 +175,7 @@ main() {
   log_info "📦 Starting Standardized Release Process...\n"
 
   # 3. Sync lockfiles if requested
-  if [ "$_SYNC_LOCKFILES" -eq 1 ]; then
+  if [ "${_SYNC_LOCKFILES:-}" -eq 1 ]; then
     sync_all_lockfiles
     printf "\n"
   fi
@@ -186,7 +186,7 @@ main() {
   printf "\n"
 
   # 5. Versioning & Tagging logic
-  perform_git_release "$_REL_TARGET_VERSION" "$_DO_TAG_MAIN"
+  perform_git_release "${_REL_TARGET_VERSION:-}" "${_DO_TAG_MAIN:-}"
 
   printf "\n"
 
@@ -196,7 +196,7 @@ main() {
   log_success "\n✨ Release process completed successfully!"
 
   # 7. Standardized Next Actions
-  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
     printf "  - Run %bgit push --tags%b to synchronize version tags with the remote.\n" "${GREEN}" "${NC}"
     printf "  - Run %bmake cleanup%b to remove temporary release artifacts.\n" "${GREEN}" "${NC}"

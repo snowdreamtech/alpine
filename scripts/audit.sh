@@ -26,7 +26,7 @@
 # We will track overall exit status manually.
 
 # ── Common Library ───────────────────────────────────────────────────────────
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
 # Purpose: Displays usage information for the security auditor.
@@ -76,7 +76,7 @@ main() {
   # 3. Secrets Scanning
   local _GITLEAKS_BIN
   _GITLEAKS_BIN=$(resolve_bin "gitleaks") || true
-  if [ -n "$_GITLEAKS_BIN" ]; then
+  if [ -n "${_GITLEAKS_BIN:-}" ]; then
     local _T0_GL
     _T0_GL=$(date +%s)
     log_info "── Scanning for Secrets (gitleaks) ──"
@@ -99,11 +99,11 @@ main() {
       fi
 
       # shellcheck disable=SC2086
-      if GIT_CONFIG_PARAMETERS="$_GL_GIT_PARAMS" \
-        run_quiet "$_GITLEAKS_BIN" $_GL_ARGS; then
-        log_summary "Security" "gitleaks" "✅ Clean" "$(get_version "$_GITLEAKS_BIN")" "$(($(date +%s) - _T0_GL))"
+      if GIT_CONFIG_PARAMETERS="${_GL_GIT_PARAMS:-}" \
+        run_quiet "${_GITLEAKS_BIN:-}" $_GL_ARGS; then
+        log_summary "Security" "gitleaks" "✅ Clean" "$(get_version "${_GITLEAKS_BIN:-}")" "$(($(date +%s) - _T0_GL))"
       else
-        log_summary "Security" "gitleaks" "❌ Leaks Found" "$(get_version "$_GITLEAKS_BIN")" "$(($(date +%s) - _T0_GL))"
+        log_summary "Security" "gitleaks" "❌ Leaks Found" "$(get_version "${_GITLEAKS_BIN:-}")" "$(($(date +%s) - _T0_GL))"
         _OVERALL_EXIT_AUDIT=1
       fi
     fi
@@ -115,7 +115,7 @@ main() {
     _T0_ZM=$(date +%s)
     local _ZIZMOR_BIN
     _ZIZMOR_BIN=$(resolve_bin "zizmor") || true
-    if [ -n "$_ZIZMOR_BIN" ]; then
+    if [ -n "${_ZIZMOR_BIN:-}" ]; then
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_success "DRY-RUN: Would run zizmor"
         log_summary "GitHub" "zizmor" "⚖️ Previewed" "-" "0"
@@ -126,23 +126,23 @@ main() {
         local _ZM_OK=0
         if [ -n "${GITHUB_TOKEN:-}" ]; then
           log_info "Zizmor: Attempting authenticated scan..."
-          export GH_TOKEN="$GITHUB_TOKEN"
-          if run_quiet "$_ZIZMOR_BIN" . --format plain --gh-token "$GITHUB_TOKEN"; then
+          export GH_TOKEN="${GITHUB_TOKEN:-}"
+          if run_quiet "${_ZIZMOR_BIN:-}" . --format plain --gh-token "${GITHUB_TOKEN:-}"; then
             _ZM_OK=1
           fi
         fi
 
-        if [ "$_ZM_OK" -eq 0 ]; then
+        if [ "${_ZM_OK:-}" -eq 0 ]; then
           log_info "Zizmor: Attempting offline scan (fallback)..."
-          if run_quiet "$_ZIZMOR_BIN" . --format plain --offline; then
+          if run_quiet "${_ZIZMOR_BIN:-}" . --format plain --offline; then
             _ZM_OK=1
           fi
         fi
 
-        if [ "$_ZM_OK" -eq 1 ]; then
-          log_summary "GitHub" "zizmor" "✅ Secure" "$(get_version "$_ZIZMOR_BIN")" "$(($(date +%s) - _T0_ZM))"
+        if [ "${_ZM_OK:-}" -eq 1 ]; then
+          log_summary "GitHub" "zizmor" "✅ Secure" "$(get_version "${_ZIZMOR_BIN:-}")" "$(($(date +%s) - _T0_ZM))"
         else
-          log_summary "GitHub" "zizmor" "⚠️ Findings" "$(get_version "$_ZIZMOR_BIN")" "$(($(date +%s) - _T0_ZM))"
+          log_summary "GitHub" "zizmor" "⚠️ Findings" "$(get_version "${_ZIZMOR_BIN:-}")" "$(($(date +%s) - _T0_ZM))"
           # Non-fatal: zizmor findings are informational for a template project.
           # Downstream projects should address these in their specific deployment environments.
         fi
@@ -151,7 +151,7 @@ main() {
   fi
 
   # 5. Dependency Audits (Node.js) — CI-only: network-heavy, slow on local dev.
-  if is_ci_env && [ -f "$PACKAGE_JSON" ]; then
+  if is_ci_env && [ -f "${PACKAGE_JSON:-}" ]; then
     local _T0_JS
     _T0_JS=$(date +%s)
     log_info "\n── Auditing Node.js dependencies ($NPM audit) ──"
@@ -164,10 +164,10 @@ main() {
       local _AUDIT_REGISTRY="https://registry.npmjs.org"
 
       # shellcheck disable=SC2086
-      if run_quiet "$NPM" audit --registry="${_AUDIT_REGISTRY}"; then
-        log_summary "Node.js" "$NPM-audit" "✅ Secure" "$(get_version "$NPM")" "$(($(date +%s) - _T0_JS))"
+      if run_quiet "${NPM:-}" audit --registry="${_AUDIT_REGISTRY}"; then
+        log_summary "Node.js" "$NPM-audit" "✅ Secure" "$(get_version "${NPM:-}")" "$(($(date +%s) - _T0_JS))"
       else
-        log_summary "Node.js" "$NPM-audit" "⚠️ Vulnerabilities" "$(get_version "$NPM")" "$(($(date +%s) - _T0_JS))"
+        log_summary "Node.js" "$NPM-audit" "⚠️ Vulnerabilities" "$(get_version "${NPM:-}")" "$(($(date +%s) - _T0_JS))"
         # Non-fatal: audit findings are informational for a template project.
         # Downstream projects should run their own audit with their own registry.
       fi
@@ -182,17 +182,17 @@ main() {
     local _PIPAUDIT_BIN
     _PIPAUDIT_BIN=$(resolve_bin "pip-audit") || true
 
-    if [ -n "$_PIPAUDIT_BIN" ]; then
+    if [ -n "${_PIPAUDIT_BIN:-}" ]; then
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_success "DRY-RUN: Would run $_PIPAUDIT_BIN"
         log_summary "Python" "pip-audit" "⚖️ Previewed" "-" "0"
       else
         local _V_PY_AUD
-        _V_PY_AUD=$(get_version "$_PIPAUDIT_BIN")
-        if run_quiet "$_PIPAUDIT_BIN"; then
-          log_summary "Python" "pip-audit" "✅ Secure" "$_V_PY_AUD" "$(($(date +%s) - _T0_PY_AUD))"
+        _V_PY_AUD=$(get_version "${_PIPAUDIT_BIN:-}")
+        if run_quiet "${_PIPAUDIT_BIN:-}"; then
+          log_summary "Python" "pip-audit" "✅ Secure" "${_V_PY_AUD:-}" "$(($(date +%s) - _T0_PY_AUD))"
         else
-          log_summary "Python" "pip-audit" "❌ Vulnerable" "$_V_PY_AUD" "$(($(date +%s) - _T0_PY_AUD))"
+          log_summary "Python" "pip-audit" "❌ Vulnerable" "${_V_PY_AUD:-}" "$(($(date +%s) - _T0_PY_AUD))"
           _OVERALL_EXIT_AUDIT=1
         fi
       fi
@@ -206,11 +206,11 @@ main() {
   # Only run when at least one lockfile is present to avoid pointless scan on bare projects.
   _HAS_LOCKFILE=0
   for _lf in package-lock.json pnpm-lock.yaml yarn.lock go.sum Cargo.lock requirements.txt Pipfile.lock; do
-    [ -f "$_lf" ] && _HAS_LOCKFILE=1 && break
+    [ -f "${_lf:-}" ] && _HAS_LOCKFILE=1 && break
   done
   local _OSV_BIN
   _OSV_BIN=$(resolve_bin "osv-scanner") || true
-  if is_ci_env && [ "$_HAS_LOCKFILE" -eq 1 ] && [ -n "$_OSV_BIN" ]; then
+  if is_ci_env && [ "${_HAS_LOCKFILE:-}" -eq 1 ] && [ -n "${_OSV_BIN:-}" ]; then
     local _T0_OSV_AUD
     _T0_OSV_AUD=$(date +%s)
     log_info "\n── Generic Vulnerability Scan (osv-scanner) ──"
@@ -220,19 +220,19 @@ main() {
     else
       # Capture output to detect "No package sources found" which should be a skip/pass, not an error.
       local _OSV_OUT
-      _OSV_OUT=$("$_OSV_BIN" -r . 2>&1)
+      _OSV_OUT=$("${_OSV_BIN:-}" -r . 2>&1)
       local _OSV_EXIT=$?
 
       if [ $_OSV_EXIT -eq 0 ]; then
-        log_summary "Security" "osv-scanner" "✅ Secure" "$(get_version "$_OSV_BIN")" "$(($(date +%s) - _T0_OSV_AUD))"
-      elif echo "$_OSV_OUT" | grep -q "No package sources found"; then
+        log_summary "Security" "osv-scanner" "✅ Secure" "$(get_version "${_OSV_BIN:-}")" "$(($(date +%s) - _T0_OSV_AUD))"
+      elif echo "${_OSV_OUT:-}" | grep -q "No package sources found"; then
         log_info "osv-scanner: No package sources found. Skipping."
-        log_summary "Security" "osv-scanner" "⏭️  Skipped" "$(get_version "$_OSV_BIN")" "$(($(date +%s) - _T0_OSV_AUD))"
+        log_summary "Security" "osv-scanner" "⏭️  Skipped" "$(get_version "${_OSV_BIN:-}")" "$(($(date +%s) - _T0_OSV_AUD))"
       else
         # Non-fatal: template project may have transitive CVEs in devDeps.
         # Downstream projects should run osv-scanner on their own codebase.
-        echo "$_OSV_OUT"
-        log_summary "Security" "osv-scanner" "⚠️ Findings" "$(get_version "$_OSV_BIN")" "$(($(date +%s) - _T0_OSV_AUD))"
+        echo "${_OSV_OUT:-}"
+        log_summary "Security" "osv-scanner" "⚠️ Findings" "$(get_version "${_OSV_BIN:-}")" "$(($(date +%s) - _T0_OSV_AUD))"
       fi
     fi
   fi
@@ -244,15 +244,15 @@ main() {
     log_info "\n── Auditing Go dependencies (govulncheck) ──"
     local _GOVULN_BIN
     _GOVULN_BIN=$(resolve_bin "govulncheck") || true
-    if [ -n "$_GOVULN_BIN" ]; then
+    if [ -n "${_GOVULN_BIN:-}" ]; then
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_success "DRY-RUN: Would run govulncheck"
         log_summary "Go" "govulncheck" "⚖️ Previewed" "-" "0"
       else
-        if run_quiet "$_GOVULN_BIN" ./...; then
-          log_summary "Go" "govulncheck" "✅ Secure" "$(get_version "$_GOVULN_BIN")" "$(($(date +%s) - _T0_GO_AUD))"
+        if run_quiet "${_GOVULN_BIN:-}" ./...; then
+          log_summary "Go" "govulncheck" "✅ Secure" "$(get_version "${_GOVULN_BIN:-}")" "$(($(date +%s) - _T0_GO_AUD))"
         else
-          log_summary "Go" "govulncheck" "❌ Vulnerable" "$(get_version "$_GOVULN_BIN")" "$(($(date +%s) - _T0_GO_AUD))"
+          log_summary "Go" "govulncheck" "❌ Vulnerable" "$(get_version "${_GOVULN_BIN:-}")" "$(($(date +%s) - _T0_GO_AUD))"
           _OVERALL_EXIT_AUDIT=1
         fi
       fi
@@ -268,15 +268,15 @@ main() {
     log_info "\n── Auditing Rust dependencies (cargo audit) ──"
     local _CARGO_AUDIT_BIN
     _CARGO_AUDIT_BIN=$(resolve_bin "cargo-audit") || true
-    if [ -n "$_CARGO_AUDIT_BIN" ]; then
+    if [ -n "${_CARGO_AUDIT_BIN:-}" ]; then
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_success "DRY-RUN: Would run cargo audit"
         log_summary "Rust" "cargo-audit" "⚖️ Previewed" "-" "0"
       else
-        if run_quiet "$_CARGO_AUDIT_BIN" audit; then
-          log_summary "Rust" "cargo-audit" "✅ Secure" "$(get_version "$_CARGO_AUDIT_BIN")" "$(($(date +%s) - _T0_RS_AUD))"
+        if run_quiet "${_CARGO_AUDIT_BIN:-}" audit; then
+          log_summary "Rust" "cargo-audit" "✅ Secure" "$(get_version "${_CARGO_AUDIT_BIN:-}")" "$(($(date +%s) - _T0_RS_AUD))"
         else
-          log_summary "Rust" "cargo-audit" "❌ Vulnerable" "$(get_version "$_CARGO_AUDIT_BIN")" "$(($(date +%s) - _T0_RS_AUD))"
+          log_summary "Rust" "cargo-audit" "❌ Vulnerable" "$(get_version "${_CARGO_AUDIT_BIN:-}")" "$(($(date +%s) - _T0_RS_AUD))"
           _OVERALL_EXIT_AUDIT=1
         fi
       fi
@@ -293,9 +293,9 @@ main() {
     _T0_SBOM=$(date +%s)
     local _TRIVY_BIN
     _TRIVY_BIN=$(resolve_bin "trivy") || true
-    if [ -n "$_TRIVY_BIN" ]; then
+    if [ -n "${_TRIVY_BIN:-}" ]; then
       local _T_VER
-      _T_VER=$(get_version "$_TRIVY_BIN")
+      _T_VER=$(get_version "${_TRIVY_BIN:-}")
       local _R_VER
       _R_VER=$(get_mise_tool_version "trivy")
 
@@ -305,25 +305,25 @@ main() {
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_success "DRY-RUN: Would generate CycloneDX SBOM"
         log_summary "Security" "sbom" "⚖️ Previewed" "-" "0"
-      elif [ "$_T_VER" != "$_R_VER" ] && [ "$_R_VER" != "latest" ]; then
+      elif [ "${_T_VER:-}" != "${_R_VER:-}" ] && [ "${_R_VER:-}" != "latest" ]; then
         log_error "SECURITY ERROR: Trivy version mismatch! Found: $_T_VER, Expected: $_R_VER"
         log_error "This may indicate a compromised binary (Ref: March 2026 Incident)."
-        log_summary "Security" "sbom" "⛔ Version Mismatch" "$_T_VER" "0"
+        log_summary "Security" "sbom" "⛔ Version Mismatch" "${_T_VER:-}" "0"
         _OVERALL_EXIT_AUDIT=1
       else
-        if run_quiet "$_TRIVY_BIN" fs --format cyclonedx --output sbom.json .; then
-          log_summary "Security" "sbom" "✅ Generated" "$_T_VER" "$(($(date +%s) - _T0_SBOM))"
+        if run_quiet "${_TRIVY_BIN:-}" fs --format cyclonedx --output sbom.json .; then
+          log_summary "Security" "sbom" "✅ Generated" "${_T_VER:-}" "$(($(date +%s) - _T0_SBOM))"
           log_success "SBOM generated at sbom.json"
 
           # 9.1 SBOM Vulnerability Scan
           log_info "── Auditing SBOM for vulnerabilities ──"
-          if run_quiet "$_TRIVY_BIN" sbom sbom.json; then
+          if run_quiet "${_TRIVY_BIN:-}" sbom sbom.json; then
             log_success "SBOM audit passed"
           else
             log_warning "SBOM contains known vulnerabilities (Review sbom.json)"
           fi
         else
-          log_summary "Security" "sbom" "⚠️ Failed" "$_T_VER" "$(($(date +%s) - _T0_SBOM))"
+          log_summary "Security" "sbom" "⚠️ Failed" "${_T_VER:-}" "$(($(date +%s) - _T0_SBOM))"
         fi
       fi
     fi
@@ -350,39 +350,39 @@ main() {
     if command -v file >/dev/null 2>&1; then
       # Scan for files that 'file' identifies as executable but don't have known allowed extensions
       _STEALTH_FOUND=$(find . -maxdepth 4 -not -path '*/.*' -not -path './node_modules/*' -not -path './dist/*' -not -path "./${VENV:-.venv}/*" -type f -exec file --mime {} + | grep -v "; charset=binary" | grep "application/x-executable\|application/x-sharedlib\|application/x-archive" | cut -d: -f1)
-      if [ -n "$_STEALTH_FOUND" ]; then
+      if [ -n "${_STEALTH_FOUND:-}" ]; then
         _BIN_FOUND="${_BIN_FOUND}\n${_STEALTH_FOUND}"
       fi
     fi
 
     # Combine results and strip leading/trailing whitespace/newlines
-    _FINAL_BIN_LIST=$(printf "%s\n%s" "$_BIN_FOUND" "$_STEALTH_FOUND" | tr -d '\r' | sed '/^[[:space:]]*$/d')
+    _FINAL_BIN_LIST=$(printf "%s\n%s" "${_BIN_FOUND:-}" "${_STEALTH_FOUND:-}" | tr -d '\r' | sed '/^[[:space:]]*$/d')
 
-    if [ -z "$_FINAL_BIN_LIST" ]; then
+    if [ -z "${_FINAL_BIN_LIST:-}" ]; then
       log_summary "Security" "binary-audit" "✅ Clean" "-" "$(($(date +%s) - _T0_BIN_AUD))"
     else
       log_warning "Unexpected binary artifacts found:"
-      echo "$_FINAL_BIN_LIST"
+      echo "${_FINAL_BIN_LIST:-}"
       log_summary "Security" "binary-audit" "⚠️ Findings" "-" "$(($(date +%s) - _T0_BIN_AUD))"
     fi
   fi
 
   # ── Final Report ─────────────────────────────────────────────────────────────
 
-  if [ "$_IS_TOP_LEVEL" = "true" ]; then
+  if [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
     local _TOTAL_DUR_AUD
     _TOTAL_DUR_AUD=$(($(date +%s) - _START_TIME_AUDIT))
-    printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR_AUD" >>"$CI_STEP_SUMMARY"
+    printf "\n**Total Duration: %ss**\n" "${_TOTAL_DUR_AUD:-}" >>"${CI_STEP_SUMMARY:-}"
 
     printf "\n"
     if ! is_ci_env; then
-      cat "$CI_STEP_SUMMARY"
+      cat "${CI_STEP_SUMMARY:-}"
     fi
     finalize_summary_table
   fi
 
-  if [ "$_IS_TOP_LEVEL" = "true" ]; then
-    if [ "$_OVERALL_EXIT_AUDIT" -eq 0 ]; then
+  if [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
+    if [ "${_OVERALL_EXIT_AUDIT:-}" -eq 0 ]; then
       log_success "\n✨ Security audit finished successfully."
       if [ "${DRY_RUN:-0}" -eq 0 ]; then
         printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
@@ -394,7 +394,7 @@ main() {
     fi
   fi
 
-  exit "$_OVERALL_EXIT_AUDIT"
+  exit "${_OVERALL_EXIT_AUDIT:-}"
 }
 
 main "$@"

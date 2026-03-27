@@ -24,7 +24,7 @@
 set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
 # Purpose: Displays usage information for the project builder.
@@ -60,15 +60,15 @@ EOF
 # Examples:
 #   run_build "go build ./..." "Go build (native)"
 run_build() {
-  local _CMD_BLD="$1"
-  local _DESC_BLD="$2"
+  local _CMD_BLD="${1:-}"
+  local _DESC_BLD="${2:-}"
 
   log_info "── Step: $_DESC_BLD ──"
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_success "DRY-RUN: Would run: $_CMD_BLD"
   else
     # shellcheck disable=SC2086
-    eval "$_CMD_BLD"
+    eval "${_CMD_BLD:-}"
   fi
 }
 
@@ -91,7 +91,7 @@ main() {
   if [ -f ".goreleaser.yaml" ] || [ -f ".goreleaser.yml" ]; then
     local _GORELEASER_BIN
     _GORELEASER_BIN=$(resolve_bin "${GORELEASER:-goreleaser}") || true
-    if [ -n "$_GORELEASER_BIN" ]; then
+    if [ -n "${_GORELEASER_BIN:-}" ]; then
       run_build "$_GORELEASER_BIN build --snapshot --clean" "GoReleaser snapshot build"
     fi
   elif [ -f "go.mod" ]; then
@@ -106,7 +106,7 @@ main() {
     local _PYTHON_BLD_BIN
     _PYTHON_BLD_BIN=$(resolve_bin "python3") || true
 
-    if [ -n "$_PYTHON_BLD_BIN" ]; then
+    if [ -n "${_PYTHON_BLD_BIN:-}" ]; then
       run_build "$_PYTHON_BLD_BIN -m build" "Python build"
     fi
   fi
@@ -114,7 +114,7 @@ main() {
   log_success "✨ Build completed successfully! Check the 'out/' or 'dist/' directory."
 
   # 6. Standardized Next Actions
-  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
     printf "  - Run %bmake release%b to create a production version tag.\n" "${GREEN}" "${NC}"
     printf "  - Run %bmake verify%b to perform final artifact validation.\n" "${GREEN}" "${NC}"

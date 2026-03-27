@@ -24,7 +24,7 @@
 set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
 # Purpose: Displays usage information for the documentation manager.
@@ -67,8 +67,8 @@ main() {
   local _COMMAND_DOC="dev"
   local _arg_doc
   for _arg_doc in "$@"; do
-    case "$_arg_doc" in
-    dev | build | preview) _COMMAND_DOC="$_arg_doc" ;;
+    case "${_arg_doc:-}" in
+    dev | build | preview) _COMMAND_DOC="${_arg_doc:-}" ;;
     esac
   done
   parse_common_args "$@"
@@ -77,12 +77,12 @@ main() {
 
   # 3. Dependency checks — skipped in dry-run (environment may not have docs/ or vitepress)
   if [ "${DRY_RUN:-0}" -eq 0 ]; then
-    if [ ! -d "$DOCS_DIR" ]; then
+    if [ ! -d "${DOCS_DIR:-}" ]; then
       log_error "Error: Documentation directory '$DOCS_DIR' not found."
       exit 1
     fi
 
-    if ! resolve_bin "$NPM" >/dev/null 2>&1; then
+    if ! resolve_bin "${NPM:-}" >/dev/null 2>&1; then
       log_error "Error: $NPM not found. Please install it to build documentation."
       exit 1
     fi
@@ -91,14 +91,14 @@ main() {
     local _VITEPRESS_BIN
     _VITEPRESS_BIN=$(resolve_bin "vitepress") || true
 
-    if [ -z "$_VITEPRESS_BIN" ]; then
+    if [ -z "${_VITEPRESS_BIN:-}" ]; then
       log_error "Error: vitepress not found. Please run 'make setup' first."
       exit 1
     fi
   fi
 
   # 5. Execute VitePress
-  case "$_COMMAND_DOC" in
+  case "${_COMMAND_DOC:-}" in
   dev)
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would start VitePress dev server on $DOCS_DIR"
@@ -106,7 +106,7 @@ main() {
       local _VITEPRESS_BIN
       _VITEPRESS_BIN=$(resolve_bin "vitepress") || true
       log_info "Starting development server..."
-      "$_VITEPRESS_BIN" dev "$DOCS_DIR"
+      "${_VITEPRESS_BIN:-}" dev "${DOCS_DIR:-}"
     fi
     ;;
   build)
@@ -118,13 +118,13 @@ main() {
         log_info "Installing documentation dependencies..."
         # use 'mise exec' to ensure pnpm is resolved via mise shims
         # even when the mise shell integration is not activated.
-        run_mise exec -- pnpm --dir "$DOCS_DIR" install
+        run_mise exec -- pnpm --dir "${DOCS_DIR:-}" install
       fi
 
       local _VITEPRESS_BIN
       _VITEPRESS_BIN=$(resolve_bin "vitepress") || true
       log_info "Building documentation site..."
-      "$_VITEPRESS_BIN" build "$DOCS_DIR"
+      "${_VITEPRESS_BIN:-}" build "${DOCS_DIR:-}"
       log_success "\n✨ Build complete! Artifacts are in $DOCS_DIR/.vitepress/dist"
     fi
     ;;
@@ -135,15 +135,15 @@ main() {
       local _VITEPRESS_BIN
       _VITEPRESS_BIN=$(resolve_bin "vitepress") || true
       log_info "Previewing production build..."
-      "$_VITEPRESS_BIN" preview "$DOCS_DIR"
+      "${_VITEPRESS_BIN:-}" preview "${DOCS_DIR:-}"
     fi
     ;;
   esac
 
   # 5. Standardized Next Actions
-  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
-    if [ "$_COMMAND_DOC" = "build" ]; then
+    if [ "${_COMMAND_DOC:-}" = "build" ]; then
       printf "  - Run %bmake release%b to publish the documentation and project.\n" "${GREEN}" "${NC}"
     else
       printf "  - Run %bmake docs build%b to generate production-ready documentation.\n" "${GREEN}" "${NC}"

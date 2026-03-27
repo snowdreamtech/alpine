@@ -21,7 +21,7 @@
 set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
 # ── Configuration ────────────────────────────────────────────────────────────
@@ -34,7 +34,7 @@ DRY_RUN=0
 # Params:
 #   $1 - Dependabot ecosystem name
 get_label() {
-  case "$1" in
+  case "${1:-}" in
   github-actions) echo "github-actions" ;;
   npm | bun) echo "javascript" ;;
   pip | conda | uv) echo "python" ;;
@@ -69,7 +69,7 @@ get_label() {
 has_tracked_file() {
   for _pattern in "$@"; do
     # Use git ls-files with glob matching; returns non-empty if matched
-    if git ls-files --error-unmatch "$_pattern" >/dev/null 2>&1; then
+    if git ls-files --error-unmatch "${_pattern:-}" >/dev/null 2>&1; then
       return 0
     fi
   done
@@ -84,11 +84,11 @@ find_dirs_for_patterns() {
   _FOUND_DIRS=""
   for _pattern in "$@"; do
     # List matching tracked files, extract directory, convert to Dependabot format
-    _matches=$(git ls-files "$_pattern" 2>/dev/null || true)
-    if [ -n "$_matches" ]; then
-      _new_dirs=$(echo "$_matches" | while IFS= read -r _file; do
-        _dir=$(dirname "$_file")
-        if [ "$_dir" = "." ]; then
+    _matches=$(git ls-files "${_pattern:-}" 2>/dev/null || true)
+    if [ -n "${_matches:-}" ]; then
+      _new_dirs=$(echo "${_matches:-}" | while IFS= read -r _file; do
+        _dir=$(dirname "${_file:-}")
+        if [ "${_dir:-}" = "." ]; then
           echo "/"
         else
           echo "/$_dir"
@@ -99,8 +99,8 @@ find_dirs_for_patterns() {
     fi
   done
   # Deduplicate and sort
-  if [ -n "$_FOUND_DIRS" ]; then
-    echo "$_FOUND_DIRS" | sort -u
+  if [ -n "${_FOUND_DIRS:-}" ]; then
+    echo "${_FOUND_DIRS:-}" | sort -u
   fi
 }
 
@@ -110,19 +110,19 @@ find_dirs_for_patterns() {
 #   $1 - Ecosystem name
 #   $2 - Directory path (Dependabot format)
 emit_entry() {
-  _ecosystem="$1"
-  _directory="$2"
-  _label=$(get_label "$_ecosystem")
+  _ecosystem="${1:-}"
+  _directory="${2:-}"
+  _label=$(get_label "${_ecosystem:-}")
 
   # 1. Frequency Tiering: Core ecosystems daily, others weekly
   _interval="weekly"
-  case "$_ecosystem" in
+  case "${_ecosystem:-}" in
   npm | gomod | bun | pip | uv) _interval="daily" ;;
   esac
 
   # 4. Semantic Commit Prefixes: ci for actions, build for infra, chore for deps
   _prefix="chore(deps):"
-  case "$_ecosystem" in
+  case "${_ecosystem:-}" in
   github-actions) _prefix="ci(deps):" ;;
   docker | devcontainers) _prefix="build(deps):" ;;
   esac
@@ -132,7 +132,7 @@ emit_entry() {
 
   # 3. Label Refinement: Add semantic labels
   _extra_labels=""
-  case "$_ecosystem" in
+  case "${_ecosystem:-}" in
   github-actions) _extra_labels='
       - "devops"' ;;
   docker | devcontainers) _extra_labels='
@@ -160,7 +160,7 @@ emit_entry() {
 EOF
 
   # Add ecosystem-specific groups to further reduce noise
-  if [ "$_ecosystem" = "npm" ]; then
+  if [ "${_ecosystem:-}" = "npm" ]; then
     cat <<EOF
       🧹-lint-dependencies:
         patterns: ["eslint*", "prettier*", "stylelint*"]
@@ -169,22 +169,22 @@ EOF
       ⚡-vite-suite:
         patterns: ["vite*", "@vitejs/*"]
 EOF
-  elif [ "$_ecosystem" = "github-actions" ]; then
+  elif [ "${_ecosystem:-}" = "github-actions" ]; then
     cat <<EOF
       🔧-actions-updates:
         patterns: ["*"]
 EOF
-  elif [ "$_ecosystem" = "docker" ] || [ "$_ecosystem" = "devcontainers" ]; then
+  elif [ "${_ecosystem:-}" = "docker" ] || [ "${_ecosystem:-}" = "devcontainers" ]; then
     cat <<EOF
       🐳-base-images:
         patterns: ["alpine*", "ubuntu*", "debian*", "rocky*", "rockylinux*", "rhel*", "node*", "python*", "golang*"]
 EOF
-  elif [ "$_ecosystem" = "pre-commit" ]; then
+  elif [ "${_ecosystem:-}" = "pre-commit" ]; then
     cat <<EOF
       🧹-pre-commit-hooks:
         patterns: ["*"]
 EOF
-  elif [ "$_ecosystem" = "gomod" ]; then
+  elif [ "${_ecosystem:-}" = "gomod" ]; then
     cat <<EOF
       🧪-go-cloud-suite:
         patterns: ["google.golang.org/*", "github.com/aws/*", "github.com/azure/*"]
@@ -215,11 +215,11 @@ scan_ecosystems() {
   # Helper: emit only if not already emitted
   _emit_unique() {
     _key="${1}:${2}"
-    case "$_EMITTED" in
+    case "${_EMITTED:-}" in
     *"|${_key}|"*) return ;; # Already emitted
     esac
     _EMITTED="${_EMITTED}|${_key}|"
-    emit_entry "$1" "$2"
+    emit_entry "${1:-}" "${2:-}"
   }
 
   # ── 1. GitHub Actions ────────────────────────────────────────────────────
@@ -229,73 +229,73 @@ scan_ecosystems() {
 
   # ── 2. npm / pnpm / yarn ────────────────────────────────────────────────
   _npm_dirs=$(find_dirs_for_patterns "package.json" "**/package.json")
-  if [ -n "$_npm_dirs" ]; then
-    echo "$_npm_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "npm" "$_d"
+  if [ -n "${_npm_dirs:-}" ]; then
+    echo "${_npm_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "npm" "${_d:-}"
     done
   fi
 
   # ── 3. pip (Python) ─────────────────────────────────────────────────────
   _pip_dirs=$(find_dirs_for_patterns "requirements.txt" "requirements-dev.txt" "setup.py" "setup.cfg" "Pipfile" "**/requirements.txt" "**/Pipfile")
-  if [ -n "$_pip_dirs" ]; then
-    echo "$_pip_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "pip" "$_d"
+  if [ -n "${_pip_dirs:-}" ]; then
+    echo "${_pip_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "pip" "${_d:-}"
     done
   fi
 
   # ── 4. Go Modules ───────────────────────────────────────────────────────
   _go_dirs=$(find_dirs_for_patterns "go.mod" "**/go.mod")
-  if [ -n "$_go_dirs" ]; then
-    echo "$_go_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "gomod" "$_d"
+  if [ -n "${_go_dirs:-}" ]; then
+    echo "${_go_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "gomod" "${_d:-}"
     done
   fi
 
   # ── 5. Cargo (Rust) ─────────────────────────────────────────────────────
   _cargo_dirs=$(find_dirs_for_patterns "Cargo.toml" "**/Cargo.toml")
-  if [ -n "$_cargo_dirs" ]; then
-    echo "$_cargo_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "cargo" "$_d"
+  if [ -n "${_cargo_dirs:-}" ]; then
+    echo "${_cargo_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "cargo" "${_d:-}"
     done
   fi
 
   # ── 6. Composer (PHP) ───────────────────────────────────────────────────
   _composer_dirs=$(find_dirs_for_patterns "composer.json" "**/composer.json")
-  if [ -n "$_composer_dirs" ]; then
-    echo "$_composer_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "composer" "$_d"
+  if [ -n "${_composer_dirs:-}" ]; then
+    echo "${_composer_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "composer" "${_d:-}"
     done
   fi
 
   # ── 7. Bundler (Ruby) ───────────────────────────────────────────────────
   _bundler_dirs=$(find_dirs_for_patterns "Gemfile" "**/Gemfile")
-  if [ -n "$_bundler_dirs" ]; then
-    echo "$_bundler_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "bundler" "$_d"
+  if [ -n "${_bundler_dirs:-}" ]; then
+    echo "${_bundler_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "bundler" "${_d:-}"
     done
   fi
 
   # ── 8. Docker ───────────────────────────────────────────────────────────
   _docker_dirs=$(find_dirs_for_patterns "Dockerfile" "**/Dockerfile" "Dockerfile.*" "**/Dockerfile.*")
-  if [ -n "$_docker_dirs" ]; then
-    echo "$_docker_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "docker" "$_d"
+  if [ -n "${_docker_dirs:-}" ]; then
+    echo "${_docker_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "docker" "${_d:-}"
     done
   fi
 
   # ── 9. Mix (Elixir) ─────────────────────────────────────────────────────
   _mix_dirs=$(find_dirs_for_patterns "mix.exs" "**/mix.exs")
-  if [ -n "$_mix_dirs" ]; then
-    echo "$_mix_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "mix" "$_d"
+  if [ -n "${_mix_dirs:-}" ]; then
+    echo "${_mix_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "mix" "${_d:-}"
     done
   fi
 
   # ── 10. Elm ──────────────────────────────────────────────────────────────
   _elm_dirs=$(find_dirs_for_patterns "elm.json" "**/elm.json")
-  if [ -n "$_elm_dirs" ]; then
-    echo "$_elm_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "elm" "$_d"
+  if [ -n "${_elm_dirs:-}" ]; then
+    echo "${_elm_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "elm" "${_d:-}"
     done
   fi
 
@@ -306,105 +306,105 @@ scan_ecosystems() {
 
   # ── 12. Gradle (Java/Kotlin) ─────────────────────────────────────────────
   _gradle_dirs=$(find_dirs_for_patterns "build.gradle" "build.gradle.kts" "**/build.gradle" "**/build.gradle.kts")
-  if [ -n "$_gradle_dirs" ]; then
-    echo "$_gradle_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "gradle" "$_d"
+  if [ -n "${_gradle_dirs:-}" ]; then
+    echo "${_gradle_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "gradle" "${_d:-}"
     done
   fi
 
   # ── 13. Maven (Java) ────────────────────────────────────────────────────
   _maven_dirs=$(find_dirs_for_patterns "pom.xml" "**/pom.xml")
-  if [ -n "$_maven_dirs" ]; then
-    echo "$_maven_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "maven" "$_d"
+  if [ -n "${_maven_dirs:-}" ]; then
+    echo "${_maven_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "maven" "${_d:-}"
     done
   fi
 
   # ── 14. NuGet (C#/.NET) ──────────────────────────────────────────────────
   _nuget_files=$(git ls-files "*.csproj" "*.fsproj" "packages.config" "**/*.csproj" "**/*.fsproj" "**/packages.config" 2>/dev/null || true)
-  if [ -n "$_nuget_files" ]; then
-    _nuget_dirs=$(echo "$_nuget_files" | while IFS= read -r _f; do
-      _d=$(dirname "$_f")
-      [ "$_d" = "." ] && echo "/" || echo "/$_d"
+  if [ -n "${_nuget_files:-}" ]; then
+    _nuget_dirs=$(echo "${_nuget_files:-}" | while IFS= read -r _f; do
+      _d=$(dirname "${_f:-}")
+      [ "${_d:-}" = "." ] && echo "/" || echo "/$_d"
     done | sort -u)
-    echo "$_nuget_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "nuget" "$_d"
+    echo "${_nuget_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "nuget" "${_d:-}"
     done
   fi
 
   # ── 15. Pub (Dart/Flutter) ───────────────────────────────────────────────
   _pub_dirs=$(find_dirs_for_patterns "pubspec.yaml" "**/pubspec.yaml")
-  if [ -n "$_pub_dirs" ]; then
-    echo "$_pub_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "pub" "$_d"
+  if [ -n "${_pub_dirs:-}" ]; then
+    echo "${_pub_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "pub" "${_d:-}"
     done
   fi
 
   # ── 16. Swift ────────────────────────────────────────────────────────────
   _swift_dirs=$(find_dirs_for_patterns "Package.swift" "**/Package.swift")
-  if [ -n "$_swift_dirs" ]; then
-    echo "$_swift_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "swift" "$_d"
+  if [ -n "${_swift_dirs:-}" ]; then
+    echo "${_swift_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "swift" "${_d:-}"
     done
   fi
 
   # ── 17. Terraform ────────────────────────────────────────────────────────
   _tf_files=$(git ls-files "*.tf" "**/*.tf" 2>/dev/null | grep -v '\.terraform/' || true)
-  if [ -n "$_tf_files" ]; then
-    _tf_dirs=$(echo "$_tf_files" | while IFS= read -r _f; do
-      _d=$(dirname "$_f")
-      [ "$_d" = "." ] && echo "/" || echo "/$_d"
+  if [ -n "${_tf_files:-}" ]; then
+    _tf_dirs=$(echo "${_tf_files:-}" | while IFS= read -r _f; do
+      _d=$(dirname "${_f:-}")
+      [ "${_d:-}" = "." ] && echo "/" || echo "/$_d"
     done | sort -u)
-    echo "$_tf_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "terraform" "$_d"
+    echo "${_tf_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "terraform" "${_d:-}"
     done
   fi
 
   # ── 18. Dev Containers ──────────────────────────────────────────────────
   _dc_dirs=$(find_dirs_for_patterns "devcontainer.json" ".devcontainer.json" "**/devcontainer.json" "**/.devcontainer.json")
-  if [ -n "$_dc_dirs" ]; then
-    echo "$_dc_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "devcontainers" "$_d"
+  if [ -n "${_dc_dirs:-}" ]; then
+    echo "${_dc_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "devcontainers" "${_d:-}"
     done
   fi
 
   # ── 19. Bazel ────────────────────────────────────────────────────────────
   _bazel_dirs=$(find_dirs_for_patterns "MODULE.bazel" "WORKSPACE" "**/MODULE.bazel" "**/WORKSPACE")
-  if [ -n "$_bazel_dirs" ]; then
-    echo "$_bazel_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "bazel" "$_d"
+  if [ -n "${_bazel_dirs:-}" ]; then
+    echo "${_bazel_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "bazel" "${_d:-}"
     done
   fi
 
   # ── 20. Bun ──────────────────────────────────────────────────────────────
   _bun_dirs=$(find_dirs_for_patterns "bun.lockb" "bunfig.toml" "**/bun.lockb" "**/bunfig.toml")
-  if [ -n "$_bun_dirs" ]; then
-    echo "$_bun_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "bun" "$_d"
+  if [ -n "${_bun_dirs:-}" ]; then
+    echo "${_bun_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "bun" "${_d:-}"
     done
   fi
 
   # ── 21. Conda ────────────────────────────────────────────────────────────
   _conda_dirs=$(find_dirs_for_patterns "environment.yml" "environment.yaml" "**/environment.yml" "**/environment.yaml")
-  if [ -n "$_conda_dirs" ]; then
-    echo "$_conda_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "conda" "$_d"
+  if [ -n "${_conda_dirs:-}" ]; then
+    echo "${_conda_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "conda" "${_d:-}"
     done
   fi
 
   # ── 22. Helm ─────────────────────────────────────────────────────────────
   _helm_dirs=$(find_dirs_for_patterns "Chart.yaml" "**/Chart.yaml")
-  if [ -n "$_helm_dirs" ]; then
-    echo "$_helm_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "helm" "$_d"
+  if [ -n "${_helm_dirs:-}" ]; then
+    echo "${_helm_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "helm" "${_d:-}"
     done
   fi
 
   # ── 23. Julia ────────────────────────────────────────────────────────────
   _julia_dirs=$(find_dirs_for_patterns "Project.toml" "**/Project.toml")
-  if [ -n "$_julia_dirs" ]; then
-    echo "$_julia_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "julia" "$_d"
+  if [ -n "${_julia_dirs:-}" ]; then
+    echo "${_julia_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "julia" "${_d:-}"
     done
   fi
 
@@ -420,25 +420,25 @@ scan_ecosystems() {
 
   # ── 26. UV (Python) ─────────────────────────────────────────────────────
   _uv_dirs=$(find_dirs_for_patterns "uv.lock" "**/uv.lock")
-  if [ -n "$_uv_dirs" ]; then
-    echo "$_uv_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "uv" "$_d"
+  if [ -n "${_uv_dirs:-}" ]; then
+    echo "${_uv_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "uv" "${_d:-}"
     done
   fi
 
   # ── 27. vcpkg (C/C++) ───────────────────────────────────────────────────
   _vcpkg_dirs=$(find_dirs_for_patterns "vcpkg.json" "**/vcpkg.json")
-  if [ -n "$_vcpkg_dirs" ]; then
-    echo "$_vcpkg_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "vcpkg" "$_d"
+  if [ -n "${_vcpkg_dirs:-}" ]; then
+    echo "${_vcpkg_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "vcpkg" "${_d:-}"
     done
   fi
 
   # ── 28. .NET SDK ─────────────────────────────────────────────────────────
   _dotnetsdk_dirs=$(find_dirs_for_patterns "global.json" "**/global.json")
-  if [ -n "$_dotnetsdk_dirs" ]; then
-    echo "$_dotnetsdk_dirs" | while IFS= read -r _d; do
-      [ -n "$_d" ] && _emit_unique "dotnet-sdk" "$_d"
+  if [ -n "${_dotnetsdk_dirs:-}" ]; then
+    echo "${_dotnetsdk_dirs:-}" | while IFS= read -r _d; do
+      [ -n "${_d:-}" ] && _emit_unique "dotnet-sdk" "${_d:-}"
     done
   fi
 }
@@ -447,7 +447,7 @@ scan_ecosystems() {
 main() {
   # Parse arguments
   for _arg in "$@"; do
-    case "$_arg" in
+    case "${_arg:-}" in
     --dry-run) DRY_RUN=1 ;;
     esac
   done
@@ -491,21 +491,21 @@ HEADER
   # Generate entries
   _ENTRIES=$(scan_ecosystems)
 
-  if [ -z "$_ENTRIES" ]; then
+  if [ -z "${_ENTRIES:-}" ]; then
     echo "WARNING: No ecosystems detected. The generated file will have no update entries." >&2
   fi
 
   _OUTPUT="${_HEADER}
 ${_ENTRIES}"
 
-  if [ "$DRY_RUN" -eq 1 ]; then
+  if [ "${DRY_RUN:-}" -eq 1 ]; then
     echo "# [DRY-RUN] Would write to ${DEPENDABOT_FILE}:"
-    echo "$_OUTPUT"
+    echo "${_OUTPUT:-}"
   else
-    mkdir -p "$(dirname "$DEPENDABOT_FILE")"
-    echo "$_OUTPUT" >"$DEPENDABOT_FILE"
+    mkdir -p "$(dirname "${DEPENDABOT_FILE:-}")"
+    echo "${_OUTPUT:-}" >"${DEPENDABOT_FILE:-}"
     echo "✅ Generated ${DEPENDABOT_FILE} successfully." >&2
-    _COUNT=$(echo "$_ENTRIES" | grep -c 'package-ecosystem' || true)
+    _COUNT=$(echo "${_ENTRIES:-}" | grep -c 'package-ecosystem' || true)
     echo "   Ecosystems detected: ${_COUNT}" >&2
 
     # Generate Markdown Summary for CI
@@ -514,10 +514,10 @@ ${_ENTRIES}"
       echo ""
       echo "| Ecosystem | Directory | Update Frequency |"
       echo "| :--- | :--- | :--- |"
-      echo "$_ENTRIES" | awk -F': ' '/package-ecosystem:/ {e=$2} /directory:/ {d=$2} /interval:/ {i=$2; printf "| %s | `%s` | %s |\n", e, d, i}' | sed 's/"//g'
+      echo "${_ENTRIES:-}" | awk -F': ' '/package-ecosystem:/ {e=$2} /directory:/ {d=$2} /interval:/ {i=$2; printf "| %s | `%s` | %s |\n", e, d, i}' | sed 's/"//g'
       echo ""
       echo "> Generated by \`scripts/gen-dependabot.sh\` at $(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-    } >>"$CI_STEP_SUMMARY"
+    } >>"${CI_STEP_SUMMARY:-}"
   fi
 }
 

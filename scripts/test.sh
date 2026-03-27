@@ -24,7 +24,7 @@
 set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
 # Purpose: Displays usage information for the multi-stack test runner.
@@ -70,7 +70,7 @@ _ensure_bats_vendor() {
   fi
 
   log_info "Installing bats test helper libraries into $_VENDOR_DIR ..."
-  mkdir -p "$_VENDOR_DIR"
+  mkdir -p "${_VENDOR_DIR:-}"
 
   if ! command -v git >/dev/null 2>&1; then
     log_warn "git not found; cannot install bats vendor libraries. Skipping."
@@ -87,14 +87,14 @@ _ensure_bats_vendor() {
   # Helper: clone with up to 3 retries, using proxy-prefixed URL first,
   # then falling back to the bare mirror URL if proxy also fails.
   _clone_with_retry() {
-    local _REPO="$1"
-    local _DEST="$2"
+    local _REPO="${1:-}"
+    local _DEST="${2:-}"
     local _ATTEMPT=0
     local _MAX_ATTEMPTS=3
 
     while [ $_ATTEMPT -lt $_MAX_ATTEMPTS ]; do
       _ATTEMPT=$((_ATTEMPT + 1))
-      if git clone --depth=1 --quiet "${_PROXY}https://github.com/${_REPO}.git" "$_DEST" 2>/dev/null; then
+      if git clone --depth=1 --quiet "${_PROXY}https://github.com/${_REPO}.git" "${_DEST:-}" 2>/dev/null; then
         return 0
       fi
       log_warn "Clone attempt $_ATTEMPT/$_MAX_ATTEMPTS failed for $_REPO. Retrying..."
@@ -103,17 +103,17 @@ _ensure_bats_vendor() {
 
     # Final fallback: bare GitHub URL (without proxy) for environments where proxy is not needed
     log_warn "Proxy clone failed. Falling back to direct GitHub URL for $_REPO ..."
-    git clone --depth=1 --quiet "https://github.com/${_REPO}.git" "$_DEST"
+    git clone --depth=1 --quiet "https://github.com/${_REPO}.git" "${_DEST:-}"
   }
 
   # bats-support
   if [ ! -f "$_BATS_SUPPORT_DIR/load.bash" ]; then
-    _clone_with_retry "bats-core/bats-support" "$_BATS_SUPPORT_DIR"
+    _clone_with_retry "bats-core/bats-support" "${_BATS_SUPPORT_DIR:-}"
   fi
 
   # bats-assert
   if [ ! -f "$_BATS_ASSERT_DIR/load.bash" ]; then
-    _clone_with_retry "bats-core/bats-assert" "$_BATS_ASSERT_DIR"
+    _clone_with_retry "bats-core/bats-assert" "${_BATS_ASSERT_DIR:-}"
   fi
 
   log_info "bats vendor libraries installed."
@@ -132,10 +132,10 @@ run_shell_tests() {
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would run bats tests in tests/"
       return 0
-    elif [ -n "$_BATS_BIN" ]; then
+    elif [ -n "${_BATS_BIN:-}" ]; then
       # Ensure bats helper libraries are present before running tests
       _ensure_bats_vendor
-      "$_BATS_BIN" tests/ && return 0
+      "${_BATS_BIN:-}" tests/ && return 0
     else
       log_warn "Warning: bats not found. Skipping shell tests."
       return 0
@@ -160,13 +160,13 @@ run_python_tests() {
       # We check for 'pytest' or 'python3 -m pytest'
       _PYTEST_BIN=$(resolve_bin "pytest") || true
 
-      if [ -n "$_PYTEST_BIN" ]; then
-        "$_PYTEST_BIN" --tb=short
+      if [ -n "${_PYTEST_BIN:-}" ]; then
+        "${_PYTEST_BIN:-}" --tb=short
       else
         local _PY_BIN
         _PY_BIN=$(resolve_bin "python3") || true
-        if [ -n "$_PY_BIN" ]; then
-          "$_PY_BIN" -m pytest --tb=short 2>/dev/null || log_warn "Warning: pytest not found. Skipping python tests."
+        if [ -n "${_PY_BIN:-}" ]; then
+          "${_PY_BIN:-}" -m pytest --tb=short 2>/dev/null || log_warn "Warning: pytest not found. Skipping python tests."
         else
           log_warn "Warning: pytest not found. Skipping python tests."
         fi
@@ -209,8 +209,8 @@ main() {
   local _SUITE_TST="all"
   local _arg_tst
   for _arg_tst in "$@"; do
-    case "$_arg_tst" in
-    shell | python | powershell | all) _SUITE_TST="$_arg_tst" ;;
+    case "${_arg_tst:-}" in
+    shell | python | powershell | all) _SUITE_TST="${_arg_tst:-}" ;;
     -q | --quiet | -v | --verbose | --dry-run | -h | --help) ;;
     esac
   done
@@ -222,7 +222,7 @@ main() {
 
   log_info "🧪 Starting Unified Test Runner...\n"
 
-  case "$_SUITE_TST" in
+  case "${_SUITE_TST:-}" in
   shell)
     if run_shell_tests; then
       log_summary "Test" "Shell (bats)" "✅ Passed" "-" "$(($(date +%s) - _T0_TST))"
@@ -276,7 +276,7 @@ main() {
   finalize_summary_table
 
   # 5. Standardized Next Actions
-  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
     printf "  - Run %bmake audit%b to verify security and licensing compliance.\n" "${GREEN}" "${NC}"
     printf "  - Run %bmake commit%b to record your verified changes.\n" "${GREEN}" "${NC}"

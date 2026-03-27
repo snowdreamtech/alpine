@@ -24,7 +24,7 @@
 # set -e removed to allow full diagnostic reporting
 
 # ── Common Library ───────────────────────────────────────────────────────────
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
 # ── Global State (Scoped to script) ──────────────────────────────────────────
@@ -62,10 +62,10 @@ EOF
 # Examples:
 #   check_tool_version "Git" "git" "2.30.0" "git --version" 1
 check_tool_version() {
-  local _LV_NAME="$1"
-  local _LV_CMD="$2"
-  local _LV_MIN_VER="$3"
-  local _LV_VER_CMD="$4"
+  local _LV_NAME="${1:-}"
+  local _LV_CMD="${2:-}"
+  local _LV_MIN_VER="${3:-}"
+  local _LV_VER_CMD="${4:-}"
   local _LV_CRITICAL="${5:-0}"
   local _LV_CI_ONLY="${6:-0}"
 
@@ -73,25 +73,25 @@ check_tool_version() {
 
   # CI-only guard: skip entirely in local environments BEFORE touching command -v,
   # which could trigger a mise shim installation attempt and stall the process.
-  if [ "$_LV_CI_ONLY" -eq 1 ] && ! is_ci_env; then
+  if [ "${_LV_CI_ONLY:-}" -eq 1 ] && ! is_ci_env; then
     log_info "⏭️  $_LV_NAME: CI-only (skipped locally)"
     return 0
   fi
 
   local _LV_RESOLVED
-  _LV_RESOLVED=$(resolve_bin "$_LV_CMD") || true
+  _LV_RESOLVED=$(resolve_bin "${_LV_CMD:-}") || true
 
-  if [ -z "$_LV_RESOLVED" ]; then
+  if [ -z "${_LV_RESOLVED:-}" ]; then
     log_warn "❌ $_LV_NAME: Not found."
     HEALTHY_ST=1
     [ "${_LV_CRITICAL:-0}" -eq 1 ] && CORE_HEALTHY_ST=1
     return 1
   fi
 
-  local _LV_MISE_KEY="${7:-$_LV_CMD}"
+  local _LV_MISE_KEY="${7:-${_LV_CMD:-}}"
   local _LV_CURRENT_VER
-  _LV_CURRENT_VER=$(get_version "$_LV_CMD" "" "$_LV_MISE_KEY" | tr -d '\r')
-  [ "$_LV_CURRENT_VER" = "-" ] && _LV_CURRENT_VER="0.0"
+  _LV_CURRENT_VER=$(get_version "${_LV_CMD:-}" "" "${_LV_MISE_KEY:-}" | tr -d '\r')
+  [ "${_LV_CURRENT_VER:-}" = "-" ] && _LV_CURRENT_VER="0.0"
 
   # If requirement is empty or -, allow anything
   if [ -z "${_LV_MIN_VER:-}" ] || [ "${_LV_MIN_VER:-}" = "-" ]; then
@@ -101,13 +101,13 @@ check_tool_version() {
 
   # Canonicalize versions to 3 components to avoid revision suffix mismatches (e.g. 1.7.11.24)
   local _LV_MIN_CANON _LV_CUR_CANON
-  _LV_MIN_CANON=$(echo "$_LV_MIN_VER" | cut -d. -f1-3)
-  _LV_CUR_CANON=$(echo "$_LV_CURRENT_VER" | cut -d. -f1-3)
+  _LV_MIN_CANON=$(echo "${_LV_MIN_VER:-}" | cut -d. -f1-3)
+  _LV_CUR_CANON=$(echo "${_LV_CURRENT_VER:-}" | cut -d. -f1-3)
 
   local _LV_LOWER_VER
-  _LV_LOWER_VER=$(printf "%s\n%s" "$_LV_MIN_CANON" "$_LV_CUR_CANON" | sort -n -t. -k1,1 -k2,2 -k3,3 | head -n1)
+  _LV_LOWER_VER=$(printf "%s\n%s" "${_LV_MIN_CANON:-}" "${_LV_CUR_CANON:-}" | sort -n -t. -k1,1 -k2,2 -k3,3 | head -n1)
 
-  if [ "$_LV_LOWER_VER" = "$_LV_MIN_CANON" ] || [ "$_LV_CUR_CANON" = "$_LV_MIN_CANON" ]; then
+  if [ "${_LV_LOWER_VER:-}" = "${_LV_MIN_CANON:-}" ] || [ "${_LV_CUR_CANON:-}" = "${_LV_MIN_CANON:-}" ]; then
     log_success "✅ $_LV_NAME: v$_LV_CURRENT_VER (matches/exceeds v$_LV_MIN_VER)"
   else
     log_warn "⚠️  $_LV_NAME: v$_LV_CURRENT_VER (below recommended v$_LV_MIN_VER)"
@@ -154,9 +154,9 @@ main() {
   log_info "── Language Runtimes ──"
 
   # Node.js
-  if [ -f "$PACKAGE_JSON" ]; then
+  if [ -f "${PACKAGE_JSON:-}" ]; then
     check_tool_version "Node.js" "node" "$(get_mise_tool_version node)" "node -v" 1
-    check_tool_version "$NPM" "$NPM" "$(get_mise_tool_version "$NPM")" "$NPM -v"
+    check_tool_version "${NPM:-}" "${NPM:-}" "$(get_mise_tool_version "${NPM:-}")" "$NPM -v"
     check_runtime "node" "Node.js (Modular)"
   else
     log_info "⏭️  Node.js/$NPM: Skipped (no package.json)"
@@ -164,7 +164,7 @@ main() {
 
   # Python
   if has_lang_files "requirements.txt requirements-dev.txt pyproject.toml" "*.py"; then
-    check_tool_version "Python" "$PYTHON" "$(get_mise_tool_version python)" "$PYTHON --version" 1
+    check_tool_version "Python" "${PYTHON:-}" "$(get_mise_tool_version python)" "$PYTHON --version" 1
     check_runtime "python" "Python (Modular)"
   else
     log_info "⏭️  Python: Skipped (no python files)"
@@ -669,7 +669,7 @@ main() {
   log_info "── Project Integrity ──"
   local _f_chk
   for _f_chk in "Makefile" "README.md" ".agent/rules/01-general.md"; do
-    if [ -f "$_f_chk" ]; then
+    if [ -f "${_f_chk:-}" ]; then
       log_debug "Found $_f_chk"
     else
       log_error "❌ Missing critical file: $_f_chk"
@@ -685,23 +685,23 @@ main() {
   # Use a temporary file to avoid subshell variable loss with find | while read
   local _TMP_SCRIPTS
   _TMP_SCRIPTS=$(mktemp)
-  trap 'rm -f "$_TMP_SCRIPTS"' EXIT INT TERM
-  find scripts -name "*.sh" -type f >"$_TMP_SCRIPTS"
+  trap 'rm -f "${_TMP_SCRIPTS:-}"' EXIT INT TERM
+  find scripts -name "*.sh" -type f >"${_TMP_SCRIPTS:-}"
   while read -r _s_chk; do
-    if [ -f "$_s_chk" ]; then
+    if [ -f "${_s_chk:-}" ]; then
       # Check if it has a shebang
-      if head -n 1 "$_s_chk" | grep -q "^#!"; then
-        if [ ! -x "$_s_chk" ]; then
+      if head -n 1 "${_s_chk:-}" | grep -q "^#!"; then
+        if [ ! -x "${_s_chk:-}" ]; then
           log_error "❌ Script lacks executable bit: $_s_chk"
           _p_err=1
           HEALTHY_ST=1
         fi
       fi
     fi
-  done <"$_TMP_SCRIPTS"
-  rm -f "$_TMP_SCRIPTS"
+  done <"${_TMP_SCRIPTS:-}"
+  rm -f "${_TMP_SCRIPTS:-}"
 
-  if [ "$_p_err" -eq 0 ]; then
+  if [ "${_p_err:-}" -eq 0 ]; then
     log_success "✅ All automation scripts have correct executable permissions."
   fi
 

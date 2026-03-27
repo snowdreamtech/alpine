@@ -24,7 +24,7 @@
 set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
 # ── Functions ────────────────────────────────────────────────────────────────
@@ -89,15 +89,15 @@ main() {
   local _SUITE_BCH="all"
   local _arg_bch
   for _arg_bch in "$@"; do
-    case "$_arg_bch" in
-    python | node | all) _SUITE_BCH="$_arg_bch" ;;
+    case "${_arg_bch:-}" in
+    python | node | all) _SUITE_BCH="${_arg_bch:-}" ;;
     esac
   done
   parse_common_args "$@"
 
   log_info "⚡ Starting Performance Benchmarker...\n"
 
-  case "$_SUITE_BCH" in
+  case "${_SUITE_BCH:-}" in
   python) run_python_bench ;;
   node) run_node_bench ;;
   all)
@@ -109,7 +109,7 @@ main() {
   log_success "\n✨ Benchmarking finished."
 
   # 5. Standardized Next Actions
-  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
     printf "  - Run %bmake test%b for full functional verification.\n" "${GREEN}" "${NC}"
     printf "  - Run %bmake verify%b to ensure overall project health.\n" "${GREEN}" "${NC}"

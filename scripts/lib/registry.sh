@@ -13,14 +13,14 @@
 #   $2 - Mise provider/name (e.g. asdf:ghc)
 #   $3 - Version string
 register_mise_tool() {
-  local _NAME="$1"
-  local _PROVIDER="$2"
-  local _VERSION="$3"
+  local _NAME="${1:-}"
+  local _PROVIDER="${2:-}"
+  local _VERSION="${3:-}"
   local _MISE_TOML
   _MISE_TOML="$(get_project_root)/.mise.toml"
 
   # Check if already in .mise.toml
-  if grep -qE "^\"?${_PROVIDER}\"?[[:space:]]*=" "$_MISE_TOML" 2>/dev/null; then
+  if grep -qE "^\"?${_PROVIDER}\"?[[:space:]]*=" "${_MISE_TOML:-}" 2>/dev/null; then
     return 0
   fi
 
@@ -30,7 +30,7 @@ register_mise_tool() {
   awk -v inject="\"${_PROVIDER}\" = \"${_VERSION}\"" '
     /^\[tools\]/ { print; print inject; next }
     { print }
-  ' "$_MISE_TOML" >"${_MISE_TOML}.tmp" && mv "${_MISE_TOML}.tmp" "$_MISE_TOML"
+  ' "${_MISE_TOML:-}" >"${_MISE_TOML}.tmp" && mv "${_MISE_TOML}.tmp" "${_MISE_TOML:-}"
 }
 
 # Purpose: Registers a tool in .mise.toml using a complex TOML value (e.g., dictionary with asset matches).
@@ -39,9 +39,9 @@ register_mise_tool() {
 #   $2 - Mise provider/name
 #   $3 - TOML representation (dictionary map)
 register_mise_tool_complex() {
-  local _NAME="$1"
-  local _TOOL="$2"
-  local _TOML_VALUE="$3"
+  local _NAME="${1:-}"
+  local _TOOL="${2:-}"
+  local _TOML_VALUE="${3:-}"
 
   # Check if already in .mise.toml
   if grep -qE "^\"?${_TOOL}\"?[[:space:]]*=" "$(get_project_root)/.mise.toml" 2>/dev/null; then

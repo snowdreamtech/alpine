@@ -25,7 +25,7 @@
 set -eu
 
 # ── 🎒 Library Sourcing ──────────────────────────────────────────────────────
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 # shellcheck source=/dev/null
 . "$SCRIPT_DIR/lib/common.sh"
 # shellcheck source=/dev/null
@@ -37,9 +37,9 @@ SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
 # Dynamically load all language-specific setup modules.
 # shellcheck source=/dev/null
 for _lang_mod in "${SCRIPT_DIR}/lib/langs"/*.sh; do
-  if [ -f "$_lang_mod" ]; then
+  if [ -f "${_lang_mod:-}" ]; then
     # shellcheck disable=SC1090
-    . "$_lang_mod"
+    . "${_lang_mod:-}"
   fi
 done
 unset _lang_mod
@@ -77,12 +77,12 @@ EOF
 
 # Purpose: Internal helper to display a consistent setup header with version info.
 _log_setup() {
-  local _TITLE="$1"
-  local _LOOKUP="$2"
+  local _TITLE="${1:-}"
+  local _LOOKUP="${2:-}"
   local _VER=""
-  [ -n "$_LOOKUP" ] && _VER=$(get_mise_tool_version "$_LOOKUP")
+  [ -n "${_LOOKUP:-}" ] && _VER=$(get_mise_tool_version "${_LOOKUP:-}")
 
-  if [ -n "$_VER" ]; then
+  if [ -n "${_VER:-}" ]; then
     log_info "── Setting up $_TITLE ($_VER) ──"
   else
     log_info "── Setting up $_TITLE ──"
@@ -99,10 +99,10 @@ main() {
   # ── Concurrency Guard (Lockfile) ──
   # Using project-local lock to allow concurrent setup in different clones/test environments
   local _LOCKFILE="${_G_PROJECT_ROOT}/.setup.lock"
-  if [ -f "$_LOCKFILE" ]; then
+  if [ -f "${_LOCKFILE:-}" ]; then
     local _PID
-    _PID=$(cat "$_LOCKFILE")
-    if ps -p "$_PID" >/dev/null 2>&1; then
+    _PID=$(cat "${_LOCKFILE:-}")
+    if ps -p "${_PID:-}" >/dev/null 2>&1; then
       log_error "Setup already in progress (PID: $_PID)."
       log_info "If you are sure no other setup is running, you can:"
       log_info "  1. Kill the process: kill -9 $_PID"
@@ -110,10 +110,10 @@ main() {
       exit 1
     else
       log_warn "Stale lockfile detected (PID: $_PID is dead). Cleaning up..."
-      rm -f "$_LOCKFILE"
+      rm -f "${_LOCKFILE:-}"
     fi
   fi
-  echo "$$" >"$_LOCKFILE"
+  echo "$$" >"${_LOCKFILE:-}"
   # shellcheck disable=SC2064
   trap "rm -f $_LOCKFILE" EXIT INT TERM
 
@@ -124,7 +124,7 @@ main() {
   local _RAW_ARGS=""
   local _arg
   for _arg in "$@"; do
-    case "$_arg" in
+    case "${_arg:-}" in
     -q | --quiet | -v | --verbose | --dry-run | -h | --help) ;;
     *) _RAW_ARGS="${_RAW_ARGS} ${_arg}" ;;
     esac
@@ -154,38 +154,38 @@ main() {
 EOF
       # Add Global Environment Detections immediately after the legend
       log_summary "Environment" "System" "✅ Active" "$(uname -s)/$(uname -m)" "0"
-      log_summary "Environment" "Shell" "✅ Active" "$(basename "$SHELL")" "0"
+      log_summary "Environment" "Shell" "✅ Active" "$(basename "${SHELL:-}")" "0"
 
       # Detect language runtimes only when corresponding project files exist.
       # This prevents spurious "⚠️ Warning" entries for unrelated runtimes
       # caused by mise cache key substring mismatches (e.g. "go" matching "goreleaser").
       for _r in node python; do
         local _v
-        _v=$(get_version "$_r")
-        if [ "$_v" != "-" ]; then
-          log_summary "Runtime" "$_r" "✅ Detected" "$_v" "0"
+        _v=$(get_version "${_r:-}")
+        if [ "${_v:-}" != "-" ]; then
+          log_summary "Runtime" "${_r:-}" "✅ Detected" "${_v:-}" "0"
         fi
       done
       # Only detect Go when go.mod is present (avoids mise cache key false-positive on "goreleaser/...")
       if has_lang_files "go.mod" "*.go"; then
         local _vgo
         _vgo=$(get_version "go")
-        if [ "$_vgo" != "-" ]; then
-          log_summary "Runtime" "go" "✅ Detected" "$_vgo" "0"
+        if [ "${_vgo:-}" != "-" ]; then
+          log_summary "Runtime" "go" "✅ Detected" "${_vgo:-}" "0"
         fi
       fi
       # Only detect Rust when Cargo.toml is present
       if has_lang_files "Cargo.toml Cargo.lock" "*.rs"; then
         local _vrust
         _vrust=$(get_version "rust")
-        if [ "$_vrust" != "-" ]; then
-          log_summary "Runtime" "rust" "✅ Detected" "$_vrust" "0"
+        if [ "${_vrust:-}" != "-" ]; then
+          log_summary "Runtime" "rust" "✅ Detected" "${_vrust:-}" "0"
         fi
       fi
-    } >>"$CI_STEP_SUMMARY"
+    } >>"${CI_STEP_SUMMARY:-}"
 
     # Set master sentinel for subsequent steps in CI
-    [ -n "${GITHUB_ENV:-}" ] && echo "_SETUP_SUMMARY_INITIALIZED=true" >>"$GITHUB_ENV"
+    [ -n "${GITHUB_ENV:-}" ] && echo "_SETUP_SUMMARY_INITIALIZED=true" >>"${GITHUB_ENV:-}"
     export _SETUP_SUMMARY_INITIALIZED=true
   fi
 
@@ -194,8 +194,8 @@ EOF
     {
       printf "| Category | Module | Status | Version | Time |\n"
       printf "| :--- | :--- | :--- | :--- | :--- |\n"
-    } >>"$CI_STEP_SUMMARY"
-    [ -n "${GITHUB_ENV:-}" ] && echo "_SUMMARY_TABLE_HEADER_SENTINEL=true" >>"$GITHUB_ENV"
+    } >>"${CI_STEP_SUMMARY:-}"
+    [ -n "${GITHUB_ENV:-}" ] && echo "_SUMMARY_TABLE_HEADER_SENTINEL=true" >>"${GITHUB_ENV:-}"
     export _SUMMARY_TABLE_HEADER_SENTINEL=true
   fi
 
@@ -206,7 +206,7 @@ EOF
   fi
 
   local _MODULES_LIST
-  if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "$_IS_ALL_MODULES" = "true" ]; then
+  if [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ] || [ "${_IS_ALL_MODULES:-}" = "true" ]; then
     # Grouped list for "On-demand" (default) or "All" (explicit)
     local _BASE_LIST="base shell toml yaml markdown node python go rust java kotlin php ruby dart swift lua cpp terraform solidity perl julia r groovy dotnet zig elixir haskell scala ada assemblyscript ballerina bun clojure crystal deno dlang duckdb elm erlang fortran fpc gleam grain haxe jsonnet kcl lean lisp luau mojo moonbit move nim ocaml odin pkl prolog pulumi racket raku rescript starlark tcl tofu typst vala vcpkg vlang wat"
     local _DOMAIN_LIST="docker sql openapi protobuf security runners testing docs ai helm k8s terraform terragrunt tofu pulumi"
@@ -217,14 +217,14 @@ EOF
 
   # ── CI/Local Environment Filtering ──
   # Skip heavyweight tools in local dev unless explicitly requested or 'all' is specified.
-  if ! is_ci_env && [ "$_IS_ALL_MODULES" != "true" ] && [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ]; then
+  if ! is_ci_env && [ "${_IS_ALL_MODULES:-}" != "true" ] && [ -z "$(echo "${_RAW_ARGS}" | tr -d ' ')" ]; then
     # Skip heavyweight and rarely-needed modules in local dev to prevent
     # long network downloads (especially GitHub-released binaries).
     # These can still be installed on-demand via: sh scripts/setup.sh <module>
     local _HEAVY_MODULES="markdown yaml toml security docs testing ai helm k8s terragrunt grain moonbit move luau rescript starlark tcl wat pkl kcl ada assemblyscript ballerina fpc lean lisp racket prolog fortran typst"
     local _SMART_LIST=""
     for _m in $_MODULES_LIST; do
-      case " ${_HEAVY_MODULES} " in *" ${_m} "*)
+      case " ${_HEAVY_MODULES:-} " in *" ${_m} "*)
         log_debug "Skipping heavyweight module in local dev: $_m"
         ;;
       *) _SMART_LIST="${_SMART_LIST} ${_m}" ;;
@@ -234,12 +234,12 @@ EOF
   fi
 
   # ── Module Skipping & Filtering (SKIP_MODULES) ──
-  if [ -n "$SKIP_MODULES" ]; then
+  if [ -n "${SKIP_MODULES:-}" ]; then
     local _NEW_LIST=""
     for _m in $_MODULES_LIST; do
-      case " ${SKIP_MODULES} " in *" ${_m} "*)
+      case " ${SKIP_MODULES:-} " in *" ${_m} "*)
         log_warn "Skipping module per SKIP_MODULES: $_m"
-        log_summary "Skipped" "$_m" "⏭️ Stopped" "-" "0"
+        log_summary "Skipped" "${_m:-}" "⏭️ Stopped" "-" "0"
         ;;
       *) _NEW_LIST="${_NEW_LIST} ${_m}" ;;
       esac
@@ -259,7 +259,7 @@ EOF
     export _G_MISE_LS_JSON_CACHE
     _G_MISE_LS_JSON_CACHE=$(run_mise ls --json 2>/dev/null || echo "{}")
 
-    if [ "$_IS_ALL_MODULES" = "true" ] && [ "$(uname -s)" != "Windows_NT" ]; then
+    if [ "${_IS_ALL_MODULES:-}" = "true" ] && [ "$(uname -s)" != "Windows_NT" ]; then
       log_info "Performing full toolchain synchronization via mise..."
       run_mise install
     else
@@ -271,13 +271,13 @@ EOF
   local _cur_grp=""
   for _cur_module in $_MODULES_LIST; do
     # Visual Grouping Headers
-    if [ "$_IS_ALL_MODULES" = "true" ]; then
-      case " ${_BASE_LIST} " in *" ${_cur_module} "*)
-        [ "$_cur_grp" != "base" ] && log_info "── Base/Language Toolsets ──" && _cur_grp="base"
+    if [ "${_IS_ALL_MODULES:-}" = "true" ]; then
+      case " ${_BASE_LIST:-} " in *" ${_cur_module} "*)
+        [ "${_cur_grp:-}" != "base" ] && log_info "── Base/Language Toolsets ──" && _cur_grp="base"
         ;;
       esac
-      case " ${_DOMAIN_LIST} " in *" ${_cur_module} "*)
-        [ "$_cur_grp" != "domain" ] && log_info "── Domain Toolsets ──" && _cur_grp="domain"
+      case " ${_DOMAIN_LIST:-} " in *" ${_cur_module} "*)
+        [ "${_cur_grp:-}" != "domain" ] && log_info "── Domain Toolsets ──" && _cur_grp="domain"
         ;;
       esac
     fi
@@ -289,8 +289,8 @@ EOF
     # is essential for pre-provisioning (like DevContainer building) where
     # tools are installed before source code exists.
     export FORCE_SETUP=0
-    if [ "$_IS_ALL_MODULES" = "false" ] && [ -n "$(echo "${_RAW_ARGS}" | tr -d ' ')" ]; then
-      case " ${_RAW_ARGS} " in *" ${_cur_module} "*)
+    if [ "${_IS_ALL_MODULES:-}" = "false" ] && [ -n "$(echo "${_RAW_ARGS}" | tr -d ' ')" ]; then
+      case " ${_RAW_ARGS:-} " in *" ${_cur_module} "*)
         export FORCE_SETUP=1
         log_debug "Force setup enabled for explicitly requested module: $_cur_module"
         ;;
@@ -407,10 +407,10 @@ EOF
   # ── Final Output Management ──
   if [ "${_IS_TOP_LEVEL:-true}" = "true" ]; then
     local _TOTAL_DUR_MAIN=$(($(date +%s) - _START_TIME_MAIN))
-    printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR_MAIN" >>"$CI_STEP_SUMMARY"
+    printf "\n**Total Duration: %ss**\n" "${_TOTAL_DUR_MAIN:-}" >>"${CI_STEP_SUMMARY:-}"
     printf "\n"
     if ! is_ci_env; then
-      cat "$CI_STEP_SUMMARY"
+      cat "${CI_STEP_SUMMARY:-}"
     fi
     finalize_summary_table
     log_info "\n✨ Setup step complete!"

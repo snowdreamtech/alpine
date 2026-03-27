@@ -40,9 +40,9 @@ if ! command -v realpath >/dev/null 2>&1; then
   if command -v grealpath >/dev/null 2>&1; then
     realpath() { grealpath "$@"; }
   elif command -v python3 >/dev/null 2>&1; then
-    realpath() { python3 -c "import os, sys; print(os.path.realpath(sys.argv[1]))" "$1"; }
+    realpath() { python3 -c "import os, sys; print(os.path.realpath(sys.argv[1]))" "${1:-}"; }
   elif command -v perl >/dev/null 2>&1; then
-    realpath() { perl -MCwd -e 'print Cwd::abs_path($ARGV[0])' "$1"; }
+    realpath() { perl -MCwd -e 'print Cwd::abs_path($ARGV[0])' "${1:-}"; }
   fi
   # shellcheck disable=SC3045
   export -f realpath 2>/dev/null || true
@@ -53,7 +53,7 @@ fi
 # Detect OS and set pathing conventions dynamically to ensure absolute parity
 # between Linux, macOS, and Windows (via POSIX shells like Git Bash).
 _G_UNAME=$(uname -s)
-case "$_G_UNAME" in
+case "${_G_UNAME:-}" in
 Darwin)
   _G_OS="macos"
   _G_VENV_BIN="bin"
@@ -71,10 +71,10 @@ MINGW* | MSYS* | CYGWIN*)
   _G_VENV_BIN="Scripts"
   # In Windows-based POSIX shells, AppData/Local is the standard base for mise data
   if command -v cygpath >/dev/null 2>&1; then
-    _G_APP_DATA_LOCAL=$(cygpath -u "$LOCALAPPDATA")
+    _G_APP_DATA_LOCAL=$(cygpath -u "${LOCALAPPDATA:-}")
   else
     # Fallback to manual path translation if cygpath is missing
-    _G_APP_DATA_LOCAL=$(echo "$LOCALAPPDATA" | sed 's/\\/\//g; s/:\(.*\)/\/\1/; s/^\([A-Za-z]\)\//\/\L\1\//')
+    _G_APP_DATA_LOCAL=$(echo "${LOCALAPPDATA:-}" | sed 's/\\/\//g; s/:\(.*\)/\/\1/; s/^\([A-Za-z]\)\//\/\L\1\//')
   fi
   _G_MISE_BIN_BASE="$HOME/.local/bin" # Mise installer usually puts bin here in Git Bash
   _G_MISE_SHIMS_BASE="${_G_APP_DATA_LOCAL:-${HOME:-}/AppData/Local}/mise/shims"
@@ -110,9 +110,9 @@ export MISE_USE_GIX=0
 # This MUST happen at bootstrap, before any direct tool invocation.
 if [ -n "${GITHUB_TOKEN:-}" ]; then
   # mise-specific token variable
-  [ -z "${MISE_GITHUB_TOKEN:-}" ] && export MISE_GITHUB_TOKEN="$GITHUB_TOKEN"
+  [ -z "${MISE_GITHUB_TOKEN:-}" ] && export MISE_GITHUB_TOKEN="${GITHUB_TOKEN:-}"
   # GitHub CLI (gh) preferred variable
-  [ -z "${GH_TOKEN:-}" ] && export GH_TOKEN="$GITHUB_TOKEN"
+  [ -z "${GH_TOKEN:-}" ] && export GH_TOKEN="${GITHUB_TOKEN:-}"
 fi
 
 # ──  Project Context Detection ──────────────────────────────────────────────
@@ -120,7 +120,7 @@ fi
 if [ -z "${_G_PROJECT_ROOT:-}" ]; then
   # Unified Context Detection: Prioritize physical location of the CALLING script ($0).
   # This avoids dependency on caller-defined variables like SCRIPT_DIR.
-  _G_CALLER_DIR=$(cd "$(dirname "$0")" && pwd)
+  _G_CALLER_DIR=$(cd "$(dirname "${0:-}")" && pwd)
   if [ -f "$_G_CALLER_DIR/lib/common.sh" ]; then
     # Caller is in 'scripts/' folder (Standard Orchestration pattern).
     _G_LIB_DIR="$_G_CALLER_DIR/lib"
@@ -128,10 +128,10 @@ if [ -z "${_G_PROJECT_ROOT:-}" ]; then
   elif [ -f "$_G_CALLER_DIR/scripts/lib/common.sh" ]; then
     # Caller is in project root (Mock tests or direct root execution).
     _G_LIB_DIR="$_G_CALLER_DIR/scripts/lib"
-    _G_PROJECT_ROOT="$_G_CALLER_DIR"
+    _G_PROJECT_ROOT="${_G_CALLER_DIR:-}"
   elif [ -f "$_G_CALLER_DIR/common.sh" ]; then
     # Caller is inside 'scripts/lib/' folder itself.
-    _G_LIB_DIR="$_G_CALLER_DIR"
+    _G_LIB_DIR="${_G_CALLER_DIR:-}"
     _G_PROJECT_ROOT=$(cd "$_G_CALLER_DIR/../.." && pwd)
   fi
 
@@ -143,9 +143,9 @@ if [ -z "${_G_PROJECT_ROOT:-}" ]; then
         _G_PROJECT_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
       elif [ -f "$SCRIPT_DIR/scripts/lib/common.sh" ]; then
         _G_LIB_DIR="$SCRIPT_DIR/scripts/lib"
-        _G_PROJECT_ROOT="$SCRIPT_DIR"
+        _G_PROJECT_ROOT="${SCRIPT_DIR:-}"
       elif [ -f "$SCRIPT_DIR/common.sh" ]; then
-        _G_LIB_DIR="$SCRIPT_DIR"
+        _G_LIB_DIR="${SCRIPT_DIR:-}"
         _G_PROJECT_ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
       fi
     fi
@@ -159,7 +159,7 @@ if [ -z "${_G_PROJECT_ROOT:-}" ]; then
       if [ -f "$_G_PROJECT_ROOT/package.json" ] || [ -f "$_G_PROJECT_ROOT/Makefile" ] || [ -d "$_G_PROJECT_ROOT/.git" ]; then
         break
       fi
-      _G_PROJECT_ROOT=$(dirname "$_G_PROJECT_ROOT")
+      _G_PROJECT_ROOT=$(dirname "${_G_PROJECT_ROOT:-}")
     done
   fi
   export _G_PROJECT_ROOT
@@ -169,7 +169,7 @@ fi
 # Ref: Rule 09 (Interaction/Summary Integration)
 if [ -n "${GITHUB_STEP_SUMMARY:-}" ] && [ -z "${GITEA_ACTIONS:-}" ] && [ -z "${FORGEJO_ACTIONS:-}" ]; then
   # GitHub Actions: Native summary file
-  CI_STEP_SUMMARY="$GITHUB_STEP_SUMMARY"
+  CI_STEP_SUMMARY="${GITHUB_STEP_SUMMARY:-}"
 elif [ -n "${GITEA_ACTIONS:-}" ] || [ -n "${FORGEJO_ACTIONS:-}" ]; then
   # Gitea/Forgejo: Often follows GitHub conventions but may need fallback
   CI_STEP_SUMMARY="${GITHUB_STEP_SUMMARY:-${_G_PROJECT_ROOT:-}/.ci_summary.log}"
@@ -197,8 +197,8 @@ fi
 
 # Orchestration tracking (detect if we are running as a sub-script)
 if [ -z "${_SNOWDREAM_TOP_LEVEL_SCRIPT:-}" ]; then
-  _SCRIPT_NAME=$(basename "$0")
-  export _SNOWDREAM_TOP_LEVEL_SCRIPT="$_SCRIPT_NAME"
+  _SCRIPT_NAME=$(basename "${0:-}")
+  export _SNOWDREAM_TOP_LEVEL_SCRIPT="${_SCRIPT_NAME:-}"
   _IS_TOP_LEVEL=true
 else
   _IS_TOP_LEVEL=false
@@ -215,8 +215,8 @@ PYTHON="${PYTHON:-python3}"
 # are prioritized over system globals without requiring manual activation.
 _LOCAL_BIN_VENV=$(pwd)/${VENV}/${_G_VENV_BIN}
 _LOCAL_BIN_NODE=$(pwd)/node_modules/.bin
-_LOCAL_MISE_BIN="$_G_MISE_BIN_BASE"
-_LOCAL_MISE_SHIMS="$_G_MISE_SHIMS_BASE"
+_LOCAL_MISE_BIN="${_G_MISE_BIN_BASE:-}"
+_LOCAL_MISE_SHIMS="${_G_MISE_SHIMS_BASE:-}"
 
 # Resilience: Always attempt to add these paths to ensure toolchain availability
 # even if directories are created later (like during setup JIT).
@@ -302,22 +302,22 @@ export _G_LIB_DIR
 if [ "${GITHUB_ACTIONS:-}" = "true" ] && [ -n "${GITHUB_PATH:-}" ]; then
   # Proactively add mise paths to GITHUB_PATH using absolute references.
   # Note: GitHub Actions expects the runner's native path format.
-  _M_BIN_CI="$_G_MISE_BIN_BASE"
-  _M_SHIMS_CI="$_G_MISE_SHIMS_BASE"
+  _M_BIN_CI="${_G_MISE_BIN_BASE:-}"
+  _M_SHIMS_CI="${_G_MISE_SHIMS_BASE:-}"
 
   if [ "${_G_OS:-}" = "windows" ] && command -v cygpath >/dev/null 2>&1; then
-    _M_BIN_CI=$(cygpath -w "$_M_BIN_CI")
-    _M_SHIMS_CI=$(cygpath -w "$_M_SHIMS_CI")
+    _M_BIN_CI=$(cygpath -w "${_M_BIN_CI:-}")
+    _M_SHIMS_CI=$(cygpath -w "${_M_SHIMS_CI:-}")
   fi
 
   case ":$PATH:" in
   *":$_G_MISE_BIN_BASE:"*) ;;
-  *) echo "$_M_BIN_CI" >>"$GITHUB_PATH" ;;
+  *) echo "${_M_BIN_CI:-}" >>"${GITHUB_PATH:-}" ;;
   esac
 
   case ":$PATH:" in
   *":$_G_MISE_SHIMS_BASE:"*) ;;
-  *) echo "$_M_SHIMS_CI" >>"$GITHUB_PATH" ;;
+  *) echo "${_M_SHIMS_CI:-}" >>"${GITHUB_PATH:-}" ;;
   esac
 fi
 
@@ -331,12 +331,12 @@ fi
 #   $1 - Timeout in seconds
 #   $@ - Command and arguments
 run_with_timeout() {
-  local _SEC="$1"
+  local _SEC="${1:-}"
   shift
   if command -v gtimeout >/dev/null 2>&1; then
-    gtimeout "$_SEC" "$@"
+    gtimeout "${_SEC:-}" "$@"
   elif command -v timeout >/dev/null 2>&1; then
-    timeout "$_SEC" "$@"
+    timeout "${_SEC:-}" "$@"
   else
     "$@"
   fi
@@ -365,15 +365,15 @@ optimize_network() {
     local _TOKEN_CACHE
     _TOKEN_CACHE="${TMPDIR:-/tmp}/.mise_token_verified_$(id -u)"
     local _SKIP_VERIFY=false
-    if [ -f "$_TOKEN_CACHE" ]; then
+    if [ -f "${_TOKEN_CACHE:-}" ]; then
       local _CACHE_AGE=0
       if [ "${_G_OS:-}" = "macos" ]; then
-        _CACHE_AGE=$(($(date +%s) - $(stat -f %m "$_TOKEN_CACHE")))
+        _CACHE_AGE=$(($(date +%s) - $(stat -f %m "${_TOKEN_CACHE:-}")))
       else
         # Linux and Windows (Git Bash) both use GNU stat
-        _CACHE_AGE=$(($(date +%s) - $(stat -c %Y "$_TOKEN_CACHE" 2>/dev/null || echo "0")))
+        _CACHE_AGE=$(($(date +%s) - $(stat -c %Y "${_TOKEN_CACHE:-}" 2>/dev/null || echo "0")))
       fi
-      [ "$_CACHE_AGE" -lt 3600 ] && _SKIP_VERIFY=true
+      [ "${_CACHE_AGE:-}" -lt 3600 ] && _SKIP_VERIFY=true
     fi
 
     if [ "${_SKIP_VERIFY:-}" = "true" ]; then
@@ -384,12 +384,12 @@ optimize_network() {
       if [ "${_HTTP_CODE:-}" = "401" ]; then
         log_warn "Current GITHUB_TOKEN appears invalid or unauthorized ($_HTTP_CODE). Unsetting for this session..."
         unset GITHUB_TOKEN
-        rm -f "$_TOKEN_CACHE"
+        rm -f "${_TOKEN_CACHE:-}"
       elif [ -z "${_HTTP_CODE:-}" ] || [ "${_HTTP_CODE:-}" = "000" ]; then
         log_debug "Network timeout verifying GITHUB_TOKEN. Keeping token."
       else
         # Token is valid, cache the result
-        touch "$_TOKEN_CACHE"
+        touch "${_TOKEN_CACHE:-}"
       fi
     fi
   fi
@@ -399,8 +399,8 @@ optimize_network() {
   if [ "${ENABLE_GITHUB_PROXY}" = "1" ] || [ "${ENABLE_GITHUB_PROXY}" = "true" ]; then
     log_info "Bypassing broken global git proxies and applying network optimization..."
 
-    mkdir -p "$(dirname "$_TEMP_GIT_CONFIG")"
-    cat >"$_TEMP_GIT_CONFIG" <<EOF
+    mkdir -p "$(dirname "${_TEMP_GIT_CONFIG:-}")"
+    cat >"${_TEMP_GIT_CONFIG:-}" <<EOF
 [http]
   postBuffer = 524288000
   lowSpeedLimit = 0
@@ -408,7 +408,7 @@ optimize_network() {
 [protocol]
   version = 2
 EOF
-    export GIT_CONFIG_GLOBAL="$_TEMP_GIT_CONFIG"
+    export GIT_CONFIG_GLOBAL="${_TEMP_GIT_CONFIG:-}"
     export GIT_CONFIG_SYSTEM="/dev/null"
   fi
 
@@ -429,22 +429,22 @@ EOF
 #   VER=$(get_mise_tool_version "rust")      # -> VER_RUST from versions.sh
 #   VER=$(get_mise_tool_version "node")      # -> from .mise.toml
 get_mise_tool_version() {
-  local _TOOL_NAME_MISE="$1"
+  local _TOOL_NAME_MISE="${1:-}"
   local _MISE_TOM_PATH
   _MISE_TOM_PATH=$(get_project_root)/.mise.toml
 
   local _VER=""
 
-  if [ -f "$_MISE_TOM_PATH" ]; then
+  if [ -f "${_MISE_TOM_PATH:-}" ]; then
     # 1. Try exact match (including quotes and provider prefix if provider string given)
-    _VER=$(grep -E "^\"?${_TOOL_NAME_MISE}\"?[[:space:]]*=" "$_MISE_TOM_PATH" 2>/dev/null |
+    _VER=$(grep -E "^\"?${_TOOL_NAME_MISE}\"?[[:space:]]*=" "${_MISE_TOM_PATH:-}" 2>/dev/null |
       sed -E 's/^[^=]*=[[:space:]]*"([^"]*)".*/\1/' | head -n 1 || true)
 
     # 2. Try matching the "basename" of the tool (e.g. github:foo/bar -> bar)
     if [ -z "${_VER:-}" ]; then
       local _SHORT_NAME
-      _SHORT_NAME=$(echo "$_TOOL_NAME_MISE" | sed -E 's/^[^:]+://; s/.*\///')
-      _VER=$(grep -E "^\"?([^:]+:)?${_SHORT_NAME}\"?[[:space:]]*=" "$_MISE_TOM_PATH" 2>/dev/null |
+      _SHORT_NAME=$(echo "${_TOOL_NAME_MISE:-}" | sed -E 's/^[^:]+://; s/.*\///')
+      _VER=$(grep -E "^\"?([^:]+:)?${_SHORT_NAME}\"?[[:space:]]*=" "${_MISE_TOM_PATH:-}" 2>/dev/null |
         sed -E 's/^[^=]*=[[:space:]]*"([^"]*)".*/\1/' | head -n 1 || true)
     fi
   fi
@@ -453,13 +453,13 @@ get_mise_tool_version() {
   if [ -z "${_VER:-}" ]; then
     # Normalize: strip provider prefix, take basename, uppercase, replace non-alnum with _
     local _VAR_KEY
-    _VAR_KEY=$(echo "$_TOOL_NAME_MISE" |
+    _VAR_KEY=$(echo "${_TOOL_NAME_MISE:-}" |
       sed -E 's/^[^:]+://; s/.*\///' |
       tr '[:lower:]' '[:upper:]' |
       tr -c 'A-Z0-9\n' '_' |
       sed 's/_*$//')
     # Safety: Only eval if key is a valid shell variable name (A-Z, 0-9, _)
-    case "$_VAR_KEY" in
+    case "${_VAR_KEY:-}" in
     *[!A-Z0-9_]*) ;;
     *) eval "_VER=\${VER_${_VAR_KEY}:-}" ;;
     esac
@@ -475,20 +475,20 @@ get_mise_tool_version() {
 # Examples:
 #   run_mise install node
 run_mise() {
-  local _CMD="$1"
+  local _CMD="${1:-}"
   shift
 
   # Guard: Only unset GITHUB_TOKEN if we are NOT in CI.
   # In CI (GitHub Actions, etc.), we MUST keep the token to avoid 403 Rate Limit errors.
   # optimize_network() has already verified the token's validity during bootstrap.
-  local _OLD_GITHUB_TOKEN="$GITHUB_TOKEN"
+  local _OLD_GITHUB_TOKEN="${GITHUB_TOKEN:-}"
   if ! is_ci_env; then
     unset GITHUB_TOKEN
   else
     # Ensure MISE_GITHUB_TOKEN is set for mise's internal GitHub API calls.
     # Workflows set this at env level, but ensure it survives subshell/export boundaries.
     if [ -n "${GITHUB_TOKEN:-}" ] && [ -z "${MISE_GITHUB_TOKEN:-}" ]; then
-      export MISE_GITHUB_TOKEN="$GITHUB_TOKEN"
+      export MISE_GITHUB_TOKEN="${GITHUB_TOKEN:-}"
       log_debug "Forwarded GITHUB_TOKEN -> MISE_GITHUB_TOKEN for mise."
     fi
   fi
@@ -500,7 +500,7 @@ run_mise() {
   local _EFFECTIVE_LOCKED="${MISE_LOCKED:-}"
   if [ "${_CMD:-}" = "install" ]; then
     for _arg in "$@"; do
-      case "$_arg" in
+      case "${_arg:-}" in
       go:*)
         _EFFECTIVE_LOCKED="0"
         break
@@ -511,25 +511,25 @@ run_mise() {
 
   local _M_BIN
   _M_BIN=$(command -v mise || echo "$HOME/.local/bin/mise")
-  [ "${_G_OS:-}" = "windows" ] && [ ! -x "$_M_BIN" ] && _M_BIN="${_M_BIN}.exe"
+  [ "${_G_OS:-}" = "windows" ] && [ ! -x "${_M_BIN:-}" ] && _M_BIN="${_M_BIN}.exe"
 
   # Performance Opt: Skip installation if version already matches SSoT
   if [ "${_CMD:-}" = "install" ] && [ -n "${1:-}" ]; then
-    local _T_CHECK="$1"
+    local _T_CHECK="${1:-}"
     local _R_VER
-    _R_VER=$(get_mise_tool_version "$_T_CHECK")
+    _R_VER=$(get_mise_tool_version "${_T_CHECK:-}")
     local _T_BASE
-    _T_BASE=$(echo "$_T_CHECK" | sed -E 's/^([^:]+:)?(@[^/]+\/)?//; s/.*\///') # Fast-path: Check version-aware existence
+    _T_BASE=$(echo "${_T_CHECK:-}" | sed -E 's/^([^:]+:)?(@[^/]+\/)?//; s/.*\///') # Fast-path: Check version-aware existence
     local _C_VER
-    _C_VER=$(get_version "$_T_BASE" | tr -d '\r')
+    _C_VER=$(get_version "${_T_BASE:-}" | tr -d '\r')
 
     if [ "${_C_VER:-}" != "-" ] && [ -n "${_R_VER:-}" ]; then
       # Use prefix matching: e.g. 3.12.0.2 (required) matches 3.12.0 (current)
-      case "$_R_VER" in "$_C_VER"*) return 0 ;; esac
+      case "${_R_VER:-}" in "${_C_VER:-}"*) return 0 ;; esac
     fi
 
     # Native/Backend Manager Awareness
-    case "$_T_CHECK" in
+    case "${_T_CHECK:-}" in
     cargo:*)
       if ! command -v cargo >/dev/null 2>&1; then
         log_error "Cannot install '$_T_CHECK': 'cargo' (Rust) is missing." && return 1
@@ -563,13 +563,13 @@ run_mise() {
     # Wrap in timeout if available
     if command -v gtimeout >/dev/null 2>&1; then
       # shellcheck disable=SC2086
-      gtimeout "$_T_OUT" "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"
+      gtimeout "${_T_OUT:-}" "${_M_BIN:-}" $_MISE_OPTS "${_CMD:-}" "$@"
     elif command -v timeout >/dev/null 2>&1; then
       # shellcheck disable=SC2086
-      timeout "$_T_OUT" "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"
+      timeout "${_T_OUT:-}" "${_M_BIN:-}" $_MISE_OPTS "${_CMD:-}" "$@"
     else
       # shellcheck disable=SC2086
-      MISE_LOCKED="$_EFFECTIVE_LOCKED" "$_M_BIN" $_MISE_OPTS "$_CMD" "$@"
+      MISE_LOCKED="${_EFFECTIVE_LOCKED:-}" "${_M_BIN:-}" $_MISE_OPTS "${_CMD:-}" "$@"
     fi
     _STATUS=$?
     [ $_STATUS -eq 0 ] && break
@@ -582,13 +582,13 @@ run_mise() {
       # Exponential backoff: 1s, 2s, 4s... to recover from transient rate limits.
       local _BACKOFF=$((1 << (_RETRY_COUNT - 1)))
       log_warn "mise $_CMD failed (attempt $_RETRY_COUNT/$_MAX_RETRIES). Retrying in ${_BACKOFF}s..."
-      sleep "$_BACKOFF"
+      sleep "${_BACKOFF:-}"
     fi
   done
 
   # Restore GITHUB_TOKEN
   if [ -n "${_OLD_GITHUB_TOKEN:-}" ]; then
-    export GITHUB_TOKEN="$_OLD_GITHUB_TOKEN"
+    export GITHUB_TOKEN="${_OLD_GITHUB_TOKEN:-}"
   else
     unset GITHUB_TOKEN
   fi
@@ -605,8 +605,8 @@ run_mise() {
 # Examples:
 #   log_info "Starting build process..."
 log_info() {
-  local _msg_info="$1"
-  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "$BLUE" "$_msg_info" "$NC"; fi
+  local _msg_info="${1:-}"
+  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "${BLUE:-}" "${_msg_info:-}" "${NC:-}"; fi
 }
 
 # Purpose: Log a success message in green.
@@ -615,8 +615,8 @@ log_info() {
 # Examples:
 #   log_success "Build completed successfully."
 log_success() {
-  local _msg_suc="$1"
-  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "$GREEN" "$_msg_suc" "$NC"; fi
+  local _msg_suc="${1:-}"
+  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "${GREEN:-}" "${_msg_suc:-}" "${NC:-}"; fi
 }
 
 # Purpose: Log a warning message in yellow.
@@ -625,8 +625,8 @@ log_success() {
 # Examples:
 #   log_warn "Dependency 'jq' not found. Some features may be limited."
 log_warn() {
-  local _msg_warn="$1"
-  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "$YELLOW" "$_msg_warn" "$NC"; fi
+  local _msg_warn="${1:-}"
+  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "${YELLOW:-}" "${_msg_warn:-}" "${NC:-}"; fi
 }
 
 # Purpose: Log an error message in red to stderr.
@@ -635,8 +635,8 @@ log_warn() {
 # Examples:
 #   log_error "Critical error: Database connection failed."
 log_error() {
-  local _msg_err="$1"
-  printf "%s%b%s\n" "$RED" "$_msg_err" "$NC" >&2
+  local _msg_err="${1:-}"
+  printf "%s%b%s\n" "${RED:-}" "${_msg_err:-}" "${NC:-}" >&2
 }
 
 # Purpose: Verifies that a required toolchain manager (e.g., cargo, npm, go) is available.
@@ -645,8 +645,8 @@ log_error() {
 # Examples:
 #   ensure_manager cargo
 ensure_manager() {
-  local _MGR="$1"
-  if ! command -v "$_MGR" >/dev/null 2>&1; then
+  local _MGR="${1:-}"
+  if ! command -v "${_MGR:-}" >/dev/null 2>&1; then
     log_error "Error: Toolchain manager '$_MGR' is missing but required for this installation."
     exit 1
   fi
@@ -658,8 +658,8 @@ ensure_manager() {
 # Examples:
 #   log_debug "Temporary path: /tmp/build-123"
 log_debug() {
-  local _msg_dbg="$1"
-  if [ "${VERBOSE:-1}" -ge 2 ]; then printf "[DEBUG] %b\n" "$_msg_dbg"; fi
+  local _msg_dbg="${1:-}"
+  if [ "${VERBOSE:-1}" -ge 2 ]; then printf "[DEBUG] %b\n" "${_msg_dbg:-}"; fi
 }
 
 # Purpose: Attempts to install a tool using native package managers (brew, apt, choco, etc.)
@@ -669,41 +669,41 @@ log_debug() {
 #   0 - Success
 #   1 - Failure or no manager found
 install_native_tool() {
-  local _PKG="$1"
+  local _PKG="${1:-}"
   [ -z "${_PKG:-}" ] && return 1
 
-  case "$_G_OS" in
+  case "${_G_OS:-}" in
   macos)
     if command -v brew >/dev/null 2>&1; then
       log_info "Installing $_PKG via Homebrew..."
-      brew install "$_PKG" && return 0
+      brew install "${_PKG:-}" && return 0
     elif command -v port >/dev/null 2>&1; then
       log_info "Installing $_PKG via MacPorts..."
-      sudo port install "$_PKG" && return 0
+      sudo port install "${_PKG:-}" && return 0
     fi
     ;;
   linux)
     if command -v apt-get >/dev/null 2>&1; then
       log_info "Installing $_PKG via apt..."
-      sudo apt-get update -y && sudo apt-get install -y "$_PKG" && return 0
+      sudo apt-get update -y && sudo apt-get install -y "${_PKG:-}" && return 0
     elif command -v dnf >/dev/null 2>&1; then
       log_info "Installing $_PKG via dnf..."
-      sudo dnf install -y "$_PKG" && return 0
+      sudo dnf install -y "${_PKG:-}" && return 0
     elif command -v pacman >/dev/null 2>&1; then
       log_info "Installing $_PKG via pacman..."
-      sudo pacman -S --noconfirm "$_PKG" && return 0
+      sudo pacman -S --noconfirm "${_PKG:-}" && return 0
     fi
     ;;
   windows)
     if command -v choco >/dev/null 2>&1; then
       log_info "Installing $_PKG via Chocolatey..."
-      choco install -y "$_PKG" && return 0
+      choco install -y "${_PKG:-}" && return 0
     elif command -v scoop >/dev/null 2>&1; then
       log_info "Installing $_PKG via Scoop..."
-      scoop install "$_PKG" && return 0
+      scoop install "${_PKG:-}" && return 0
     elif command -v winget >/dev/null 2>&1; then
       log_info "Installing $_PKG via Winget..."
-      winget install "$_PKG" && return 0
+      winget install "${_PKG:-}" && return 0
     fi
     ;;
   esac
@@ -716,17 +716,17 @@ install_native_tool() {
 #   $1 - Tool name
 #   $2 - Mise provider name (optional, defaults to tool name)
 ensure_tool() {
-  local _TOOL="$1"
+  local _TOOL="${1:-}"
   local _PRV="${2:-${_TOOL:-}}"
 
-  if command -v "$_TOOL" >/dev/null 2>&1; then
+  if command -v "${_TOOL:-}" >/dev/null 2>&1; then
     return 0
   fi
 
-  install_native_tool "$_TOOL" && return 0
+  install_native_tool "${_TOOL:-}" && return 0
 
   if command -v mise >/dev/null 2>&1; then
-    run_mise install "$_PRV" && return 0
+    run_mise install "${_PRV:-}" && return 0
   fi
 
   return 1
@@ -744,10 +744,10 @@ get_project_root() {
   _DIR=$(pwd)
   while [ "${_DIR:-}" != "/" ]; do
     if [ -f "$_DIR/Makefile" ] || [ -f "$_DIR/package.json" ] || [ -d "$_DIR/.git" ] || [ -f "$_DIR/.mise.toml" ]; then
-      echo "$_DIR"
+      echo "${_DIR:-}"
       return 0
     fi
-    _DIR=$(dirname "$_DIR")
+    _DIR=$(dirname "${_DIR:-}")
   done
   pwd
 }
@@ -773,7 +773,7 @@ guard_project_root() {
 # Examples:
 #   if ! check_ci_summary "### Summary"; then ...; fi
 check_ci_summary() {
-  [ -n "${CI_STEP_SUMMARY:-}" ] && [ -f "$CI_STEP_SUMMARY" ] && grep -qF "$1" "$CI_STEP_SUMMARY"
+  [ -n "${CI_STEP_SUMMARY:-}" ] && [ -f "${CI_STEP_SUMMARY:-}" ] && grep -qF "${1:-}" "${CI_STEP_SUMMARY:-}"
 }
 
 # Purpose: Detects the current CI platform by inspecting well-known environment variables.
@@ -837,13 +837,13 @@ has_lang_files() {
     return 0
   fi
 
-  local _FILES_LANG="$1"
-  local _EXTS_LANG="$2"
+  local _FILES_LANG="${1:-}"
+  local _EXTS_LANG="${2:-}"
 
   # 1. Check for specific config files in root
   local _f_lang
   for _f_lang in $_FILES_LANG; do
-    [ -f "$_f_lang" ] && return 0
+    [ -f "${_f_lang:-}" ] && return 0
   done
 
   # 2. Check for file extensions (recursive, maxdepth 5 for performance)
@@ -852,7 +852,7 @@ has_lang_files() {
   local _ext_lang
   for _ext_lang in $_EXTS_LANG; do
     # Specialty cases for common multi-file structures
-    case "$_ext_lang" in
+    case "${_ext_lang:-}" in
     CHARTS)
       [ -f "Chart.yaml" ] && return 0
       [ -d "charts" ] && return 0
@@ -963,7 +963,7 @@ has_lang_files() {
 
     # Use find for POSIX compatibility and performance
     # Prune common build/dependency/cache/AI/IDE directories to ensure speed
-    if [ "$(find . \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify -o -name .tmp -o -name tmp -o -name .agent -o -name .agents -o -name .gemini -o -name .trae -o -name .windsurf -o -name .cursor -o -name .cline -o -name .roo -o -name .aide -o -name .bob -o -name .pi -o -name .adal -o -name .aide -o -name .zencoder -o -name .supermaven -o -name .neovate -o -name .qoder -o -name .kode -o -name .mux -o -name .shai -o -name .vibe -o -name .void -o -name .factory -o -name .bob -o -name .crush -o -name .pi -o -name .pochi -o -name .opencode -o -name .iflow -o -name .kilocode -o -name .bito -o -name .amazonq -o -name .codeium -o -name .tabnine -o -name .codegeex -o -name .blackbox -o -name .cody -o -name .continue -o -name .codebuddy -o -name .codex -o -name .cortex -o -name .openhands -o -name .melty -o -name .pearai -o -name .mcpjam -o -name .aider.conf.yml -o -name .commandcode -o -name .goose -o -name .aide -o -name .bob -o -name .pi -o -name .adal \) -prune -o -maxdepth 5 -type f -name "$_ext_lang" -print -quit 2>/dev/null)" ]; then
+    if [ "$(find . \( -name .git -o -name node_modules -o -name .venv -o -name venv -o -name env -o -name vendor -o -name dist -o -name build -o -name out -o -name target -o -name .next -o -name .nuxt -o -name .output -o -name __pycache__ -o -name .specify -o -name .tmp -o -name tmp -o -name .agent -o -name .agents -o -name .gemini -o -name .trae -o -name .windsurf -o -name .cursor -o -name .cline -o -name .roo -o -name .aide -o -name .bob -o -name .pi -o -name .adal -o -name .aide -o -name .zencoder -o -name .supermaven -o -name .neovate -o -name .qoder -o -name .kode -o -name .mux -o -name .shai -o -name .vibe -o -name .void -o -name .factory -o -name .bob -o -name .crush -o -name .pi -o -name .pochi -o -name .opencode -o -name .iflow -o -name .kilocode -o -name .bito -o -name .amazonq -o -name .codeium -o -name .tabnine -o -name .codegeex -o -name .blackbox -o -name .cody -o -name .continue -o -name .codebuddy -o -name .codex -o -name .cortex -o -name .openhands -o -name .melty -o -name .pearai -o -name .mcpjam -o -name .aider.conf.yml -o -name .commandcode -o -name .goose -o -name .aide -o -name .bob -o -name .pi -o -name .adal \) -prune -o -maxdepth 5 -type f -name "${_ext_lang:-}" -print -quit 2>/dev/null)" ]; then
       return 0
     fi
   done
@@ -994,14 +994,14 @@ run_quiet() {
 # Examples:
 #   atomic_swap "new_config.json.tmp" "config.json"
 atomic_swap() {
-  local _SRC_ATOMIC="$1"
-  local _DST_ATOMIC="$2"
-  if [ ! -f "$_SRC_ATOMIC" ]; then
+  local _SRC_ATOMIC="${1:-}"
+  local _DST_ATOMIC="${2:-}"
+  if [ ! -f "${_SRC_ATOMIC:-}" ]; then
     log_warn "atomic_swap: Source file $_SRC_ATOMIC does not exist."
     return 1
   fi
   # Use mv for atomic operation on the same filesystem
-  mv "$_SRC_ATOMIC" "$_DST_ATOMIC"
+  mv "${_SRC_ATOMIC:-}" "${_DST_ATOMIC:-}"
 }
 
 # Purpose: Orchestrates global argument parsing for all project scripts.
@@ -1012,7 +1012,7 @@ atomic_swap() {
 parse_common_args() {
   local _arg_common
   for _arg_common in "$@"; do
-    case "$_arg_common" in
+    case "${_arg_common:-}" in
     --dry-run)
       # shellcheck disable=SC2034
       DRY_RUN=1
@@ -1027,7 +1027,7 @@ parse_common_args() {
       if command -v show_help >/dev/null 2>&1; then
         show_help
       else
-        printf "Usage: %s [OPTIONS]\n\nOptions:\n  --dry-run      Show what would be done\n  -q, --quiet    Suppress output\n  -v, --verbose  Enable debug logging\n  -h, --help     Show this help\n" "$0"
+        printf "Usage: %s [OPTIONS]\n\nOptions:\n  --dry-run      Show what would be done\n  -q, --quiet    Suppress output\n  -v, --verbose  Enable debug logging\n  -h, --help     Show this help\n" "${0:-}"
       fi
       exit 0
       ;;
@@ -1053,15 +1053,15 @@ log_summary() {
   local _DUR_SUM="${5:--}"
   local _FILE_SUM="${6:-${SETUP_SUMMARY_FILE:-}}"
 
-  if [ -z "${_FILE_SUM:-}" ] || [ ! -f "$_FILE_SUM" ]; then
+  if [ -z "${_FILE_SUM:-}" ] || [ ! -f "${_FILE_SUM:-}" ]; then
     return 0
   fi
 
   # Automatically demote to Warning if status is supposedly Active/Installed but version detection failed
-  case "$_STAT_SUM" in
+  case "${_STAT_SUM:-}" in
   ✅*)
     if [ "${_VER_SUM:-}" = "-" ] || [ -z "${_VER_SUM:-}" ]; then
-      case "$_MOD_SUM" in
+      case "${_MOD_SUM:-}" in
       System | Shell | React | Vue | Tailwind | VitePress | Vite | pnpm-deps | Python-Venv | Homebrew | Hooks | Go-Mod | Cargo-Deps | Ruby-Gems | Go | Rust | Pipx) ;; # These are complex or bootstrap components
       *) _STAT_SUM="⚠️ Warning" ;;
       esac
@@ -1069,7 +1069,7 @@ log_summary() {
     ;;
   esac
 
-  printf "| %-12s | %-15s | %-20s | %-15s | %-6s |\n" "$_CAT_SUM" "$_MOD_SUM" "$_STAT_SUM" "$_VER_SUM" "${_DUR_SUM}s" >>"$_FILE_SUM"
+  printf "| %-12s | %-15s | %-20s | %-15s | %-6s |\n" "${_CAT_SUM:-}" "${_MOD_SUM:-}" "${_STAT_SUM:-}" "${_VER_SUM:-}" "${_DUR_SUM}s" >>"${_FILE_SUM:-}"
 }
 
 # Purpose: Safely extracts version strings from various command outputs.
@@ -1083,7 +1083,7 @@ log_summary() {
 #   V=$(get_version "node")
 #   V=$(get_version "shfmt" "" "shfmt-py")
 get_version() {
-  local _CMD_VER="$1"
+  local _CMD_VER="${1:-}"
   local _ARG_VER="${2:---version}"
   local _M_PLUGIN="${3:-${_CMD_VER:-}}"
   [ -z "${_CMD_VER:-}" ] && {
@@ -1092,14 +1092,14 @@ get_version() {
   }
 
   local _BIN_PATH
-  _BIN_PATH=$(command -v "$_CMD_VER" 2>/dev/null || true)
+  _BIN_PATH=$(command -v "${_CMD_VER:-}" 2>/dev/null || true)
 
   # 1. Try Mise First (Fast & Reliable for JIT tools)
   # Check mise via cache first (fastest)
   local _MISE_VER_OUT
   # Optimization: Prefer the currently active version; fall back to any installed version
   # to avoid slow shim fallbacks. Using 'first(select(...))' or sort ensures active wins.
-  _MISE_VER_OUT=$(echo "$_G_MISE_LS_JSON_CACHE" | jq -r "
+  _MISE_VER_OUT=$(echo "${_G_MISE_LS_JSON_CACHE:-}" | jq -r "
     # Priority 1: Exact key match (e.g. 'go' matches only 'go', not 'go-task/task')
     # Priority 2: Provider suffix match (e.g. ':go' or '/go' at end of key)
     # This prevents false positives where short names like 'go' match unrelated
@@ -1111,28 +1111,28 @@ get_version() {
     | .version // empty" 2>/dev/null | head -n 1 || true)
 
   if [ -n "${_MISE_VER_OUT:-}" ] && [ "${_MISE_VER_OUT:-}" != "null" ]; then
-    echo "$_MISE_VER_OUT" && return 0
+    echo "${_MISE_VER_OUT:-}" && return 0
   fi
 
   # Fallback to system command or mise direct binary
   local _LV_RESOLVED
-  _LV_RESOLVED=$(resolve_bin "$_CMD_VER") || true
+  _LV_RESOLVED=$(resolve_bin "${_CMD_VER:-}") || true
 
   if [ -n "${_LV_RESOLVED:-}" ]; then
     # Special cases for tools with unusual version output or slow shims
-    case "$_CMD_VER" in
+    case "${_CMD_VER:-}" in
     python*)
-      "$_LV_RESOLVED" --version 2>/dev/null | cut -d' ' -f2 && return 0
+      "${_LV_RESOLVED:-}" --version 2>/dev/null | cut -d' ' -f2 && return 0
       ;;
     node)
-      "$_LV_RESOLVED" --version 2>/dev/null | sed 's/^v//'
+      "${_LV_RESOLVED:-}" --version 2>/dev/null | sed 's/^v//'
       ;;
     go)
-      "$_LV_RESOLVED" version 2>/dev/null | awk '{print $3}' | sed 's/^go//'
+      "${_LV_RESOLVED:-}" version 2>/dev/null | awk '{print $3}' | sed 's/^go//'
       ;;
     java)
       # java -version outputs to stderr and puts version in quotes
-      "$_LV_RESOLVED" "$_ARG_VER" 2>&1 | sed -n 's/.*version "\([0-9][0-9.]*\).*/\1/p' | head -n 1
+      "${_LV_RESOLVED:-}" "${_ARG_VER:-}" 2>&1 | sed -n 's/.*version "\([0-9][0-9.]*\).*/\1/p' | head -n 1
       ;;
     vitepress | docusaurus)
       # Avoid running binaries that might start a dev server on --version/--help
@@ -1145,7 +1145,7 @@ get_version() {
       # On Windows, ensures we don't hang on interactive prompts or external lookups.
       # shellcheck disable=SC2155
       local _VERSION_RAW
-      _VERSION_RAW="$(MISE_OFFLINE=1 "$_LV_RESOLVED" "$_ARG_VER" 2>/dev/null | tr -d '\r' | sed 's/^[vV]//' | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15 2>/dev/null)"
+      _VERSION_RAW="$(MISE_OFFLINE=1 "${_LV_RESOLVED:-}" "${_ARG_VER:-}" 2>/dev/null | tr -d '\r' | sed 's/^[vV]//' | grep -o '[0-9][0-9.]*' | head -n 1 | cut -c1-15 2>/dev/null)"
       echo "${_VERSION_RAW:--}" && return 0
       ;;
 
@@ -1168,24 +1168,24 @@ get_version() {
 # Examples:
 #   BIN=$(resolve_bin "eslint") || true
 resolve_bin() {
-  local _BIN="$1"
+  local _BIN="${1:-}"
   [ -z "${_BIN:-}" ] && return 1
 
   # ── 1. Python Venv ──
   local _VP="${VENV:-.venv}/$_G_VENV_BIN/$_BIN"
-  if [ -x "$_VP" ]; then echo "$_VP" && return 0; fi
+  if [ -x "${_VP:-}" ]; then echo "${_VP:-}" && return 0; fi
   # Windows: venv scripts use .exe suffix
   if [ "${_G_OS:-}" = "windows" ] && [ -x "${_VP}.exe" ]; then echo "${_VP}.exe" && return 0; fi
 
   # ── 2. Node Modules ──
   local _NP="node_modules/.bin/$_BIN"
-  if [ -x "$_NP" ]; then echo "$_NP" && return 0; fi
+  if [ -x "${_NP:-}" ]; then echo "${_NP:-}" && return 0; fi
   # Windows: npm generates .cmd wrappers
   if [ "${_G_OS:-}" = "windows" ] && [ -f "${_NP}.cmd" ]; then echo "${_NP}.cmd" && return 0; fi
 
   # ── 3. System PATH ──
   local _SP
-  _SP=$(command -v "$_BIN" 2>/dev/null) || true
+  _SP=$(command -v "${_BIN:-}" 2>/dev/null) || true
 
   # Windows: command -v might miss extensions or return sh wrappers
   if [ -z "${_SP:-}" ] && [ "${_G_OS:-}" = "windows" ]; then
@@ -1195,20 +1195,20 @@ resolve_bin() {
   if [ -n "${_SP:-}" ]; then
     # Guard: If it resolves to a mise shim, verify the tool is actually installed.
     # Shims exist for ALL tools in .mise.toml, even uninstalled ones ("hollow shims").
-    case "$_SP" in
-    *"$_G_MISE_SHIMS_BASE"*)
+    case "${_SP:-}" in
+    *"${_G_MISE_SHIMS_BASE:-}"*)
       # Use 'mise which' — the lightweight, jq-free way to validate a shim.
       # Returns the real binary path if installed, non-zero if not.
       local _MW
-      _MW=$(mise which "$_BIN" 2>/dev/null) || true
-      if [ -n "${_MW:-}" ] && [ -x "$_MW" ]; then
-        echo "$_MW" && return 0
+      _MW=$(mise which "${_BIN:-}" 2>/dev/null) || true
+      if [ -n "${_MW:-}" ] && [ -x "${_MW:-}" ]; then
+        echo "${_MW:-}" && return 0
       fi
       # Shim is hollow — fall through to Layer 4.
       ;;
     *)
       # Not a shim — it's a real system binary.
-      echo "$_SP" && return 0
+      echo "${_SP:-}" && return 0
       ;;
     esac
   fi
@@ -1216,9 +1216,9 @@ resolve_bin() {
   # ── 4. Mise direct lookup (no shim in PATH, e.g., fresh CI) ──
   # Covers: mise installed the tool but shims/PATH not yet activated.
   local _MW
-  _MW=$(mise which "$_BIN" 2>/dev/null) || true
-  if [ -n "${_MW:-}" ] && [ -x "$_MW" ]; then
-    echo "$_MW" && return 0
+  _MW=$(mise which "${_BIN:-}" 2>/dev/null) || true
+  if [ -n "${_MW:-}" ] && [ -x "${_MW:-}" ]; then
+    echo "${_MW:-}" && return 0
   fi
 
   return 1
@@ -1229,14 +1229,14 @@ resolve_bin() {
 # Examples:
 #   VER=$(get_project_version)
 get_project_version() {
-  if [ -f "$PACKAGE_JSON" ]; then
-    grep '"version":' "$PACKAGE_JSON" | head -n 1 | sed 's/.*"version":[[:space:]]*"//;s/".*//'
-  elif [ -f "$CARGO_TOML" ]; then
-    grep '^version =' "$CARGO_TOML" | head -n 1 | sed -e 's/.*"\(.*\)"/\1/' -e "s/.*'\(.*\)'/\1/"
-  elif [ -f "$PYPROJECT_TOML" ]; then
-    grep '^version =' "$PYPROJECT_TOML" | head -n 1 | sed 's/.*"//;s/".*//'
-  elif [ -f "$VERSION_FILE" ]; then
-    awk 'NR==1' "$VERSION_FILE" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
+  if [ -f "${PACKAGE_JSON:-}" ]; then
+    grep '"version":' "${PACKAGE_JSON:-}" | head -n 1 | sed 's/.*"version":[[:space:]]*"//;s/".*//'
+  elif [ -f "${CARGO_TOML:-}" ]; then
+    grep '^version =' "${CARGO_TOML:-}" | head -n 1 | sed -e 's/.*"\(.*\)"/\1/' -e "s/.*'\(.*\)'/\1/"
+  elif [ -f "${PYPROJECT_TOML:-}" ]; then
+    grep '^version =' "${PYPROJECT_TOML:-}" | head -n 1 | sed 's/.*"//;s/".*//'
+  elif [ -f "${VERSION_FILE:-}" ]; then
+    awk 'NR==1' "${VERSION_FILE:-}" | sed 's/^[[:space:]]*//;s/[[:space:]]*$//'
   else
     echo "0.0.0"
   fi
@@ -1250,13 +1250,13 @@ get_project_version() {
 # Examples:
 #   check_runtime "go" "Golang Builder"
 check_runtime() {
-  local _RT_NAME="$1"
+  local _RT_NAME="${1:-}"
   local _TOOL_DESC="${2:-Tool}"
 
   # Priority 1: Modular Check Delegation
   # If check_runtime_<name> exists in the environment, delegate to it.
   if command -v "check_runtime_${_RT_NAME}" >/dev/null 2>&1; then
-    if ! "check_runtime_${_RT_NAME}" "$_TOOL_DESC"; then
+    if ! "check_runtime_${_RT_NAME}" "${_TOOL_DESC:-}"; then
       if [ "${_G_AUDIT_MODE:-0}" -eq 1 ]; then
         return 1
       fi
@@ -1266,7 +1266,7 @@ check_runtime() {
   fi
 
   # Priority 2: Standard Command Check (Fallback using resolve_bin)
-  if ! resolve_bin "$_RT_NAME" >/dev/null 2>&1; then
+  if ! resolve_bin "${_RT_NAME:-}" >/dev/null 2>&1; then
     log_warn "Required runtime '$_RT_NAME' for $_TOOL_DESC is missing. Skipping."
     if [ "${_G_AUDIT_MODE:-0}" -eq 1 ]; then
       return 1
@@ -1301,7 +1301,7 @@ install_runtime_hooks() {
   _PRE_COMMIT_BIN=$(resolve_bin "pre-commit") || true
   if [ -n "${_PRE_COMMIT_BIN:-}" ]; then
     log_info "Running pre-commit install..."
-    run_quiet "$_PRE_COMMIT_BIN" install
+    run_quiet "${_PRE_COMMIT_BIN:-}" install
   else
     log_warn "pre-commit binary not found. Skipping hook installation."
   fi
@@ -1313,10 +1313,10 @@ sync_node_lockfile() {
   local _OLDPWD_SYNC
   _OLDPWD_SYNC="$(pwd)"
 
-  cd "$_SYNC_DIR" || return 1
+  cd "${_SYNC_DIR:-}" || return 1
 
   if [ -f "package.json" ]; then
-    case "$NPM" in
+    case "${NPM:-}" in
     pnpm)
       log_info "Syncing Node.js lockfile (pnpm)..."
       run_quiet pnpm install --no-frozen-lockfile
@@ -1336,7 +1336,7 @@ sync_node_lockfile() {
     esac
   fi
 
-  cd "$_OLDPWD_SYNC" || exit 1
+  cd "${_OLDPWD_SYNC:-}" || exit 1
 }
 
 # Purpose: Executes an npm/pnpm script with infinite-recursion detection.
@@ -1345,17 +1345,17 @@ sync_node_lockfile() {
 # Examples:
 #   run_npm_script "test"
 run_npm_script() {
-  local _SCRIPT_NAME_NPM="$1"
+  local _SCRIPT_NAME_NPM="${1:-}"
   shift # Capture remaining arguments
   local _EXTRA_ARGS_NPM="$*"
   local _CURRENT_BASENAME_NPM
-  _CURRENT_BASENAME_NPM="$(basename "$0")"
+  _CURRENT_BASENAME_NPM="$(basename "${0:-}")"
 
   if [ -f "package.json" ]; then
     # 1. Manager Detection & Guard
-    _NODE_MGR="$NPM"
+    _NODE_MGR="${NPM:-}"
 
-    if ! command -v "$_NODE_MGR" >/dev/null 2>&1; then
+    if ! command -v "${_NODE_MGR:-}" >/dev/null 2>&1; then
       log_warn "Warning: $_NODE_MGR command not found and no fallback available. Skipping Node.js task: $_SCRIPT_NAME_NPM."
       return 0
     fi
@@ -1372,18 +1372,18 @@ run_npm_script() {
 
     if [ -n "${_CMD_NPM:-}" ]; then
       # Avoid infinite loop if the command points back to this script
-      if echo "$_CMD_NPM" | grep -q "$_CURRENT_BASENAME_NPM"; then
+      if echo "${_CMD_NPM:-}" | grep -q "${_CURRENT_BASENAME_NPM:-}"; then
         log_debug "Node script '$_SCRIPT_NAME_NPM' is a self-reference to '$_CURRENT_BASENAME_NPM'. Skipping."
         return 0
       fi
       log_info "── Running Node.js script: $_NODE_MGR $_SCRIPT_NAME_NPM $_EXTRA_ARGS_NPM ──"
       # shellcheck disable=SC2086
-      "$_NODE_MGR" run "$_SCRIPT_NAME_NPM" $_EXTRA_ARGS_NPM
+      "${_NODE_MGR:-}" run "${_SCRIPT_NAME_NPM:-}" $_EXTRA_ARGS_NPM
     elif [ "${_SCRIPT_NAME_NPM:-}" = "install" ] || [ "${_SCRIPT_NAME_NPM:-}" = "update" ]; then
       # 4. Special Fallback for native commands if not defined in package.json scripts
       log_info "── Node.js standard command: $_NODE_MGR $_SCRIPT_NAME_NPM $_EXTRA_ARGS_NPM ──"
       # shellcheck disable=SC2086
-      run_quiet "$_NODE_MGR" "$_SCRIPT_NAME_NPM" $_EXTRA_ARGS_NPM
+      run_quiet "${_NODE_MGR:-}" "${_SCRIPT_NAME_NPM:-}" $_EXTRA_ARGS_NPM
     fi
   fi
   return 0
@@ -1399,19 +1399,19 @@ init_summary_table() {
 
   # Sentinel to prevent duplicate headers in the same summary stream
   local _SENTINEL_TABLE
-  _SENTINEL_TABLE="_SUMMARY_TABLE_INITIALIZED_$(echo "$_TITLE_TABLE" | tr ' ' '_')"
+  _SENTINEL_TABLE="_SUMMARY_TABLE_INITIALIZED_$(echo "${_TITLE_TABLE:-}" | tr ' ' '_')"
   if [ "$(eval echo "\${$_SENTINEL_TABLE:-}")" = "true" ]; then
     return 0
   fi
 
   # Ensure the summary file exists
-  touch "$CI_STEP_SUMMARY"
+  touch "${CI_STEP_SUMMARY:-}"
 
   {
-    printf "### %s\n\n" "$_TITLE_TABLE"
+    printf "### %s\n\n" "${_TITLE_TABLE:-}"
     printf "| Category | Module | Status | Version | Time |\n"
     printf "| :--- | :--- | :--- | :--- | :--- |\n"
-  } >>"$CI_STEP_SUMMARY"
+  } >>"${CI_STEP_SUMMARY:-}"
 
   eval "export $_SENTINEL_TABLE=true"
 }
@@ -1429,13 +1429,13 @@ finalize_summary_table() {
 #   0 - Match
 #   1 - Mismatch
 is_version_match() {
-  local _CUR_V_M="$1"
-  local _REQ_V_M="$2"
+  local _CUR_V_M="${1:-}"
+  local _REQ_V_M="${2:-}"
   [ "${_CUR_V_M:- -}" = "-" ] && return 1
   [ -z "${_REQ_V_M:-}" ] && return 1
   [ "${_REQ_V_M:-}" = "latest" ] && return 0
   # Use prefix match to handle diffs like 3.12.0.2 (pkg) vs 3.12.0 (binary)
-  case "$_REQ_V_M" in "$_CUR_V_M"*) return 0 ;; esac
+  case "${_REQ_V_M:-}" in "${_CUR_V_M:-}"*) return 0 ;; esac
   return 1
 }
 

@@ -24,7 +24,7 @@
 set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
 # ── Functions ────────────────────────────────────────────────────────────────
@@ -55,11 +55,11 @@ run_shfmt_format() {
   local _SHFMT_BIN
   _SHFMT_BIN=$(resolve_bin "shfmt") || true
 
-  if [ -n "$_SHFMT_BIN" ]; then
+  if [ -n "${_SHFMT_BIN:-}" ]; then
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
-      "$_SHFMT_BIN" -d -s -i 2 scripts/ tests/ 2>/dev/null || true
+      "${_SHFMT_BIN:-}" -d -s -i 2 scripts/ tests/ 2>/dev/null || true
     else
-      "$_SHFMT_BIN" -w -s -i 2 scripts/ tests/ 2>/dev/null || true
+      "${_SHFMT_BIN:-}" -w -s -i 2 scripts/ tests/ 2>/dev/null || true
     fi
   else
     log_warn "Warning: shfmt not found. Skipping shell formatting."
@@ -74,15 +74,15 @@ run_prettier_format() {
   local _PRETTIER_BIN
   _PRETTIER_BIN=$(resolve_bin "prettier") || true
 
-  if [ -z "$_PRETTIER_BIN" ]; then
+  if [ -z "${_PRETTIER_BIN:-}" ]; then
     log_warn "Warning: prettier not found. Skipping web/general formatting."
     return
   fi
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    "$_PRETTIER_BIN" --check .
+    "${_PRETTIER_BIN:-}" --check .
   else
-    "$_PRETTIER_BIN" --write .
+    "${_PRETTIER_BIN:-}" --write .
   fi
 }
 
@@ -94,15 +94,15 @@ run_ruff_format() {
   local _RUFF_FMT_BIN
   _RUFF_FMT_BIN=$(resolve_bin "ruff") || true
 
-  if [ -z "$_RUFF_FMT_BIN" ]; then
+  if [ -z "${_RUFF_FMT_BIN:-}" ]; then
     log_warn "Warning: ruff not found. Skipping python formatting."
     return
   fi
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    "$_RUFF_FMT_BIN" format --check .
+    "${_RUFF_FMT_BIN:-}" format --check .
   else
-    "$_RUFF_FMT_BIN" format .
+    "${_RUFF_FMT_BIN:-}" format .
   fi
 }
 
@@ -133,7 +133,7 @@ main() {
   log_success "\n✨ Formatting complete!"
 
   # 4. Standardized Next Actions
-  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
     printf "  - Run %bmake lint%b to verify code quality standards.\n" "${GREEN}" "${NC}"
     printf "  - Run %bmake test%b to ensure functional integrity.\n" "${GREEN}" "${NC}"

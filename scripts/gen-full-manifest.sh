@@ -38,11 +38,11 @@ perl -ne '
 
 # Get all VER_* variables from versions.sh
 grep -E "^VER_[A-Z0-9_]+=" scripts/lib/versions.sh | while IFS= read -r line; do
-  var_name=$(echo "$line" | cut -d= -f1)
-  var_val=$(echo "$line" | cut -d= -f2- | tr -d '"')
+  var_name=$(echo "${line:-}" | cut -d= -f1)
+  var_val=$(echo "${line:-}" | cut -d= -f2- | tr -d '"')
 
   # Skip _PROVIDER, _REF, and other metadata variables
-  case "$var_name" in
+  case "${var_name:-}" in
   *_PROVIDER | *_REF | *_URL | *_SHA*) continue ;;
   esac
 
@@ -51,15 +51,15 @@ grep -E "^VER_[A-Z0-9_]+=" scripts/lib/versions.sh | while IFS= read -r line; do
   # Use eval to get the value of the provider variable
   provider_val=$(eval "echo \${$provider_var:-}")
 
-  if [ -n "$provider_val" ]; then
+  if [ -n "${provider_val:-}" ]; then
     # Use the explicit provider (e.g., github:aquasecurity/trivy)
     echo "\"$provider_val\" = \"$var_val\""
   else
     # Fallback to simple name (e.g., go, rust) if it's a core tool not in .mise.toml
     # Usually these are already in Tier 1, so we avoid duplicates if they exist there.
-    tool_name=$(echo "$var_name" | sed 's/^VER_//' | tr '[:upper:]' '[:lower:]' | tr '_' '-')
+    tool_name=$(echo "${var_name:-}" | sed 's/^VER_//' | tr '[:upper:]' '[:lower:]' | tr '_' '-')
     # Check if tool_name is one of the core runtimes
-    case "$tool_name" in
+    case "${tool_name:-}" in
     go | node | python | ruby | java | rust | kotlin | dotnet | bun | deno | zig)
       # Only add if NOT already in .mise.toml Tier 1
       if ! grep -q "^\s*$tool_name\s*=" .mise.toml; then

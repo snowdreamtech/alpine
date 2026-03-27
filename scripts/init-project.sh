@@ -24,7 +24,7 @@
 set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
 # Purpose: Main entry point for project hydration.
@@ -50,7 +50,7 @@ main() {
 
   local _arg_hyd
   for _arg_hyd in "$@"; do
-    case "$_arg_hyd" in
+    case "${_arg_hyd:-}" in
     --project=*) _PROJECT_NAME_HYD="${_arg_hyd#*=}" ;;
     --desc=*) _PROJECT_DESC_HYD="${_arg_hyd#*=}" ;;
     --author=*) _AUTHOR_NAME_HYD="${_arg_hyd#*=}" ;;
@@ -70,7 +70,7 @@ main() {
   fi
 
   # 3. Input Collection (Interactive fallback or validation)
-  if [ -z "$_PROJECT_NAME_HYD" ]; then
+  if [ -z "${_PROJECT_NAME_HYD:-}" ]; then
     if [ "${_IS_TTY_HYD:-0}" -eq 1 ] && [ "${_AUTO_CON_HYD:-0}" -eq 0 ]; then
       printf "Enter Project Name (e.g., my-awesome-app): "
       read -r _PROJECT_NAME_HYD
@@ -80,14 +80,14 @@ main() {
     fi
   fi
 
-  if [ -z "$_PROJECT_DESC_HYD" ]; then
+  if [ -z "${_PROJECT_DESC_HYD:-}" ]; then
     if [ "${_IS_TTY_HYD:-0}" -eq 1 ] && [ "${_AUTO_CON_HYD:-0}" -eq 0 ]; then
       printf "Enter Project Description: "
       read -r _PROJECT_DESC_HYD
     fi
   fi
 
-  if [ -z "$_AUTHOR_NAME_HYD" ]; then
+  if [ -z "${_AUTHOR_NAME_HYD:-}" ]; then
     if [ "${_IS_TTY_HYD:-0}" -eq 1 ] && [ "${_AUTO_CON_HYD:-0}" -eq 0 ]; then
       printf "Enter Author Name (e.g., John Doe): "
       read -r _AUTHOR_NAME_HYD
@@ -97,14 +97,14 @@ main() {
     fi
   fi
 
-  if [ -z "$_AUTHOR_EMAIL_HYD" ]; then
+  if [ -z "${_AUTHOR_EMAIL_HYD:-}" ]; then
     if [ "${_IS_TTY_HYD:-0}" -eq 1 ] && [ "${_AUTO_CON_HYD:-0}" -eq 0 ]; then
       printf "Enter Author Email: "
       read -r _AUTHOR_EMAIL_HYD
     fi
   fi
 
-  if [ -z "$_GITHUB_ORG_HYD" ]; then
+  if [ -z "${_GITHUB_ORG_HYD:-}" ]; then
     if [ "${_IS_TTY_HYD:-0}" -eq 1 ] && [ "${_AUTO_CON_HYD:-0}" -eq 0 ]; then
       printf "Enter GitHub Username/Org (e.g., myorg): "
       read -r _GITHUB_ORG_HYD
@@ -121,10 +121,10 @@ main() {
   # 4. Confirmation
   if [ "${VERBOSE:-0}" -ge 1 ]; then
     printf "\n%bConfiguration Summary:%b\n" "${YELLOW}" "${NC}"
-    printf "  Project:     %b%s%b\n" "${GREEN}" "$_PROJECT_NAME_HYD" "${NC}"
-    printf "  Description: %b%s%b\n" "${GREEN}" "$_PROJECT_DESC_HYD" "${NC}"
-    printf "  Author:      %b%s (%s)%b\n" "${GREEN}" "$_AUTHOR_NAME_HYD" "$_AUTHOR_EMAIL_HYD" "${NC}"
-    printf "  GitHub:      %b%s%b\n" "${GREEN}" "$_GITHUB_ORG_HYD" "${NC}"
+    printf "  Project:     %b%s%b\n" "${GREEN}" "${_PROJECT_NAME_HYD:-}" "${NC}"
+    printf "  Description: %b%s%b\n" "${GREEN}" "${_PROJECT_DESC_HYD:-}" "${NC}"
+    printf "  Author:      %b%s (%s)%b\n" "${GREEN}" "${_AUTHOR_NAME_HYD:-}" "${_AUTHOR_EMAIL_HYD:-}" "${NC}"
+    printf "  GitHub:      %b%s%b\n" "${GREEN}" "${_GITHUB_ORG_HYD:-}" "${NC}"
   fi
 
   if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${VERBOSE:-0}" -ge 1 ] && [ "${_AUTO_CON_HYD:-0}" -eq 0 ]; then
@@ -132,7 +132,7 @@ main() {
       printf "\nProceed with project initialization? (y/N): "
       local _CONFIRM_HYD
       read -r _CONFIRM_HYD
-      case "$_CONFIRM_HYD" in
+      case "${_CONFIRM_HYD:-}" in
       [yY]*) ;;
       *)
         log_error "Aborted."
@@ -166,7 +166,7 @@ main() {
       -exec perl -pi -e "s~$_OLD_ORG_REF|$_OLD_USER_REF~$_GITHUB_ORG_HYD~g" {} +
 
     # Replace description if provided
-    if [ -n "$_PROJECT_DESC_HYD" ]; then
+    if [ -n "${_PROJECT_DESC_HYD:-}" ]; then
       local _OLD_DESC="An enterprise-grade, foundational template designed for multi-AI IDE collaboration."
       find . -name "*.md" -exec perl -pi -e "s~\Q$_OLD_DESC\E~$_PROJECT_DESC_HYD~g" {} +
     fi
@@ -206,7 +206,7 @@ main() {
     printf "\nRe-initialize Git repository? (y/N): "
     local _REINIT_GIT_HYD
     read -r _REINIT_GIT_HYD
-    case "$_REINIT_GIT_HYD" in
+    case "${_REINIT_GIT_HYD:-}" in
     [yY]*)
       log_info "\nStep 4: Re-initializing Git..."
       rm -rf .git
@@ -223,11 +223,11 @@ main() {
   log_success "\n🚀 Project Initialization Complete!"
 
   # 9. Automated Environment Setup
-  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ] && [ "${_AUTO_CON_HYD:-0}" -eq 0 ]; then
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ] && [ "${_AUTO_CON_HYD:-0}" -eq 0 ]; then
     printf "\n%bWould you like to run 'make setup' and 'make install' now? (y/N): %b" "${YELLOW}" "${NC}"
     local _DO_SETUP_HYD
     read -r _DO_SETUP_HYD
-    case "$_DO_SETUP_HYD" in
+    case "${_DO_SETUP_HYD:-}" in
     [yY]*)
       log_info "\nRunning 'make setup'..."
       make setup
@@ -239,7 +239,7 @@ main() {
   fi
 
   # 10. Standardized Next Actions
-  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
     printf "  - Run %bmake verify%b to validate the project state.\n" "${GREEN}" "${NC}"
     printf "  - Start coding in the %bsrc/%b directory.\n" "${GREEN}" "${NC}"

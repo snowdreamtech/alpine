@@ -20,14 +20,14 @@
 _mise_detect_shell() {
   local _M_SHELL="bash"
   local _PARENT_SHELL
-  _PARENT_SHELL=$(ps -p "$PPID" -o comm= 2>/dev/null | awk -F/ '{print $NF}' | tr -d '-')
+  _PARENT_SHELL=$(ps -p "${PPID:-}" -o comm= 2>/dev/null | awk -F/ '{print $NF}' | tr -d '-')
 
-  case "$_PARENT_SHELL" in
+  case "${_PARENT_SHELL:-}" in
   zsh | bash | fish | pwsh | powershell | nu | xonsh | elvish)
-    _M_SHELL="$_PARENT_SHELL"
+    _M_SHELL="${_PARENT_SHELL:-}"
     ;;
   *)
-    case "$SHELL" in
+    case "${SHELL:-}" in
     *zsh*) _M_SHELL="zsh" ;;
     *bash*) _M_SHELL="bash" ;;
     *fish*) _M_SHELL="fish" ;;
@@ -39,28 +39,28 @@ _mise_detect_shell() {
     esac
     ;;
   esac
-  echo "$_M_SHELL"
+  echo "${_M_SHELL:-}"
 }
 
 # Internal helper to detect the CPU architecture.
 _mise_detect_arch() {
-  local _OS="$1"
+  local _OS="${1:-}"
   local _ARCH
   _ARCH=$(uname -m)
-  case "$_ARCH" in
+  case "${_ARCH:-}" in
   x86_64 | amd64) _ARCH="x64" ;;
   arm64 | aarch64) _ARCH="arm64" ;;
   armv7*) _ARCH="armv7" ;;
   *) _ARCH="x64" ;;
   esac
 
-  if [ "$_OS" = "linux" ]; then
+  if [ "${_OS:-}" = "linux" ]; then
     # Detect musl libc (common in Alpine and minimal Docker images)
     if (ldd "$(command -v ls)" 2>&1 | grep -q "musl") || [ -f /lib/ld-musl-x86_64.so.1 ] || [ -f /lib/ld-musl-aarch64.so.1 ] || [ -f /lib/ld-musl-armhf.so.1 ]; then
       _ARCH="${_ARCH}-musl"
     fi
   fi
-  echo "$_ARCH"
+  echo "${_ARCH:-}"
 }
 
 # Internal helper to detect the OS type.
@@ -75,16 +75,16 @@ _mise_detect_os() {
 
 # Tier 1: Shell-specific streamers (mise.run) - Includes auto-activation.
 _mise_install_tier1() {
-  local _SHELL="$1"
+  local _SHELL="${1:-}"
   log_info "Tier 1: Trying official shell-specific streamer for ${_SHELL}..."
   _TMP_SH="${TMPDIR:-/tmp}/mise_install_$$.sh"
-  if curl --retry 5 --retry-delay 2 --retry-connrefused -sS -L "https://mise.run/${_SHELL}" -o "$_TMP_SH"; then
-    if sh "$_TMP_SH"; then
-      rm -f "$_TMP_SH"
+  if curl --retry 5 --retry-delay 2 --retry-connrefused -sS -L "https://mise.run/${_SHELL}" -o "${_TMP_SH:-}"; then
+    if sh "${_TMP_SH:-}"; then
+      rm -f "${_TMP_SH:-}"
       return 0
     fi
   fi
-  rm -f "$_TMP_SH"
+  rm -f "${_TMP_SH:-}"
   return 1
 }
 
@@ -131,9 +131,9 @@ _mise_install_tier3() {
   else
     local _m_bs
     for _m_bs in pnpm npm bun; do
-      if command -v "$_m_bs" >/dev/null 2>&1; then
+      if command -v "${_m_bs:-}" >/dev/null 2>&1; then
         log_info "Detected $_m_bs. Installing mise..."
-        "$_m_bs" install -g @jdxcode/mise && return 0
+        "${_m_bs:-}" install -g @jdxcode/mise && return 0
       fi
     done
     if command -v yarn >/dev/null 2>&1; then
@@ -146,35 +146,35 @@ _mise_install_tier3() {
 
 # Tier 4: Manual Binary Download (GitHub Releases).
 _mise_install_tier4() {
-  local _OS="$1"
-  local _ARCH="$2"
-  local _VER="$3"
+  local _OS="${1:-}"
+  local _ARCH="${2:-}"
+  local _VER="${3:-}"
   log_info "Tier 4: Performing manual binary download for ${_OS}-${_ARCH} (v${_VER})..."
 
   local _M_BIN_NAME="mise-v${_VER}-${_OS}-${_ARCH}"
   local _EXT=""
-  [ "$_OS" = "windows" ] && _EXT=".zip"
+  [ "${_OS:-}" = "windows" ] && _EXT=".zip"
   local _M_URL="https://github.com/jdx/mise/releases/download/v${_VER}/${_M_BIN_NAME}${_EXT}"
   if [ "${ENABLE_GITHUB_PROXY}" = "1" ] || [ "${ENABLE_GITHUB_PROXY}" = "true" ]; then
     _M_URL="${GITHUB_PROXY}${_M_URL}"
   fi
   local _DEST="$HOME/.local/bin/mise"
-  [ "$_OS" = "windows" ] && _DEST="${_DEST}.exe"
+  [ "${_OS:-}" = "windows" ] && _DEST="${_DEST}.exe"
 
-  mkdir -p "$(dirname "$_DEST")"
+  mkdir -p "$(dirname "${_DEST:-}")"
 
   _download() {
     if command -v curl >/dev/null 2>&1; then
-      run_quiet curl --retry 5 --retry-delay 2 --retry-connrefused -fSL --connect-timeout 15 -o "$2" "$1"
+      run_quiet curl --retry 5 --retry-delay 2 --retry-connrefused -fSL --connect-timeout 15 -o "${2:-}" "${1:-}"
     elif command -v wget >/dev/null 2>&1; then
-      run_quiet wget --tries=5 --waitretry=2 -q --timeout=15 -O "$2" "$1"
+      run_quiet wget --tries=5 --waitretry=2 -q --timeout=15 -O "${2:-}" "${1:-}"
     else
       log_error "Neither curl nor wget is available for manual download."
       return 1
     fi
   }
 
-  if [ "$_OS" = "windows" ]; then
+  if [ "${_OS:-}" = "windows" ]; then
     if ! command -v unzip >/dev/null 2>&1; then
       log_error "Error: 'unzip' is required for Windows manual bootstrap."
       return 1
@@ -183,25 +183,25 @@ _mise_install_tier4() {
     _TMP_DIR=$(mktemp -d 2>/dev/null || echo "/tmp/mise_win_extract_$$")
     local _TMP_ZIP="${_TMP_DIR}/mise.zip"
 
-    if _download "$_M_URL" "$_TMP_ZIP"; then
-      if unzip -q "$_TMP_ZIP" -d "$_TMP_DIR"; then
+    if _download "${_M_URL:-}" "${_TMP_ZIP:-}"; then
+      if unzip -q "${_TMP_ZIP:-}" -d "${_TMP_DIR:-}"; then
         # Robustly find mise.exe and mise-shim.exe in any extracted path
         local _FOUND_BIN
-        _FOUND_BIN=$(find "$_TMP_DIR" -maxdepth 3 -name "mise.exe" | head -n 1)
-        if [ -n "$_FOUND_BIN" ]; then
-          mv "$_FOUND_BIN" "$_DEST"
+        _FOUND_BIN=$(find "${_TMP_DIR:-}" -maxdepth 3 -name "mise.exe" | head -n 1)
+        if [ -n "${_FOUND_BIN:-}" ]; then
+          mv "${_FOUND_BIN:-}" "${_DEST:-}"
           local _FOUND_SHIM
-          _FOUND_SHIM=$(find "$_TMP_DIR" -maxdepth 3 -name "mise-shim.exe" | head -n 1)
-          [ -n "$_FOUND_SHIM" ] && mv "$_FOUND_SHIM" "$(dirname "$_DEST")/mise-shim.exe"
-          rm -rf "$_TMP_DIR"
+          _FOUND_SHIM=$(find "${_TMP_DIR:-}" -maxdepth 3 -name "mise-shim.exe" | head -n 1)
+          [ -n "${_FOUND_SHIM:-}" ] && mv "${_FOUND_SHIM:-}" "$(dirname "${_DEST:-}")/mise-shim.exe"
+          rm -rf "${_TMP_DIR:-}"
           return 0
         fi
       fi
     fi
-    rm -rf "$_TMP_DIR"
+    rm -rf "${_TMP_DIR:-}"
   else
-    if _download "$_M_URL" "$_DEST"; then
-      chmod +x "$_DEST"
+    if _download "${_M_URL:-}" "${_DEST:-}"; then
+      chmod +x "${_DEST:-}"
       return 0
     fi
   fi
@@ -210,7 +210,7 @@ _mise_install_tier4() {
 
 # Setup shell completions.
 _mise_setup_completions() {
-  local _SHELL="$1"
+  local _SHELL="${1:-}"
   log_info "Setting up mise completions for ${_SHELL}..."
 
   # mise completion performs better when 'usage' is installed.
@@ -220,25 +220,25 @@ _mise_setup_completions() {
     run_quiet run_mise use --global usage || true
   fi
 
-  case "$_SHELL" in
+  case "${_SHELL:-}" in
   zsh)
     local _DIR="${ZDOTDIR:-$HOME}/.zsh/completions"
-    mkdir -p "$_DIR"
+    mkdir -p "${_DIR:-}"
     mise completion zsh >"$_DIR/_mise" 2>/dev/null || true
     ;;
   bash)
     local _DIR="$HOME/.local/share/bash-completion/completions"
-    mkdir -p "$_DIR"
+    mkdir -p "${_DIR:-}"
     mise completion bash >"$_DIR/mise" 2>/dev/null || true
     ;;
   fish)
     local _DIR="$HOME/.config/fish/completions"
-    mkdir -p "$_DIR"
+    mkdir -p "${_DIR:-}"
     mise completion fish >"$_DIR/mise.fish" 2>/dev/null || true
     ;;
   pwsh | powershell)
     local _DIR="$HOME/Documents/PowerShell/Completions"
-    mkdir -p "$_DIR"
+    mkdir -p "${_DIR:-}"
     # mise completion supports 'powershell' (or 'pwsh' as alias in newer versions)
     mise completion powershell >"$_DIR/mise-completion.ps1" 2>/dev/null || true
     ;;
@@ -259,70 +259,70 @@ _mise_verify_health() {
 
 _mise_activate_bash() {
   local _RC="$HOME/.bashrc"
-  [ -f "$_RC" ] || return 0
+  [ -f "${_RC:-}" ] || return 0
   # shellcheck disable=SC2016
-  grep -q "mise activate bash" "$_RC" || echo 'eval "$(mise activate bash)"' >>"$_RC"
+  grep -q "mise activate bash" "${_RC:-}" || echo 'eval "$(mise activate bash)"' >>"${_RC:-}"
 }
 
 _mise_activate_zsh() {
   local _RC="${ZDOTDIR-$HOME}/.zshrc"
-  [ -f "$_RC" ] || return 0
+  [ -f "${_RC:-}" ] || return 0
   # shellcheck disable=SC2016
-  grep -q "mise activate zsh" "$_RC" || echo 'eval "$(mise activate zsh)"' >>"$_RC"
+  grep -q "mise activate zsh" "${_RC:-}" || echo 'eval "$(mise activate zsh)"' >>"${_RC:-}"
 }
 
 _mise_activate_fish() {
   local _RC="$HOME/.config/fish/config.fish"
-  mkdir -p "$(dirname "$_RC")"
-  grep -q "mise activate fish" "$_RC" || echo 'mise activate fish | source' >>"$_RC"
+  mkdir -p "$(dirname "${_RC:-}")"
+  grep -q "mise activate fish" "${_RC:-}" || echo 'mise activate fish | source' >>"${_RC:-}"
 }
 
 _mise_activate_pwsh() {
   # Powershell profile path varies, we use a common heuristic.
   local _RC="$HOME/Documents/PowerShell/Microsoft.PowerShell_profile.ps1"
-  [ -d "$(dirname "$_RC")" ] || mkdir -p "$(dirname "$_RC")"
-  grep -q "mise activate pwsh" "$_RC" 2>/dev/null || echo '(&mise activate pwsh) | Out-String | Invoke-Expression' >>"$_RC"
+  [ -d "$(dirname "${_RC:-}")" ] || mkdir -p "$(dirname "${_RC:-}")"
+  grep -q "mise activate pwsh" "${_RC:-}" 2>/dev/null || echo '(&mise activate pwsh) | Out-String | Invoke-Expression' >>"${_RC:-}"
 }
 
 _mise_activate_nu() {
   # Nushell requires env.nu and config.nu updates.
   local _NU_DIR="$HOME/.config/nushell"
-  [ -d "$_NU_DIR" ] || return 0
+  [ -d "${_NU_DIR:-}" ] || return 0
   local _ENV="${_NU_DIR}/env.nu"
   local _CONF="${_NU_DIR}/config.nu"
   local _MISE_NU="${_NU_DIR}/mise.nu"
 
-  if [ ! -f "$_MISE_NU" ]; then
-    mise activate nu >"$_MISE_NU" 2>/dev/null || true
+  if [ ! -f "${_MISE_NU:-}" ]; then
+    mise activate nu >"${_MISE_NU:-}" 2>/dev/null || true
   fi
 
   # shellcheck disable=SC2016
-  grep -q "mise.nu" "$_ENV" 2>/dev/null || printf "let mise_path = \$nu.default-config-dir | path join mise.nu\n^mise activate nu | save \$mise_path --force\n" >>"$_ENV"
+  grep -q "mise.nu" "${_ENV:-}" 2>/dev/null || printf "let mise_path = \$nu.default-config-dir | path join mise.nu\n^mise activate nu | save \$mise_path --force\n" >>"${_ENV:-}"
   # shellcheck disable=SC2016
-  grep -q "mise.nu" "$_CONF" 2>/dev/null || printf "use (\$nu.default-config-dir | path join mise.nu)\n" >>"$_CONF"
+  grep -q "mise.nu" "${_CONF:-}" 2>/dev/null || printf "use (\$nu.default-config-dir | path join mise.nu)\n" >>"${_CONF:-}"
 }
 
 _mise_activate_xonsh() {
   local _RC="$HOME/.config/xonsh/rc.xsh"
-  [ -d "$(dirname "$_RC")" ] || mkdir -p "$(dirname "$_RC")"
+  [ -d "$(dirname "${_RC:-}")" ] || mkdir -p "$(dirname "${_RC:-}")"
   # shellcheck disable=SC2016
-  grep -q "mise activate xonsh" "$_RC" 2>/dev/null || echo 'execx($(mise activate xonsh))' >>"$_RC"
+  grep -q "mise activate xonsh" "${_RC:-}" 2>/dev/null || echo 'execx($(mise activate xonsh))' >>"${_RC:-}"
 }
 
 _mise_activate_elvish() {
   local _RC="$HOME/.config/elvish/rc.elv"
-  [ -d "$(dirname "$_RC")" ] || mkdir -p "$(dirname "$_RC")"
+  [ -d "$(dirname "${_RC:-}")" ] || mkdir -p "$(dirname "${_RC:-}")"
   # shellcheck disable=SC2016
-  grep -q "mise activate elvish" "$_RC" 2>/dev/null || echo 'eval (mise activate elvish | slurp)' >>"$_RC"
+  grep -q "mise activate elvish" "${_RC:-}" 2>/dev/null || echo 'eval (mise activate elvish | slurp)' >>"${_RC:-}"
 }
 
 # Helper to ensure mise is activated in the current session and RC files.
 _mise_apply_activation() {
-  local _SHELL="$1"
+  local _SHELL="${1:-}"
   log_info "Synchronizing mise activation for ${_SHELL}..."
 
   # 1. Permanent RC File Injection
-  case "$_SHELL" in
+  case "${_SHELL:-}" in
   zsh) _mise_activate_zsh ;;
   bash) _mise_activate_bash ;;
   fish) _mise_activate_fish ;;
@@ -337,17 +337,17 @@ _mise_apply_activation() {
   local _M_BIN
   _M_BIN=$(command -v mise || echo "$_G_MISE_BIN_BASE/mise")
   # shellcheck disable=SC2153
-  [ "$_G_OS" = "windows" ] && [ ! -x "$_M_BIN" ] && _M_BIN="${_M_BIN}.exe"
+  [ "${_G_OS:-}" = "windows" ] && [ ! -x "${_M_BIN:-}" ] && _M_BIN="${_M_BIN}.exe"
 
-  if [ -x "$_M_BIN" ]; then
+  if [ -x "${_M_BIN:-}" ]; then
     # PowerShell and Nushell activation in POSIX sh is complex/limited to shims.
     # We focus on the most impactful session update: shims.
-    case "$_SHELL" in
+    case "${_SHELL:-}" in
     pwsh | powershell | nu | nushell)
       export PATH="$_G_MISE_SHIMS_BASE:$PATH"
       ;;
     *)
-      eval "$("$_M_BIN" activate "$_SHELL" --shims)"
+      eval "$("${_M_BIN:-}" activate "${_SHELL:-}" --shims)"
       ;;
     esac
     log_debug "mise environment synchronized for current session."
@@ -374,16 +374,16 @@ bootstrap_mise() {
   local _M_OS
   _M_OS=$(_mise_detect_os)
   local _M_ARCH
-  _M_ARCH=$(_mise_detect_arch "$_M_OS")
+  _M_ARCH=$(_mise_detect_arch "${_M_OS:-}")
 
   # Priority 1: Official Streamer (Includes auto-activation for some methods)
-  if _mise_install_tier1 "$_M_SHELL"; then
+  if _mise_install_tier1 "${_M_SHELL:-}"; then
     log_success "mise installed via Tier 1 (Streamer)."
   # Priority 2: System Package Managers
   elif _mise_install_tier2; then
     log_success "mise installed via Tier 2 (Package Manager)."
   # Priority 3: Manual Binary (Fast & cross-platform)
-  elif _mise_install_tier4 "$_M_OS" "$_M_ARCH" "${MISE_VERSION#[vV]}"; then
+  elif _mise_install_tier4 "${_M_OS:-}" "${_M_ARCH:-}" "${MISE_VERSION#[vV]}"; then
     log_success "mise installed via Tier 3 (Manual Binary)."
   # Priority 4: Language Tools (Slowest fallback)
   elif _mise_install_tier3; then
@@ -395,16 +395,16 @@ bootstrap_mise() {
 
   # Path Refresh: Ensure MISE is available for immediate setup
   [ -d "$HOME/.local/bin" ] && export PATH="$HOME/.local/bin:$PATH"
-  [ -d "$_G_MISE_BIN_BASE" ] && export PATH="$_G_MISE_BIN_BASE:$PATH"
-  [ -d "$_G_MISE_SHIMS_BASE" ] && export PATH="$_G_MISE_SHIMS_BASE:$PATH"
+  [ -d "${_G_MISE_BIN_BASE:-}" ] && export PATH="$_G_MISE_BIN_BASE:$PATH"
+  [ -d "${_G_MISE_SHIMS_BASE:-}" ] && export PATH="$_G_MISE_SHIMS_BASE:$PATH"
 
   # ── 🏗️ Post-Install Configuration ──
 
   # Finalize Activation
-  _mise_apply_activation "$_M_SHELL"
+  _mise_apply_activation "${_M_SHELL:-}"
 
   # Setup Completions
-  _mise_setup_completions "$_M_SHELL"
+  _mise_setup_completions "${_M_SHELL:-}"
 
   # Security & Automation: Trust project config
   if [ -f ".mise.toml" ]; then

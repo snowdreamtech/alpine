@@ -24,7 +24,7 @@
 set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
 # ── Functions ────────────────────────────────────────────────────────────────
@@ -54,15 +54,15 @@ EOF
 # Examples:
 #   clean_item "dist" "Build distribution"
 clean_item() {
-  local _PATH_CLN="$1"
-  local _DESC_CLN="$2"
+  local _PATH_CLN="${1:-}"
+  local _DESC_CLN="${2:-}"
 
-  if [ -e "$_PATH_CLN" ]; then
+  if [ -e "${_PATH_CLN:-}" ]; then
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_success "DRY-RUN: Would remove $_DESC_CLN ($_PATH_CLN)"
     else
       log_info "Removing $_DESC_CLN ($_PATH_CLN)..."
-      rm -rf "$_PATH_CLN"
+      rm -rf "${_PATH_CLN:-}"
     fi
   else
     log_debug "Skipping $_DESC_CLN ($_PATH_CLN) - Not found."
@@ -131,7 +131,7 @@ main() {
   log_success "\n✨ Cleanup complete!"
 
   # 5. Standardized Next Actions
-  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
     printf "  - Run %bmake setup%b to re-initialize the project environment.\n" "${GREEN}" "${NC}"
   fi

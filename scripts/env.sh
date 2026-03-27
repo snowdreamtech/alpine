@@ -24,7 +24,7 @@
 set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
 # ── Functions ────────────────────────────────────────────────────────────────
@@ -76,20 +76,20 @@ run_env_setup() {
 
 # Purpose: Internal helper to parse .env.example and execute an action (check or sync) for missing keys.
 _process_env_template() {
-  local _MODE="$1" # "check" or "sync"
+  local _MODE="${1:-}" # "check" or "sync"
   local _MISSING_COUNT=0
   local _ADDED_COUNT=0
 
-  while IFS= read -r line_parsed || [ -n "$line_parsed" ]; do
-    case "$line_parsed" in
+  while IFS= read -r line_parsed || [ -n "${line_parsed:-}" ]; do
+    case "${line_parsed:-}" in
     \#* | '') continue ;;
     esac
 
     local _KEY_PARSED
-    _KEY_PARSED=$(echo "$line_parsed" | cut -d'=' -f1 | sed 's/[[:space:]]*$//')
+    _KEY_PARSED=$(echo "${line_parsed:-}" | cut -d'=' -f1 | sed 's/[[:space:]]*$//')
 
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
-      if [ "$_MODE" = "check" ]; then
+      if [ "${_MODE:-}" = "check" ]; then
         log_debug "DRY-RUN: Would check if $_KEY_PARSED exists in .env"
       else
         log_info "DRY-RUN: Would add $_KEY_PARSED to .env"
@@ -98,16 +98,16 @@ _process_env_template() {
     fi
 
     if ! grep -q "^${_KEY_PARSED}=" ".env" && ! grep -q "^${_KEY_PARSED} =" ".env"; then
-      if [ "$_MODE" = "check" ]; then
+      if [ "${_MODE:-}" = "check" ]; then
         log_warn "Missing key: $_KEY_PARSED"
         _MISSING_COUNT=$((_MISSING_COUNT + 1))
-      elif [ "$_MODE" = "sync" ]; then
-        printf "Missing key found: %b%s%b. Add to .env? (y/N): " "${YELLOW}" "$_KEY_PARSED" "${NC}"
+      elif [ "${_MODE:-}" = "sync" ]; then
+        printf "Missing key found: %b%s%b. Add to .env? (y/N): " "${YELLOW}" "${_KEY_PARSED:-}" "${NC}"
         local _CONFIRM_SYNC
         read -r _CONFIRM_SYNC
-        case "$_CONFIRM_SYNC" in
+        case "${_CONFIRM_SYNC:-}" in
         [yY]*)
-          echo "$line_parsed" >>.env
+          echo "${line_parsed:-}" >>.env
           log_success "Added $_KEY_PARSED"
           _ADDED_COUNT=$((_ADDED_COUNT + 1))
           ;;
@@ -117,15 +117,15 @@ _process_env_template() {
     fi
   done <".env.example"
 
-  if [ "$_MODE" = "check" ]; then
-    if [ "$_MISSING_COUNT" -eq 0 ]; then
+  if [ "${_MODE:-}" = "check" ]; then
+    if [ "${_MISSING_COUNT:-}" -eq 0 ]; then
       log_success "All environment keys are present."
     else
       log_error "Validation failed: $_MISSING_COUNT keys missing from .env"
       log_info "💡 Run 'scripts/env.sh sync' to add missing keys (interactive)."
       exit 1
     fi
-  elif [ "$_MODE" = "sync" ]; then
+  elif [ "${_MODE:-}" = "sync" ]; then
     log_success "Sync complete. $_ADDED_COUNT keys added."
   fi
 }
@@ -178,15 +178,15 @@ main() {
   local _COMMAND_ENV="setup"
   local _arg_env
   for _arg_env in "$@"; do
-    case "$_arg_env" in
-    setup | check | sync) _COMMAND_ENV="$_arg_env" ;;
+    case "${_arg_env:-}" in
+    setup | check | sync) _COMMAND_ENV="${_arg_env:-}" ;;
     esac
   done
   parse_common_args "$@"
 
   log_info "🔧 Environment Configuration Manager ($_COMMAND_ENV)...\n"
 
-  case "$_COMMAND_ENV" in
+  case "${_COMMAND_ENV:-}" in
   setup) run_env_setup ;;
   check) run_env_check ;;
   sync) run_env_sync ;;
@@ -195,7 +195,7 @@ main() {
   log_success "\n✨ Environment management task complete."
 
   # 4. Standardized Next Actions
-  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
     printf "  - Run %bmake setup%b to prepare your development environment.\n" "${GREEN}" "${NC}"
     printf "  - Run %bmake install%b to synchronize project dependencies.\n" "${GREEN}" "${NC}"

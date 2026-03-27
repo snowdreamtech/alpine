@@ -24,7 +24,7 @@
 set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
 # Purpose: Displays usage information for the guided commit manager.
@@ -92,8 +92,8 @@ main() {
 
   # 4. Check for dependencies
   local _NPM_LOCAL_CMT
-  _NPM_LOCAL_CMT="$NPM"
-  if ! resolve_bin "$_NPM_LOCAL_CMT" >/dev/null 2>&1; then
+  _NPM_LOCAL_CMT="${NPM:-}"
+  if ! resolve_bin "${_NPM_LOCAL_CMT:-}" >/dev/null 2>&1; then
     log_error "Error: $_NPM_LOCAL_CMT client not found."
     exit 1
   fi
@@ -111,10 +111,10 @@ main() {
 
   log_info "Launching interactive CLI..."
   # We use direct exec to avoid recursion if the npm script points back here
-  "$_NPM_LOCAL_CMT" exec cz
+  "${_NPM_LOCAL_CMT:-}" exec cz
 
   # 6. Standardized Next Actions
-  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
     printf "  - Run %bmake release%b to publish your changes.\n" "${GREEN}" "${NC}"
     printf "  - Run %bgit push%b to upload changes to the remote repository.\n" "${GREEN}" "${NC}"

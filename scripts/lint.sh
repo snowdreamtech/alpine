@@ -24,7 +24,7 @@
 set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
 # Purpose: Displays usage information for the quality orchestrator.
@@ -51,12 +51,12 @@ EOF
 # Examples:
 #   run_pre_commit_lint "--fix"
 run_pre_commit_lint() {
-  local _LV_FIX="$1"
+  local _LV_FIX="${1:-}"
   log_info "── Running pre-commit hooks (Pass 1/1) ──"
   local _PRE_COMMIT_LNT
   _PRE_COMMIT_LNT=$(resolve_bin "pre-commit") || true
 
-  if [ -z "$_PRE_COMMIT_LNT" ]; then
+  if [ -z "${_PRE_COMMIT_LNT:-}" ]; then
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_warn "DRY-RUN: pre-commit not found. Using placeholder for preview."
       _PRE_COMMIT_LNT="pre-commit"
@@ -69,13 +69,13 @@ run_pre_commit_lint() {
   # Run on all files
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_success "DRY-RUN: Would run $_PRE_COMMIT_LNT --all-files"
-  elif [ -n "$_LV_FIX" ]; then
+  elif [ -n "${_LV_FIX:-}" ]; then
     log_info "Running in auto-fix mode..."
     # pre-commit doesn't have a direct --fix flag for everything at once,
     # but many hooks auto-fix by default.
-    "$_PRE_COMMIT_LNT" run --all-files || log_warn "Some hooks modified files or reported errors."
+    "${_PRE_COMMIT_LNT:-}" run --all-files || log_warn "Some hooks modified files or reported errors."
   else
-    "$_PRE_COMMIT_LNT" run --all-files
+    "${_PRE_COMMIT_LNT:-}" run --all-files
   fi
 }
 
@@ -92,7 +92,7 @@ main() {
   local _FIX_LNT=""
   local _arg_lnt
   for _arg_lnt in "$@"; do
-    case "$_arg_lnt" in
+    case "${_arg_lnt:-}" in
     --fix) _FIX_LNT="--fix" ;;
     -q | --quiet | -v | --verbose | --dry-run | -h | --help) ;;
     esac
@@ -111,7 +111,7 @@ main() {
   fi
 
   local _L_OK=0
-  if run_pre_commit_lint "$_FIX_LNT"; then
+  if run_pre_commit_lint "${_FIX_LNT:-}"; then
     _L_OK=1
     log_summary "Quality" "pre-commit" "✅ Passed" "-" "$(($(date +%s) - _T0_LNT))"
   else
@@ -122,7 +122,7 @@ main() {
   finalize_summary_table
 
   # 5. Standardized Next Actions
-  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
     printf "  - Run %bmake test%b to execute functional test suites.\n" "${GREEN}" "${NC}"
     printf "  - Run %bmake verify%b to ensure full project stability.\n" "${GREEN}" "${NC}"

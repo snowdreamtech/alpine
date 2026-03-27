@@ -23,7 +23,7 @@
 set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
 # ── Configuration ────────────────────────────────────────────────────────────
@@ -53,22 +53,22 @@ EOF
 #   $3 - Command to execute (e.g., "brew update")
 #   $4 - Version command (optional, e.g., "$(get_version brew)")
 _execute_update() {
-  local _CATEGORY="$1"
-  local _TOOL="$2"
-  local _CMD="$3"
-  local _VERSION_CMD="$4"
+  local _CATEGORY="${1:-}"
+  local _TOOL="${2:-}"
+  local _CMD="${3:-}"
+  local _VERSION_CMD="${4:-}"
 
   local _T0
   _T0=$(date +%s)
 
   log_info "Updating $_TOOL..."
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "$_CATEGORY" "$_TOOL" "⚖️ Previewed" "-" "0"
+    log_summary "${_CATEGORY:-}" "${_TOOL:-}" "⚖️ Previewed" "-" "0"
   else
-    if run_quiet eval "$_CMD"; then
-      log_summary "$_CATEGORY" "$_TOOL" "✅ Updated" "${_VERSION_CMD:-"-"}" "$(($(date +%s) - _T0))"
+    if run_quiet eval "${_CMD:-}"; then
+      log_summary "${_CATEGORY:-}" "${_TOOL:-}" "✅ Updated" "${_VERSION_CMD:-"-"}" "$(($(date +%s) - _T0))"
     else
-      log_summary "$_CATEGORY" "$_TOOL" "❌ Failed" "-" "$(($(date +%s) - _T0))"
+      log_summary "${_CATEGORY:-}" "${_TOOL:-}" "❌ Failed" "-" "$(($(date +%s) - _T0))"
     fi
   fi
 }
@@ -79,7 +79,7 @@ _execute_update() {
 # Examples:
 #   update_node_manager_global
 update_node_manager_global() {
-  case "$NPM" in
+  case "${NPM:-}" in
   pnpm)
     if command -v corepack >/dev/null 2>&1 && pnpm self-update --help 2>&1 | grep -q "corepack" >/dev/null 2>&1; then
       _execute_update "Manager" "pnpm" "corepack prepare pnpm@latest --activate" "$(get_version pnpm)"
@@ -101,7 +101,7 @@ update_node_manager_global() {
     fi
     ;;
   bun)
-    _execute_update "Manager" "$NPM" "$NPM upgrade" "$(get_version "$NPM" "--version")"
+    _execute_update "Manager" "${NPM:-}" "$NPM upgrade" "$(get_version "${NPM:-}" "--version")"
     ;;
   esac
 }
@@ -110,7 +110,7 @@ update_node_manager_global() {
 # Examples:
 #   update_node_project_deps
 update_node_project_deps() {
-  if [ -f "$PACKAGE_JSON" ]; then
+  if [ -f "${PACKAGE_JSON:-}" ]; then
     _execute_update "Project" "$NPM-deps" "$NPM update" ""
   fi
 }
@@ -119,12 +119,12 @@ update_node_project_deps() {
 # Examples:
 #   update_python_venv
 update_python_venv() {
-  if [ -d "$VENV" ] && [ -x "$VENV/bin/pip" ]; then
+  if [ -d "${VENV:-}" ] && [ -x "$VENV/bin/pip" ]; then
     local _CMD_PY="\"$VENV/bin/pip\" install --upgrade pip"
-    if [ -f "$REQUIREMENTS_TXT" ]; then
+    if [ -f "${REQUIREMENTS_TXT:-}" ]; then
       _CMD_PY="$_CMD_PY && \"$VENV/bin/pip\" install -r \"$REQUIREMENTS_TXT\" --upgrade"
     fi
-    _execute_update "Project" "Python-Venv" "$_CMD_PY" "\$(get_version \"$VENV/bin/pip\")"
+    _execute_update "Project" "Python-Venv" "${_CMD_PY:-}" "\$(get_version \"$VENV/bin/pip\")"
   fi
 }
 
@@ -164,7 +164,7 @@ update_pre_commit() {
     _BIN_PC="$VENV/bin/pre-commit"
   elif command -v pre-commit >/dev/null 2>&1; then _BIN_PC="pre-commit"; fi
 
-  if [ -n "$_BIN_PC" ] && [ -f ".pre-commit-config.yaml" ]; then
+  if [ -n "${_BIN_PC:-}" ] && [ -f ".pre-commit-config.yaml" ]; then
     _execute_update "Other" "Hooks" "\"$_BIN_PC\" autoupdate" "\$(get_version \"$_BIN_PC\")"
   fi
 }
@@ -230,8 +230,8 @@ main() {
   if [ "${_UPDATE_SUMMARY_INITIALIZED:-false}" != "true" ] && ! check_ci_summary "### Update Execution Summary"; then
     {
       printf "### Update Execution Summary\n\n"
-    } >>"$CI_STEP_SUMMARY"
-    [ -n "${GITHUB_ENV:-}" ] && echo "_UPDATE_SUMMARY_INITIALIZED=true" >>"$GITHUB_ENV"
+    } >>"${CI_STEP_SUMMARY:-}"
+    [ -n "${GITHUB_ENV:-}" ] && echo "_UPDATE_SUMMARY_INITIALIZED=true" >>"${GITHUB_ENV:-}"
     export _UPDATE_SUMMARY_INITIALIZED=true
   fi
 
@@ -240,8 +240,8 @@ main() {
     {
       printf "| Category | Module | Status | Version | Time |\n"
       printf "| :--- | :--- | :--- | :--- | :--- |\n"
-    } >>"$CI_STEP_SUMMARY"
-    [ -n "${GITHUB_ENV:-}" ] && echo "_SUMMARY_TABLE_HEADER_SENTINEL=true" >>"$GITHUB_ENV"
+    } >>"${CI_STEP_SUMMARY:-}"
+    [ -n "${GITHUB_ENV:-}" ] && echo "_SUMMARY_TABLE_HEADER_SENTINEL=true" >>"${GITHUB_ENV:-}"
     export _SUMMARY_TABLE_HEADER_SENTINEL=true
   fi
 
@@ -263,16 +263,16 @@ main() {
   if [ "${_IS_TOP_LEVEL:-true}" = "true" ]; then
     local _TOTAL_DUR_M
     _TOTAL_DUR_M=$(($(date +%s) - _START_TIME_M))
-    printf "\n**Total Duration: %ss**\n" "$_TOTAL_DUR_M" >>"$CI_STEP_SUMMARY"
+    printf "\n**Total Duration: %ss**\n" "${_TOTAL_DUR_M:-}" >>"${CI_STEP_SUMMARY:-}"
 
     printf "\n\n"
     if ! is_ci_env; then
-      cat "$CI_STEP_SUMMARY"
+      cat "${CI_STEP_SUMMARY:-}"
     fi
     finalize_summary_table
   fi
 
-  if [ "$_IS_TOP_LEVEL" = "true" ]; then
+  if [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
     log_success "\n✨ All tools and dependencies updated successfully!"
 
     # 6. Standardized Next Actions

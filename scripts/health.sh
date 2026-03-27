@@ -25,7 +25,7 @@
 set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
 # Purpose: Main entry point for the health dashboard aggregation engine.
@@ -43,7 +43,7 @@ main() {
   local _OUTPUT_FILE=""
   local _arg_h
   for _arg_h in "$@"; do
-    case "$_arg_h" in
+    case "${_arg_h:-}" in
     --output=*) _OUTPUT_FILE="${_arg_h#*=}" ;;
     esac
   done
@@ -56,14 +56,14 @@ main() {
 
   local _HEALTH_REPORT
   _HEALTH_REPORT="health_report_$(date +%Y%m%d_%H%M%S).md"
-  [ -n "$_OUTPUT_FILE" ] && _HEALTH_REPORT="$_OUTPUT_FILE"
+  [ -n "${_OUTPUT_FILE:-}" ] && _HEALTH_REPORT="${_OUTPUT_FILE:-}"
 
   # Temporary report buffer
   local _TMP_REPORT
   _TMP_REPORT=$(mktemp)
-  trap 'rm -f "$_TMP_REPORT"' EXIT
+  trap 'rm -f "${_TMP_REPORT:-}"' EXIT
 
-  cat <<EOF >"$_TMP_REPORT"
+  cat <<EOF >"${_TMP_REPORT:-}"
 # Project Health Dashboard
 
 > Generated on: $(date)
@@ -84,9 +84,9 @@ EOF
     # shellcheck disable=SC2016
     _ENV_DETAIL='Run `make check-env` for details'
   fi
-  printf "%s\n" "$_ENV_STATUS"
+  printf "%s\n" "${_ENV_STATUS:-}"
   # shellcheck disable=SC2016
-  printf "| Environment | %s | %s |\n" "$_ENV_STATUS" "$_ENV_DETAIL" >>"$_TMP_REPORT"
+  printf "| Environment | %s | %s |\n" "${_ENV_STATUS:-}" "${_ENV_DETAIL:-}" >>"${_TMP_REPORT:-}"
 
   # --- Check 2: Standards (Lint) ---
   printf "Checking Standards... "
@@ -97,9 +97,9 @@ EOF
     # shellcheck disable=SC2016
     _LINT_DETAIL='Run `make lint` to fix issues'
   fi
-  printf "%s\n" "$_LINT_STATUS"
+  printf "%s\n" "${_LINT_STATUS:-}"
   # shellcheck disable=SC2016
-  printf "| Standards (Lint) | %s | %s |\n" "$_LINT_STATUS" "$_LINT_DETAIL" >>"$_TMP_REPORT"
+  printf "| Standards (Lint) | %s | %s |\n" "${_LINT_STATUS:-}" "${_LINT_DETAIL:-}" >>"${_TMP_REPORT:-}"
 
   # --- Check 3: Logic (Test) ---
   printf "Checking Logic... "
@@ -110,9 +110,9 @@ EOF
     # shellcheck disable=SC2016
     _TEST_DETAIL='Run `make test` for failure logs'
   fi
-  printf "%s\n" "$_TEST_STATUS"
+  printf "%s\n" "${_TEST_STATUS:-}"
   # shellcheck disable=SC2016
-  printf "| Logic (Test) | %s | %s |\n" "$_TEST_STATUS" "$_TEST_DETAIL" >>"$_TMP_REPORT"
+  printf "| Logic (Test) | %s | %s |\n" "${_TEST_STATUS:-}" "${_TEST_DETAIL:-}" >>"${_TMP_REPORT:-}"
 
   # --- Check 4: Security (Audit) ---
   printf "Checking Security... "
@@ -122,10 +122,10 @@ EOF
     _AUDIT_STATUS="⚠️  Warning"
     _AUDIT_DETAIL="Vulnerabilities or leaks detected"
   fi
-  printf "%s\n" "$_AUDIT_STATUS"
-  printf "| Security (Audit) | %s | %s |\n" "$_AUDIT_STATUS" "$_AUDIT_DETAIL" >>"$_TMP_REPORT"
+  printf "%s\n" "${_AUDIT_STATUS:-}"
+  printf "| Security (Audit) | %s | %s |\n" "${_AUDIT_STATUS:-}" "${_AUDIT_DETAIL:-}" >>"${_TMP_REPORT:-}"
 
-  cat <<EOF >>"$_TMP_REPORT"
+  cat <<EOF >>"${_TMP_REPORT:-}"
 
 ## 🚀 Next Steps
 
@@ -137,13 +137,13 @@ EOF
 
   # 5. Result
   if [ "${DRY_RUN:-0}" -eq 0 ]; then
-    cp "$_TMP_REPORT" "$_HEALTH_REPORT"
-    rm "$_TMP_REPORT"
+    cp "${_TMP_REPORT:-}" "${_HEALTH_REPORT:-}"
+    rm "${_TMP_REPORT:-}"
     log_success "\n✨ Health check complete! Report saved to: $_HEALTH_REPORT"
 
     # Print the table to console
     printf "\n"
-    head -n 12 "$_HEALTH_REPORT" | tail -n 5
+    head -n 12 "${_HEALTH_REPORT:-}" | tail -n 5
     printf "\n"
   else
     log_warn "DRY-RUN: Report skipped."

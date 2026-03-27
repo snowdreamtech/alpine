@@ -24,15 +24,15 @@
 set -eu
 
 # ── Common Library ───────────────────────────────────────────────────────────
-SCRIPT_DIR=$(cd "$(dirname "$0")" && pwd)
+SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 . "$SCRIPT_DIR/lib/common.sh"
 
 # ── Extension Modules Sourcing ───────────────────────────────────────────────
 # Dynamically load all language-specific setup modules.
 for _lang_mod in "${SCRIPT_DIR}/lib/langs"/*.sh; do
-  if [ -f "$_lang_mod" ]; then
+  if [ -f "${_lang_mod:-}" ]; then
     # shellcheck disable=SC1090
-    . "$_lang_mod"
+    . "${_lang_mod:-}"
   fi
 done
 unset _lang_mod
@@ -43,7 +43,7 @@ unset _lang_mod
 # Examples:
 #   install_node_deps
 install_node_deps() {
-  if [ -f "$PACKAGE_JSON" ]; then
+  if [ -f "${PACKAGE_JSON:-}" ]; then
     log_info "── Installing Node.js dependencies ──"
     install_runtime_node
   fi
@@ -53,7 +53,7 @@ install_node_deps() {
 # Examples:
 #   install_python_deps
 install_python_deps() {
-  if [ -f "$REQUIREMENTS_TXT" ] || [ -f "$PYPROJECT_TOML" ]; then
+  if [ -f "${REQUIREMENTS_TXT:-}" ] || [ -f "${PYPROJECT_TOML:-}" ]; then
     printf "\n"
     log_info "── Installing Python dependencies ──"
     install_runtime_python
@@ -84,10 +84,10 @@ main() {
   # ── Concurrency Guard (Lockfile) ──
   # Using project-local lock to allow concurrent setup in different clones/test environments
   local _LOCKFILE="${_G_PROJECT_ROOT}/.setup.lock"
-  if [ -f "$_LOCKFILE" ]; then
+  if [ -f "${_LOCKFILE:-}" ]; then
     local _PID
-    _PID=$(cat "$_LOCKFILE")
-    if ps -p "$_PID" >/dev/null 2>&1; then
+    _PID=$(cat "${_LOCKFILE:-}")
+    if ps -p "${_PID:-}" >/dev/null 2>&1; then
       log_error "Setup or installation already in progress (PID: $_PID)."
       log_info "If you are sure no other task is running, you can:"
       log_info "  1. Kill the process: kill -9 $_PID"
@@ -95,10 +95,10 @@ main() {
       exit 1
     else
       log_warn "Stale lockfile detected (PID: $_PID is dead). Cleaning up..."
-      rm -f "$_LOCKFILE"
+      rm -f "${_LOCKFILE:-}"
     fi
   fi
-  echo "$$" >"$_LOCKFILE"
+  echo "$$" >"${_LOCKFILE:-}"
   # shellcheck disable=SC2064
   trap "rm -f $_LOCKFILE" EXIT INT TERM
 
@@ -115,7 +115,7 @@ main() {
   log_success "\n✨ All dependencies installed successfully!"
 
   # 4. Standardized Next Actions
-  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "$_IS_TOP_LEVEL" = "true" ]; then
+  if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
     printf "\n%bNext Actions:%b\n" "${YELLOW}" "${NC}"
     printf "  - Run %bmake verify%b to ensure environment and project health.\n" "${GREEN}" "${NC}"
     printf "  - Run %bmake test%b to execute the functional test suite.\n" "${GREEN}" "${NC}"

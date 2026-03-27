@@ -30,16 +30,16 @@ sync_label() {
 
   echo "🔄 Syncing label: [$_name] (#$_color)"
   # Create or Edit the label
-  if gh label list --json name --jq ".[].name" | grep -qx "$_name"; then
-    gh label edit "$_name" --color "$_color" --description "$_desc"
+  if gh label list --json name --jq ".[].name" | grep -qx "${_name:-}"; then
+    gh label edit "${_name:-}" --color "${_color:-}" --description "${_desc:-}"
   else
-    gh label create "$_name" --color "$_color" --description "$_desc"
+    gh label create "${_name:-}" --color "${_color:-}" --description "${_desc:-}"
   fi
 }
 
 # Main loop
-echo "$LABELS" | while IFS=: read -r name color desc; do
-  [ -n "$name" ] && sync_label "$name" "$color" "$desc"
+echo "${LABELS:-}" | while IFS=: read -r name color desc; do
+  [ -n "${name:-}" ] && sync_label "${name:-}" "${color:-}" "${desc:-}"
 done
 
 echo "✅ Label synchronization complete."
