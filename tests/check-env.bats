@@ -45,6 +45,7 @@ teardown() {
 }
 
 @test "check-env.sh: reports warning when pnpm version is too low" {
+  touch "$TEMP_DIR/pnpm-lock.yaml"
   mkdir -p "$TEMP_DIR/bin"
   # shellcheck disable=SC2030,SC2031
   export PATH="$TEMP_DIR/bin:$PATH"
@@ -53,13 +54,20 @@ teardown() {
   printf '#!/usr/bin/env sh\necho "Python 3.10.0"\n' >"$TEMP_DIR/bin/python3"
   printf '#!/usr/bin/env sh\necho "git version 2.30.0"\n' >"$TEMP_DIR/bin/git"
   printf '#!/usr/bin/env sh\necho "GNU Make 3.81"\n' >"$TEMP_DIR/bin/make"
+  printf '#!/usr/bin/env sh\necho "0.11.0"\n' >"$TEMP_DIR/bin/shellcheck"
+  printf '#!/usr/bin/env sh\necho "3.12.0"\n' >"$TEMP_DIR/bin/shfmt"
+  printf '#!/usr/bin/env sh\necho "8.30.0"\n' >"$TEMP_DIR/bin/gitleaks"
+  printf '#!/usr/bin/env sh\necho "2.3.0"\n' >"$TEMP_DIR/bin/osv-scanner"
+  # Mock mise to prevent host toolchain pollution
+  printf '#!/usr/bin/env sh\nexit 1\n' >"$TEMP_DIR/bin/mise"
   chmod +x "$TEMP_DIR/bin/"*
 
-  run sh scripts/check-env.sh
-  assert_output --partial "below recommended v10.30.3"
+  NO_COLOR=1 run sh scripts/check-env.sh --verbose
+  assert_output --partial "pnpm: v9.0.0 (below recommended v10.30.3)"
 }
 
 @test "check-env.sh: reports warning when Python version is too low" {
+  touch "$TEMP_DIR/main.py"
   mkdir -p "$TEMP_DIR/bin"
   # shellcheck disable=SC2030,SC2031
   export PATH="$TEMP_DIR/bin:$PATH"
@@ -68,9 +76,14 @@ teardown() {
   printf '#!/usr/bin/env sh\necho "Python 3.7.0"\n' >"$TEMP_DIR/bin/python3"
   printf '#!/usr/bin/env sh\necho "git version 2.30.0"\n' >"$TEMP_DIR/bin/git"
   printf '#!/usr/bin/env sh\necho "GNU Make 3.81"\n' >"$TEMP_DIR/bin/make"
+  printf '#!/usr/bin/env sh\necho "0.11.0"\n' >"$TEMP_DIR/bin/shellcheck"
+  printf '#!/usr/bin/env sh\necho "3.12.0"\n' >"$TEMP_DIR/bin/shfmt"
+  printf '#!/usr/bin/env sh\necho "8.30.0"\n' >"$TEMP_DIR/bin/gitleaks"
+  printf '#!/usr/bin/env sh\necho "2.3.0"\n' >"$TEMP_DIR/bin/osv-scanner"
+  # Mock mise to prevent host toolchain pollution
+  printf '#!/usr/bin/env sh\nexit 1\n' >"$TEMP_DIR/bin/mise"
   chmod +x "$TEMP_DIR/bin/"*
 
-  touch main.py
-  run sh scripts/check-env.sh
-  assert_output --partial "below recommended v3.12.9"
+  NO_COLOR=1 run sh scripts/check-env.sh --verbose
+  assert_output --partial "Python: v3.7.0 (below recommended v3.12.9)"
 }

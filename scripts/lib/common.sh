@@ -30,11 +30,16 @@ export NO_UPDATE_NOTIFIER=1
 # ── 🎨 Visual Assets ─────────────────────────────────────────────────────────
 
 # Colors (using printf to generate literal ESC characters for maximum compatibility)
-BLUE=$(printf '\033[0;34m')
-GREEN=$(printf '\033[0;32m')
-YELLOW=$(printf '\033[1;33m')
-RED=$(printf '\033[0;31m')
-NC=$(printf '\033[0m')
+# Respect NO_COLOR standard (https://no-color.org/) and detect non-TTY for cleaner logs/tests.
+if [ -z "${NO_COLOR:-}" ] && [ -t 1 ]; then
+  BLUE=$(printf '\033[0;34m')
+  GREEN=$(printf '\033[0;32m')
+  YELLOW=$(printf '\033[1;33m')
+  RED=$(printf '\033[0;31m')
+  NC=$(printf '\033[0m')
+else
+  BLUE="" GREEN="" YELLOW="" RED="" NC=""
+fi
 
 # ── 🛠️ POSIX realpath Fallback ───────────────────────────────────────────────
 # Ensures compatibility for tools/plugins that expect 'realpath' (missing on macOS/minimal systems).
@@ -165,6 +170,14 @@ if [ -z "${_G_PROJECT_ROOT:-}" ]; then
     done
   fi
   export _G_PROJECT_ROOT
+fi
+
+# ── 📄 SSoT Version Registry ────────────────────────────────────────────────
+# Load the centralized version registry to provide a Single Source of Truth
+# for all Tier 2 and optional tools across the entire toolchain.
+if [ -f "${_G_LIB_DIR:-}/versions.sh" ]; then
+  # shellcheck disable=SC1091
+  . "${_G_LIB_DIR:-}/versions.sh"
 fi
 
 # ── 🔍 Tooling Metadata Cache (Mise LS) ──────────────────────────────────────
@@ -1235,7 +1248,19 @@ resolve_bin() {
       if [ -n "${_MW:-}" ] && [ -x "${_MW:-}" ]; then
         echo "${_MW:-}" && return 0
       fi
-      # Shim is hollow — fall through to Layer 4.
+
+      # Shim is hollow — try to find another match in the path that is NOT a shim.
+      # This enables BATS mocks and system fallback when mise is inactive.
+      local _OLD_IFS="$IFS"
+      IFS=":"
+      # shellcheck disable=SC2086
+      for _p in $PATH; do
+        if [ "${_p:-}" != "${_G_MISE_SHIMS_BASE:-}" ] && [ -x "${_p:-}/${_BIN:-}" ]; then
+          IFS="$_OLD_IFS" && echo "${_p:-}/${_BIN:-}" && return 0
+        fi
+      done
+      IFS="$_OLD_IFS"
+      # Fall through to Layer 4.
       ;;
     *)
       # Not a shim — it's a real system binary.
