@@ -116,21 +116,31 @@ if [ -n "${GITHUB_TOKEN:-}" ]; then
 fi
 
 # ──  Project Context Detection ──────────────────────────────────────────────
-# Robustly identify the project root directory before defining summary paths.
+# robustly identify the project root directory relative to the script location.
 if [ -z "$_G_PROJECT_ROOT" ]; then
-  _G_PROJECT_ROOT=$(pwd)
-  # Basic verification: Ensure we are in a project-like directory
-  if [ ! -f "$_G_PROJECT_ROOT/package.json" ] && [ ! -d "$_G_PROJECT_ROOT/.git" ]; then
-    # Fallback: if we are deeper in the tree, try to find the root
-    _cur_check_dir="$_G_PROJECT_ROOT"
-    while [ "$_cur_check_dir" != "/" ] && [ "$_cur_check_dir" != "." ]; do
-      if [ -f "$_cur_check_dir/package.json" ] || [ -d "$_cur_check_dir/.git" ]; then
-        _G_PROJECT_ROOT="$_cur_check_dir"
+  # SCRIPT_DIR is assumed to be defined by the caller.
+  # We verify its location against known project markers.
+  if [ -n "$SCRIPT_DIR" ]; then
+    # Check if SCRIPT_DIR itself is the project root (common in mock tests)
+    if [ -f "$SCRIPT_DIR/package.json" ] || [ -f "$SCRIPT_DIR/Makefile" ] || [ -d "$SCRIPT_DIR/.git" ]; then
+      _G_PROJECT_ROOT="$SCRIPT_DIR"
+    # Check if SCRIPT_DIR is 'scripts/' (common project layout)
+    elif [ -f "$SCRIPT_DIR/../package.json" ] || [ -f "$SCRIPT_DIR/../Makefile" ] || [ -d "$SCRIPT_DIR/../.git" ]; then
+      _G_PROJECT_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
+    # Check if SCRIPT_DIR is 'scripts/lib/' (deep nesting)
+    elif [ -f "$SCRIPT_DIR/../../package.json" ] || [ -f "$SCRIPT_DIR/../../Makefile" ] || [ -d "$SCRIPT_DIR/../../.git" ]; then
+      _G_PROJECT_ROOT=$(cd "$SCRIPT_DIR/../.." && pwd)
+    fi
+  fi
+  # Fallback: if SCRIPT_DIR is missing or doesn't lead to a root, use PWD heuristic
+  if [ -z "$_G_PROJECT_ROOT" ]; then
+    _G_PROJECT_ROOT=$(pwd)
+    while [ "$_G_PROJECT_ROOT" != "/" ] && [ "$_G_PROJECT_ROOT" != "." ]; do
+      if [ -f "$_G_PROJECT_ROOT/package.json" ] || [ -f "$_G_PROJECT_ROOT/Makefile" ] || [ -d "$_G_PROJECT_ROOT/.git" ]; then
         break
       fi
-      _cur_check_dir=$(dirname "$_cur_check_dir")
+      _G_PROJECT_ROOT=$(dirname "$_G_PROJECT_ROOT")
     done
-    unset _cur_check_dir
   fi
   export _G_PROJECT_ROOT
 fi
