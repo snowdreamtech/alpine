@@ -117,7 +117,7 @@ fi
 
 # ──  Project Context Detection ──────────────────────────────────────────────
 # robustly identify the project root directory relative to the script location.
-if [ -z "$_G_PROJECT_ROOT" ]; then
+if [ -z "${_G_PROJECT_ROOT:-}" ]; then
   # Unified Context Detection: Prioritize physical location of the CALLING script ($0).
   # This avoids dependency on caller-defined variables like SCRIPT_DIR.
   _G_CALLER_DIR=$(cd "$(dirname "$0")" && pwd)
@@ -136,8 +136,8 @@ if [ -z "$_G_PROJECT_ROOT" ]; then
   fi
 
   # Fallback: Multi-Marker Sentinel (If $0 doesn't lead to library or for direct sourcing)
-  if [ -z "$_G_PROJECT_ROOT" ]; then
-    if [ -n "$SCRIPT_DIR" ]; then
+  if [ -z "${_G_PROJECT_ROOT:-}" ]; then
+    if [ -n "${SCRIPT_DIR:-}" ]; then
       if [ -f "$SCRIPT_DIR/lib/common.sh" ]; then
         _G_LIB_DIR="$SCRIPT_DIR/lib"
         _G_PROJECT_ROOT=$(cd "$SCRIPT_DIR/.." && pwd)
@@ -152,10 +152,10 @@ if [ -z "$_G_PROJECT_ROOT" ]; then
   fi
 
   # Final Fallback: Traverse upwards from PWD (for direct library sourcing or missing markers)
-  if [ -z "$_G_PROJECT_ROOT" ]; then
+  if [ -z "${_G_PROJECT_ROOT:-}" ]; then
     # Try markers starting from PWD traversal
     _G_PROJECT_ROOT=$(pwd)
-    while [ "$_G_PROJECT_ROOT" != "/" ] && [ "$_G_PROJECT_ROOT" != "." ]; do
+    while [ "${_G_PROJECT_ROOT:-}" != "/" ] && [ "${_G_PROJECT_ROOT:-}" != "." ]; do
       if [ -f "$_G_PROJECT_ROOT/package.json" ] || [ -f "$_G_PROJECT_ROOT/Makefile" ] || [ -d "$_G_PROJECT_ROOT/.git" ]; then
         break
       fi
@@ -196,7 +196,7 @@ if [ "${CI:-}" = "true" ] || [ "${GITHUB_ACTIONS:-}" = "true" ]; then
 fi
 
 # Orchestration tracking (detect if we are running as a sub-script)
-if [ -z "$_SNOWDREAM_TOP_LEVEL_SCRIPT" ]; then
+if [ -z "${_SNOWDREAM_TOP_LEVEL_SCRIPT:-}" ]; then
   _SCRIPT_NAME=$(basename "$0")
   export _SNOWDREAM_TOP_LEVEL_SCRIPT="$_SCRIPT_NAME"
   _IS_TOP_LEVEL=true
@@ -263,7 +263,7 @@ _detect_node_manager() {
 }
 
 # Dynamically# Purpose: Runs a Node.js package manager script safely.
-if [ -z "$NPM" ]; then
+if [ -z "${NPM:-}" ]; then
   NPM=$(_detect_node_manager)
 fi
 export NPM
@@ -305,7 +305,7 @@ if [ "${GITHUB_ACTIONS:-}" = "true" ] && [ -n "${GITHUB_PATH:-}" ]; then
   _M_BIN_CI="$_G_MISE_BIN_BASE"
   _M_SHIMS_CI="$_G_MISE_SHIMS_BASE"
 
-  if [ "$_G_OS" = "windows" ] && command -v cygpath >/dev/null 2>&1; then
+  if [ "${_G_OS:-}" = "windows" ] && command -v cygpath >/dev/null 2>&1; then
     _M_BIN_CI=$(cygpath -w "$_M_BIN_CI")
     _M_SHIMS_CI=$(cygpath -w "$_M_SHIMS_CI")
   fi
@@ -349,7 +349,7 @@ run_with_timeout() {
 # Examples:
 #   optimize_network
 optimize_network() {
-  if [ "$_NETWORK_OPTIMIZED" = "true" ]; then return 0; fi
+  if [ "${_NETWORK_OPTIMIZED:-}" = "true" ]; then return 0; fi
 
   local _TEMP_GIT_CONFIG
   _TEMP_GIT_CONFIG="${TMPDIR:-/tmp}/.git_config_$(id -u)"
@@ -361,13 +361,13 @@ optimize_network() {
   # Test via `/rate_limit` endpoint because GitHub Bot tokens lack `/user` access.
   # Cache: Skip verification if already validated within the last hour (3600s)
   # to avoid hitting the GitHub API on every script invocation.
-  if [ -n "$GITHUB_TOKEN" ]; then
+  if [ -n "${GITHUB_TOKEN:-}" ]; then
     local _TOKEN_CACHE
     _TOKEN_CACHE="${TMPDIR:-/tmp}/.mise_token_verified_$(id -u)"
     local _SKIP_VERIFY=false
     if [ -f "$_TOKEN_CACHE" ]; then
       local _CACHE_AGE=0
-      if [ "$_G_OS" = "macos" ]; then
+      if [ "${_G_OS:-}" = "macos" ]; then
         _CACHE_AGE=$(($(date +%s) - $(stat -f %m "$_TOKEN_CACHE")))
       else
         # Linux and Windows (Git Bash) both use GNU stat
@@ -376,16 +376,16 @@ optimize_network() {
       [ "$_CACHE_AGE" -lt 3600 ] && _SKIP_VERIFY=true
     fi
 
-    if [ "$_SKIP_VERIFY" = "true" ]; then
+    if [ "${_SKIP_VERIFY:-}" = "true" ]; then
       log_debug "GITHUB_TOKEN recently validated (cache age: ${_CACHE_AGE}s). Skipping API check."
     else
       local _HTTP_CODE
       _HTTP_CODE=$(curl -o /dev/null -s -w "%{http_code}" -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/rate_limit --connect-timeout 2 2>/dev/null || echo "000")
-      if [ "$_HTTP_CODE" = "401" ]; then
+      if [ "${_HTTP_CODE:-}" = "401" ]; then
         log_warn "Current GITHUB_TOKEN appears invalid or unauthorized ($_HTTP_CODE). Unsetting for this session..."
         unset GITHUB_TOKEN
         rm -f "$_TOKEN_CACHE"
-      elif [ -z "$_HTTP_CODE" ] || [ "$_HTTP_CODE" = "000" ]; then
+      elif [ -z "${_HTTP_CODE:-}" ] || [ "${_HTTP_CODE:-}" = "000" ]; then
         log_debug "Network timeout verifying GITHUB_TOKEN. Keeping token."
       else
         # Token is valid, cache the result
@@ -441,7 +441,7 @@ get_mise_tool_version() {
       sed -E 's/^[^=]*=[[:space:]]*"([^"]*)".*/\1/' | head -n 1 || true)
 
     # 2. Try matching the "basename" of the tool (e.g. github:foo/bar -> bar)
-    if [ -z "$_VER" ]; then
+    if [ -z "${_VER:-}" ]; then
       local _SHORT_NAME
       _SHORT_NAME=$(echo "$_TOOL_NAME_MISE" | sed -E 's/^[^:]+://; s/.*\///')
       _VER=$(grep -E "^\"?([^:]+:)?${_SHORT_NAME}\"?[[:space:]]*=" "$_MISE_TOM_PATH" 2>/dev/null |
@@ -450,7 +450,7 @@ get_mise_tool_version() {
   fi
 
   # 3. Check VER_<UPPER> env variable from versions.sh (Tier 2 tools not in .mise.toml)
-  if [ -z "$_VER" ]; then
+  if [ -z "${_VER:-}" ]; then
     # Normalize: strip provider prefix, take basename, uppercase, replace non-alnum with _
     local _VAR_KEY
     _VAR_KEY=$(echo "$_TOOL_NAME_MISE" |
@@ -487,7 +487,7 @@ run_mise() {
   else
     # Ensure MISE_GITHUB_TOKEN is set for mise's internal GitHub API calls.
     # Workflows set this at env level, but ensure it survives subshell/export boundaries.
-    if [ -n "$GITHUB_TOKEN" ] && [ -z "$MISE_GITHUB_TOKEN" ]; then
+    if [ -n "${GITHUB_TOKEN:-}" ] && [ -z "${MISE_GITHUB_TOKEN:-}" ]; then
       export MISE_GITHUB_TOKEN="$GITHUB_TOKEN"
       log_debug "Forwarded GITHUB_TOKEN -> MISE_GITHUB_TOKEN for mise."
     fi
@@ -498,7 +498,7 @@ run_mise() {
   # failures in --locked mode, we automatically drop the strict requirement
   # for these tools while preserving it for the rest of the orchestration.
   local _EFFECTIVE_LOCKED="${MISE_LOCKED:-}"
-  if [ "$_CMD" = "install" ]; then
+  if [ "${_CMD:-}" = "install" ]; then
     for _arg in "$@"; do
       case "$_arg" in
       go:*)
@@ -511,10 +511,10 @@ run_mise() {
 
   local _M_BIN
   _M_BIN=$(command -v mise || echo "$HOME/.local/bin/mise")
-  [ "$_G_OS" = "windows" ] && [ ! -x "$_M_BIN" ] && _M_BIN="${_M_BIN}.exe"
+  [ "${_G_OS:-}" = "windows" ] && [ ! -x "$_M_BIN" ] && _M_BIN="${_M_BIN}.exe"
 
   # Performance Opt: Skip installation if version already matches SSoT
-  if [ "$_CMD" = "install" ] && [ -n "$1" ]; then
+  if [ "${_CMD:-}" = "install" ] && [ -n "${1:-}" ]; then
     local _T_CHECK="$1"
     local _R_VER
     _R_VER=$(get_mise_tool_version "$_T_CHECK")
@@ -523,7 +523,7 @@ run_mise() {
     local _C_VER
     _C_VER=$(get_version "$_T_BASE" | tr -d '\r')
 
-    if [ "$_C_VER" != "-" ] && [ -n "$_R_VER" ]; then
+    if [ "${_C_VER:-}" != "-" ] && [ -n "${_R_VER:-}" ]; then
       # Use prefix matching: e.g. 3.12.0.2 (required) matches 3.12.0 (current)
       case "$_R_VER" in "$_C_VER"*) return 0 ;; esac
     fi
@@ -587,7 +587,7 @@ run_mise() {
   done
 
   # Restore GITHUB_TOKEN
-  if [ -n "$_OLD_GITHUB_TOKEN" ]; then
+  if [ -n "${_OLD_GITHUB_TOKEN:-}" ]; then
     export GITHUB_TOKEN="$_OLD_GITHUB_TOKEN"
   else
     unset GITHUB_TOKEN
@@ -670,7 +670,7 @@ log_debug() {
 #   1 - Failure or no manager found
 install_native_tool() {
   local _PKG="$1"
-  [ -z "$_PKG" ] && return 1
+  [ -z "${_PKG:-}" ] && return 1
 
   case "$_G_OS" in
   macos)
@@ -742,7 +742,7 @@ log_debug "common.sh (v2026.03.14.01) loaded"
 get_project_root() {
   local _DIR
   _DIR=$(pwd)
-  while [ "$_DIR" != "/" ]; do
+  while [ "${_DIR:-}" != "/" ]; do
     if [ -f "$_DIR/Makefile" ] || [ -f "$_DIR/package.json" ] || [ -d "$_DIR/.git" ] || [ -f "$_DIR/.mise.toml" ]; then
       echo "$_DIR"
       return 0
@@ -773,7 +773,7 @@ guard_project_root() {
 # Examples:
 #   if ! check_ci_summary "### Summary"; then ...; fi
 check_ci_summary() {
-  [ -n "$CI_STEP_SUMMARY" ] && [ -f "$CI_STEP_SUMMARY" ] && grep -qF "$1" "$CI_STEP_SUMMARY"
+  [ -n "${CI_STEP_SUMMARY:-}" ] && [ -f "$CI_STEP_SUMMARY" ] && grep -qF "$1" "$CI_STEP_SUMMARY"
 }
 
 # Purpose: Detects the current CI platform by inspecting well-known environment variables.
@@ -1053,14 +1053,14 @@ log_summary() {
   local _DUR_SUM="${5:--}"
   local _FILE_SUM="${6:-$SETUP_SUMMARY_FILE}"
 
-  if [ -z "$_FILE_SUM" ] || [ ! -f "$_FILE_SUM" ]; then
+  if [ -z "${_FILE_SUM:-}" ] || [ ! -f "$_FILE_SUM" ]; then
     return 0
   fi
 
   # Automatically demote to Warning if status is supposedly Active/Installed but version detection failed
   case "$_STAT_SUM" in
   ✅*)
-    if [ "$_VER_SUM" = "-" ] || [ -z "$_VER_SUM" ]; then
+    if [ "${_VER_SUM:-}" = "-" ] || [ -z "${_VER_SUM:-}" ]; then
       case "$_MOD_SUM" in
       System | Shell | React | Vue | Tailwind | VitePress | Vite | pnpm-deps | Python-Venv | Homebrew | Hooks | Go-Mod | Cargo-Deps | Ruby-Gems | Go | Rust | Pipx) ;; # These are complex or bootstrap components
       *) _STAT_SUM="⚠️ Warning" ;;
@@ -1086,7 +1086,7 @@ get_version() {
   local _CMD_VER="$1"
   local _ARG_VER="${2:---version}"
   local _M_PLUGIN="${3:-$_CMD_VER}"
-  [ -z "$_CMD_VER" ] && {
+  [ -z "${_CMD_VER:-}" ] && {
     echo "-"
     return 0
   }
@@ -1110,7 +1110,7 @@ get_version() {
     | (map(select(.active==true))[0] // map(select(.installed==true))[0])
     | .version // empty" 2>/dev/null | head -n 1 || true)
 
-  if [ -n "$_MISE_VER_OUT" ] && [ "$_MISE_VER_OUT" != "null" ]; then
+  if [ -n "${_MISE_VER_OUT:-}" ] && [ "${_MISE_VER_OUT:-}" != "null" ]; then
     echo "$_MISE_VER_OUT" && return 0
   fi
 
@@ -1118,7 +1118,7 @@ get_version() {
   local _LV_RESOLVED
   _LV_RESOLVED=$(resolve_bin "$_CMD_VER") || true
 
-  if [ -n "$_LV_RESOLVED" ]; then
+  if [ -n "${_LV_RESOLVED:-}" ]; then
     # Special cases for tools with unusual version output or slow shims
     case "$_CMD_VER" in
     python*)
@@ -1169,30 +1169,30 @@ get_version() {
 #   BIN=$(resolve_bin "eslint") || true
 resolve_bin() {
   local _BIN="$1"
-  [ -z "$_BIN" ] && return 1
+  [ -z "${_BIN:-}" ] && return 1
 
   # ── 1. Python Venv ──
   local _VP="${VENV:-.venv}/$_G_VENV_BIN/$_BIN"
   if [ -x "$_VP" ]; then echo "$_VP" && return 0; fi
   # Windows: venv scripts use .exe suffix
-  if [ "$_G_OS" = "windows" ] && [ -x "${_VP}.exe" ]; then echo "${_VP}.exe" && return 0; fi
+  if [ "${_G_OS:-}" = "windows" ] && [ -x "${_VP}.exe" ]; then echo "${_VP}.exe" && return 0; fi
 
   # ── 2. Node Modules ──
   local _NP="node_modules/.bin/$_BIN"
   if [ -x "$_NP" ]; then echo "$_NP" && return 0; fi
   # Windows: npm generates .cmd wrappers
-  if [ "$_G_OS" = "windows" ] && [ -f "${_NP}.cmd" ]; then echo "${_NP}.cmd" && return 0; fi
+  if [ "${_G_OS:-}" = "windows" ] && [ -f "${_NP}.cmd" ]; then echo "${_NP}.cmd" && return 0; fi
 
   # ── 3. System PATH ──
   local _SP
   _SP=$(command -v "$_BIN" 2>/dev/null) || true
 
   # Windows: command -v might miss extensions or return sh wrappers
-  if [ -z "$_SP" ] && [ "$_G_OS" = "windows" ]; then
+  if [ -z "${_SP:-}" ] && [ "${_G_OS:-}" = "windows" ]; then
     _SP=$(command -v "${_BIN}.exe" 2>/dev/null) || _SP=$(command -v "${_BIN}.cmd" 2>/dev/null) || true
   fi
 
-  if [ -n "$_SP" ]; then
+  if [ -n "${_SP:-}" ]; then
     # Guard: If it resolves to a mise shim, verify the tool is actually installed.
     # Shims exist for ALL tools in .mise.toml, even uninstalled ones ("hollow shims").
     case "$_SP" in
@@ -1201,7 +1201,7 @@ resolve_bin() {
       # Returns the real binary path if installed, non-zero if not.
       local _MW
       _MW=$(mise which "$_BIN" 2>/dev/null) || true
-      if [ -n "$_MW" ] && [ -x "$_MW" ]; then
+      if [ -n "${_MW:-}" ] && [ -x "$_MW" ]; then
         echo "$_MW" && return 0
       fi
       # Shim is hollow — fall through to Layer 4.
@@ -1217,7 +1217,7 @@ resolve_bin() {
   # Covers: mise installed the tool but shims/PATH not yet activated.
   local _MW
   _MW=$(mise which "$_BIN" 2>/dev/null) || true
-  if [ -n "$_MW" ] && [ -x "$_MW" ]; then
+  if [ -n "${_MW:-}" ] && [ -x "$_MW" ]; then
     echo "$_MW" && return 0
   fi
 
@@ -1299,7 +1299,7 @@ install_runtime_hooks() {
 
   local _PRE_COMMIT_BIN
   _PRE_COMMIT_BIN=$(resolve_bin "pre-commit") || true
-  if [ -n "$_PRE_COMMIT_BIN" ]; then
+  if [ -n "${_PRE_COMMIT_BIN:-}" ]; then
     log_info "Running pre-commit install..."
     run_quiet "$_PRE_COMMIT_BIN" install
   else
@@ -1370,7 +1370,7 @@ run_npm_script() {
     local _CMD_NPM
     _CMD_NPM=$(grep "\"$_SCRIPT_NAME_NPM\":" "package.json" | sed "s/.*\"$_SCRIPT_NAME_NPM\":[[:space:]]*\"//;s/\".*//" || true)
 
-    if [ -n "$_CMD_NPM" ]; then
+    if [ -n "${_CMD_NPM:-}" ]; then
       # Avoid infinite loop if the command points back to this script
       if echo "$_CMD_NPM" | grep -q "$_CURRENT_BASENAME_NPM"; then
         log_debug "Node script '$_SCRIPT_NAME_NPM' is a self-reference to '$_CURRENT_BASENAME_NPM'. Skipping."
@@ -1379,7 +1379,7 @@ run_npm_script() {
       log_info "── Running Node.js script: $_NODE_MGR $_SCRIPT_NAME_NPM $_EXTRA_ARGS_NPM ──"
       # shellcheck disable=SC2086
       "$_NODE_MGR" run "$_SCRIPT_NAME_NPM" $_EXTRA_ARGS_NPM
-    elif [ "$_SCRIPT_NAME_NPM" = "install" ] || [ "$_SCRIPT_NAME_NPM" = "update" ]; then
+    elif [ "${_SCRIPT_NAME_NPM:-}" = "install" ] || [ "${_SCRIPT_NAME_NPM:-}" = "update" ]; then
       # 4. Special Fallback for native commands if not defined in package.json scripts
       log_info "── Node.js standard command: $_NODE_MGR $_SCRIPT_NAME_NPM $_EXTRA_ARGS_NPM ──"
       # shellcheck disable=SC2086
@@ -1432,8 +1432,8 @@ is_version_match() {
   local _CUR_V_M="$1"
   local _REQ_V_M="$2"
   [ "${_CUR_V_M:- -}" = "-" ] && return 1
-  [ -z "$_REQ_V_M" ] && return 1
-  [ "$_REQ_V_M" = "latest" ] && return 0
+  [ -z "${_REQ_V_M:-}" ] && return 1
+  [ "${_REQ_V_M:-}" = "latest" ] && return 0
   # Use prefix match to handle diffs like 3.12.0.2 (pkg) vs 3.12.0 (binary)
   case "$_REQ_V_M" in "$_CUR_V_M"*) return 0 ;; esac
   return 1
