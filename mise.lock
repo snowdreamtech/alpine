@@ -110,6 +110,52 @@ url = "https://github.com/cli/cli/releases/download/v2.88.1/gh_2.88.1_windows_am
 url_api = "https://api.github.com/repos/cli/cli/releases/assets/372317959"
 provenance = "github-attestations"
 
+[[tools."github:cli/cli"]]
+version = "2.89.0"
+backend = "github:cli/cli"
+
+[tools."github:cli/cli"."platforms.linux-arm64"]
+checksum = "sha256:9e64a623dfc242990aa5d9b3f507111149c4282f66b68eaad1dc79eeb13b9ce5"
+url = "https://github.com/cli/cli/releases/download/v2.89.0/gh_2.89.0_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/382152834"
+provenance = "github-attestations"
+
+[tools."github:cli/cli"."platforms.linux-arm64-musl"]
+checksum = "sha256:9e64a623dfc242990aa5d9b3f507111149c4282f66b68eaad1dc79eeb13b9ce5"
+url = "https://github.com/cli/cli/releases/download/v2.89.0/gh_2.89.0_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/382152834"
+provenance = "github-attestations"
+
+[tools."github:cli/cli"."platforms.linux-x64"]
+checksum = "sha256:d0422caade520530e76c1c558da47daebaa8e1203d6b7ff10ad7d6faba3490d8"
+url = "https://github.com/cli/cli/releases/download/v2.89.0/gh_2.89.0_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/382152824"
+provenance = "github-attestations"
+
+[tools."github:cli/cli"."platforms.linux-x64-musl"]
+checksum = "sha256:d0422caade520530e76c1c558da47daebaa8e1203d6b7ff10ad7d6faba3490d8"
+url = "https://github.com/cli/cli/releases/download/v2.89.0/gh_2.89.0_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/382152824"
+provenance = "github-attestations"
+
+[tools."github:cli/cli"."platforms.macos-arm64"]
+checksum = "sha256:2423d02ec0a2094898c378703a1b28a5846c08700f87461363857cb8cb3fda94"
+url = "https://github.com/cli/cli/releases/download/v2.89.0/gh_2.89.0_macOS_arm64.zip"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/382152851"
+provenance = "github-attestations"
+
+[tools."github:cli/cli"."platforms.macos-x64"]
+checksum = "sha256:862e21cac6a71f81e7cd6e5127e3cd344f8537441ad2db94cd208319dd17b6e9"
+url = "https://github.com/cli/cli/releases/download/v2.89.0/gh_2.89.0_macOS_amd64.zip"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/382152850"
+provenance = "github-attestations"
+
+[tools."github:cli/cli"."platforms.windows-x64"]
+checksum = "sha256:f3326f6406c98c99701b257d77e2b040eedf83d0176c2c2e9809aa339ceb467e"
+url = "https://github.com/cli/cli/releases/download/v2.89.0/gh_2.89.0_windows_amd64.zip"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/382152866"
+provenance = "github-attestations"
+
 [[tools."github:goreleaser/goreleaser"]]
 version = "2.14.3"
 backend = "github:goreleaser/goreleaser"
@@ -259,6 +305,38 @@ url = "https://dl.google.com/go/go1.24.1.darwin-amd64.tar.gz"
 checksum = "sha256:95666b551453209a2b8869d29d177285ff9573af10f085d961d7ae5440f645ce"
 url = "https://dl.google.com/go/go1.24.1.windows-amd64.zip"
 
+[[tools.go]]
+version = "1.26.1"
+backend = "core:go"
+
+[tools.go."platforms.linux-arm64"]
+checksum = "sha256:a290581cfe4fe28ddd737dde3095f3dbeb7f2e4065cab4eae44dfc53b760c2f7"
+url = "https://dl.google.com/go/go1.26.1.linux-arm64.tar.gz"
+
+[tools.go."platforms.linux-arm64-musl"]
+checksum = "sha256:a290581cfe4fe28ddd737dde3095f3dbeb7f2e4065cab4eae44dfc53b760c2f7"
+url = "https://dl.google.com/go/go1.26.1.linux-arm64.tar.gz"
+
+[tools.go."platforms.linux-x64"]
+checksum = "sha256:031f088e5d955bab8657ede27ad4e3bc5b7c1ba281f05f245bcc304f327c987a"
+url = "https://dl.google.com/go/go1.26.1.linux-amd64.tar.gz"
+
+[tools.go."platforms.linux-x64-musl"]
+checksum = "sha256:031f088e5d955bab8657ede27ad4e3bc5b7c1ba281f05f245bcc304f327c987a"
+url = "https://dl.google.com/go/go1.26.1.linux-amd64.tar.gz"
+
+[tools.go."platforms.macos-arm64"]
+checksum = "sha256:353df43a7811ce284c8938b5f3c7df40b7bfb6f56cb165b150bc40b5e2dd541f"
+url = "https://dl.google.com/go/go1.26.1.darwin-arm64.tar.gz"
+
+[tools.go."platforms.macos-x64"]
+checksum = "sha256:65773dab2f8cc4cd23d93ba6d0a805de150ca0b78378879292be0b903b8cdd08"
+url = "https://dl.google.com/go/go1.26.1.darwin-amd64.tar.gz"
+
+[tools.go."platforms.windows-x64"]
+checksum = "sha256:9b68112c913f45b7aebbf13c036721264bbba7e03a642f8f7490c561eebd1ecc"
+url = "https://dl.google.com/go/go1.26.1.windows-amd64.zip"
+
 [[tools."go:github.com/google/addlicense"]]
 version = "v1.1.1"
 backend = "go:github.com/google/addlicense"
@@ -294,6 +372,31 @@ url = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/v20.18.3/node-v20.18.
 [tools.node."platforms.windows-x64"]
 checksum = "sha256:11d483dfba711bc7c9bcb513e80a2941be0c2e7cbf62753755785b9a6e80a731"
 url = "https://mirrors.tuna.tsinghua.edu.cn/nodejs-release/v20.18.3/node-v20.18.3-win-x64.zip"
+
+[[tools.node]]
+version = "25.8.2"
+backend = "core:node"
+
+[tools.node."platforms.linux-arm64"]
+url = "https://mirrors.aliyun.com/nodejs-release/v25.8.2/node-v25.8.2-linux-arm64.tar.gz"
+
+[tools.node."platforms.linux-arm64-musl"]
+url = "https://mirrors.aliyun.com/nodejs-release/v25.8.2/node-v25.8.2-linux-arm64.tar.gz"
+
+[tools.node."platforms.linux-x64"]
+url = "https://mirrors.aliyun.com/nodejs-release/v25.8.2/node-v25.8.2-linux-x64.tar.gz"
+
+[tools.node."platforms.linux-x64-musl"]
+url = "https://mirrors.aliyun.com/nodejs-release/v25.8.2/node-v25.8.2-linux-x64.tar.gz"
+
+[tools.node."platforms.macos-arm64"]
+url = "https://mirrors.aliyun.com/nodejs-release/v25.8.2/node-v25.8.2-darwin-arm64.tar.gz"
+
+[tools.node."platforms.macos-x64"]
+url = "https://mirrors.aliyun.com/nodejs-release/v25.8.2/node-v25.8.2-darwin-x64.tar.gz"
+
+[tools.node."platforms.windows-x64"]
+url = "https://mirrors.aliyun.com/nodejs-release/v25.8.2/node-v25.8.2-win-x64.zip"
 
 [[tools."npm:@commitlint/cli"]]
 version = "20.5.0"
@@ -383,6 +486,10 @@ backend = "pipx:actionlint-py"
 version = "22.1.1"
 backend = "pipx:clang-format"
 
+[[tools."pipx:clang-format"]]
+version = "22.1.2"
+backend = "pipx:clang-format"
+
 [[tools."pipx:dotenv-linter"]]
 version = "0.7.0"
 backend = "pipx:dotenv-linter"
@@ -395,6 +502,10 @@ backend = "pipx:pre-commit"
 version = "0.15.7"
 backend = "pipx:ruff"
 
+[[tools."pipx:ruff"]]
+version = "0.15.8"
+backend = "pipx:ruff"
+
 [[tools."pipx:shellcheck-py"]]
 version = "0.11.0.1"
 backend = "pipx:shellcheck-py"
@@ -405,6 +516,10 @@ backend = "pipx:shfmt-py"
 
 [[tools."pipx:sqlfluff"]]
 version = "4.0.4"
+backend = "pipx:sqlfluff"
+
+[[tools."pipx:sqlfluff"]]
+version = "4.1.0"
 backend = "pipx:sqlfluff"
 
 [[tools."pipx:yamllint"]]
@@ -446,3 +561,35 @@ url = "https://github.com/astral-sh/python-build-standalone/releases/download/20
 [tools.python."platforms.windows-x64"]
 checksum = "sha256:ee338839315bdd8af5fc935f9595eca20ebebdd250726c5816b2d0cf94d1e661"
 url = "https://github.com/astral-sh/python-build-standalone/releases/download/20250317/cpython-3.12.9+20250317-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+
+[[tools.python]]
+version = "3.14.3"
+backend = "core:python"
+
+[tools.python."platforms.linux-arm64"]
+checksum = "sha256:53700338695e402a1a1fe22be4a41fbdacc70e22bb308a48eca8ed67cb7992be"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.3+20260324-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz"
+
+[tools.python."platforms.linux-arm64-musl"]
+checksum = "sha256:53700338695e402a1a1fe22be4a41fbdacc70e22bb308a48eca8ed67cb7992be"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.3+20260324-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz"
+
+[tools.python."platforms.linux-x64"]
+checksum = "sha256:d7a9f970914bb4c88756fe3bdcc186d4feb90e9500e54f1db47dae4dc9687e39"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.3+20260324-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
+
+[tools.python."platforms.linux-x64-musl"]
+checksum = "sha256:d7a9f970914bb4c88756fe3bdcc186d4feb90e9500e54f1db47dae4dc9687e39"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.3+20260324-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
+
+[tools.python."platforms.macos-arm64"]
+checksum = "sha256:c43aecde4a663aebff99b9b83da0efec506479f1c3f98331442f33d2c43501f9"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.3+20260324-aarch64-apple-darwin-install_only_stripped.tar.gz"
+
+[tools.python."platforms.macos-x64"]
+checksum = "sha256:9ab41dbc2f100a2a45d1833b9c11165f51051c558b5213eda9a9731d5948a0c0"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.3+20260324-x86_64-apple-darwin-install_only_stripped.tar.gz"
+
+[tools.python."platforms.windows-x64"]
+checksum = "sha256:bbe19034b35b0267176a7442575ae7dc6343480fd4d35598cb7700173d431e09"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.3+20260324-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
