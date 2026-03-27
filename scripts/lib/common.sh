@@ -1421,6 +1421,12 @@ init_summary_table() {
 
 # Purpose: Finalizes the summary table. (Deprecated: Writes are now direct).
 finalize_summary_table() {
+  if [ "${_IS_TOP_LEVEL:-}" = "true" ] && [ -f "${CI_STEP_SUMMARY:-}" ]; then
+    # In CI, the platform handles the file. In local dev, we print it to the console.
+    if [ "${CI:-}" != "true" ] && [ "${GITHUB_ACTIONS:-}" != "true" ] && [ "${VERBOSE:-0}" -ge 1 ]; then
+      cat "${CI_STEP_SUMMARY:-}"
+    fi
+  fi
   log_debug "Summary table finalized in $CI_STEP_SUMMARY"
 }
 
