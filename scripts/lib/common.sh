@@ -1044,7 +1044,7 @@ parse_common_args() {
 #   $3 - Status indicator (e.g., ✅ Success, ❌ Failed)
 #   $4 - Version identifier string (or "-" if unavailable)
 #   $5 - Duration in seconds (elapsed time)
-#   $6 - Summary file path (optional, default: $SETUP_SUMMARY_FILE)
+#   $6 - Summary file path (optional, default: $CI_STEP_SUMMARY)
 # Examples:
 #   log_summary "Security" "Gitleaks" "✅ Clean" "v8.1.0" "5"
 log_summary() {
@@ -1053,7 +1053,7 @@ log_summary() {
   local _STAT_SUM="${3:-⏭️ Skipped}"
   local _VER_SUM="${4:--}"
   local _DUR_SUM="${5:--}"
-  local _FILE_SUM="${6:-${SETUP_SUMMARY_FILE:-}}"
+  local _FILE_SUM="${6:-${CI_STEP_SUMMARY:-}}"
 
   if [ -z "${_FILE_SUM:-}" ] || [ ! -f "${_FILE_SUM:-}" ]; then
     return 0
