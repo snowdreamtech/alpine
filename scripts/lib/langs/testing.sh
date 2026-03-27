@@ -36,6 +36,7 @@ install_bats() {
   fi
   local _STAT_BATS="✅ mise"
   run_mise install "${_PROVIDER:-}" || _STAT_BATS="❌ Failed"
+  refresh_mise_cache
   log_summary "Testing" "Bats" "${_STAT_BATS:-}" "$(get_version bats --version)" "$(($(date +%s) - _T0_BATS))"
 }
 

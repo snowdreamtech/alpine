@@ -1,6 +1,6 @@
 #!/usr/bin/env sh
-set -eu
 # shellcheck disable=SC2034
+set -eu
 # Copyright (c) 2026 SnowdreamTech. All rights reserved.
 # Licensed under the MIT License. See LICENSE file in the project root for full license information.
 
@@ -19,6 +19,7 @@ set -eu
 # (Variables are used by sourcing scripts: lang modules and setup.sh)
 
 # ── 🏗️ Language Runtimes ──────────────────────────────────────────────────────
+# shellcheck disable=SC2034
 VER_GO="1.26.1"
 VER_KOTLIN="2.3.20"
 VER_RUST="1.94.1"

@@ -166,6 +166,24 @@ if [ -z "${_G_PROJECT_ROOT:-}" ]; then
   fi
   export _G_PROJECT_ROOT
 fi
+
+# ── 🔍 Tooling Metadata Cache (Mise LS) ──────────────────────────────────────
+# Caching 'mise ls --json' results provides a massive performance boost for
+# scripts that perform multiple version checks (like setup and check-env).
+# Initialized once at bootstrap, can be manually refreshed after tool installs.
+# shellcheck disable=SC2120
+refresh_mise_cache() {
+  if command -v mise >/dev/null 2>&1; then
+    _G_MISE_LS_JSON_CACHE=$(MISE_OFFLINE=1 mise ls --json 2>/dev/null || echo "{}")
+  else
+    _G_MISE_LS_JSON_CACHE="{}"
+  fi
+  # shellcheck disable=SC2034
+  export _G_MISE_LS_JSON_CACHE
+}
+
+# Initial population
+refresh_mise_cache
 # ── 📊 CI Step Summary Abstraction (Cross-Platform) ──────────────────────────
 # Detect and unify CI summary reporting paths (GitHub, GitLab, Gitea, Local).
 # Ref: Rule 09 (Interaction/Summary Integration)
@@ -269,6 +287,7 @@ if [ -z "${NPM:-}" ]; then
   NPM=$(_detect_node_manager)
 fi
 export NPM
+# shellcheck disable=SC2034
 DOCS_DIR="docs"
 PACKAGE_JSON="${PACKAGE_JSON:-package.json}"
 REQUIREMENTS_TXT="${REQUIREMENTS_TXT:-requirements.txt}"
@@ -594,6 +613,15 @@ run_mise() {
   else
     unset GITHUB_TOKEN
   fi
+  # Centralized Metadata Cache Refresh:
+  # If we just performed an installation, refresh the global mise metadata cache
+  # to ensure subsequent version checks (get_version) or resolution (resolve_bin)
+  # see the newly available tools/binaries immediately.
+  if [ ${_STATUS:-} -eq 0 ] &&
+    { [ "${_CMD:-}" = "install" ] || [ "${_CMD:-}" = "i" ]; }; then
+    refresh_mise_cache
+  fi
+
   return ${_STATUS:-}
 }
 

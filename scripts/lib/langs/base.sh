@@ -64,7 +64,6 @@ install_pipx() {
 
   local _STAT_PIPX="✅ mise"
   run_mise install pipx || _STAT_PIPX="❌ Failed"
-
   log_summary "Base" "Pipx" "${_STAT_PIPX:-}" "$(get_version pipx)" "$(($(date +%s) - _T0_PIPX))"
 }
 
