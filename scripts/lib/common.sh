@@ -77,7 +77,7 @@ MINGW* | MSYS* | CYGWIN*)
     _G_APP_DATA_LOCAL=$(echo "$LOCALAPPDATA" | sed 's/\\/\//g; s/:\(.*\)/\/\1/; s/^\([A-Za-z]\)\//\/\L\1\//')
   fi
   _G_MISE_BIN_BASE="$HOME/.local/bin" # Mise installer usually puts bin here in Git Bash
-  _G_MISE_SHIMS_BASE="${_G_APP_DATA_LOCAL:-$HOME/AppData/Local}/mise/shims"
+  _G_MISE_SHIMS_BASE="${_G_APP_DATA_LOCAL:-${HOME:-}/AppData/Local}/mise/shims"
   ;;
 *)
   _G_OS="linux"
@@ -172,7 +172,7 @@ if [ -n "${GITHUB_STEP_SUMMARY:-}" ] && [ -z "${GITEA_ACTIONS:-}" ] && [ -z "${F
   CI_STEP_SUMMARY="$GITHUB_STEP_SUMMARY"
 elif [ -n "${GITEA_ACTIONS:-}" ] || [ -n "${FORGEJO_ACTIONS:-}" ]; then
   # Gitea/Forgejo: Often follows GitHub conventions but may need fallback
-  CI_STEP_SUMMARY="${GITHUB_STEP_SUMMARY:-${_G_PROJECT_ROOT}/.ci_summary.log}"
+  CI_STEP_SUMMARY="${GITHUB_STEP_SUMMARY:-${_G_PROJECT_ROOT:-}/.ci_summary.log}"
 elif [ -n "${GITLAB_CI:-}" ]; then
   # GitLab: Use a standard log file that can be rendered as an artifact
   CI_STEP_SUMMARY="${_G_PROJECT_ROOT}/ci_summary.md"
@@ -294,7 +294,7 @@ MISE_VERSION="${MISE_VERSION:-2026.3.8}"
 # Any tool added below MUST have a corresponding entry in .mise.toml Tools section.
 
 # Standardized library directory reference (calculated during early detection)
-_G_LIB_DIR="${_G_LIB_DIR:-${_G_PROJECT_ROOT}/scripts/lib}"
+_G_LIB_DIR="${_G_LIB_DIR:-${_G_PROJECT_ROOT:-}/scripts/lib}"
 export _G_LIB_DIR
 
 # ── 🛣️ CI Persistence (GitHub Actions) ───────────────────────────────────────
@@ -717,7 +717,7 @@ install_native_tool() {
 #   $2 - Mise provider name (optional, defaults to tool name)
 ensure_tool() {
   local _TOOL="$1"
-  local _PRV="${2:-$_TOOL}"
+  local _PRV="${2:-${_TOOL:-}}"
 
   if command -v "$_TOOL" >/dev/null 2>&1; then
     return 0
@@ -1051,7 +1051,7 @@ log_summary() {
   local _STAT_SUM="${3:-⏭️ Skipped}"
   local _VER_SUM="${4:--}"
   local _DUR_SUM="${5:--}"
-  local _FILE_SUM="${6:-$SETUP_SUMMARY_FILE}"
+  local _FILE_SUM="${6:-${SETUP_SUMMARY_FILE:-}}"
 
   if [ -z "${_FILE_SUM:-}" ] || [ ! -f "$_FILE_SUM" ]; then
     return 0
@@ -1085,7 +1085,7 @@ log_summary() {
 get_version() {
   local _CMD_VER="$1"
   local _ARG_VER="${2:---version}"
-  local _M_PLUGIN="${3:-$_CMD_VER}"
+  local _M_PLUGIN="${3:-${_CMD_VER:-}}"
   [ -z "${_CMD_VER:-}" ] && {
     echo "-"
     return 0
@@ -1400,7 +1400,7 @@ init_summary_table() {
   # Sentinel to prevent duplicate headers in the same summary stream
   local _SENTINEL_TABLE
   _SENTINEL_TABLE="_SUMMARY_TABLE_INITIALIZED_$(echo "$_TITLE_TABLE" | tr ' ' '_')"
-  if [ "$(eval echo "\$$_SENTINEL_TABLE")" = "true" ]; then
+  if [ "$(eval echo "\${$_SENTINEL_TABLE:-}")" = "true" ]; then
     return 0
   fi
 
