@@ -265,11 +265,9 @@ main() {
     _TOTAL_DUR_M=$(($(date +%s) - _START_TIME_M))
     printf "\n**Total Duration: %ss**\n" "${_TOTAL_DUR_M:-}" >>"${CI_STEP_SUMMARY:-}"
 
-    printf "\n\n"
-    if ! is_ci_env; then
-      cat "${CI_STEP_SUMMARY:-}"
-    fi
+    printf "\n"
     finalize_summary_table
+    log_info "\n✨ Update complete!"
   fi
 
   if [ "${_IS_TOP_LEVEL:-}" = "true" ]; then

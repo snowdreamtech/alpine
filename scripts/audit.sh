@@ -376,13 +376,9 @@ main() {
     printf "\n**Total Duration: %ss**\n" "${_TOTAL_DUR_AUD:-}" >>"${CI_STEP_SUMMARY:-}"
 
     printf "\n"
-    if ! is_ci_env; then
-      cat "${CI_STEP_SUMMARY:-}"
-    fi
     finalize_summary_table
-  fi
+    log_info "\n✨ Audit complete!"
 
-  if [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
     if [ "${_OVERALL_EXIT_AUDIT:-}" -eq 0 ]; then
       log_success "\n✨ Security audit finished successfully."
       if [ "${DRY_RUN:-0}" -eq 0 ]; then

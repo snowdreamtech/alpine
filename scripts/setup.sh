@@ -409,9 +409,6 @@ EOF
     local _TOTAL_DUR_MAIN=$(($(date +%s) - _START_TIME_MAIN))
     printf "\n**Total Duration: %ss**\n" "${_TOTAL_DUR_MAIN:-}" >>"${CI_STEP_SUMMARY:-}"
     printf "\n"
-    if ! is_ci_env; then
-      cat "${CI_STEP_SUMMARY:-}"
-    fi
     finalize_summary_table
     log_info "\n✨ Setup step complete!"
 
