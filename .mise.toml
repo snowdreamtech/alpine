@@ -11,7 +11,7 @@
 
 # ── 🏗️ Core Runtimes ──────────────────────────────────────────────────────────
 go = "1.26.1"
-node = "25.8.2"
+node = "22.14.0"
 "npm:pnpm" = "10.33.0"
 python = "3.14.3"
 
@@ -81,6 +81,9 @@ plugin_autoupdate_last_check_duration = "never"
 # GitHub Proxy Acceleration
 ENABLE_GITHUB_PROXY = "{% if env.CI is defined %}0{% else %}1{% endif %}"
 GITHUB_PROXY = "{% if env.CI is defined %}{% else %}https://gh-proxy.sn0wdr1am.com/{% endif %}"
+
+# Feature Governance (0 = Disabled, 1 = Enabled)
+CONFIG_AUTO_UPDATE = "1"
 
 PYTHONUTF8 = "1"
 # Corepack: bypass signature verification (fixes Windows Node 20 key mismatch)

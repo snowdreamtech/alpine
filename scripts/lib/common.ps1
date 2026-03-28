@@ -50,7 +50,11 @@ function Invoke-ShellDelegation {
     $ScriptPath = Join-Path $ParentDir $ScriptName
 
     # 3. Execution Delegation
-    if (Get-Command 'sh' -ErrorAction SilentlyContinue) {
+    if (Get-Command 'mise' -ErrorAction SilentlyContinue) {
+        # Preferred: Use mise to load environment defined in .mise.toml
+        mise x -- sh "$ScriptPath" @Arguments
+    }
+    elseif (Get-Command 'sh' -ErrorAction SilentlyContinue) {
         # POSIX shell found (typical for Git for Windows)
         sh "$ScriptPath" @Arguments
     }

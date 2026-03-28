@@ -193,6 +193,12 @@ run_upgrade() {
 # ── Main ─────────────────────────────────────────────────────────────────────
 
 main() {
+  # 0. Governance Check: Skip if auto-update is disabled
+  if [ "${CONFIG_AUTO_UPDATE:-1}" = "0" ]; then
+    echo "⏭️  Auto-update is disabled (CONFIG_AUTO_UPDATE=0). Skipping tool upgrades." >&2
+    exit 0
+  fi
+
   guard_project_root
   parse_common_args "$@"
 

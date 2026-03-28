@@ -444,6 +444,12 @@ scan_ecosystems() {
 
 # ── Main ─────────────────────────────────────────────────────────────────────
 main() {
+  # 0. Governance Check: Skip if auto-update is disabled
+  if [ "${CONFIG_AUTO_UPDATE:-1}" = "0" ]; then
+    echo "⏭️  Auto-update is disabled (CONFIG_AUTO_UPDATE=0). Skipping dependabot generation." >&2
+    exit 0
+  fi
+
   # Parse arguments
   for _arg in "$@"; do
     case "${_arg:-}" in

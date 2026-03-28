@@ -233,7 +233,7 @@ gen-dependabot: ## Auto-generate dependabot.yml from detected ecosystems
 ifeq ($(OS_NAME),Windows)
 	@scripts/gen-dependabot.bat $(SCRIPT_ARGS) $(ARGS)
 else
-	@sh scripts/gen-dependabot.sh $(SCRIPT_ARGS) $(ARGS)
+	@mise x -- sh scripts/gen-dependabot.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 sync-labels: ## Synchronize and brand repository labels
