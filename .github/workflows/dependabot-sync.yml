@@ -49,6 +49,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    environment: maintenance
     timeout-minutes: 5
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
@@ -139,6 +140,7 @@ jobs:
         shell: sh
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REF: ${{ github.ref }}
         run: |
           if git diff --quiet .github/dependabot.yml mise.lock scripts/lib/versions.sh .mise.toml 2>/dev/null; then
             echo "✅ No changes detected. Dependabot config and Mise toolchain are up-to-date."
@@ -147,6 +149,6 @@ jobs:
             git config user.email "github-actions[bot]@users.noreply.github.com"
             git add .github/dependabot.yml mise.lock scripts/lib/versions.sh .mise.toml
             git commit -m "chore(deps): sync dependabot config and mise toolchain [skip ci]"
-            git push
+            git push origin HEAD:"$GITHUB_REF"
             echo "✅ Dependabot config and Mise toolchain updated and pushed."
           fi
