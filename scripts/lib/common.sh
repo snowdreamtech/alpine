@@ -84,6 +84,10 @@ MINGW* | MSYS* | CYGWIN*)
     _G_APP_DATA_LOCAL=$(echo "${LOCALAPPDATA:-}" | sed 's/\\/\//g; s/:\(.*\)/\/\1/; s/^\([A-Za-z]\)\//\/\L\1\//')
   fi
   _G_MISE_BIN_BASE="$HOME/.local/bin" # Mise installer usually puts bin here in Git Bash
+  # Support standard Windows-specific install paths if present
+  if [ ! -d "$_G_MISE_BIN_BASE" ] && [ -d "${_G_APP_DATA_LOCAL:-}/mise/bin" ]; then
+    _G_MISE_BIN_BASE="${_G_APP_DATA_LOCAL:-}/mise/bin"
+  fi
   _G_MISE_SHIMS_BASE="${_G_APP_DATA_LOCAL:-${HOME:-}/AppData/Local}/mise/shims"
   ;;
 *)
@@ -331,29 +335,9 @@ MISE_VERSION="${MISE_VERSION:-2026.3.8}"
 _G_LIB_DIR="${_G_LIB_DIR:-${_G_PROJECT_ROOT:-}/scripts/lib}"
 export _G_LIB_DIR
 
+
 # ── 🛣️ CI Persistence (GitHub Actions) ───────────────────────────────────────
-
-if [ "${GITHUB_ACTIONS:-}" = "true" ] && [ -n "${GITHUB_PATH:-}" ]; then
-  # Proactively add mise paths to GITHUB_PATH using absolute references.
-  # Note: GitHub Actions expects the runner's native path format.
-  _M_BIN_CI="${_G_MISE_BIN_BASE:-}"
-  _M_SHIMS_CI="${_G_MISE_SHIMS_BASE:-}"
-
-  if [ "${_G_OS:-}" = "windows" ] && command -v cygpath >/dev/null 2>&1; then
-    _M_BIN_CI=$(cygpath -w "${_M_BIN_CI:-}")
-    _M_SHIMS_CI=$(cygpath -w "${_M_SHIMS_CI:-}")
-  fi
-
-  case ":$PATH:" in
-  *":${_G_MISE_BIN_BASE:-}:"*) ;;
-  *) echo "${_M_BIN_CI:-}" >>"${GITHUB_PATH:-}" ;;
-  esac
-
-  case ":$PATH:" in
-  *":${_G_MISE_SHIMS_BASE:-}:"*) ;;
-  *) echo "${_M_SHIMS_CI:-}" >>"${GITHUB_PATH:-}" ;;
-  esac
-fi
+# Note: Moved to regulated block at the end of the file to satisfy ShellCheck SC2218
 
 # ── 🪄 Mise Bootstrap ────────────────────────────────────────────────────────
 # Logic extracted to ./lib/bootstrap.sh
@@ -1532,3 +1516,31 @@ is_version_match() {
 # ── Extension Modules Sourcing ──
 # Note: Dynamic loading of language-specific setup modules has been moved to setup.sh
 # to optimize performance for non-setup scripts.
+
+# ── 🛣️ CI Persistence (GitHub Actions) ───────────────────────────────────────
+
+if [ "${GITHUB_ACTIONS:-}" = "true" ] && [ -n "${GITHUB_PATH:-}" ] && [ -z "${_G_GITHUB_PATH_SYNCED:-}" ]; then
+  # Proactively add mise paths to GITHUB_PATH using absolute references.
+  # Note: GitHub Actions expects the runner's native path format.
+  _M_BIN_CI="${_G_MISE_BIN_BASE:-}"
+  _M_SHIMS_CI="${_G_MISE_SHIMS_BASE:-}"
+
+  if [ "${_G_OS:-}" = "windows" ] && command -v cygpath >/dev/null 2>&1; then
+    _M_BIN_CI=$(cygpath -w "${_M_BIN_CI:-}")
+    _M_SHIMS_CI=$(cygpath -w "${_M_SHIMS_CI:-}")
+  fi
+
+  # Always ensure these are in GITHUB_PATH if they exist, regardless of session PATH
+  if [ -d "$_G_MISE_BIN_BASE" ]; then
+    echo "${_M_BIN_CI:-}" >>"${GITHUB_PATH:-}"
+    # shellcheck disable=SC2119
+    log_debug "Persisted mise bin to GITHUB_PATH: $_M_BIN_CI"
+  fi
+  if [ -d "$_G_MISE_SHIMS_BASE" ]; then
+    echo "${_M_SHIMS_CI:-}" >>"${GITHUB_PATH:-}"
+    # shellcheck disable=SC2119
+    log_debug "Persisted mise shims to GITHUB_PATH: $_M_SHIMS_CI"
+  fi
+
+  export _G_GITHUB_PATH_SYNCED=true
+fi
