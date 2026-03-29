@@ -13,6 +13,8 @@ go = "1.26.1"
 node = "25.8.2"
 "npm:pnpm" = "10.33.0"
 python = "3.14.3"
+pipx = "1.11.0"
+
 
 # ── 🔐 Security & Engineering (always needed) ──────────────────────────────────
 gitleaks = "8.30.1"
@@ -58,8 +60,7 @@ editorconfig-checker = "3.6.1"
 # ── DevOps/release tools used globally ──────────────────────────────────────────
 "pipx:zizmor" = "1.23.1"
 "npm:vitepress" = "1.6.4"
-pipx = "1.11.0"
-# pipx = "1.11.0" # Removed to let mise handle pipx natively on Windows/Linux/Mac
+
 
 
 # ------------------------------------------------------------
