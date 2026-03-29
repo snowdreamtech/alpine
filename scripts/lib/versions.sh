@@ -55,7 +55,7 @@ VER_BALLERINA_PROVIDER="github:ballerina-platform/ballerina-distribution"
 VER_STYLUA="2.4.0"
 VER_STYLUA_PROVIDER="github:JohnnyMorganz/StyLua"
 
-VER_JUST="1.48.0"
+VER_JUST="1.48.1"
 VER_JUST_PROVIDER="github:casey/just"
 
 VER_TASK="3.49.1"
@@ -81,7 +81,7 @@ VER_STYLELINT_PROVIDER="npm:stylelint"
 VER_STYLELINT_CONFIG="40.0.0"
 VER_STYLELINT_CONFIG_PROVIDER="npm:stylelint-config-standard"
 
-VER_ASSEMBLYSCRIPT="0.28.10"
+VER_ASSEMBLYSCRIPT="0.28.12"
 VER_ASSEMBLYSCRIPT_PROVIDER="npm:assemblyscript"
 
 VER_OPA="1.15.0"
