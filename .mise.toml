@@ -7,7 +7,6 @@
 # ------------------------------------------------------------
 
 [tools]
-"github:google/osv-scanner" = "2.3.5"
 
 # ── 🏗️ Core Runtimes ──────────────────────────────────────────────────────────
 go = "1.26.1"
@@ -72,6 +71,8 @@ asdf_compat = true
 status.missing_tools = "never"
 legacy_version_file = false
 plugin_autoupdate_last_check_duration = "never"
+url_replacements = { "https://github.com" = "{% if env.CI is defined %}https://github.com{% else %}https://gh-proxy.sn0wdr1am.com/https://github.com{% endif %}" }
+
 
 
 # ------------------------------------------------------------
@@ -104,6 +105,7 @@ RUBY_BUILD_MIRROR_URL = "{% if env.CI is defined %}https://cache.ruby-lang.org/p
 
 # Go acceleration
 GOPROXY = "{% if env.CI is defined %}https://proxy.golang.org,direct{% else %}https://mirrors.aliyun.com/goproxy/,direct{% endif %}"
+MISE_GO_DOWNLOAD_MIRROR = "{% if env.CI is defined %}https://dl.google.com/go/{% else %}https://mirrors.aliyun.com/golang/{% endif %}"
 
 # Rust & Cargo acceleration
 RUSTUP_DIST_SERVER = "{% if env.CI is defined %}https://static.rust-lang.org{% else %}https://mirrors.aliyun.com/rustup{% endif %}"

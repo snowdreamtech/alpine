@@ -41,9 +41,6 @@ install_ruff() {
   _T0_RUF=$(date +%s)
   local _TITLE="Ruff"
   local _PROVIDER="pipx:ruff"
-  if ! has_lang_files "requirements.txt pyproject.toml" "*.py"; then
-    return 0
-  fi
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -102,9 +99,7 @@ install_pip_audit() {
 # Purpose: Sets up Python runtime for project.
 # Delegate: Managed by mise (.mise.toml)
 setup_python() {
-  if ! has_lang_files "requirements.txt pyproject.toml .python-version" "*.py"; then
-    return 0
-  fi
+  # Python is a first-class citizen: setup is always performed.
 
   local _T0_PY_RT
   _T0_PY_RT=$(date +%s)

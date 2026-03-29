@@ -67,9 +67,7 @@ install_govulncheck() {
 # Purpose: Sets up Go runtime for project.
 # Delegate: Managed by mise (.mise.toml)
 setup_go() {
-  if ! has_lang_files "go.mod go.sum" "*.go"; then
-    return 0
-  fi
+  # Go is a first-class citizen: setup is always performed.
 
   # Dynamically register Go in .mise.toml if not already present.
   # This is essential for pre-provisioning (e.g., DevContainer builds)

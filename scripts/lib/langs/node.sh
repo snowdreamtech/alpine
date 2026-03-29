@@ -61,9 +61,6 @@ install_sort_package_json() {
   _T0_SPJ=$(date +%s)
   local _TITLE="sort-package-json"
   local _PROVIDER="npm:sort-package-json"
-  if [ ! -f "package.json" ]; then
-    return 0
-  fi
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -94,9 +91,6 @@ install_eslint() {
   _T0_ES=$(date +%s)
   local _TITLE="ESLint"
   local _PROVIDER="npm:eslint"
-  if ! has_lang_files "package.json" "*.js *.ts *.vue *.jsx *.tsx"; then
-    return 0
-  fi
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -115,7 +109,8 @@ install_eslint() {
     log_summary "Node" "ESLint" '⚖️ Previewed' "-" '0'
     return 0
   fi
-  local _STAT_ES="✅ mise"
+  local _STAT_ES
+  _STAT_ES="✅ mise"
   run_mise install "${_PROVIDER:-}" || _STAT_ES="❌ Failed"
   log_summary "Node" "ESLint" "${_STAT_ES:-}" "$(get_version eslint)" "$(($(date +%s) - _T0_ES))"
 }
@@ -127,10 +122,6 @@ install_stylelint() {
   _T0_SL=$(date +%s)
   local _TITLE="Stylelint"
   local _PROVIDER="npm:stylelint"
-
-  if ! has_lang_files "" "*.css *.scss *.less *.vue"; then
-    return 0
-  fi
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -149,7 +140,8 @@ install_stylelint() {
     log_summary "Node" "Stylelint" '⚖️ Previewed' "-" '0'
     return 0
   fi
-  local _STAT_SL="✅ mise"
+  local _STAT_SL
+  _STAT_SL="✅ mise"
   run_mise install "${_PROVIDER:-}" || _STAT_SL="❌ Failed"
   log_summary "Node" "Stylelint" "${_STAT_SL:-}" "$(get_version stylelint)" "$(($(date +%s) - _T0_SL))"
 }
@@ -183,7 +175,8 @@ install_vitepress() {
     log_summary "Docs" "VitePress" '⚖️ Previewed' "-" '0'
     return 0
   fi
-  local _STAT_VP="✅ mise"
+  local _STAT_VP
+  _STAT_VP="✅ mise"
   run_mise install "${_PROVIDER:-}" || _STAT_VP="❌ Failed"
   log_summary "Docs" "VitePress" "${_STAT_VP:-}" "$(get_version vitepress)" "$(($(date +%s) - _T0_VP))"
 }
@@ -213,7 +206,8 @@ install_prettier() {
     log_summary "Base" "Prettier" '⚖️ Previewed' "-" '0'
     return 0
   fi
-  local _STAT_PR="✅ mise"
+  local _STAT_PR
+  _STAT_PR="✅ mise"
   run_mise install "${_PROVIDER:-}" || _STAT_PR="❌ Failed"
   log_summary "Base" "Prettier" "${_STAT_PR:-}" "$(get_version prettier)" "$(($(date +%s) - _T0_PR))"
 }
@@ -243,7 +237,8 @@ install_commitlint() {
     log_summary "Base" "Commitlint" '⚖️ Previewed' "-" '0'
     return 0
   fi
-  local _STAT_CL="✅ mise"
+  local _STAT_CL
+  _STAT_CL="✅ mise"
   run_mise install "${_PROVIDER:-}" || _STAT_CL="❌ Failed"
   log_summary "Base" "Commitlint" "${_STAT_CL:-}" "$(get_version commitlint)" "$(($(date +%s) - _T0_CL))"
 }
@@ -255,10 +250,6 @@ install_commitizen() {
   _T0_CZ=$(date +%s)
   local _TITLE="Commitizen"
   local _PROVIDER="npm:commitizen"
-
-  if [ ! -f "package.json" ]; then
-    return 0
-  fi
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -277,7 +268,8 @@ install_commitizen() {
     log_summary "Base" "Commitizen" '⚖️ Previewed' "-" '0'
     return 0
   fi
-  local _STAT_CZ="✅ mise"
+  local _STAT_CZ
+  _STAT_CZ="✅ mise"
   run_mise install "${_PROVIDER:-}" || _STAT_CZ="❌ Failed"
   log_summary "Base" "Commitizen" "${_STAT_CZ:-}" "$(get_version commitizen)" "$(($(date +%s) - _T0_CZ))"
 }
@@ -285,9 +277,7 @@ install_commitizen() {
 # Purpose: Sets up Node.js runtime for project.
 # Delegate: Managed by mise (.mise.toml)
 setup_node() {
-  if ! has_lang_files "package.json .nvmrc .node-version" "*.js *.ts *.jsx *.tsx"; then
-    return 0
-  fi
+  # Node.js is a first-class citizen: setup is always performed.
 
   local _T0_NODE_RT
   _T0_NODE_RT=$(date +%s)
