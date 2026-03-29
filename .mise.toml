@@ -7,7 +7,6 @@
 # ------------------------------------------------------------
 
 [tools]
-"github:google/osv-scanner" = "2.3.5"
 
 # ── 🏗️ Core Runtimes ──────────────────────────────────────────────────────────
 go = "1.26.1"
@@ -30,37 +29,20 @@ editorconfig-checker = "3.6.1"
 # Git / commit workflow
 "npm:@commitlint/cli" = "20.5.0"
 "npm:@commitlint/config-conventional" = "20.5.0"
-"npm:bats" = "1.13.0"
 "npm:commitizen" = "4.3.1"
 "npm:cz-conventional-changelog" = "3.3.0"
 
 # Formatting & linting (invoked by pre-commit hooks)
-"npm:eslint" = "10.1.0"
-"npm:markdownlint-cli2" = "0.22.0"
 "npm:prettier" = "3.8.1"
-"npm:sort-package-json" = "3.6.1"
-"npm:@taplo/cli" = "0.7.0"
-
-# Docker / Infrastructure linters (invoked by pre-commit hooks)
-"github:hadolint/hadolint" = "2.14.0"
-"npm:dockerfile-utils" = "0.16.3"
 
 # Shell & scripting linters (pre-commit hooks)
 "pipx:actionlint-py" = "1.7.11.24"
 "pipx:pre-commit" = "4.5.1"
-"pipx:ruff" = "0.15.8"
 "pipx:shellcheck-py" = "0.11.0.1"
 "pipx:shfmt-py" = "3.12.0.2"
 "pipx:yamllint" = "1.38.0"
 
-# Additional linters invoked by pre-commit hooks
-"pipx:clang-format" = "22.1.2"
-"pipx:dotenv-linter" = "0.7.0"
-"pipx:sqlfluff" = "4.1.0"
-
 # ── DevOps/release tools used globally ──────────────────────────────────────────
-"pipx:zizmor" = "1.23.1"
-"npm:vitepress" = "1.6.4"
 
 
 # ------------------------------------------------------------
