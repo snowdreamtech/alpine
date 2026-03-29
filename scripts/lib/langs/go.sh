@@ -105,9 +105,11 @@ setup_go() {
     fi
   fi
 
-  # Setup related tools
-  install_go_lint
-  install_govulncheck
+  # Setup related tools (Conditional on project files)
+  if has_lang_files "go.mod" "*.go"; then
+    install_go_lint
+    install_govulncheck
+  fi
 }
 # Purpose: Checks if Go runtime is available.
 # Examples:

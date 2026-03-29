@@ -129,9 +129,11 @@ setup_python() {
     fi
   fi
 
-  # Setup related tools
-  install_ruff
-  install_pip_audit
+  # Setup related tools (Conditional on project files)
+  if has_lang_files "requirements.txt pyproject.toml" "*.py"; then
+    install_ruff
+    install_pip_audit
+  fi
 }
 # Purpose: Checks if Python runtime is available.
 # Examples:

@@ -326,11 +326,15 @@ setup_node() {
     log_summary "Runtime" "Deno" "✅ Detected" "$(deno --version 2>/dev/null | head -n 1 | awk '{print $2}')" "0"
   fi
 
-  # Setup related tools
-  install_sort_package_json
-  install_eslint
-  install_stylelint
-  install_vitepress
+  # Setup related tools (Conditional on project files)
+  if has_lang_files "package.json" "*.js *.ts *.jsx *.tsx *.vue *.svelte *.astro"; then
+    install_sort_package_json
+    install_eslint
+    install_stylelint
+    install_vitepress
+  fi
+
+  # Base tools often used project-wide across all languages
   install_commitizen
   install_prettier
   install_commitlint
