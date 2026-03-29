@@ -279,67 +279,35 @@ backend = "core:go"
 
 [tools.go."platforms.linux-arm64"]
 checksum = "sha256:a290581cfe4fe28ddd737dde3095f3dbeb7f2e4065cab4eae44dfc53b760c2f7"
-url = "https://dl.google.com/go/go1.26.1.linux-arm64.tar.gz"
+url = "https://mirrors.aliyun.com/golang//go1.26.1.linux-arm64.tar.gz"
 
 [tools.go."platforms.linux-arm64-musl"]
 checksum = "sha256:a290581cfe4fe28ddd737dde3095f3dbeb7f2e4065cab4eae44dfc53b760c2f7"
-url = "https://dl.google.com/go/go1.26.1.linux-arm64.tar.gz"
+url = "https://mirrors.aliyun.com/golang//go1.26.1.linux-arm64.tar.gz"
 
 [tools.go."platforms.linux-x64"]
 checksum = "sha256:031f088e5d955bab8657ede27ad4e3bc5b7c1ba281f05f245bcc304f327c987a"
-url = "https://dl.google.com/go/go1.26.1.linux-amd64.tar.gz"
+url = "https://mirrors.aliyun.com/golang//go1.26.1.linux-amd64.tar.gz"
 
 [tools.go."platforms.linux-x64-musl"]
 checksum = "sha256:031f088e5d955bab8657ede27ad4e3bc5b7c1ba281f05f245bcc304f327c987a"
-url = "https://dl.google.com/go/go1.26.1.linux-amd64.tar.gz"
+url = "https://mirrors.aliyun.com/golang//go1.26.1.linux-amd64.tar.gz"
 
 [tools.go."platforms.macos-arm64"]
 checksum = "sha256:353df43a7811ce284c8938b5f3c7df40b7bfb6f56cb165b150bc40b5e2dd541f"
-url = "https://dl.google.com/go/go1.26.1.darwin-arm64.tar.gz"
+url = "https://mirrors.aliyun.com/golang//go1.26.1.darwin-arm64.tar.gz"
 
 [tools.go."platforms.macos-x64"]
 checksum = "sha256:65773dab2f8cc4cd23d93ba6d0a805de150ca0b78378879292be0b903b8cdd08"
-url = "https://dl.google.com/go/go1.26.1.darwin-amd64.tar.gz"
+url = "https://mirrors.aliyun.com/golang//go1.26.1.darwin-amd64.tar.gz"
 
 [tools.go."platforms.windows-x64"]
 checksum = "sha256:9b68112c913f45b7aebbf13c036721264bbba7e03a642f8f7490c561eebd1ecc"
-url = "https://dl.google.com/go/go1.26.1.windows-amd64.zip"
+url = "https://mirrors.aliyun.com/golang//go1.26.1.windows-amd64.zip"
 
 [[tools."go:github.com/google/addlicense"]]
 version = "v1.1.1"
 backend = "go:github.com/google/addlicense"
-
-[[tools.node]]
-version = "22.14.0"
-backend = "core:node"
-
-[tools.node."platforms.linux-arm64"]
-checksum = "sha256:8cf30ff7250f9463b53c18f89c6c606dfda70378215b2c905d0a9a8b08bd45e0"
-url = "https://npmmirror.com/mirrors/node/v22.14.0/node-v22.14.0-linux-arm64.tar.gz"
-
-[tools.node."platforms.linux-arm64-musl"]
-checksum = "sha256:8cf30ff7250f9463b53c18f89c6c606dfda70378215b2c905d0a9a8b08bd45e0"
-url = "https://npmmirror.com/mirrors/node/v22.14.0/node-v22.14.0-linux-arm64.tar.gz"
-
-[tools.node."platforms.linux-x64"]
-checksum = "sha256:9d942932535988091034dc94cc5f42b6dc8784d6366df3a36c4c9ccb3996f0c2"
-url = "https://npmmirror.com/mirrors/node/v22.14.0/node-v22.14.0-linux-x64.tar.gz"
-
-[tools.node."platforms.linux-x64-musl"]
-checksum = "sha256:9d942932535988091034dc94cc5f42b6dc8784d6366df3a36c4c9ccb3996f0c2"
-url = "https://npmmirror.com/mirrors/node/v22.14.0/node-v22.14.0-linux-x64.tar.gz"
-
-[tools.node."platforms.macos-arm64"]
-checksum = "sha256:e9404633bc02a5162c5c573b1e2490f5fb44648345d64a958b17e325729a5e42"
-url = "https://npmmirror.com/mirrors/node/v22.14.0/node-v22.14.0-darwin-arm64.tar.gz"
-
-[tools.node."platforms.macos-x64"]
-checksum = "sha256:6698587713ab565a94a360e091df9f6d91c8fadda6d00f0cf6526e9b40bed250"
-url = "https://npmmirror.com/mirrors/node/v22.14.0/node-v22.14.0-darwin-x64.tar.gz"
-
-[tools.node."platforms.windows-x64"]
-checksum = "sha256:55b639295920b219bb2acbcfa00f90393a2789095b7323f79475c9f34795f217"
-url = "https://npmmirror.com/mirrors/node/v22.14.0/node-v22.14.0-win-x64.zip"
 
 [[tools.node]]
 version = "25.8.2"
@@ -424,6 +392,34 @@ backend = "npm:sort-package-json"
 [[tools."npm:vitepress"]]
 version = "1.6.4"
 backend = "npm:vitepress"
+
+[[tools.pipx]]
+version = "1.11.0"
+backend = "aqua:pypa/pipx"
+
+[tools.pipx."platforms.linux-arm64"]
+checksum = "sha256:088012ed44db557464e48721275b62b2c2a9a943f444cde05f82cf7a23e63dbc"
+url = "https://github.com/pypa/pipx/releases/download/1.11.0/pipx.pyz"
+
+[tools.pipx."platforms.linux-arm64-musl"]
+checksum = "sha256:088012ed44db557464e48721275b62b2c2a9a943f444cde05f82cf7a23e63dbc"
+url = "https://github.com/pypa/pipx/releases/download/1.11.0/pipx.pyz"
+
+[tools.pipx."platforms.linux-x64"]
+checksum = "sha256:088012ed44db557464e48721275b62b2c2a9a943f444cde05f82cf7a23e63dbc"
+url = "https://github.com/pypa/pipx/releases/download/1.11.0/pipx.pyz"
+
+[tools.pipx."platforms.linux-x64-musl"]
+checksum = "sha256:088012ed44db557464e48721275b62b2c2a9a943f444cde05f82cf7a23e63dbc"
+url = "https://github.com/pypa/pipx/releases/download/1.11.0/pipx.pyz"
+
+[tools.pipx."platforms.macos-arm64"]
+checksum = "sha256:088012ed44db557464e48721275b62b2c2a9a943f444cde05f82cf7a23e63dbc"
+url = "https://github.com/pypa/pipx/releases/download/1.11.0/pipx.pyz"
+
+[tools.pipx."platforms.macos-x64"]
+checksum = "sha256:088012ed44db557464e48721275b62b2c2a9a943f444cde05f82cf7a23e63dbc"
+url = "https://github.com/pypa/pipx/releases/download/1.11.0/pipx.pyz"
 
 [[tools."pipx:actionlint-py"]]
 version = "1.7.11.24"

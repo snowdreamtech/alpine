@@ -143,6 +143,9 @@ VER_ANSIBLE_LINT_PROVIDER="pipx:ansible-lint"
 VER_SPECTRAL="6.15.0"
 VER_SPECTRAL_PROVIDER="npm:@stoplight/spectral-cli"
 
+VER_GORELEASER="2.14.3"
+VER_GORELEASER_PROVIDER="github:goreleaser/goreleaser"
+
 # ── 📖 Documentation ──────────────────────────────────────────────────────────
 VER_BATS="1.13.0"
 VER_BATS_PROVIDER="npm:bats"

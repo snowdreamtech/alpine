@@ -56,9 +56,9 @@ editorconfig-checker = "3.6.1"
 "pipx:sqlfluff" = "4.1.0"
 
 # ── DevOps/release tools used globally ──────────────────────────────────────────
-"github:goreleaser/goreleaser" = "2.14.3"
 "pipx:zizmor" = "1.23.1"
 "npm:vitepress" = "1.6.4"
+pipx = "1.11.0"
 # pipx = "1.11.0" # Removed to let mise handle pipx natively on Windows/Linux/Mac
 
 
@@ -72,7 +72,6 @@ status.missing_tools = "never"
 legacy_version_file = false
 plugin_autoupdate_last_check_duration = "never"
 url_replacements = { "https://github.com" = "{% if env.CI is defined %}https://github.com{% else %}https://gh-proxy.sn0wdr1am.com/https://github.com{% endif %}" }
-
 
 
 # ------------------------------------------------------------

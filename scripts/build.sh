@@ -91,6 +91,11 @@ main() {
   if [ -f ".goreleaser.yaml" ] || [ -f ".goreleaser.yml" ]; then
     local _GORELEASER_BIN
     _GORELEASER_BIN=$(resolve_bin "${GORELEASER:-goreleaser}") || true
+    if [ -z "${_GORELEASER_BIN:-}" ]; then
+      ensure_tool "goreleaser" "${VER_GORELEASER_PROVIDER:-goreleaser}" || true
+      _GORELEASER_BIN=$(resolve_bin "${GORELEASER:-goreleaser}") || true
+    fi
+
     if [ -n "${_GORELEASER_BIN:-}" ]; then
       run_build "${_GORELEASER_BIN:-} build --snapshot --clean" "GoReleaser snapshot build"
     fi
