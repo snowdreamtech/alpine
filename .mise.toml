@@ -70,10 +70,11 @@ editorconfig-checker = "3.6.1"
 [settings]
 experimental = true
 asdf_compat = true
-status.missing_tools = "never"
-legacy_version_file = false
-plugin_autoupdate_last_check_duration = "never"
-url_replacements = { "https://github.com" = "{% if env.CI is defined %}https://github.com{% else %}https://gh-proxy.sn0wdr1am.com/https://github.com{% endif %}" }
+# Settings and URL replacements for network reliability.
+# Note: url_replacements do not support Jinja2/Tera templates directly in settings; 
+# simple key-value replacement of the URL prefix is performed.
+http_timeout = "300s"
+url_replacements = { "https://github.com" = "https://gh-proxy.sn0wdr1am.com/https://github.com" }
 
 
 # ------------------------------------------------------------

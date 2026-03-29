@@ -427,6 +427,8 @@ optimize_network() {
 EOF
     export GIT_CONFIG_GLOBAL="${_TEMP_GIT_CONFIG:-}"
     export GIT_CONFIG_SYSTEM="/dev/null"
+    # Ensure mise uses the same long timeout for HTTP downloads
+    export MISE_HTTP_TIMEOUT="300s"
   fi
 
   export _NETWORK_OPTIMIZED=true
@@ -569,9 +571,9 @@ run_mise() {
   local _MAX_RETRIES=3
   local _RETRY_COUNT=0
   local _STATUS=1
-  # 120s per attempt to handle large GitHub releases on slow networks.
-  # Previously 60s which caused frequent timeouts for tools like moonbit/grain.
-  local _T_OUT=120
+  # 300s per attempt to handle large GitHub releases on slow networks.
+  # Previously 120s which might still cause timeouts for very large binaries.
+  local _T_OUT=300
 
   local _MISE_OPTS=""
   if [ "${VERBOSE:-1}" -ge 2 ]; then _MISE_OPTS="--verbose"; fi
