@@ -63,7 +63,6 @@ editorconfig-checker = "3.6.1"
 "npm:vitepress" = "1.6.4"
 
 
-
 # ------------------------------------------------------------
 # Global settings
 # ------------------------------------------------------------
@@ -71,7 +70,7 @@ editorconfig-checker = "3.6.1"
 experimental = true
 asdf_compat = true
 # Settings and URL replacements for network reliability.
-# Note: url_replacements do not support Jinja2/Tera templates directly in settings; 
+# Note: url_replacements do not support Jinja2/Tera templates directly in settings;
 # simple key-value replacement of the URL prefix is performed.
 http_timeout = "300s"
 url_replacements = { "https://github.com" = "https://gh-proxy.sn0wdr1am.com/https://github.com" }

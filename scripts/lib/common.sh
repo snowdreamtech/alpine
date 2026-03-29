@@ -343,7 +343,7 @@ export _G_LIB_DIR
 # shellcheck source=/dev/null
 . "${_G_LIB_DIR:-}/bootstrap.sh"
 
-# Purpose: Runs a command with a timeout, handling gtimeout (macOS) and timeout (Linux).
+# Purpose: Runs a command with a timeout, handling gtimeout (macOS), timeout (Linux), or Bash fallback.
 # Params:
 #   $1 - Timeout in seconds
 #   $@ - Command and arguments
@@ -355,7 +355,18 @@ run_with_timeout() {
   elif command -v timeout >/dev/null 2>&1; then
     timeout "${_SEC:-}" "$@"
   else
-    "$@"
+    # Fallback: Lightweight Bash-native timeout mechanism
+    # Works by spawning the command in the background and a sleep watcher.
+    ("$@") &
+    local _PID=$!
+    (sleep "${_SEC:-}" && kill -0 "${_PID:-}" 2>/dev/null && kill "${_PID:-}" 2>/dev/null) &
+    local _WATCH_PID=$!
+    # Wait for the command to finish. We use wait $PID to get the specific exit code.
+    wait "${_PID:-}" 2>/dev/null
+    local _RET=$?
+    # Cleanup: kill the watcher if it's still running.
+    kill "${_WATCH_PID:-}" 2>/dev/null
+    return "${_RET:-}"
   fi
 }
 
@@ -579,17 +590,13 @@ run_mise() {
   if [ "${VERBOSE:-1}" -ge 2 ]; then _MISE_OPTS="--verbose"; fi
 
   while [ ${_RETRY_COUNT:-} -lt ${_MAX_RETRIES:-} ]; do
-    # Wrap in timeout if available
-    if command -v gtimeout >/dev/null 2>&1; then
-      # shellcheck disable=SC2086
-      gtimeout "${_T_OUT:-}" "${_M_BIN:-}" ${_MISE_OPTS:-} "${_CMD:-}" "$@"
-    elif command -v timeout >/dev/null 2>&1; then
-      # shellcheck disable=SC2086
-      timeout "${_T_OUT:-}" "${_M_BIN:-}" ${_MISE_OPTS:-} "${_CMD:-}" "$@"
-    else
-      # shellcheck disable=SC2086
-      MISE_LOCKED="${_EFFECTIVE_LOCKED:-}" "${_M_BIN:-}" ${_MISE_OPTS:-} "${_CMD:-}" "$@"
-    fi
+    # Ensure MISE_HTTP_TIMEOUT is synchronized with the execution timeout
+    # to prevent internal mise network calls from hanging the wrapper.
+    export MISE_HTTP_TIMEOUT="${_T_OUT:-300}s"
+
+    # Wrap in timeout utility (Standardized via run_with_timeout)
+    # shellcheck disable=SC2086
+    MISE_LOCKED="${_EFFECTIVE_LOCKED:-}" run_with_timeout "${_T_OUT:-}" "${_M_BIN:-}" ${_MISE_OPTS:-} "${_CMD:-}" "$@"
     _STATUS=$?
     [ ${_STATUS:-} -eq 0 ] && break
     # Exit code 124 = timeout expiry; treat as retryable network failure.
