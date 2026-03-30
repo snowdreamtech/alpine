@@ -116,7 +116,7 @@ main() {
     _T0_ZM=$(date +%s)
     local _ZIZMOR_BIN
     _ZIZMOR_BIN=$(resolve_bin "zizmor") || true
-    if [ -n "${_ZIZMOR_BIN:-}" ] && { is_ci_env || [ "${ZIZMOR_FORCE_INSTALL:-0}" -eq 1 ]; }; then
+    if is_ci_env || [ -n "${_ZIZMOR_BIN:-}" ]; then
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_success "DRY-RUN: Would run zizmor"
         log_summary "GitHub" "zizmor" "⚖️ Previewed" "-" "0"
@@ -177,16 +177,16 @@ main() {
   fi
 
   # 6. Dependency Audits (Python) — CI-only: network-heavy, slow on local dev.
-  if { [ -f "requirements-dev.txt" ] || [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; } && { is_ci_env || [ "${PA_FORCE_INSTALL:-0}" -eq 1 ]; }; then
+  local _PA_BIN
+  _PA_BIN=$(resolve_bin "pip-audit") || true
+  if { [ -f "requirements-dev.txt" ] || [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; } && { is_ci_env || [ -n "${_PA_BIN:-}" ]; }; then
     local _T0_PY_AUD
     _T0_PY_AUD=$(date +%s)
     log_info "\n── Auditing Python dependencies (pip-audit) ──"
-    local _PIPAUDIT_BIN
-    _PIPAUDIT_BIN=$(resolve_bin "pip-audit") || true
 
-    if [ -n "${_PIPAUDIT_BIN:-}" ]; then
+    if [ -n "${_PA_BIN:-}" ]; then
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
-        log_success "DRY-RUN: Would run ${_PIPAUDIT_BIN:-}"
+        log_success "DRY-RUN: Would run ${_PA_BIN:-}"
         log_summary "Python" "pip-audit" "⚖️ Previewed" "-" "0"
       else
         local _PA_SPEC="${VER_PIP_AUDIT_PROVIDER:-pip-audit}@${VER_PIP_AUDIT:-latest}"
@@ -211,7 +211,7 @@ main() {
   done
   local _OSV_BIN
   _OSV_BIN=$(resolve_bin "osv-scanner") || true
-  if is_ci_env || [ "${OSV_FORCE_INSTALL:-0}" -eq 1 ]; then
+  if is_ci_env || [ -n "${_OSV_BIN:-}" ]; then
     if [ "${_HAS_LOCKFILE:-}" -eq 1 ] && [ -n "${_OSV_BIN:-}" ]; then
       local _T0_OSV_AUD
       _T0_OSV_AUD=$(date +%s)
@@ -240,12 +240,12 @@ main() {
   fi
 
   # 8. Stack Specific (Go/Rust/Containers) — CI-only: slow network scans.
-  if [ -f "go.mod" ] && { is_ci_env || [ "${GOVULN_FORCE_INSTALL:-0}" -eq 1 ]; }; then
+  local _GOVULN_BIN
+  _GOVULN_BIN=$(resolve_bin "govulncheck") || true
+  if [ -f "go.mod" ] && { is_ci_env || [ -n "${_GOVULN_BIN:-}" ]; }; then
     local _T0_GO_AUD
     _T0_GO_AUD=$(date +%s)
     log_info "\n── Auditing Go dependencies (govulncheck) ──"
-    local _GOVULN_BIN
-    _GOVULN_BIN=$(resolve_bin "govulncheck") || true
     if [ -n "${_GOVULN_BIN:-}" ]; then
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_success "DRY-RUN: Would run govulncheck"
@@ -265,13 +265,14 @@ main() {
     fi
   fi
 
-  if [ -f "Cargo.toml" ] && { is_ci_env || [ "${CA_FORCE_INSTALL:-0}" -eq 1 ]; }; then
+  # Rust CVE Audit
+  local _CA_BIN
+  _CA_BIN=$(resolve_bin "cargo-audit") || true
+  if [ -f "Cargo.toml" ] && { is_ci_env || [ -n "${_CA_BIN:-}" ]; }; then
     local _T0_RS_AUD
     _T0_RS_AUD=$(date +%s)
     log_info "\n── Auditing Rust dependencies (cargo audit) ──"
-    local _CARGO_AUDIT_BIN
-    _CARGO_AUDIT_BIN=$(resolve_bin "cargo-audit") || true
-    if [ -n "${_CARGO_AUDIT_BIN:-}" ]; then
+    if [ -n "${_CA_BIN:-}" ]; then
       if [ "${DRY_RUN:-0}" -eq 1 ]; then
         log_success "DRY-RUN: Would run cargo audit"
         log_summary "Rust" "cargo-audit" "⚖️ Previewed" "-" "0"
