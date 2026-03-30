@@ -129,14 +129,14 @@ main() {
         if [ -n "${GITHUB_TOKEN:-}" ]; then
           log_info "Zizmor: Attempting authenticated scan..."
           export GH_TOKEN="${GITHUB_TOKEN:-}"
-          if run_quiet run_mise exec "${_ZM_SPEC:-}" -- zizmor . --format plain --gh-token "${GITHUB_TOKEN:-}"; then
+          if run_quiet run_mise exec "${_ZM_SPEC:-}" -- zizmor . --format plain --config .zizmor.yml --gh-token "${GITHUB_TOKEN:-}"; then
             _ZM_OK=1
           fi
         fi
 
         if [ "${_ZM_OK:-}" -eq 0 ]; then
           log_info "Zizmor: Attempting offline scan (fallback)..."
-          if run_quiet run_mise exec "${_ZM_SPEC:-}" -- zizmor . --format plain --offline; then
+          if run_quiet run_mise exec "${_ZM_SPEC:-}" -- zizmor . --format plain --config .zizmor.yml --offline; then
             _ZM_OK=1
           fi
         fi
