@@ -142,6 +142,17 @@ run_upgrade() {
         # Determine provider
         _PROV_VAL="${_TOOL_IDENT:-}"
 
+        # [CI ISOLATION]: In CI environments, strictly forbid updating Tier 3 dynamic tools
+        # to ensure they are never persisted back to the repository via automated syncs.
+        if is_ci_env; then
+          case "${_TOOL_IDENT:-}" in
+          *osv-scanner* | *zizmor* | *pip-audit* | *govulncheck* | *cargo-audit*)
+            log_warn "⏭️  CI Filter: Bypassing upgrade for Tier 3 tool [${_TOOL_IDENT:-}] in ${_MISE_FILE:-}"
+            continue
+            ;;
+          esac
+        fi
+
         _LATEST_VER=$(_get_latest_version "${_PROV_VAL:-}")
         if [ -n "${_LATEST_VER:-}" ] && [ "${_CUR_VER:-}" != "${_LATEST_VER:-}" ]; then
           log_success "✨ Upgrade [${_MISE_FILE:-}]: ${_TOOL_IDENT:-} ${_CUR_VER:-} -> ${_LATEST_VER:-}"

@@ -125,17 +125,18 @@ main() {
         # (403 Forbidden) in CI when querying non-existent branches for multiple Action tags.
         # To guarantee CI stability, we force offline mode in CI environments or when no token is present.
         local _ZM_OK=0
+        local _ZM_SPEC="${VER_ZIZMOR_PROVIDER:-zizmor}@${VER_ZIZMOR:-latest}"
         if [ -n "${GITHUB_TOKEN:-}" ]; then
           log_info "Zizmor: Attempting authenticated scan..."
           export GH_TOKEN="${GITHUB_TOKEN:-}"
-          if run_quiet "${_ZIZMOR_BIN:-}" . --format plain --gh-token "${GITHUB_TOKEN:-}"; then
+          if run_quiet run_mise exec "${_ZM_SPEC:-}" -- zizmor . --format plain --gh-token "${GITHUB_TOKEN:-}"; then
             _ZM_OK=1
           fi
         fi
 
         if [ "${_ZM_OK:-}" -eq 0 ]; then
           log_info "Zizmor: Attempting offline scan (fallback)..."
-          if run_quiet "${_ZIZMOR_BIN:-}" . --format plain --offline; then
+          if run_quiet run_mise exec "${_ZM_SPEC:-}" -- zizmor . --format plain --offline; then
             _ZM_OK=1
           fi
         fi
@@ -188,12 +189,11 @@ main() {
         log_success "DRY-RUN: Would run ${_PIPAUDIT_BIN:-}"
         log_summary "Python" "pip-audit" "⚖️ Previewed" "-" "0"
       else
-        local _V_PY_AUD
-        _V_PY_AUD=$(get_version "${_PIPAUDIT_BIN:-}")
-        if run_quiet "${_PIPAUDIT_BIN:-}"; then
-          log_summary "Python" "pip-audit" "✅ Secure" "${_V_PY_AUD:-}" "$(($(date +%s) - _T0_PY_AUD))"
+        local _PA_SPEC="${VER_PIP_AUDIT_PROVIDER:-pip-audit}@${VER_PIP_AUDIT:-latest}"
+        if run_quiet run_mise exec "${_PA_SPEC:-}" -- pip-audit; then
+          log_summary "Python" "pip-audit" "✅ Secure" "$(get_version pip-audit --version)" "$(($(date +%s) - _T0_PY_AUD))"
         else
-          log_summary "Python" "pip-audit" "❌ Vulnerable" "${_V_PY_AUD:-}" "$(($(date +%s) - _T0_PY_AUD))"
+          log_summary "Python" "pip-audit" "❌ Vulnerable" "$(get_version pip-audit --version)" "$(($(date +%s) - _T0_PY_AUD))"
           _OVERALL_EXIT_AUDIT=1
         fi
       fi
@@ -220,16 +220,17 @@ main() {
         log_success "DRY-RUN: Would run osv-scanner"
         log_summary "Security" "osv-scanner" "⚖️ Previewed" "-" "0"
       else
-        _OSV_OUT=$("${_OSV_BIN:-}" scan . --format table 2>&1) || _OSV_EXIT=$?
+        local _OSV_SPEC="${VER_OSV_SCANNER_PROVIDER:-osv-scanner}@${VER_OSV_SCANNER:-latest}"
+        _OSV_OUT=$(run_mise exec "${_OSV_SPEC:-}" -- osv-scanner scan . --format table 2>&1) || _OSV_EXIT=$?
         [ -n "${_OSV_EXIT:-}" ] || _OSV_EXIT=0
         if [ "${_OSV_EXIT:-}" -eq 0 ]; then
-          log_summary "Security" "osv-scanner" "✅ Secure" "$(get_version "${_OSV_BIN:-}")" "$(($(date +%s) - _T0_OSV_AUD))"
+          log_summary "Security" "osv-scanner" "✅ Secure" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV_AUD))"
         elif echo "${_OSV_OUT:-}" | grep -q "No package sources found"; then
           log_info "osv-scanner: No package sources found. Skipping."
-          log_summary "Security" "osv-scanner" "⏭️  Skipped" "$(get_version "${_OSV_BIN:-}")" "$(($(date +%s) - _T0_OSV_AUD))"
+          log_summary "Security" "osv-scanner" "⏭️  Skipped" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV_AUD))"
         else
           echo "${_OSV_OUT:-}"
-          log_summary "Security" "osv-scanner" "⚠️ Findings" "$(get_version "${_OSV_BIN:-}")" "$(($(date +%s) - _T0_OSV_AUD))"
+          log_summary "Security" "osv-scanner" "⚠️ Findings" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV_AUD))"
         fi
       fi
     fi
@@ -250,10 +251,11 @@ main() {
         log_success "DRY-RUN: Would run govulncheck"
         log_summary "Go" "govulncheck" "⚖️ Previewed" "-" "0"
       else
-        if run_quiet "${_GOVULN_BIN:-}" ./...; then
-          log_summary "Go" "govulncheck" "✅ Secure" "$(get_version "${_GOVULN_BIN:-}")" "$(($(date +%s) - _T0_GO_AUD))"
+        local _GOV_SPEC="${VER_GOVULNCHECK_PROVIDER:-govulncheck}@${VER_GOVULNCHECK:-latest}"
+        if run_quiet run_mise exec "${_GOV_SPEC:-}" -- govulncheck ./...; then
+          log_summary "Go" "govulncheck" "✅ Secure" "$(get_version govulncheck)" "$(($(date +%s) - _T0_GO_AUD))"
         else
-          log_summary "Go" "govulncheck" "❌ Vulnerable" "$(get_version "${_GOVULN_BIN:-}")" "$(($(date +%s) - _T0_GO_AUD))"
+          log_summary "Go" "govulncheck" "❌ Vulnerable" "$(get_version govulncheck)" "$(($(date +%s) - _T0_GO_AUD))"
           _OVERALL_EXIT_AUDIT=1
         fi
       fi
@@ -274,10 +276,11 @@ main() {
         log_success "DRY-RUN: Would run cargo audit"
         log_summary "Rust" "cargo-audit" "⚖️ Previewed" "-" "0"
       else
-        if run_quiet "${_CARGO_AUDIT_BIN:-}" audit; then
-          log_summary "Rust" "cargo-audit" "✅ Secure" "$(get_version "${_CARGO_AUDIT_BIN:-}")" "$(($(date +%s) - _T0_RS_AUD))"
+        local _RS_SPEC="${VER_CARGO_AUDIT_PROVIDER:-cargo-audit}@${VER_CARGO_AUDIT:-latest}"
+        if run_quiet run_mise exec "${_RS_SPEC:-}" -- cargo audit; then
+          log_summary "Rust" "cargo-audit" "✅ Secure" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_RS_AUD))"
         else
-          log_summary "Rust" "cargo-audit" "❌ Vulnerable" "$(get_version "${_CARGO_AUDIT_BIN:-}")" "$(($(date +%s) - _T0_RS_AUD))"
+          log_summary "Rust" "cargo-audit" "❌ Vulnerable" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_RS_AUD))"
           _OVERALL_EXIT_AUDIT=1
         fi
       fi

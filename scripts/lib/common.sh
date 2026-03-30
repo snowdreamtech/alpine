@@ -857,8 +857,21 @@ detect_ci_platform() {
 # Examples:
 #   if is_ci_env; then echo "CI"; fi
 is_ci_env() {
+  # Use cached global flag if available for performance and consistency
+  if [ -n "${_G_IS_CI:-}" ]; then
+    [ "${_G_IS_CI:-}" = "1" ]
+    return $?
+  fi
   [ "$(detect_ci_platform)" != "local" ]
 }
+
+# --- GLOBAL CI STATE (Atomic & Inherited) ---
+
+# Calculate once at bootstrap and export for sub-shells (make -> sh -> registry)
+if [ -z "${_G_IS_CI:-}" ]; then
+  if is_ci_env; then _G_IS_CI=1; else _G_IS_CI=0; fi
+  export _G_IS_CI
+fi
 
 # Purpose: Detects project language affiliation based on manifests or extensions.
 # Params:

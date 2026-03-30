@@ -13,6 +13,16 @@ set -eu
 #   $1 - Tool name (internal)
 #   $2 - Mise provider/name (e.g. asdf:ghc)
 #   $3 - Version string
+# Internal helper: checks for CI environment robustly even if common.sh is not pre-sourced.
+_is_ci() {
+  if command -v is_ci_env >/dev/null 2>&1; then
+    is_ci_env
+  else
+    # Fallback to exported global or well-known platform variables
+    [ "${_G_IS_CI:-0}" -eq 1 ] || [ "${CI:-}" = "true" ] || [ "${GITHUB_ACTIONS:-}" = "true" ]
+  fi
+}
+
 register_mise_tool() {
   local _NAME="${1:-}"
   local _PROVIDER="${2:-}"
@@ -26,6 +36,15 @@ register_mise_tool() {
   fi
 
   log_info "Dynamically registering ${_NAME:-} SDK (${_PROVIDER:-}@${_VERSION:-})..."
+
+  # In CI environment, we only install it but skip registry in .mise.toml to keep it clean.
+  # This prevents CI from dirtying the workspace and leaking CI-only tools back into the repo.
+  if _is_ci; then
+    # We must explicitly install here because since it is not in .mise.toml,
+    # the general 'mise install' at the end of setup won't capture it.
+    run_mise install "${_PROVIDER:-}@${_VERSION:-}"
+    return 0
+  fi
 
   # Inject directly into [tools] section via awk to avoid API calls.
   awk -v inject="\"${_PROVIDER:-}\" = \"${_VERSION:-}\"" '
@@ -50,6 +69,13 @@ register_mise_tool_complex() {
   fi
 
   log_info "Dynamically registering ${_NAME:-} SDK (${_TOOL:-}) with complex assets..."
+
+  # In CI environment, we only install it but skip registry in .mise.toml to keep it clean.
+  # This prevents CI from dirtying the workspace and leaking CI-only tools back into the repo.
+  if _is_ci; then
+    run_mise install "${_TOOL:-}"
+    return 0
+  fi
 
   awk -v inject="\"${_TOOL:-}\" = ${_TOML_VALUE:-}" '
     /^\[tools\]/ { print; print inject; next }
