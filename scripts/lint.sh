@@ -103,19 +103,13 @@ main() {
   local _T0_LNT
   _T0_LNT=$(date +%s)
 
+  # 🔍 Starting Unified Project Linter...
   log_info "🔍 Starting Unified Project Linter...\n"
 
-  # Skip heavy tools locally unless explicitly forced
-  local _FORCE_LNT="zizmor,osv-scanner,govulncheck,cargo-audit,pip-audit"
-  [ "${ZIZMOR_FORCE_INSTALL:-0}" -ne 1 ] || _FORCE_LNT=$(echo "${_FORCE_LNT:-}" | sed 's/zizmor,//g;s/,zizmor//g')
-  [ "${OSV_FORCE_INSTALL:-0}" -ne 1 ] || _FORCE_LNT=$(echo "${_FORCE_LNT:-}" | sed 's/osv-scanner,//g;s/,osv-scanner//g')
-  [ "${GOVULN_FORCE_INSTALL:-0}" -ne 1 ] || _FORCE_LNT=$(echo "${_FORCE_LNT:-}" | sed 's/govulncheck,//g;s/,govulncheck//g')
-  [ "${CA_FORCE_INSTALL:-0}" -ne 1 ] || _FORCE_LNT=$(echo "${_FORCE_LNT:-}" | sed 's/cargo-audit,//g;s/,cargo-audit//g')
-  [ "${PA_FORCE_INSTALL:-0}" -ne 1 ] || _FORCE_LNT=$(echo "${_FORCE_LNT:-}" | sed 's/pip-audit,//g;s/,pip-audit//g')
-
-  if ! is_ci_env; then
-    export SKIP="${SKIP:+$SKIP,}${_FORCE_LNT:-}"
-  fi
+  # Shift-Left Governance:
+  # Instead of hardcoded skips in lint.sh, we rely on scripts/lib/lint-wrapper.sh
+  # which handles missing binaries gracefully (Warn, Skip) in local environments.
+  # This rewards developers with "forced local installs" as per Rule 03/08.
 
   local _L_OK=0
   if run_pre_commit_lint "${_FIX_LNT:-}"; then

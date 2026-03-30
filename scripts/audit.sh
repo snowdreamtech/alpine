@@ -221,7 +221,7 @@ main() {
         log_summary "Security" "osv-scanner" "⚖️ Previewed" "-" "0"
       else
         local _OSV_SPEC="${VER_OSV_SCANNER_PROVIDER:-osv-scanner}@${VER_OSV_SCANNER:-latest}"
-        _OSV_OUT=$(run_mise exec "${_OSV_SPEC:-}" -- osv-scanner scan . --format table 2>&1) || _OSV_EXIT=$?
+        _OSV_OUT=$(run_mise exec "${_OSV_SPEC:-}" -- osv-scanner scan . --config .osv-scanner.toml --call-analysis=all --format table 2>&1) || _OSV_EXIT=$?
         [ -n "${_OSV_EXIT:-}" ] || _OSV_EXIT=0
         if [ "${_OSV_EXIT:-}" -eq 0 ]; then
           log_summary "Security" "osv-scanner" "✅ Secure" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV_AUD))"
