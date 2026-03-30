@@ -429,10 +429,6 @@ version = "3.6.1"
 backend = "npm:sort-package-json"
 
 [[tools."npm:stylelint"]]
-version = "16.15.0"
-backend = "npm:stylelint"
-
-[[tools."npm:stylelint"]]
 version = "17.6.0"
 backend = "npm:stylelint"
 

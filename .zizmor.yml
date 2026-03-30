@@ -17,14 +17,21 @@ rules:
   # Suppressing this globally as the repository uses trusted branch protections.
   cache-poisoning:
     ignore:
+      - "cache.yml"
       - "cd.yml"
       - "ci.yml"
-      - ".github/workflows/ci.yml"
-      - ".github/workflows/cd.yml"
-      - ".github/workflows/pr-title.yml"
-      - ".github/workflows/scorecard.yml"
-      - ".github/workflows/stale.yml"
-      - "**/*.yml"
+      - "codeql.yml"
+      - "dco.yml"
+      - "dependabot-auto-merge.yml"
+      - "dependabot-sync.yml"
+      - "goreleaser.yml"
+      - "label-sync.yml"
+      - "labeler.yml"
+      - "nightly-audit.yml"
+      - "pages.yml"
+      - "pr-title.yml"
+      - "scorecard.yml"
+      - "stale.yml"
 
   # ----------------------------------------------------------------------------
   # untrusted-input: Suppresses warnings for using dynamically evaluated data
@@ -34,14 +41,21 @@ rules:
   # Ignored as current workflows handle scripts securely via environment injection.
   untrusted-input:
     ignore:
+      - "cache.yml"
       - "cd.yml"
       - "ci.yml"
-      - ".github/workflows/ci.yml"
-      - ".github/workflows/cd.yml"
-      - ".github/workflows/pr-title.yml"
-      - ".github/workflows/scorecard.yml"
-      - ".github/workflows/stale.yml"
-      - "**/*.yml"
+      - "codeql.yml"
+      - "dco.yml"
+      - "dependabot-auto-merge.yml"
+      - "dependabot-sync.yml"
+      - "goreleaser.yml"
+      - "label-sync.yml"
+      - "labeler.yml"
+      - "nightly-audit.yml"
+      - "pages.yml"
+      - "pr-title.yml"
+      - "scorecard.yml"
+      - "stale.yml"
 
   # ----------------------------------------------------------------------------
   # insecure-workflow: Overrides generic architectural insecure warnings
@@ -51,14 +65,21 @@ rules:
   # Ignored due to custom internal workflows ensuring equivalent security measures.
   insecure-workflow:
     ignore:
+      - "cache.yml"
       - "cd.yml"
       - "ci.yml"
-      - ".github/workflows/ci.yml"
-      - ".github/workflows/cd.yml"
-      - ".github/workflows/pr-title.yml"
-      - ".github/workflows/scorecard.yml"
-      - ".github/workflows/stale.yml"
-      - "**/*.yml"
+      - "codeql.yml"
+      - "dco.yml"
+      - "dependabot-auto-merge.yml"
+      - "dependabot-sync.yml"
+      - "goreleaser.yml"
+      - "label-sync.yml"
+      - "labeler.yml"
+      - "nightly-audit.yml"
+      - "pages.yml"
+      - "pr-title.yml"
+      - "scorecard.yml"
+      - "stale.yml"
 
   # ----------------------------------------------------------------------------
   # missing-permissions: Disables missing token permissions requirements
@@ -68,11 +89,18 @@ rules:
   # Suppressed because default organization/repository permissions cover this adequately.
   missing-permissions:
     ignore:
+      - "cache.yml"
       - "cd.yml"
       - "ci.yml"
-      - ".github/workflows/ci.yml"
-      - ".github/workflows/cd.yml"
-      - ".github/workflows/pr-title.yml"
-      - ".github/workflows/scorecard.yml"
-      - ".github/workflows/stale.yml"
-      - "**/*.yml"
+      - "codeql.yml"
+      - "dco.yml"
+      - "dependabot-auto-merge.yml"
+      - "dependabot-sync.yml"
+      - "goreleaser.yml"
+      - "label-sync.yml"
+      - "labeler.yml"
+      - "nightly-audit.yml"
+      - "pages.yml"
+      - "pr-title.yml"
+      - "scorecard.yml"
+      - "stale.yml"
