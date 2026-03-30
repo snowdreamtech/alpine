@@ -72,58 +72,60 @@ check_tool_version() {
 
   log_debug "Checking ${_LV_NAME:-} (min: ${_LV_MIN_VER:-})..."
 
-  # Availability-first detection:
+  # 1. Availability-first detection:
   # Check if the tool is ALREADY resolved or available in the environment.
   local _LV_RESOLVED
   _LV_RESOLVED=$(resolve_bin "${_LV_CMD:-}") || true
 
-  # If tool is missing, handle optional vs critical status
-  if [ -z "${_LV_RESOLVED:-}" ]; then
-    local _LV_FORCE_VAR="${8:-}"
-    # If tool is marked as CI-only and we are in local dev, it's optional.
-    if [ "${_LV_CI_ONLY:-0}" -eq 1 ] && ! is_ci_env; then
-      # Only fail if FORCE_INSTALL was explicitly requested but tool is missing.
-      if [ -n "${_LV_FORCE_VAR:-}" ] && [ "$(eval echo "\${$_LV_FORCE_VAR:-0}")" -eq 1 ]; then
-        log_warn "❌ ${_LV_NAME:-}: Not found (Forced check failed)."
-        HEALTHY_ST=1
-        return 1
-      fi
-      log_info "⏭️  ${_LV_NAME:-}: Optional (CI-only by default)"
+  # 2. Path A: Tool is FOUND (Active)
+  if [ -n "${_LV_RESOLVED:-}" ]; then
+    local _LV_MISE_KEY="${7:-${_LV_CMD:-}}"
+    local _LV_CURRENT_VER
+    _LV_CURRENT_VER=$(get_version "${_LV_CMD:-}" "" "${_LV_MISE_KEY:-}" | tr -d '\r')
+    [ "${_LV_CURRENT_VER:-}" = "-" ] && _LV_CURRENT_VER="0.0"
+
+    # If requirement is empty or -, allow anything
+    if [ -z "${_LV_MIN_VER:-}" ] || [ "${_LV_MIN_VER:-}" = "-" ]; then
+      log_success "✅ ${_LV_NAME:-}: v${_LV_CURRENT_VER:-} (Active)"
       return 0
     fi
 
-    log_warn "❌ ${_LV_NAME:-}: Not found."
-    HEALTHY_ST=1
-    if [ "${_LV_CRITICAL:-0}" -eq 1 ]; then CORE_HEALTHY_ST=1; fi
-    return 1
-  fi
+    # Canonicalize versions to 3 components to avoid revision suffix mismatches (e.g. 1.7.11.24)
+    local _LV_MIN_CANON _LV_CUR_CANON
+    _LV_MIN_CANON=$(echo "${_LV_MIN_VER:-}" | cut -d. -f1-3)
+    _LV_CUR_CANON=$(echo "${_LV_CURRENT_VER:-}" | cut -d. -f1-3)
 
-  local _LV_MISE_KEY="${7:-${_LV_CMD:-}}"
-  local _LV_CURRENT_VER
-  _LV_CURRENT_VER=$(get_version "${_LV_CMD:-}" "" "${_LV_MISE_KEY:-}" | tr -d '\r')
-  [ "${_LV_CURRENT_VER:-}" = "-" ] && _LV_CURRENT_VER="0.0"
+    local _LV_LOWER_VER
+    _LV_LOWER_VER=$(printf "%s\n%s" "${_LV_MIN_CANON:-}" "${_LV_CUR_CANON:-}" | sort -n -t. -k1,1 -k2,2 -k3,3 | head -n1)
 
-  # If requirement is empty or -, allow anything
-  if [ -z "${_LV_MIN_VER:-}" ] || [ "${_LV_MIN_VER:-}" = "-" ]; then
-    log_success "✅ ${_LV_NAME:-}: v${_LV_CURRENT_VER:-} (detected)"
+    if [ "${_LV_LOWER_VER:-}" = "${_LV_MIN_CANON:-}" ] || [ "${_LV_CUR_CANON:-}" = "${_LV_MIN_CANON:-}" ]; then
+      log_success "✅ ${_LV_NAME:-}: v${_LV_CURRENT_VER:-} (Active, matches v${_LV_MIN_VER:-})"
+    else
+      log_warn "⚠️  ${_LV_NAME:-}: v${_LV_CURRENT_VER:-} (below recommended v${_LV_MIN_VER:-})"
+      HEALTHY_ST=1
+      if [ "${_LV_CRITICAL:-0}" -eq 1 ]; then CORE_HEALTHY_ST=1; fi
+    fi
     return 0
   fi
 
-  # Canonicalize versions to 3 components to avoid revision suffix mismatches (e.g. 1.7.11.24)
-  local _LV_MIN_CANON _LV_CUR_CANON
-  _LV_MIN_CANON=$(echo "${_LV_MIN_VER:-}" | cut -d. -f1-3)
-  _LV_CUR_CANON=$(echo "${_LV_CURRENT_VER:-}" | cut -d. -f1-3)
-
-  local _LV_LOWER_VER
-  _LV_LOWER_VER=$(printf "%s\n%s" "${_LV_MIN_CANON:-}" "${_LV_CUR_CANON:-}" | sort -n -t. -k1,1 -k2,2 -k3,3 | head -n1)
-
-  if [ "${_LV_LOWER_VER:-}" = "${_LV_MIN_CANON:-}" ] || [ "${_LV_CUR_CANON:-}" = "${_LV_MIN_CANON:-}" ]; then
-    log_success "✅ ${_LV_NAME:-}: v${_LV_CURRENT_VER:-} (matches/exceeds v${_LV_MIN_VER:-})"
-  else
-    log_warn "⚠️  ${_LV_NAME:-}: v${_LV_CURRENT_VER:-} (below recommended v${_LV_MIN_VER:-})"
-    HEALTHY_ST=1
-    if [ "${_LV_CRITICAL:-0}" -eq 1 ]; then CORE_HEALTHY_ST=1; fi
+  # 3. Path B: Tool is MISSING
+  local _LV_FORCE_VAR="${8:-}"
+  # If tool is marked as CI-only and we are in local dev, it's optional.
+  if [ "${_LV_CI_ONLY:-0}" -eq 1 ] && ! is_ci_env; then
+    # Only fail if FORCE_INSTALL was explicitly requested but tool is missing.
+    if [ -n "${_LV_FORCE_VAR:-}" ] && [ "$(eval echo "\${$_LV_FORCE_VAR:-0}")" -eq 1 ]; then
+      log_warn "❌ ${_LV_NAME:-}: Not found (Forced check failed)."
+      HEALTHY_ST=1
+      return 1
+    fi
+    log_info "⏭️  ${_LV_NAME:-}: Optional (CI-only by default)"
+    return 0
   fi
+
+  log_warn "❌ ${_LV_NAME:-}: Not found."
+  HEALTHY_ST=1
+  if [ "${_LV_CRITICAL:-0}" -eq 1 ]; then CORE_HEALTHY_ST=1; fi
+  return 1
 }
 
 # Purpose: Main entry point for the environment health auditing engine.
@@ -669,6 +671,9 @@ main() {
   fi
   if has_lang_files "Cargo.toml" "*.rs"; then
     check_tool_version "Cargo-audit" "cargo-audit" "latest" "cargo-audit --version" 0 1 "cargo-audit" "CA_FORCE_INSTALL"
+  fi
+  if [ -f "package.json" ]; then
+    check_tool_version "npm-audit" "npm" "$(get_version npm)" "npm audit --version" 0 1 "npm" "NPM_AUDIT_FORCE_INSTALL"
   fi
   if has_lang_files "requirements.txt pyproject.toml" "*.py"; then
     check_tool_version "Pip-audit" "pip-audit" "$(get_mise_tool_version pip-audit)" "pip-audit --version" 0 1 "pip-audit" "PA_FORCE_INSTALL"

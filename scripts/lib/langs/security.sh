@@ -15,10 +15,21 @@ install_osv_scanner() {
 
   # CI-only guard by default, but allow manual/explicit on-demand installation
   # for local developers who explicitly run 'make audit'.
-  if ! is_ci_env && [ "${OSV_FORCE_INSTALL:-0}" -ne 1 ]; then
-    log_summary "Security" "OSV-Scanner" "⏭️ Optional (CI-only by default)" "-" "0"
+  local _OSV_BIN
+  _OSV_BIN=$(resolve_bin "osv-scanner") || true
+  if [ -n "${_OSV_BIN:-}" ]; then
+    log_success "✅ OSV-Scanner: Active (Found at ${_OSV_BIN:-})"
     return 0
   fi
+
+  # Tier 3 Tool: Optional for local development.
+  if ! is_ci_env && [ "${OSV_FORCE_INSTALL:-0}" -ne 1 ]; then
+    log_summary "Security" "OSV-Scanner" "⏭️ Optional (CI-only by default)" "-" "0"
+    log_info "⏭️  OSV-Scanner: Optional for local development. Set OSV_FORCE_INSTALL=1 to force installation."
+    return 0
+  fi
+
+  log_info "Installing OSV-Scanner..."
 
   # Skip if manually disabled
   if [ "${SKIP_OSV:-0}" -eq 1 ]; then
@@ -67,10 +78,21 @@ install_zizmor() {
   local _PROVIDER="${VER_ZIZMOR_PROVIDER:-}"
 
   # CI-only: GH Actions security linter is rarely needed for local app code.
-  if ! is_ci_env && [ "${ZIZMOR_FORCE_INSTALL:-0}" -ne 1 ]; then
-    log_summary "Security" "Zizmor" "⏭️ Optional (CI-only by default)" "-" "0"
+  local _ZIZMOR_BIN
+  _ZIZMOR_BIN=$(resolve_bin "zizmor") || true
+  if [ -n "${_ZIZMOR_BIN:-}" ]; then
+    log_success "✅ Zizmor: Active (Found at ${_ZIZMOR_BIN:-})"
     return 0
   fi
+
+  # Tier 3 Tool: Optional for local development.
+  if ! is_ci_env && [ "${ZIZMOR_FORCE_INSTALL:-0}" -ne 1 ]; then
+    log_summary "Security" "Zizmor" "⏭️ Optional (CI-only by default)" "-" "0"
+    log_info "⏭️  Zizmor: Optional for local development. Set ZIZMOR_FORCE_INSTALL=1 to force installation."
+    return 0
+  fi
+
+  log_info "Installing zizmor..."
 
   if ! has_lang_files ".github/workflows" "*.yaml *.yml"; then
     return 0
@@ -111,10 +133,21 @@ install_cargo_audit() {
   fi
 
   # CI-only guard: Advisory DB download is network-heavy, skip locally.
-  if ! is_ci_env && [ "${CA_FORCE_INSTALL:-0}" -ne 1 ]; then
-    log_summary "Security" "Cargo-Audit" "⏭️ Optional (CI-only by default)" "-" "0"
+  local _CA_BIN
+  _CA_BIN=$(resolve_bin "cargo-audit") || true
+  if [ -n "${_CA_BIN:-}" ]; then
+    log_success "✅ Cargo-audit: Active (Found at ${_CA_BIN:-})"
     return 0
   fi
+
+  # Tier 3 Tool: Optional for local development.
+  if ! is_ci_env && [ "${CA_FORCE_INSTALL:-0}" -ne 1 ]; then
+    log_summary "Security" "Cargo-audit" "⏭️ Optional (CI-only by default)" "-" "0"
+    log_info "⏭️  Cargo-audit: Optional for local development. Set CA_FORCE_INSTALL=1 to force installation."
+    return 0
+  fi
+
+  log_info "Installing cargo-audit..."
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
