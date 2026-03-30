@@ -69,6 +69,8 @@ install_ruff() {
 install_pip_audit() {
   local _T0_PA
   _T0_PA=$(date +%s)
+  local _TITLE="pip-audit"
+  local _PROVIDER="pipx:pip-audit"
   # CI-only: Optional security tool, local dev skips to avoid pip-audit installation overhead.
   if ! is_ci_env && [ "${PA_FORCE_INSTALL:-0}" -ne 1 ]; then
     return 0
