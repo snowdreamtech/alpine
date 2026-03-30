@@ -7,20 +7,26 @@ set -eu
 # Tool Registry - Centralized version management for dynamic registration
 #
 # Purpose:
-#   Single Source of Truth for all on-demand (Tier 2) tool versions.
-#   These tools are NOT listed in .mise.toml (to avoid global mise install
-#   downloading everything). Versions are pinned here and referenced by
-#   each scripts/lib/langs/*.sh module.
+#   Centralized version registry for ALL project tools.
 #
-#   Tier 1 tools (always installed) have their versions in .mise.toml.
-#   Tier 2 tools (on-demand) have their versions here.
+#   - Tier 1 (Core): SSoT is .mise.toml. Versions here serve as a
+#     backup mirror and must stay in sync. update-tools.sh updates both.
+#   - Tier 2 (On-demand): SSoT is THIS FILE. Versions are pinned here
+#     and referenced by scripts/lib/langs/*.sh for dynamic registration.
 #
 # shellcheck disable=SC2034
 # (Variables are used by sourcing scripts: lang modules and setup.sh)
 
-# ── 🏗️ Language Runtimes ──────────────────────────────────────────────────────
+# ── 🏗️ Tier 1: Core Runtimes (Mirror of .mise.toml) ──────────────────────────
 # shellcheck disable=SC2034
 VER_GO="1.26.1"
+VER_NODE="25.8.2"
+VER_PNPM="10.33.0"
+VER_PNPM_PROVIDER="npm:pnpm"
+VER_PYTHON="3.14.3"
+VER_PIPX="1.11.0"
+
+# ── 🏗️ Tier 2: Language Runtimes (On-demand) ─────────────────────────────────
 VER_KOTLIN="2.3.20"
 VER_RUST="1.94.1"
 VER_BUN="1.3.11"
@@ -65,6 +71,44 @@ VER_TYPST="0.13.0"
 VER_DUCKDB="1.5.0"
 # NOTE: Lychee version removed — link checking delegated to lycheeverse/lychee-action in CI.
 
+# ── 🔐 Tier 1: Security & Engineering (Mirror of .mise.toml) ─────────────────
+VER_GITLEAKS="8.30.1"
+VER_GH_CLI="2.89.0"
+VER_GH_CLI_PROVIDER="github:cli/cli"
+
+# ── 💎 Tier 1: Core Quality & Commit Tooling (Mirror of .mise.toml) ──────────
+VER_CHECKMAKE="0.3.2"
+VER_CHECKMAKE_PROVIDER="github:checkmake/checkmake"
+VER_EDITORCONFIG_CHECKER="3.6.1"
+VER_ADDLICENSE="v1.1.1"
+VER_ADDLICENSE_PROVIDER="go:github.com/google/addlicense"
+
+# Git / commit workflow
+VER_COMMITLINT="20.5.0"
+VER_COMMITLINT_PROVIDER="npm:@commitlint/cli"
+VER_COMMITLINT_CONFIG="20.5.0"
+VER_COMMITLINT_CONFIG_PROVIDER="npm:@commitlint/config-conventional"
+VER_COMMITIZEN="4.3.1"
+VER_COMMITIZEN_PROVIDER="npm:commitizen"
+VER_CZ_CONVENTIONAL_CHANGELOG="3.3.0"
+VER_CZ_CONVENTIONAL_CHANGELOG_PROVIDER="npm:cz-conventional-changelog"
+
+# Universal formatting
+VER_PRETTIER="3.8.1"
+VER_PRETTIER_PROVIDER="npm:prettier"
+
+# Shell & scripting
+VER_SHELLCHECK="0.11.0.1"
+VER_SHELLCHECK_PROVIDER="pipx:shellcheck-py"
+VER_SHFMT="3.12.0.2"
+VER_SHFMT_PROVIDER="pipx:shfmt-py"
+VER_YAMLLINT="1.38.0"
+VER_YAMLLINT_PROVIDER="pipx:yamllint"
+VER_PRE_COMMIT="4.5.1"
+VER_PRE_COMMIT_PROVIDER="pipx:pre-commit"
+VER_ACTIONLINT="1.7.11.24"
+VER_ACTIONLINT_PROVIDER="pipx:actionlint-py"
+
 # ── 🎨 Language Tooling (Linters/Formatters) ─────────────────────────────────
 VER_KTLINT="1.16.1"
 VER_KTLINT_PROVIDER="npm:@naturalcycles/ktlint"
@@ -75,7 +119,7 @@ VER_JAVA_FORMAT_PROVIDER="github:google/google-java-format"
 VER_SWIFTLINT="0.63.2"
 VER_SWIFTLINT_PROVIDER="github:realm/SwiftLint"
 
-VER_STYLELINT="17.6.0"
+VER_STYLELINT="16.15.0"
 VER_STYLELINT_PROVIDER="npm:stylelint"
 
 VER_STYLELINT_CONFIG="40.0.0"
@@ -131,8 +175,7 @@ VER_SQLFLUFF_PROVIDER="pipx:sqlfluff"
 VER_DOTENV_LINTER="4.0.0"
 VER_DOTENV_LINTER_PROVIDER="github:dotenv-linter/dotenv-linter"
 
-VER_CHECKMAKE="0.3.2"
-VER_CHECKMAKE_PROVIDER="github:checkmake/checkmake"
+# NOTE: VER_CHECKMAKE moved to Tier 1 section above.
 
 # ── 🛡️ Security Scanning (CI-only by default) ─────────────────────────────────
 VER_TRIVY="0.69.3"
