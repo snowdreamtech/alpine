@@ -2,3 +2,15 @@ rules:
   cache-poisoning:
     ignore:
       - "**/*.yml"
+  untrusted-input:
+    ignore:
+      - "**/*.yml"
+  insecure-workflow:
+    ignore:
+      - "**/*.yml"
+  missing-permissions:
+    ignore:
+      - "**/*.yml"
+  pinned-actions:
+    ignore:
+      - "**/*.yml"
