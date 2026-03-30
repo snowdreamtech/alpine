@@ -74,9 +74,15 @@ check_tool_version() {
 
   # CI-only guard: skip entirely in local environments BEFORE touching command -v,
   # which could trigger a mise shim installation attempt and stall the process.
+  local _LV_FORCE_VAR="${8:-}"
   if [ "${_LV_CI_ONLY:-}" -eq 1 ] && ! is_ci_env; then
-    log_info "⏭️  ${_LV_NAME:-}: CI-only (skipped locally)"
-    return 0
+    # Allow override via FORCE_INSTALL variable
+    if [ -n "${_LV_FORCE_VAR:-}" ] && [ "$(eval echo "\${$_LV_FORCE_VAR:-0}")" -eq 1 ]; then
+      log_debug "Forcing check for ${_LV_NAME:-} (CI-only override via ${_LV_FORCE_VAR:-})"
+    else
+      log_info "⏭️  ${_LV_NAME:-}: CI-only (skipped locally)"
+      return 0
+    fi
   fi
 
   local _LV_RESOLVED
@@ -639,9 +645,9 @@ main() {
   # 7. Group: Security & Quality Tools
   log_info "── Security & Quality Tools ──"
   check_tool_version "Gitleaks" "gitleaks" "$(get_mise_tool_version gitleaks)" "gitleaks version" 0 0
-  # check_tool_version "OSV-scanner" "osv-scanner" "$(get_mise_tool_version osv-scanner)" "osv-scanner --version" 0 1 (Tier 3: CI-only skip)
+  # check_tool_version "OSV-scanner" "osv-scanner" "$(get_mise_tool_version osv-scanner)" "osv-scanner --version" 0 1 "osv-scanner" "OSV_FORCE_INSTALL"
   # NOTE: Trivy version check removed — scanning delegated to aquasecurity/trivy-action.
-  check_tool_version "Zizmor" "zizmor" "$(get_mise_tool_version zizmor)" "zizmor --version" 0 1
+  check_tool_version "Zizmor" "zizmor" "$(get_mise_tool_version zizmor)" "zizmor --version" 0 1 "zizmor" "ZIZMOR_FORCE_INSTALL"
 
   log_info "── Lint & Quality Tools ──"
   check_tool_version "Shfmt" "shfmt" "$(get_mise_tool_version "pipx:shfmt-py")" "shfmt --version" 0 0 "pipx:shfmt-py"
@@ -653,16 +659,16 @@ main() {
   fi
   if has_lang_files "go.mod" "*.go"; then
     check_tool_version "golangci-lint" "golangci-lint" "$(get_mise_tool_version golangci-lint)" "golangci-lint --version" 0 0
-    check_tool_version "Govulncheck" "govulncheck" "latest" "govulncheck ./..." 0 1
+    check_tool_version "Govulncheck" "govulncheck" "latest" "govulncheck ./..." 0 1 "govulncheck" "GOVULN_FORCE_INSTALL"
   fi
   if has_lang_files "Makefile" "*.make"; then
     check_tool_version "Checkmake" "checkmake" "$(get_mise_tool_version checkmake)" "checkmake --version" 0 0
   fi
   if has_lang_files "Cargo.toml" "*.rs"; then
-    check_tool_version "Cargo-audit" "cargo-audit" "latest" "cargo-audit --version" 0 1
+    check_tool_version "Cargo-audit" "cargo-audit" "latest" "cargo-audit --version" 0 1 "cargo-audit" "CA_FORCE_INSTALL"
   fi
   if has_lang_files "requirements.txt pyproject.toml" "*.py"; then
-    check_tool_version "Pip-audit" "pip-audit" "$(get_mise_tool_version pip-audit)" "pip-audit --version" 0 1
+    check_tool_version "Pip-audit" "pip-audit" "$(get_mise_tool_version pip-audit)" "pip-audit --version" 0 1 "pip-audit" "PA_FORCE_INSTALL"
   fi
   printf "\n"
 

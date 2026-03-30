@@ -217,7 +217,7 @@ _mise_setup_completions() {
   # mise completion performs better when 'usage' is installed.
   # However, it often hangs on Windows CI due to compilation or interactive prompts.
   # We skip 'usage' installation entirely in CI to guarantee fast bootstrap.
-  if ! is_ci_env; then
+  if ! is_ci_env && [ "${USAGE_FORCE_INSTALL:-0}" -ne 1 ]; then
     run_quiet run_mise use --global usage || true
   fi
 

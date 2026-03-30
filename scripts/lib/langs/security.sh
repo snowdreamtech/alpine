@@ -66,6 +66,12 @@ install_zizmor() {
   local _TITLE="Zizmor"
   local _PROVIDER="${VER_ZIZMOR_PROVIDER:-}"
 
+  # CI-only: GH Actions security linter is rarely needed for local app code.
+  if ! is_ci_env && [ "${ZIZMOR_FORCE_INSTALL:-0}" -ne 1 ]; then
+    log_summary "Security" "Zizmor" "⏭️ CI-only" "-" "0"
+    return 0
+  fi
+
   if ! has_lang_files ".github/workflows" "*.yaml *.yml"; then
     return 0
   fi
@@ -105,7 +111,7 @@ install_cargo_audit() {
   fi
 
   # CI-only guard: Advisory DB download is network-heavy, skip locally.
-  if ! is_ci_env; then
+  if ! is_ci_env && [ "${CA_FORCE_INSTALL:-0}" -ne 1 ]; then
     log_summary "Security" "Cargo-Audit" "⏭️ CI-only" "-" "0"
     return 0
   fi

@@ -55,7 +55,8 @@ install_govulncheck() {
   _T0_GOVC=$(date +%s)
   local _TITLE="Govulncheck"
   local _PROVIDER="${VER_GOVULNCHECK_PROVIDER:-}"
-  if ! is_ci_env; then
+  # CI-only: Go vulnerability checks are typically heavier and reserved for CI workflows.
+  if ! is_ci_env && [ "${GOVULN_FORCE_INSTALL:-0}" -ne 1 ]; then
     return 0
   fi
 

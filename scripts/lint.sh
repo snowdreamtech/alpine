@@ -105,9 +105,16 @@ main() {
 
   log_info "🔍 Starting Unified Project Linter...\n"
 
-  # Skip heavy tools locally
+  # Skip heavy tools locally unless explicitly forced
+  local _FORCE_LNT="zizmor,osv-scanner,govulncheck,cargo-audit,pip-audit"
+  [ "${ZIZMOR_FORCE_INSTALL:-0}" -ne 1 ] || _FORCE_LNT=$(echo "${_FORCE_LNT:-}" | sed 's/zizmor,//g;s/,zizmor//g')
+  [ "${OSV_FORCE_INSTALL:-0}" -ne 1 ] || _FORCE_LNT=$(echo "${_FORCE_LNT:-}" | sed 's/osv-scanner,//g;s/,osv-scanner//g')
+  [ "${GOVULN_FORCE_INSTALL:-0}" -ne 1 ] || _FORCE_LNT=$(echo "${_FORCE_LNT:-}" | sed 's/govulncheck,//g;s/,govulncheck//g')
+  [ "${CA_FORCE_INSTALL:-0}" -ne 1 ] || _FORCE_LNT=$(echo "${_FORCE_LNT:-}" | sed 's/cargo-audit,//g;s/,cargo-audit//g')
+  [ "${PA_FORCE_INSTALL:-0}" -ne 1 ] || _FORCE_LNT=$(echo "${_FORCE_LNT:-}" | sed 's/pip-audit,//g;s/,pip-audit//g')
+
   if ! is_ci_env; then
-    export SKIP="${SKIP:+$SKIP,}zizmor,osv-scanner,govulncheck,cargo-audit,pip-audit"
+    export SKIP="${SKIP:+$SKIP,}${_FORCE_LNT:-}"
   fi
 
   local _L_OK=0
