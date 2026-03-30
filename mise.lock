@@ -110,6 +110,45 @@ url = "https://github.com/cli/cli/releases/download/v2.89.0/gh_2.89.0_windows_am
 url_api = "https://api.github.com/repos/cli/cli/releases/assets/382152866"
 provenance = "github-attestations"
 
+[[tools."github:dotenv-linter/dotenv-linter"]]
+version = "4.0.0"
+backend = "github:dotenv-linter/dotenv-linter"
+
+[tools."github:dotenv-linter/dotenv-linter"."platforms.linux-arm64"]
+checksum = "sha256:819153e4f43ce016ebd076653e611431d5207e4fa5623a83028dfca92b1c3201"
+url = "https://github.com/dotenv-linter/dotenv-linter/releases/download/v4.0.0/dotenv-linter-alpine-aarch64.tar.gz"
+url_api = "https://api.github.com/repos/dotenv-linter/dotenv-linter/releases/assets/305835510"
+
+[tools."github:dotenv-linter/dotenv-linter"."platforms.linux-arm64-musl"]
+checksum = "sha256:819153e4f43ce016ebd076653e611431d5207e4fa5623a83028dfca92b1c3201"
+url = "https://github.com/dotenv-linter/dotenv-linter/releases/download/v4.0.0/dotenv-linter-alpine-aarch64.tar.gz"
+url_api = "https://api.github.com/repos/dotenv-linter/dotenv-linter/releases/assets/305835510"
+
+[tools."github:dotenv-linter/dotenv-linter"."platforms.linux-x64"]
+checksum = "sha256:88a9f2ccfbfea621e5b4691246c419de71d79c7596def888849496695cd8a082"
+url = "https://github.com/dotenv-linter/dotenv-linter/releases/download/v4.0.0/dotenv-linter-alpine-x86_64.tar.gz"
+url_api = "https://api.github.com/repos/dotenv-linter/dotenv-linter/releases/assets/305835425"
+
+[tools."github:dotenv-linter/dotenv-linter"."platforms.linux-x64-musl"]
+checksum = "sha256:88a9f2ccfbfea621e5b4691246c419de71d79c7596def888849496695cd8a082"
+url = "https://github.com/dotenv-linter/dotenv-linter/releases/download/v4.0.0/dotenv-linter-alpine-x86_64.tar.gz"
+url_api = "https://api.github.com/repos/dotenv-linter/dotenv-linter/releases/assets/305835425"
+
+[tools."github:dotenv-linter/dotenv-linter"."platforms.macos-arm64"]
+checksum = "sha256:430ed45983cfc1d242cae959ec4b3b2df43fa1aff07d7750cc836d2f6479799a"
+url = "https://github.com/dotenv-linter/dotenv-linter/releases/download/v4.0.0/dotenv-linter-darwin-arm64.tar.gz"
+url_api = "https://api.github.com/repos/dotenv-linter/dotenv-linter/releases/assets/305835009"
+
+[tools."github:dotenv-linter/dotenv-linter"."platforms.macos-x64"]
+checksum = "sha256:143361bcd3c859cac0b16a6eaa51f3f69f270f17a55431e2e44d76722a7f0271"
+url = "https://github.com/dotenv-linter/dotenv-linter/releases/download/v4.0.0/dotenv-linter-darwin-x86_64.tar.gz"
+url_api = "https://api.github.com/repos/dotenv-linter/dotenv-linter/releases/assets/305835361"
+
+[tools."github:dotenv-linter/dotenv-linter"."platforms.windows-x64"]
+checksum = "sha256:771214659b86d2de5c8c5214e6d59484ceb0de8a87037d488ce37d6ca6f6cc1a"
+url = "https://github.com/dotenv-linter/dotenv-linter/releases/download/v4.0.0/dotenv-linter-win-x64.zip"
+url_api = "https://api.github.com/repos/dotenv-linter/dotenv-linter/releases/assets/305835598"
+
 [[tools."github:google/osv-scanner"]]
 version = "2.3.5"
 backend = "github:google/osv-scanner"
@@ -388,6 +427,14 @@ backend = "npm:prettier"
 [[tools."npm:sort-package-json"]]
 version = "3.6.1"
 backend = "npm:sort-package-json"
+
+[[tools."npm:stylelint"]]
+version = "16.15.0"
+backend = "npm:stylelint"
+
+[[tools."npm:stylelint"]]
+version = "17.6.0"
+backend = "npm:stylelint"
 
 [[tools."npm:vitepress"]]
 version = "1.6.4"

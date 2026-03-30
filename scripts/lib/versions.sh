@@ -80,7 +80,7 @@ VER_GH_CLI_PROVIDER="github:cli/cli"
 VER_CHECKMAKE="0.3.2"
 VER_CHECKMAKE_PROVIDER="github:checkmake/checkmake"
 VER_EDITORCONFIG_CHECKER="3.6.1"
-VER_ADDLICENSE="v1.1.1"
+VER_ADDLICENSE="1.2.0"
 VER_ADDLICENSE_PROVIDER="go:github.com/google/addlicense"
 
 # Git / commit workflow
@@ -119,7 +119,7 @@ VER_JAVA_FORMAT_PROVIDER="github:google/google-java-format"
 VER_SWIFTLINT="0.63.2"
 VER_SWIFTLINT_PROVIDER="github:realm/SwiftLint"
 
-VER_STYLELINT="16.15.0"
+VER_STYLELINT="17.6.0"
 VER_STYLELINT_PROVIDER="npm:stylelint"
 
 VER_STYLELINT_CONFIG="40.0.0"
@@ -213,7 +213,7 @@ VER_ANSIBLE_LINT_PROVIDER="pipx:ansible-lint"
 VER_SPECTRAL="6.15.0"
 VER_SPECTRAL_PROVIDER="npm:@stoplight/spectral-cli"
 
-VER_GORELEASER="2.14.3"
+VER_GORELEASER="2.15.0"
 VER_GORELEASER_PROVIDER="github:goreleaser/goreleaser"
 
 # ── 📖 Documentation ──────────────────────────────────────────────────────────
