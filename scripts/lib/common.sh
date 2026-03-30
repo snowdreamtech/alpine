@@ -246,7 +246,7 @@ if [ "${_IS_TOP_LEVEL:-}" = "true" ] && [ "${CI:-}" != "true" ] && [ "${GITHUB_A
   # Ensure the directory exists before truncation
   _CS_DIR=$(dirname "${CI_STEP_SUMMARY:-}")
   [ ! -d "${_CS_DIR:-}" ] && mkdir -p "${_CS_DIR:-}"
-  : > "${CI_STEP_SUMMARY:-}"
+  : >"${CI_STEP_SUMMARY:-}"
 fi
 
 # ── 📄 SSoT Constants (Paths and Files) ──────────────────────────────────────
