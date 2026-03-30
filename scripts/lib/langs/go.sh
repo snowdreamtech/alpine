@@ -38,10 +38,13 @@ install_go_lint() {
     return 0
   fi
   local _STAT_GO="✅ mise"
+
   # Support verbose logging for Tier 2 tools to track large binary downloads (~50MB)
   # or complex compilations that might hang without feedback.
+  # We also enforce a local MISE_HTTP_TIMEOUT override here to ensure reliability.
   # Ref: Rule 01 (Network/Retry)
-  VERBOSE=2 ENABLE_GITHUB_PROXY=1 run_mise install golangci-lint || _STAT_GO="❌ Failed"
+  log_info "Downloading golangci-lint (this may take a few minutes on slow networks)..."
+  MISE_HTTP_TIMEOUT=600s VERBOSE=2 ENABLE_GITHUB_PROXY=1 run_mise install golangci-lint || _STAT_GO="❌ Failed"
   log_summary "Go" "Go Lint" "${_STAT_GO:-}" "$(get_version golangci-lint)" "$(($(date +%s) - _T0_GO))"
 }
 

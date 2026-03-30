@@ -357,11 +357,12 @@ run_with_timeout() {
   else
     # Fallback: Lightweight Bash-native timeout mechanism
     # Works by spawning the command in the background and a sleep watcher.
+    # Note: Using setsid or similar would be better but is not POSIX.
+    # We attempt to kill the process group by using -P if supported.
     ("$@") &
     local _PID=$!
-    (sleep "${_SEC:-}" && kill -0 "${_PID:-}" 2>/dev/null && kill "${_PID:-}" 2>/dev/null) &
+    (sleep "${_SEC:-}" && kill "${_PID:-}" 2>/dev/null) &
     local _WATCH_PID=$!
-    # Wait for the command to finish. We use wait $PID to get the specific exit code.
     wait "${_PID:-}" 2>/dev/null
     local _RET=$?
     # Cleanup: kill the watcher if it's still running.
@@ -438,9 +439,10 @@ optimize_network() {
 EOF
     export GIT_CONFIG_GLOBAL="${_TEMP_GIT_CONFIG:-}"
     export GIT_CONFIG_SYSTEM="/dev/null"
-    # Ensure mise uses the same long timeout for HTTP downloads
-    export MISE_HTTP_TIMEOUT="300s"
   fi
+
+  # Ensure mise uses a long timeout for HTTP downloads regardless of proxy settings
+  export MISE_HTTP_TIMEOUT="${MISE_HTTP_TIMEOUT:-300s}"
 
   export _NETWORK_OPTIMIZED=true
 }

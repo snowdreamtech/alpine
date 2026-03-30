@@ -11,6 +11,8 @@ setup() {
   unset _G_LIB_DIR
   TEMP_DIR="$(mktemp -d)"
   cp -r scripts "$TEMP_DIR/"
+  cp .mise.toml "$TEMP_DIR/"
+  cp VERSION "$TEMP_DIR/"
 
   # Create a dummy project structure
   cd "$TEMP_DIR" || exit
