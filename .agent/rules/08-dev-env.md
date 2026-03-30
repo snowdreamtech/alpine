@@ -227,12 +227,17 @@
 
 - **Language-Aware & Dynamic Detection**: Health checks and tool installations MUST be context-sensitive.
   - **Prerequisite Detection**: Secondary tools (e.g., `golangci-lint`, `asdf:ghc`) MUST only be installed if corresponding source files or manifests are detected.
-  - **Dynamic Registration**: To avoid the "Mise Tax" (slow resolution of unused tools), tools MUST NOT be pre-committed to `.mise.toml` unless they are core essentials. Use `mise use --local [tool]@[version]` within setup modules to dynamically register runtimes ONLY when detected. This combines a "Large & Comprehensive" template with "Lean & Fast" execution.
+  - **Dynamic Registration**: To avoid the "Mise Tax" (slow resolution of unused tools), tools MUST NOT be pre-committed to `.mise.toml` unless they are core essentials. Use `mise use --local [tool]@[version]` within setup modules to dynamically register runtimes ONLY when detected.
+  - **Availability-First Detection (Security)**: Security scanners (e.g., `osv-scanner`, `zizmor`) MUST prioritize local availability. If the tool is present in the local environment, it MUST be reported as `✅ Active` and participate in the audit workflow, even if categorized as a Tier 3/CI-only tool.
 
 - **Grouped UX & Selective Display**:
-  - Output MUST be organized into logical groups (e.g., Core Infrastructure, Language Runtimes, Mobile Support).
-  - Groups that are entirely irrelevant to the current project (e.g., "Mobile Support" in a CLI-only project) SHOULD be hidden entirely from the output to maintain high signal-to-noise ratio.
-  - Skip reasons SHOULD be explicitly stated as `⏭️  Skipped (reason)`.
+  - Output MUST be organized into logical groups (e.g., Core Infrastructure, Security & Quality, Language Runtimes).
+  - Groups that are entirely irrelevant (e.g., "Mobile Support" in a CLI-only project) SHOULD be hidden to maintain a high signal-to-noise ratio.
+  - Status Reporting MUST follow these conventions:
+    - `✅ Active`: Binary resolved and version matches recommended standards.
+    - `⏭️ Optional`: Tier 3 tool missing in local dev (CI-only by default).
+    - `⏭️ Skipped`: Feature-specific tool skipped because corresponding files are missing.
+    - `❌ Missing`: Critical tool missing or version mismatch; causes failure.
 
 ## 7. Recommended Project Lifecycle
 

@@ -171,14 +171,21 @@ To prevent toolchain poisoning (Node.js, Go, Python, etc.):
 - **Semantic Scanning**: `osv-scanner` MUST be enabled in `audit.sh` to provide deep vulnerability detection for all supported ecosystems (Go, npm, Python, etc.).
 - **Artifact Signing**: All production binaries MUST be signed with `cosign` using OIDC-based keyless signing.
 
-- CVE remediation SLA:
-
-  | Severity | Resolution Deadline |
+  | severity | Resolution Deadline |
   |----------|-------------------|
   | Critical | 7 days |
   | High | 30 days |
   | Medium | 90 days |
   | Low | Next planned maintenance |
+
+### Security Audit Orchestration & Shift-Left
+
+To maintain a robust security posture across all development stages, the audit pipeline MUST follow these core principles:
+
+- **Availability-First Detection (可用性优先检测)**: Environment validations (e.g., `check-env.sh`) MUST prioritize tool presence over environment gating. If a security tool is detected locally, it MUST be reported as `✅ Active`, regardless of its Tier 3 or CI-only classification.
+- **Automatic Activation (自动激活)**: Security scanners (e.g., `osv-scanner`, `zizmor`, `pip-audit`) MUST follow a "Run if installed" pattern. If a tool is available locally, `make audit` MUST automatically execute it, ensuring local validation parity with CI.
+- **Non-Blocking Optionality (非阻塞可选性)**: In local environments, missing optional security tools SHOULD be reported as `⏭️ Optional (CI-only by default)` to avoid developer friction. These tools remain strictly required in CI, where their absence MUST cause a pipeline failure.
+- **Unified Summary Reporting**: Both local and CI audit results MUST be captured in a standardized summary table (`.ci_summary.log`) to provide clear visibility into the project's security coverage and findings.
 
 ## 5. Incident Response & Disclosure
 
