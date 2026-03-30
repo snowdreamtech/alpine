@@ -290,10 +290,12 @@ setup_node() {
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
+  # Always log setup start for consistency and test assertions
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
+
   if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
     log_summary "Runtime" "Node.js" "✅ Detected" "${_CUR_VER:-}" "0"
   else
-    _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
     if [ "${DRY_RUN:-0}" -eq 1 ]; then
       log_summary "Runtime" "Node.js" "⚖️ Previewed" "-" "0"

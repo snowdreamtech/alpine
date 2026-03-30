@@ -241,6 +241,14 @@ else
   _IS_TOP_LEVEL=false
 fi
 
+# Truncate the persistent local summary file only at the start of a top-level session (Local Dev only).
+if [ "${_IS_TOP_LEVEL:-}" = "true" ] && [ "${CI:-}" != "true" ] && [ "${GITHUB_ACTIONS:-}" != "true" ]; then
+  # Ensure the directory exists before truncation
+  _CS_DIR=$(dirname "${CI_STEP_SUMMARY:-}")
+  [ ! -d "${_CS_DIR:-}" ] && mkdir -p "${_CS_DIR:-}"
+  : > "${CI_STEP_SUMMARY:-}"
+fi
+
 # ── 📄 SSoT Constants (Paths and Files) ──────────────────────────────────────
 
 VENV="${VENV:-.venv}"

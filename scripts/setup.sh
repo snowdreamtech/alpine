@@ -134,12 +134,12 @@ main() {
   local _START_TIME_MAIN
   _START_TIME_MAIN=$(date +%s)
 
+  # Unified table initialization (handles sentinels internally)
   init_summary_table "Setup Execution Summary"
 
-  # Initialize Summary Legend (Only once per CI Job or first call)
+  # Initialize Status Legend (Only once per session)
   if [ "${_SETUP_SUMMARY_INITIALIZED:-false}" != "true" ] && ! check_ci_summary "Status Legend:"; then
     {
-      printf "### Setup Execution Summary\n\n"
       cat <<EOF
 > **Status Legend:**
 > ⚖️ **Previewed**: Running in \`--dry-run\` mode.
