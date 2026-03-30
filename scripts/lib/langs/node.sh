@@ -24,24 +24,32 @@ install_runtime_node() {
 
   # 1b. Package Manager initialization (Corepack)
   log_info "Initializing Node.js package managers (corepack)..."
-  corepack enable
+
+  # Check if corepack exists before enabling. If missing, try to install it.
+  if ! run_mise x -- corepack --version >/dev/null 2>&1; then
+    log_warn "corepack not found. Attempting to install via npm..."
+    npm install -g corepack@latest --force >/dev/null 2>&1 || true
+  fi
+
+  # Attempt to enable, but don't fail if it's fundamentally missing (e.g. system restriction)
+  run_mise x -- corepack enable >/dev/null 2>&1 || log_warn "Could not enable corepack. Proceeding with fallbacks."
   local _V_PNPM
   _V_PNPM=$(get_mise_tool_version pnpm)
   local _V_YARN
   _V_YARN=$(get_mise_tool_version yarn)
 
   # Resilient pnpm installation (Handles corepack signature errors in fresh CI)
-  if ! corepack prepare "pnpm@${_V_PNPM:-latest}" --activate; then
+  if ! run_mise x -- corepack prepare "pnpm@${_V_PNPM:-latest}" --activate; then
     log_warn "Corepack failed to prepare pnpm (Signature error?). Attempting update and direct fallback..."
     npm install -g corepack@latest --force >/dev/null 2>&1 || true
-    corepack prepare "pnpm@${_V_PNPM:-latest}" --activate || {
+    run_mise x -- corepack prepare "pnpm@${_V_PNPM:-latest}" --activate || {
       log_warn "Corepack still failed. Using direct npm installation for pnpm."
       npm install -g "pnpm@${_V_PNPM:-latest}" --force
     }
   fi
 
   # Resilient yarn installation
-  if ! corepack prepare "yarn@${_V_YARN:-latest}" --activate; then
+  if ! run_mise x -- corepack prepare "yarn@${_V_YARN:-latest}" --activate; then
     log_warn "Corepack failed for yarn. Using direct npm installation."
     npm install -g "yarn@${_V_YARN:-latest}" --force
   fi
