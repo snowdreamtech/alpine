@@ -152,8 +152,8 @@ main() {
     fi
   fi
 
-  # 5. Dependency Audits (Node.js) — CI-only: network-heavy, slow on local dev.
-  if [ -f "${PACKAGE_JSON:-}" ] && { is_ci_env || [ "${NODE_AUDIT_FORCE:-0}" -eq 1 ]; }; then
+  # 5. Dependency Audits (Node.js) - Automatic Activation: run if NPM is available.
+  if [ -f "${PACKAGE_JSON:-}" ] && { is_ci_env || resolve_bin "${NPM:-}" >/dev/null 2>&1; }; then
     local _T0_JS
     _T0_JS=$(date +%s)
     log_info "\n── Auditing Node.js dependencies ($NPM audit) ──"
@@ -235,8 +235,8 @@ main() {
       fi
     fi
   else
-    # Tier 3 Tooling: Local developers skip by default to keep environment light.
-    log_summary "Security" "osv-scanner" "⏭️  Tier 3 Local Skip" "-" "0"
+    # Tier 3 Tooling: Skip only if tool is missing and not in CI.
+    log_summary "Security" "osv-scanner" "⏭️  Optional (CI-only by default)" "-" "0"
   fi
 
   # 8. Stack Specific (Go/Rust/Containers) — CI-only: slow network scans.
@@ -292,8 +292,8 @@ main() {
   fi
 
   # NOTE: Trivy CLI container audit removed (handled by GHA).
-  # 9. SBOM Generation (CycloneDX)
-  if is_ci_env || [ "${SBOM_FORCE_GENERATE:-0}" -eq 1 ]; then
+  # 9. SBOM Generation (CycloneDX) - Automatic Activation: run if Trivy is available.
+  if is_ci_env || [ -n "${_TRIVY_BIN:-}" ]; then
     local _T0_SBOM
     _T0_SBOM=$(date +%s)
     local _TRIVY_BIN

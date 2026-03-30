@@ -72,25 +72,24 @@ check_tool_version() {
 
   log_debug "Checking ${_LV_NAME:-} (min: ${_LV_MIN_VER:-})..."
 
-  # CI-only guard: skip entirely in local environments BEFORE touching command -v,
-  # which could trigger a mise shim installation attempt and stall the process.
+  # Availability-first detection:
+  # Check if the tool is ALREADY resolved or available in the environment.
   local _LV_RESOLVED
   _LV_RESOLVED=$(resolve_bin "${_LV_CMD:-}") || true
 
-  # CI-only guard: if not in CI and tool is missing, report as optional.
-  # If it IS present locally, we proceed to version/health check as normal.
-  local _LV_FORCE_VAR="${8:-}"
+  # If tool is missing, handle optional vs critical status
   if [ -z "${_LV_RESOLVED:-}" ]; then
+    local _LV_FORCE_VAR="${8:-}"
+    # If tool is marked as CI-only and we are in local dev, it's optional.
     if [ "${_LV_CI_ONLY:-0}" -eq 1 ] && ! is_ci_env; then
-      # Allow override via FORCE_INSTALL variable
+      # Only fail if FORCE_INSTALL was explicitly requested but tool is missing.
       if [ -n "${_LV_FORCE_VAR:-}" ] && [ "$(eval echo "\${$_LV_FORCE_VAR:-0}")" -eq 1 ]; then
         log_warn "❌ ${_LV_NAME:-}: Not found (Forced check failed)."
         HEALTHY_ST=1
         return 1
-      else
-        log_info "⏭️  ${_LV_NAME:-}: Optional (CI-only by default)"
-        return 0
       fi
+      log_info "⏭️  ${_LV_NAME:-}: Optional (CI-only by default)"
+      return 0
     fi
 
     log_warn "❌ ${_LV_NAME:-}: Not found."

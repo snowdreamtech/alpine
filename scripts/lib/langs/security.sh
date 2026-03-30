@@ -16,7 +16,7 @@ install_osv_scanner() {
   # CI-only guard by default, but allow manual/explicit on-demand installation
   # for local developers who explicitly run 'make audit'.
   if ! is_ci_env && [ "${OSV_FORCE_INSTALL:-0}" -ne 1 ]; then
-    log_summary "Security" "OSV-Scanner" "⏭️ CI-only" "-" "0"
+    log_summary "Security" "OSV-Scanner" "⏭️ Optional (CI-only by default)" "-" "0"
     return 0
   fi
 
@@ -68,7 +68,7 @@ install_zizmor() {
 
   # CI-only: GH Actions security linter is rarely needed for local app code.
   if ! is_ci_env && [ "${ZIZMOR_FORCE_INSTALL:-0}" -ne 1 ]; then
-    log_summary "Security" "Zizmor" "⏭️ CI-only" "-" "0"
+    log_summary "Security" "Zizmor" "⏭️ Optional (CI-only by default)" "-" "0"
     return 0
   fi
 
@@ -112,7 +112,7 @@ install_cargo_audit() {
 
   # CI-only guard: Advisory DB download is network-heavy, skip locally.
   if ! is_ci_env && [ "${CA_FORCE_INSTALL:-0}" -ne 1 ]; then
-    log_summary "Security" "Cargo-Audit" "⏭️ CI-only" "-" "0"
+    log_summary "Security" "Cargo-Audit" "⏭️ Optional (CI-only by default)" "-" "0"
     return 0
   fi
 
