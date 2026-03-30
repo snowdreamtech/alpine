@@ -22,36 +22,38 @@ install_runtime_node() {
   # 1. Runtime initialization
   run_mise install node
 
-  # 1b. Package Manager initialization (Corepack)
-  log_info "Initializing Node.js package managers (corepack)..."
+  # Optimization: If pnpm/yarn are already managed by mise (via .mise.toml), skip corepack to avoid
+  # redundant network calls and signature errors, especially in Node 22+.
+  if grep -qE "pnpm|yarn" .mise.toml 2>/dev/null; then
+    log_info "Package managers are already managed by mise. Skipping corepack."
+  else
+    log_info "Initializing Node.js package managers (corepack)..."
 
-  # Check if corepack exists before enabling. If missing, try to install it.
-  if ! run_mise x -- corepack --version >/dev/null 2>&1; then
-    log_warn "corepack not found. Attempting to install via npm..."
-    npm install -g corepack@latest --force >/dev/null 2>&1 || true
-  fi
+    # Check if corepack exists before enabling. If missing, try to install it.
+    if ! run_mise x -- corepack --version >/dev/null 2>&1; then
+      log_warn "corepack not found. Attempting to install via npm..."
+      npm install -g corepack@latest --force >/dev/null 2>&1 || true
+    fi
 
-  # Attempt to enable, but don't fail if it's fundamentally missing (e.g. system restriction)
-  run_mise x -- corepack enable >/dev/null 2>&1 || log_warn "Could not enable corepack. Proceeding with fallbacks."
-  local _V_PNPM
-  _V_PNPM=$(get_mise_tool_version pnpm)
-  local _V_YARN
-  _V_YARN=$(get_mise_tool_version yarn)
+    # Attempt to enable, but don't fail if it's fundamentally missing
+    run_mise x -- corepack enable >/dev/null 2>&1 || log_warn "Could not enable corepack. Proceeding with fallbacks."
 
-  # Resilient pnpm installation (Handles corepack signature errors in fresh CI)
-  if ! run_mise x -- corepack prepare "pnpm@${_V_PNPM:-latest}" --activate; then
-    log_warn "Corepack failed to prepare pnpm (Signature error?). Attempting update and direct fallback..."
-    npm install -g corepack@latest --force >/dev/null 2>&1 || true
-    run_mise x -- corepack prepare "pnpm@${_V_PNPM:-latest}" --activate || {
-      log_warn "Corepack still failed. Using direct npm installation for pnpm."
-      npm install -g "pnpm@${_V_PNPM:-latest}" --force
-    }
-  fi
+    local _V_PNPM
+    _V_PNPM=$(get_mise_tool_version pnpm)
+    local _V_YARN
+    _V_YARN=$(get_mise_tool_version yarn)
 
-  # Resilient yarn installation
-  if ! run_mise x -- corepack prepare "yarn@${_V_YARN:-latest}" --activate; then
-    log_warn "Corepack failed for yarn. Using direct npm installation."
-    npm install -g "yarn@${_V_YARN:-latest}" --force
+    # Resilient pnpm installation
+    if ! run_mise x -- corepack prepare "pnpm@${_V_PNPM:-latest}" --activate 2>/dev/null; then
+      log_warn "Corepack failed for pnpm. Falling back to direct npm installation."
+      npm install -g "pnpm@${_V_PNPM:-latest}" --force >/dev/null 2>&1 || true
+    fi
+
+    # Resilient yarn installation
+    if ! run_mise x -- corepack prepare "yarn@${_V_YARN:-latest}" --activate 2>/dev/null; then
+      log_warn "Corepack failed for yarn. Falling back to direct npm installation."
+      npm install -g "yarn@${_V_YARN:-latest}" --force >/dev/null 2>&1 || true
+    fi
   fi
 
   # 2. Dependency resolution
