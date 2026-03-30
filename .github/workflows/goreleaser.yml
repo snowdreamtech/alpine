@@ -152,6 +152,7 @@ jobs:
   goreleaser:
     name: "📦 Distribution Packaging"
     runs-on: ubuntu-latest
+    environment: internal
     concurrency:
       group: goreleaser-${{ github.workflow }}-${{ github.ref }}
       cancel-in-progress: true
@@ -165,7 +166,7 @@ jobs:
     timeout-minutes: 30 # Go compilation and asset upload usually completes in <10m
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
-        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.10.4
+        uses: step-security/harden-runner@fa2e9d605c4eeb9fcad4c99c224cee0c6c7f3594 # v2.16.0
         with:
           egress-policy: block
           allowed-endpoints: >
@@ -219,7 +220,7 @@ jobs:
             *.azurecr.io:443
 
       - name: "📂 Checkout Repository Code"
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v4.2.2
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
           # Pass GitHub Token to avoid triggering Rate Limit when accessing github.com links
           token: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}

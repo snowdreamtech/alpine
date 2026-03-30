@@ -1178,6 +1178,16 @@ get_version() {
   _LV_RESOLVED=$(resolve_bin "${_CMD_VER:-}") || true
 
   if [ -n "${_LV_RESOLVED:-}" ]; then
+    # Guard: If binary is a mise shim but version wasn't found in cache,
+    # it likely means the tool is installed globally (pipx, etc.) but not in .mise.toml.
+    # To prevent 'mise ERROR No version is set', we use 'mise exec' if it's a shim.
+    case "${_LV_RESOLVED:-}" in
+    *"${_G_MISE_SHIMS_BASE:-}"*)
+      run_mise exec "${_M_PLUGIN:-latest}" -- "${_CMD_VER:-}" "${_ARG_VER:---version}" 2>/dev/null | grep -E -o "[0-9]+\.[0-9]+\.[0-9]+" | head -n 1
+      return 0
+      ;;
+    esac
+
     # Special cases for tools with unusual version output or slow shims
     case "${_CMD_VER:-}" in
     python*)
