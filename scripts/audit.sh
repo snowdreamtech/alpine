@@ -94,7 +94,7 @@ main() {
         _GL_GIT_PARAMS="${GIT_CONFIG_PARAMETERS:-},'diff.renameLimit=5000'"
       fi
       _GL_ARGS="detect --source . --no-banner"
-      if is_ci_env && [ -n "${GITHUB_BASE_REF:-}" ]; then
+      if [ -n "${GITHUB_BASE_REF:-}" ] && { is_ci_env || [ "${GITLEAKS_FORCE_INCREMENTAL:-0}" -eq 1 ]; }; then
         log_info "Gitleaks: Performing incremental PR scan (origin/${GITHUB_BASE_REF:-}..HEAD)..."
         _GL_ARGS="detect --log-opts=origin/${GITHUB_BASE_REF:-}..HEAD --no-banner"
       fi
@@ -289,7 +289,7 @@ main() {
 
   # NOTE: Trivy CLI container audit removed (handled by GHA).
   # 9. SBOM Generation (CycloneDX)
-  if is_ci_env; then
+  if is_ci_env || [ "${SBOM_FORCE_GENERATE:-0}" -eq 1 ]; then
     local _T0_SBOM
     _T0_SBOM=$(date +%s)
     local _TRIVY_BIN
