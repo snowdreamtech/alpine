@@ -217,7 +217,7 @@ EOF
 
   # ── CI/Local Environment Filtering ──
   # Skip heavyweight tools in local dev unless explicitly requested or 'all' is specified.
-  if ! is_ci_env && [ "${_IS_ALL_MODULES:-}" != "true" ] && [ -z "$(echo "${_RAW_ARGS:-}" | tr -d ' ')" ]; then
+  if ! is_ci_env && [ "${_IS_ALL_MODULES:-}" != "true" ] && [ "${SETUP_FORCE_ALL:-0}" -ne 1 ] && [ -z "$(echo "${_RAW_ARGS:-}" | tr -d ' ')" ]; then
     # Skip heavyweight and rarely-needed modules in local dev to prevent
     # long network downloads (especially GitHub-released binaries).
     # These can still be installed on-demand via: sh scripts/setup.sh <module>

@@ -522,7 +522,7 @@ run_mise() {
   # In CI (GitHub Actions, etc.), we MUST keep the token to avoid 403 Rate Limit errors.
   # optimize_network() has already verified the token's validity during bootstrap.
   local _OLD_GITHUB_TOKEN="${GITHUB_TOKEN:-}"
-  if ! is_ci_env; then
+  if ! is_ci_env && [ "${GITHUB_TOKEN_FORCE_KEEP:-0}" -ne 1 ]; then
     unset GITHUB_TOKEN
   else
     # Ensure MISE_GITHUB_TOKEN is set for mise's internal GitHub API calls.
