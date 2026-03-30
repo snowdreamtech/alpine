@@ -13,9 +13,15 @@ install_osv_scanner() {
   local _TITLE="OSV-Scanner"
   local _PROVIDER="${VER_OSV_SCANNER_PROVIDER:-}"
 
-  # CI-only guard: skip on local dev to avoid go install build time.
-  if ! is_ci_env; then
+  # CI-only guard by default, but allow manual/explicit on-demand installation
+  # for local developers who explicitly run 'make audit'.
+  if ! is_ci_env && [ "${OSV_FORCE_INSTALL:-0}" -ne 1 ]; then
     log_summary "Security" "OSV-Scanner" "⏭️ CI-only" "-" "0"
+    return 0
+  fi
+
+  # Skip if manually disabled
+  if [ "${SKIP_OSV:-0}" -eq 1 ]; then
     return 0
   fi
 
@@ -35,8 +41,10 @@ install_osv_scanner() {
     log_summary "Security" "OSV-Scanner" '⚖️ Previewed' "-" '0'
     return 0
   fi
+
   local _STAT_OSV="✅ mise"
   setup_registry_osv_scanner
+  # Explicitly use mise to install the github provider
   if ! run_mise install "${_PROVIDER:-}"; then
     _STAT_OSV="❌ Failed"
     if is_ci_env; then

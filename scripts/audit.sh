@@ -211,30 +211,31 @@ main() {
   done
   local _OSV_BIN
   _OSV_BIN=$(resolve_bin "osv-scanner") || true
-  if is_ci_env && [ "${_HAS_LOCKFILE:-}" -eq 1 ] && [ -n "${_OSV_BIN:-}" ]; then
-    local _T0_OSV_AUD
-    _T0_OSV_AUD=$(date +%s)
-    log_info "\n── Generic Vulnerability Scan (osv-scanner) ──"
-    if [ "${DRY_RUN:-0}" -eq 1 ]; then
-      log_success "DRY-RUN: Would run osv-scanner"
-      log_summary "Security" "osv-scanner" "⚖️ Previewed" "-" "0"
-    else
-      # Capture output to detect "No package sources found" which should be a skip/pass, not an error.
-      _OSV_OUT=$("${_OSV_BIN:-}" -r . 2>&1) || _OSV_EXIT=$?
-      [ -n "${_OSV_EXIT:-}" ] || _OSV_EXIT=0
-
-      if [ "${_OSV_EXIT:-}" -eq 0 ]; then
-        log_summary "Security" "osv-scanner" "✅ Secure" "$(get_version "${_OSV_BIN:-}")" "$(($(date +%s) - _T0_OSV_AUD))"
-      elif echo "${_OSV_OUT:-}" | grep -q "No package sources found"; then
-        log_info "osv-scanner: No package sources found. Skipping."
-        log_summary "Security" "osv-scanner" "⏭️  Skipped" "$(get_version "${_OSV_BIN:-}")" "$(($(date +%s) - _T0_OSV_AUD))"
+  if is_ci_env; then
+    if [ "${_HAS_LOCKFILE:-}" -eq 1 ] && [ -n "${_OSV_BIN:-}" ]; then
+      local _T0_OSV_AUD
+      _T0_OSV_AUD=$(date +%s)
+      log_info "\n── Generic Vulnerability Scan (osv-scanner) ──"
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
+        log_success "DRY-RUN: Would run osv-scanner"
+        log_summary "Security" "osv-scanner" "⚖️ Previewed" "-" "0"
       else
-        # Non-fatal: template project may have transitive CVEs in devDeps.
-        # Downstream projects should run osv-scanner on their own codebase.
-        echo "${_OSV_OUT:-}"
-        log_summary "Security" "osv-scanner" "⚠️ Findings" "$(get_version "${_OSV_BIN:-}")" "$(($(date +%s) - _T0_OSV_AUD))"
+        _OSV_OUT=$("${_OSV_BIN:-}" scan . --format table 2>&1) || _OSV_EXIT=$?
+        [ -n "${_OSV_EXIT:-}" ] || _OSV_EXIT=0
+        if [ "${_OSV_EXIT:-}" -eq 0 ]; then
+          log_summary "Security" "osv-scanner" "✅ Secure" "$(get_version "${_OSV_BIN:-}")" "$(($(date +%s) - _T0_OSV_AUD))"
+        elif echo "${_OSV_OUT:-}" | grep -q "No package sources found"; then
+          log_info "osv-scanner: No package sources found. Skipping."
+          log_summary "Security" "osv-scanner" "⏭️  Skipped" "$(get_version "${_OSV_BIN:-}")" "$(($(date +%s) - _T0_OSV_AUD))"
+        else
+          echo "${_OSV_OUT:-}"
+          log_summary "Security" "osv-scanner" "⚠️ Findings" "$(get_version "${_OSV_BIN:-}")" "$(($(date +%s) - _T0_OSV_AUD))"
+        fi
       fi
     fi
+  else
+    # Tier 3 Tooling: Local developers skip by default to keep environment light.
+    log_summary "Security" "osv-scanner" "⏭️  Tier 3 Local Skip" "-" "0"
   fi
 
   # 8. Stack Specific (Go/Rust/Containers) — CI-only: slow network scans.
