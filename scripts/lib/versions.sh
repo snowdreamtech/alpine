@@ -42,7 +42,7 @@ VER_GRAIN="0.7.2"
 VER_GRAIN_PROVIDER="github:grain-lang/grain"
 VER_GRAIN_REF="grain-v0.7.2"
 
-VER_MOONBIT="0.8.3+cd28f524e"
+VER_MOONBIT="0.8.4+4d98d95d4"
 VER_MOONBIT_PROVIDER="github:moonbitlang/moonbit-compiler"
 VER_MOONBIT_REF="v0.7.2+c12686398"
 
@@ -128,7 +128,7 @@ VER_STYLELINT_CONFIG_PROVIDER="npm:stylelint-config-standard"
 VER_ASSEMBLYSCRIPT="0.28.12"
 VER_ASSEMBLYSCRIPT_PROVIDER="npm:assemblyscript"
 
-VER_OPA="1.15.0"
+VER_OPA="1.15.1"
 VER_OPA_PROVIDER="github:open-policy-agent/opa"
 
 VER_BUF="1.66.1"

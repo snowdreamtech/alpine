@@ -41,15 +41,12 @@ updates:
         patterns: ["*"]
     schedule:
       interval: "weekly"
-      day: "monday"
     commit-message:
       prefix: "ci(deps):"
     labels:
       - "dependencies"
       - "github-actions"
       - "devops"
-    cooldown:
-      default-days: 7
 
   - package-ecosystem: "npm"
     directory: "/"
@@ -73,15 +70,12 @@ updates:
       ⚡-vite-suite:
         patterns: ["vite*", "@vitejs/*"]
     schedule:
-      interval: "weekly"
-      day: "monday"
+      interval: "daily"
     commit-message:
       prefix: "chore(deps):"
     labels:
       - "dependencies"
       - "javascript"
-    cooldown:
-      default-days: 7
 
   - package-ecosystem: "npm"
     directory: "/docs"
@@ -111,8 +105,6 @@ updates:
     labels:
       - "dependencies"
       - "javascript"
-    cooldown:
-      default-days: 7
 
   - package-ecosystem: "docker"
     directory: "/.devcontainer"
@@ -133,15 +125,12 @@ updates:
         patterns: ["alpine*", "ubuntu*", "debian*", "rocky*", "rockylinux*", "rhel*", "node*", "python*", "golang*"]
     schedule:
       interval: "weekly"
-      day: "monday"
     commit-message:
       prefix: "build(deps):"
     labels:
       - "dependencies"
       - "docker"
       - "infrastructure"
-    cooldown:
-      default-days: 7
 
   - package-ecosystem: "devcontainers"
     directory: "/.devcontainer"
@@ -162,15 +151,12 @@ updates:
         patterns: ["alpine*", "ubuntu*", "debian*", "rocky*", "rockylinux*", "rhel*", "node*", "python*", "golang*"]
     schedule:
       interval: "weekly"
-      day: "monday"
     commit-message:
       prefix: "build(deps):"
     labels:
       - "dependencies"
       - "devcontainers"
       - "infrastructure"
-    cooldown:
-      default-days: 7
 
   - package-ecosystem: "pre-commit"
     directory: "/"
@@ -191,12 +177,9 @@ updates:
         patterns: ["*"]
     schedule:
       interval: "weekly"
-      day: "monday"
     commit-message:
       prefix: "chore(deps):"
     labels:
       - "dependencies"
       - "pre-commit"
       - "linting"
-    cooldown:
-      default-days: 7
