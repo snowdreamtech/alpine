@@ -44,6 +44,11 @@ main() {
   local _LINTER_BIN="${_LINTER_WRAP:-}"
   case "${_LINTER_WRAP:-}" in
   psscriptanalyzer) _LINTER_BIN="pwsh" ;;
+  osv_scanner) _LINTER_BIN="osv-scanner" ;;
+  node-audit)
+    # node-audit is a logical tool, we resolve the package manager instead
+    _LINTER_BIN="${NPM:-pnpm}"
+    ;;
   esac
 
   local _RESOLVED_BIN_WRAP
@@ -73,7 +78,7 @@ main() {
     fi
     check_runtime haskell "${_LINTER_WRAP:-}"
     ;;
-  eslint | prettier | stylelint | spectral | sort-package-json | markdownlint-cli2 | taplo | dockerfile-utils | commitlint)
+  eslint | prettier | stylelint | spectral | sort-package-json | markdownlint-cli2 | taplo | dockerfile-utils | commitlint | node-audit)
     check_runtime node "${_LINTER_WRAP:-}"
     ;;
   psscriptanalyzer)
@@ -90,6 +95,15 @@ main() {
   dotnet) check_runtime dotnet "${_LINTER_WRAP:-}" ;;
   gofmt) check_runtime go "${_LINTER_WRAP:-}" ;;
   cargo) check_runtime rust "${_LINTER_WRAP:-}" ;;
+  osv_scanner | trivy | checkov | semgrep)
+    # Generic binaries or cross-language tools
+    # check_runtime will use resolve_bin to find them
+    # For osv_scanner, we mapped it to osv-scanner binary in step 1
+    check_runtime "${_LINTER_BIN:-}" "${_LINTER_WRAP:-}"
+    ;;
+  bandit) check_runtime python "${_LINTER_WRAP:-}" ;;
+  gosec | govulncheck) check_runtime go "${_LINTER_WRAP:-}" ;;
+  cargo-audit) check_runtime rust "${_LINTER_WRAP:-}" ;;
   *)
     # Generic fallback for other binary tools (yamllint, etc.)
     # If a module exists for the tool name, it will be used.
@@ -99,6 +113,11 @@ main() {
 
   # 4. Execute Linter
   # shellcheck disable=SC2086
+  if [ "${_LINTER_WRAP:-}" = "node-audit" ]; then
+    # logical case: call package manager audit command
+    exec "${_RESOLVED_BIN_WRAP:-}" audit "$@"
+  fi
+
   exec "${_RESOLVED_BIN_WRAP:-}" "$@"
 }
 

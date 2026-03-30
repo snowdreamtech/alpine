@@ -751,6 +751,78 @@ repos:
         files: "Dockerfile.*"
         description: "Audit Dockerfiles for best practices and security vulnerabilities."
 
+      # -- Deep Security & Vulnerability Audits -------------------------------
+      - id: osv-scanner
+        name: osv-scanner vulnerability audit
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh osv_scanner --config .osv-scanner.toml --call-analysis=all --format table --lockfile
+        files: '(pnpm-lock\.yaml|go\.mod|Cargo\.lock|package-lock\.json|yarn\.lock|bun\.lockb)$'
+        description: "Audit project dependencies for known vulnerabilities using Google OSV-Scanner."
+
+      - id: trivy
+        name: trivy security scan
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh trivy fs . --scanners vuln,config,secret --exit-code 1 --severity HIGH,CRITICAL
+        always_run: true
+        pass_filenames: false
+        description: "Comprehensive security scan for vulnerabilities, misconfigurations, and secrets using Trivy."
+
+      - id: checkov
+        name: checkov iac security audit
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh checkov --directory . --quiet --compact --soft-fail-on HIGH
+        types_or: [yaml, dockerfile, terraform]
+        pass_filenames: false
+        description: "Audit Infrastructure-as-Code (Terraform, K8s, Docker) for security best practices."
+
+      - id: semgrep
+        name: semgrep security scan
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh semgrep scan --config auto --error --quiet
+        always_run: true
+        pass_filenames: false
+        description: "Multi-language static analysis for security, bugs, and best practices using Semgrep."
+
+      - id: bandit
+        name: bandit python security check
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh bandit -r -ll
+        types: [python]
+        exclude: ^tests/
+        description: "Find common security issues in Python code using Bandit."
+
+      - id: gosec
+        name: gosec go security scan
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh gosec -quiet ./...
+        types: [go]
+        pass_filenames: false
+        description: "Audit Go source code for security vulnerabilities using Gosec."
+
+      - id: govulncheck
+        name: govulncheck go vulnerability audit
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh govulncheck ./...
+        types: [go]
+        pass_filenames: false
+        description: "Official Go vulnerability checker for source code and dependencies."
+
+      - id: cargo-audit
+        name: cargo audit rust dependencies
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh cargo-audit audit
+        files: 'Cargo\.lock$'
+        pass_filenames: false
+        description: "Audit Rust dependencies for known security vulnerabilities."
+
+      - id: npm-pnpm-audit
+        name: node ecosystem audit
+        language: system
+        entry: sh scripts/lib/lint-wrapper.sh node-audit
+        files: '(pnpm-lock\.yaml|package-lock\.json|yarn\.lock|bun\.lockb)$'
+        pass_filenames: false
+        description: "Audit Node.js ecosystem dependencies for known vulnerabilities."
+
       # -- Hardening & Security ----------------------------------------------
       - id: check-executables-have-shebangs
         name: check shell scripts for shebangs
