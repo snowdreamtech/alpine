@@ -21,10 +21,8 @@
 
 ### Cross-Platform Tooling & Providers
 
-- **Mandatory Native Backends**: When specifying tools in `.mise.toml`, you MUST prefer native `mise` core backends (e.g., `pipx`, `node`, `go`) over legacy `asdf:` plugins.
-  - **Why**: Legacy `asdf` plugins rely heavily on embedded Bash scripts (e.g., `bin/download`), which predictably fail in Windows CI environments (like GitHub Actions `windows-latest` running `pwsh`) due to missing POSIX toolchains, UNIX path translation mismatches, and symlink limitations.
-  - **Example**: Use native `pipx = "1.11.0"` configured directly in `.mise.toml` instead of `"asdf:mise-plugins/mise-pipx" = "1.11.0"`.
-- **Prefer Pre-compiled Binaries**: For core operational tools (e.g., `ruff`, `shellcheck`, `shfmt`, `actionlint`), rely on their natively supported `mise` Registry backends, `cargo:`, or `go:` binary providers rather than Python wrapper ecosystems (like `pipx:ruff-py`) to guarantee the fastest cross-platform reliability and execution speed without sandbox escaping issues.
+- **Avoid Legacy `asdf` Plugins**: When specifying tools in `.mise.toml`, strictly avoid using `asdf:` prefixed plugins (e.g., `asdf:mise-plugins/mise-pipx`). `asdf` plugins are heavily reliant on POSIX Bash scripts (`bin/download`, `bin/install`), which inherently fail on native Windows CI environments (e.g., GitHub Actions `windows-latest` running `pwsh`) due to path translation conflicts, missing POSIX utilities, and symlink permission restrictions.
+- **Prefer Native & Universal Providers**: Always default to `mise`'s built-in core backends (e.g., `pipx`, `node`, `python`, `go`) which are written in Rust and provide flawless cross-platform support. If a core backend is unavailable, use native package manager providers (`npm:`, `cargo:`, `go:`) or direct GitHub releases (`github:`) over complex wrapper systems to guarantee execution speed and reliability across macOS, Linux, and Windows.
 
 ### Environment Variables
 
