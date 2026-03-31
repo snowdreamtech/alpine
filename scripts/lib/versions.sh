@@ -83,7 +83,7 @@ VER_CHECKMAKE="0.3.2"
 VER_CHECKMAKE_PROVIDER="github:checkmake/checkmake"
 VER_EDITORCONFIG_CHECKER="3.6.1"
 VER_ADDLICENSE="1.2.0"
-VER_ADDLICENSE_PROVIDER="go:github.com/google/addlicense"
+VER_ADDLICENSE_PROVIDER="github:google/addlicense"
 
 # Git / commit workflow
 VER_COMMITLINT="20.5.0"
