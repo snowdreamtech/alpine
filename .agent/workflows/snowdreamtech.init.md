@@ -29,7 +29,7 @@ You **MUST** consider the user input before proceeding (if not empty).
 
       > **💡 First-Class Citizens:**
       > This template treats **Node.js, Go, and Python** as first-class citizens. The setup scripts will automatically install their runtimes and core toolchains (pnpm, golangci-lint, ruff, etc.) regardless of whether project files currently exist.
-
+      >
       > **💡 Specify VENV (Optional):**
       > If you need to specify a custom virtual environment path (e.g., for subprojects):
       > `make VENV=.custom/.venv setup`
