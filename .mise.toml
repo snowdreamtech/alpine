@@ -18,13 +18,13 @@ python = "3.14.3"
 
 
 # ── 🔐 Security & Engineering (always needed) ──────────────────────────────────
-gitleaks = "8.30.1"
+"github:gitleaks/gitleaks" = "8.30.1"
 "github:cli/cli" = "2.89.0"
 
 # ── 💎 Core Quality & Commit Tooling ──────────────────────────────────────────
 # Tools invoked by pre-commit hooks or universally needed.
-checkmake = "0.3.2"
-editorconfig-checker = "3.6.1"
+"github:mrtazz/checkmake" = "0.3.2"
+"github:editorconfig-checker/editorconfig-checker" = "3.6.1"
 "github:google/addlicense" = "1.2.0"
 
 # Git / commit workflow
@@ -47,14 +47,14 @@ editorconfig-checker = "3.6.1"
 "github:dotenv-linter/dotenv-linter" = "4.0.0"
 
 # Python tools (pre-commit hooks)
-ruff = "0.15.8"
+"github:astral-sh/ruff" = "0.15.8"
 "pipx:clang-format" = "22.1.2"
 
 # Shell & scripting linters (pre-commit hooks)
-actionlint = "1.7.12"
+"github:rhysd/actionlint" = "1.7.12"
 "pipx:pre-commit" = "4.5.1"
-shellcheck = "0.11.0"
-shfmt = "3.13.0"
+"github:koalaman/shellcheck" = "0.11.0"
+"github:mvdan/sh" = "3.13.0"
 
 # Testing (required by make test)
 "npm:bats" = "1.13.0"
