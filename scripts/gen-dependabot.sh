@@ -200,6 +200,9 @@ EOF
     schedule:
       interval: "${_interval}"
       day: "monday"
+    # 6.1 Cooldown: Wait for software to be stable before updating (Zizmor compliance)
+    cooldown:
+      default-days: 7
     # 7. Commit Format: Semantic commit prefixes
     commit-message:
       prefix: "${_prefix}"
