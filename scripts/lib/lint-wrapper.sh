@@ -136,7 +136,9 @@ main() {
   # shellcheck disable=SC2086
   if [ "${_LINTER_WRAP:-}" = "node-audit" ]; then
     # logical case: call package manager audit command
-    exec "${_RESOLVED_BIN_WRAP:-}" audit "$@"
+    # NOTE: Some registries (like npmmirror.com) do not support the audit endpoint.
+    # We use the official registry for the audit scan to ensure reliability.
+    exec "${_RESOLVED_BIN_WRAP:-}" audit --registry="${NPM_AUDIT_REGISTRY:-https://registry.npmjs.org}" "$@"
   fi
 
   exec "${_RESOLVED_BIN_WRAP:-}" "$@"

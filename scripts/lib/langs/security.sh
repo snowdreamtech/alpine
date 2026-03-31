@@ -115,6 +115,7 @@ install_zizmor() {
     return 0
   fi
   local _STAT_ZIZ="✅ mise"
+  setup_registry_zizmor
   run_mise install "${_PROVIDER:-}" || _STAT_ZIZ="❌ Failed"
   log_summary "Security" "Zizmor" "${_STAT_ZIZ:-}" "$(get_version zizmor)" "$(($(date +%s) - _T0_ZIZ))"
 }

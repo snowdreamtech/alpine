@@ -1327,43 +1327,38 @@ resolve_bin() {
   # Handles tools installed JIT (e.g., Tier 2) but not in active .mise.toml
   # which causes 'mise which' to fail even if the tool exists on disk.
   if [ -z "${_G_MISE_LS_JSON_CACHE:-}" ]; then refresh_mise_cache; fi
-  local _MC_PATH
-  # Parse JSON without jq for cross-platform compatibility
-  _MC_PATH=$(echo "${_G_MISE_LS_JSON_CACHE:-}" | awk '{
-    # Convert JSON to a more manageable format
-    gsub(/[{}]/, "");
-    gsub(/"/, "");
-    gsub(/, /, "\n");
-    print
-  }' | grep -E "^${_BIN:-}:|^.*:${_BIN:-}:|^.*\/${_BIN:-}:" | head -n 1 | awk -F: '{
-    # Extract the value part
-    for (i=2; i<=NF; i++) {
-      if (i>2) printf(":");
-      printf("%s", $i);
+  _MC_PATH=$(echo "${_G_MISE_LS_JSON_CACHE:-}" | awk -v bin="${_BIN:-}" '
+    BEGIN { found_bin = 0; }
+    # Portable matching of tool key "bin": [ or "prefix:bin": [
+    $0 ~ "\"" bin "\"" && $0 ~ ":" && $0 ~ "\\[" {
+      found_bin = 1;
+      next;
     }
-    print
-  }' | awk '{
-    # Look for install_path
-    if (match($0, /install_path:([^,]+)/)) {
-      print substr($0, RSTART+13, RLENGTH-13);
-      exit;
+    found_bin {
+      if ($0 ~ "\"install_path\":") {
+        match($0, /"install_path":[[:space:]]*"[^"]+"/);
+        if (RSTART > 0) {
+          res = substr($0, RSTART, RLENGTH);
+          sub(/.*"install_path":[[:space:]]*"/, "", res);
+          sub(/"$/, "", res);
+          print res;
+        }
+      }
+      # Stop at end of tool array or end of JSON
+      if ($0 ~ /^[[:space:]]*\],?/ || $0 ~ /^[[:space:]]*\}/) {
+        found_bin = 0;
+      }
     }
-  }' 2>/dev/null | head -n 1 || true)
+  ' 2>/dev/null | sort -V | tail -n 1 || true)
 
   if [ -n "${_MC_PATH:-}" ] && [ "${_MC_PATH:-}" != "null" ]; then
-    # Standard mise structure: bin/tool or tool
-    if [ -x "${_MC_PATH:-}/bin/${_BIN:-}" ]; then
-      echo "${_MC_PATH:-}/bin/${_BIN:-}" && return 0
-    elif [ -x "${_MC_PATH:-}/${_BIN:-}" ]; then
-      echo "${_MC_PATH:-}/${_BIN:-}" && return 0
+    # Robustly find the binary within the install_path (maxdepth 3 for performance)
+    _FOUND_BIN=$(find "${_MC_PATH:-}" -maxdepth 3 -name "${_BIN:-}" -type f -perm +111 2>/dev/null | head -n 1) || true
+    if [ -z "${_FOUND_BIN:-}" ] && [ "${_G_OS:-}" = "windows" ]; then
+      _FOUND_BIN=$(find "${_MC_PATH:-}" -maxdepth 3 -name "${_BIN:-}.exe" -type f 2>/dev/null | head -n 1) || true
     fi
-    # Windows: .exe suffix
-    if [ "${_G_OS:-}" = "windows" ]; then
-      if [ -x "${_MC_PATH:-}/bin/${_BIN:-}.exe" ]; then
-        echo "${_MC_PATH:-}/bin/${_BIN:-}.exe" && return 0
-      elif [ -x "${_MC_PATH:-}/${_BIN:-}.exe" ]; then
-        echo "${_MC_PATH:-}/${_BIN:-}.exe" && return 0
-      fi
+    if [ -n "${_FOUND_BIN:-}" ]; then
+      echo "${_FOUND_BIN:-}" && return 0
     fi
   fi
 
