@@ -539,14 +539,21 @@ run_mise() {
   # for these tools while preserving it for the rest of the orchestration.
   local _EFFECTIVE_LOCKED="${MISE_LOCKED:-}"
   if [ "${_CMD:-}" = "install" ]; then
-    for _arg in "$@"; do
-      case "${_arg:-}" in
-      go:*)
+    if [ $# -eq 0 ]; then
+      # Full install (no args): check if .mise.toml contains any go: tools
+      if grep -q '^"go:' "${_G_PROJECT_ROOT:-}/.mise.toml" 2>/dev/null; then
         _EFFECTIVE_LOCKED="0"
-        break
-        ;;
-      esac
-    done
+      fi
+    else
+      for _arg in "$@"; do
+        case "${_arg:-}" in
+        go:*)
+          _EFFECTIVE_LOCKED="0"
+          break
+          ;;
+        esac
+      done
+    fi
   fi
 
   local _M_BIN
