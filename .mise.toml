@@ -13,7 +13,7 @@ go = "1.26.1"
 node = "25.8.2"
 "npm:pnpm" = "10.33.0"
 python = "3.14.3"
-"asdf:mise-plugins/mise-pipx" = "1.11.0"
+pipx = "1.11.0"
 
 
 # ── 🔐 Security & Engineering (always needed) ──────────────────────────────────

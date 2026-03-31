@@ -25,7 +25,7 @@ VER_PNPM="10.33.0"
 VER_PNPM_PROVIDER="npm:pnpm"
 VER_PYTHON="3.14.3"
 VER_PIPX="1.11.0"
-VER_PIPX_PROVIDER="asdf:mise-plugins/mise-pipx"
+VER_PIPX_PROVIDER="pipx"
 
 # ── 🏗️ Tier 2: Language Runtimes (On-demand) ─────────────────────────────────
 VER_KOTLIN="2.3.20"
