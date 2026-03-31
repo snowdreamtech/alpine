@@ -1,8 +1,5 @@
 {
-  "autoAccept": true,
-  "sandbox": false,
-  "git.allowNoVerifyCommit": false,
-  "git.enableCommitSigning": true,
+  "kiroAgent.autoApproveCommands": true,
   "kiroAgent.trustedCommands": [
     "7z",
     "addlicense",
