@@ -11,7 +11,7 @@ install_pipx() {
   local _T0_PIPX
   _T0_PIPX=$(date +%s)
   local _TITLE="Pipx"
-  local _PROVIDER="pipx"
+  local _PROVIDER="${VER_PIPX_PROVIDER:-pip:pipx}"
   if resolve_bin "pipx" >/dev/null 2>&1; then
     log_summary "Base" "Pipx" "✅ Exists" "$(get_version pipx)" "$(($(date +%s) - _T0_PIPX))"
     return 0
@@ -25,9 +25,10 @@ install_pipx() {
     log_info "Ensuring pipx is available via pip..."
     # Use python -m pip to ensure we use the correct python instance
     # Note: --user may fail inside a virtualenv, so we try with it first and fallback if needed.
-    if ! "${PYTHON:-}" -m pip install --user pipx --quiet 2>/dev/null; then
+    local _V_PIPX="${VER_PIPX:-latest}"
+    if ! "${PYTHON:-}" -m pip install --user "pipx==${_V_PIPX:-}" --quiet 2>/dev/null; then
       log_debug "Pipx: --user install failed or not available, trying standard install..."
-      "${PYTHON:-}" -m pip install pipx --quiet || true
+      "${PYTHON:-}" -m pip install "pipx==${_V_PIPX:-}" --quiet || true
     fi
 
     # Add user scripts to PATH immediately if not present
@@ -62,8 +63,9 @@ install_pipx() {
 
   fi
 
-  local _STAT_PIPX="✅ mise"
-  run_mise install pipx || _STAT_PIPX="❌ Failed"
+  # Note: mise managed installation removed to avoid aqua backend non-Windows compatibility issues.
+  # pipx is correctly available via the pip-based bypass above.
+  local _STAT_PIPX="✅ pip"
   log_summary "Base" "Pipx" "${_STAT_PIPX:-}" "$(get_version pipx)" "$(($(date +%s) - _T0_PIPX))"
 }
 
