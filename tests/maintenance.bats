@@ -78,7 +78,7 @@ teardown() {
 @test "maintenance: audit.sh dry-run reports security scans" {
   run sh scripts/audit.sh --dry-run
   assert_success
-  assert_output --partial "Security Audit Execution Summary"
+  assert_output --partial "Audit complete"
 }
 
 @test "maintenance: cleanup.sh dry-run reports cleanup activities" {
@@ -102,7 +102,7 @@ teardown() {
 @test "maintenance: update.sh dry-run reports tool updates" {
   run sh scripts/update.sh --dry-run
   assert_success
-  assert_output --partial "Update Execution Summary"
+  assert_output --partial "Update complete"
 }
 
 @test "maintenance: verify.sh dry-run reports orchestration" {

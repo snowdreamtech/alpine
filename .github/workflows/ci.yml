@@ -184,7 +184,6 @@ jobs:
         env:
           MISE_GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           VENV: ${{ env.VENV }}
-          SKIP_MODULES: security
 
       - name: "🔍 Inspect Code Quality (Lint)"
         shell: sh
@@ -326,7 +325,6 @@ jobs:
         env:
           MISE_GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           VENV: ${{ env.VENV }}
-          SKIP_MODULES: security
 
       - name: "🧪 Execute Multi-Stack Test Suite"
         shell: sh
