@@ -33,6 +33,38 @@ provenance = "github-attestations"
 checksum = "sha256:5414b7124a91f4b5abee62e5c9d84802237734f8d15b9b7032732a32c3ebffa3"
 url = "https://github.com/rhysd/actionlint/releases/download/v1.7.11/actionlint_1.7.11_windows_amd64.zip"
 
+[[tools.actionlint]]
+version = "1.7.12"
+backend = "aqua:rhysd/actionlint"
+
+[tools.actionlint."platforms.linux-arm64"]
+checksum = "sha256:325e971b6ba9bfa504672e29be93c24981eeb1c07576d730e9f7c8805afff0c6"
+url = "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_arm64.tar.gz"
+
+[tools.actionlint."platforms.linux-arm64-musl"]
+checksum = "sha256:325e971b6ba9bfa504672e29be93c24981eeb1c07576d730e9f7c8805afff0c6"
+url = "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_arm64.tar.gz"
+
+[tools.actionlint."platforms.linux-x64"]
+checksum = "sha256:8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8"
+url = "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz"
+
+[tools.actionlint."platforms.linux-x64-musl"]
+checksum = "sha256:8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8"
+url = "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz"
+
+[tools.actionlint."platforms.macos-arm64"]
+checksum = "sha256:aba9ced2dee8d27fecca3dc7feb1a7f9a52caefa1eb46f3271ea66b6e0e6953f"
+url = "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_darwin_arm64.tar.gz"
+
+[tools.actionlint."platforms.macos-x64"]
+checksum = "sha256:5b44c3bc2255115c9b69e30efc0fecdf498fdb63c5d58e17084fd5f16324c644"
+url = "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_darwin_amd64.tar.gz"
+
+[tools.actionlint."platforms.windows-x64"]
+checksum = "sha256:6e7241b51e6817ea6a047693d8e6fed13b31819c9a0dd6c5a726e1592d22f6e9"
+url = "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_windows_amd64.zip"
+
 [[tools."asdf:mise-plugins/mise-pipx"]]
 version = "1.11.0"
 backend = "asdf:mise-plugins/mise-pipx"
@@ -355,31 +387,31 @@ backend = "core:go"
 
 [tools.go."platforms.linux-arm64"]
 checksum = "sha256:a290581cfe4fe28ddd737dde3095f3dbeb7f2e4065cab4eae44dfc53b760c2f7"
-url = "https://mirrors.aliyun.com/golang//go1.26.1.linux-arm64.tar.gz"
+url = "https://dl.google.com/go/go1.26.1.linux-arm64.tar.gz"
 
 [tools.go."platforms.linux-arm64-musl"]
 checksum = "sha256:a290581cfe4fe28ddd737dde3095f3dbeb7f2e4065cab4eae44dfc53b760c2f7"
-url = "https://mirrors.aliyun.com/golang//go1.26.1.linux-arm64.tar.gz"
+url = "https://dl.google.com/go/go1.26.1.linux-arm64.tar.gz"
 
 [tools.go."platforms.linux-x64"]
 checksum = "sha256:031f088e5d955bab8657ede27ad4e3bc5b7c1ba281f05f245bcc304f327c987a"
-url = "https://mirrors.aliyun.com/golang//go1.26.1.linux-amd64.tar.gz"
+url = "https://dl.google.com/go/go1.26.1.linux-amd64.tar.gz"
 
 [tools.go."platforms.linux-x64-musl"]
 checksum = "sha256:031f088e5d955bab8657ede27ad4e3bc5b7c1ba281f05f245bcc304f327c987a"
-url = "https://mirrors.aliyun.com/golang//go1.26.1.linux-amd64.tar.gz"
+url = "https://dl.google.com/go/go1.26.1.linux-amd64.tar.gz"
 
 [tools.go."platforms.macos-arm64"]
 checksum = "sha256:353df43a7811ce284c8938b5f3c7df40b7bfb6f56cb165b150bc40b5e2dd541f"
-url = "https://mirrors.aliyun.com/golang//go1.26.1.darwin-arm64.tar.gz"
+url = "https://dl.google.com/go/go1.26.1.darwin-arm64.tar.gz"
 
 [tools.go."platforms.macos-x64"]
 checksum = "sha256:65773dab2f8cc4cd23d93ba6d0a805de150ca0b78378879292be0b903b8cdd08"
-url = "https://mirrors.aliyun.com/golang//go1.26.1.darwin-amd64.tar.gz"
+url = "https://dl.google.com/go/go1.26.1.darwin-amd64.tar.gz"
 
 [tools.go."platforms.windows-x64"]
 checksum = "sha256:9b68112c913f45b7aebbf13c036721264bbba7e03a642f8f7490c561eebd1ecc"
-url = "https://mirrors.aliyun.com/golang//go1.26.1.windows-amd64.zip"
+url = "https://dl.google.com/go/go1.26.1.windows-amd64.zip"
 
 [[tools."go:github.com/google/addlicense"]]
 version = "v1.1.1"
@@ -391,31 +423,31 @@ backend = "core:node"
 
 [tools.node."platforms.linux-arm64"]
 checksum = "sha256:2f823ecd4f9331d6492fedbe50c5a610be3084521f3a5af146875e00a52f2e63"
-url = "https://npmmirror.com/mirrors/node/v25.8.2/node-v25.8.2-linux-arm64.tar.gz"
+url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-linux-arm64.tar.gz"
 
 [tools.node."platforms.linux-arm64-musl"]
 checksum = "sha256:2f823ecd4f9331d6492fedbe50c5a610be3084521f3a5af146875e00a52f2e63"
-url = "https://npmmirror.com/mirrors/node/v25.8.2/node-v25.8.2-linux-arm64.tar.gz"
+url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-linux-arm64.tar.gz"
 
 [tools.node."platforms.linux-x64"]
 checksum = "sha256:e06c7069012d40914c57b31157c69d4ce83ea1fe9d63bbb7d26e0509a4535d21"
-url = "https://npmmirror.com/mirrors/node/v25.8.2/node-v25.8.2-linux-x64.tar.gz"
+url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-linux-x64.tar.gz"
 
 [tools.node."platforms.linux-x64-musl"]
 checksum = "sha256:e06c7069012d40914c57b31157c69d4ce83ea1fe9d63bbb7d26e0509a4535d21"
-url = "https://npmmirror.com/mirrors/node/v25.8.2/node-v25.8.2-linux-x64.tar.gz"
+url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-linux-x64.tar.gz"
 
 [tools.node."platforms.macos-arm64"]
 checksum = "sha256:fb8dabfda3232ef90d992e6439824fc3237356c04d182f3fa883bebeef31e871"
-url = "https://npmmirror.com/mirrors/node/v25.8.2/node-v25.8.2-darwin-arm64.tar.gz"
+url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-darwin-arm64.tar.gz"
 
 [tools.node."platforms.macos-x64"]
 checksum = "sha256:530ffb419789f843215375a65b8fcf4cf010735e99276f512a241a31ba8e5e13"
-url = "https://npmmirror.com/mirrors/node/v25.8.2/node-v25.8.2-darwin-x64.tar.gz"
+url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-darwin-x64.tar.gz"
 
 [tools.node."platforms.windows-x64"]
 checksum = "sha256:51815d5b0256b947d27d614de04060fcfdbdb830d2c86e63e6f33dbf7964cca7"
-url = "https://npmmirror.com/mirrors/node/v25.8.2/node-v25.8.2-win-x64.zip"
+url = "https://nodejs.org/dist/v25.8.2/node-v25.8.2-win-x64.zip"
 
 [[tools."npm:@commitlint/cli"]]
 version = "20.5.0"
@@ -669,3 +701,35 @@ url = "https://github.com/mvdan/sh/releases/download/v3.12.0/shfmt_v3.12.0_darwi
 [tools.shfmt."platforms.windows-x64"]
 checksum = "sha256:c8bda517ba1c640ce4a715c0fa665439ddbe4357ba5e9b77b0e51e70e2b9c94b"
 url = "https://github.com/mvdan/sh/releases/download/v3.12.0/shfmt_v3.12.0_windows_amd64.exe"
+
+[[tools.shfmt]]
+version = "3.13.0"
+backend = "aqua:mvdan/sh"
+
+[tools.shfmt."platforms.linux-arm64"]
+checksum = "sha256:2091a31afd47742051a77bf7cfd175533ab07e924c20ef3151cd108fa1cab5b0"
+url = "https://github.com/mvdan/sh/releases/download/v3.13.0/shfmt_v3.13.0_linux_arm64"
+
+[tools.shfmt."platforms.linux-arm64-musl"]
+checksum = "sha256:2091a31afd47742051a77bf7cfd175533ab07e924c20ef3151cd108fa1cab5b0"
+url = "https://github.com/mvdan/sh/releases/download/v3.13.0/shfmt_v3.13.0_linux_arm64"
+
+[tools.shfmt."platforms.linux-x64"]
+checksum = "sha256:70aa99784703a8d6569bbf0b1e43e1a91906a4166bf1a79de42050a6d0de7551"
+url = "https://github.com/mvdan/sh/releases/download/v3.13.0/shfmt_v3.13.0_linux_amd64"
+
+[tools.shfmt."platforms.linux-x64-musl"]
+checksum = "sha256:70aa99784703a8d6569bbf0b1e43e1a91906a4166bf1a79de42050a6d0de7551"
+url = "https://github.com/mvdan/sh/releases/download/v3.13.0/shfmt_v3.13.0_linux_amd64"
+
+[tools.shfmt."platforms.macos-arm64"]
+checksum = "sha256:650970603b5946dc6041836ddcfa7a19d99b5da885e4687f64575508e99cf718"
+url = "https://github.com/mvdan/sh/releases/download/v3.13.0/shfmt_v3.13.0_darwin_arm64"
+
+[tools.shfmt."platforms.macos-x64"]
+checksum = "sha256:b6890a0009abf71d36d7c536ad56e3132c547ceb77cd5d5ee62b3469ab4e9417"
+url = "https://github.com/mvdan/sh/releases/download/v3.13.0/shfmt_v3.13.0_darwin_amd64"
+
+[tools.shfmt."platforms.windows-x64"]
+checksum = "sha256:62241aaf6b0ca236f8625d8892784b73fa67ad40bc677a1ad1a64ae395f6a7d5"
+url = "https://github.com/mvdan/sh/releases/download/v3.13.0/shfmt_v3.13.0_windows_amd64.exe"

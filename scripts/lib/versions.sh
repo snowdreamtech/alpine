@@ -105,7 +105,7 @@ VER_SHELLCHECK_PROVIDER="github:koalaman/shellcheck"
 # Use shellcheck-py for pipx fallback if needed
 VER_SHELLCHECK_PY="0.11.0.1"
 VER_SHELLCHECK_PY_PROVIDER="pipx:shellcheck-py"
-VER_SHFMT="3.12.0"
+VER_SHFMT="3.13.0"
 VER_SHFMT_PROVIDER="github:mvdan/sh"
 # Use shfmt-py for pipx fallback if needed
 VER_SHFMT_PY="3.12.0.2"
@@ -114,7 +114,7 @@ VER_YAMLLINT="1.38.0"
 VER_YAMLLINT_PROVIDER="pipx:yamllint"
 VER_PRE_COMMIT="4.5.1"
 VER_PRE_COMMIT_PROVIDER="pipx:pre-commit"
-VER_ACTIONLINT="1.7.11"
+VER_ACTIONLINT="1.7.12"
 VER_ACTIONLINT_PROVIDER="github:rhysd/actionlint"
 # Use actionlint-py for pipx fallback if needed
 VER_ACTIONLINT_PY="1.7.11.24"
@@ -224,7 +224,7 @@ VER_ANSIBLE_LINT_PROVIDER="pipx:ansible-lint"
 VER_SPECTRAL="6.15.0"
 VER_SPECTRAL_PROVIDER="npm:@stoplight/spectral-cli"
 
-VER_GORELEASER="2.15.0"
+VER_GORELEASER="2.15.1"
 VER_GORELEASER_PROVIDER="github:goreleaser/goreleaser"
 
 # ── 📖 Documentation ──────────────────────────────────────────────────────────
@@ -232,5 +232,5 @@ VER_BATS="1.13.0"
 VER_BATS_PROVIDER="npm:bats"
 
 # ── 🛠️ Mise Internal / Helpers ────────────────────────────────────────────────
-VER_USAGE="2.18.2"
+VER_USAGE="3.2.0"
 VER_USAGE_PROVIDER="usage"
