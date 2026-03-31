@@ -184,7 +184,8 @@ To maintain a robust security posture across all development stages, the audit p
 
 - **Availability-First Detection (可用性优先检测)**: Environment validations (e.g., `check-env.sh`) MUST prioritize tool presence over environment gating. If a security tool is detected locally, it MUST be reported as `✅ Active`, regardless of its Tier 3 or CI-only classification.
 - **Automatic Activation (自动激活)**: Security scanners (e.g., `osv-scanner`, `zizmor`, `pip-audit`) MUST follow a "Run if installed" pattern. If a tool is available locally, `make audit` MUST automatically execute it, ensuring local validation parity with CI.
-- **Non-Blocking Optionality (非阻塞可选性)**: In local environments, missing optional security tools SHOULD be reported as `⏭️ Optional (CI-only by default)` to avoid developer friction. These tools remain strictly required in CI, where their absence MUST cause a pipeline failure.
+- **Non-Blocking Optionality (非阻塞可选性 / Strict CI vs Local Grace)**: Orchestration scripts MUST implement environment-aware exits (e.g., `is_ci_env`). In local environments, missing security tools MUST be reported as gracefully skipped (`⏭️ Skipped`) to eliminate developer friction. Conversely, these tools remain strictly mandated in CI, where their absence MUST trigger an immediate fatal error (`❌ Missing (Fatal)` -> `exit 1`).
+- **Dynamic On-Demand Execution (动态按需执行)**: Extremely heavy analysis or security tools (like `zizmor`) MUST NOT bulk up the primary `.mise.toml` manifest. Instead, they should be defined as Tier 2/On-Demand tools and executed dynamically (`mise exec tool@ver -- cmd`) only when their specific security audit is invoked.
 - **Unified Summary Reporting**: Both local and CI audit results MUST be captured in a standardized summary table (`.ci_summary.log`) to provide clear visibility into the project's security coverage and findings.
 
 ## 5. Incident Response & Disclosure

@@ -19,6 +19,11 @@
 
 - All three of these SHOULD agree to avoid version ambiguity between tools: `.nvmrc` / `.node-version`, `engines` field in `package.json`, and `.mise.toml`.
 
+### Cross-Platform Tooling & Providers
+
+- **Prefer Universal Providers**: When specifying tools in `.mise.toml`, avoid OS-specific `[targets]` blocks that restrict installation (e.g., excluding Windows). Always prefer universal or cross-platform compatible providers. For example, use `asdf:mise-plugins/mise-pipx` over `aqua:pypa/pipx` to ensure seamless installation across macOS, Linux, and Windows.
+- **Native Providers Priority**: For core operational tools (e.g., `ruff`, `shellcheck`, `shfmt`, `actionlint`), prefer their native, `cargo`, or `go` binary providers over complex wrapper systems if it guarantees better cross-platform reliability and execution speed.
+
 ### Environment Variables
 
 - Provide a `.env.example` file listing all required environment variables with placeholder values and clear descriptions:
@@ -227,8 +232,9 @@
 
 - **Language-Aware & Dynamic Detection**: Health checks and tool installations MUST be context-sensitive.
   - **Prerequisite Detection**: Secondary tools (e.g., `golangci-lint`, `asdf:ghc`) MUST only be installed if corresponding source files or manifests are detected.
-  - **Dynamic Registration**: To avoid the "Mise Tax" (slow resolution of unused tools), tools MUST NOT be pre-committed to `.mise.toml` unless they are core essentials. Use `mise use --local [tool]@[version]` within setup modules to dynamically register runtimes ONLY when detected.
+  - **Dynamic Heavy Tools Execution**: To avoid the "Mise Tax" (slow compilation or resolution of massive security tools like `zizmor`), do NOT add them permanently to the global `.mise.toml`. Instead, track their versions in a central manifest (e.g., `scripts/lib/versions.sh`) and execute them strictly on-demand using `mise exec tool@version -- cmd`. This ensures the core environment remains maximally lightweight.
   - **Availability-First Detection (Security)**: Security scanners (e.g., `osv-scanner`, `zizmor`) MUST prioritize local availability. If the tool is present in the local environment, it MUST be reported as `✅ Active` and participate in the audit workflow, even if categorized as a Tier 3/CI-only tool.
+  - **Strict CI vs. Permissive Local Orchestration**: All audit and linting scripts MUST be environment-aware (e.g., via `is_ci_env`). In CI pipelines, missing required tools MUST trigger a strict, fatal error (`exit 1`) to enforce security gates. In local development, the absence of those same tools MUST degrade gracefully to a non-blocking warning (e.g., `⏭️ Skipped`) to preserve developer velocity.
 
 - **Grouped UX & Selective Display**:
   - Output MUST be organized into logical groups (e.g., Core Infrastructure, Security & Quality, Language Runtimes).
