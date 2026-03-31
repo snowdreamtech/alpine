@@ -180,7 +180,7 @@ jobs:
         run: |
           make setup
           make install
-          MISE_OFFLINE=true make check-env
+          make check-env
         env:
           MISE_GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           VENV: ${{ env.VENV }}
@@ -189,7 +189,7 @@ jobs:
       - name: "🔍 Inspect Code Quality (Lint)"
         shell: sh
         run: |
-          MISE_OFFLINE=true make lint
+          make lint
         env:
           VENV: ${{ env.VENV }}
 
@@ -322,7 +322,7 @@ jobs:
         run: |
           make setup
           make install
-          MISE_OFFLINE=true make check-env
+          make check-env
         env:
           MISE_GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           VENV: ${{ env.VENV }}
@@ -331,7 +331,7 @@ jobs:
       - name: "🧪 Execute Multi-Stack Test Suite"
         shell: sh
         run: |
-          MISE_OFFLINE=true make test
+          make test
         env:
           VENV: ${{ env.VENV }}
 
@@ -436,7 +436,7 @@ jobs:
         run: |
           make setup
           make install
-          MISE_OFFLINE=true make check-env
+          make check-env
         env:
           MISE_GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           VENV: ${{ env.VENV }}
@@ -470,7 +470,7 @@ jobs:
       - name: "🛡️ Perform Security Audit"
         shell: sh
         run: |
-          MISE_OFFLINE=true make audit
+          make audit
           # Extra SARIF export for GitHub Security Tab (Offline to prevent API rate limits)
           mise exec -- zizmor . --format sarif --offline --config .zizmor.yml > zizmor-results.sarif
         env:

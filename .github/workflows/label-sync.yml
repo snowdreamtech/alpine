@@ -87,7 +87,7 @@ jobs:
         run: |
           make setup
           make install
-          MISE_OFFLINE=true make check-env
+          make check-env
         env:
           MISE_GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
 
