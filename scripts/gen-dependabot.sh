@@ -151,12 +151,9 @@ emit_entry() {
     target-branch: "${TARGET_BRANCH:-}"
     # 2. Concurrency: Prevent PR-bombing
     open-pull-requests-limit: 10
-    # 3. Assignment: Auto-request reviews
-    reviewers:
-      - "snowdream"
-    # 4. Management: Auto-rebase to resolve conflicts
+    # 3. Management: Auto-rebase to resolve conflicts
     rebase-strategy: "auto"
-    # 5. Grouping: Consolidate updates to reduce PR noise
+    # 4. Grouping: Consolidate updates to reduce PR noise
     groups:
       📦-all-patch-minor:
         update-types:

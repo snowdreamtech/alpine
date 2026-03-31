@@ -40,13 +40,12 @@ install_ruff() {
   local _T0_RUF
   _T0_RUF=$(date +%s)
   local _TITLE="Ruff"
-  local _PROVIDER="pipx:ruff"
+  local _PROVIDER="ruff"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
   _CUR_VER=$(get_version "ruff" "")
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "pipx:ruff")
+  _REQ_VER=$(get_mise_tool_version "ruff")
 
   if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
     log_summary "Python" "Ruff" "✅ Exists" "${_CUR_VER:-}" "0"

@@ -11,7 +11,7 @@ install_shfmt() {
   local _T0_SHF
   _T0_SHF=$(date +%s)
   local _TITLE="Shfmt"
-  local _PROVIDER="pipx:shfmt-py"
+  local _PROVIDER="shfmt"
 
   if ! has_lang_files "" "*.sh *.bash *.bats"; then
     return 0
@@ -19,7 +19,7 @@ install_shfmt() {
 
   # Fast-path: Check version-aware existence (prefix match to handle pkg vs binary diffs)
   local _CUR_VER
-  _CUR_VER=$(get_version shfmt "" "shfmt-py")
+  _CUR_VER=$(get_version shfmt)
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
@@ -48,7 +48,7 @@ install_shellcheck() {
   local _T0_SHC
   _T0_SHC=$(date +%s)
   local _TITLE="Shellcheck"
-  local _PROVIDER="pipx:shellcheck-py"
+  local _PROVIDER="shellcheck"
 
   if ! has_lang_files "" "*.sh *.bash *.bats"; then
     return 0
@@ -56,7 +56,7 @@ install_shellcheck() {
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
-  _CUR_VER=$(get_version shellcheck "" "shellcheck-py")
+  _CUR_VER=$(get_version shellcheck)
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
@@ -89,14 +89,14 @@ install_actionlint() {
   local _T0_ACT
   _T0_ACT=$(date +%s)
   local _TITLE="Actionlint"
-  local _PROVIDER="pipx:actionlint-py"
+  local _PROVIDER="actionlint"
   if ! has_lang_files ".github/workflows" "*.yml *.yaml"; then
     return 0
   fi
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
-  _CUR_VER=$(get_version actionlint "" "actionlint-py")
+  _CUR_VER=$(get_version actionlint)
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
