@@ -21,8 +21,10 @@
 
 ### Cross-Platform Tooling & Providers
 
-- **Prefer Universal Providers**: When specifying tools in `.mise.toml`, avoid OS-specific `[targets]` blocks that restrict installation (e.g., excluding Windows). Always prefer universal or cross-platform compatible providers. For example, use `asdf:mise-plugins/mise-pipx` over `aqua:pypa/pipx` to ensure seamless installation across macOS, Linux, and Windows.
-- **Native Providers Priority**: For core operational tools (e.g., `ruff`, `shellcheck`, `shfmt`, `actionlint`), prefer their native, `cargo`, or `go` binary providers over complex wrapper systems if it guarantees better cross-platform reliability and execution speed.
+- **Mandatory Native Backends**: When specifying tools in `.mise.toml`, you MUST prefer native `mise` core backends (e.g., `pipx`, `node`, `go`) over legacy `asdf:` plugins.
+  - **Why**: Legacy `asdf` plugins rely heavily on embedded Bash scripts (e.g., `bin/download`), which predictably fail in Windows CI environments (like GitHub Actions `windows-latest` running `pwsh`) due to missing POSIX toolchains, UNIX path translation mismatches, and symlink limitations.
+  - **Example**: Use native `pipx = "1.11.0"` configured directly in `.mise.toml` instead of `"asdf:mise-plugins/mise-pipx" = "1.11.0"`.
+- **Prefer Pre-compiled Binaries**: For core operational tools (e.g., `ruff`, `shellcheck`, `shfmt`, `actionlint`), rely on their natively supported `mise` Registry backends, `cargo:`, or `go:` binary providers rather than Python wrapper ecosystems (like `pipx:ruff-py`) to guarantee the fastest cross-platform reliability and execution speed without sandbox escaping issues.
 
 ### Environment Variables
 
