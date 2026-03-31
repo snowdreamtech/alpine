@@ -1,6 +1,4 @@
 # OSV-Scanner configuration
-# https://google.github.io/osv-scanner/usage/config/
+# https://google.github.io/osv-scanner/configuration/
 
-# Minimal valid configuration
-[ExperimentalScannerConfig]
-# LockfileOnly = true
+# Minimal valid configuration - no experimental features
