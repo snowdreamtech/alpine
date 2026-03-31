@@ -65,6 +65,17 @@ main() {
       exec mise exec "${_ZM_SPEC:-}" -- zizmor "$@"
     fi
 
+    # Optional Security Tools: These heavy scanners are NOT registered in .mise.toml
+    # and have dedicated coverage in CI audit stages (trivy-action, CodeQL, SARIF uploads).
+    # They should skip gracefully in ALL environments (CI and local) when not installed,
+    # instead of hard-failing the lint pipeline.
+    case "${_LINTER_WRAP:-}" in
+    trivy | checkov | semgrep | bandit)
+      log_warn "⏭️  ${_LINTER_WRAP:-} not available. Skipping (covered by CI audit stage)."
+      exit 0
+      ;;
+    esac
+
     if is_ci_env; then
       log_error "❌ ${_LINTER_WRAP:-} not found in CI. Failing."
       log_info "💡 CI environments must have all required tools installed."

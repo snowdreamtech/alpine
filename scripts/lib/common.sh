@@ -1165,16 +1165,30 @@ get_version() {
   local _MISE_VER_OUT
   # Optimization: Prefer the currently active version; fall back to any installed version
   # to avoid slow shim fallbacks. Using 'first(select(...))' or sort ensures active wins.
-  _MISE_VER_OUT=$(echo "${_G_MISE_LS_JSON_CACHE:-}" | jq -r "
-    # Priority 1: Exact key match (e.g. 'go' matches only 'go', not 'go-task/task')
-    # Priority 2: Provider suffix match (e.g. ':go' or '/go' at end of key)
-    # This prevents false positives where short names like 'go' match unrelated
-    # tools such as 'github:go-task/task' via substring contains().
-    (to_entries[] | select(.key == \"${_M_PLUGIN:-}\")) //
-    (to_entries[] | select(.key | endswith(\":${_M_PLUGIN:-}\") or endswith(\"/${_M_PLUGIN:-}\")))
-    | .value
-    | (map(select(.active==true))[0] // map(select(.installed==true))[0])
-    | .version // empty" 2>/dev/null | head -n 1 || true)
+  # Parse JSON without jq for cross-platform compatibility
+  _MISE_VER_OUT=$(echo "${_G_MISE_LS_JSON_CACHE:-}" | awk '{
+    # Convert JSON to a more manageable format
+    gsub(/[{}]/, "");
+    gsub(/"/, "");
+    gsub(/, /, "\n");
+    print
+  }' | grep -E "^${_M_PLUGIN:-}:|^.*:${_M_PLUGIN:-}:|^.*\/${_M_PLUGIN:-}:" | head -n 1 | awk -F: '{
+    # Extract the value part
+    for (i=2; i<=NF; i++) {
+      if (i>2) printf(":");
+      printf("%s", $i);
+    }
+    print
+  }' | awk '{
+    # Look for active version first, then installed
+    if (match($0, /active:true[^}]*version:([0-9]+\.[0-9]+\.[0-9]+)/)) {
+      print substr($0, RSTART+20, RLENGTH-20);
+      exit;
+    } else if (match($0, /installed:true[^}]*version:([0-9]+\.[0-9]+\.[0-9]+)/)) {
+      print substr($0, RSTART+23, RLENGTH-23);
+      exit;
+    }
+  }' 2>/dev/null | head -n 1 || true)
 
   if [ -n "${_MISE_VER_OUT:-}" ] && [ "${_MISE_VER_OUT:-}" != "null" ]; then
     echo "${_MISE_VER_OUT:-}" && return 0
@@ -1314,10 +1328,27 @@ resolve_bin() {
   # which causes 'mise which' to fail even if the tool exists on disk.
   if [ -z "${_G_MISE_LS_JSON_CACHE:-}" ]; then refresh_mise_cache; fi
   local _MC_PATH
-  _MC_PATH=$(echo "${_G_MISE_LS_JSON_CACHE:-}" | jq -r "
-    (to_entries[] | select(.key == \"${_BIN:-}\")) //
-    (to_entries[] | select(.key | endswith(\":${_BIN:-}\") or endswith(\"/${_BIN:-}\")))
-    | .value[0].install_path // empty" 2>/dev/null || true)
+  # Parse JSON without jq for cross-platform compatibility
+  _MC_PATH=$(echo "${_G_MISE_LS_JSON_CACHE:-}" | awk '{
+    # Convert JSON to a more manageable format
+    gsub(/[{}]/, "");
+    gsub(/"/, "");
+    gsub(/, /, "\n");
+    print
+  }' | grep -E "^${_BIN:-}:|^.*:${_BIN:-}:|^.*\/${_BIN:-}:" | head -n 1 | awk -F: '{
+    # Extract the value part
+    for (i=2; i<=NF; i++) {
+      if (i>2) printf(":");
+      printf("%s", $i);
+    }
+    print
+  }' | awk '{
+    # Look for install_path
+    if (match($0, /install_path:([^,]+)/)) {
+      print substr($0, RSTART+13, RLENGTH-13);
+      exit;
+    }
+  }' 2>/dev/null | head -n 1 || true)
 
   if [ -n "${_MC_PATH:-}" ] && [ "${_MC_PATH:-}" != "null" ]; then
     # Standard mise structure: bin/tool or tool
