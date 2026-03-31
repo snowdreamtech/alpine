@@ -81,6 +81,6 @@ assert_contains "📦-all-patch-minor"
 assert_contains "🧹-lint-dependencies"
 assert_contains "🔧-actions-updates"
 assert_contains 'rebase-strategy: "auto"'
-assert_contains "reviewers: \[\"snowdream\"\]"
+assert_contains 'open-pull-requests-limit: 10'
 
 echo "✨ Smoke test PASSED successfully!"
