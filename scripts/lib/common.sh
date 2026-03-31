@@ -1163,32 +1163,59 @@ get_version() {
   # Check mise via cache first (fastest)
   if [ -z "${_G_MISE_LS_JSON_CACHE:-}" ]; then refresh_mise_cache; fi
   local _MISE_VER_OUT
-  # Optimization: Prefer the currently active version; fall back to any installed version
-  # to avoid slow shim fallbacks. Using 'first(select(...))' or sort ensures active wins.
   # Parse JSON without jq for cross-platform compatibility
-  _MISE_VER_OUT=$(echo "${_G_MISE_LS_JSON_CACHE:-}" | awk '{
-    # Convert JSON to a more manageable format
-    gsub(/[{}]/, "");
-    gsub(/"/, "");
-    gsub(/, /, "\n");
-    print
-  }' | grep -E "^${_M_PLUGIN:-}:|^.*:${_M_PLUGIN:-}:|^.*\/${_M_PLUGIN:-}:" | head -n 1 | awk -F: '{
-    # Extract the value part
-    for (i=2; i<=NF; i++) {
-      if (i>2) printf(":");
-      printf("%s", $i);
+  # Uses a robust awk script that properly handles JSON structure
+  _MISE_VER_OUT=$(echo "${_G_MISE_LS_JSON_CACHE:-}" | awk -v plugin="${_M_PLUGIN:-}" '
+    BEGIN {
+      in_tool = 0;
+      active_ver = "";
+      installed_ver = "";
+      buffer = "";
     }
-    print
-  }' | awk '{
-    # Look for active version first, then installed
-    if (match($0, /active:true[^}]*version:([0-9]+\.[0-9]+\.[0-9]+)/)) {
-      print substr($0, RSTART+20, RLENGTH-20);
-      exit;
-    } else if (match($0, /installed:true[^}]*version:([0-9]+\.[0-9]+\.[0-9]+)/)) {
-      print substr($0, RSTART+23, RLENGTH-23);
-      exit;
+    # Match tool key: exact match or suffix match with : or /
+    # Examples: "go", "cargo:eza", "github:go-task/task"
+    {
+      buffer = buffer " " $0;
+      # Check if we are entering a tool definition
+      if ($0 ~ "\"" plugin "\"[[:space:]]*:" || $0 ~ "[:/]" plugin "\"[[:space:]]*:") {
+        in_tool = 1;
+        next;
+      }
     }
-  }' 2>/dev/null | head -n 1 || true)
+    # Inside the tool array, extract version info
+    in_tool {
+      # Look for active and version in buffer
+      if ($0 ~ /"active"[[:space:]]*:[[:space:]]*true/ && active_ver == "") {
+        if (match(buffer, /"version"[[:space:]]*:[[:space:]]*"([0-9]+\.[0-9]+[^"]*)"/, arr)) {
+          active_ver = arr[1];
+        }
+      }
+      # Look for installed and version in buffer
+      if ($0 ~ /"installed"[[:space:]]*:[[:space:]]*true/ && installed_ver == "") {
+        if (match(buffer, /"version"[[:space:]]*:[[:space:]]*"([0-9]+\.[0-9]+[^"]*)"/, arr)) {
+          installed_ver = arr[1];
+        }
+      }
+      # Exit tool array when we hit closing bracket
+      if ($0 ~ /^[[:space:]]*\]/) {
+        in_tool = 0;
+        buffer = "";
+        # If we found a version, print and exit (prefer active over installed)
+        if (active_ver != "") {
+          print active_ver;
+          exit;
+        } else if (installed_ver != "") {
+          print installed_ver;
+          exit;
+        }
+      }
+    }
+    END {
+      # Final fallback: prefer active over installed
+      if (active_ver != "") print active_ver;
+      else if (installed_ver != "") print installed_ver;
+    }
+  ' 2>/dev/null | head -n 1 || true)
 
   if [ -n "${_MISE_VER_OUT:-}" ] && [ "${_MISE_VER_OUT:-}" != "null" ]; then
     echo "${_MISE_VER_OUT:-}" && return 0
@@ -1329,8 +1356,9 @@ resolve_bin() {
   if [ -z "${_G_MISE_LS_JSON_CACHE:-}" ]; then refresh_mise_cache; fi
   _MC_PATH=$(echo "${_G_MISE_LS_JSON_CACHE:-}" | awk -v bin="${_BIN:-}" '
     BEGIN { found_bin = 0; }
-    # Portable matching of tool key "bin": [ or "prefix:bin": [
-    $0 ~ "\"" bin "\"" && $0 ~ ":" && $0 ~ "\\[" {
+    # Portable matching of tool key: matches "bin", "prefix:bin", or "prefix:owner/bin"
+    # Matches strings ending in "bin" preceded by " , : or /
+    $0 ~ "(\"|:|/)" bin "\"" && $0 ~ ":" && $0 ~ "\\[" {
       found_bin = 1;
       next;
     }
@@ -1339,13 +1367,14 @@ resolve_bin() {
         match($0, /"install_path":[[:space:]]*"[^"]+"/);
         if (RSTART > 0) {
           res = substr($0, RSTART, RLENGTH);
+          # Extract between quotes: "install_path": "PATH"
           sub(/.*"install_path":[[:space:]]*"/, "", res);
           sub(/"$/, "", res);
           print res;
         }
       }
-      # Stop at end of tool array or end of JSON
-      if ($0 ~ /^[[:space:]]*\],?/ || $0 ~ /^[[:space:]]*\}/) {
+      # Stop if we hit a new tool key or end of array
+      if ($0 ~ /^[[:space:]]*\],?/ || $0 ~ /^[[:space:]]*\}/ || ($0 ~ /^  "[^"]+": \[/ && !($0 ~ bin))) {
         found_bin = 0;
       }
     }

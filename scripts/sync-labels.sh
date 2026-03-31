@@ -30,13 +30,9 @@ sync_label() {
 
   echo "🔄 Syncing label: [$_name] (#$_color)"
   # Create or Edit the label
-  # Parse JSON without jq for cross-platform compatibility
-  if gh label list --json name | awk '{
-    gsub(/[\[\]{}]/, "");
-    gsub(/"/, "");
-    gsub(/, /, "\n");
-    print
-  }' | grep -E "^name:" | awk -F: '{print $2}' | grep -qx "${_name:-}"; then
+  # Use gh's native template output instead of jq for cross-platform compatibility
+  # Template format extracts just the name field, one per line
+  if gh label list --template '{{range .}}{{.name}}{{"\n"}}{{end}}' | grep -qx "${_name:-}"; then
     gh label edit "${_name:-}" --color "${_color:-}" --description "${_desc:-}"
   else
     gh label create "${_name:-}" --color "${_color:-}" --description "${_desc:-}"
