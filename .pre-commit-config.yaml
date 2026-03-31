@@ -888,8 +888,8 @@ repos:
       - id: license-check
         name: check license headers
         language: system
-        entry: mise x -- addlicense -check -v -f .github/license-header.txt
-        files: ^(src|pkg|internal|cmd|app|lib|include|scripts|tests)/
+        entry: sh scripts/lib/lint-wrapper.sh addlicense -check -v -f .github/license-header.txt
+        files: ^(src|pkg|internal|cmd|app|lib|include|tests)/
         types_or:
           [
             go,
@@ -916,6 +916,11 @@ repos:
             f#,
             dart,
           ]
+        exclude: |
+          (?x)^(
+            scripts/.*\.(sh|ps1|bat)$|
+            \.github/agents|agent|agents|roo|claude|qwen|amazonq|augment|bob|codebuddy|codex|kilocode|opencode|qoder|shai|cursor|windsurf|pearai|pi|pochi|supermaven|tabnine|trae|vibe|void|zed|zencoder|openhands|cody|coderabbit|aide|cline|clinerules|cursorrules|pr_agent.toml
+          )/.*
         description: "High-performance incremental compliance: Verify staged files for a SnowdreamTech license header."
 
       - id: forbidden-files

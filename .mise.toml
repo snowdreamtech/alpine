@@ -71,17 +71,18 @@ asdf_compat = true
 # Settings and URL replacements for network reliability.
 # Note: url_replacements do not support Jinja2/Tera templates directly in settings;
 # simple key-value replacement of the URL prefix is performed.
-http_timeout = "300s"
-url_replacements = { "https://github.com" = "https://gh-proxy.sn0wdr1am.com/https://github.com" }
+http_timeout = "30s"
+# GitHub proxy disabled - causing mise ls to hang
+# url_replacements = { "https://github.com" = "https://gh-proxy.sn0wdr1am.com/https://github.com" }
 
 
 # ------------------------------------------------------------
 # Environment variables for performance acceleration
 # ------------------------------------------------------------
 [env]
-# GitHub Proxy Acceleration
-ENABLE_GITHUB_PROXY = "{% if env.CI is defined %}0{% else %}1{% endif %}"
-GITHUB_PROXY = "{% if env.CI is defined %}{% else %}https://gh-proxy.sn0wdr1am.com/{% endif %}"
+# GitHub Proxy Acceleration - DISABLED to prevent hanging
+ENABLE_GITHUB_PROXY = "0"
+GITHUB_PROXY = ""
 
 # Feature Governance (0 = Disabled, 1 = Enabled)
 CONFIG_AUTO_UPDATE = "1"

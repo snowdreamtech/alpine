@@ -190,13 +190,18 @@ fi
 # Initialized LAZILY at first tool resolution, or manually refreshed after installs.
 # shellcheck disable=SC2120
 refresh_mise_cache() {
-  if command -v mise >/dev/null 2>&1; then
-    _G_MISE_LS_JSON_CACHE=$(MISE_OFFLINE=1 mise ls --json 2>/dev/null || echo "{}")
-  else
-    _G_MISE_LS_JSON_CACHE="{}"
-  fi
-  # shellcheck disable=SC2034
+  # DISABLED: mise ls --json hangs due to proxy/network issues
+  # Fallback to direct command resolution for better reliability
+  _G_MISE_LS_JSON_CACHE="{}"
   export _G_MISE_LS_JSON_CACHE
+  return 0
+
+  # Original implementation (commented out):
+  # if command -v mise >/dev/null 2>&1; then
+  #   _G_MISE_LS_JSON_CACHE=$(MISE_OFFLINE=1 mise ls --json 2>/dev/null || echo "{}")
+  # else
+  #   _G_MISE_LS_JSON_CACHE="{}"
+  # fi
 }
 
 # Initial state: Empty (triggers lazy load on first resolution)
@@ -1435,13 +1440,18 @@ check_runtime() {
     return 0
   fi
 
-  # Priority 2: Standard Command Check (Fallback using resolve_bin)
+  # Priority 2: In audit mode, skip resolve_bin check entirely
+  # The tool version was already checked by check_tool_version above.
+  # This prevents hanging on mise operations during environment health checks.
+  if [ "${_G_AUDIT_MODE:-0}" -eq 1 ]; then
+    log_debug "Audit mode: Skipping runtime check for '${_RT_NAME:-}' (already verified by check_tool_version)"
+    return 0
+  fi
+
+  # Priority 3: Standard Command Check (Fallback using resolve_bin)
+  # Only used in pre-commit hooks, not in audit mode.
   if ! resolve_bin "${_RT_NAME:-}" >/dev/null 2>&1; then
     log_warn "Required runtime '${_RT_NAME:-}' for ${_TOOL_DESC:-} is missing. Skipping."
-    # In audit mode, we report and continue
-    if [ "${_G_AUDIT_MODE:-0}" -eq 1 ]; then
-      return 0
-    fi
     exit 0 # Graceful skip for pre-commit
   fi
 }
