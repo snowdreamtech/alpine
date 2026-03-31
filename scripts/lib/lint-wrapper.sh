@@ -56,11 +56,21 @@ main() {
 
   # 2. Check Existence
   if [ -z "${_RESOLVED_BIN_WRAP:-}" ]; then
-    if [ "${_G_AUDIT_MODE:-0}" -eq 1 ]; then
-      log_error "❌ ${_LINTER_WRAP:-} not found but required in AUDIT mode. Failing."
+    # Dynamic Handler: On-demand Tier 2 tools (not registered in .mise.toml)
+    if [ "${_LINTER_WRAP:-}" = "zizmor" ]; then
+      local _ZM_SPEC="${VER_ZIZMOR_PROVIDER:-zizmor}@${VER_ZIZMOR:-latest}"
+      log_info "── Executing ${_LINTER_WRAP:-} (dynamic) ──"
+      # Execute directly with mise exec
+      # shellcheck disable=SC2093
+      exec mise exec "${_ZM_SPEC:-}" -- zizmor "$@"
+    fi
+
+    if is_ci_env; then
+      log_error "❌ ${_LINTER_WRAP:-} not found in CI. Failing."
+      log_info "💡 CI environments must have all required tools installed."
       exit 1
     fi
-    log_warn "⚠️  ${_LINTER_WRAP:-} not found. Skipping linting for this module."
+    log_warn "⚠️  ${_LINTER_WRAP:-} not found locally. Skipping linting for this module."
     log_info "💡 Run 'make setup' to install required tools."
     exit 0
   fi

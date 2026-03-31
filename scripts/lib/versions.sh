@@ -25,6 +25,7 @@ VER_PNPM="10.33.0"
 VER_PNPM_PROVIDER="npm:pnpm"
 VER_PYTHON="3.14.3"
 VER_PIPX="1.11.0"
+VER_PIPX_PROVIDER="asdf:mise-plugins/mise-pipx"
 
 # ── 🏗️ Tier 2: Language Runtimes (On-demand) ─────────────────────────────────
 VER_KOTLIN="2.3.20"
@@ -73,6 +74,7 @@ VER_DUCKDB="1.5.0"
 
 # ── 🔐 Tier 1: Security & Engineering (Mirror of .mise.toml) ─────────────────
 VER_GITLEAKS="8.30.1"
+VER_GITLEAKS_PROVIDER="github:gitleaks/gitleaks"
 VER_GH_CLI="2.89.0"
 VER_GH_CLI_PROVIDER="github:cli/cli"
 
@@ -98,16 +100,25 @@ VER_PRETTIER="3.8.1"
 VER_PRETTIER_PROVIDER="npm:prettier"
 
 # Shell & scripting
-VER_SHELLCHECK="0.11.0.1"
-VER_SHELLCHECK_PROVIDER="pipx:shellcheck-py"
-VER_SHFMT="3.12.0.2"
-VER_SHFMT_PROVIDER="pipx:shfmt-py"
+VER_SHELLCHECK="0.11.0"
+VER_SHELLCHECK_PROVIDER="github:koalaman/shellcheck"
+# Use shellcheck-py for pipx fallback if needed
+VER_SHELLCHECK_PY="0.11.0.1"
+VER_SHELLCHECK_PY_PROVIDER="pipx:shellcheck-py"
+VER_SHFMT="3.12.0"
+VER_SHFMT_PROVIDER="github:mvdan/sh"
+# Use shfmt-py for pipx fallback if needed
+VER_SHFMT_PY="3.12.0.2"
+VER_SHFMT_PY_PROVIDER="pipx:shfmt-py"
 VER_YAMLLINT="1.38.0"
 VER_YAMLLINT_PROVIDER="pipx:yamllint"
 VER_PRE_COMMIT="4.5.1"
 VER_PRE_COMMIT_PROVIDER="pipx:pre-commit"
-VER_ACTIONLINT="1.7.11.24"
-VER_ACTIONLINT_PROVIDER="pipx:actionlint-py"
+VER_ACTIONLINT="1.7.11"
+VER_ACTIONLINT_PROVIDER="github:rhysd/actionlint"
+# Use actionlint-py for pipx fallback if needed
+VER_ACTIONLINT_PY="1.7.11.24"
+VER_ACTIONLINT_PY_PROVIDER="pipx:actionlint-py"
 
 # ── 🎨 Language Tooling (Linters/Formatters) ─────────────────────────────────
 VER_KTLINT="1.16.1"
@@ -164,7 +175,7 @@ VER_DOCKERFILE_UTILS="0.16.3"
 VER_DOCKERFILE_UTILS_PROVIDER="npm:dockerfile-utils"
 
 VER_RUFF="0.15.8"
-VER_RUFF_PROVIDER="pipx:ruff"
+VER_RUFF_PROVIDER="github:astral-sh/ruff"
 
 VER_CLANG_FORMAT="22.1.2"
 VER_CLANG_FORMAT_PROVIDER="pipx:clang-format"
@@ -219,3 +230,7 @@ VER_GORELEASER_PROVIDER="github:goreleaser/goreleaser"
 # ── 📖 Documentation ──────────────────────────────────────────────────────────
 VER_BATS="1.13.0"
 VER_BATS_PROVIDER="npm:bats"
+
+# ── 🛠️ Mise Internal / Helpers ────────────────────────────────────────────────
+VER_USAGE="2.18.2"
+VER_USAGE_PROVIDER="usage"

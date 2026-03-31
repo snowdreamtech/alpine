@@ -108,6 +108,13 @@ main() {
         _OVERALL_EXIT_AUDIT=1
       fi
     fi
+  elif is_ci_env; then
+    log_error "gitleaks not found in CI. Failing Secrets Scan."
+    log_summary "Security" "gitleaks" "❌ Missing (Fatal)" "-" "0"
+    _OVERALL_EXIT_AUDIT=1
+  else
+    log_warn "gitleaks not found locally. Skipping Secrets Scan."
+    log_summary "Security" "gitleaks" "⏭️  Skipped" "-" "0"
   fi
 
   # 4. GitHub Actions Security
@@ -117,66 +124,77 @@ main() {
     local _ZIZMOR_BIN
     _ZIZMOR_BIN=$(resolve_bin "zizmor") || true
 
-    if [ -n "${_ZIZMOR_BIN:-}" ] || is_ci_env; then
-      if [ -n "${_ZIZMOR_BIN:-}" ]; then
-        if [ "${DRY_RUN:-0}" -eq 1 ]; then
-          log_success "DRY-RUN: Would run zizmor"
-          log_summary "GitHub" "zizmor" "⚖️ Previewed" "-" "0"
-        else
-          # zizmor logic...
-          local _ZM_OK=0
-          local _ZM_SPEC="${VER_ZIZMOR_PROVIDER:-zizmor}@${VER_ZIZMOR:-latest}"
-          if [ -n "${GITHUB_TOKEN:-}" ]; then
-            log_info "Zizmor: Attempting authenticated scan..."
-            export GH_TOKEN="${GITHUB_TOKEN:-}"
-            if run_quiet run_mise exec "${_ZM_SPEC:-}" -- zizmor . --format plain --config .zizmor.yml --gh-token "${GITHUB_TOKEN:-}"; then
-              _ZM_OK=1
-            fi
-          fi
-
-          if [ "${_ZM_OK:-}" -eq 0 ]; then
-            log_info "Zizmor: Attempting offline scan (fallback)..."
-            if run_quiet run_mise exec "${_ZM_SPEC:-}" -- zizmor . --format plain --config .zizmor.yml --offline; then
-              _ZM_OK=1
-            fi
-          fi
-
-          if [ "${_ZM_OK:-}" -eq 1 ]; then
-            log_summary "GitHub" "zizmor" "✅ Secure" "$(get_version "${_ZIZMOR_BIN:-}")" "$(($(date +%s) - _T0_ZM))"
-          else
-            log_summary "GitHub" "zizmor" "⚠️ Findings" "$(get_version "${_ZIZMOR_BIN:-}")" "$(($(date +%s) - _T0_ZM))"
+    # Logic: Always run zizmor as it is dynamically installed.
+    local _ZM_SPEC="${VER_ZIZMOR_PROVIDER:-zizmor}@${VER_ZIZMOR:-latest}"
+    if [ -n "${_ZM_SPEC:-}" ]; then
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
+        log_success "DRY-RUN: Would run zizmor"
+        log_summary "GitHub" "zizmor" "⚖️ Previewed" "-" "0"
+      else
+        # zizmor logic...
+        local _ZM_OK=0
+        if [ -n "${GITHUB_TOKEN:-}" ]; then
+          log_info "Zizmor: Attempting authenticated scan..."
+          export GH_TOKEN="${GITHUB_TOKEN:-}"
+          if run_quiet run_mise exec "${_ZM_SPEC:-}" -- zizmor . --format plain --config .zizmor.yml --gh-token "${GITHUB_TOKEN:-}"; then
+            _ZM_OK=1
           fi
         fi
-      elif is_ci_env; then
-        log_warn "zizmor not found in CI. Skipping GitHub security audit."
-        log_summary "GitHub" "zizmor" "❌ Missing" "-" "0"
+
+        if [ "${_ZM_OK:-}" -eq 0 ]; then
+          log_info "Zizmor: Attempting offline scan (fallback)..."
+          if run_quiet run_mise exec "${_ZM_SPEC:-}" -- zizmor . --format plain --config .zizmor.yml --offline; then
+            _ZM_OK=1
+          fi
+        fi
+
+        if [ "${_ZM_OK:-}" -eq 1 ]; then
+          log_summary "GitHub" "zizmor" "✅ Secure" "${VER_ZIZMOR:-dynamic}" "$(($(date +%s) - _T0_ZM))"
+        else
+          log_summary "GitHub" "zizmor" "❌ Vulnerable" "${VER_ZIZMOR:-dynamic}" "$(($(date +%s) - _T0_ZM))"
+          _OVERALL_EXIT_AUDIT=1
+        fi
       fi
+    elif is_ci_env; then
+      log_error "zizmor not found in CI. Failing GitHub Actions Security Scan."
+      log_summary "GitHub" "zizmor" "❌ Missing (Fatal)" "-" "0"
+      _OVERALL_EXIT_AUDIT=1
     else
-      log_summary "GitHub" "zizmor" "⏭️  Optional (CI-only by default)" "-" "0"
+      log_warn "zizmor not found locally. Skipping GitHub Actions Security Scan."
+      log_summary "GitHub" "zizmor" "⏭️  Skipped" "-" "0"
     fi
   fi
 
-  # 5. Dependency Audits (Node.js) - Automatic Activation: run if NPM is available.
-  if [ -f "${PACKAGE_JSON:-}" ] && { is_ci_env || resolve_bin "${NPM:-}" >/dev/null 2>&1; }; then
-    local _T0_JS
-    _T0_JS=$(date +%s)
-    log_info "\n── Auditing Node.js dependencies ($NPM audit) ──"
-    if [ "${DRY_RUN:-0}" -eq 1 ]; then
-      log_success "DRY-RUN: Would run $NPM audit"
-      log_summary "Node.js" "$NPM-audit" "⚖️ Previewed" "-" "0"
-    else
-      # Always use the official npm registry for audit — mirror registries (e.g.
-      # npmmirror.com) do not implement the audit endpoint and return 404.
-      local _AUDIT_REGISTRY="https://registry.npmjs.org"
-
-      # shellcheck disable=SC2086
-      if run_quiet "${NPM:-}" audit --registry="${_AUDIT_REGISTRY:-}"; then
-        log_summary "Node.js" "$NPM-audit" "✅ Secure" "$(get_version "${NPM:-}")" "$(($(date +%s) - _T0_JS))"
+  # 5. Dependency Audits (Node.js)
+  if [ -f "${PACKAGE_JSON:-}" ]; then
+    if resolve_bin "${NPM:-npm}" >/dev/null 2>&1; then
+      local _T0_JS
+      _T0_JS=$(date +%s)
+      log_info "\n── Auditing Node.js dependencies (${NPM:-npm} audit) ──"
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
+        log_success "DRY-RUN: Would run ${NPM:-npm} audit"
+        log_summary "Node.js" "${NPM:-npm}-audit" "⚖️ Previewed" "-" "0"
       else
-        log_summary "Node.js" "$NPM-audit" "⚠️ Vulnerabilities" "$(get_version "${NPM:-}")" "$(($(date +%s) - _T0_JS))"
-        # Non-fatal: audit findings are informational for a template project.
-        # Downstream projects should run their own audit with their own registry.
+        # Always use the official npm registry for audit — mirror registries (e.g.
+        # npmmirror.com) do not implement the audit endpoint and return 404.
+        local _AUDIT_REGISTRY="https://registry.npmjs.org"
+
+        # shellcheck disable=SC2086
+        if run_quiet "${NPM:-npm}" audit --registry="${_AUDIT_REGISTRY:-}"; then
+          log_summary "Node.js" "${NPM:-npm}-audit" "✅ Secure" "$(get_version "${NPM:-npm}")" "$(($(date +%s) - _T0_JS))"
+        else
+          log_summary "Node.js" "${NPM:-npm}-audit" "⚠️ Vulnerabilities" "$(get_version "${NPM:-npm}")" "$(($(date +%s) - _T0_JS))"
+          # Non-fatal: audit findings are informational for a template project.
+          # Downstream projects should run their own audit with their own registry.
+        fi
       fi
+    elif is_ci_env; then
+      log_error "${NPM:-npm} not found in CI. Failing Node.js audit."
+      log_summary "Node.js" "${NPM:-npm}-audit" "❌ Missing (Fatal)" "-" "0"
+      _OVERALL_EXIT_AUDIT=1
+    else
+      log_warn "${NPM:-npm} not found locally. Skipping Node.js audit."
+      log_summary "Node.js" "${NPM:-npm}-audit" "⏭️  Skipped" "-" "0"
     fi
   fi
 
@@ -184,30 +202,30 @@ main() {
   local _PA_BIN
   _PA_BIN=$(resolve_bin "pip-audit") || true
   if { [ -f "requirements-dev.txt" ] || [ -f "requirements.txt" ] || [ -f "pyproject.toml" ]; }; then
-    if [ -n "${_PA_BIN:-}" ] || is_ci_env; then
+    if [ -n "${_PA_BIN:-}" ]; then
       local _T0_PY_AUD
       _T0_PY_AUD=$(date +%s)
       log_info "\n── Auditing Python dependencies (pip-audit) ──"
 
-      if [ -n "${_PA_BIN:-}" ]; then
-        if [ "${DRY_RUN:-0}" -eq 1 ]; then
-          log_success "DRY-RUN: Would run ${_PA_BIN:-}"
-          log_summary "Python" "pip-audit" "⚖️ Previewed" "-" "0"
-        else
-          local _PA_SPEC="${VER_PIP_AUDIT_PROVIDER:-pip-audit}@${VER_PIP_AUDIT:-latest}"
-          if run_quiet run_mise exec "${_PA_SPEC:-}" -- pip-audit; then
-            log_summary "Python" "pip-audit" "✅ Secure" "$(get_version pip-audit --version)" "$(($(date +%s) - _T0_PY_AUD))"
-          else
-            log_summary "Python" "pip-audit" "❌ Vulnerable" "$(get_version pip-audit --version)" "$(($(date +%s) - _T0_PY_AUD))"
-            _OVERALL_EXIT_AUDIT=1
-          fi
-        fi
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
+        log_success "DRY-RUN: Would run ${_PA_BIN:-}"
+        log_summary "Python" "pip-audit" "⚖️ Previewed" "-" "0"
       else
-        log_warn "pip-audit not found in CI. Skipping Python audit."
-        log_summary "Python" "pip-audit" "❌ Missing" "-" "0"
+        local _PA_SPEC="${VER_PIP_AUDIT_PROVIDER:-pip-audit}@${VER_PIP_AUDIT:-latest}"
+        if run_quiet run_mise exec "${_PA_SPEC:-}" -- pip-audit; then
+          log_summary "Python" "pip-audit" "✅ Secure" "$(get_version pip-audit --version)" "$(($(date +%s) - _T0_PY_AUD))"
+        else
+          log_summary "Python" "pip-audit" "❌ Vulnerable" "$(get_version pip-audit --version)" "$(($(date +%s) - _T0_PY_AUD))"
+          _OVERALL_EXIT_AUDIT=1
+        fi
       fi
+    elif is_ci_env; then
+      log_error "pip-audit not found in CI. Failing Python audit."
+      log_summary "Python" "pip-audit" "❌ Missing (Fatal)" "-" "0"
+      _OVERALL_EXIT_AUDIT=1
     else
-      log_summary "Python" "pip-audit" "⏭️  Optional (CI-only by default)" "-" "0"
+      log_warn "pip-audit not found locally. Skipping Python audit."
+      log_summary "Python" "pip-audit" "⏭️  Skipped" "-" "0"
     fi
   fi
 
@@ -221,35 +239,35 @@ main() {
   _OSV_BIN=$(resolve_bin "osv-scanner") || true
 
   if [ "${_HAS_LOCKFILE:-}" -eq 1 ]; then
-    if [ -n "${_OSV_BIN:-}" ] || is_ci_env; then
+    if [ -n "${_OSV_BIN:-}" ]; then
       local _T0_OSV_AUD
       _T0_OSV_AUD=$(date +%s)
       log_info "\n── Generic Vulnerability Scan (osv-scanner) ──"
 
-      if [ -n "${_OSV_BIN:-}" ]; then
-        if [ "${DRY_RUN:-0}" -eq 1 ]; then
-          log_success "DRY-RUN: Would run osv-scanner"
-          log_summary "Security" "osv-scanner" "⚖️ Previewed" "-" "0"
-        else
-          local _OSV_SPEC="${VER_OSV_SCANNER_PROVIDER:-osv-scanner}@${VER_OSV_SCANNER:-latest}"
-          _OSV_OUT=$(run_mise exec "${_OSV_SPEC:-}" -- osv-scanner scan . --config .osv-scanner.toml --call-analysis=all --format table 2>&1) || _OSV_EXIT=$?
-          [ -n "${_OSV_EXIT:-}" ] || _OSV_EXIT=0
-          if [ "${_OSV_EXIT:-}" -eq 0 ]; then
-            log_summary "Security" "osv-scanner" "✅ Secure" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV_AUD))"
-          elif echo "${_OSV_OUT:-}" | grep -q "No package sources found"; then
-            log_info "osv-scanner: No package sources found. Skipping."
-            log_summary "Security" "osv-scanner" "⏭️  Skipped" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV_AUD))"
-          else
-            echo "${_OSV_OUT:-}"
-            log_summary "Security" "osv-scanner" "⚠️ Findings" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV_AUD))"
-          fi
-        fi
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
+        log_success "DRY-RUN: Would run osv-scanner"
+        log_summary "Security" "osv-scanner" "⚖️ Previewed" "-" "0"
       else
-        log_warn "osv-scanner not found in CI. Skipping generic vulnerability scan."
-        log_summary "Security" "osv-scanner" "❌ Missing" "-" "0"
+        local _OSV_SPEC="${VER_OSV_SCANNER_PROVIDER:-osv-scanner}@${VER_OSV_SCANNER:-latest}"
+        _OSV_OUT=$(run_mise exec "${_OSV_SPEC:-}" -- osv-scanner scan . --config .osv-scanner.toml --call-analysis=all --format table 2>&1) || _OSV_EXIT=$?
+        [ -n "${_OSV_EXIT:-}" ] || _OSV_EXIT=0
+        if [ "${_OSV_EXIT:-}" -eq 0 ]; then
+          log_summary "Security" "osv-scanner" "✅ Secure" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV_AUD))"
+        elif echo "${_OSV_OUT:-}" | grep -q "No package sources found"; then
+          log_info "osv-scanner: No package sources found. Skipping."
+          log_summary "Security" "osv-scanner" "⏭️  Skipped" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV_AUD))"
+        else
+          echo "${_OSV_OUT:-}"
+          log_summary "Security" "osv-scanner" "⚠️ Findings" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV_AUD))"
+        fi
       fi
+    elif is_ci_env; then
+      log_error "osv-scanner not found in CI. Failing generic vulnerability scan."
+      log_summary "Security" "osv-scanner" "❌ Missing (Fatal)" "-" "0"
+      _OVERALL_EXIT_AUDIT=1
     else
-      log_summary "Security" "osv-scanner" "⏭️  Optional (CI-only by default)" "-" "0"
+      log_warn "osv-scanner not found locally. Skipping generic vulnerability scan."
+      log_summary "Security" "osv-scanner" "⏭️  Skipped" "-" "0"
     fi
   fi
 
@@ -257,29 +275,29 @@ main() {
   local _GOVULN_BIN
   _GOVULN_BIN=$(resolve_bin "govulncheck") || true
   if [ -f "go.mod" ]; then
-    if [ -n "${_GOVULN_BIN:-}" ] || is_ci_env; then
+    if [ -n "${_GOVULN_BIN:-}" ]; then
       local _T0_GO_AUD
       _T0_GO_AUD=$(date +%s)
       log_info "\n── Auditing Go dependencies (govulncheck) ──"
-      if [ -n "${_GOVULN_BIN:-}" ]; then
-        if [ "${DRY_RUN:-0}" -eq 1 ]; then
-          log_success "DRY-RUN: Would run govulncheck"
-          log_summary "Go" "govulncheck" "⚖️ Previewed" "-" "0"
-        else
-          local _GOV_SPEC="${VER_GOVULNCHECK_PROVIDER:-govulncheck}@${VER_GOVULNCHECK:-latest}"
-          if run_quiet run_mise exec "${_GOV_SPEC:-}" -- govulncheck ./...; then
-            log_summary "Go" "govulncheck" "✅ Secure" "$(get_version govulncheck)" "$(($(date +%s) - _T0_GO_AUD))"
-          else
-            log_summary "Go" "govulncheck" "❌ Vulnerable" "$(get_version govulncheck)" "$(($(date +%s) - _T0_GO_AUD))"
-            _OVERALL_EXIT_AUDIT=1
-          fi
-        fi
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
+        log_success "DRY-RUN: Would run govulncheck"
+        log_summary "Go" "govulncheck" "⚖️ Previewed" "-" "0"
       else
-        log_warn "govulncheck not found in CI. Skipping Go audit."
-        log_summary "Go" "govulncheck" "❌ Missing" "-" "0"
+        local _GOV_SPEC="${VER_GOVULNCHECK_PROVIDER:-govulncheck}@${VER_GOVULNCHECK:-latest}"
+        if run_quiet run_mise exec "${_GOV_SPEC:-}" -- govulncheck ./...; then
+          log_summary "Go" "govulncheck" "✅ Secure" "$(get_version govulncheck)" "$(($(date +%s) - _T0_GO_AUD))"
+        else
+          log_summary "Go" "govulncheck" "❌ Vulnerable" "$(get_version govulncheck)" "$(($(date +%s) - _T0_GO_AUD))"
+          _OVERALL_EXIT_AUDIT=1
+        fi
       fi
+    elif is_ci_env; then
+      log_error "govulncheck not found in CI. Failing Go audit."
+      log_summary "Go" "govulncheck" "❌ Missing (Fatal)" "-" "0"
+      _OVERALL_EXIT_AUDIT=1
     else
-      log_summary "Go" "govulncheck" "⏭️  Optional (CI-only by default)" "-" "0"
+      log_warn "govulncheck not found locally. Skipping Go audit."
+      log_summary "Go" "govulncheck" "⏭️  Skipped" "-" "0"
     fi
   fi
 
@@ -287,29 +305,29 @@ main() {
   local _CA_BIN
   _CA_BIN=$(resolve_bin "cargo-audit") || true
   if [ -f "Cargo.toml" ]; then
-    if [ -n "${_CA_BIN:-}" ] || is_ci_env; then
+    if [ -n "${_CA_BIN:-}" ]; then
       local _T0_RS_AUD
       _T0_RS_AUD=$(date +%s)
       log_info "\n── Auditing Rust dependencies (cargo audit) ──"
-      if [ -n "${_CA_BIN:-}" ]; then
-        if [ "${DRY_RUN:-0}" -eq 1 ]; then
-          log_success "DRY-RUN: Would run cargo audit"
-          log_summary "Rust" "cargo-audit" "⚖️ Previewed" "-" "0"
-        else
-          local _RS_SPEC="${VER_CARGO_AUDIT_PROVIDER:-cargo-audit}@${VER_CARGO_AUDIT:-latest}"
-          if run_quiet run_mise exec "${_RS_SPEC:-}" -- cargo audit; then
-            log_summary "Rust" "cargo-audit" "✅ Secure" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_RS_AUD))"
-          else
-            log_summary "Rust" "cargo-audit" "❌ Vulnerable" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_RS_AUD))"
-            _OVERALL_EXIT_AUDIT=1
-          fi
-        fi
+      if [ "${DRY_RUN:-0}" -eq 1 ]; then
+        log_success "DRY-RUN: Would run cargo audit"
+        log_summary "Rust" "cargo-audit" "⚖️ Previewed" "-" "0"
       else
-        log_warn "cargo-audit not found in CI. Skipping Rust audit."
-        log_summary "Rust" "cargo-audit" "❌ Missing" "-" "0"
+        local _RS_SPEC="${VER_CARGO_AUDIT_PROVIDER:-cargo-audit}@${VER_CARGO_AUDIT:-latest}"
+        if run_quiet run_mise exec "${_RS_SPEC:-}" -- cargo audit; then
+          log_summary "Rust" "cargo-audit" "✅ Secure" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_RS_AUD))"
+        else
+          log_summary "Rust" "cargo-audit" "❌ Vulnerable" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_RS_AUD))"
+          _OVERALL_EXIT_AUDIT=1
+        fi
       fi
+    elif is_ci_env; then
+      log_error "cargo-audit not found in CI. Failing Rust audit."
+      log_summary "Rust" "cargo-audit" "❌ Missing (Fatal)" "-" "0"
+      _OVERALL_EXIT_AUDIT=1
     else
-      log_summary "Rust" "cargo-audit" "⏭️  Optional (CI-only by default)" "-" "0"
+      log_warn "cargo-audit not found locally. Skipping Rust audit."
+      log_summary "Rust" "cargo-audit" "⏭️  Skipped" "-" "0"
     fi
   fi
 
@@ -318,48 +336,48 @@ main() {
   # 9. SBOM Generation (CycloneDX)
   local _TRIVY_BIN
   _TRIVY_BIN=$(resolve_bin "trivy") || true
-  if [ -n "${_TRIVY_BIN:-}" ] || is_ci_env; then
+  if [ -n "${_TRIVY_BIN:-}" ]; then
     local _T0_SBOM
     _T0_SBOM=$(date +%s)
-    if [ -n "${_TRIVY_BIN:-}" ]; then
-      local _T_VER
-      _T_VER=$(get_version "${_TRIVY_BIN:-}")
-      local _R_VER
-      _R_VER=$(get_mise_tool_version "trivy")
+    local _T_VER
+    _T_VER=$(get_version "${_TRIVY_BIN:-}")
+    local _R_VER
+    _R_VER=$(get_mise_tool_version "trivy")
 
-      log_info "\n── Generating SBOM (trivy fs) ──"
-      log_info "Trivy: Using version ${_T_VER:-} (Required: ${_R_VER:-})"
+    log_info "\n── Generating SBOM (trivy fs) ──"
+    log_info "Trivy: Using version ${_T_VER:-} (Required: ${_R_VER:-})"
 
-      if [ "${DRY_RUN:-0}" -eq 1 ]; then
-        log_success "DRY-RUN: Would generate CycloneDX SBOM"
-        log_summary "Security" "sbom" "⚖️ Previewed" "-" "0"
-      elif [ "${_T_VER:-}" != "${_R_VER:-}" ] && [ "${_R_VER:-}" != "latest" ]; then
-        log_error "SECURITY ERROR: Trivy version mismatch! Found: ${_T_VER:-}, Expected: ${_R_VER:-}"
-        log_error "This may indicate a compromised binary (Ref: March 2026 Incident)."
-        log_summary "Security" "sbom" "⛔ Version Mismatch" "${_T_VER:-}" "0"
-        _OVERALL_EXIT_AUDIT=1
-      else
-        if run_quiet "${_TRIVY_BIN:-}" fs --format cyclonedx --output sbom.json .; then
-          log_summary "Security" "sbom" "✅ Generated" "${_T_VER:-}" "$(($(date +%s) - _T0_SBOM))"
-          log_success "SBOM generated at sbom.json"
-
-          # 9.1 SBOM Vulnerability Scan
-          log_info "── Auditing SBOM for vulnerabilities ──"
-          if run_quiet "${_TRIVY_BIN:-}" sbom sbom.json; then
-            log_success "SBOM audit passed"
-          else
-            log_warning "SBOM contains known vulnerabilities (Review sbom.json)"
-          fi
-        else
-          log_summary "Security" "sbom" "⚠️ Failed" "${_T_VER:-}" "$(($(date +%s) - _T0_SBOM))"
-        fi
-      fi
+    if [ "${DRY_RUN:-0}" -eq 1 ]; then
+      log_success "DRY-RUN: Would generate CycloneDX SBOM"
+      log_summary "Security" "sbom" "⚖️ Previewed" "-" "0"
+    elif [ "${_T_VER:-}" != "${_R_VER:-}" ] && [ "${_R_VER:-}" != "latest" ]; then
+      log_error "SECURITY ERROR: Trivy version mismatch! Found: ${_T_VER:-}, Expected: ${_R_VER:-}"
+      log_error "This may indicate a compromised binary (Ref: March 2026 Incident)."
+      log_summary "Security" "sbom" "⛔ Version Mismatch" "${_T_VER:-}" "0"
+      _OVERALL_EXIT_AUDIT=1
     else
-      log_warn "trivy not found in CI. Skipping SBOM generation."
-      log_summary "Security" "sbom" "❌ Missing" "-" "0"
+      if run_quiet "${_TRIVY_BIN:-}" fs --format cyclonedx --output sbom.json .; then
+        log_summary "Security" "sbom" "✅ Generated" "${_T_VER:-}" "$(($(date +%s) - _T0_SBOM))"
+        log_success "SBOM generated at sbom.json"
+
+        # 9.1 SBOM Vulnerability Scan
+        log_info "── Auditing SBOM for vulnerabilities ──"
+        if run_quiet "${_TRIVY_BIN:-}" sbom sbom.json; then
+          log_success "SBOM audit passed"
+        else
+          log_warning "SBOM contains known vulnerabilities (Review sbom.json)"
+        fi
+      else
+        log_summary "Security" "sbom" "⚠️ Failed" "${_T_VER:-}" "$(($(date +%s) - _T0_SBOM))"
+      fi
     fi
+  elif is_ci_env; then
+    log_error "trivy not found in CI. Failing SBOM generation."
+    log_summary "Security" "sbom" "❌ Missing (Fatal)" "-" "0"
+    _OVERALL_EXIT_AUDIT=1
   else
-    log_summary "Security" "sbom" "⏭️  Optional (CI-only by default)" "-" "0"
+    log_warn "trivy not found locally. Skipping SBOM generation."
+    log_summary "Security" "sbom" "⏭️  Skipped" "-" "0"
   fi
 
   # 10. Binary Artifact Audit (Preventing Binary Poisoning)

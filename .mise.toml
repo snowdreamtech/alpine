@@ -13,7 +13,7 @@ go = "1.26.1"
 node = "25.8.2"
 "npm:pnpm" = "10.33.0"
 python = "3.14.3"
-pipx = "1.11.0"
+"asdf:mise-plugins/mise-pipx" = "1.11.0"
 
 
 # ── 🔐 Security & Engineering (always needed) ──────────────────────────────────
@@ -46,16 +46,14 @@ editorconfig-checker = "3.6.1"
 "github:dotenv-linter/dotenv-linter" = "4.0.0"
 
 # Python tools (pre-commit hooks)
-"pipx:ruff" = "0.15.8"
+ruff = "0.15.8"
 "pipx:clang-format" = "22.1.2"
-"pipx:sqlfluff" = "4.1.0"
 
 # Shell & scripting linters (pre-commit hooks)
-"pipx:actionlint-py" = "1.7.11.24"
+actionlint = "1.7.11"
 "pipx:pre-commit" = "4.5.1"
-"pipx:shellcheck-py" = "0.11.0.1"
-"pipx:shfmt-py" = "3.12.0.2"
-"pipx:yamllint" = "1.38.0"
+shellcheck = "0.11.0"
+shfmt = "3.12.0"
 
 # Testing (required by make test)
 "npm:bats" = "1.13.0"

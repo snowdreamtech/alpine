@@ -114,10 +114,13 @@ emit_entry() {
   _directory="${2:-}"
   _label=$(get_label "${_ecosystem:-}")
 
-  # 1. Frequency Tiering: Core ecosystems daily, others weekly
+  # 1. Frequency Tiering: Most ecosystems weekly to reduce noise.
   _interval="weekly"
   case "${_ecosystem:-}" in
-  npm | gomod | bun | pip | uv) _interval="daily" ;;
+  # Core ecosystems stay daily unless project stability favors weekly.
+  # For this project, we prefer weekly (Monday) across the board for balance.
+  # npm | gomod | bun | pip | uv) _interval="daily" ;;
+  *) _interval="weekly" ;;
   esac
 
   # 4. Semantic Commit Prefixes: ci for actions, build for infra, chore for deps
@@ -144,14 +147,16 @@ emit_entry() {
   cat <<EOF
   - package-ecosystem: "${_ecosystem}"
     directory: "${_directory}"
+    # 1. Target Branch: dev (Ensures updates are validated in development)
     target-branch: "${TARGET_BRANCH:-}"
-    # 2. Open PR Limit: Prevent PR-bombing
+    # 2. Concurrency: Prevent PR-bombing
     open-pull-requests-limit: 10
-    # 6. Rebase Strategy: Auto-rebase to resolve conflicts
+    # 3. Assignment: Auto-request reviews
+    reviewers:
+      - "snowdream"
+    # 4. Management: Auto-rebase to resolve conflicts
     rebase-strategy: "auto"
-    # 5. Reviewers:
-    ${_reviewers}
-    # Consolidate updates to reduce PR noise
+    # 5. Grouping: Consolidate updates to reduce PR noise
     groups:
       📦-all-patch-minor:
         update-types:
@@ -194,10 +199,14 @@ EOF
   fi
 
   cat <<EOF
+    # 6. Scheduling: Weekly updates on Monday
     schedule:
       interval: "${_interval}"
+      day: "monday"
+    # 7. Commit Format: Semantic commit prefixes
     commit-message:
       prefix: "${_prefix}"
+    # 8. Classification: Semantic labels for triage
     labels:
       - "dependencies"
       - "${_label}"${_extra_labels}
