@@ -187,18 +187,18 @@ fi
 # ── ⏱️ Timeout Configuration ─────────────────────────────────────────────────
 # Default timeout values for various operations (seconds)
 # These can be overridden via environment variables
-TIMEOUT_RESOLVE_BIN="${TIMEOUT_RESOLVE_BIN:-5}"      # Binary resolution
-TIMEOUT_JSON_PARSE="${TIMEOUT_JSON_PARSE:-3}"        # JSON parsing
-TIMEOUT_MISE_WHICH="${TIMEOUT_MISE_WHICH:-5}"        # mise which command
-TIMEOUT_FIND_BINARY="${TIMEOUT_FIND_BINARY:-10}"     # Filesystem search
-TIMEOUT_NETWORK="${TIMEOUT_NETWORK:-30}"             # Network operations
+TIMEOUT_RESOLVE_BIN="${TIMEOUT_RESOLVE_BIN:-5}"  # Binary resolution
+TIMEOUT_JSON_PARSE="${TIMEOUT_JSON_PARSE:-3}"    # JSON parsing
+TIMEOUT_MISE_WHICH="${TIMEOUT_MISE_WHICH:-5}"    # mise which command
+TIMEOUT_FIND_BINARY="${TIMEOUT_FIND_BINARY:-10}" # Filesystem search
+TIMEOUT_NETWORK="${TIMEOUT_NETWORK:-30}"         # Network operations
 
 # ── 🐛 Debug Mode Switches ───────────────────────────────────────────────────
 # Enable detailed debug logging for specific subsystems
 # Set to 1 to enable, 0 to disable
-DEBUG_RESOLVE_BIN="${DEBUG_RESOLVE_BIN:-0}"          # Binary resolution debug
-DEBUG_TIMEOUT="${DEBUG_TIMEOUT:-0}"                  # Timeout mechanism debug
-DEBUG_JSON_PARSE="${DEBUG_JSON_PARSE:-0}"            # JSON parsing debug
+DEBUG_RESOLVE_BIN="${DEBUG_RESOLVE_BIN:-0}" # Binary resolution debug
+DEBUG_TIMEOUT="${DEBUG_TIMEOUT:-0}"         # Timeout mechanism debug
+DEBUG_JSON_PARSE="${DEBUG_JSON_PARSE:-0}"   # JSON parsing debug
 
 # ── 🔧 Modular Components ────────────────────────────────────────────────────
 # Source new modular components for timeout, JSON parsing, process management,
@@ -235,18 +235,20 @@ fi
 # Initialized LAZILY at first tool resolution, or manually refreshed after installs.
 # shellcheck disable=SC2120
 refresh_mise_cache() {
-  # DISABLED: mise ls --json hangs due to proxy/network issues
-  # Fallback to direct command resolution for better reliability
-  _G_MISE_LS_JSON_CACHE="{}"
+  # Re-enabled with timeout protection to prevent indefinite hangs
+  # Uses 5-second timeout and MISE_OFFLINE=1 to prevent network calls
+  if command -v mise >/dev/null 2>&1; then
+    # Use run_with_timeout_robust if available, otherwise fallback to run_with_timeout
+    if command -v run_with_timeout_robust >/dev/null 2>&1; then
+      _G_MISE_LS_JSON_CACHE=$(run_with_timeout_robust 5 mise ls --json 2>/dev/null || echo "{}")
+    else
+      _G_MISE_LS_JSON_CACHE=$(MISE_OFFLINE=1 run_with_timeout 5 mise ls --json 2>/dev/null || echo "{}")
+    fi
+  else
+    _G_MISE_LS_JSON_CACHE="{}"
+  fi
   export _G_MISE_LS_JSON_CACHE
   return 0
-
-  # Original implementation (commented out):
-  # if command -v mise >/dev/null 2>&1; then
-  #   _G_MISE_LS_JSON_CACHE=$(MISE_OFFLINE=1 mise ls --json 2>/dev/null || echo "{}")
-  # else
-  #   _G_MISE_LS_JSON_CACHE="{}"
-  # fi
 }
 
 # Initial state: Empty (triggers lazy load on first resolution)
@@ -661,7 +663,7 @@ run_mise() {
   # For install operations, use longer timeout to handle large GitHub releases
   local _T_OUT="${TIMEOUT_NETWORK:-30}"
   if [ "${_CMD:-}" = "install" ] || [ "${_CMD:-}" = "i" ]; then
-    _T_OUT=300  # 300s for install operations
+    _T_OUT=300 # 300s for install operations
   fi
 
   local _MISE_OPTS=""
