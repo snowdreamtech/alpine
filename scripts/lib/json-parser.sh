@@ -107,4 +107,7 @@ _parse_json_awk() {
   ' 2>/dev/null || true
 }
 
-log_debug "json-parser.sh loaded"
+# Safe log_debug call - only if function exists
+if command -v log_debug >/dev/null 2>&1; then
+  log_debug "json-parser.sh loaded"
+fi

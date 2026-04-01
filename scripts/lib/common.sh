@@ -184,6 +184,51 @@ if [ -f "${_G_LIB_DIR:-}/versions.sh" ]; then
   . "${_G_LIB_DIR:-}/versions.sh"
 fi
 
+# ── ⏱️ Timeout Configuration ─────────────────────────────────────────────────
+# Default timeout values for various operations (seconds)
+# These can be overridden via environment variables
+TIMEOUT_RESOLVE_BIN="${TIMEOUT_RESOLVE_BIN:-5}"      # Binary resolution
+TIMEOUT_JSON_PARSE="${TIMEOUT_JSON_PARSE:-3}"        # JSON parsing
+TIMEOUT_MISE_WHICH="${TIMEOUT_MISE_WHICH:-5}"        # mise which command
+TIMEOUT_FIND_BINARY="${TIMEOUT_FIND_BINARY:-10}"     # Filesystem search
+TIMEOUT_NETWORK="${TIMEOUT_NETWORK:-30}"             # Network operations
+
+# ── 🐛 Debug Mode Switches ───────────────────────────────────────────────────
+# Enable detailed debug logging for specific subsystems
+# Set to 1 to enable, 0 to disable
+DEBUG_RESOLVE_BIN="${DEBUG_RESOLVE_BIN:-0}"          # Binary resolution debug
+DEBUG_TIMEOUT="${DEBUG_TIMEOUT:-0}"                  # Timeout mechanism debug
+DEBUG_JSON_PARSE="${DEBUG_JSON_PARSE:-0}"            # JSON parsing debug
+
+# ── 🔧 Modular Components ────────────────────────────────────────────────────
+# Source new modular components for timeout, JSON parsing, process management,
+# and binary resolution. These modules provide zero-hang guarantees and robust
+# error handling.
+
+# Source timeout mechanism module
+if [ -f "${_G_LIB_DIR:-}/timeout.sh" ]; then
+  # shellcheck disable=SC1091
+  . "${_G_LIB_DIR:-}/timeout.sh"
+fi
+
+# Source JSON parser module
+if [ -f "${_G_LIB_DIR:-}/json-parser.sh" ]; then
+  # shellcheck disable=SC1091
+  . "${_G_LIB_DIR:-}/json-parser.sh"
+fi
+
+# Source process manager module
+if [ -f "${_G_LIB_DIR:-}/process-manager.sh" ]; then
+  # shellcheck disable=SC1091
+  . "${_G_LIB_DIR:-}/process-manager.sh"
+fi
+
+# Source binary resolver module
+if [ -f "${_G_LIB_DIR:-}/bin-resolver.sh" ]; then
+  # shellcheck disable=SC1091
+  . "${_G_LIB_DIR:-}/bin-resolver.sh"
+fi
+
 # ── 🔍 Tooling Metadata Cache (Mise LS) ──────────────────────────────────────
 # Caching 'mise ls --json' results provides a massive performance boost for
 # scripts that perform multiple version checks (like setup and check-env).
@@ -363,6 +408,14 @@ export _G_LIB_DIR
 run_with_timeout() {
   local _SEC="${1:-}"
   shift
+
+  # Delegate to robust implementation if available
+  if command -v run_with_timeout_robust >/dev/null 2>&1; then
+    run_with_timeout_robust "${_SEC:-}" "$@"
+    return $?
+  fi
+
+  # Legacy fallback
   if command -v gtimeout >/dev/null 2>&1; then
     gtimeout "${_SEC:-}" "$@"
   elif command -v timeout >/dev/null 2>&1; then
@@ -604,9 +657,12 @@ run_mise() {
   local _MAX_RETRIES=3
   local _RETRY_COUNT=0
   local _STATUS=1
-  # 300s per attempt to handle large GitHub releases on slow networks.
-  # Previously 120s which might still cause timeouts for very large binaries.
-  local _T_OUT=300
+  # Use TIMEOUT_NETWORK for network operations (default 30s, can be overridden)
+  # For install operations, use longer timeout to handle large GitHub releases
+  local _T_OUT="${TIMEOUT_NETWORK:-30}"
+  if [ "${_CMD:-}" = "install" ] || [ "${_CMD:-}" = "i" ]; then
+    _T_OUT=300  # 300s for install operations
+  fi
 
   local _MISE_OPTS=""
   if [ "${VERBOSE:-1}" -ge 2 ]; then _MISE_OPTS="--verbose"; fi
@@ -616,9 +672,9 @@ run_mise() {
     # to prevent internal mise network calls from hanging the wrapper.
     export MISE_HTTP_TIMEOUT="${_T_OUT:-300}s"
 
-    # Wrap in timeout utility (Standardized via run_with_timeout)
+    # Wrap in timeout utility (Standardized via run_with_timeout_robust)
     # shellcheck disable=SC2086
-    MISE_LOCKED="${_EFFECTIVE_LOCKED:-}" run_with_timeout "${_T_OUT:-}" "${_M_BIN:-}" ${_MISE_OPTS:-} "${_CMD:-}" "$@"
+    MISE_LOCKED="${_EFFECTIVE_LOCKED:-}" run_with_timeout_robust "${_T_OUT:-}" "${_M_BIN:-}" ${_MISE_OPTS:-} "${_CMD:-}" "$@"
     _STATUS=$?
     [ ${_STATUS:-} -eq 0 ] && break
     # Exit code 124 = timeout expiry; treat as retryable network failure.
@@ -1168,59 +1224,94 @@ get_version() {
   # Check mise via cache first (fastest)
   if [ -z "${_G_MISE_LS_JSON_CACHE:-}" ]; then refresh_mise_cache; fi
   local _MISE_VER_OUT
-  # Parse JSON without jq for cross-platform compatibility
-  # Uses a robust awk script that properly handles JSON structure
-  _MISE_VER_OUT=$(echo "${_G_MISE_LS_JSON_CACHE:-}" | awk -v plugin="${_M_PLUGIN:-}" '
-    BEGIN {
-      in_tool = 0;
-      active_ver = "";
-      installed_ver = "";
-      buffer = "";
-    }
-    # Match tool key: exact match or suffix match with : or /
-    # Examples: "go", "cargo:eza", "github:go-task/task"
-    {
-      buffer = buffer " " $0;
-      # Check if we are entering a tool definition
-      if ($0 ~ "\"" plugin "\"[[:space:]]*:" || $0 ~ "[:/]" plugin "\"[[:space:]]*:") {
-        in_tool = 1;
-        next;
+
+  # Parse JSON using the new parse_json function with fallback to awk
+  # The mise ls --json structure is: { "tool-name": [{ "version": "x.y.z", "active": true/false, "installed": true/false }] }
+  # We need to find the tool and extract the version from the first active or installed entry
+
+  # Try using parse_json if available (requires custom logic for array handling)
+  # For now, use a helper script approach with Node.js/Python that can handle the complex structure
+  if command -v node >/dev/null 2>&1 && [ -f "${_G_LIB_DIR:-}/json-parser.cjs" ]; then
+    _MISE_VER_OUT=$(echo "${_G_MISE_LS_JSON_CACHE:-}" | node -e "
+      const data = JSON.parse(require('fs').readFileSync(0, 'utf-8'));
+      const plugin = '${_M_PLUGIN:-}';
+
+      // Find tool by exact match or suffix match (e.g., 'go' matches 'go', 'cargo:go', 'github:org/go')
+      const toolKey = Object.keys(data).find(k =>
+        k === plugin || k.endsWith(':' + plugin) || k.endsWith('/' + plugin)
+      );
+
+      if (toolKey && Array.isArray(data[toolKey])) {
+        // Prefer active version, fallback to first installed
+        const active = data[toolKey].find(v => v.active === true);
+        const installed = data[toolKey].find(v => v.installed === true);
+        const version = (active || installed)?.version;
+        if (version) console.log(version);
       }
-    }
-    # Inside the tool array, extract version info
-    in_tool {
-      # Look for active and version in buffer
-      if ($0 ~ /"active"[[:space:]]*:[[:space:]]*true/ && active_ver == "") {
-        if (match(buffer, /"version"[[:space:]]*:[[:space:]]*"([0-9]+\.[0-9]+[^"]*)"/, arr)) {
-          active_ver = arr[1];
-        }
-      }
-      # Look for installed and version in buffer
-      if ($0 ~ /"installed"[[:space:]]*:[[:space:]]*true/ && installed_ver == "") {
-        if (match(buffer, /"version"[[:space:]]*:[[:space:]]*"([0-9]+\.[0-9]+[^"]*)"/, arr)) {
-          installed_ver = arr[1];
-        }
-      }
-      # Exit tool array when we hit closing bracket
-      if ($0 ~ /^[[:space:]]*\]/) {
+    " 2>/dev/null || true)
+  elif command -v python3 >/dev/null 2>&1; then
+    _MISE_VER_OUT=$(echo "${_G_MISE_LS_JSON_CACHE:-}" | python3 -c "
+import json, sys
+data = json.load(sys.stdin)
+plugin = '${_M_PLUGIN:-}'
+
+# Find tool by exact match or suffix match
+tool_key = next((k for k in data.keys() if k == plugin or k.endswith(':' + plugin) or k.endswith('/' + plugin)), None)
+
+if tool_key and isinstance(data[tool_key], list):
+    # Prefer active version, fallback to first installed
+    active = next((v for v in data[tool_key] if v.get('active') == True), None)
+    installed = next((v for v in data[tool_key] if v.get('installed') == True), None)
+    version = (active or installed or {}).get('version')
+    if version:
+        print(version)
+" 2>/dev/null || true)
+  else
+    # Fallback to awk for cross-platform compatibility (original implementation)
+    _MISE_VER_OUT=$(echo "${_G_MISE_LS_JSON_CACHE:-}" | awk -v plugin="${_M_PLUGIN:-}" '
+      BEGIN {
         in_tool = 0;
+        active_ver = "";
+        installed_ver = "";
         buffer = "";
-        # If we found a version, print and exit (prefer active over installed)
-        if (active_ver != "") {
-          print active_ver;
-          exit;
-        } else if (installed_ver != "") {
-          print installed_ver;
-          exit;
+      }
+      # Match tool key: exact match or suffix match with : or /
+      {
+        buffer = buffer " " $0;
+        if ($0 ~ "\"" plugin "\"[[:space:]]*:" || $0 ~ "[:/]" plugin "\"[[:space:]]*:") {
+          in_tool = 1;
+          next;
         }
       }
-    }
-    END {
-      # Final fallback: prefer active over installed
-      if (active_ver != "") print active_ver;
-      else if (installed_ver != "") print installed_ver;
-    }
-  ' 2>/dev/null | head -n 1 || true)
+      in_tool {
+        if ($0 ~ /"active"[[:space:]]*:[[:space:]]*true/ && active_ver == "") {
+if (match(buffer, /"version"[[:space:]]*:[[:space:]]*"([0-9]+\.[0-9]+[^"]*)"/, arr)) {
+            active_ver = arr[1];
+          }
+        }
+        if ($0 ~ /"installed"[[:space:]]*:[[:space:]]*true/ && installed_ver == "") {
+          if (match(buffer, /"version"[[:space:]]*:[[:space:]]*"([0-9]+\.[0-9]+[^"]*)"/, arr)) {
+            installed_ver = arr[1];
+          }
+        }
+        if ($0 ~ /^[[:space:]]*\]/) {
+          in_tool = 0;
+          buffer = "";
+          if (active_ver != "") {
+            print active_ver;
+            exit;
+          } else if (installed_ver != "") {
+            print installed_ver;
+            exit;
+          }
+        }
+      }
+      END {
+        if (active_ver != "") print active_ver;
+        else if (installed_ver != "") print installed_ver;
+      }
+    ' 2>/dev/null | head -n 1 || true)
+  fi
 
   if [ -n "${_MISE_VER_OUT:-}" ] && [ "${_MISE_VER_OUT:-}" != "null" ]; then
     echo "${_MISE_VER_OUT:-}" && return 0
@@ -1289,9 +1380,24 @@ get_version() {
 #   - Windows (Git Bash/MSYS2), macOS, Linux
 # Examples:
 #   BIN=$(resolve_bin "eslint") || true
+# Feature Flag:
+#   USE_NEW_RESOLVE_BIN=1 - Use new layered implementation with timeout protection
+#   USE_NEW_RESOLVE_BIN=0 - Use legacy implementation (default for gradual rollout)
 resolve_bin() {
   local _BIN="${1:-}"
   [ -z "${_BIN:-}" ] && return 1
+
+  # Feature flag: Use new implementation if enabled
+  if [ "${USE_NEW_RESOLVE_BIN:-0}" = "1" ]; then
+    # Delegate to new layered implementation with timeout protection
+    if command -v resolve_bin_cached >/dev/null 2>&1; then
+      resolve_bin_cached "${_BIN:-}"
+      return $?
+    else
+      # Fallback to legacy if new implementation not available
+      log_debug "resolve_bin_cached not found, falling back to legacy implementation"
+    fi
+  fi
 
   # ── 1. Python Venv ──
   local _VP="${VENV:-.venv}/${_G_VENV_BIN:-}/${_BIN:-}"
