@@ -15,12 +15,20 @@ set -eu
 #   $3 - Version string
 # Internal helper: checks for CI environment robustly even if common.sh is not pre-sourced.
 _is_ci() {
+  # Priority 1: Check dynamically set CI environment variables first
+  # This allows tests and scripts to override CI detection
+  if [ "${CI:-}" = "true" ] || [ "${GITHUB_ACTIONS:-}" = "true" ]; then
+    return 0
+  fi
+
+  # Priority 2: Use is_ci_env if available (from common.sh)
   if command -v is_ci_env >/dev/null 2>&1; then
     is_ci_env
-  else
-    # Fallback to exported global or well-known platform variables
-    [ "${_G_IS_CI:-0}" -eq 1 ] || [ "${CI:-}" = "true" ] || [ "${GITHUB_ACTIONS:-}" = "true" ]
+    return $?
   fi
+
+  # Priority 3: Fallback to cached global flag
+  [ "${_G_IS_CI:-0}" -eq 1 ]
 }
 
 register_mise_tool() {
