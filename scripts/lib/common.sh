@@ -720,6 +720,43 @@ run_mise() {
       esac
     fi
 
+    # Enhanced PATH Management for Dynamically Installed Tools:
+    # For tools installed but not activated (not in .mise.toml), mise won't
+    # create shims. We need to add the tool's actual bin directory to PATH.
+    # This supports the "dynamic install without .mise.toml pollution" pattern.
+    if [ $# -ge 1 ]; then
+      local _INSTALLED_TOOL="${1:-}"
+      # Extract tool spec (remove version if present)
+      local _TOOL_SPEC
+      _TOOL_SPEC=$(echo "${_INSTALLED_TOOL:-}" | sed 's/@.*//')
+
+      # Try to get the tool's bin directory from mise
+      if command -v mise >/dev/null 2>&1; then
+        local _TOOL_BIN_DIR
+        # Use mise where to get the installation path
+        _TOOL_BIN_DIR=$(mise where "${_TOOL_SPEC:-}" 2>/dev/null || true)
+
+        if [ -n "${_TOOL_BIN_DIR:-}" ] && [ -d "${_TOOL_BIN_DIR:-}/bin" ]; then
+          # Add tool's bin directory to PATH
+          case ":$PATH:" in
+          *":${_TOOL_BIN_DIR:-}/bin:"*) ;;
+          *)
+            export PATH="${_TOOL_BIN_DIR:-}/bin:$PATH"
+            log_debug "Added tool bin to PATH: ${_TOOL_BIN_DIR:-}/bin"
+            ;;
+          esac
+
+          # CI PATH Persistence for tool bin directory
+          if [ -n "${GITHUB_PATH:-}" ]; then
+            if ! grep -qxF "${_TOOL_BIN_DIR:-}/bin" "${GITHUB_PATH:-}" 2>/dev/null; then
+              echo "${_TOOL_BIN_DIR:-}/bin" >>"${GITHUB_PATH:-}"
+              log_debug "Persisted tool bin to GITHUB_PATH: ${_TOOL_BIN_DIR:-}/bin"
+            fi
+          fi
+        fi
+      fi
+    fi
+
     # CI PATH Persistence (Task 3.2):
     # In CI environments, persist mise shims to GITHUB_PATH to ensure
     # subsequent workflow steps can resolve tools installed in this step.
