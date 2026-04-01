@@ -705,6 +705,31 @@ run_mise() {
   if [ ${_STATUS:-} -eq 0 ] &&
     { [ "${_CMD:-}" = "install" ] || [ "${_CMD:-}" = "i" ]; }; then
     refresh_mise_cache
+
+    # Unified PATH Management (Task 3.1):
+    # Automatically add mise shims to PATH after successful installation
+    # if not already present. This ensures resolve_bin can immediately
+    # locate newly installed tools without manual PATH manipulation.
+    if [ -n "${_G_MISE_SHIMS_BASE:-}" ]; then
+      case ":$PATH:" in
+      *":${_G_MISE_SHIMS_BASE:-}:"*) ;;
+      *)
+        export PATH="${_G_MISE_SHIMS_BASE:-}:$PATH"
+        log_debug "Added mise shims to PATH: ${_G_MISE_SHIMS_BASE:-}"
+        ;;
+      esac
+    fi
+
+    # CI PATH Persistence (Task 3.2):
+    # In CI environments, persist mise shims to GITHUB_PATH to ensure
+    # subsequent workflow steps can resolve tools installed in this step.
+    if [ -n "${GITHUB_PATH:-}" ] && [ -n "${_G_MISE_SHIMS_BASE:-}" ]; then
+      # Idempotent: Check if already persisted to avoid duplicates
+      if ! grep -qxF "${_G_MISE_SHIMS_BASE:-}" "${GITHUB_PATH:-}" 2>/dev/null; then
+        echo "${_G_MISE_SHIMS_BASE:-}" >>"${GITHUB_PATH:-}"
+        log_debug "Persisted mise shims to GITHUB_PATH: ${_G_MISE_SHIMS_BASE:-}"
+      fi
+    fi
   fi
 
   return ${_STATUS:-}
