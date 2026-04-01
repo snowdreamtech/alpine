@@ -101,7 +101,7 @@
       - 后端管理器检查正常
     - _Requirements: Preservation Requirements from design (3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8)_
 
-- [-] 4. Checkpoint - 确保所有测试通过
+- [x] 4. Checkpoint - 确保所有测试通过
   - 运行完整的测试套件验证修复
   - 确认所有 bug condition 测试通过（任务 1 的测试现在应该通过）
   - 确认所有 preservation 测试通过（任务 2 的测试应该继续通过）
