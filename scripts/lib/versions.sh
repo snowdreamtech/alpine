@@ -9,6 +9,8 @@ set -eu
 # Purpose:
 #   Centralized version registry for ALL project tools.
 #
+# Cache Invalidation: 2026-04-01 (PATH management fix)
+#
 #   - Tier 1 (Core): SSoT is .mise.toml. Versions here serve as a
 #     backup mirror and must stay in sync. update-tools.sh updates both.
 #   - Tier 2 (On-demand): SSoT is THIS FILE. Versions are pinned here
