@@ -569,6 +569,61 @@ get_mise_tool_version() {
   echo "${_VER:-latest}"
 }
 
+# ── 🔄 GITHUB_PATH Synchronization ──────────────────────────────────────────
+
+# Synchronize GITHUB_PATH file contents to current shell PATH.
+#
+# Purpose: Read all paths from $GITHUB_PATH file and add them to current shell's
+#          $PATH environment variable. This ensures tools installed in CI are
+#          immediately available in the same step, not just in subsequent steps.
+#
+# Context: GitHub Actions' GITHUB_PATH mechanism only applies changes between
+#          steps. This function bridges that gap for same-step tool availability.
+#
+# Behavior:
+#   - Reads each line from $GITHUB_PATH file
+#   - Skips empty lines and whitespace
+#   - Implements idempotent checking (no duplicate paths)
+#   - Exports updated PATH to current shell
+#
+# Requirements: 2.1, 2.2, 2.5
+#
+# Examples:
+#   _sync_github_path_to_current_shell
+_sync_github_path_to_current_shell() {
+  # Guard: Skip if GITHUB_PATH is not set or file doesn't exist
+  if [ -z "${GITHUB_PATH:-}" ] || [ ! -f "${GITHUB_PATH:-}" ]; then
+    return 0
+  fi
+
+  log_debug "Syncing GITHUB_PATH to current shell: ${GITHUB_PATH:-}"
+
+  # CRITICAL: Use input redirection with while loop to avoid subshell
+  # Using pipe (cat | while) creates a subshell where export PATH won't affect parent
+  # Using input redirection (while ... < file) keeps us in the current shell
+  while IFS= read -r _path || [ -n "${_path:-}" ]; do
+    # Skip empty lines
+    [ -z "${_path:-}" ] && continue
+
+    # Remove trailing whitespace/newlines
+    _path=$(echo "${_path:-}" | tr -d '\r\n' | sed 's/[[:space:]]*$//')
+
+    # Skip if still empty after trimming
+    [ -z "${_path:-}" ] && continue
+
+    # Idempotent check: Skip if path already in current $PATH
+    case ":${PATH:-}:" in
+    *":${_path:-}:"*)
+      continue
+      ;;
+    esac
+
+    # Add to current shell PATH
+    export PATH="${_path:-}:${PATH:-}"
+    log_debug "Synced GITHUB_PATH to current shell: ${_path:-}"
+  done <"${GITHUB_PATH:-}"
+}
+
 # Purpose: Executes a mise command with retry logic and intelligent fallback.
 # Params:
 #   $@ - Command and arguments for mise
@@ -577,6 +632,9 @@ get_mise_tool_version() {
 run_mise() {
   local _CMD="${1:-}"
   shift
+
+  # Save the first argument (tool spec) for later use in PATH management
+  local _TOOL_ARG="${1:-}"
 
   # Guard: Only unset GITHUB_TOKEN if we are NOT in CI.
   # In CI (GitHub Actions, etc.), we MUST keep the token to avoid 403 Rate Limit errors.
@@ -621,6 +679,8 @@ run_mise() {
   [ "${_G_OS:-}" = "windows" ] && [ ! -x "${_M_BIN:-}" ] && _M_BIN="${_M_BIN:-}.exe"
 
   # Performance Opt: Skip installation if version already matches SSoT
+  # BUT still ensure PATH synchronization for CI environments
+  local _SKIP_INSTALL=0
   if [ "${_CMD:-}" = "install" ] && [ -n "${1:-}" ]; then
     local _T_CHECK="${1:-}"
     local _R_VER
@@ -632,7 +692,10 @@ run_mise() {
 
     if [ "${_C_VER:-}" != "-" ] && [ -n "${_R_VER:-}" ]; then
       # Use prefix matching: e.g. 3.12.0.2 (required) matches 3.12.0 (current)
-      case "${_R_VER:-}" in "${_C_VER:-}"*) return 0 ;; esac
+      case "${_R_VER:-}" in "${_C_VER:-}"*)
+        _SKIP_INSTALL=1
+        ;;
+      esac
     fi
 
     # Native/Backend Manager Awareness
@@ -669,28 +732,34 @@ run_mise() {
   local _MISE_OPTS=""
   if [ "${VERBOSE:-1}" -ge 2 ]; then _MISE_OPTS="--verbose"; fi
 
-  while [ ${_RETRY_COUNT:-} -lt ${_MAX_RETRIES:-} ]; do
-    # Ensure MISE_HTTP_TIMEOUT is synchronized with the execution timeout
-    # to prevent internal mise network calls from hanging the wrapper.
-    export MISE_HTTP_TIMEOUT="${_T_OUT:-300}s"
+  # Skip actual installation if tool is already at correct version
+  if [ "${_SKIP_INSTALL:-0}" -eq 1 ]; then
+    log_debug "Skipping installation - tool already at correct version"
+    _STATUS=0
+  else
+    while [ ${_RETRY_COUNT:-} -lt ${_MAX_RETRIES:-} ]; do
+      # Ensure MISE_HTTP_TIMEOUT is synchronized with the execution timeout
+      # to prevent internal mise network calls from hanging the wrapper.
+      export MISE_HTTP_TIMEOUT="${_T_OUT:-300}s"
 
-    # Wrap in timeout utility (Standardized via run_with_timeout_robust)
-    # shellcheck disable=SC2086
-    MISE_LOCKED="${_EFFECTIVE_LOCKED:-}" run_with_timeout_robust "${_T_OUT:-}" "${_M_BIN:-}" ${_MISE_OPTS:-} "${_CMD:-}" "$@"
-    _STATUS=$?
-    [ ${_STATUS:-} -eq 0 ] && break
-    # Exit code 124 = timeout expiry; treat as retryable network failure.
-    # Exit codes > 128 = signal (SIGTERM/SIGKILL); abort immediately.
-    if [ ${_STATUS:-} -gt 128 ] && [ ${_STATUS:-} -ne 124 ]; then break; fi
+      # Wrap in timeout utility (Standardized via run_with_timeout_robust)
+      # shellcheck disable=SC2086
+      MISE_LOCKED="${_EFFECTIVE_LOCKED:-}" run_with_timeout_robust "${_T_OUT:-}" "${_M_BIN:-}" ${_MISE_OPTS:-} "${_CMD:-}" "$@"
+      _STATUS=$?
+      [ ${_STATUS:-} -eq 0 ] && break
+      # Exit code 124 = timeout expiry; treat as retryable network failure.
+      # Exit codes > 128 = signal (SIGTERM/SIGKILL); abort immediately.
+      if [ ${_STATUS:-} -gt 128 ] && [ ${_STATUS:-} -ne 124 ]; then break; fi
 
-    _RETRY_COUNT=$((_RETRY_COUNT + 1))
-    if [ ${_RETRY_COUNT:-} -lt ${_MAX_RETRIES:-} ]; then
-      # Exponential backoff: 1s, 2s, 4s... to recover from transient rate limits.
-      local _BACKOFF=$((1 << (_RETRY_COUNT - 1)))
-      log_warn "mise ${_CMD:-} failed (attempt ${_RETRY_COUNT:-}/${_MAX_RETRIES:-}). Retrying in ${_BACKOFF:-}s..."
-      sleep "${_BACKOFF:-}"
-    fi
-  done
+      _RETRY_COUNT=$((_RETRY_COUNT + 1))
+      if [ ${_RETRY_COUNT:-} -lt ${_MAX_RETRIES:-} ]; then
+        # Exponential backoff: 1s, 2s, 4s... to recover from transient rate limits.
+        local _BACKOFF=$((1 << (_RETRY_COUNT - 1)))
+        log_warn "mise ${_CMD:-} failed (attempt ${_RETRY_COUNT:-}/${_MAX_RETRIES:-}). Retrying in ${_BACKOFF:-}s..."
+        sleep "${_BACKOFF:-}"
+      fi
+    done
+  fi
 
   # Restore GITHUB_TOKEN
   if [ -n "${_OLD_GITHUB_TOKEN:-}" ]; then
@@ -724,11 +793,10 @@ run_mise() {
     # For tools installed but not activated (not in .mise.toml), mise won't
     # create shims. We need to add the tool's actual bin directory to PATH.
     # This supports the "dynamic install without .mise.toml pollution" pattern.
-    if [ $# -ge 1 ]; then
-      local _INSTALLED_TOOL="${1:-}"
+    if [ -n "${_TOOL_ARG:-}" ]; then
       # Extract tool spec (remove version if present)
       local _TOOL_SPEC
-      _TOOL_SPEC=$(echo "${_INSTALLED_TOOL:-}" | sed 's/@.*//')
+      _TOOL_SPEC=$(echo "${_TOOL_ARG:-}" | sed 's/@.*//')
 
       # Try to get the tool's bin directory from mise
       if command -v mise >/dev/null 2>&1; then
@@ -748,9 +816,15 @@ run_mise() {
 
           # CI PATH Persistence for tool bin directory
           if [ -n "${GITHUB_PATH:-}" ]; then
+            log_debug "Checking if tool bin needs to be persisted to GITHUB_PATH..."
             if ! grep -qxF "${_TOOL_BIN_DIR:-}/bin" "${GITHUB_PATH:-}" 2>/dev/null; then
               echo "${_TOOL_BIN_DIR:-}/bin" >>"${GITHUB_PATH:-}"
               log_debug "Persisted tool bin to GITHUB_PATH: ${_TOOL_BIN_DIR:-}/bin"
+              log_debug "About to call _sync_github_path_to_current_shell..."
+              _sync_github_path_to_current_shell
+              log_debug "Returned from _sync_github_path_to_current_shell"
+            else
+              log_debug "Tool bin already in GITHUB_PATH, skipping"
             fi
           fi
         fi
@@ -765,6 +839,7 @@ run_mise() {
       if ! grep -qxF "${_G_MISE_SHIMS_BASE:-}" "${GITHUB_PATH:-}" 2>/dev/null; then
         echo "${_G_MISE_SHIMS_BASE:-}" >>"${GITHUB_PATH:-}"
         log_debug "Persisted mise shims to GITHUB_PATH: ${_G_MISE_SHIMS_BASE:-}"
+        _sync_github_path_to_current_shell
       fi
     fi
   fi
