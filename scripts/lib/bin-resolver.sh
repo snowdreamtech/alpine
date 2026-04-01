@@ -221,9 +221,9 @@ resolve_bin_layer4() {
   # Search for binary in install path with timeout and depth limit
   local _FOUND_BIN
   if command -v run_with_timeout_robust >/dev/null 2>&1; then
-    _FOUND_BIN=$(run_with_timeout_robust 10 find "${_MC_PATH:-}" -maxdepth 3 -name "${_BIN:-}" -type f -perm +111 2>/dev/null | head -n 1) || true
+    _FOUND_BIN=$(run_with_timeout_robust 10 find "${_MC_PATH:-}" -maxdepth 3 -name "${_BIN:-}" -type f -perm /111 2>/dev/null | head -n 1) || true
   else
-_FOUND_BIN=$(find "${_MC_PATH:-}" -maxdepth 3 -name "${_BIN:-}" -type f -perm +111 2>/dev/null | head -n 1) || true
+    _FOUND_BIN=$(find "${_MC_PATH:-}" -maxdepth 3 -name "${_BIN:-}" -type f -perm /111 2>/dev/null | head -n 1) || true
   fi
 
   # Windows fallback: try .exe extension
