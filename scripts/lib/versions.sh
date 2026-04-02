@@ -234,6 +234,6 @@ VER_BATS="1.13.0"
 VER_BATS_PROVIDER="npm:bats"
 
 # ── 🛠️ Mise Internal / Helpers ────────────────────────────────────────────────
-VER_MISE="2026.3.15"
+VER_MISE="2026.4.0"
 VER_USAGE="3.2.0"
 VER_USAGE_PROVIDER="usage"
