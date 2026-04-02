@@ -12,6 +12,7 @@ install_shfmt() {
   _T0_SHF=$(date +%s)
   local _TITLE="Shfmt"
   local _PROVIDER="${VER_SHFMT_PROVIDER:-}"
+  local _VERSION="${VER_SHFMT:-}"
 
   if ! has_lang_files "" "*.sh *.bash *.bats"; then
     return 0
@@ -38,7 +39,7 @@ install_shfmt() {
     return 0
   fi
   local _STAT_SHF="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_SHF="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_SHF="❌ Failed"
   log_summary "Base" "Shfmt" "${_STAT_SHF:-}" "$(get_version shfmt)" "$(($(date +%s) - _T0_SHF))"
 }
 
@@ -49,6 +50,7 @@ install_shellcheck() {
   _T0_SHC=$(date +%s)
   local _TITLE="Shellcheck"
   local _PROVIDER="${VER_SHELLCHECK_PROVIDER:-}"
+  local _VERSION="${VER_SHELLCHECK:-}"
 
   if ! has_lang_files "" "*.sh *.bash *.bats"; then
     return 0
@@ -79,7 +81,7 @@ install_shellcheck() {
     return 0
   fi
   local _STAT_SHC="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_SHC="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_SHC="❌ Failed"
   log_summary "Base" "Shellcheck" "${_STAT_SHC:-}" "$(get_version shellcheck)" "$(($(date +%s) - _T0_SHC))"
 }
 
@@ -90,6 +92,7 @@ install_actionlint() {
   _T0_ACT=$(date +%s)
   local _TITLE="Actionlint"
   local _PROVIDER="${VER_ACTIONLINT_PROVIDER:-}"
+  local _VERSION="${VER_ACTIONLINT:-}"
   if ! has_lang_files ".github/workflows" "*.yml *.yaml"; then
     return 0
   fi
@@ -115,7 +118,7 @@ install_actionlint() {
     return 0
   fi
   local _STAT_ACT="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_ACT="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_ACT="❌ Failed"
   log_summary "Base" "Actionlint" "${_STAT_ACT:-}" "$(get_version actionlint)" "$(($(date +%s) - _T0_ACT))"
 }
 
