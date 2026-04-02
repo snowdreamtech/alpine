@@ -12,6 +12,7 @@ install_sqlfluff() {
   _T0_SQL=$(date +%s)
   local _TITLE="Sqlfluff"
   local _PROVIDER="${VER_SQLFLUFF_PROVIDER:-}"
+  local _VERSION="${VER_SQLFLUFF:-}"
 
   if ! has_lang_files "" "*.sql"; then
     return 0
@@ -35,7 +36,7 @@ install_sqlfluff() {
     return 0
   fi
   local _STAT_SQL="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_SQL="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_SQL="❌ Failed"
   log_summary "Data" "Sqlfluff" "${_STAT_SQL:-}" "$(get_version sqlfluff)" "$(($(date +%s) - _T0_SQL))"
 }
 
