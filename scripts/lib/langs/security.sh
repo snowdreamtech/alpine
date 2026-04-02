@@ -12,6 +12,7 @@ install_osv_scanner() {
   _T0_OSV=$(date +%s)
   local _TITLE="OSV-Scanner"
   local _PROVIDER="${VER_OSV_SCANNER_PROVIDER:-}"
+  local _VERSION="${VER_OSV_SCANNER:-}"
 
   # CI-only guard by default, but allow manual/explicit on-demand installation
   # for local developers who explicitly run 'make audit'.
@@ -56,7 +57,7 @@ install_osv_scanner() {
   local _STAT_OSV="✅ mise"
   setup_registry_osv_scanner
   # Explicitly use mise to install the github provider
-  if ! run_mise install "${_PROVIDER:-}"; then
+  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
     _STAT_OSV="❌ Failed"
     if is_ci_env; then
       log_warn "Optional security tool (${_TITLE:-}) failed to install. Continuing..."
@@ -76,6 +77,7 @@ install_zizmor() {
   _T0_ZIZ=$(date +%s)
   local _TITLE="Zizmor"
   local _PROVIDER="${VER_ZIZMOR_PROVIDER:-}"
+  local _VERSION="${VER_ZIZMOR:-}"
 
   # CI-only: GH Actions security linter is rarely needed for local app code.
   local _ZIZMOR_BIN
@@ -116,7 +118,7 @@ install_zizmor() {
   fi
   local _STAT_ZIZ="✅ mise"
   setup_registry_zizmor
-  run_mise install "${_PROVIDER:-}" || _STAT_ZIZ="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_ZIZ="❌ Failed"
   log_summary "Security" "Zizmor" "${_STAT_ZIZ:-}" "$(get_version zizmor)" "$(($(date +%s) - _T0_ZIZ))"
 }
 
@@ -128,6 +130,7 @@ install_cargo_audit() {
   _T0_CA=$(date +%s)
   local _TITLE="Cargo-Audit"
   local _PROVIDER="${VER_CARGO_AUDIT_PROVIDER:-}"
+  local _VERSION="${VER_CARGO_AUDIT:-}"
 
   if ! has_lang_files "Cargo.toml Cargo.lock" ""; then
     return 0
@@ -168,7 +171,7 @@ install_cargo_audit() {
   fi
   local _STAT_CA="✅ mise"
   setup_registry_cargo_audit
-  run_mise install "${_PROVIDER:-}" || _STAT_CA="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_CA="❌ Failed"
   log_summary "Security" "Cargo-Audit" "${_STAT_CA:-}" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_CA))"
 }
 
