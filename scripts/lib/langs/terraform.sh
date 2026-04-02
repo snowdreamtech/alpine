@@ -24,6 +24,7 @@ install_tflint() {
   _T0_TF=$(date +%s)
   local _TITLE="TFLint"
   local _PROVIDER="${VER_TFLINT_PROVIDER:-}"
+  local _VERSION="${VER_TFLINT:-}"
   if ! has_lang_files "" "*.tf"; then
     return 0
   fi
@@ -47,7 +48,7 @@ install_tflint() {
   fi
   local _STAT_TF="✅ mise"
   setup_registry_tflint
-  run_mise install "${_PROVIDER:-}" || _STAT_TF="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_TF="❌ Failed"
   log_summary "IaC" "TFLint" "${_STAT_TF:-}" "$(get_version tflint)" "$(($(date +%s) - _T0_TF))"
 }
 
