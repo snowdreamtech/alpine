@@ -31,6 +31,7 @@ install_clang_format() {
   _T0_CF=$(date +%s)
   local _TITLE="clang-format"
   local _PROVIDER="${VER_CLANG_FORMAT_PROVIDER:-}"
+  local _VERSION="${VER_CLANG_FORMAT:-}"
   if ! has_lang_files "" "*.c *.cpp *.h *.hpp *.cc *.m *.mm"; then
     return 0
   fi
@@ -42,7 +43,7 @@ install_clang_format() {
     return 0
   fi
   local _STAT_CF="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_CF="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_CF="❌ Failed"
   log_summary "CPP" "clang-format" "${_STAT_CF:-}" "$(get_version clang-format)" "$(($(date +%s) - _T0_CF))"
 }
 
