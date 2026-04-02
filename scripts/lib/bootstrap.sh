@@ -266,21 +266,33 @@ _mise_verify_health() {
 _mise_activate_bash() {
   local _RC="$HOME/.bashrc"
   [ -f "${_RC:-}" ] || return 0
+  local _MISE_BIN
+  _MISE_BIN=$(command -v mise || echo "$HOME/.local/bin/mise")
   # shellcheck disable=SC2016
-  grep -q "mise activate bash" "${_RC:-}" || echo 'eval "$(mise activate bash)"' >>"${_RC:-}"
+  if ! grep -q "mise activate bash" "${_RC:-}"; then
+    echo "eval \"\$(${_MISE_BIN} activate bash)\"" >>"${_RC:-}"
+  fi
 }
 
 _mise_activate_zsh() {
   local _RC="${ZDOTDIR-$HOME}/.zshrc"
   [ -f "${_RC:-}" ] || return 0
+  local _MISE_BIN
+  _MISE_BIN=$(command -v mise || echo "$HOME/.local/bin/mise")
   # shellcheck disable=SC2016
-  grep -q "mise activate zsh" "${_RC:-}" || echo 'eval "$(mise activate zsh)"' >>"${_RC:-}"
+  if ! grep -q "mise activate zsh" "${_RC:-}"; then
+    echo "eval \"\$(${_MISE_BIN} activate zsh)\"" >>"${_RC:-}"
+  fi
 }
 
 _mise_activate_fish() {
   local _RC="$HOME/.config/fish/config.fish"
   mkdir -p "$(dirname "${_RC:-}")"
-  grep -q "mise activate fish" "${_RC:-}" || echo 'mise activate fish | source' >>"${_RC:-}"
+  local _MISE_BIN
+  _MISE_BIN=$(command -v mise || echo "$HOME/.local/bin/mise")
+  if ! grep -q "mise activate fish" "${_RC:-}"; then
+    echo "${_MISE_BIN} activate fish | source" >>"${_RC:-}"
+  fi
 }
 
 _mise_activate_pwsh() {
@@ -346,13 +358,25 @@ _mise_apply_activation() {
   [ "${_G_OS:-}" = "windows" ] && [ ! -x "${_M_BIN:-}" ] && _M_BIN="${_M_BIN:-}.exe"
 
   if [ -x "${_M_BIN:-}" ]; then
-    # PowerShell and Nushell activation in POSIX sh is complex/limited to shims.
-    # We focus on the most impactful session update: shims.
+    # Activate mise for the current session using the official method
+    # Reference: https://mise.jdx.dev/getting-started.html#activate-mise
     case "${_SHELL:-}" in
+    bash | zsh)
+      # For bash/zsh: eval "$(mise activate <shell>)"
+      eval "$("${_M_BIN:-}" activate "${_SHELL:-}")"
+      ;;
+    fish)
+      # For fish: mise activate fish | source
+      # Note: In POSIX sh, we can't directly pipe to 'source', so we use eval with shims
+      eval "$("${_M_BIN:-}" activate fish --shims)"
+      ;;
     pwsh | powershell | nu | nushell)
+      # PowerShell and Nushell activation in POSIX sh is complex/limited to shims
+      # We focus on the most impactful session update: shims
       export PATH="${_G_MISE_SHIMS_BASE:-}:$PATH"
       ;;
     *)
+      # Fallback: use shims mode for unknown shells
       eval "$("${_M_BIN:-}" activate "${_SHELL:-}" --shims)"
       ;;
     esac
