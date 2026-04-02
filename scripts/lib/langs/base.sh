@@ -76,6 +76,7 @@ install_gitleaks() {
   _T0_GITL=$(date +%s)
   local _TITLE="Gitleaks"
   local _PROVIDER="${VER_GITLEAKS_PROVIDER:-}"
+  local _VERSION="${VER_GITLEAKS:-}"
 
   if [ ! -d ".git" ]; then
     return 0
@@ -94,7 +95,7 @@ install_gitleaks() {
 
   _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
   local _STAT_GITL="✅ mise"
-  run_mise install gitleaks || _STAT_GITL="❌ Failed"
+  run_mise install "gitleaks@${_VERSION:-}" || _STAT_GITL="❌ Failed"
   log_summary "Base" "Gitleaks" "${_STAT_GITL:-}" "$(get_version gitleaks)" "$(($(date +%s) - _T0_GITL))"
 }
 
@@ -105,6 +106,7 @@ install_checkmake() {
   _T0_CM=$(date +%s)
   local _TITLE="Checkmake"
   local _PROVIDER="${VER_CHECKMAKE_PROVIDER:-}"
+  local _VERSION="${VER_CHECKMAKE:-}"
 
   if ! has_lang_files "Makefile" "*.make"; then
     return 0
@@ -123,7 +125,7 @@ install_checkmake() {
 
   _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
   local _STAT_CM="✅ mise"
-  run_mise install checkmake || _STAT_CM="❌ Failed"
+  run_mise install "checkmake@${_VERSION:-}" || _STAT_CM="❌ Failed"
   log_summary "Base" "Checkmake" "${_STAT_CM:-}" "$(get_version checkmake)" "$(($(date +%s) - _T0_CM))"
 }
 
@@ -168,6 +170,7 @@ install_editorconfig_checker() {
   _T0_EC=$(date +%s)
   local _TITLE="Editorconfig-Checker"
   local _PROVIDER="${VER_EDITORCONFIG_CHECKER_PROVIDER:-}"
+  local _VERSION="${VER_EDITORCONFIG_CHECKER:-}"
 
   if [ ! -f ".editorconfig" ]; then
     return 0
@@ -191,7 +194,7 @@ install_editorconfig_checker() {
     return 0
   fi
   local _STAT_EC="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_EC="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_EC="❌ Failed"
   log_summary "Base" "Editorconfig-Checker" "${_STAT_EC:-}" "$(get_version editorconfig-checker)" "$(($(date +%s) - _T0_EC))"
 }
 
@@ -203,6 +206,7 @@ install_goreleaser() {
   _T0_GR=$(date +%s)
   local _TITLE="GoReleaser"
   local _PROVIDER="${VER_GORELEASER_PROVIDER:-}"
+  local _VERSION="${VER_GORELEASER:-}"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -222,7 +226,7 @@ install_goreleaser() {
     return 0
   fi
   local _STAT_GR="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_GR="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_GR="❌ Failed"
   log_summary "Base" "GoReleaser" "${_STAT_GR:-}" "$(get_version goreleaser)" "$(($(date +%s) - _T0_GR))"
 }
 
