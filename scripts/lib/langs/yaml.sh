@@ -12,6 +12,7 @@ install_yamllint() {
   _T0_YAML=$(date +%s)
   local _TITLE="Yamllint"
   local _PROVIDER="${VER_YAMLLINT_PROVIDER:-}"
+  local _VERSION="${VER_YAMLLINT:-}"
 
   if ! has_lang_files "" "*.yaml *.yml"; then
     return 0
@@ -35,7 +36,7 @@ install_yamllint() {
     return 0
   fi
   local _STAT_YAML="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_YAML="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_YAML="❌ Failed"
   log_summary "Config" "Yamllint" "${_STAT_YAML:-}" "$(get_version yamllint)" "$(($(date +%s) - _T0_YAML))"
 }
 
@@ -46,6 +47,7 @@ install_dotenv_linter() {
   _T0_ENV=$(date +%s)
   local _TITLE="Dotenv-Linter"
   local _PROVIDER="${VER_DOTENV_LINTER_PROVIDER:-}"
+  local _VERSION="${VER_DOTENV_LINTER:-}"
 
   if ! has_lang_files ".env .env.example .env.template" ""; then
     return 0
@@ -69,7 +71,7 @@ install_dotenv_linter() {
     return 0
   fi
   local _STAT_ENV="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_ENV="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_ENV="❌ Failed"
   log_summary "Config" "Dotenv-Linter" "${_STAT_ENV:-}" "$(get_version dotenv-linter)" "$(($(date +%s) - _T0_ENV))"
 }
 

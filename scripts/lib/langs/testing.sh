@@ -12,6 +12,7 @@ install_bats() {
   _T0_BATS=$(date +%s)
   local _TITLE="Bats"
   local _PROVIDER="${VER_BATS_PROVIDER:-npm:bats}"
+  local _VERSION="${VER_BATS:-}"
 
   if ! has_lang_files "" "*.bats"; then
     return 0
@@ -35,7 +36,7 @@ install_bats() {
     return 0
   fi
   local _STAT_BATS="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_BATS="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_BATS="❌ Failed"
   refresh_mise_cache
   log_summary "Testing" "Bats" "${_STAT_BATS:-}" "$(get_version bats --version)" "$(($(date +%s) - _T0_BATS))"
 }

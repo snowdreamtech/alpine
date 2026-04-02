@@ -12,6 +12,7 @@ install_taplo() {
   _T0_TAP=$(date +%s)
   local _TITLE="Taplo"
   local _PROVIDER="${VER_TAPLO_PROVIDER:-}"
+  local _VERSION="${VER_TAPLO:-}"
   if ! has_lang_files "" "*.toml"; then
     return 0
   fi
@@ -34,7 +35,7 @@ install_taplo() {
     return 0
   fi
   local _STAT_TAP="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_TAP="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_TAP="❌ Failed"
   log_summary "Base" "Taplo" "${_STAT_TAP:-}" "$(get_version taplo)" "$(($(date +%s) - _T0_TAP))"
 }
 
