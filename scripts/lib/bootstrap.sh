@@ -351,37 +351,30 @@ _mise_apply_activation() {
   *) _mise_activate_bash ;;
   esac
 
-  # 2. Ephemeral Session Activation
-  local _M_BIN
-  _M_BIN=$(command -v mise || echo "${_G_MISE_BIN_BASE:-}/mise")
-  # shellcheck disable=SC2153
-  [ "${_G_OS:-}" = "windows" ] && [ ! -x "${_M_BIN:-}" ] && _M_BIN="${_M_BIN:-}.exe"
+  # 2. Ephemeral Session Activation (POSIX sh compatible)
+  # CRITICAL: We are running in a POSIX sh script, so we CANNOT eval shell-specific
+  # activation code (e.g., zsh's $+functions, bash's PROMPT_COMMAND, etc.).
+  # Instead, we only update PATH to include mise bin and shims directories.
+  # Full activation (hook-env, etc.) will happen when the user starts a new shell
+  # session with the RC file changes we made above.
 
-  if [ -x "${_M_BIN:-}" ]; then
-    # Activate mise for the current session using the official method
-    # Reference: https://mise.jdx.dev/getting-started.html#activate-mise
-    case "${_SHELL:-}" in
-    bash | zsh)
-      # For bash/zsh: eval "$(mise activate <shell>)"
-      eval "$("${_M_BIN:-}" activate "${_SHELL:-}")"
-      ;;
-    fish)
-      # For fish: mise activate fish | source
-      # Note: In POSIX sh, we can't directly pipe to 'source', so we use eval with shims
-      eval "$("${_M_BIN:-}" activate fish --shims)"
-      ;;
-    pwsh | powershell | nu | nushell)
-      # PowerShell and Nushell activation in POSIX sh is complex/limited to shims
-      # We focus on the most impactful session update: shims
-      export PATH="${_G_MISE_SHIMS_BASE:-}:$PATH"
-      ;;
-    *)
-      # Fallback: use shims mode for unknown shells
-      eval "$("${_M_BIN:-}" activate "${_SHELL:-}" --shims)"
-      ;;
+  # Ensure mise bin directory is in PATH
+  if [ -d "${_G_MISE_BIN_BASE:-}" ]; then
+    case ":${PATH:-}:" in
+    *":${_G_MISE_BIN_BASE:-}:"*) ;;
+    *) export PATH="${_G_MISE_BIN_BASE:-}:${PATH:-}" ;;
     esac
-    log_debug "mise environment synchronized for current session."
   fi
+
+  # Ensure mise shims directory is in PATH
+  if [ -d "${_G_MISE_SHIMS_BASE:-}" ]; then
+    case ":${PATH:-}:" in
+    *":${_G_MISE_SHIMS_BASE:-}:"*) ;;
+    *) export PATH="${_G_MISE_SHIMS_BASE:-}:${PATH:-}" ;;
+    esac
+  fi
+
+  log_debug "mise PATH synchronized for current session. Full activation will occur in new shell sessions."
 }
 
 bootstrap_mise() {
