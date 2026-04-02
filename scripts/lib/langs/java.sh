@@ -22,6 +22,7 @@ install_java_lint() {
   _T0_JAVA=$(date +%s)
   local _TITLE="Java Lint"
   local _PROVIDER="${VER_JAVA_FORMAT_PROVIDER:-}"
+  local _VERSION="${VER_JAVA_FORMAT:-}"
   local _REQ_VER="${VER_JAVA_FORMAT:-}"
 
   # Rely natively on mise's asset mapping from registry.sh for arm64/windows fallbacks
@@ -43,7 +44,7 @@ install_java_lint() {
   fi
   local _STAT_JAVA="✅ mise"
   setup_registry_google_java_format
-  run_mise install "${_PROVIDER:-}" || _STAT_JAVA="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_JAVA="❌ Failed"
   log_summary "Java" "Java Lint" "${_STAT_JAVA:-}" "$(get_version google-java-format)" "$(($(date +%s) - _T0_JAVA))"
 }
 
