@@ -32,6 +32,7 @@ install_ruby_lint() {
   _T0_RUBY=$(date +%s)
   local _TITLE="Rubocop"
   local _PROVIDER="${VER_RUBOCOP_PROVIDER:-}"
+  local _VERSION="${VER_RUBOCOP:-}"
 
   if ! has_lang_files "Gemfile" "*.rb"; then
     return 0
@@ -66,7 +67,7 @@ install_ruby_lint() {
   # Support mise gem provider if possible, else fallback to direct gem
   if resolve_bin "mise" >/dev/null 2>&1; then
     setup_registry_rubocop
-    run_mise install "${_PROVIDER:-}" || _STAT_RUBY="❌ Failed"
+    run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_RUBY="❌ Failed"
   else
     gem install rubocop --no-document || _STAT_RUBY="❌ Failed"
   fi

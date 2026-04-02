@@ -20,6 +20,7 @@ install_ktlint() {
   _T0_KT=$(date +%s)
   local _TITLE="ktlint"
   local _PROVIDER="${VER_KTLINT_PROVIDER:-}"
+  local _VERSION="${VER_KTLINT:-}"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -39,7 +40,7 @@ install_ktlint() {
   fi
   local _STAT_KT="✅ mise"
   setup_registry_ktlint
-  run_mise install "${_PROVIDER:-}" || _STAT_KT="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_KT="❌ Failed"
   log_summary "Kotlin" "ktlint" "${_STAT_KT:-}" "$(get_version ktlint --version)" "$(($(date +%s) - _T0_KT))"
 }
 

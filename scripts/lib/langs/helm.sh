@@ -24,13 +24,14 @@ install_kube_linter() {
   _T0_KL=$(date +%s)
   local _TITLE="Kube-Linter"
   local _PROVIDER="${VER_KUBE_LINTER_PROVIDER:-}"
+  local _VERSION="${VER_KUBE_LINTER:-}"
   if ! has_lang_files "" "CHARTS *.yaml *.yml"; then
     return 0
   fi
 
   _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
   local _STAT_KL="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_KL="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_KL="❌ Failed"
   log_summary "IaC" "Kube-Linter" "${_STAT_KL:-}" "$(get_version kube-linter version)" "$(($(date +%s) - _T0_KL))"
 }
 
