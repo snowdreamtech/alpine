@@ -74,12 +74,17 @@ _mise_detect_os() {
   esac
 }
 
-# Tier 1: Shell-specific streamers (mise.run) - Includes auto-activation.
+# Tier 1: Official install script (mise.jdx.dev) - Supports version specification.
 _mise_install_tier1() {
-  local _SHELL="${1:-}"
-  log_info "Tier 1: Trying official shell-specific streamer for ${_SHELL:-}..."
-  _TMP_SH="${TMPDIR:-/tmp}/mise_install_$$.sh"
-  if curl --retry 5 --retry-delay 2 --retry-connrefused -sS -L "https://mise.run/${_SHELL:-}" -o "${_TMP_SH:-}"; then
+  log_info "Tier 1: Trying official install script..."
+  if [ -n "${MISE_VERSION:-}" ]; then
+    log_info "Installing mise version: ${MISE_VERSION:-}"
+  else
+    log_info "Installing latest mise version"
+  fi
+
+  _TMP_SH="${TMPDIR:-/tmp}/mise_install_$.sh"
+  if curl --retry 5 --retry-delay 2 --retry-connrefused -sS -L "https://mise.jdx.dev/install.sh" -o"${_TMP_SH:-}"; then
     if sh "${_TMP_SH:-}"; then
       rm -f "${_TMP_SH:-}"
       return 0
@@ -181,7 +186,7 @@ _mise_install_tier4() {
       return 1
     fi
     local _TMP_DIR
-    _TMP_DIR=$(mktemp -d 2>/dev/null || echo "/tmp/mise_win_extract_$$")
+    _TMP_DIR=$(mktemp -d 2>/dev/null || echo "/tmp/mise_win_extract_$")
     local _TMP_ZIP="${_TMP_DIR:-}/mise.zip"
 
     if _download "${_M_URL:-}" "${_TMP_ZIP:-}"; then
@@ -377,9 +382,9 @@ bootstrap_mise() {
   local _M_ARCH
   _M_ARCH=$(_mise_detect_arch "${_M_OS:-}")
 
-  # Priority 1: Official Streamer (Includes auto-activation for some methods)
-  if _mise_install_tier1 "${_M_SHELL:-}"; then
-    log_success "mise installed via Tier 1 (Streamer)."
+  # Priority 1: Official Install Script (Supports version specification)
+  if _mise_install_tier1; then
+    log_success "mise installed via Tier 1 (Official Install Script)."
   # Priority 2: System Package Managers
   elif _mise_install_tier2; then
     log_success "mise installed via Tier 2 (Package Manager)."

@@ -385,7 +385,7 @@ GITHUB_PROXY="${GITHUB_PROXY:-https://gh-proxy.sn0wdr1am.com/}"
 
 # Runtime versions (Managed via .mise.toml, but some logic might still reference these for bootstrap purposes)
 # Only MISE is hardcoded here to facilitate the zero-dependency bootstrap phase.
-MISE_VERSION="${MISE_VERSION:-2026.3.8}"
+MISE_VERSION="${MISE_VERSION:-}"
 
 # Note: All other tools (Gitleaks, Shellcheck, Shfmt, Java Format, etc.) are purely managed
 # by the project's .mise.toml file. Do not add hardcoded version variables here.
