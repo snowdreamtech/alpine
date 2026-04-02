@@ -40,7 +40,7 @@ install_ruff() {
   local _T0_RUF
   _T0_RUF=$(date +%s)
   local _TITLE="Ruff"
-  local _PROVIDER="ruff"
+  local _PROVIDER="github:astral-sh/ruff"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER

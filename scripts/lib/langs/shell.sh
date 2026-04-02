@@ -11,7 +11,7 @@ install_shfmt() {
   local _T0_SHF
   _T0_SHF=$(date +%s)
   local _TITLE="Shfmt"
-  local _PROVIDER="shfmt"
+  local _PROVIDER="github:mvdan/sh"
 
   if ! has_lang_files "" "*.sh *.bash *.bats"; then
     return 0
@@ -48,7 +48,7 @@ install_shellcheck() {
   local _T0_SHC
   _T0_SHC=$(date +%s)
   local _TITLE="Shellcheck"
-  local _PROVIDER="shellcheck"
+  local _PROVIDER="github:koalaman/shellcheck"
 
   if ! has_lang_files "" "*.sh *.bash *.bats"; then
     return 0
@@ -89,7 +89,7 @@ install_actionlint() {
   local _T0_ACT
   _T0_ACT=$(date +%s)
   local _TITLE="Actionlint"
-  local _PROVIDER="actionlint"
+  local _PROVIDER="github:rhysd/actionlint"
   if ! has_lang_files ".github/workflows" "*.yml *.yaml"; then
     return 0
   fi

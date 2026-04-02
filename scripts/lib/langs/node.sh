@@ -26,6 +26,12 @@ install_runtime_node() {
   # redundant network calls and signature errors, especially in Node 22+.
   if grep -qE "pnpm|yarn" .mise.toml 2>/dev/null; then
     log_info "Package managers are already managed by mise. Skipping corepack."
+    if grep -q "npm:pnpm" .mise.toml 2>/dev/null; then
+      run_mise install npm:pnpm || log_warn "Failed to install npm:pnpm via mise"
+    fi
+    if grep -q "npm:yarn" .mise.toml 2>/dev/null; then
+      run_mise install npm:yarn || log_warn "Failed to install npm:yarn via mise"
+    fi
   else
     log_info "Initializing Node.js package managers (corepack)..."
 

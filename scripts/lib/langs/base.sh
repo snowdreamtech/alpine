@@ -75,7 +75,7 @@ install_gitleaks() {
   local _T0_GITL
   _T0_GITL=$(date +%s)
   local _TITLE="Gitleaks"
-  local _PROVIDER="gitleaks"
+  local _PROVIDER="github:gitleaks/gitleaks"
 
   if [ ! -d ".git" ]; then
     return 0
@@ -104,7 +104,7 @@ install_checkmake() {
   local _T0_CM
   _T0_CM=$(date +%s)
   local _TITLE="Checkmake"
-  local _PROVIDER="checkmake"
+  local _PROVIDER="github:mrtazz/checkmake"
 
   if ! has_lang_files "Makefile" "*.make"; then
     return 0
