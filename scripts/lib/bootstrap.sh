@@ -267,7 +267,7 @@ _mise_activate_bash() {
   local _RC="$HOME/.bashrc"
   [ -f "${_RC:-}" ] || return 0
   local _MISE_BIN
-  _MISE_BIN=$(command -v mise || echo "$HOME/.local/bin/mise")
+  _MISE_BIN=$(command -v mise 2>/dev/null || echo "$HOME/.local/bin/mise")
   # shellcheck disable=SC2016
   if ! grep -q "mise activate bash" "${_RC:-}"; then
     echo "eval \"\$(${_MISE_BIN} activate bash)\"" >>"${_RC:-}"
@@ -278,7 +278,7 @@ _mise_activate_zsh() {
   local _RC="${ZDOTDIR-$HOME}/.zshrc"
   [ -f "${_RC:-}" ] || return 0
   local _MISE_BIN
-  _MISE_BIN=$(command -v mise || echo "$HOME/.local/bin/mise")
+  _MISE_BIN=$(command -v mise 2>/dev/null || echo "$HOME/.local/bin/mise")
   # shellcheck disable=SC2016
   if ! grep -q "mise activate zsh" "${_RC:-}"; then
     echo "eval \"\$(${_MISE_BIN} activate zsh)\"" >>"${_RC:-}"
@@ -289,7 +289,7 @@ _mise_activate_fish() {
   local _RC="$HOME/.config/fish/config.fish"
   mkdir -p "$(dirname "${_RC:-}")"
   local _MISE_BIN
-  _MISE_BIN=$(command -v mise || echo "$HOME/.local/bin/mise")
+  _MISE_BIN=$(command -v mise 2>/dev/null || echo "$HOME/.local/bin/mise")
   if ! grep -q "mise activate fish" "${_RC:-}"; then
     echo "${_MISE_BIN} activate fish | source" >>"${_RC:-}"
   fi
