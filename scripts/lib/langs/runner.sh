@@ -11,7 +11,7 @@ install_just() {
   local _T0_JUST
   _T0_JUST=$(date +%s)
   local _TITLE="Just"
-  local _PROVIDER="github:casey/just"
+  local _PROVIDER="${VER_JUST_PROVIDER:-}"
   if ! has_lang_files "" "JUST"; then
     return 0
   fi
@@ -45,7 +45,7 @@ install_task() {
   local _T0_TASK
   _T0_TASK=$(date +%s)
   local _TITLE="Task"
-  local _PROVIDER="github:go-task/task"
+  local _PROVIDER="${VER_TASK_PROVIDER:-}"
   if ! has_lang_files "" "TASK"; then
     return 0
   fi

@@ -11,7 +11,7 @@ install_markdownlint() {
   local _T0_MD
   _T0_MD=$(date +%s)
   local _TITLE="Markdownlint"
-  local _PROVIDER="npm:markdownlint-cli2"
+  local _PROVIDER="${VER_MARKDOWNLINT_PROVIDER:-}"
 
   if ! has_lang_files "" "*.md"; then
     return 0

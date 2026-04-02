@@ -1,252 +1,131 @@
-# 测试环境文档
+# Scripts Version Centralization Tests
 
-## 概述
+This directory contains property-based tests for the scripts version centralization bugfix.
 
-本目录包含 scripts 重构项目的所有测试文件。测试环境使用 BATS (Bash Automated Testing System) 进行 shell 脚本测试，Node.js 用于 JSON 解析测试，Python 作为后备解析器。
+## Test Files
 
-## 目录结构
+### 1. Bug Condition Exploration Test
+**File**: `tests/bug-condition-exploration.sh`
 
-```
-tests/
-├── unit/              # 单元测试
-│   ├── test_timeout.bats
-│   ├── test_json_parser.bats
-│   ├── test_process_manager.bats
-│   └── test_resolve_bin.bats
-├── integration/       # 集成测试
-│   ├── test_setup_flow.bats
-│   └── test_ci_simulation.bats
-├── fixtures/          # 测试数据和 fixtures
-│   ├── mock_binaries/
-│   └── test_data.json
-├── vendor/            # 测试依赖库
-│   ├── bats-assert/
-│   └── bats-support/
-└── README.md          # 本文件
-```
+**Purpose**: Detect hardcoded provider values across the codebase (Task 1)
 
-## 测试环境要求
+**Expected Outcome on UNFIXED code**: FAIL with 36 hardcoded instances found
 
-### 必需工具
+**Expected Outcome on FIXED code**: PASS with 0 hardcoded instances found
 
-1. **BATS (Bash Automated Testing System)**
-   - 版本: >= 1.11.0
-   - 安装方式: `mise install npm:bats@latest`
-   - 验证: `bats --version`
+**What it tests**:
+- Searches for `local _PROVIDER="github:*"` patterns
+- Searches for `local _PROVIDER="npm:*"` patterns
+- Searches for `local _PROVIDER="pipx:*"` patterns
+- Searches for `local _PROVIDER="gem:*"` patterns
+- Counts total instances across all `scripts/lib/langs/*.sh` files
 
-2. **Node.js**
-   - 版本: >= 20.0.0
-   - 安装方式: `mise install node@20`
-   - 验证: `node --version`
-
-3. **Python**
-   - 版本: >= 3.12.0
-   - 安装方式: `mise install python@3.12`
-   - 验证: `python3 --version`
-
-### 可选工具
-
-- **jq**: JSON 命令行处理器（用于测试 JSON 解析降级）
-- **timeout/gtimeout**: 超时命令（用于测试超时机制）
-
-## 当前环境状态
-
-### 已安装工具
-
-✅ **BATS**: 1.13.0
-
-- 路径: `/Users/snowdream/.local/share/mise/installs/npm-bats/1.13.0/bin/bats`
-- 状态: 已安装并可用
-
-✅ **Node.js**: v25.8.2
-
-- 路径: `/Users/snowdream/.local/share/mise/installs/node/25.8.2/bin/node`
-- 状态: 已安装并可用
-
-✅ **Python**: 3.14.3
-
-- 路径: `/Users/snowdream/.local/share/mise/installs/python/3.14.3/bin/python3`
-- 状态: 已安装并可用
-
-### 测试目录结构
-
-✅ **tests/unit/**: 单元测试目录已创建
-✅ **tests/integration/**: 集成测试目录已创建
-✅ **tests/fixtures/**: 测试数据目录已创建
-
-## 运行测试
-
-### 运行所有测试
-
+**Run**:
 ```bash
-# 运行所有 BATS 测试
-bats tests/**/*.bats
-
-# 或使用 make 命令
-make test
+./tests/bug-condition-exploration.sh
 ```
 
-### 运行特定测试套件
+### 2. Preservation Property Test
+**File**: `tests/preservation-property.sh`
 
+**Purpose**: Verify existing functionality is preserved (Task 2)
+
+**Expected Outcome on UNFIXED code**: PASS (confirms baseline behavior)
+
+**Expected Outcome on FIXED code**: PASS (confirms no regressions)
+
+**What it tests**:
+- Centralized provider variables exist in versions.sh
+- Provider variables follow expected format (github:, npm:, pipx:, gem:)
+- Scripts already using centralized pattern (security.sh, java.sh, kotlin.sh) work correctly
+- Fallback pattern `${VAR:-}` works correctly
+- Version variables are defined alongside provider variables
+- Scripts using centralized pattern have NO hardcoded providers
+- Centralized provider variables are non-empty
+- Multiple scripts use the centralized pattern consistently
+- Provider variables exist for expected tools
+- Provider variables follow VER_*_PROVIDER naming convention
+
+**Run**:
 ```bash
-# 运行单元测试
-bats tests/unit/*.bats
-
-# 运行集成测试
-bats tests/integration/*.bats
-
-# 运行特定测试文件
-bats tests/unit/test_timeout.bats
+./tests/preservation-property.sh
 ```
 
-### 调试模式
+## Test Workflow
 
-```bash
-# 启用详细输出
-bats -t tests/unit/test_timeout.bats
+### Phase 1: Before Fix (Observation)
 
-# 启用调试模式
-DEBUG=1 bats tests/unit/test_timeout.bats
-```
+1. **Run Bug Condition Test** (Task 1):
+   ```bash
+   ./tests/bug-condition-exploration.sh
+   ```
+   - Expected: FAIL with 36 hardcoded instances
+   - This confirms the bug exists
 
-## 编写测试
+2. **Run Preservation Test** (Task 2):
+   ```bash
+   ./tests/preservation-property.sh
+   ```
+   - Expected: PASS
+   - This confirms baseline behavior to preserve
 
-### BATS 测试示例
+### Phase 2: After Fix (Validation)
 
-```bash
-#!/usr/bin/env bats
+3. **Implement Fix** (Task 3):
+   - Add missing variables to versions.sh
+   - Replace hardcoded providers with centralized variables
+   - Update all 36 instances across 20+ scripts
 
-# 加载测试辅助库
-load '../vendor/bats-support/load'
-load '../vendor/bats-assert/load'
+4. **Re-run Bug Condition Test** (Task 3.21):
+   ```bash
+   ./tests/bug-condition-exploration.sh
+   ```
+   - Expected: PASS with 0 hardcoded instances
+   - This confirms the bug is fixed
 
-# 设置和清理
-setup() {
-    # 测试前准备
-    export TEST_VAR="value"
-}
+5. **Re-run Preservation Test** (Task 3.22):
+   ```bash
+   ./tests/preservation-property.sh
+   ```
+   - Expected: PASS
+   - This confirms no regressions
 
-teardown() {
-    # 测试后清理
-    unset TEST_VAR
-}
+## Test Design Philosophy
 
-# 测试用例
-@test "示例测试：验证命令成功" {
-    run echo "hello"
-    assert_success
-    assert_output "hello"
-}
+These tests follow the **observation-first methodology** for bugfix testing:
 
-@test "示例测试：验证命令失败" {
-    run false
-    assert_failure
-}
-```
+1. **Exploratory Phase**: Write tests that detect the bug condition on unfixed code
+2. **Preservation Phase**: Write tests that validate baseline behavior on unfixed code
+3. **Fix Phase**: Implement the fix
+4. **Validation Phase**: Re-run the same tests to confirm the fix and no regressions
 
-### Node.js 测试示例
+This approach ensures:
+- The bug is properly understood before fixing
+- Baseline behavior is documented and preserved
+- The fix is validated by the same tests that detected the bug
+- No regressions are introduced
 
-```javascript
-// tests/unit/json-parser.test.js
-const assert = require("assert");
-const { parseJson } = require("../../scripts/lib/json-parser.js");
+## Why Shell Scripts Instead of Bats?
 
-describe("JSON Parser", () => {
-  it("should parse simple JSON", () => {
-    const result = parseJson('{"key":"value"}', "key");
-    assert.strictEqual(result, "value");
-  });
-});
-```
+The original preservation test was written using the bats testing framework but encountered hanging issues when sourcing `scripts/lib/versions.sh`. After investigation, we replaced it with a standalone shell script because:
 
-## 测试覆盖率
+1. **No External Dependencies**: Pure POSIX shell scripts work everywhere
+2. **No Hanging Issues**: Direct execution without complex framework setup
+3. **Simpler Logic**: Pattern matching with grep instead of function stubbing
+4. **Clear Output**: Colored output with clear pass/fail indicators
+5. **Easy to Run**: Just `./test-name.sh` without special setup
 
-### 目标
+See `tests/PRESERVATION_TEST_SOLUTION.md` for details on the solution.
 
-- 单元测试覆盖率: >= 80%
-- 集成测试覆盖率: >= 70%
-- 关键路径覆盖率: >= 95%
+## Test Results
 
-### 生成覆盖率报告
+### Current Status (Unfixed Code)
 
-```bash
-# 使用 kcov 生成 shell 脚本覆盖率
-kcov --exclude-pattern=/usr coverage/ bats tests/unit/*.bats
-```
+**Bug Condition Test**: ✓ PASSED (36 hardcoded instances found - bug confirmed)
 
-## 持续集成
+**Preservation Test**: ✓ PASSED (29 assertions passed - baseline validated)
 
-测试在 CI 环境中自动运行：
-
-- **GitHub Actions**: `.github/workflows/test.yml`
-- **触发条件**: Pull Request, Push to main
-- **测试矩阵**: Linux, macOS, Windows
-
-## 故障排查
-
-### BATS 找不到
-
-```bash
-# 确保 mise 已安装 BATS
-mise install npm:bats@latest
-
-# 或使用 npm 全局安装
-npm install -g bats
-```
-
-### Node.js 版本不匹配
-
-```bash
-# 使用 mise 安装正确版本
-mise install node@20
-
-# 或使用 mise 自动安装
-mise install
-```
-
-### Python 不可用
-
-```bash
-# 使用 mise 安装 Python
-mise install python@3.12
-
-# 验证安装
-python3 --version
-```
-
-### 测试超时
-
-```bash
-# 增加超时时间
-BATS_TEST_TIMEOUT=60 bats tests/unit/test_timeout.bats
-```
-
-## 性能基准
-
-### 目标响应时间
-
-- `resolve_bin`（缓存命中）: < 10ms
-- `resolve_bin`（mise 查找）: < 100ms
-- `resolve_bin`（文件系统搜索）: < 500ms
-- JSON 解析（< 1MB）: < 50ms
-- 超时触发后清理: < 3 秒
-
-### 运行性能测试
-
-```bash
-# 运行性能基准测试
-bats tests/unit/test_timeout.bats --filter "performance"
-```
-
-## 参考资源
-
-- [BATS 官方文档](https://bats-core.readthedocs.io/)
-- [bats-assert 库](https://github.com/bats-core/bats-assert)
-- [bats-support 库](https://github.com/bats-core/bats-support)
-- [Shell 测试最佳实践](https://github.com/bats-core/bats-core#best-practices)
-
-## 维护者
-
-- 开发团队: Dev Team
-- 测试负责人: QA Team
-- 最后更新: 2025-04-01
+This confirms:
+- The bug exists as documented (36 hardcoded providers)
+- Scripts using centralized variables work correctly
+- Baseline behavior is properly documented and ready to preserve

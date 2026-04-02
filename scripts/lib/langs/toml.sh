@@ -11,7 +11,7 @@ install_taplo() {
   local _T0_TAP
   _T0_TAP=$(date +%s)
   local _TITLE="Taplo"
-  local _PROVIDER="npm:@taplo/cli"
+  local _PROVIDER="${VER_TAPLO_PROVIDER:-}"
   if ! has_lang_files "" "*.toml"; then
     return 0
   fi

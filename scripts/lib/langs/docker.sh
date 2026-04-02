@@ -11,7 +11,7 @@ install_hadolint() {
   local _T0_HADO
   _T0_HADO=$(date +%s)
   local _TITLE="Hadolint"
-  local _PROVIDER="github:hadolint/hadolint"
+  local _PROVIDER="${VER_HADOLINT_PROVIDER:-}"
 
   if ! has_lang_files "" "Dockerfile docker-compose.yaml"; then
     return 0
@@ -45,7 +45,7 @@ install_dockerfile_utils() {
   local _T0_DU
   _T0_DU=$(date +%s)
   local _TITLE="Dockerfile Utils"
-  local _PROVIDER="npm:dockerfile-utils"
+  local _PROVIDER="${VER_DOCKERFILE_UTILS_PROVIDER:-}"
 
   if ! has_lang_files "" "Dockerfile"; then
     return 0

@@ -84,6 +84,7 @@ VER_GH_CLI_PROVIDER="github:cli/cli"
 VER_CHECKMAKE="0.3.2"
 VER_CHECKMAKE_PROVIDER="github:checkmake/checkmake"
 VER_EDITORCONFIG_CHECKER="3.6.1"
+VER_EDITORCONFIG_CHECKER_PROVIDER="github:editorconfig-checker/editorconfig-checker"
 VER_ADDLICENSE="1.2.0"
 VER_ADDLICENSE_PROVIDER="github:google/addlicense"
 
@@ -129,8 +130,12 @@ VER_KTLINT_PROVIDER="npm:@naturalcycles/ktlint"
 VER_JAVA_FORMAT="1.35.0"
 VER_JAVA_FORMAT_PROVIDER="github:google/google-java-format"
 
+VER_SWIFTFORMAT_PROVIDER="github:nicklockwood/SwiftFormat"
+
 VER_SWIFTLINT="0.63.2"
 VER_SWIFTLINT_PROVIDER="github:realm/SwiftLint"
+
+VER_RUBOCOP_PROVIDER="gem:rubocop"
 
 VER_STYLELINT="17.6.0"
 VER_STYLELINT_PROVIDER="npm:stylelint"

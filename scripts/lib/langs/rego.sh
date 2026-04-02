@@ -11,7 +11,7 @@ install_rego() {
   local _T0_REGO
   _T0_REGO=$(date +%s)
   local _TITLE="Rego (OPA)"
-  local _PROVIDER="github:open-policy-agent/opa"
+  local _PROVIDER="${VER_OPA_PROVIDER:-}"
   if ! has_lang_files "" "REGO"; then
     return 0
   fi

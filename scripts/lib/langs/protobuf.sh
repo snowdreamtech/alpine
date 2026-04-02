@@ -11,7 +11,7 @@ install_buf() {
   local _T0_BUF
   _T0_BUF=$(date +%s)
   local _TITLE="Buf"
-  local _PROVIDER="github:bufbuild/buf"
+  local _PROVIDER="${VER_BUF_PROVIDER:-}"
   if ! has_lang_files "" "PROTOC"; then
     return 0
   fi

@@ -22,7 +22,7 @@ install_stylua() {
   local _T0_LUA
   _T0_LUA=$(date +%s)
   local _TITLE="StyLua"
-  local _PROVIDER="github:JohnnyMorganz/StyLua"
+  local _PROVIDER="${VER_STYLUA_PROVIDER:-}"
 
   _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 

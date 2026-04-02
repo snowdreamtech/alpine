@@ -11,7 +11,7 @@ install_spectral() {
   local _T0_SPEC
   _T0_SPEC=$(date +%s)
   local _TITLE="Spectral"
-  local _PROVIDER="npm:@stoplight/spectral-cli"
+  local _PROVIDER="${VER_SPECTRAL_PROVIDER:-}"
 
   if ! has_lang_files "" "openapi.yaml openapi.json asyncapi.yaml asyncapi.json"; then
     return 0

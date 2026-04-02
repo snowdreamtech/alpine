@@ -30,7 +30,7 @@ install_clang_format() {
   local _T0_CF
   _T0_CF=$(date +%s)
   local _TITLE="clang-format"
-  local _PROVIDER="pipx:clang-format"
+  local _PROVIDER="${VER_CLANG_FORMAT_PROVIDER:-}"
   if ! has_lang_files "" "*.c *.cpp *.h *.hpp *.cc *.m *.mm"; then
     return 0
   fi

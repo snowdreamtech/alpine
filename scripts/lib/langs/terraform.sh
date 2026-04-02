@@ -23,7 +23,7 @@ install_tflint() {
   local _T0_TF
   _T0_TF=$(date +%s)
   local _TITLE="TFLint"
-  local _PROVIDER="github:terraform-linters/tflint"
+  local _PROVIDER="${VER_TFLINT_PROVIDER:-}"
   if ! has_lang_files "" "*.tf"; then
     return 0
   fi

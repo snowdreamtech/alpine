@@ -31,7 +31,7 @@ install_ruby_lint() {
   local _T0_RUBY
   _T0_RUBY=$(date +%s)
   local _TITLE="Rubocop"
-  local _PROVIDER="gem:rubocop"
+  local _PROVIDER="${VER_RUBOCOP_PROVIDER:-}"
 
   if ! has_lang_files "Gemfile" "*.rb"; then
     return 0

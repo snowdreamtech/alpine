@@ -40,7 +40,7 @@ install_ruff() {
   local _T0_RUF
   _T0_RUF=$(date +%s)
   local _TITLE="Ruff"
-  local _PROVIDER="github:astral-sh/ruff"
+  local _PROVIDER="${VER_RUFF_PROVIDER:-}"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -69,7 +69,7 @@ install_pip_audit() {
   local _T0_PA
   _T0_PA=$(date +%s)
   local _TITLE="pip-audit"
-  local _PROVIDER="pipx:pip-audit"
+  local _PROVIDER="${VER_PIP_AUDIT_PROVIDER:-}"
   # CI-only: Optional security tool, local dev skips to avoid pip-audit installation overhead.
   if ! is_ci_env && [ "${PA_FORCE_INSTALL:-0}" -ne 1 ]; then
     return 0

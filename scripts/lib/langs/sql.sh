@@ -11,7 +11,7 @@ install_sqlfluff() {
   local _T0_SQL
   _T0_SQL=$(date +%s)
   local _TITLE="Sqlfluff"
-  local _PROVIDER="pipx:sqlfluff"
+  local _PROVIDER="${VER_SQLFLUFF_PROVIDER:-}"
 
   if ! has_lang_files "" "*.sql"; then
     return 0

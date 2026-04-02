@@ -11,7 +11,7 @@ install_yamllint() {
   local _T0_YAML
   _T0_YAML=$(date +%s)
   local _TITLE="Yamllint"
-  local _PROVIDER="pipx:yamllint"
+  local _PROVIDER="${VER_YAMLLINT_PROVIDER:-}"
 
   if ! has_lang_files "" "*.yaml *.yml"; then
     return 0
@@ -45,7 +45,7 @@ install_dotenv_linter() {
   local _T0_ENV
   _T0_ENV=$(date +%s)
   local _TITLE="Dotenv-Linter"
-  local _PROVIDER="github:dotenv-linter/dotenv-linter"
+  local _PROVIDER="${VER_DOTENV_LINTER_PROVIDER:-}"
 
   if ! has_lang_files ".env .env.example .env.template" ""; then
     return 0

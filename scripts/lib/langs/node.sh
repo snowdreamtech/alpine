@@ -76,7 +76,7 @@ install_sort_package_json() {
   local _T0_SPJ
   _T0_SPJ=$(date +%s)
   local _TITLE="sort-package-json"
-  local _PROVIDER="npm:sort-package-json"
+  local _PROVIDER="${VER_SORT_PACKAGE_JSON_PROVIDER:-}"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -106,7 +106,7 @@ install_eslint() {
   local _T0_ES
   _T0_ES=$(date +%s)
   local _TITLE="ESLint"
-  local _PROVIDER="npm:eslint"
+  local _PROVIDER="${VER_ESLINT_PROVIDER:-}"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -137,7 +137,7 @@ install_stylelint() {
   local _T0_SL
   _T0_SL=$(date +%s)
   local _TITLE="Stylelint"
-  local _PROVIDER="npm:stylelint"
+  local _PROVIDER="${VER_STYLELINT_PROVIDER:-}"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -168,7 +168,7 @@ install_vitepress() {
   local _T0_VP
   _T0_VP=$(date +%s)
   local _TITLE="VitePress"
-  local _PROVIDER="npm:vitepress"
+  local _PROVIDER="${VER_VITEPRESS_PROVIDER:-}"
 
   if [ ! -d docs ] && ! grep -q '"vitepress"' "${PACKAGE_JSON:-}" 2>/dev/null; then
     return 0
@@ -203,7 +203,7 @@ install_prettier() {
   local _T0_PR
   _T0_PR=$(date +%s)
   local _TITLE="Prettier"
-  local _PROVIDER="npm:prettier"
+  local _PROVIDER="${VER_PRETTIER_PROVIDER:-}"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -234,7 +234,7 @@ install_commitlint() {
   local _T0_CL
   _T0_CL=$(date +%s)
   local _TITLE="Commitlint"
-  local _PROVIDER="npm:@commitlint/cli"
+  local _PROVIDER="${VER_COMMITLINT_PROVIDER:-}"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -265,7 +265,7 @@ install_commitizen() {
   local _T0_CZ
   _T0_CZ=$(date +%s)
   local _TITLE="Commitizen"
-  local _PROVIDER="npm:commitizen"
+  local _PROVIDER="${VER_COMMITIZEN_PROVIDER:-}"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER

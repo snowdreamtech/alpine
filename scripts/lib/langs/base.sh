@@ -75,7 +75,7 @@ install_gitleaks() {
   local _T0_GITL
   _T0_GITL=$(date +%s)
   local _TITLE="Gitleaks"
-  local _PROVIDER="github:gitleaks/gitleaks"
+  local _PROVIDER="${VER_GITLEAKS_PROVIDER:-}"
 
   if [ ! -d ".git" ]; then
     return 0
@@ -104,7 +104,7 @@ install_checkmake() {
   local _T0_CM
   _T0_CM=$(date +%s)
   local _TITLE="Checkmake"
-  local _PROVIDER="github:mrtazz/checkmake"
+  local _PROVIDER="${VER_CHECKMAKE_PROVIDER:-}"
 
   if ! has_lang_files "Makefile" "*.make"; then
     return 0
@@ -167,7 +167,7 @@ install_editorconfig_checker() {
   local _T0_EC
   _T0_EC=$(date +%s)
   local _TITLE="Editorconfig-Checker"
-  local _PROVIDER="github:editorconfig-checker/editorconfig-checker"
+  local _PROVIDER="${VER_EDITORCONFIG_CHECKER_PROVIDER:-}"
 
   if [ ! -f ".editorconfig" ]; then
     return 0
@@ -202,7 +202,7 @@ install_goreleaser() {
   local _T0_GR
   _T0_GR=$(date +%s)
   local _TITLE="GoReleaser"
-  local _PROVIDER="github:goreleaser/goreleaser"
+  local _PROVIDER="${VER_GORELEASER_PROVIDER:-}"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER

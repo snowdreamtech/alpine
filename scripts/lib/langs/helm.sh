@@ -23,7 +23,7 @@ install_kube_linter() {
   local _T0_KL
   _T0_KL=$(date +%s)
   local _TITLE="Kube-Linter"
-  local _PROVIDER="github:stackrox/kube-linter"
+  local _PROVIDER="${VER_KUBE_LINTER_PROVIDER:-}"
   if ! has_lang_files "" "CHARTS *.yaml *.yml"; then
     return 0
   fi

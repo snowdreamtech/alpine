@@ -56,7 +56,7 @@ install_swiftformat() {
   local _T0_SF
   _T0_SF=$(date +%s)
   local _TITLE="SwiftFormat"
-  local _PROVIDER="github:nicklockwood/SwiftFormat"
+  local _PROVIDER="${VER_SWIFTFORMAT_PROVIDER:-}"
 
   if ! has_lang_files "Package.swift" "*.swift"; then
     return 0
@@ -86,7 +86,7 @@ install_swiftlint() {
   local _T0_SL
   _T0_SL=$(date +%s)
   local _TITLE="SwiftLint"
-  local _PROVIDER="github:realm/SwiftLint"
+  local _PROVIDER="${VER_SWIFTLINT_PROVIDER:-}"
 
   if ! has_lang_files "Package.swift" "*.swift"; then
     return 0
