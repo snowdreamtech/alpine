@@ -202,6 +202,11 @@ install_editorconfig_checker() {
 # Note: goreleaser supports multi-language projects (Go, Rust, Python, Node, etc.)
 #       It is installed globally regardless of project language.
 install_goreleaser() {
+  # CI-only: Optional release tool, local dev skips to avoid slow GitHub download.
+  if ! is_ci_env && [ "${GORELEASER_FORCE_INSTALL:-0}" -ne 1 ]; then
+    return 0
+  fi
+
   local _T0_GR
   _T0_GR=$(date +%s)
   local _TITLE="GoReleaser"
