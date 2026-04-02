@@ -20,6 +20,7 @@ install_go_lint() {
   _T0_GO=$(date +%s)
   local _TITLE="Go Lint"
   local _PROVIDER="golangci-lint"
+  local _VERSION="${VER_GOLANGCI_LINT:-}"
 
   # Fast-path: Check version-aware existence — avoid re-downloading the large
   # GitHub-released binary (~50MB) on every local setup run.
@@ -44,7 +45,7 @@ install_go_lint() {
   # We also enforce a local MISE_HTTP_TIMEOUT override here to ensure reliability.
   # Ref: Rule 01 (Network/Retry)
   log_info "Downloading golangci-lint (this may take a few minutes on slow networks)..."
-  MISE_HTTP_TIMEOUT=600s VERBOSE=2 ENABLE_GITHUB_PROXY=1 run_mise install golangci-lint || _STAT_GO="❌ Failed"
+  MISE_HTTP_TIMEOUT=600s VERBOSE=2 ENABLE_GITHUB_PROXY=1 run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_GO="❌ Failed"
   log_summary "Go" "Go Lint" "${_STAT_GO:-}" "$(get_version golangci-lint)" "$(($(date +%s) - _T0_GO))"
 }
 
@@ -55,6 +56,7 @@ install_govulncheck() {
   _T0_GOVC=$(date +%s)
   local _TITLE="Govulncheck"
   local _PROVIDER="${VER_GOVULNCHECK_PROVIDER:-}"
+  local _VERSION="${VER_GOVULNCHECK:-}"
   # CI-only: Go vulnerability checks are typically heavier and reserved for CI workflows.
   if ! is_ci_env && [ "${GOVULN_FORCE_INSTALL:-0}" -ne 1 ]; then
     return 0
@@ -67,7 +69,7 @@ install_govulncheck() {
     return 0
   fi
   local _STAT_GOVC="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_GOVC="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_GOVC="❌ Failed"
   log_summary "Go" "Govulncheck" "${_STAT_GOVC:-}" "$(get_version govulncheck)" "$(($(date +%s) - _T0_GOVC))"
 }
 
