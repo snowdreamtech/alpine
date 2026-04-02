@@ -655,6 +655,20 @@ run_mise() {
       export MISE_GITHUB_TOKEN="${GITHUB_TOKEN:-}"
       log_debug "Forwarded GITHUB_TOKEN -> MISE_GITHUB_TOKEN for mise."
     fi
+
+    # Ensure GITHUB_API_TOKEN is set for mise's internal GitHub API calls.
+    # Workflows set this at env level, but ensure it survives subshell/export boundaries.
+    if [ -n "${GITHUB_TOKEN:-}" ] && [ -z "${GITHUB_API_TOKEN:-}" ]; then
+      export GITHUB_API_TOKEN="${GITHUB_TOKEN:-}"
+      log_debug "Forwarded GITHUB_TOKEN -> GITHUB_API_TOKEN for mise."
+    fi
+
+    # Ensure MISE_GITHUB_ENTERPRISE_TOKEN is set for mise's internal GitHub API calls.
+    # Workflows set this at env level, but ensure it survives subshell/export boundaries.
+    if [ -n "${GITHUB_TOKEN:-}" ] && [ -z "${MISE_GITHUB_ENTERPRISE_TOKEN:-}" ]; then
+      export MISE_GITHUB_ENTERPRISE_TOKEN="${GITHUB_TOKEN:-}"
+      log_debug "Forwarded GITHUB_TOKEN -> MISE_GITHUB_ENTERPRISE_TOKEN for mise."
+    fi
   fi
 
   # Adaptive Lock Forgiveness (ALF)
@@ -705,20 +719,52 @@ run_mise() {
     fi
 
     # Native/Backend Manager Awareness
+    # Ref: https://mise.jdx.dev/dev-tools/backends/
+    # Ensure required backend package managers are available before attempting installation
     case "${_T_CHECK:-}" in
     cargo:*)
       if ! command -v cargo >/dev/null 2>&1; then
-        log_error "Cannot install '${_T_CHECK:-}': 'cargo' (Rust) is missing." && return 1
+        log_error "Cannot install '${_T_CHECK:-}': 'cargo' (Rust) is missing. Install with: mise use -g rust" && return 1
       fi
       ;;
     go:*)
       if ! command -v go >/dev/null 2>&1; then
-        log_error "Cannot install '${_T_CHECK:-}': 'go' (Golang) is missing." && return 1
+        log_error "Cannot install '${_T_CHECK:-}': 'go' (Golang) is missing. Install with: mise use -g go" && return 1
       fi
       ;;
     npm:*)
-      if ! command -v npm >/dev/null 2>&1; then
-        log_error "Cannot install '${_T_CHECK:-}': 'npm' (Node.js) is missing." && return 1
+      # npm backend supports npm, bun, or pnpm as package managers
+      if ! command -v npm >/dev/null 2>&1 && ! command -v bun >/dev/null 2>&1 && ! command -v pnpm >/dev/null 2>&1; then
+        log_error "Cannot install '${_T_CHECK:-}': No Node.js package manager found (npm/bun/pnpm). Install with: mise use -g node" && return 1
+      fi
+      ;;
+    pipx:*)
+      # pipx backend prefers uvx (from uv) but falls back to pipx
+      if ! command -v uv >/dev/null 2>&1 && ! command -v pipx >/dev/null 2>&1; then
+        log_error "Cannot install '${_T_CHECK:-}': Neither 'uv' nor 'pipx' found. Install with: mise use -g uv (or: mise use -g python && pip install pipx)" && return 1
+      fi
+      ;;
+    gem:*)
+      if ! command -v gem >/dev/null 2>&1; then
+        log_error "Cannot install '${_T_CHECK:-}': 'gem' (Ruby) is missing. Install with: mise use -g ruby" && return 1
+      fi
+      ;;
+    conda:*)
+      # conda backend (experimental) requires conda or mamba
+      if ! command -v conda >/dev/null 2>&1 && ! command -v mamba >/dev/null 2>&1; then
+        log_error "Cannot install '${_T_CHECK:-}': Neither 'conda' nor 'mamba' found. Install conda/mamba first." && return 1
+      fi
+      ;;
+    dotnet:*)
+      # dotnet backend (experimental) requires .NET SDK
+      if ! command -v dotnet >/dev/null 2>&1; then
+        log_error "Cannot install '${_T_CHECK:-}': 'dotnet' (.NET SDK) is missing. Install from: https://dotnet.microsoft.com/" && return 1
+      fi
+      ;;
+    spm:*)
+      # spm backend (experimental) requires Swift Package Manager
+      if ! command -v swift >/dev/null 2>&1; then
+        log_error "Cannot install '${_T_CHECK:-}': 'swift' (Swift Package Manager) is missing. Install Swift first." && return 1
       fi
       ;;
     esac
