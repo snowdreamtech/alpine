@@ -12,6 +12,7 @@ install_just() {
   _T0_JUST=$(date +%s)
   local _TITLE="Just"
   local _PROVIDER="${VER_JUST_PROVIDER:-}"
+  local _VERSION="${VER_JUST:-}"
   if ! has_lang_files "" "JUST"; then
     return 0
   fi
@@ -35,7 +36,7 @@ install_just() {
   fi
   local _STAT_JUST="✅ mise"
   setup_registry_just
-  run_mise install "${_PROVIDER:-}" || _STAT_JUST="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_JUST="❌ Failed"
   log_summary "Base" "Just" "${_STAT_JUST:-}" "$(get_version just --version)" "$(($(date +%s) - _T0_JUST))"
 }
 
@@ -46,6 +47,7 @@ install_task() {
   _T0_TASK=$(date +%s)
   local _TITLE="Task"
   local _PROVIDER="${VER_TASK_PROVIDER:-}"
+  local _VERSION="${VER_TASK:-}"
   if ! has_lang_files "" "TASK"; then
     return 0
   fi
@@ -69,7 +71,7 @@ install_task() {
   fi
   local _STAT_TASK="✅ mise"
   setup_registry_task
-  run_mise install "${_PROVIDER:-}" || _STAT_TASK="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_TASK="❌ Failed"
   log_summary "Base" "Task" "${_STAT_TASK:-}" "$(get_version task --version)" "$(($(date +%s) - _T0_TASK))"
 }
 
