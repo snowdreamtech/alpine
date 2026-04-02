@@ -12,6 +12,7 @@ install_hadolint() {
   _T0_HADO=$(date +%s)
   local _TITLE="Hadolint"
   local _PROVIDER="${VER_HADOLINT_PROVIDER:-}"
+  local _VERSION="${VER_HADOLINT:-}"
 
   if ! has_lang_files "" "Dockerfile docker-compose.yaml"; then
     return 0
@@ -35,7 +36,7 @@ install_hadolint() {
     return 0
   fi
   local _STAT_HADO="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_HADO="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_HADO="❌ Failed"
   log_summary "Docker" "Hadolint" "${_STAT_HADO:-}" "$(get_version hadolint)" "$(($(date +%s) - _T0_HADO))"
 }
 
@@ -46,6 +47,7 @@ install_dockerfile_utils() {
   _T0_DU=$(date +%s)
   local _TITLE="Dockerfile Utils"
   local _PROVIDER="${VER_DOCKERFILE_UTILS_PROVIDER:-}"
+  local _VERSION="${VER_DOCKERFILE_UTILS:-}"
 
   if ! has_lang_files "" "Dockerfile"; then
     return 0
@@ -69,7 +71,7 @@ install_dockerfile_utils() {
     return 0
   fi
   local _STAT_DU="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_DU="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_DU="❌ Failed"
   log_summary "Docker" "dockerfile-utils" "${_STAT_DU:-}" "$(get_version dockerfile-utils)" "$(($(date +%s) - _T0_DU))"
 }
 
