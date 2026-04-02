@@ -77,6 +77,7 @@ install_sort_package_json() {
   _T0_SPJ=$(date +%s)
   local _TITLE="sort-package-json"
   local _PROVIDER="${VER_SORT_PACKAGE_JSON_PROVIDER:-}"
+  local _VERSION="${VER_SORT_PACKAGE_JSON:-}"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -96,7 +97,7 @@ install_sort_package_json() {
     return 0
   fi
   local _STAT_SPJ="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_SPJ="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_SPJ="❌ Failed"
   log_summary "Node" "sort-package-json" "${_STAT_SPJ:-}" "$(get_version sort-package-json)" "$(($(date +%s) - _T0_SPJ))"
 }
 
@@ -107,6 +108,7 @@ install_eslint() {
   _T0_ES=$(date +%s)
   local _TITLE="ESLint"
   local _PROVIDER="${VER_ESLINT_PROVIDER:-}"
+  local _VERSION="${VER_ESLINT:-}"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -127,7 +129,7 @@ install_eslint() {
   fi
   local _STAT_ES
   _STAT_ES="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_ES="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_ES="❌ Failed"
   log_summary "Node" "ESLint" "${_STAT_ES:-}" "$(get_version eslint)" "$(($(date +%s) - _T0_ES))"
 }
 
@@ -138,6 +140,7 @@ install_stylelint() {
   _T0_SL=$(date +%s)
   local _TITLE="Stylelint"
   local _PROVIDER="${VER_STYLELINT_PROVIDER:-}"
+  local _VERSION="${VER_STYLELINT:-}"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -158,7 +161,7 @@ install_stylelint() {
   fi
   local _STAT_SL
   _STAT_SL="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_SL="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_SL="❌ Failed"
   log_summary "Node" "Stylelint" "${_STAT_SL:-}" "$(get_version stylelint)" "$(($(date +%s) - _T0_SL))"
 }
 
@@ -169,6 +172,7 @@ install_vitepress() {
   _T0_VP=$(date +%s)
   local _TITLE="VitePress"
   local _PROVIDER="${VER_VITEPRESS_PROVIDER:-}"
+  local _VERSION="${VER_VITEPRESS:-}"
 
   if [ ! -d docs ] && ! grep -q '"vitepress"' "${PACKAGE_JSON:-}" 2>/dev/null; then
     return 0
@@ -193,7 +197,7 @@ install_vitepress() {
   fi
   local _STAT_VP
   _STAT_VP="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_VP="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_VP="❌ Failed"
   log_summary "Docs" "VitePress" "${_STAT_VP:-}" "$(get_version vitepress)" "$(($(date +%s) - _T0_VP))"
 }
 
@@ -204,6 +208,7 @@ install_prettier() {
   _T0_PR=$(date +%s)
   local _TITLE="Prettier"
   local _PROVIDER="${VER_PRETTIER_PROVIDER:-}"
+  local _VERSION="${VER_PRETTIER:-}"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -224,7 +229,7 @@ install_prettier() {
   fi
   local _STAT_PR
   _STAT_PR="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_PR="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_PR="❌ Failed"
   log_summary "Base" "Prettier" "${_STAT_PR:-}" "$(get_version prettier)" "$(($(date +%s) - _T0_PR))"
 }
 
@@ -235,6 +240,7 @@ install_commitlint() {
   _T0_CL=$(date +%s)
   local _TITLE="Commitlint"
   local _PROVIDER="${VER_COMMITLINT_PROVIDER:-}"
+  local _VERSION="${VER_COMMITLINT:-}"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -255,7 +261,7 @@ install_commitlint() {
   fi
   local _STAT_CL
   _STAT_CL="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_CL="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_CL="❌ Failed"
   log_summary "Base" "Commitlint" "${_STAT_CL:-}" "$(get_version commitlint)" "$(($(date +%s) - _T0_CL))"
 }
 
@@ -266,6 +272,7 @@ install_commitizen() {
   _T0_CZ=$(date +%s)
   local _TITLE="Commitizen"
   local _PROVIDER="${VER_COMMITIZEN_PROVIDER:-}"
+  local _VERSION="${VER_COMMITIZEN:-}"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -286,7 +293,7 @@ install_commitizen() {
   fi
   local _STAT_CZ
   _STAT_CZ="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_CZ="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_CZ="❌ Failed"
   log_summary "Base" "Commitizen" "${_STAT_CZ:-}" "$(get_version commitizen)" "$(($(date +%s) - _T0_CZ))"
 }
 

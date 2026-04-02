@@ -12,6 +12,7 @@ install_markdownlint() {
   _T0_MD=$(date +%s)
   local _TITLE="Markdownlint"
   local _PROVIDER="${VER_MARKDOWNLINT_PROVIDER:-}"
+  local _VERSION="${VER_MARKDOWNLINT:-}"
 
   if ! has_lang_files "" "*.md"; then
     return 0
@@ -35,7 +36,7 @@ install_markdownlint() {
     return 0
   fi
   local _STAT_MD="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_MD="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_MD="❌ Failed"
   log_summary "Docs" "Markdownlint" "${_STAT_MD:-}" "$(get_version markdownlint)" "$(($(date +%s) - _T0_MD))"
 }
 
