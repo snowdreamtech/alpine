@@ -468,11 +468,13 @@ optimize_network() {
     local _SKIP_VERIFY=false
     if [ -f "${_TOKEN_CACHE:-}" ]; then
       local _CACHE_AGE=0
-      if [ "${_G_OS:-}" = "macos" ]; then
-        _CACHE_AGE=$(($(date +%s) - $(stat -f %m "${_TOKEN_CACHE:-}")))
+      # Try BSD stat first (macOS default), fallback to GNU stat (Linux/coreutils)
+      if _MTIME=$(stat -f "%m" "${_TOKEN_CACHE:-}" 2>/dev/null); then
+        _CACHE_AGE=$(($(date +%s) - _MTIME))
+      elif _MTIME=$(stat -c "%Y" "${_TOKEN_CACHE:-}" 2>/dev/null); then
+        _CACHE_AGE=$(($(date +%s) - _MTIME))
       else
-        # Linux and Windows (Git Bash) both use GNU stat
-        _CACHE_AGE=$(($(date +%s) - $(stat -c %Y "${_TOKEN_CACHE:-}" 2>/dev/null || echo "0")))
+        _CACHE_AGE=9999  # Force verification if stat fails
       fi
       [ "${_CACHE_AGE:-}" -lt 3600 ] && _SKIP_VERIFY=true
     fi
