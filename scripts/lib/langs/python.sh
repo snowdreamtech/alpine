@@ -14,7 +14,8 @@ install_runtime_python() {
   fi
 
   # 1. Runtime initialization
-  run_mise install python
+  local _VERSION="${VER_PYTHON:-}"
+  run_mise install "python@${_VERSION:-}"
 
   # 2. Virtualenv management
   if [ ! -d "${VENV:-}" ]; then
@@ -41,6 +42,7 @@ install_ruff() {
   _T0_RUF=$(date +%s)
   local _TITLE="Ruff"
   local _PROVIDER="${VER_RUFF_PROVIDER:-}"
+  local _VERSION="${VER_RUFF:-}"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -59,7 +61,7 @@ install_ruff() {
     return 0
   fi
   local _STAT_RUF="✅ mise"
-  run_mise install "${_PROVIDER:-}" || _STAT_RUF="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_RUF="❌ Failed"
   log_summary "Python" "Ruff" "${_STAT_RUF:-}" "$(get_version ruff)" "$(($(date +%s) - _T0_RUF))"
 }
 
@@ -70,6 +72,7 @@ install_pip_audit() {
   _T0_PA=$(date +%s)
   local _TITLE="pip-audit"
   local _PROVIDER="${VER_PIP_AUDIT_PROVIDER:-}"
+  local _VERSION="${VER_PIP_AUDIT:-}"
   # CI-only: Optional security tool, local dev skips to avoid pip-audit installation overhead.
   if ! is_ci_env && [ "${PA_FORCE_INSTALL:-0}" -ne 1 ]; then
     return 0
@@ -86,13 +89,7 @@ install_pip_audit() {
     return 0
   fi
   local _STAT_PA="✅ mise"
-  local _V_PA
-  _V_PA=$(get_mise_tool_version pip-audit)
-  if [ -n "${_V_PA:-}" ]; then
-    run_mise install "${_PROVIDER:-}@${_V_PA:-}" || _STAT_PA="❌ Failed"
-  else
-    run_mise install "${_PROVIDER:-}" || _STAT_PA="❌ Failed"
-  fi
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_PA="❌ Failed"
   log_summary "Python" "pip-audit" "${_STAT_PA:-}" "$(get_version pip-audit --version)" "$(($(date +%s) - _T0_PA))"
 }
 
