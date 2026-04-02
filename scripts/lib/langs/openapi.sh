@@ -12,6 +12,7 @@ install_spectral() {
   _T0_SPEC=$(date +%s)
   local _TITLE="Spectral"
   local _PROVIDER="${VER_SPECTRAL_PROVIDER:-}"
+  local _VERSION="${VER_SPECTRAL:-}"
 
   if ! has_lang_files "" "openapi.yaml openapi.json asyncapi.yaml asyncapi.json"; then
     return 0
@@ -24,7 +25,7 @@ install_spectral() {
   _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
   if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "API" "Spectral" "✅ Exists" "${_CUR_VER:-}" "0"
+    log_summary"API" "Spectral" "✅ Exists" "${_CUR_VER:-}" "0"
     return 0
   fi
 
@@ -36,7 +37,7 @@ install_spectral() {
   fi
   local _STAT_SPEC="✅ mise"
   setup_registry_spectral
-  run_mise install "${_PROVIDER:-}" || _STAT_SPEC="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_SPEC="❌ Failed"
   log_summary "API" "Spectral" "${_STAT_SPEC:-}" "$(get_version spectral)" "$(($(date +%s) - _T0_SPEC))"
 }
 
