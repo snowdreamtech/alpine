@@ -383,9 +383,13 @@ GITHUB_PROXY="${GITHUB_PROXY:-https://gh-proxy.sn0wdr1am.com/}"
 
 # ── 🔨 SSoT Tool Versions ────────────────────────────────────────────────────
 
+# Source version registry
+# shellcheck source=/dev/null
+. "${_G_LIB_DIR:-${_G_PROJECT_ROOT:-}/scripts/lib}/versions.sh"
+
 # Runtime versions (Managed via .mise.toml, but some logic might still reference these for bootstrap purposes)
 # Only MISE is hardcoded here to facilitate the zero-dependency bootstrap phase.
-MISE_VERSION="${MISE_VERSION:-}"
+MISE_VERSION="${MISE_VERSION:-${VER_MISE:-}}"
 
 # Note: All other tools (Gitleaks, Shellcheck, Shfmt, Java Format, etc.) are purely managed
 # by the project's .mise.toml file. Do not add hardcoded version variables here.
