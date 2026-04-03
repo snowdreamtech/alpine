@@ -145,3 +145,8 @@ Desktop.ini
 *.orig
 CHANGELOG.md
 LICENSE
+
+# ── 11. Markdown Files (Handled by markdownlint) ──────────────────────────────
+# Prettier converts *emphasis* to _emphasis_, conflicting with markdownlint.
+# Let markdownlint handle all markdown formatting instead.
+**/*.md
