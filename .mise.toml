@@ -12,7 +12,7 @@
 go = "1.26.1"
 node = "25.8.2"
 "npm:pnpm" = "10.33.0"
-python = "3.14.3"
+python = "3.12.3"
 # pipx is managed as a bootstrap tool via pip in scripts/lib/langs/base.sh to ensure cross-platform compatibility.
 # pipx = "1.11.0"
 
@@ -81,7 +81,7 @@ http_timeout = "30s"
 # ------------------------------------------------------------
 [env]
 # GitHub Proxy Acceleration - DISABLED to prevent hanging
-ENABLE_GITHUB_PROXY = "1"
+ENABLE_GITHUB_PROXY = "0"
 GITHUB_PROXY = "https://gh-proxy.sn0wdr1am.com/"
 
 # Feature Governance (0 = Disabled, 1 = Enabled)
