@@ -474,7 +474,7 @@ optimize_network() {
       elif _MTIME=$(stat -c "%Y" "${_TOKEN_CACHE:-}" 2>/dev/null); then
         _CACHE_AGE=$(($(date +%s) - _MTIME))
       else
-        _CACHE_AGE=9999  # Force verification if stat fails
+        _CACHE_AGE=9999 # Force verification if stat fails
       fi
       [ "${_CACHE_AGE:-}" -lt 3600 ] && _SKIP_VERIFY=true
     fi

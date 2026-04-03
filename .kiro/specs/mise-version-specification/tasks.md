@@ -18,7 +18,7 @@
 
 - [x] 2. Write preservation property tests (BEFORE implementing fix)
   - **Proper
-IMPORTANT**: Follow observation-first methodology
+    IMPORTANT**: Follow observation-first methodology
   - Observe behavior on UNFIXED code for non-buggy installation patterns
   - Test fast-path version checks: verify `is_version_match` skips reinstallation when correct version exists
   - Test DRY_RUN mode: verify installations are previewed without execution
@@ -33,7 +33,6 @@ IMPORTANT**: Follow observation-first methodology
   - _Requirements: 3.1, 3.2, 3.3, 3.4, 3.5_
 
 - [ ] 3. Fix for mise version specification bug
-
   - [x] 3.1 Fix scripts/lib/langs/base.sh
     - Add `local _VERSION="${VER_GITLEAKS:-}"` to `install_gitleaks()`
     - Transform `run_mise install gitleaks` to `run_mise install "gitleaks@${_VERSION:-}"`
@@ -43,8 +42,8 @@ IMPORTANT**: Follow observation-first methodology
     - Transform `run_mise install "${_PROVIDER:-}"` to `run_mise install "${_PROVIDER:-}@${_VERSION:-}"`
     - Add `local _VERSION="${VER_GORELEASER:-}"` to `install_goreleaser()`
     - Transform `run_mise install "${_PROVIDER:-}"` to `run_mise install "${_PROVIDER:-}@${_VERSION:-}"`
-    - _Bug_Condition: isBugCondition(installCall) where installCall matches 'run_mise install "${_PROVIDER:-}"' without version suffix_
-    - _Expected_Behavior: All install calls SHALL include @${_VERSION:-} suffix to enforce version locking from versions.sh_
+    - _Bug_Condition: isBugCondition(installCall) where installCall matches 'run_mise install "${\_PROVIDER:-}"' without version suffix_
+    - _Expected_Behavior: All install calls SHALL include @${\_VERSION:-} suffix to enforce version locking from versions.sh_
     - _Preservation: Fast-path checks, DRY_RUN mode, error handling, and log formatting remain unchanged_
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.4, 3.5_
 
@@ -55,8 +54,8 @@ IMPORTANT**: Follow observation-first methodology
     - Transform `run_mise install "${_PROVIDER:-}"` to `run_mise install "${_PROVIDER:-}@${_VERSION:-}"`
     - Add `local _VERSION="${VER_ACTIONLINT:-}"` to `install_actionlint()`
     - Transform `run_mise install "${_PROVIDER:-}"` to `run_mise install "${_PROVIDER:-}@${_VERSION:-}"`
-    - _Bug_Condition: isBugCondition(installCall) where installCall matches 'run_mise install "${_PROVIDER:-}"' without version suffix_
-    - _Expected_Behavior: All install calls SHALL include @${_VERSION:-} suffix to enforce version locking from versions.sh_
+    - _Bug_Condition: isBugCondition(installCall) where installCall matches 'run_mise install "${\_PROVIDER:-}"' without version suffix_
+    - _Expected_Behavior: All install calls SHALL include @${\_VERSION:-} suffix to enforce version locking from versions.sh_
     - _Preservation: Fast-path checks, DRY_RUN mode, error handling, and log formatting remain unchanged_
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.4, 3.5_
 
@@ -65,32 +64,32 @@ IMPORTANT**: Follow observation-first methodology
     - Transform `run_mise install "${_PROVIDER:-}"` to `run_mise install "${_PROVIDER:-}@${_VERSION:-}"`
     - Add `local _VERSION="${VER_DOCKERFILE_UTILS:-}"` to `install_dockerfile_utils()`
     - Transform `run_mise install "${_PROVIDER:-}"` to `run_mise install "${_PROVIDER:-}@${_VERSION:-}"`
-    - _Bug_Condition: isBugCondition(installCall) where installCall matches 'run_mise install "${_PROVIDER:-}"' without version suffix_
-    - _Expected_Behavior: All install calls SHALL include @${_VERSION:-} suffix to enforce version locking from versions.sh_
+    - _Bug_Condition: isBugCondition(installCall) where installCall matches 'run_mise install "${\_PROVIDER:-}"' without version suffix_
+    - _Expected_Behavior: All install calls SHALL include @${\_VERSION:-} suffix to enforce version locking from versions.sh_
     - _Preservation: Fast-path checks, DRY_RUN mode, error handling, and log formatting remain unchanged_
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.4, 3.5_
 
   - [x] 3.4 Fix scripts/lib/langs/java.sh
     - Add `local _VERSION="${VER_JAVA_FORMAT:-}"` to `install_java_lint()`
     - Transform `run_mise install "${_PROVIDER:-}"` to `run_mise install "${_PROVIDER:-}@${_VERSION:-}"`
-    - _Bug_Condition: isBugCondition(installCall) where installCall matches 'run_mise install "${_PROVIDER:-}"' without version suffix_
-    - _Expected_Behavior: All install calls SHALL include @${_VERSION:-} suffix to enforce version locking from versions.sh_
+    - _Bug_Condition: isBugCondition(installCall) where installCall matches 'run_mise install "${\_PROVIDER:-}"' without version suffix_
+    - _Expected_Behavior: All install calls SHALL include @${\_VERSION:-} suffix to enforce version locking from versions.sh_
     - _Preservation: Fast-path checks, DRY_RUN mode, error handling, setup_registry_google_java_format call, and log formatting remain unchanged_
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.4, 3.5_
 
   - [x] 3.5 Fix scripts/lib/langs/cpp.sh
     - Add `local _VERSION="${VER_CLANG_FORMAT:-}"` to `install_clang_format()`
     - Transform `run_mise install "${_PROVIDER:-}"` to `run_mise install "${_PROVIDER:-}@${_VERSION:-}"`
-    - _Bug_Condition: isBugCondition(installCall) where installCall matches 'run_mise install "${_PROVIDER:-}"' without version suffix_
-    - _Expected_Behavior: All install calls SHALL include @${_VERSION:-} suffix to enforce version locking from versions.sh_
+    - _Bug_Condition: isBugCondition(installCall) where installCall matches 'run_mise install "${\_PROVIDER:-}"' without version suffix_
+    - _Expected_Behavior: All install calls SHALL include @${\_VERSION:-} suffix to enforce version locking from versions.sh_
     - _Preservation: Fast-path checks, DRY_RUN mode, error handling, and log formatting remain unchanged_
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.4, 3.5_
 
   - [x] 3.6 Fix scripts/lib/langs/lua.sh
     - Add `local _VERSION="${VER_STYLUA:-}"` to `install_stylua()`
     - Transform `run_mise install "${_PROVIDER:-}"` to `run_mise install "${_PROVIDER:-}@${_VERSION:-}"`
-    - _Bug_Condition: isBugCondition(installCall) where installCall matches 'run_mise install "${_PROVIDER:-}"' without version suffix_
-    - _Expected_Behavior: All install calls SHALL include @${_VERSION:-} suffix to enforce version locking from versions.sh_
+    - _Bug_Condition: isBugCondition(installCall) where installCall matches 'run_mise install "${\_PROVIDER:-}"' without version suffix_
+    - _Expected_Behavior: All install calls SHALL include @${\_VERSION:-} suffix to enforce version locking from versions.sh_
     - _Preservation: Fast-path checks, DRY_RUN mode, error handling, and log formatting remain unchanged_
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.4, 3.5_
 
@@ -98,46 +97,31 @@ IMPORTANT**: Follow observation-first methodology
     - Add `local _VERSION` extraction logic to `setup_registry_rubocop()`
     - Transform `run_mise install "${_PROVIDER:-}"` to `run_mise install "${_PROVIDER:-}@${_VERSION:-}"`
     - Note: Rubocop uses gem provider, version may need extraction from gem specification
-    - _Bug_Condition: isBugCondition(installCall) where installCall matches'run_mise install "${_PROVIDER:-}"' without version suffix_
-    - _Expected_Behavior: All install calls SHALL include @${_VERSION:-} suffix to enforce version locking from versions.sh_
+    - _Bug_Condition: isBugCondition(installCall) where installCall matches'run_mise install "${\_PROVIDER:-}"' without version suffix_
+    - _Expected_Behavior: All install calls SHALL include @${\_VERSION:-} suffix to enforce version locking from versions.sh_
     - _Preservation: Fast-path checks, DRY_RUN mode, error handling, and log formatting remain unchanged_
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.4, 3.5_
 
-  - [x] 3.8 Fix scripts/lib/langs/runner.sh
-    - Add `local _VERSION="${VER_JUST:-}"` to `install_just()`
-    - Transform `run_mise install "${_PROVIDER:-}"` to `run_mise install "${_PROVIDER:-}@${_VERSION:-}"`
-    - Add
-All install calls SHALL include @${_VERSION:-} suffix to enforce version locking from versions.sh_
-    - _Preservation: Fast-path checks, DRY_RUN mode, error handling, and log formatting remain unchanged_
-    - _Requirements: 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.4,
-3.5_
+  - [x] 3.8 Fix scripts/lib/langs/runner.sh - Add `local _VERSION="${VER_JUST:-}"` to `install_just()` - Transform `run_mise install "${_PROVIDER:-}"` to `run_mise install "${_PROVIDER:-}@${_VERSION:-}"` - Add
+        All install calls SHALL include @${_VERSION:-} suffix to enforce version locking from versions.sh_ - _Preservation: Fast-path checks, DRY_RUN mode, error handling, and log formatting remain unchanged_ - _Requirements: 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.4,
+        3.5_
 
-  - [x] 3.9 Fix scripts/lib/langs/security.sh
-    - Add `local _VERSION="${VER_OSV_SCANNER:-}"` to `install_osv_scanner()`
-    - Transform `run_mise install "${_PROVIDER:-}"` to `run_mise install "${_PROVIDER:-}@${_VERSION:-}"`
-    - Add `local _VERSION=
-"${VER_ZIZMOR:-}"` to `install_zizmor()`
-    - Transform `run_mise install "${_PROVIDER:-}"` to `run_mise install "${_PROVIDER:-}@${_VERSION:-}"`
-    - Add `local _VERSION="${VER_CARGO_AUDIT:-}"` to `install_cargo_audit()`
-    - Transform `run_mise install "${_PROVIDER:-}"` to `run_mise install "${_PROVIDER:-}@${_VERSION:-}"`
-    - _Bug_Condition: isBugCondition(installCall) where installCall matches 'run_mise install "${_PROVIDER:-}"' without version suffix_
-    - _Expected_Behavior: All install calls SHALL include @${_VERSION:-} suffix to enforce version locking from versions.sh_
-    - _Preservation: Fast-path checks, DRY_RUN mode, error handling, and log formatting remain unchanged_
-    - _Requirements: 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.4, 3.5_
+  - [x] 3.9 Fix scripts/lib/langs/security.sh - Add `local _VERSION="${VER_OSV_SCANNER:-}"` to `install_osv_scanner()` - Transform `run_mise install "${_PROVIDER:-}"` to `run_mise install "${_PROVIDER:-}@${_VERSION:-}"` - Add `local _VERSION=
+"${VER_ZIZMOR:-}"` to `install_zizmor()` - Transform `run_mise install "${_PROVIDER:-}"` to `run_mise install "${_PROVIDER:-}@${_VERSION:-}"` - Add `local _VERSION="${VER_CARGO_AUDIT:-}"` to `install_cargo_audit()` - Transform `run_mise install "${_PROVIDER:-}"` to `run_mise install "${_PROVIDER:-}@${_VERSION:-}"` - _Bug_Condition: isBugCondition(installCall) where installCall matches 'run_mise install "${\_PROVIDER:-}"' without version suffix_ - _Expected_Behavior: All install calls SHALL include @${\_VERSION:-} suffix to enforce version locking from versions.sh_ - _Preservation: Fast-path checks, DRY_RUN mode, error handling, and log formatting remain unchanged_ - _Requirements: 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.4, 3.5_
 
   - [x] 3.10 Fix scripts/lib/langs/terraform.sh
     - Add `local _VERSION="${VER_TFLINT:-}"` to `install_tflint()`
     - Transform `run_mise install "${_PROVIDER:-}"` to `run_mise install "${_PROVIDER:-}@${_VERSION:-}"`
-    - _Bug_Condition: isBugCondition(installCall) where installCall matches 'run_mise install "${_PROVIDER:-}"' without version suffix_
-    - _Expected_Behavior: All install calls SHALL include @${_VERSION:-} suffix to enforce version locking from versions.sh_
+    - _Bug_Condition: isBugCondition(installCall) where installCall matches 'run_mise install "${\_PROVIDER:-}"' without version suffix_
+    - _Expected_Behavior: All install calls SHALL include @${\_VERSION:-} suffix to enforce version locking from versions.sh_
     - _Preservation: Fast-path checks, DRY_RUN mode, error handling, and log formatting remain unchanged_
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.4, 3.5_
 
   - [x] 3.11 Fix scripts/lib/langs/openapi.sh
     - Add `local _VERSION="${VER_SPECTRAL:-}"` to `install_spectral()`
     - Transform `run_mise install "${_PROVIDER:-}"` to `run_mise install "${_PROVIDER:-}@${_VERSION:-}"`
-    - _Bug_Condition: isBugCondition(installCall) where installCall matches 'run_mise install "${_PROVIDER:-}"' without version suffix_
-    - _Expected_Behavior: All install calls SHALL include @${_VERSION:-} suffix to enforce version locking from versions.sh_
+    - _Bug_Condition: isBugCondition(installCall) where installCall matches 'run_mise install "${\_PROVIDER:-}"' without version suffix_
+    - _Expected_Behavior: All install calls SHALL include @${\_VERSION:-} suffix to enforce version locking from versions.sh_
     - _Preservation: Fast-path checks, DRY_RUN mode, error handling, and log formatting remain unchanged_
     - _Requirements: 2.1, 2.2, 2.3, 2.4, 3.1, 3.2, 3.4, 3.5_
 
@@ -166,4 +150,3 @@ All install calls SHALL include @${_VERSION:-} suffix to enforce version locking
   - Verify no regressions in existing installation patterns
   - Ensure reproducibility across multiple runs
   - Ask the user if questions arise
-

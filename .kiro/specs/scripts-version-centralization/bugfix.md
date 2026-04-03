@@ -175,4 +175,3 @@ Many scripts in `scripts/lib/langs/` have hardcoded provider values instead of u
 3.9 WHEN scripts use `log_summary` to report installation status THEN the system SHALL CONTINUE TO display accurate status information
 
 3.10 WHEN scripts source `versions.sh` at the beginning THEN the system SHALL CONTINUE TO have access to all centralized version variables
-

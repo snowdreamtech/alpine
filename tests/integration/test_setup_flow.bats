@@ -58,7 +58,7 @@ teardown() {
 @test "resolve_bin: finds system binaries" {
   run resolve_bin "sh"
   assert_success
-  [[ "$output" =~ /sh$ ]]
+  [[ $output =~ /sh$ ]]
 }
 
 @test "resolve_bin: handles missing binaries gracefully" {
@@ -71,7 +71,7 @@ teardown() {
 
   run resolve_bin "sh"
   assert_success
-  [[ "$output" =~ /sh$ ]]
+  [[ $output =~ /sh$ ]]
 }
 
 @test "resolve_bin: legacy implementation still works" {
@@ -79,7 +79,7 @@ teardown() {
 
   run resolve_bin "sh"
   assert_success
-  [[ "$output" =~ /sh$ ]]
+  [[ $output =~ /sh$ ]]
 }
 
 # ── Test: JSON Parsing Integration ───────────────────────────────────────────
@@ -90,7 +90,7 @@ teardown() {
   # Test that get_version works with new parser
   run get_version "node"
   # Should return version or "-"
-  [[ "$output" =~ ^[0-9]+\.[0-9]+.*$ ]] || [[ "$output" == "-" ]]
+  [[ $output =~ ^[0-9]+\.[0-9]+.*$ ]] || [[ $output == "-" ]]
 }
 
 # ── Test: Process Management Integration ─────────────────────────────────────
@@ -104,7 +104,7 @@ teardown() {
   # This should timeout if mise hangs
   run run_mise --version
   # Should either succeed quickly or timeout (124)
-  [[ "$status" -eq 0 ]] || [[ "$status" -eq 124 ]]
+  [[ $status -eq 0 ]] || [[ $status -eq 124 ]]
 }
 
 # ── Test: Complete Setup Flow ────────────────────────────────────────────────
@@ -125,16 +125,16 @@ teardown() {
 }
 
 @test "setup flow: timeout constants are set" {
-  [[ -n "$TIMEOUT_RESOLVE_BIN" ]]
-  [[ -n "$TIMEOUT_JSON_PARSE" ]]
-  [[ -n "$TIMEOUT_MISE_WHICH" ]]
-  [[ -n "$TIMEOUT_NETWORK" ]]
+  [[ -n $TIMEOUT_RESOLVE_BIN ]]
+  [[ -n $TIMEOUT_JSON_PARSE ]]
+  [[ -n $TIMEOUT_MISE_WHICH ]]
+  [[ -n $TIMEOUT_NETWORK ]]
 }
 
 @test "setup flow: debug switches are set" {
-  [[ -n "$DEBUG_RESOLVE_BIN" ]]
-  [[ -n "$DEBUG_TIMEOUT" ]]
-  [[ -n "$DEBUG_JSON_PARSE" ]]
+  [[ -n $DEBUG_RESOLVE_BIN ]]
+  [[ -n $DEBUG_TIMEOUT ]]
+  [[ -n $DEBUG_JSON_PARSE ]]
 }
 
 # ── Test: No Hangs Guarantee ─────────────────────────────────────────────────
@@ -145,7 +145,7 @@ teardown() {
   # Should complete within 5 seconds
   run timeout 10 resolve_bin "nonexistent"
   # Either finds it, doesn't find it, or times out - but doesn't hang
-  [[ "$status" -ne 124 ]]
+  [[ $status -ne 124 ]]
 }
 
 @test "no hangs: parse_json completes within timeout" {
@@ -167,14 +167,14 @@ teardown() {
   # Old code should still work
   local bin_path
   bin_path=$(resolve_bin "sh") || true
-  [[ -n "$bin_path" ]]
+  [[ -n $bin_path ]]
 }
 
 @test "backward compatibility: get_version maintains signature" {
   # Old code should still work
   local version
   version=$(get_version "sh") || true
-  [[ -n "$version" ]]
+  [[ -n $version ]]
 }
 
 # ── Test: Error Handling ─────────────────────────────────────────────────────
@@ -275,5 +275,5 @@ teardown() {
 
   run resolve_bin_cached "sh"
   assert_success
-  [[ "$output" =~ /sh$ ]]
+  [[ $output =~ /sh$ ]]
 }

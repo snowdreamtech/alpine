@@ -41,7 +41,6 @@
   - _Requirements: 3.1-3.10_
 
 - [ ] 3. Fix for hardcoded provider centralization
-
   - [x] 3.1 Add missing provider variables to versions.sh
     - Add `VER_EDITORCONFIG_CHECKER_PROVIDER="github:editorconfig-checker/editorconfig-checker"` in the quality tooling section
     - Add `VER_SWIFTFORMAT_PROVIDER="github:nicklockwood/SwiftFormat"` in the language tooling section
@@ -237,6 +236,5 @@
   - Verify preservation tests pass (no regressions in existing functionality)
   - Verify all 36 instances have been centralized
   - Verify 3 missing variables added to versions.sh
-  - Run smoke test: source versions.sh and verify all VER_*_PROVIDER variables are defined
+  - Run smoke test: source versions.sh and verify all VER\_\*\_PROVIDER variables are defined
   - Ask the user if questions arise or if additional validation is needed
-

@@ -37,4 +37,3 @@ Many `run_mise install` commands across `scripts/lib/langs/*.sh` are missing ver
 3.4 WHEN DRY_RUN mode is enabled THEN the system SHALL CONTINUE TO preview installations without executing them
 
 3.5 WHEN tools fail to install THEN the system SHALL CONTINUE TO log failure status and continue with remaining installations
-

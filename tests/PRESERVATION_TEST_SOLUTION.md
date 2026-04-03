@@ -1,12 +1,15 @@
 # Preservation Test Solution
 
 ## Problem
+
 The original `tests/preservation-property.bats` test was hanging when executed. The test setup function was sourcing `scripts/lib/versions.sh`, which appeared to trigger some operation that hung indefinitely.
 
 ## Root Cause Analysis
+
 After investigation, the issue was not with `versions.sh` itself (which only contains variable definitions), but likely with the bats test framework setup or environment configuration. The bats test was attempting to source multiple files and stub out functions, which created complex interactions.
 
 ## Solution
+
 Replaced the bats-based test with a simpler, more robust standalone shell script: `tests/preservation-property.sh`
 
 ### Key Improvements
@@ -37,7 +40,7 @@ The new preservation test validates:
 - **Property 2.7**: Centralized provider variables are non-empty
 - **Property 2.8**: Multiple scripts use the centralized pattern consistently
 - **Property 2.9**: Provider variables exist for expected security tools
-- **Property 2.10**: Provider variables follow VER_*_PROVIDER naming convention
+- **Property 2.10**: Provider variables follow VER\_\*\_PROVIDER naming convention
 
 ## Test Results
 
@@ -70,7 +73,7 @@ chmod +x tests/preservation-property.sh
 ## Next Steps
 
 After implementing the fix (Task 3), these same tests should continue to pass, confirming that:
+
 - The fix didn't break existing functionality
 - Scripts that already used centralized variables still work
 - No regressions were introduced
-

@@ -57,7 +57,7 @@ teardown() {
 @test "resolve_bin_layer1: finds binary in venv/bin" {
   # Create fake venv structure
   mkdir -p "$TEMP_DIR/.venv/bin"
-  echo "#!/bin/sh" > "$TEMP_DIR/.venv/bin/pytest"
+  echo "#!/bin/sh" >"$TEMP_DIR/.venv/bin/pytest"
   chmod +x "$TEMP_DIR/.venv/bin/pytest"
 
   # Change to temp dir
@@ -71,7 +71,7 @@ teardown() {
 @test "resolve_bin_layer1: finds binary in node_modules/.bin" {
   # Create fake node_modules structure
   mkdir -p "$TEMP_DIR/node_modules/.bin"
-  echo "#!/bin/sh" > "$TEMP_DIR/node_modules/.bin/eslint"
+  echo "#!/bin/sh" >"$TEMP_DIR/node_modules/.bin/eslint"
   chmod +x "$TEMP_DIR/node_modules/.bin/eslint"
 
   cd "$TEMP_DIR"
@@ -92,8 +92,8 @@ teardown() {
   # Create both
   mkdir -p "$TEMP_DIR/.venv/bin"
   mkdir -p "$TEMP_DIR/node_modules/.bin"
-  echo "#!/bin/sh" > "$TEMP_DIR/.venv/bin/tool"
-  echo "#!/bin/sh" > "$TEMP_DIR/node_modules/.bin/tool"
+  echo "#!/bin/sh" >"$TEMP_DIR/.venv/bin/tool"
+  echo "#!/bin/sh" >"$TEMP_DIR/node_modules/.bin/tool"
   chmod +x "$TEMP_DIR/.venv/bin/tool"
   chmod +x "$TEMP_DIR/node_modules/.bin/tool"
 
@@ -110,7 +110,7 @@ teardown() {
   # Use a known system binary
   run resolve_bin_layer2 "sh"
   assert_success
-  [[ "$output" =~ /sh$ ]]
+  [[ $output =~ /sh$ ]]
 }
 
 @test "resolve_bin_layer2: returns 1 when binary not in PATH" {
@@ -144,7 +144,7 @@ teardown() {
 @test "resolve_bin_layer4: finds binary with filesystem search" {
   # Create a binary in a subdirectory
   mkdir -p "$TEMP_DIR/tools/bin"
-  echo "#!/bin/sh" > "$TEMP_DIR/tools/bin/mytool"
+  echo "#!/bin/sh" >"$TEMP_DIR/tools/bin/mytool"
   chmod +x "$TEMP_DIR/tools/bin/mytool"
 
   cd "$TEMP_DIR"
@@ -157,7 +157,7 @@ teardown() {
 @test "resolve_bin_layer4: respects depth limit" {
   # Create a deeply nested binary
   mkdir -p "$TEMP_DIR/a/b/c/d/e/f"
-  echo "#!/bin/sh" > "$TEMP_DIR/a/b/c/d/e/f/deep"
+  echo "#!/bin/sh" >"$TEMP_DIR/a/b/c/d/e/f/deep"
   chmod +x "$TEMP_DIR/a/b/c/d/e/f/deep"
 
   cd "$TEMP_DIR"
@@ -182,7 +182,7 @@ teardown() {
 @test "resolve_bin_cached: caches successful lookups" {
   # Create a binary
   mkdir -p "$TEMP_DIR/.venv/bin"
-  echo "#!/bin/sh" > "$TEMP_DIR/.venv/bin/cached_tool"
+  echo "#!/bin/sh" >"$TEMP_DIR/.venv/bin/cached_tool"
   chmod +x "$TEMP_DIR/.venv/bin/cached_tool"
 
   cd "$TEMP_DIR"
@@ -193,7 +193,7 @@ teardown() {
   local first_result="$output"
 
   # Verify it's cached
-  [[ -n "${_G_BIN_CACHE[cached_tool]}" ]]
+  [[ -n ${_G_BIN_CACHE[cached_tool]} ]]
 
   # Second lookup should use cache
   run resolve_bin_cached "cached_tool"
@@ -203,7 +203,7 @@ teardown() {
 
 @test "resolve_bin_cached: cache avoids redundant lookups" {
   mkdir -p "$TEMP_DIR/.venv/bin"
-  echo "#!/bin/sh" > "$TEMP_DIR/.venv/bin/tool"
+  echo "#!/bin/sh" >"$TEMP_DIR/.venv/bin/tool"
   chmod +x "$TEMP_DIR/.venv/bin/tool"
 
   cd "$TEMP_DIR"
@@ -230,7 +230,7 @@ teardown() {
   export DEBUG_RESOLVE_BIN=1
 
   mkdir -p "$TEMP_DIR/.venv/bin"
-  echo "#!/bin/sh" > "$TEMP_DIR/.venv/bin/debug_tool"
+  echo "#!/bin/sh" >"$TEMP_DIR/.venv/bin/debug_tool"
   chmod +x "$TEMP_DIR/.venv/bin/debug_tool"
 
   cd "$TEMP_DIR"
@@ -295,7 +295,7 @@ teardown() {
   # Test with sh (should exist on all systems)
   run resolve_bin_cached "sh"
   assert_success
-  [[ "$output" =~ /sh$ ]]
+  [[ $output =~ /sh$ ]]
 }
 
 @test "resolve_bin_cached: finds bash if available" {
@@ -305,7 +305,7 @@ teardown() {
 
   run resolve_bin_cached "bash"
   assert_success
-  [[ "$output" =~ /bash$ ]]
+  [[ $output =~ /bash$ ]]
 }
 
 # ── Test: Layer Priority ─────────────────────────────────────────────────────
@@ -315,8 +315,8 @@ teardown() {
   mkdir -p "$TEMP_DIR/.venv/bin"
   mkdir -p "$TEMP_DIR/node_modules/.bin"
 
-  echo "#!/bin/sh" > "$TEMP_DIR/.venv/bin/priority_test"
-  echo "#!/bin/sh" > "$TEMP_DIR/node_modules/.bin/priority_test"
+  echo "#!/bin/sh" >"$TEMP_DIR/.venv/bin/priority_test"
+  echo "#!/bin/sh" >"$TEMP_DIR/node_modules/.bin/priority_test"
   chmod +x "$TEMP_DIR/.venv/bin/priority_test"
   chmod +x "$TEMP_DIR/node_modules/.bin/priority_test"
 
@@ -332,7 +332,7 @@ teardown() {
 
 @test "resolve_bin_cached: cache improves performance" {
   mkdir -p "$TEMP_DIR/.venv/bin"
-  echo "#!/bin/sh" > "$TEMP_DIR/.venv/bin/perf_test"
+  echo "#!/bin/sh" >"$TEMP_DIR/.venv/bin/perf_test"
   chmod +x "$TEMP_DIR/.venv/bin/perf_test"
 
   cd "$TEMP_DIR"

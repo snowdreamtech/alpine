@@ -92,7 +92,7 @@ EOF
   # Should return 124 (timeout) or 137 (SIGKILL) depending on implementation
   # Both are acceptable as they indicate the process was forcefully terminated
   assert_failure
-  [[ "$status" -eq 124 || "$status" -eq 137 ]]
+  [[ $status -eq 124 || $status -eq 137 ]]
 }
 
 # ── Test: Process Cleanup ────────────────────────────────────────────────────
@@ -102,11 +102,11 @@ EOF
   run_with_timeout_robust 1 sleep 100 &
   local test_pid=$!
 
-# Wait for timeout to trigger
+  # Wait for timeout to trigger
   wait $test_pid 2>/dev/null || true
 
   # Verify no sleep processes remain
-  sleep 0.5  # Give cleanup time to complete
+  sleep 0.5 # Give cleanup time to complete
   run pgrep -f "sleep 100"
   assert_failure
 }
@@ -126,7 +126,7 @@ EOF
   assert_failure 124
 
   # Verify no sleep processes remain
-  sleep 0.5  # Give cleanup time to complete
+  sleep 0.5 # Give cleanup time to complete
   run pgrep -f "sleep 100"
   assert_failure
 }
@@ -140,7 +140,7 @@ EOF
 
   # Wait for timeout
   wait $test_pid 2>/dev/null || true
-  sleep 0.5  #Give cleanup time to complete
+  sleep 0.5 #Give cleanup time to complete
 
   # Check for zombie processes
   run sh -c "ps aux | grep -E 'Z|defunct' | grep -v grep"
@@ -280,7 +280,7 @@ EOF
   run detect_timeout_impl
   assert_success
   # Should return one of: timeout, gtimeout, or bash
-  [[ "$output" =~ ^(timeout|gtimeout|bash)$ ]]
+  [[ $output =~ ^(timeout|gtimeout|bash)$ ]]
 }
 
 # ── Test: Process Group Management ───────────────────────────────────────────
@@ -291,7 +291,7 @@ EOF
 
   local pid="$output"
   # Verify PID is a number
-  [[ "$pid" =~ ^[0-9]+$ ]]
+  [[ $pid =~ ^[0-9]+$ ]]
 
   # Verify process is running
   if kill -0 "$pid" 2>/dev/null; then
@@ -311,7 +311,7 @@ EOF
   pid=$(start_process_group sleep 10)
 
   # Verify we got a PID (numeric value)
-  [[ "$pid" =~ ^[0-9]+$ ]]
+  [[ $pid =~ ^[0-9]+$ ]]
 
   # Clean up
   kill "$pid" 2>/dev/null || true

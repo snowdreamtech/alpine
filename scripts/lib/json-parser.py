@@ -19,8 +19,8 @@ Examples:
 """
 
 import json
-import sys
 import re
+import sys
 
 
 def evaluate_query(data, query):
@@ -37,7 +37,7 @@ def evaluate_query(data, query):
     if not query:
         return data
 
-    parts = query.split('.')
+    parts = query.split(".")
     result = data
 
     for part in parts:
@@ -45,7 +45,7 @@ def evaluate_query(data, query):
             return None
 
         # Support array indexing: tools[0].version
-        array_match = re.match(r'^(.+)\[(\d+)\]$', part)
+        array_match = re.match(r"^(.+)\[(\d+)\]$", part)
         if array_match:
             key, index = array_match.groups()
             if isinstance(result, dict) and key in result:
@@ -76,14 +76,14 @@ def main():
         if sys.stdin.isatty():
             # Arguments mode
             if len(sys.argv) < 2:
-                sys.stderr.write('Usage: json-parser.py <json-string> <query-path>\n')
+                sys.stderr.write("Usage: json-parser.py <json-string> <query-path>\n")
                 sys.exit(1)
             json_str = sys.argv[1]
-            query = sys.argv[2] if len(sys.argv) > 2 else ''
+            query = sys.argv[2] if len(sys.argv) > 2 else ""
         else:
             # Stdin mode
             json_str = sys.stdin.read()
-            query = sys.argv[1] if len(sys.argv) > 1 else ''
+            query = sys.argv[1] if len(sys.argv) > 1 else ""
 
         # Parse JSON with error handling
         data = json.loads(json_str)
@@ -107,5 +107,5 @@ def main():
         sys.exit(1)
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()

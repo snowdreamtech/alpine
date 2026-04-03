@@ -88,7 +88,7 @@ resolve_bin_layer2() {
 
   # Windows: command -v might miss extensions or return sh wrappers
   if [ -z "${_SP:-}" ] && [ "${_G_OS:-}" = "windows" ]; then
-    _SP=$(command -v "${_BIN:-}.exe" 2>/dev/null) || \
+    _SP=$(command -v "${_BIN:-}.exe" 2>/dev/null) ||
       _SP=$(command -v "${_BIN:-}.cmd" 2>/dev/null) || true
   fi
 

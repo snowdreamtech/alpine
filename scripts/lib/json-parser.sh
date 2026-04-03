@@ -48,7 +48,7 @@ parse_json() {
       echo "${_RESULT:-}"
       return 0
     fi
- fi
+  fi
 
   # Strategy 2: Python (widely available)
   if command -v python3 >/dev/null 2>&1; then

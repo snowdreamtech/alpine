@@ -290,7 +290,7 @@ EOF
 
   local pid="$output"
   # Verify PID is numeric
-  [[ "$pid" =~ ^[0-9]+$ ]]
+  [[ $pid =~ ^[0-9]+$ ]]
 
   # Cleanup
   kill $pid 2>/dev/null || true

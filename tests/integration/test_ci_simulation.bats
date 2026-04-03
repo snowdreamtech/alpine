@@ -113,9 +113,9 @@ teardown() {
   export TIMEOUT_MISE_WHICH=3
 
   # All timeouts should be respected
-  [[ "$TIMEOUT_RESOLVE_BIN" -eq 2 ]]
-  [[ "$TIMEOUT_JSON_PARSE" -eq 1 ]]
-  [[ "$TIMEOUT_MISE_WHICH" -eq 3 ]]
+  [[ $TIMEOUT_RESOLVE_BIN -eq 2 ]]
+  [[ $TIMEOUT_JSON_PARSE -eq 1 ]]
+  [[ $TIMEOUT_MISE_WHICH -eq 3 ]]
 }
 
 # ── Test: Resource-Constrained Environments ──────────────────────────────────
@@ -172,9 +172,9 @@ teardown() {
   export GITHUB_ACTIONS="true"
 
   # Verify non-interactive flags are set
-  [[ "$MISE_YES" == "true" ]]
-  [[ "$MISE_NON_INTERACTIVE" == "true" ]]
-  [[ "$MISE_QUIET" == "true" ]]
+  [[ $MISE_YES == "true" ]]
+  [[ $MISE_NON_INTERACTIVE == "true" ]]
+  [[ $MISE_QUIET == "true" ]]
 }
 
 @test "CI behavior: update checks disabled in CI" {
@@ -182,8 +182,8 @@ teardown() {
   export GITHUB_ACTIONS="true"
 
   # Verify update checks are disabled
-  [[ "$MISE_CHECK_FOR_UPDATES" -eq 0 ]]
-  [[ "$NO_UPDATE_NOTIFIER" -eq 1 ]]
+  [[ $MISE_CHECK_FOR_UPDATES -eq 0 ]]
+  [[ $NO_UPDATE_NOTIFIER -eq 1 ]]
 }
 
 # ── Test: Timeout Protection in CI ───────────────────────────────────────────
@@ -225,7 +225,7 @@ teardown() {
 
 @test "parallel execution: multiple resolve_bin calls" {
   # Simulate parallel lookups
-  resolve_bin "sh"&
+  resolve_bin "sh" &
   local pid1=$!
   resolve_bin "sh" &
   local pid2=$!
@@ -249,7 +249,7 @@ teardown() {
   wait
 
   # Cache should remain consistent
-  [[ -n "${_G_BIN_CACHE[sh]}" ]]
+  [[ -n ${_G_BIN_CACHE[sh]} ]]
 }
 
 # ── Test: Error Recovery ─────────────────────────────────────────────────────
@@ -268,41 +268,41 @@ teardown() {
 @test "error recovery: cache survives failures" {
   export USE_NEW_RESOLVE_BIN=1
 
- # Successful lookup
+  # Successful lookup
   resolve_bin_cached "sh" >/dev/null
 
   # Failed lookup
   resolve_bin_cached "nonexistent" >/dev/null 2>&1 || true
 
   # Original cache entry should still exist
-  [[ -n "${_G_BIN_CACHE[sh]}" ]]
+  [[ -n ${_G_BIN_CACHE[sh]} ]]
 }
 
 # ── Test: CI Summary Integration ─────────────────────────────────────────────
 
 @test "CI summary: file is created" {
-  [[ -n "$CI_STEP_SUMMARY" ]]
+  [[ -n $CI_STEP_SUMMARY ]]
 }
 
 @test "CI summary: file path is valid" {
   # Should be a valid path
-  [[ "$CI_STEP_SUMMARY" =~ ^/ ]] || [[ "$CI_STEP_SUMMARY" =~ ^\. ]]
+  [[ $CI_STEP_SUMMARY =~ ^/ ]] || [[ $CI_STEP_SUMMARY =~ ^\. ]]
 }
 
 # ── Test: Cross-Platform Compatibility ───────────────────────────────────────
 
 @test "cross-platform: OS detection works" {
-  [[ -n "$_G_OS" ]]
-  [[ "$_G_OS" =~ ^(linux|macos|windows)$ ]]
+  [[ -n $_G_OS ]]
+  [[ $_G_OS =~ ^(linux|macos|windows)$ ]]
 }
 
 @test "cross-platform: venv bin path is set" {
-  [[ -n "$_G_VENV_BIN" ]]
+  [[ -n $_G_VENV_BIN ]]
 }
 
 @test "cross-platform: mise paths are set" {
-  [[ -n "$_G_MISE_BIN_BASE" ]]
-  [[ -n "$_G_MISE_SHIMS_BASE" ]]
+  [[ -n $_G_MISE_BIN_BASE ]]
+  [[ -n $_G_MISE_SHIMS_BASE ]]
 }
 
 # ── Test: Stress Testing ─────────────────────────────────────────────────────

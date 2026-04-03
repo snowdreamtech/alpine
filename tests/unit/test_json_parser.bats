@@ -46,7 +46,7 @@ teardown() {
     skip "Node.js not available"
   fi
 
-  run node "$_G_LIB_DIR/json-parser.cjs" "version" <<< '{"version":"1.2.3"}'
+  run node "$_G_LIB_DIR/json-parser.cjs" "version" <<<'{"version":"1.2.3"}'
   assert_success
   assert_output "1.2.3"
 }
@@ -56,7 +56,7 @@ teardown() {
     skip "Node.js not available"
   fi
 
-  run node "$_G_LIB_DIR/json-parser.cjs" "tools.node.version" <<< '{"tools":{"node":{"version":"20.0.0"}}}'
+  run node "$_G_LIB_DIR/json-parser.cjs" "tools.node.version" <<<'{"tools":{"node":{"version":"20.0.0"}}}'
   assert_success
   assert_output "20.0.0"
 }
@@ -66,7 +66,7 @@ teardown() {
     skip "Node.js not available"
   fi
 
-  run node "$_G_LIB_DIR/json-parser.cjs" "missing" <<< '{"version":"1.2.3"}'
+  run node "$_G_LIB_DIR/json-parser.cjs" "missing" <<<'{"version":"1.2.3"}'
   assert_success
   assert_output ""
 }
@@ -76,7 +76,7 @@ teardown() {
     skip "Node.js not available"
   fi
 
-  run node "$_G_LIB_DIR/json-parser.cjs" "value" <<< '{"value":null}'
+  run node "$_G_LIB_DIR/json-parser.cjs" "value" <<<'{"value":null}'
   assert_success
   assert_output ""
 }
@@ -86,7 +86,7 @@ teardown() {
     skip "Node.js not available"
   fi
 
-  run node "$_G_LIB_DIR/json-parser.cjs" "version" <<< '{"version":"1.2.3"'
+  run node "$_G_LIB_DIR/json-parser.cjs" "version" <<<'{"version":"1.2.3"'
   assert_failure
 }
 
@@ -97,7 +97,7 @@ teardown() {
     skip "Python3 not available"
   fi
 
-  run python3 "$_G_LIB_DIR/json-parser.py" "version" <<< '{"version":"1.2.3"}'
+  run python3 "$_G_LIB_DIR/json-parser.py" "version" <<<'{"version":"1.2.3"}'
   assert_success
   assert_output "1.2.3"
 }
@@ -107,7 +107,7 @@ teardown() {
     skip "Python3 not available"
   fi
 
-  run python3 "$_G_LIB_DIR/json-parser.py" "tools.node.version" <<< '{"tools":{"node":{"version":"20.0.0"}}}'
+  run python3 "$_G_LIB_DIR/json-parser.py" "tools.node.version" <<<'{"tools":{"node":{"version":"20.0.0"}}}'
   assert_success
   assert_output "20.0.0"
 }
@@ -117,7 +117,7 @@ teardown() {
     skip "Python3 not available"
   fi
 
-  run python3 "$_G_LIB_DIR/json-parser.py" "missing" <<< '{"version":"1.2.3"}'
+  run python3 "$_G_LIB_DIR/json-parser.py" "missing" <<<'{"version":"1.2.3"}'
   assert_success
   assert_output ""
 }
@@ -127,7 +127,7 @@ teardown() {
     skip "Python3 not available"
   fi
 
-  run python3 "$_G_LIB_DIR/json-parser.py" "value" <<< '{"value":null}'
+  run python3 "$_G_LIB_DIR/json-parser.py" "value" <<<'{"value":null}'
   assert_success
   assert_output ""
 }
@@ -137,7 +137,7 @@ teardown() {
     skip "Python3 not available"
   fi
 
-  run python3 "$_G_LIB_DIR/json-parser.py" "version" <<< '{"version":"1.2.3"'
+  run python3 "$_G_LIB_DIR/json-parser.py" "version" <<<'{"version":"1.2.3"'
   assert_failure
 }
 

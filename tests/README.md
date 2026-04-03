@@ -5,6 +5,7 @@ This directory contains property-based tests for the scripts version centralizat
 ## Test Files
 
 ### 1. Bug Condition Exploration Test
+
 **File**: `tests/bug-condition-exploration.sh`
 
 **Purpose**: Detect hardcoded provider values across the codebase (Task 1)
@@ -14,6 +15,7 @@ This directory contains property-based tests for the scripts version centralizat
 **Expected Outcome on FIXED code**: PASS with 0 hardcoded instances found
 
 **What it tests**:
+
 - Searches for `local _PROVIDER="github:*"` patterns
 - Searches for `local _PROVIDER="npm:*"` patterns
 - Searches for `local _PROVIDER="pipx:*"` patterns
@@ -21,11 +23,13 @@ This directory contains property-based tests for the scripts version centralizat
 - Counts total instances across all `scripts/lib/langs/*.sh` files
 
 **Run**:
+
 ```bash
 ./tests/bug-condition-exploration.sh
 ```
 
 ### 2. Preservation Property Test
+
 **File**: `tests/preservation-property.sh`
 
 **Purpose**: Verify existing functionality is preserved (Task 2)
@@ -35,6 +39,7 @@ This directory contains property-based tests for the scripts version centralizat
 **Expected Outcome on FIXED code**: PASS (confirms no regressions)
 
 **What it tests**:
+
 - Centralized provider variables exist in versions.sh
 - Provider variables follow expected format (github:, npm:, pipx:, gem:)
 - Scripts already using centralized pattern (security.sh, java.sh, kotlin.sh) work correctly
@@ -44,9 +49,10 @@ This directory contains property-based tests for the scripts version centralizat
 - Centralized provider variables are non-empty
 - Multiple scripts use the centralized pattern consistently
 - Provider variables exist for expected tools
-- Provider variables follow VER_*_PROVIDER naming convention
+- Provider variables follow VER\_\*\_PROVIDER naming convention
 
 **Run**:
+
 ```bash
 ./tests/preservation-property.sh
 ```
@@ -56,37 +62,45 @@ This directory contains property-based tests for the scripts version centralizat
 ### Phase 1: Before Fix (Observation)
 
 1. **Run Bug Condition Test** (Task 1):
+
    ```bash
    ./tests/bug-condition-exploration.sh
    ```
+
    - Expected: FAIL with 36 hardcoded instances
    - This confirms the bug exists
 
 2. **Run Preservation Test** (Task 2):
+
    ```bash
    ./tests/preservation-property.sh
    ```
+
    - Expected: PASS
    - This confirms baseline behavior to preserve
 
 ### Phase 2: After Fix (Validation)
 
-3. **Implement Fix** (Task 3):
+1. **Implement Fix** (Task 3):
    - Add missing variables to versions.sh
    - Replace hardcoded providers with centralized variables
    - Update all 36 instances across 20+ scripts
 
-4. **Re-run Bug Condition Test** (Task 3.21):
+2. **Re-run Bug Condition Test** (Task 3.21):
+
    ```bash
    ./tests/bug-condition-exploration.sh
    ```
+
    - Expected: PASS with 0 hardcoded instances
    - This confirms the bug is fixed
 
-5. **Re-run Preservation Test** (Task 3.22):
+3. **Re-run Preservation Test** (Task 3.22):
+
    ```bash
    ./tests/preservation-property.sh
    ```
+
    - Expected: PASS
    - This confirms no regressions
 
@@ -100,6 +114,7 @@ These tests follow the **observation-first methodology** for bugfix testing:
 4. **Validation Phase**: Re-run the same tests to confirm the fix and no regressions
 
 This approach ensures:
+
 - The bug is properly understood before fixing
 - Baseline behavior is documented and preserved
 - The fix is validated by the same tests that detected the bug
@@ -126,6 +141,7 @@ See `tests/PRESERVATION_TEST_SOLUTION.md` for details on the solution.
 **Preservation Test**: ✓ PASSED (29 assertions passed - baseline validated)
 
 This confirms:
+
 - The bug exists as documented (36 hardcoded providers)
 - Scripts using centralized variables work correctly
 - Baseline behavior is properly documented and ready to preserve
