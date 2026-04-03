@@ -1686,7 +1686,7 @@ resolve_bin() {
   # ── 4. Mise direct lookup (no shim in PATH, e.g., fresh CI) ──
   # Covers: mise installed the tool but shims/PATH not yet activated.
   local _MW
-  _MW=$(mise which "${_BIN:-}" 2>/dev/null) || true
+  _MW=$(MISE_OFFLINE=1 run_with_timeout_robust 3 mise which "${_BIN:-}" 2>/dev/null) || true
   if [ -n "${_MW:-}" ] && [ -x "${_MW:-}" ]; then
     echo "${_MW:-}" && return 0
   fi

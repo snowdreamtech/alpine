@@ -161,12 +161,16 @@ _run_with_timeout_native() {
 
   # Start timeout watcher in background
   (
+    echo "[$(date)] Watcher started for PID ${_CMD_PID:-} with timeout ${_TIMEOUT:-}s" >> /tmp/timeout_debug.log
     sleep "${_TIMEOUT:-}" 2>/dev/null || sleep "${_TIMEOUT:-}"
+    echo "[$(date)] Watcher woke up for PID ${_CMD_PID:-}" >> /tmp/timeout_debug.log
     if kill -0 "${_CMD_PID:-}" 2>/dev/null; then
+      echo "[$(date)] Calling cleanup for PID ${_CMD_PID:-}" >> /tmp/timeout_debug.log
       # Timeout occurred - clean up process tree
       cleanup_process_tree "${_CMD_PID:-}" 2
+      echo "[$(date)] Cleanup finished for PID ${_CMD_PID:-}" >> /tmp/timeout_debug.log
     fi
-  ) &
+  ) >/dev/null 2>&1 </dev/null &
   local _WATCH_PID=$!
 
   # Wait for command to complete
