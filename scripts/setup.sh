@@ -115,7 +115,7 @@ main() {
   fi
   echo "$$" >"${_LOCKFILE:-}"
   # shellcheck disable=SC2064
-  trap "rm -f ${_LOCKFILE:-}" EXIT INT TERM
+  trap "_cleanup_recursion_lock; rm -f ${_LOCKFILE:-}" EXIT INT TERM
 
   # 3. Network Optimization
   optimize_network

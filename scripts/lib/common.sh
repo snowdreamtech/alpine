@@ -14,13 +14,20 @@ set -eu
 #   - POSIX-compliant sh logic.
 #   - "World Class" AI Documentation (English-only).
 #   - Rule 01 (General, Network), Rule 03 (Architecture), Rule 09 (Interaction).
-#
-# Features:
-#   - Standardized colored logging (info, success, warn, error).
-#   - Robust downloading with retry and proxy logic.
-#   - Build-then-Swap atomic file operations.
-#   - Dual-Sentinel (双重哨兵) pattern for CI reporting.
-#
+
+# ── 🛤️ Path Sentinel (Early Tool Initialization) ────────────────────────────────
+# Ensure common binary directories are in PATH early to avoid redundant
+# bootstrapping if tools already exist but aren't on the caller's PATH.
+for _p in "$HOME/.local/bin" "/usr/local/bin" "/opt/homebrew/bin"; do
+  if [ -d "${_p:-}" ]; then
+    case ":${PATH:-}:" in
+      *":${_p:-}:"*) ;;
+      *) export PATH="${_p:-}:${PATH:-}" ;;
+    esac
+  fi
+done
+unset _p
+
 # shellcheck disable=SC2034
 export PAGER="cat"
 export MISE_LOCKFILE=0
@@ -175,6 +182,29 @@ if [ -z "${_G_PROJECT_ROOT:-}" ]; then
   fi
   export _G_PROJECT_ROOT
 fi
+
+# ── 🛡️ Execution Guard (Recursion Prevention) ──────────────────────────────────
+# Prevents infinite process recursion if mise, python or other tools are
+# misconfigured to trigger another 'make setup' or 'sh scripts/setup.sh'.
+_RECURSION_LOCK_FILE="${_G_PROJECT_ROOT:-.}/.setup_recursion"
+_RECURSION_LEVEL=0
+if [ -f "${_RECURSION_LOCK_FILE:-}" ]; then
+  _RECURSION_LEVEL=$(cat "${_RECURSION_LOCK_FILE:-}" 2>/dev/null || echo "0")
+fi
+if [ "${_RECURSION_LEVEL:-0}" -gt 2 ]; then
+  # We allow one level of nesting (e.g., make -> setup.sh) but no more.
+  # If you see this error, check for recursive calls in your toolchain config.
+  printf "[FATAL] Infinite recursion detected in setup scripts (Level: %s). Aborting.\n" "${_RECURSION_LEVEL:-}" >&2
+  # Do NOT delete the lockfile here; we want the user to know it failed.
+  exit 1
+fi
+printf "[DEBUG] Recursion Level: %s -> %s (PID: %s, PPID: %s)\n" "${_RECURSION_LEVEL:-0}" "$((${_RECURSION_LEVEL:-0} + 1))" "$$" "$PPID" >&2
+echo $((${_RECURSION_LEVEL:-0} + 1)) > "${_RECURSION_LOCK_FILE:-}"
+
+# Export cleanup function (to be called by trap in setup.sh)
+_cleanup_recursion_lock() {
+  rm -f "${_G_PROJECT_ROOT:-}/.setup_recursion" 2>/dev/null || true
+}
 
 # ── 📄 SSoT Version Registry ────────────────────────────────────────────────
 # Load the centralized version registry to provide a Single Source of Truth
@@ -450,12 +480,12 @@ run_with_timeout() {
 # Examples:
 #   optimize_network
 optimize_network() {
-  if [ "${_NETWORK_OPTIMIZED:-}" = "true" ]; then return 0; fi
+  if [ "${_NETWORK_OPTIMIZED:-}" = "true" ] || [ "${DRY_RUN:-0}" -eq 1 ]; then return 0; fi
 
   local _TEMP_GIT_CONFIG
   _TEMP_GIT_CONFIG="${TMPDIR:-/tmp}/.git_config_$(id -u)"
 
-  log_debug "Detecting network connectivity and global proxy health..."
+  log_debug "Detecting network connectivity and global proxy health... (DRY_RUN=${DRY_RUN:-0})"
 
   # 1. Handle Git Protocols & Proxies
   # Guard: If GITHUB_TOKEN is set, verify it's not broken (avoid 401 errors).
@@ -479,20 +509,22 @@ optimize_network() {
       [ "${_CACHE_AGE:-}" -lt 3600 ] && _SKIP_VERIFY=true
     fi
 
-    if [ "${_SKIP_VERIFY:-}" = "true" ]; then
-      log_debug "GITHUB_TOKEN recently validated (cache age: ${_CACHE_AGE:-}s). Skipping API check."
+    if [ "${_SKIP_VERIFY:-}" = "true" ] || [ "${DRY_RUN:-0}" -eq 1 ]; then
+      log_debug "GITHUB_TOKEN check skipped (cache/dry-run). Keeping token: ${_SKIPPED_TOKEN:-}"
     else
       local _HTTP_CODE
-      _HTTP_CODE=$(curl -o /dev/null -s -w "%{http_code}" -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/rate_limit --connect-timeout 2 2>/dev/null || echo "000")
+      # Use --max-time to prevent indefinite hangs in broken network environments
+      _HTTP_CODE=$(curl -o /dev/null -s -w "%{http_code}" -H "Authorization: Bearer $GITHUB_TOKEN" https://api.github.com/rate_limit --connect-timeout 2 --max-time 10 2>/dev/null || echo "000")
       if [ "${_HTTP_CODE:-}" = "401" ]; then
         log_warn "Current GITHUB_TOKEN appears invalid or unauthorized (${_HTTP_CODE:-}). Unsetting for this session..."
         unset GITHUB_TOKEN
         rm -f "${_TOKEN_CACHE:-}"
-      elif [ -z "${_HTTP_CODE:-}" ] || [ "${_HTTP_CODE:-}" = "000" ]; then
-        log_debug "Network timeout verifying GITHUB_TOKEN. Keeping token."
+      elif [ -z "${_HTTP_CODE:-}" ] || [ "${_HTTP_CODE:-}" = "000" ] || [ "${_HTTP_CODE:-}" = "200" ]; then
+        # 200 is success, anything else is treated as transient or invalid (handled above)
+        [ "${_HTTP_CODE:-}" = "200" ] && touch "${_TOKEN_CACHE:-}"
+        log_debug "Network verification for GITHUB_TOKEN completed: ${_HTTP_CODE:-}"
       else
-        # Token is valid, cache the result
-        touch "${_TOKEN_CACHE:-}"
+        log_debug "Unexpected response verifying GITHUB_TOKEN (${_HTTP_CODE:-}). Keeping token."
       fi
     fi
   fi
@@ -1466,33 +1498,39 @@ if tool_key and isinstance(data[tool_key], list):
         installed_ver = "";
         buffer = "";
       }
-      # Match tool key: exact match or suffix match with : or /
-      {
-        buffer = buffer " " $0;
-        if ($0 ~ "\"" plugin "\"[[:space:]]*:" || $0 ~ "[:/]" plugin "\"[[:space:]]*:") {
-          in_tool = 1;
-          next;
-        }
+      # 1. Match tool key: exact match or suffix match with : or /
+      $0 ~ "\"" plugin "\"[[:space:]]*:" || $0 ~ "[:/]" plugin "\"[[:space:]]*:" {
+        in_tool = 1;
+        buffer = $0;
+        next;
       }
+      # 2. Accumulate lines only while inside the target tool block
       in_tool {
+        buffer = buffer " " $0;
+        
+        # Check for active-true vs installed-true within the context
         if ($0 ~ /"active"[[:space:]]*:[[:space:]]*true/ && active_ver == "") {
-if (match(buffer, /"version"[[:space:]]*:[[:space:]]*"([0-9]+\.[0-9]+[^"]*)"/, arr)) {
-            active_ver = arr[1];
+          if (match(buffer, /"version"[[:space:]]*:[[:space:]]*"[0-9]+\.[0-9]+[^"]*"/) > 0) {
+            res = substr(buffer, RSTART, RLENGTH);
+            sub(/.*"version"[[:space:]]*:[[:space:]]*"/, "", res);
+            sub(/"$/, "", res);
+            active_ver = res;
           }
         }
         if ($0 ~ /"installed"[[:space:]]*:[[:space:]]*true/ && installed_ver == "") {
-          if (match(buffer, /"version"[[:space:]]*:[[:space:]]*"([0-9]+\.[0-9]+[^"]*)"/, arr)) {
-            installed_ver = arr[1];
+          if (match(buffer, /"version"[[:space:]]*:[[:space:]]*"[0-9]+\.[0-9]+[^"]*"/) > 0) {
+            res = substr(buffer, RSTART, RLENGTH);
+            sub(/.*"version"[[:space:]]*:[[:space:]]*"/, "", res);
+            sub(/"$/, "", res);
+            installed_ver = res;
           }
         }
+        
+        # 3. Detect end of tool array block
         if ($0 ~ /^[[:space:]]*\]/) {
           in_tool = 0;
           buffer = "";
-          if (active_ver != "") {
-            print active_ver;
-            exit;
-          } else if (installed_ver != "") {
-            print installed_ver;
+          if (active_ver != "" || installed_ver != "") {
             exit;
           }
         }
@@ -1618,8 +1656,9 @@ resolve_bin() {
     *"${_G_MISE_SHIMS_BASE:-}"*)
       # Use 'mise which' — the lightweight, jq-free way to validate a shim.
       # Returns the real binary path if installed, non-zero if not.
+      # Guard: Add timeout and offline mode to prevent hangs in broken mise environments or lock contention.
       local _MW
-      _MW=$(mise which "${_BIN:-}" 2>/dev/null) || true
+      _MW=$(MISE_OFFLINE=1 run_with_timeout_robust 3 mise which "${_BIN:-}" 2>/dev/null) || true
       if [ -n "${_MW:-}" ] && [ -x "${_MW:-}" ]; then
         echo "${_MW:-}" && return 0
       fi

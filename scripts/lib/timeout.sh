@@ -79,12 +79,14 @@ cleanup_process_tree() {
     return 0
   fi
 
-  # 1. Send SIGTERM to process group
-  kill -TERM -"${_PID:-}" 2>/dev/null || kill -TERM "${_PID:-}" 2>/dev/null || true
+  # 1. Send SIGTERM to the process itself
+  # Note: Avoid using group kill (-PID) unless we are sure it's in a new PGID (e.g. via setsid)
+  # as it can kill the caller on some systems if not careful.
+  kill -TERM "${_PID:-}" 2>/dev/null || true
 
   # 2. Wait for graceful shutdown
   local _WAITED=0
-  while [ "${_WAITED:-}" -lt "${_GRACE:-}" ]; do
+  while [ "${_WAITED:-0}" -lt "${_GRACE:-2}" ]; do
     if ! kill -0 "${_PID:-}" 2>/dev/null; then
       return 0
     fi
@@ -93,7 +95,7 @@ cleanup_process_tree() {
   done
 
   # 3. Force kill if still running
-  kill -KILL -"${_PID:-}" 2>/dev/null || kill -KILL "${_PID:-}" 2>/dev/null || true
+  kill -KILL "${_PID:-}" 2>/dev/null || true
 
   # 4. Clean up any remaining child processes
   if command -v pkill >/dev/null 2>&1; then

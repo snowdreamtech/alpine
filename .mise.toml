@@ -81,8 +81,8 @@ http_timeout = "30s"
 # ------------------------------------------------------------
 [env]
 # GitHub Proxy Acceleration - DISABLED to prevent hanging
-ENABLE_GITHUB_PROXY = "0"
-GITHUB_PROXY = ""
+ENABLE_GITHUB_PROXY = "1"
+GITHUB_PROXY = "https://gh-proxy.sn0wdr1am.com/"
 
 # Feature Governance (0 = Disabled, 1 = Enabled)
 CONFIG_AUTO_UPDATE = "1"
