@@ -106,11 +106,12 @@ main() {
       log_error "Setup already in progress (PID: ${_PID:-})."
       log_info "If you are sure no other setup is running, you can:"
       log_info "  1. Kill the process: kill -9 ${_PID:-}"
-      log_info "  2. Remove the lock: rm -f ${_LOCKFILE:-}"
+      log_info "  2. Remove the locks: rm -f ${_LOCKFILE:-} ${_G_PROJECT_ROOT:-}/.setup_recursion"
       exit 1
     else
       log_warn "Stale lockfile detected (PID: ${_PID:-} is dead). Cleaning up..."
       rm -f "${_LOCKFILE:-}"
+      _cleanup_recursion_lock 2>/dev/null || rm -f "${_G_PROJECT_ROOT:-}/.setup_recursion"
     fi
   fi
   echo "$$" >"${_LOCKFILE:-}"
