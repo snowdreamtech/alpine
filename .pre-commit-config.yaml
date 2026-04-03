@@ -1052,8 +1052,11 @@ repos:
         language: system
         entry: sh scripts/lib/lint-wrapper.sh shellcheck --shell=sh
         types: [shell]
-        exclude: ^tests/integration/test_dynamic_tool_install\.sh$
-        description: "Enforce strict POSIX compliance for shell scripts (Rule 01.3.39)."
+        exclude: |
+          (?x)^(
+            tests/.*\.(sh|bats)$
+          )
+        description: "Enforce strict POSIX compliance for shell scripts (Rule 01.3.39). Test files are excluded as they use bash features."
 
       - id: psscriptanalyzer
         name: PSScriptAnalyzer
