@@ -46,7 +46,7 @@ main() {
   # They should skip gracefully in ALL environments (CI and local) when not
   # installed, instead of hard-failing the lint pipeline.
   case "${_LINTER_WRAP:-}" in
-  trivy | checkov | semgrep | bandit)
+  trivy | checkov | semgrep | bandit | zizmor)
     log_warn "⏭️  ${_LINTER_WRAP:-} not available. Skipping (covered by CI audit stage)."
     exit 0
     ;;
