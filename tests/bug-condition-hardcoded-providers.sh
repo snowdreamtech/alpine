@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 SnowdreamTech. All rights reserved.
+# Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
 # Bug Condition Exploration Test for Scripts Version Centralization
 # **Validates: Requirements 1.1-1.36**
 #
@@ -35,7 +38,7 @@ echo "=========================================="
 echo ""
 
 # Check if scripts directory exists
-if [[ ! -d "${SCRIPTS_DIR}" ]]; then
+if [[ ! -d ${SCRIPTS_DIR} ]]; then
   echo -e "${RED}ERROR: Directory ${SCRIPTS_DIR} not found${NC}"
   exit 1
 fi
@@ -109,10 +112,10 @@ echo "=========================================="
 echo ""
 
 for file in "${SCRIPTS_DIR}"/*.sh; do
-  if [[ -f "${file}" ]]; then
+  if [[ -f ${file} ]]; then
     filename=$(basename "${file}")
     file_matches=$(grep -n 'local _PROVIDER="[^$]' "${file}" 2>/dev/null || true)
-    if [[ -n "${file_matches}" ]]; then
+    if [[ -n ${file_matches} ]]; then
       count=$(echo "${file_matches}" | wc -l | tr -d ' ')
       echo "${filename}: ${count} instance(s)"
       echo "${file_matches}" | sed 's/^/  /'
@@ -178,4 +181,3 @@ echo ""
 
 # Exit with failure code since we found hardcoded instances (bug exists)
 exit 1
-

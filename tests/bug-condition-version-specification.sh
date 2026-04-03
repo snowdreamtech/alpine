@@ -1,4 +1,7 @@
 #!/usr/bin/env bash
+# Copyright (c) 2026 SnowdreamTech. All rights reserved.
+# Licensed under the MIT License. See LICENSE file in the project root for full license information.
+
 # Bug Condition Exploration Test for Mise Version Specification
 # **Validates: Requirements 1.1, 1.2, 1.3, 1.4**
 #
@@ -36,13 +39,13 @@ echo "=========================================="
 echo ""
 
 # Check if scripts directory exists
-if [[ ! -d "${SCRIPTS_DIR}" ]]; then
+if [[ ! -d ${SCRIPTS_DIR} ]]; then
   echo -e "${RED}ERROR: Directory ${SCRIPTS_DIR} not found${NC}"
   exit 1
 fi
 
 # Check if versions.sh exists
-if [[ ! -f "${VERSIONS_FILE}" ]]; then
+if [[ ! -f ${VERSIONS_FILE} ]]; then
   echo -e "${RED}ERROR: File ${VERSIONS_FILE} not found${NC}"
   exit 1
 fi
@@ -54,8 +57,8 @@ echo ""
 # Pattern: run_mise install "${_PROVIDER:-}" (without @${_VERSION or @${)
 # This matches calls that are missing version specifications
 
-BUGGY_CALLS=$(grep -rn 'run_mise install[[:space:]]*"\${_PROVIDER:-}"' "${SCRIPTS_DIR}"/*.sh 2>/dev/null | \
-  grep -v '@\${_VERSION' | \
+BUGGY_CALLS=$(grep -rn 'run_mise install[[:space:]]*"\${_PROVIDER:-}"' "${SCRIPTS_DIR}"/*.sh 2>/dev/null |
+  grep -v '@\${_VERSION' |
   grep -v '@\${' || true)
 
 # Count instances
@@ -89,7 +92,7 @@ echo ""
 
 for tool in ${FOCUS_TOOLS}; do
   tool_matches=$(echo "${BUGGY_CALLS}" | grep -i "${tool}" || true)
-  if [[ -n "${tool_matches}" ]]; then
+  if [[ -n ${tool_matches} ]]; then
     echo -e "${BLUE}${tool}:${NC}"
     echo "${tool_matches}" | sed 's/^/  /'
 
@@ -98,7 +101,7 @@ for tool in ${FOCUS_TOOLS}; do
     version_var="VER_${tool_upper}"
     pinned_version=$(grep "^${version_var}=" "${VERSIONS_FILE}" 2>/dev/null | cut -d'"' -f2 || echo "NOT_FOUND")
 
-    if [[ "${pinned_version}" != "NOT_FOUND" ]]; then
+    if [[ ${pinned_version} != "NOT_FOUND" ]]; then
       echo -e "  ${YELLOW}Pinned version in versions.sh: ${pinned_version}${NC}"
       echo -e "  ${RED}Bug: Will install LATEST instead of ${pinned_version}${NC}"
     fi
@@ -111,12 +114,12 @@ echo ""
 
 # Detailed breakdown by file
 for file in "${SCRIPTS_DIR}"/*.sh; do
-  if [[ -f "${file}" ]]; then
+  if [[ -f ${file} ]]; then
     filename=$(basename "${file}")
-    file_matches=$(grep -n'run_mise install.*"\${_PROVIDER:-}"' "${file}" 2>/dev/null | \
-      grep -v '@\${_VERSION' | \
+    file_matches=$(grep -n'run_mise install.*"\${_PROVIDER:-}"' "${file}" 2>/dev/null |
+      grep -v '@\${_VERSION' |
       grep -v '@\${' || true)
-    if [[ -n "${file_matches}" ]]; then
+    if [[ -n ${file_matches} ]]; then
       count=$(echo "${file_matches}" | wc -l | tr -d ' ')
       echo "${filename}: ${count} instance(s)"
       echo "${file_matches}" | sed 's/^/  /'
@@ -132,8 +135,8 @@ echo ""
 
 # Analyze the bug pattern
 echo "Bug Pattern Analysis:"
-echo "  - Buggy pattern: run_mise install \"\\\${_PROVIDER:-}\""
-echo "  - Expected pattern: run_mise install \"\\\${_PROVIDER:-}@\\\${_VERSION:-}\""
+echo '  - Buggy pattern: run_mise install "\${_PROVIDER:-}"'
+echo '  - Expected pattern: run_mise install "\${_PROVIDER:-}@\${_VERSION:-}"'
 echo ""
 
 # Check if _VERSION variables are defined
@@ -173,12 +176,12 @@ echo ""
 echo "Based on the counterexamples found, the root causes are:"
 echo ""
 echo "1. Inconsistent Version Specification Pattern:"
-echo "   - Some functions use: run_mise install \"\\\${_PROVIDER:-}@\\\${_VERSION:-}\" (correct)"
-echo "   - Affected functions use: run_mise install \"\\\${_PROVIDER:-}\" (buggy)"
+echo '   - Some functions use: run_mise install "\${_PROVIDER:-}@\${_VERSION:-}" (correct)'
+echo '   - Affected functions use: run_mise install "\${_PROVIDER:-}" (buggy)'
 echo ""
 echo "2. Missing Version Variable Assignment:"
 echo "   - Functions define _PROVIDER but fail to define _VERSION from versions.sh"
-echo "   - Example: local _VERSION=\"\\\${VER_HADOLINT:-}\" is missing"
+echo '   - Example: local _VERSION="\${VER_HADOLINT:-}" is missing'
 echo ""
 echo "3. Copy-Paste Error Propagation:"
 echo "   - The buggy pattern was likely copied across multiple language modules"
@@ -190,14 +193,14 @@ echo "=========================================="
 echo ""
 
 echo "After the fix is applied, ALL run_mise install calls should:"
-echo "  1. Include @\\\${_VERSION:-} suffix to enforce version locking"
+echo '  1. Include @\${_VERSION:-} suffix to enforce version locking'
 echo "  2. Install exact versions from versions.sh"
 echo "  3. Ensure reproducibility across multiple runs and environments"
 echo ""
 
 echo "Example fix for hadolint:"
-echo "  Before: run_mise install \"\\\${_PROVIDER:-}\""
-echo "  After:  run_mise install \"\\\${_PROVIDER:-}@\\\${_VERSION:-}\""
+echo '  Before: run_mise install "\${_PROVIDER:-}"'
+echo '  After:  run_mise install "\${_PROVIDER:-}@\${_VERSION:-}"'
 echo ""
 
 echo "=========================================="
@@ -228,10 +231,9 @@ echo "Total affected calls: ${INSTANCE_COUNT}"
 echo ""
 echo "Next steps:"
 echo "  1. These counterexamples document the scope of the bug"
-echo "  2. Implement the fix to add @\${_VERSION:-} suffix to all affected calls"
+echo '  2. Implement the fix to add @${_VERSION:-} suffix to all affected calls'
 echo "  3. Re-run this test - it should PASS (0 instances) after the fix is applied"
 echo ""
 
 # Exit with failure code since we found buggy calls (bug exists)
 exit 1
-

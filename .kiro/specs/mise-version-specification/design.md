@@ -10,9 +10,9 @@ This bugfix addresses a critical version locking violation where ~40+ `run_mise 
 - **Property (P)**: The desired behavior - mise SHALL install the exact version specified in versions.sh
 - **Preservation**: Existing fast-path checks, DRY_RUN mode, and error handling that must remain unchanged
 - **run_mise**: Helper function in `scripts/lib/helpers.sh` that wraps mise installation commands
-- **_PROVIDER**: Variable containing the mise provider string (e.g., `github:hadolint/hadolint`)
-- **_VERSION**: Variable containing the version string from versions.sh (e.g., `VER_HADOLINT="2.14.0"`)
-- **setup_registry_***: Functions that dynamically register tools with mise using `mise registry set`
+- **\_PROVIDER**: Variable containing the mise provider string (e.g., `github:hadolint/hadolint`)
+- **\_VERSION**: Variable containing the version string from versions.sh (e.g., `VER_HADOLINT="2.14.0"`)
+- **setup*registry*\***: Functions that dynamically register tools with mise using `mise registry set`
 - **get_mise_tool_version**: Helper function that extracts version from provider string or versions.sh
 
 ## Bug Details
@@ -22,6 +22,7 @@ This bugfix addresses a critical version locking violation where ~40+ `run_mise 
 The bug manifests when `run_mise install "${_PROVIDER:-}"` is called without a version suffix in any of the language module installation functions. The mise tool interprets this as a request to install the latest version from the provider, ignoring the pinned version defined in `scripts/lib/versions.sh`.
 
 **Formal Specification:**
+
 ```
 FUNCTION isBugCondition(installCall)
   INPUT: installCall of type String (shell command)
@@ -47,6 +48,7 @@ END FUNCTION
 ### Preservation Requirements
 
 **Unchanged Behaviors:**
+
 - Fast-path version checks using `is_version_match` must continue to skip reinstallation when correct version exists
 - DRY_RUN mode must continue to preview installations without executing them
 - Error handling with `|| _STAT="❌ Failed"` must continue to log failures and proceed
@@ -56,6 +58,7 @@ END FUNCTION
 
 **Scope:**
 All installation calls that do NOT involve the bug condition should be completely unaffected by this fix. This includes:
+
 - Tools that already have correct version specifications (e.g., Grain, Java)
 - Tools installed via runtime-only calls (e.g., `run_mise install ruby`, `run_mise install dart`)
 - Tools with version extraction via `get_mise_tool_version` (e.g., Perl, Erlang, Mojo)
@@ -81,15 +84,15 @@ Based on the bug description and code analysis, the root causes are:
 
 Property 1: Bug Condition - Version Locking Enforcement
 
-_For any_ `run_mise install` call where a provider is specified and a corresponding version exists in versions.sh, the fixed function SHALL install the exact version specified in versions.sh by appending `@${_VERSION:-}` to the provider string.
+*For any* `run_mise install` call where a provider is specified and a corresponding version exists in versions.sh, the fixed function SHALL install the exact version specified in versions.sh by appending `@${_VERSION:-}` to the provider string.
 
-**Validates: Requirements 2.1, 2.2, 2.3, 2.4**
+Validates: Requirements 2.1, 2.2, 2.3, 2.4
 
 Property 2: Preservation - Existing Installation Behavior
 
-_For any_ installation call that does NOT match the bug condition (runtime-only installs, tools with version extraction, tools without defined versions), the fixed code SHALL produce exactly the same behavior as the original code, preserving all existing installation patterns and error handling.
+*For any* installation call that does NOT match the bug condition (runtime-only installs, tools with version extraction, tools without defined versions), the fixed code SHALL produce exactly the same behavior as the original code, preserving all existing installation patterns and error handling.
 
-**Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.5**
+Validates: Requirements 3.1, 3.2, 3.3, 3.4, 3.5
 
 ## Fix Implementation
 
@@ -104,12 +107,14 @@ Assuming our root cause analysis is correct:
 **Specific Changes**:
 
 1. **Add Version Variable Assignment**: For each affected function, add `_VERSION` variable assignment after `_PROVIDER`:
+
    ```sh
    local _PROVIDER="${VER_HADOLINT_PROVIDER:-}"
    local _VERSION="${VER_HADOLINT:-}"
    ```
 
 2. **Update run_mise install Call**: Transform the installation call to include version suffix:
+
    ```sh
    # Before (buggy):
    run_mise install"${_PROVIDER:-}" || _STAT_HADO="❌ Failed"
@@ -151,17 +156,20 @@ The testing strategy follows a two-phase approach: first, surface counterexample
 **Goal**: Surface counterexamples that demonstrate the bug BEFORE implementing the fix. Confirm that mise installs latest versions instead of pinned versions when version suffix is missing.
 
 **Test Plan**: Write tests that invoke affected installation functions on UNFIXED code and verify that mise attempts to install the latest version instead of the pinned version from versions.sh. This can be done by:
+
 1. Mocking mise to capture installation commands
 2. Verifying the command does NOT contain version suffix
 3. Comparing installed version with versions.sh (should differ if latest is newer)
 
 **Test Cases**:
+
 1. **Hadolint Latest Install**: Call `install_hadolint()` on unfixed code, verify mise installs latest instead of VER_HADOLINT="2.14.0" (will fail on unfixed code)
 2. **Shellcheck Latest Install**: Call `install_shellcheck()` on unfixed code, verify mise installs latest instead of VER_SHELLCHECK="0.11.0" (will fail on unfixed code)
 3. **Multiple Tools**: Test 5-10 affected tools to confirm pattern is consistent (will fail on unfixed code)
 4. **Version Drift Detection**: Run setup on two different dates, verify different versions are installed (will fail on unfixed code)
 
 **Expected Counterexamples**:
+
 - `run_mise install "github:hadolint/hadolint"` installs version 2.15.0 (latest) instead of 2.14.0 (pinned)
 - `run_mise install "github:koalaman/shellcheck"` installs version 0.11.1 (latest) instead of 0.11.0 (pinned)
 - Possible causes: missing `@${_VERSION:-}` suffix, missing `_VERSION` variable assignment, incorrect version variable name
@@ -171,6 +179,7 @@ The testing strategy follows a two-phase approach: first, surface counterexample
 **Goal**: Verify that for all inputs where the bug condition holds, the fixed function produces the expected behavior (installs pinned version).
 
 **Pseudocode:**
+
 ```
 FOR ALL installCall WHERE isBugCondition(installCall) DO
   result := executeFixedInstall(installCall)
@@ -180,11 +189,13 @@ END FOR
 ```
 
 **Test Plan**: After applying the fix, verify that:
+
 1. All affected `run_mise install` calls include version suffix
 2. Mise installs exact versions from versions.sh
 3. Multiple runs produce identical versions across environments
 
 **Test Cases**:
+
 1. **Hadolint Pinned Install**: Call `install_hadolint()` on fixed code, verify mise installs VER_HADOLINT="2.14.0" exactly
 2. **Shellcheck Pinned Install**: Call `install_shellcheck()` on fixed code, verify mise installs VER_SHELLCHECK="0.11.0" exactly
 3. **All Affected Tools**: Test all ~40+ affected tools to verify version locking
@@ -195,6 +206,7 @@ END FOR
 **Goal**: Verify that for all inputs where the bug condition does NOT hold, the fixed function produces the same result as the original function.
 
 **Pseudocode:**
+
 ```
 FOR ALL installCall WHERE NOT isBugCondition(installCall) DO
   ASSERT fixedFunction(installCall) = originalFunction(installCall)
@@ -202,6 +214,7 @@ END FOR
 ```
 
 **Testing Approach**: Property-based testing is recommended for preservation checking because:
+
 - It generates many test cases automatically across the input domain
 - It catches edge cases that manual unit tests might miss
 - It provides strong guarantees that behavior is unchanged for all non-buggy inputs
@@ -209,6 +222,7 @@ END FOR
 **Test Plan**: Observe behavior on UNFIXED code first for non-affected installation patterns, then write property-based tests capturing that behavior.
 
 **Test Cases**:
+
 1. **Fast-Path Preservation**: Observe that `is_version_match` skips reinstallation on unfixed code, verify this continues after fix
 2. **DRY_RUN Preservation**: Observe that DRY_RUN mode previews without executing on unfixed code, verify this continues after fix
 3. **Runtime-Only Installs**: Observe that `run_mise install ruby` works on unfixed code, verify this continues after fix
@@ -239,4 +253,3 @@ END FOR
 - Test that version updates in versions.sh are reflected in installations
 - Test that mise registry is correctly populated before installations
 - Test that error handling and logging work correctly across all tools
-

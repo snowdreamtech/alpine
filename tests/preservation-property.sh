@@ -141,10 +141,10 @@ for script_name in ${SCRIPTS_TO_CHECK}; do
   fi
 
   # Verify script does NOT have hardcoded providers
-  if grep -q 'local _PROVIDER="github:' "${script_path}" || \
-     grep -q 'local _PROVIDER="npm:' "${script_path}" || \
-     grep -q 'local _PROVIDER="pipx:' "${script_path}" || \
-     grep -q 'local _PROVIDER="gem:' "${script_path}"; then
+  if grep -q 'local _PROVIDER="github:' "${script_path}" ||
+    grep -q 'local _PROVIDER="npm:' "${script_path}" ||
+    grep -q 'local _PROVIDER="pipx:' "${script_path}" ||
+    grep -q 'local _PROVIDER="gem:' "${script_path}"; then
     fail "${script_name} contains hardcoded providers"
   else
     pass "${script_name} has no hardcoded providers"
@@ -153,7 +153,7 @@ done
 
 # ── Property 2.4: Fallback Pattern Preservation ──────────────────────────────
 
-test_start "Property 2.4: Fallback pattern \${VAR:-} is used correctly"
+test_start 'Property 2.4: Fallback pattern ${VAR:-} is used correctly'
 
 # Test that the :- fallback pattern works as expected
 TEST_VAR="${UNDEFINED_VAR:-default_value}"
