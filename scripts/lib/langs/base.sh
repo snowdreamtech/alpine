@@ -78,7 +78,11 @@ install_gitleaks() {
   local _PROVIDER="${VER_GITLEAKS_PROVIDER:-}"
   local _VERSION="${VER_GITLEAKS:-}"
 
-  if [ ! -d ".git" ]; then
+  # In CI environments, install gitleaks unconditionally for security scanning.
+  # In local dev, skip if not a git repository to avoid unnecessary installation.
+  if [ ! -d ".git" ] && ! is_ci_env; then
+    log_info "⏭️  Gitleaks: Skipped (not a git repository)"
+    log_summary "Base" "Gitleaks" "⏭️ Skipped" "-" "0"
     return 0
   fi
 
