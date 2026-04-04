@@ -50,7 +50,10 @@ register_mise_tool() {
   if _is_ci; then
     # We must explicitly install here because since it is not in .mise.toml,
     # the general 'mise install' at the end of setup won't capture it.
-    run_mise install "${_PROVIDER:-}@${_VERSION:-}"
+    if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
+      log_error "Failed to install ${_NAME:-} (${_PROVIDER:-}@${_VERSION:-}) in CI."
+      return 1
+    fi
     return 0
   fi
 
