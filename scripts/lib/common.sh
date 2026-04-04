@@ -201,10 +201,14 @@ fi
 printf "[DEBUG] Recursion Level: %s -> %s (PID: %s, PPID: %s)\n" "${_RECURSION_LEVEL:-0}" "$((${_RECURSION_LEVEL:-0} + 1))" "$$" "$PPID" >&2
 echo $((${_RECURSION_LEVEL:-0} + 1)) > "${_RECURSION_LOCK_FILE:-}"
 
-# Export cleanup function (to be called by trap in setup.sh)
+# Export cleanup function (to be called by trap or explicitly)
 _cleanup_recursion_lock() {
   rm -f "${_G_PROJECT_ROOT:-}/.setup_recursion" 2>/dev/null || true
 }
+
+# Automatic cleanup on script exit (works for most cases)
+# Individual scripts can override this with their own trap if needed
+trap '_cleanup_recursion_lock' EXIT
 
 # ── 📄 SSoT Version Registry ────────────────────────────────────────────────
 # Load the centralized version registry to provide a Single Source of Truth
@@ -1507,7 +1511,7 @@ if tool_key and isinstance(data[tool_key], list):
       # 2. Accumulate lines only while inside the target tool block
       in_tool {
         buffer = buffer " " $0;
-        
+
         # Check for active-true vs installed-true within the context
         if ($0 ~ /"active"[[:space:]]*:[[:space:]]*true/ && active_ver == "") {
           if (match(buffer, /"version"[[:space:]]*:[[:space:]]*"[0-9]+\.[0-9]+[^"]*"/) > 0) {
@@ -1525,7 +1529,7 @@ if tool_key and isinstance(data[tool_key], list):
             installed_ver = res;
           }
         }
-        
+
         # 3. Detect end of tool array block
         if ($0 ~ /^[[:space:]]*\]/) {
           in_tool = 0;

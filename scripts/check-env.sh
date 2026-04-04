@@ -135,6 +135,10 @@ check_tool_version() {
 #   main --verbose
 main() {
   export _G_AUDIT_MODE=1
+
+  # Setup trap to clean up recursion lock on exit
+  trap '_cleanup_recursion_lock' EXIT INT TERM
+
   # 1. Execution Context Guard
   guard_project_root
 
@@ -721,6 +725,9 @@ main() {
   fi
 
   finalize_summary_table
+
+  # Clean up recursion lock before exit
+  _cleanup_recursion_lock
 
   # Final combined health check
   if [ "${HEALTHY_ST:-0}" -eq 0 ]; then
