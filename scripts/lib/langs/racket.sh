@@ -14,7 +14,7 @@ install_runtime_racket() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "racket@$(get_mise_tool_version racket)"
+  run_mise install "${VER_RACKET_PROVIDER:-}@${VER_RACKET:-}"
 }
 
 # Purpose: Sets up Racket environment for project.

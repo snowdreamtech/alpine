@@ -14,7 +14,7 @@ install_runtime_vala() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "vala@$(get_mise_tool_version vala)"
+  run_mise install "${VER_VALA_PROVIDER:-}@${VER_VALA:-}"
 }
 
 # Purpose: Sets up Vala environment for project.

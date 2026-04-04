@@ -74,6 +74,22 @@ VER_TYPST="0.13.0"
 VER_DUCKDB="1.5.0"
 # NOTE: Lychee version removed — link checking delegated to lycheeverse/lychee-action in CI.
 
+# Additional language runtimes requiring GitHub providers
+VER_LEAN="4.20.0"
+VER_LEAN_PROVIDER="github:leanprover/lean4"
+
+VER_NIM="2.4.0"
+VER_NIM_PROVIDER="github:nim-lang/Nim"
+
+VER_RACKET="8.18"
+VER_RACKET_PROVIDER="github:racket/racket"
+
+VER_VALA="0.58.0"
+VER_VALA_PROVIDER="github:GNOME/vala"
+
+VER_APTOS="5.5.0"
+VER_APTOS_PROVIDER="github:aptos-labs/aptos-core"
+
 # ── 🔐 Tier 1: Security & Engineering (Mirror of .mise.toml) ─────────────────
 VER_GITLEAKS="8.30.1"
 VER_GITLEAKS_PROVIDER="github:gitleaks/gitleaks"

@@ -14,7 +14,7 @@ install_runtime_move() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "aptos@$(get_mise_tool_version move)"
+  run_mise install "${VER_APTOS_PROVIDER:-}@${VER_APTOS:-}"
 }
 
 # Purpose: Sets up Move environment for project.

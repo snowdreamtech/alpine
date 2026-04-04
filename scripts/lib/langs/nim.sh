@@ -14,7 +14,7 @@ install_runtime_nim() {
   fi
 
   # shellcheck disable=SC2154
-  run_mise install "nim@$(get_mise_tool_version nim)"
+  run_mise install "${VER_NIM_PROVIDER:-}@${VER_NIM:-}"
 }
 
 # Purpose: Sets up Nim environment for project.
