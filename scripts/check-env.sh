@@ -60,8 +60,21 @@ EOF
 #   $4 - Version check command
 #   $5 - Critical flag (1 for core, 0 for optional)
 #   $6 - CI-only flag (1 to skip locally with info, 0 to always check)
+#
+# Behavior Matrix:
+#   (1, 1) Critical CI-only:  Local=skip, CI=must exist (fail if missing)
+#          Use for: Universal security scanners (OSV-scanner, Zizmor)
+#   (0, 1) Optional CI-only:  Local=skip, CI=optional (warn if missing)
+#          Use for: Language-specific security tools (govulncheck, cargo-audit, etc.)
+#   (1, 0) Critical Always:   Local=must exist, CI=must exist
+#          Use for: Core infrastructure (Git, Make)
+#   (0, 0) Optional Always:   Local=optional, CI=optional
+#          Use for: Language runtimes, linters (when source files present)
+#
 # Examples:
-#   check_tool_version "Git" "git" "2.30.0" "git --version" 1
+#   check_tool_version "Git" "git" "2.30.0" "git --version" 1 0
+#   check_tool_version "OSV-scanner" "osv-scanner" "1.0.0" "osv-scanner --version" 1 1 "osv-scanner" "OSV_FORCE_INSTALL"
+#   check_tool_version "Govulncheck" "govulncheck" "latest" "govulncheck ./..." 0 1 "govulncheck" "GOVULN_FORCE_INSTALL"
 check_tool_version() {
   local _LV_NAME="${1:-}"
   local _LV_CMD="${2:-}"
@@ -654,9 +667,10 @@ main() {
   # 7. Group: Security & Quality Tools
   log_info "── Security & Quality Tools ──"
   check_tool_version "Gitleaks" "gitleaks" "$(get_mise_tool_version gitleaks)" "gitleaks version" 0 0
-  check_tool_version "OSV-scanner" "osv-scanner" "$(get_mise_tool_version osv-scanner)" "osv-scanner --version" 0 1 "osv-scanner" "OSV_FORCE_INSTALL"
+  # Universal security scanners - Critical in CI (must be present)
+  check_tool_version "OSV-scanner" "osv-scanner" "$(get_mise_tool_version osv-scanner)" "osv-scanner --version" 1 1 "osv-scanner" "OSV_FORCE_INSTALL"
   # NOTE: Trivy version check removed — scanning delegated to aquasecurity/trivy-action.
-  check_tool_version "Zizmor" "zizmor" "$(get_mise_tool_version zizmor)" "zizmor --version" 0 1 "zizmor" "ZIZMOR_FORCE_INSTALL"
+  check_tool_version "Zizmor" "zizmor" "$(get_mise_tool_version zizmor)" "zizmor --version" 1 1 "zizmor" "ZIZMOR_FORCE_INSTALL"
 
   log_info "── Lint & Quality Tools ──"
   check_tool_version "Shfmt" "shfmt" "$(get_mise_tool_version "shfmt")" "shfmt --version" 0 0 "shfmt"
