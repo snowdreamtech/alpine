@@ -99,7 +99,7 @@ install_gitleaks() {
 
   _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
   local _STAT_GITL="✅ mise"
-  run_mise install "gitleaks@${_VERSION:-}" || _STAT_GITL="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_GITL="❌ Failed"
   log_summary "Base" "Gitleaks" "${_STAT_GITL:-}" "$(get_version gitleaks)" "$(($(date +%s) - _T0_GITL))"
 }
 
