@@ -129,7 +129,7 @@ install_checkmake() {
 
   _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
   local _STAT_CM="✅ mise"
-  run_mise install "checkmake@${_VERSION:-}" || _STAT_CM="❌ Failed"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_CM="❌ Failed"
   log_summary "Base" "Checkmake" "${_STAT_CM:-}" "$(get_version checkmake)" "$(($(date +%s) - _T0_CM))"
 }
 
