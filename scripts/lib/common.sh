@@ -21,8 +21,8 @@ set -eu
 for _p in "$HOME/.local/bin" "/usr/local/bin" "/opt/homebrew/bin"; do
   if [ -d "${_p:-}" ]; then
     case ":${PATH:-}:" in
-      *":${_p:-}:"*) ;;
-      *) export PATH="${_p:-}:${PATH:-}" ;;
+    *":${_p:-}:"*) ;;
+    *) export PATH="${_p:-}:${PATH:-}" ;;
     esac
   fi
 done
@@ -199,7 +199,7 @@ if [ "${_RECURSION_LEVEL:-0}" -gt 2 ]; then
   exit 1
 fi
 printf "[DEBUG] Recursion Level: %s -> %s (PID: %s, PPID: %s)\n" "${_RECURSION_LEVEL:-0}" "$((${_RECURSION_LEVEL:-0} + 1))" "$$" "$PPID" >&2
-echo $((${_RECURSION_LEVEL:-0} + 1)) > "${_RECURSION_LOCK_FILE:-}"
+echo $((${_RECURSION_LEVEL:-0} + 1)) >"${_RECURSION_LOCK_FILE:-}"
 
 # Export cleanup function (to be called by trap or explicitly)
 _cleanup_recursion_lock() {
