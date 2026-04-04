@@ -59,8 +59,13 @@ install_osv_scanner() {
   # Explicitly use mise to install the github provider
   if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
     _STAT_OSV="❌ Failed"
+    log_summary "Security" "OSV-Scanner" "${_STAT_OSV:-}" "-" "$(($(date +%s) - _T0_OSV))"
     if is_ci_env; then
+      log_error "Critical security tool (${_TITLE:-}) failed to install in CI."
+      return 1
+    else
       log_warn "Optional security tool (${_TITLE:-}) failed to install. Continuing..."
+      return 0
     fi
   fi
   log_summary "Security" "OSV-Scanner" "${_STAT_OSV:-}" "$(get_version osv-scanner)" "$(($(date +%s) - _T0_OSV))"
@@ -118,7 +123,17 @@ install_zizmor() {
   fi
   local _STAT_ZIZ="✅ mise"
   setup_registry_zizmor
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_ZIZ="❌ Failed"
+  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
+    _STAT_ZIZ="❌ Failed"
+    log_summary "Security" "Zizmor" "${_STAT_ZIZ:-}" "-" "$(($(date +%s) - _T0_ZIZ))"
+    if is_ci_env; then
+      log_error "Critical security tool (${_TITLE:-}) failed to install in CI."
+      return 1
+    else
+      log_warn "Optional security tool (${_TITLE:-}) failed to install. Continuing..."
+      return 0
+    fi
+  fi
   log_summary "Security" "Zizmor" "${_STAT_ZIZ:-}" "$(get_version zizmor)" "$(($(date +%s) - _T0_ZIZ))"
 }
 
