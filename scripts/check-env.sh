@@ -97,24 +97,31 @@ check_tool_version() {
     _LV_CURRENT_VER=$(get_version "${_LV_CMD:-}" "" "${_LV_MISE_KEY:-}" | tr -d '\r')
     [ "${_LV_CURRENT_VER:-}" = "-" ] && _LV_CURRENT_VER="0.0"
 
+    # Strip leading 'v' or 'V' from version for consistent comparison
+    _LV_CURRENT_VER=$(echo "${_LV_CURRENT_VER:-}" | sed 's/^[vV]//')
+
     # If requirement is empty or -, allow anything
     if [ -z "${_LV_MIN_VER:-}" ] || [ "${_LV_MIN_VER:-}" = "-" ]; then
       log_success "✅ ${_LV_NAME:-}: v${_LV_CURRENT_VER:-} (Active)"
       return 0
     fi
 
+    # Strip leading 'v' from requirement as well
+    local _LV_MIN_VER_CLEAN
+    _LV_MIN_VER_CLEAN=$(echo "${_LV_MIN_VER:-}" | sed 's/^[vV]//')
+
     # Canonicalize versions to 3 components to avoid revision suffix mismatches (e.g. 1.7.11.24)
     local _LV_MIN_CANON _LV_CUR_CANON
-    _LV_MIN_CANON=$(echo "${_LV_MIN_VER:-}" | cut -d. -f1-3)
+    _LV_MIN_CANON=$(echo "${_LV_MIN_VER_CLEAN:-}" | cut -d. -f1-3)
     _LV_CUR_CANON=$(echo "${_LV_CURRENT_VER:-}" | cut -d. -f1-3)
 
     local _LV_LOWER_VER
-    _LV_LOWER_VER=$(printf "%s\n%s" "${_LV_MIN_CANON:-}" "${_LV_CUR_CANON:-}" | sort -n -t. -k1,1 -k2,2 -k3,3 | head -n1)
+    _LV_LOWER_VER=$(printf "%s\n%s" "${_LV_MIN_CANON:-}" "${_LV_CUR_CANON:-}" | sort -V | head -n1)
 
     if [ "${_LV_LOWER_VER:-}" = "${_LV_MIN_CANON:-}" ] || [ "${_LV_CUR_CANON:-}" = "${_LV_MIN_CANON:-}" ]; then
-      log_success "✅ ${_LV_NAME:-}: v${_LV_CURRENT_VER:-} (Active, matches v${_LV_MIN_VER:-})"
+      log_success "✅ ${_LV_NAME:-}: v${_LV_CURRENT_VER:-} (Active, matches v${_LV_MIN_VER_CLEAN:-})"
     else
-      log_warn "⚠️  ${_LV_NAME:-}: v${_LV_CURRENT_VER:-} (below recommended v${_LV_MIN_VER:-})"
+      log_warn "⚠️  ${_LV_NAME:-}: v${_LV_CURRENT_VER:-} (below recommended v${_LV_MIN_VER_CLEAN:-})"
       HEALTHY_ST=1
       if [ "${_LV_CRITICAL:-0}" -eq 1 ]; then CORE_HEALTHY_ST=1; fi
     fi
