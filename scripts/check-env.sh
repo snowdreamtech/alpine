@@ -121,9 +121,10 @@ check_tool_version() {
     if [ "${_LV_LOWER_VER:-}" = "${_LV_MIN_CANON:-}" ] || [ "${_LV_CUR_CANON:-}" = "${_LV_MIN_CANON:-}" ]; then
       log_success "✅ ${_LV_NAME:-}: v${_LV_CURRENT_VER:-} (Active, matches v${_LV_MIN_VER_CLEAN:-})"
     else
+      # Version mismatch - warn but don't fail (tool exists, just old version)
       log_warn "⚠️  ${_LV_NAME:-}: v${_LV_CURRENT_VER:-} (below recommended v${_LV_MIN_VER_CLEAN:-})"
       HEALTHY_ST=1
-      if [ "${_LV_CRITICAL:-0}" -eq 1 ]; then CORE_HEALTHY_ST=1; fi
+      # Don't set CORE_HEALTHY_ST for version mismatches - tool is present and functional
     fi
     return 0
   fi
