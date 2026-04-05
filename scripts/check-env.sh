@@ -28,21 +28,6 @@ set -eu
 SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 . "${SCRIPT_DIR:-}/lib/common.sh"
 
-# ── CI PATH Synchronization ──────────────────────────────────────────────────
-# In CI, tools installed by previous steps are persisted to GITHUB_PATH file.
-# We need to read this file and add those paths to current shell's PATH.
-if [ -n "${GITHUB_PATH:-}" ] && [ -f "${GITHUB_PATH:-}" ]; then
-  while IFS= read -r _ci_path || [ -n "${_ci_path:-}" ]; do
-    [ -z "${_ci_path:-}" ] && continue
-    _ci_path=$(echo "${_ci_path:-}" | tr -d '\r\n' | sed 's/[[:space:]]*$//')
-    [ -z "${_ci_path:-}" ] && continue
-    case ":${PATH:-}:" in
-    *":${_ci_path:-}:"*) ;;
-    *) export PATH="${_ci_path:-}:${PATH:-}" ;;
-    esac
-  done <"${GITHUB_PATH:-}"
-fi
-
 # ── Global State (Scoped to script) ──────────────────────────────────────────
 HEALTHY_ST=0
 CORE_HEALTHY_ST=0

@@ -1972,6 +1972,26 @@ is_version_match() {
 
 # ── 🛣️ CI Persistence (GitHub Actions) ───────────────────────────────────────
 
+# Step 1: Read existing GITHUB_PATH and sync to current shell
+# This ensures tools installed by previous steps are available in current shell
+if [ "${GITHUB_ACTIONS:-}" = "true" ] && [ -n "${GITHUB_PATH:-}" ] && [ -f "${GITHUB_PATH:-}" ] && [ -z "${_G_GITHUB_PATH_READ:-}" ]; then
+  log_debug "Reading GITHUB_PATH and syncing to current shell..."
+  while IFS= read -r _ci_path || [ -n "${_ci_path:-}" ]; do
+    [ -z "${_ci_path:-}" ] && continue
+    _ci_path=$(echo "${_ci_path:-}" | tr -d '\r\n' | sed 's/[[:space:]]*$//')
+    [ -z "${_ci_path:-}" ] && continue
+    case ":${PATH:-}:" in
+    *":${_ci_path:-}:"*) ;;
+    *)
+      export PATH="${_ci_path:-}:${PATH:-}"
+      log_debug "Added to PATH from GITHUB_PATH: ${_ci_path:-}"
+      ;;
+    esac
+  done <"${GITHUB_PATH:-}"
+  export _G_GITHUB_PATH_READ=true
+fi
+
+# Step 2: Write mise paths to GITHUB_PATH for future steps
 if [ "${GITHUB_ACTIONS:-}" = "true" ] && [ -n "${GITHUB_PATH:-}" ] && [ -z "${_G_GITHUB_PATH_SYNCED:-}" ]; then
   # Proactively add mise paths to GITHUB_PATH using absolute references.
   # Note: GitHub Actions expects the runner's native path format.
