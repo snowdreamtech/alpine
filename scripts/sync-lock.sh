@@ -23,6 +23,12 @@ SCRIPT_DIR=$(cd "$(dirname "${0:-}")" && pwd)
 run_sync_lock() {
   log_info "Synchronizing mise.lock for all platforms..."
 
+  # 0. Clear mise cache to avoid stale provenance verification data
+  # This prevents errors like "has no provenance verification" when attestations
+  # are actually present but cached metadata is outdated.
+  log_debug "Clearing mise cache to refresh provenance verification data..."
+  mise cache clear >/dev/null 2>&1 || true
+
   # 1. Manifest Aggregation
   local _TMP_MANIFEST=".mise.toml.lock.temp"
   "${_G_PROJECT_ROOT:-.}/scripts/gen-full-manifest.sh" >"${_TMP_MANIFEST:-}"
