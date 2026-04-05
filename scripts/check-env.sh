@@ -135,10 +135,18 @@ check_tool_version() {
     return 0
   fi
 
-  log_warn "❌ ${_LV_NAME:-}: Not found."
-  HEALTHY_ST=1
-  if [ "${_LV_CRITICAL:-0}" -eq 1 ]; then CORE_HEALTHY_ST=1; fi
-  return 1
+  # Tool is missing - determine severity based on criticality
+  if [ "${_LV_CRITICAL:-0}" -eq 1 ]; then
+    # Critical tool missing - this is a failure
+    log_warn "❌ ${_LV_NAME:-}: Not found."
+    HEALTHY_ST=1
+    CORE_HEALTHY_ST=1
+    return 1
+  else
+    # Non-critical tool missing - just a warning, don't fail
+    log_warn "⚠️  ${_LV_NAME:-}: Not found (optional)."
+    return 0
+  fi
 }
 
 # Purpose: Main entry point for the environment health auditing engine.

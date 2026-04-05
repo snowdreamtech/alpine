@@ -15,9 +15,12 @@ install_shfmt() {
   local _VERSION="${VER_SHFMT:-}"
 
   if ! has_lang_files "" "*.sh *.bash *.bats"; then
-    log_debug "Skipping Shfmt: No shell files detected"
+    log_info "⏭️  Skipping Shfmt: No shell files detected (FORCE_SETUP=${FORCE_SETUP:-0})"
+    log_summary "Base" "Shfmt" "⏭️ Skipped" "-" "0"
     return 0
   fi
+
+  log_debug "Shell files detected, proceeding with Shfmt installation"
 
   # Fast-path: Check version-aware existence (prefix match to handle pkg vs binary diffs)
   local _CUR_VER
@@ -65,9 +68,12 @@ install_shellcheck() {
   local _VERSION="${VER_SHELLCHECK:-}"
 
   if ! has_lang_files "" "*.sh *.bash *.bats"; then
-    log_debug "Skipping Shellcheck: No shell files detected"
+    log_info "⏭️  Skipping Shellcheck: No shell files detected (FORCE_SETUP=${FORCE_SETUP:-0})"
+    log_summary "Base" "Shellcheck" "⏭️ Skipped" "-" "0"
     return 0
   fi
+
+  log_debug "Shell files detected, proceeding with Shellcheck installation"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
@@ -118,9 +124,12 @@ install_actionlint() {
   local _PROVIDER="${VER_ACTIONLINT_PROVIDER:-}"
   local _VERSION="${VER_ACTIONLINT:-}"
   if ! has_lang_files ".github/workflows" "*.yml *.yaml"; then
-    log_debug "Skipping Actionlint: No GitHub workflow files detected"
+    log_info "⏭️  Skipping Actionlint: No GitHub workflow files detected (FORCE_SETUP=${FORCE_SETUP:-0})"
+    log_summary "Base" "Actionlint" "⏭️ Skipped" "-" "0"
     return 0
   fi
+
+  log_debug "GitHub workflow files detected, proceeding with Actionlint installation"
 
   # Fast-path: Check version-aware existence
   local _CUR_VER
