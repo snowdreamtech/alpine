@@ -613,59 +613,6 @@ get_mise_tool_version() {
 
 # ── 🔄 GITHUB_PATH Synchronization ──────────────────────────────────────────
 
-# Synchronize GITHUB_PATH file contents to current shell PATH.
-#
-# Purpose: Read all paths from $GITHUB_PATH file and add them to current shell's
-#          $PATH environment variable. This ensures tools installed in CI are
-#          immediately available in the same step, not just in subsequent steps.
-#
-# Context: GitHub Actions' GITHUB_PATH mechanism only applies changes between
-#          steps. This function bridges that gap for same-step tool availability.
-#
-# Behavior:
-#   - Reads each line from $GITHUB_PATH file
-#   - Skips empty lines and whitespace
-#   - Implements idempotent checking (no duplicate paths)
-#   - Exports updated PATH to current shell
-#
-# Requirements: 2.1, 2.2, 2.5
-#
-# Examples:
-#   _sync_github_path_to_current_shell
-_sync_github_path_to_current_shell() {
-  # Guard: Skip if GITHUB_PATH is not set or file doesn't exist
-  if [ -z "${GITHUB_PATH:-}" ] || [ ! -f "${GITHUB_PATH:-}" ]; then
-    return 0
-  fi
-
-  log_debug "Syncing GITHUB_PATH to current shell: ${GITHUB_PATH:-}"
-
-  # CRITICAL: Use input redirection with while loop to avoid subshell
-  # Using pipe (cat | while) creates a subshell where export PATH won't affect parent
-  # Using input redirection (while ... < file) keeps us in the current shell
-  while IFS= read -r _path || [ -n "${_path:-}" ]; do
-    # Skip empty lines
-    [ -z "${_path:-}" ] && continue
-
-    # Remove trailing whitespace/newlines
-    _path=$(echo "${_path:-}" | tr -d '\r\n' | sed 's/[[:space:]]*$//')
-
-    # Skip if still empty after trimming
-    [ -z "${_path:-}" ] && continue
-
-    # Idempotent check: Skip if path already in current $PATH
-    case ":${PATH:-}:" in
-    *":${_path:-}:"*)
-      continue
-      ;;
-    esac
-
-    # Add to current shell PATH
-    export PATH="${_path:-}:${PATH:-}"
-    log_debug "Synced GITHUB_PATH to current shell: ${_path:-}"
-  done <"${GITHUB_PATH:-}"
-}
-
 # Purpose: Executes a mise command with retry logic and intelligent fallback.
 # Params:
 #   $@ - Command and arguments for mise
@@ -903,32 +850,18 @@ run_mise() {
           esac
 
           # CI PATH Persistence for tool bin directory
-          if [ -n "${GITHUB_PATH:-}" ]; then
-            log_debug "Checking if tool bin needs to be persisted to GITHUB_PATH..."
-            if ! grep -qxF "${_TOOL_BIN_DIR:-}/bin" "${GITHUB_PATH:-}" 2>/dev/null; then
-              echo "${_TOOL_BIN_DIR:-}/bin" >>"${GITHUB_PATH:-}"
-              log_debug "Persisted tool bin to GITHUB_PATH: ${_TOOL_BIN_DIR:-}/bin"
-              log_debug "About to call _sync_github_path_to_current_shell..."
-              _sync_github_path_to_current_shell
-              log_debug "Returned from _sync_github_path_to_current_shell"
-            else
-              log_debug "Tool bin already in GITHUB_PATH, skipping"
-            fi
+          if is_ci_env; then
+            _persist_path_to_ci "${_TOOL_BIN_DIR:-}/bin"
           fi
         fi
       fi
     fi
 
     # CI PATH Persistence (Task 3.2):
-    # In CI environments, persist mise shims to GITHUB_PATH to ensure
+    # In CI environments, persist mise shims to ensure
     # subsequent workflow steps can resolve tools installed in this step.
-    if [ -n "${GITHUB_PATH:-}" ] && [ -n "${_G_MISE_SHIMS_BASE:-}" ]; then
-      # Idempotent: Check if already persisted to avoid duplicates
-      if ! grep -qxF "${_G_MISE_SHIMS_BASE:-}" "${GITHUB_PATH:-}" 2>/dev/null; then
-        echo "${_G_MISE_SHIMS_BASE:-}" >>"${GITHUB_PATH:-}"
-        log_debug "Persisted mise shims to GITHUB_PATH: ${_G_MISE_SHIMS_BASE:-}"
-        _sync_github_path_to_current_shell
-      fi
+    if is_ci_env && [ -n "${_G_MISE_SHIMS_BASE:-}" ]; then
+      _persist_path_to_ci "${_G_MISE_SHIMS_BASE:-}"
     fi
   fi
 
@@ -1970,31 +1903,103 @@ is_version_match() {
 # Note: Dynamic loading of language-specific setup modules has been moved to setup.sh
 # to optimize performance for non-setup scripts.
 
-# ── 🛣️ CI Persistence (GitHub Actions) ───────────────────────────────────────
+# ── 🛣️ CI Persistence (Cross-Platform) ──────────────────────────────────────
 
-# Step 1: Read existing GITHUB_PATH and sync to current shell
-# This ensures tools installed by previous steps are available in current shell
-if [ "${GITHUB_ACTIONS:-}" = "true" ] && [ -n "${GITHUB_PATH:-}" ] && [ -f "${GITHUB_PATH:-}" ] && [ -z "${_G_GITHUB_PATH_READ:-}" ]; then
-  log_debug "Reading GITHUB_PATH and syncing to current shell..."
+# Purpose: Get the CI-specific PATH persistence file location
+# Returns: Path to the file where PATH additions should be written, or empty if not supported
+_get_ci_path_file() {
+  case "$(detect_ci_platform)" in
+  github-actions | forgejo-actions | gitea-actions)
+    # GitHub Actions and compatible platforms use GITHUB_PATH
+    echo "${GITHUB_PATH:-}"
+    ;;
+  gitlab-ci)
+    # GitLab CI: No direct PATH persistence mechanism
+    # PATH modifications only last within the current job
+    # We can use a custom file and source it in subsequent scripts
+    echo "${CI_PROJECT_DIR:-.}/.ci_path_cache"
+    ;;
+  drone | woodpecker)
+    # Drone/Woodpecker: Similar to GitLab, use custom file
+    echo "${DRONE_WORKSPACE:-${CI_WORKSPACE:-.}}/.ci_path_cache"
+    ;;
+  circleci)
+    # CircleCI: Use custom file in workspace
+    echo "${CIRCLE_WORKING_DIRECTORY:-.}/.ci_path_cache"
+    ;;
+  azure-pipelines)
+    # Azure Pipelines: Use custom file
+    echo "${BUILD_SOURCESDIRECTORY:-.}/.ci_path_cache"
+    ;;
+  jenkins)
+    # Jenkins: Use custom file in workspace
+    echo "${WORKSPACE:-.}/.ci_path_cache"
+    ;;
+  travis)
+    # Travis CI: Use custom file
+    echo "${TRAVIS_BUILD_DIR:-.}/.ci_path_cache"
+    ;;
+  *)
+    # Unknown or local: no persistence
+    echo ""
+    ;;
+  esac
+}
+
+# Purpose: Add a path to CI persistence file for future steps/jobs
+# Params: $1 - Path to add
+_persist_path_to_ci() {
+  local _path_to_add="${1:-}"
+  [ -z "${_path_to_add:-}" ] && return 0
+
+  local _ci_path_file
+  _ci_path_file=$(_get_ci_path_file)
+  [ -z "${_ci_path_file:-}" ] && return 0
+
+  # Idempotent: Don't add if already present
+  if [ -f "${_ci_path_file:-}" ] && grep -qxF "${_path_to_add:-}" "${_ci_path_file:-}" 2>/dev/null; then
+    return 0
+  fi
+
+  echo "${_path_to_add:-}" >>"${_ci_path_file:-}"
+  log_debug "Persisted path to CI: ${_path_to_add:-}"
+}
+
+# Purpose: Read CI persistence file and sync paths to current shell
+_sync_ci_paths_to_shell() {
+  local _ci_path_file
+  _ci_path_file=$(_get_ci_path_file)
+
+  [ -z "${_ci_path_file:-}" ] && return 0
+  [ ! -f "${_ci_path_file:-}" ] && return 0
+
+  log_debug "Reading CI path cache and syncing to current shell: ${_ci_path_file:-}"
+
   while IFS= read -r _ci_path || [ -n "${_ci_path:-}" ]; do
     [ -z "${_ci_path:-}" ] && continue
     _ci_path=$(echo "${_ci_path:-}" | tr -d '\r\n' | sed 's/[[:space:]]*$//')
     [ -z "${_ci_path:-}" ] && continue
+
     case ":${PATH:-}:" in
     *":${_ci_path:-}:"*) ;;
     *)
       export PATH="${_ci_path:-}:${PATH:-}"
-      log_debug "Added to PATH from GITHUB_PATH: ${_ci_path:-}"
+      log_debug "Added to PATH from CI cache: ${_ci_path:-}"
       ;;
     esac
-  done <"${GITHUB_PATH:-}"
-  export _G_GITHUB_PATH_READ=true
+  done <"${_ci_path_file:-}"
+}
+
+# Step 1: Read existing CI path cache and sync to current shell
+# This ensures tools installed by previous steps are available in current shell
+if is_ci_env && [ -z "${_G_CI_PATH_READ:-}" ]; then
+  _sync_ci_paths_to_shell
+  export _G_CI_PATH_READ=true
 fi
 
-# Step 2: Write mise paths to GITHUB_PATH for future steps
-if [ "${GITHUB_ACTIONS:-}" = "true" ] && [ -n "${GITHUB_PATH:-}" ] && [ -z "${_G_GITHUB_PATH_SYNCED:-}" ]; then
-  # Proactively add mise paths to GITHUB_PATH using absolute references.
-  # Note: GitHub Actions expects the runner's native path format.
+# Step 2: Write mise paths to CI cache for future steps
+if is_ci_env && [ -z "${_G_CI_PATH_SYNCED:-}" ]; then
+  # Proactively add mise paths to CI persistence
   _M_BIN_CI="${_G_MISE_BIN_BASE:-}"
   _M_SHIMS_CI="${_G_MISE_SHIMS_BASE:-}"
 
@@ -2003,17 +2008,15 @@ if [ "${GITHUB_ACTIONS:-}" = "true" ] && [ -n "${GITHUB_PATH:-}" ] && [ -z "${_G
     _M_SHIMS_CI=$(cygpath -w "${_M_SHIMS_CI:-}")
   fi
 
-  # Always ensure these are in GITHUB_PATH if they exist, regardless of session PATH
+  # Always ensure these are in CI cache if they exist
   if [ -d "$_G_MISE_BIN_BASE" ]; then
-    echo "${_M_BIN_CI:-}" >>"${GITHUB_PATH:-}"
-    # shellcheck disable=SC2119
-    log_debug "Persisted mise bin to GITHUB_PATH: $_M_BIN_CI"
+    _persist_path_to_ci "${_M_BIN_CI:-}"
+    log_debug "Persisted mise bin to CI: $_M_BIN_CI"
   fi
   if [ -d "$_G_MISE_SHIMS_BASE" ]; then
-    echo "${_M_SHIMS_CI:-}" >>"${GITHUB_PATH:-}"
-    # shellcheck disable=SC2119
-    log_debug "Persisted mise shims to GITHUB_PATH: $_M_SHIMS_CI"
+    _persist_path_to_ci "${_M_SHIMS_CI:-}"
+    log_debug "Persisted mise shims to CI: $_M_SHIMS_CI"
   fi
 
-  export _G_GITHUB_PATH_SYNCED=true
+  export _G_CI_PATH_SYNCED=true
 fi
