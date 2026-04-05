@@ -269,8 +269,14 @@ _mise_activate_bash() {
   local _MISE_BIN
   _MISE_BIN=$(command -v mise 2>/dev/null || echo "$HOME/.local/bin/mise")
   # shellcheck disable=SC2016
-  if ! grep -q "mise activate bash" "${_RC:-}"; then
+  # Check for any existing mise activate line (with or without full path)
+  if ! grep -qE '(mise|\.local/bin/mise) activate bash' "${_RC:-}"; then
+    echo '' >>"${_RC:-}"
+    echo '# mise activation (added by snowdreamtech/ai-ide-template setup)' >>"${_RC:-}"
     echo "eval \"\$(${_MISE_BIN} activate bash)\"" >>"${_RC:-}"
+    log_debug "Added mise activation to ${_RC:-}"
+  else
+    log_debug "mise activation already present in ${_RC:-}"
   fi
 }
 
@@ -280,8 +286,14 @@ _mise_activate_zsh() {
   local _MISE_BIN
   _MISE_BIN=$(command -v mise 2>/dev/null || echo "$HOME/.local/bin/mise")
   # shellcheck disable=SC2016
-  if ! grep -q "mise activate zsh" "${_RC:-}"; then
+  # Check for any existing mise activate line (with or without full path)
+  if ! grep -qE '(mise|\.local/bin/mise) activate zsh' "${_RC:-}"; then
+    echo '' >>"${_RC:-}"
+    echo '# mise activation (added by snowdreamtech/ai-ide-template setup)' >>"${_RC:-}"
     echo "eval \"\$(${_MISE_BIN} activate zsh)\"" >>"${_RC:-}"
+    log_debug "Added mise activation to ${_RC:-}"
+  else
+    log_debug "mise activation already present in ${_RC:-}"
   fi
 }
 
@@ -290,8 +302,14 @@ _mise_activate_fish() {
   mkdir -p "$(dirname "${_RC:-}")"
   local _MISE_BIN
   _MISE_BIN=$(command -v mise 2>/dev/null || echo "$HOME/.local/bin/mise")
-  if ! grep -q "mise activate fish" "${_RC:-}"; then
+  # Check for any existing mise activate line
+  if ! grep -qE '(mise|\.local/bin/mise) activate fish' "${_RC:-}"; then
+    echo '' >>"${_RC:-}"
+    echo '# mise activation (added by snowdreamtech/ai-ide-template setup)' >>"${_RC:-}"
     echo "${_MISE_BIN} activate fish | source" >>"${_RC:-}"
+    log_debug "Added mise activation to ${_RC:-}"
+  else
+    log_debug "mise activation already present in ${_RC:-}"
   fi
 }
 
@@ -299,7 +317,15 @@ _mise_activate_pwsh() {
   # Powershell profile path varies, we use a common heuristic.
   local _RC="$HOME/Documents/PowerShell/Microsoft.PowerShell_profile.ps1"
   [ -d "$(dirname "${_RC:-}")" ] || mkdir -p "$(dirname "${_RC:-}")"
-  grep -q "mise activate pwsh" "${_RC:-}" 2>/dev/null || echo '(&mise activate pwsh) | Out-String | Invoke-Expression' >>"${_RC:-}"
+  # Check for any existing mise activate line
+  if ! grep -qE '(mise|\.local/bin/mise) activate pwsh' "${_RC:-}" 2>/dev/null; then
+    echo '' >>"${_RC:-}"
+    echo '# mise activation (added by snowdreamtech/ai-ide-template setup)' >>"${_RC:-}"
+    echo '(&mise activate pwsh) | Out-String | Invoke-Expression' >>"${_RC:-}"
+    log_debug "Added mise activation to ${_RC:-}"
+  else
+    log_debug "mise activation already present in ${_RC:-}"
+  fi
 }
 
 _mise_activate_nu() {
@@ -324,14 +350,30 @@ _mise_activate_xonsh() {
   local _RC="$HOME/.config/xonsh/rc.xsh"
   [ -d "$(dirname "${_RC:-}")" ] || mkdir -p "$(dirname "${_RC:-}")"
   # shellcheck disable=SC2016
-  grep -q "mise activate xonsh" "${_RC:-}" 2>/dev/null || echo 'execx($(mise activate xonsh))' >>"${_RC:-}"
+  # Check for any existing mise activate line
+  if ! grep -qE '(mise|\.local/bin/mise) activate xonsh' "${_RC:-}" 2>/dev/null; then
+    echo '' >>"${_RC:-}"
+    echo '# mise activation (added by snowdreamtech/ai-ide-template setup)' >>"${_RC:-}"
+    echo 'execx($(mise activate xonsh))' >>"${_RC:-}"
+    log_debug "Added mise activation to ${_RC:-}"
+  else
+    log_debug "mise activation already present in ${_RC:-}"
+  fi
 }
 
 _mise_activate_elvish() {
   local _RC="$HOME/.config/elvish/rc.elv"
   [ -d "$(dirname "${_RC:-}")" ] || mkdir -p "$(dirname "${_RC:-}")"
   # shellcheck disable=SC2016
-  grep -q "mise activate elvish" "${_RC:-}" 2>/dev/null || echo 'eval (mise activate elvish | slurp)' >>"${_RC:-}"
+  # Check for any existing mise activate line
+  if ! grep -qE '(mise|\.local/bin/mise) activate elvish' "${_RC:-}" 2>/dev/null; then
+    echo '' >>"${_RC:-}"
+    echo '# mise activation (added by snowdreamtech/ai-ide-template setup)' >>"${_RC:-}"
+    echo 'eval (mise activate elvish | slurp)' >>"${_RC:-}"
+    log_debug "Added mise activation to ${_RC:-}"
+  else
+    log_debug "mise activation already present in ${_RC:-}"
+  fi
 }
 
 # Helper to ensure mise is activated in the current session and RC files.
