@@ -157,8 +157,6 @@ install_actionlint() {
   fi
   log_summary "Base" "Actionlint" "${_STAT_ACT:-}" "$(get_version actionlint)" "$(($(date +%s) - _T0_ACT))"
 }
-  log_summary "Base" "Actionlint" "${_STAT_ACT:-}" "$(get_version actionlint)" "$(($(date +%s) - _T0_ACT))"
-}
 
 # Purpose: Sets up Shell environment.
 setup_shell() {
