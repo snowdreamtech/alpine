@@ -10,7 +10,7 @@
 
 # ── 🏗️ Core Runtimes ──────────────────────────────────────────────────────────
 go = "1.26.1"
-node = "25.8.2"
+node = "25.9.0"
 "npm:pnpm" = "10.33.0"
 python = "3.14.3"
 # pipx is managed as a bootstrap tool via pip in scripts/lib/langs/base.sh to ensure cross-platform compatibility.
@@ -35,7 +35,7 @@ python = "3.14.3"
 
 # Formatting & linting (invoked by pre-commit hooks)
 "npm:prettier" = "3.8.1"
-"npm:eslint" = "10.1.0"
+"npm:eslint" = "10.2.0"
 "npm:stylelint" = "17.6.0"
 "npm:markdownlint-cli2" = "0.22.0"
 "npm:sort-package-json" = "3.6.1"

@@ -22,7 +22,7 @@ set -eu
 # ── 🏗️ Tier 1: Core Runtimes (Mirror of .mise.toml) ──────────────────────────
 # shellcheck disable=SC2034
 VER_GO="1.26.1"
-VER_NODE="25.8.2"
+VER_NODE="25.9.0"
 VER_PNPM="10.33.0"
 VER_PNPM_PROVIDER="npm:pnpm"
 VER_PYTHON="3.14.3"
@@ -33,7 +33,7 @@ VER_PIPX_PROVIDER="pip"
 VER_KOTLIN="2.3.20"
 VER_RUST="1.94.1"
 VER_BUN="1.3.11"
-VER_DENO="2.7.9"
+VER_DENO="2.7.11"
 VER_ZIG="0.15.2"
 VER_JAVA="26.0.0"
 VER_DOTNET="10.0.201"
@@ -64,7 +64,7 @@ VER_BALLERINA_PROVIDER="github:ballerina-platform/ballerina-distribution"
 VER_STYLUA="2.4.0"
 VER_STYLUA_PROVIDER="github:JohnnyMorganz/StyLua"
 
-VER_JUST="1.48.1"
+VER_JUST="1.49.0"
 VER_JUST_PROVIDER="github:casey/just"
 
 VER_TASK="3.49.1"
@@ -75,13 +75,13 @@ VER_DUCKDB="1.5.0"
 # NOTE: Lychee version removed — link checking delegated to lycheeverse/lychee-action in CI.
 
 # Additional language runtimes requiring GitHub providers
-VER_LEAN="4.20.0"
+VER_LEAN="4.29.0"
 VER_LEAN_PROVIDER="github:leanprover/lean4"
 
 VER_NIM="2.4.0"
 VER_NIM_PROVIDER="github:nim-lang/Nim"
 
-VER_RACKET="8.18"
+VER_RACKET="9.1"
 VER_RACKET_PROVIDER="github:racket/racket"
 
 VER_VALA="0.58.0"
@@ -136,7 +136,7 @@ VER_PRE_COMMIT_PROVIDER="pipx:pre-commit"
 VER_ACTIONLINT="1.7.12"
 VER_ACTIONLINT_PROVIDER="github:rhysd/actionlint"
 # Use actionlint-py for pipx fallback if needed
-VER_ACTIONLINT_PY="1.7.11.24"
+VER_ACTIONLINT_PY="1.7.12.24"
 VER_ACTIONLINT_PY_PROVIDER="pipx:actionlint-py"
 
 # ── 🎨 Language Tooling (Linters/Formatters) ─────────────────────────────────
@@ -159,13 +159,13 @@ VER_STYLELINT_PROVIDER="npm:stylelint"
 VER_STYLELINT_CONFIG="40.0.0"
 VER_STYLELINT_CONFIG_PROVIDER="npm:stylelint-config-standard"
 
-VER_ASSEMBLYSCRIPT="0.28.12"
+VER_ASSEMBLYSCRIPT="0.28.13"
 VER_ASSEMBLYSCRIPT_PROVIDER="npm:assemblyscript"
 
 VER_OPA="1.15.1"
 VER_OPA_PROVIDER="github:open-policy-agent/opa"
 
-VER_BUF="1.66.1"
+VER_BUF="1.67.0"
 VER_BUF_PROVIDER="github:bufbuild/buf"
 
 VER_CUE="0.16.0"
@@ -179,7 +179,7 @@ VER_GOLANGCI_LINT="1.64.5"
 VER_VITEPRESS="1.6.4"
 VER_VITEPRESS_PROVIDER="npm:vitepress"
 
-VER_ESLINT="10.1.0"
+VER_ESLINT="10.2.0"
 VER_ESLINT_PROVIDER="npm:eslint"
 
 VER_MARKDOWNLINT="0.22.0"
@@ -238,18 +238,18 @@ VER_TERRAFORM="1.11.0"
 VER_TERRAGRUNT="1.0.0-rc3"
 VER_TOFU="1.11.5"
 VER_TOFU_PROVIDER="github:opentofu/opentofu"
-VER_PULUMI="3.228.0"
+VER_PULUMI="3.229.0"
 VER_PULUMI_PROVIDER="github:pulumi/pulumi"
 VER_KUBE_LINTER="0.8.3"
 VER_KUBE_LINTER_PROVIDER="github:stackrox/kube-linter"
 VER_TFLINT="0.61.0"
 VER_TFLINT_PROVIDER="github:terraform-linters/tflint"
-VER_ANSIBLE_LINT="26.3.0"
+VER_ANSIBLE_LINT="26.4.0"
 VER_ANSIBLE_LINT_PROVIDER="pipx:ansible-lint"
 VER_SPECTRAL="6.15.0"
 VER_SPECTRAL_PROVIDER="npm:@stoplight/spectral-cli"
 
-VER_GORELEASER="2.15.1"
+VER_GORELEASER="2.15.2"
 VER_GORELEASER_PROVIDER="github:goreleaser/goreleaser"
 
 # ── 📖 Documentation ──────────────────────────────────────────────────────────
