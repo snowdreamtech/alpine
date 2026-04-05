@@ -47,7 +47,7 @@ python = "3.14.3"
 "github:dotenv-linter/dotenv-linter" = "4.0.0"
 
 # Python tools (pre-commit hooks)
-"github:astral-sh/ruff" = "0.15.8"
+"github:astral-sh/ruff" = "0.15.9"
 "pipx:clang-format" = "22.1.2"
 
 # Shell & scripting linters (pre-commit hooks)
