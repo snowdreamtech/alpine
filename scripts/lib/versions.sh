@@ -221,12 +221,14 @@ VER_OSV_SCANNER_PROVIDER="go:github.com/google/osv-scanner/v2/cmd/osv-scanner"
 VER_GOVULNCHECK="1.1.4"
 VER_GOVULNCHECK_PROVIDER="go:golang.org/x/vuln/cmd/govulncheck"
 
+# Updated 2026-04-05: Ensure latest versions are installed
 VER_PIP_AUDIT="2.10.0"
 VER_PIP_AUDIT_PROVIDER="pipx:pip-audit"
 
 VER_CARGO_AUDIT="0.22.1"
 VER_CARGO_AUDIT_PROVIDER="cargo:cargo-audit"
 
+# Updated 2026-04-05: Ensure latest versions are installed
 VER_ZIZMOR="1.23.1"
 VER_ZIZMOR_PROVIDER="pipx:zizmor"
 
