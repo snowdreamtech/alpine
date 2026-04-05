@@ -15,6 +15,7 @@ install_shfmt() {
   local _VERSION="${VER_SHFMT:-}"
 
   if ! has_lang_files "" "*.sh *.bash *.bats"; then
+    log_debug "Skipping Shfmt: No shell files detected"
     return 0
   fi
 
@@ -38,8 +39,19 @@ install_shfmt() {
     log_summary "Base" "Shfmt" '⚖️ Previewed' "-" '0'
     return 0
   fi
+
   local _STAT_SHF="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_SHF="❌ Failed"
+  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
+    _STAT_SHF="❌ Failed"
+    log_summary "Base" "Shfmt" "${_STAT_SHF:-}" "-" "$(($(date +%s) - _T0_SHF))"
+    if is_ci_env; then
+      log_error "Failed to install ${_TITLE:-} in CI."
+      return 1
+    else
+      log_warn "Failed to install ${_TITLE:-}. Continuing..."
+      return 0
+    fi
+  fi
   log_summary "Base" "Shfmt" "${_STAT_SHF:-}" "$(get_version shfmt)" "$(($(date +%s) - _T0_SHF))"
 }
 
@@ -53,6 +65,7 @@ install_shellcheck() {
   local _VERSION="${VER_SHELLCHECK:-}"
 
   if ! has_lang_files "" "*.sh *.bash *.bats"; then
+    log_debug "Skipping Shellcheck: No shell files detected"
     return 0
   fi
 
@@ -80,8 +93,19 @@ install_shellcheck() {
     log_summary "Base" "Shellcheck" '⚖️ Previewed' "-" '0'
     return 0
   fi
+
   local _STAT_SHC="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_SHC="❌ Failed"
+  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
+    _STAT_SHC="❌ Failed"
+    log_summary "Base" "Shellcheck" "${_STAT_SHC:-}" "-" "$(($(date +%s) - _T0_SHC))"
+    if is_ci_env; then
+      log_error "Failed to install ${_TITLE:-} in CI."
+      return 1
+    else
+      log_warn "Failed to install ${_TITLE:-}. Continuing..."
+      return 0
+    fi
+  fi
   log_summary "Base" "Shellcheck" "${_STAT_SHC:-}" "$(get_version shellcheck)" "$(($(date +%s) - _T0_SHC))"
 }
 
@@ -94,6 +118,7 @@ install_actionlint() {
   local _PROVIDER="${VER_ACTIONLINT_PROVIDER:-}"
   local _VERSION="${VER_ACTIONLINT:-}"
   if ! has_lang_files ".github/workflows" "*.yml *.yaml"; then
+    log_debug "Skipping Actionlint: No GitHub workflow files detected"
     return 0
   fi
 
@@ -117,8 +142,21 @@ install_actionlint() {
     log_summary "Base" "Actionlint" '⚖️ Previewed' "-" '0'
     return 0
   fi
+
   local _STAT_ACT="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_ACT="❌ Failed"
+  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
+    _STAT_ACT="❌ Failed"
+    log_summary "Base" "Actionlint" "${_STAT_ACT:-}" "-" "$(($(date +%s) - _T0_ACT))"
+    if is_ci_env; then
+      log_error "Failed to install ${_TITLE:-} in CI."
+      return 1
+    else
+      log_warn "Failed to install ${_TITLE:-}. Continuing..."
+      return 0
+    fi
+  fi
+  log_summary "Base" "Actionlint" "${_STAT_ACT:-}" "$(get_version actionlint)" "$(($(date +%s) - _T0_ACT))"
+}
   log_summary "Base" "Actionlint" "${_STAT_ACT:-}" "$(get_version actionlint)" "$(($(date +%s) - _T0_ACT))"
 }
 
