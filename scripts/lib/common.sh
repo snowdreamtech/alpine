@@ -1948,6 +1948,7 @@ _get_ci_path_file() {
 
 # Purpose: Add a path to CI persistence file for future steps/jobs
 # Params: $1 - Path to add
+# Security: Only stores directory paths (no credentials/secrets)
 _persist_path_to_ci() {
   local _path_to_add="${1:-}"
   [ -z "${_path_to_add:-}" ] && return 0
@@ -1956,9 +1957,24 @@ _persist_path_to_ci() {
   _ci_path_file=$(_get_ci_path_file)
   [ -z "${_ci_path_file:-}" ] && return 0
 
+  # Security: Validate input is a path (no special characters that could inject commands)
+  case "${_path_to_add:-}" in
+  *\$* | *\`* | *\;* | *\|* | *\&*)
+    log_warn "Security: Rejected suspicious path containing special characters: ${_path_to_add:-}"
+    return 1
+    ;;
+  esac
+
   # Idempotent: Don't add if already present
   if [ -f "${_ci_path_file:-}" ] && grep -qxF "${_path_to_add:-}" "${_ci_path_file:-}" 2>/dev/null; then
     return 0
+  fi
+
+  # Security: Set restrictive permissions on first write (owner read/write only)
+  if [ ! -f "${_ci_path_file:-}" ]; then
+    touch "${_ci_path_file:-}"
+    chmod 600 "${_ci_path_file:-}" 2>/dev/null || true
+    log_debug "Created CI path cache with restrictive permissions: ${_ci_path_file:-}"
   fi
 
   echo "${_path_to_add:-}" >>"${_ci_path_file:-}"
