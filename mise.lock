@@ -248,6 +248,51 @@ checksum = "sha256:fe4f4a54daa4a750ffa7d1b0da471d077ac24f09d04d7c1f307e7b7950969
 url = "https://github.com/google/addlicense/releases/download/v1.2.0/addlicense_v1.2.0_Windows_x86_64.zip"
 url_api = "https://api.github.com/repos/google/addlicense/releases/assets/282300418"
 
+[[tools."github:google/osv-scanner"]]
+version = "2.3.5"
+backend = "github:google/osv-scanner"
+
+[tools."github:google/osv-scanner"."platforms.linux-arm64"]
+checksum = "sha256:fa46ad2b3954db5d5335303d45de921613393285d9a93c140b63b40e35e9ce50"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_linux_arm64"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248755"
+provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.linux-arm64-musl"]
+checksum = "sha256:fa46ad2b3954db5d5335303d45de921613393285d9a93c140b63b40e35e9ce50"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_linux_arm64"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248755"
+provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.linux-x64"]
+checksum = "sha256:bb30c580afe5e757d3e959f4afd08a4795ea505ef84c46962b9a738aa573b41b"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_linux_amd64"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248788"
+
+[tools."github:google/osv-scanner"."platforms.linux-x64-musl"]
+checksum = "sha256:bb30c580afe5e757d3e959f4afd08a4795ea505ef84c46962b9a738aa573b41b"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_linux_amd64"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248788"
+provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.macos-arm64"]
+checksum = "sha256:b740efe0b08fb817865e818a498997d5f042f14b8eeafb6393176ce84dd09cf6"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_darwin_arm64"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248752"
+provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.macos-x64"]
+checksum = "sha256:3b1c72d59dcbad99fa4eb2c72bf2e82017f83e0268340e4b00af76a1fea32c85"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_darwin_amd64"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248790"
+provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.windows-x64"]
+checksum = "sha256:b165d33c08bda663119a459f5187e096d2525f888503495f5f34925741e981a2"
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_windows_amd64.exe"
+url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248754"
+provenance = "slsa"
+
 [[tools."github:hadolint/hadolint"]]
 version = "2.14.0"
 backend = "github:hadolint/hadolint"
@@ -448,6 +493,52 @@ provenance = "github-attestations"
 checksum = "sha256:6e7241b51e6817ea6a047693d8e6fed13b31819c9a0dd6c5a726e1592d22f6e9"
 url = "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_windows_amd64.zip"
 url_api = "https://api.github.com/repos/rhysd/actionlint/releases/assets/384924919"
+provenance = "github-attestations"
+
+[[tools."github:woodruffw/zizmor"]]
+version = "1.23.1"
+backend = "github:woodruffw/zizmor"
+
+[tools."github:woodruffw/zizmor"."platforms.linux-arm64"]
+checksum = "sha256:3725d7cd7102e4d70827186389f7d5930b6878232930d0a3eb058d7e5b47e658"
+url = "https://github.com/zizmorcore/zizmor/releases/download/v1.23.1/zizmor-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/369532190"
+provenance = "github-attestations"
+
+[tools."github:woodruffw/zizmor"."platforms.linux-arm64-musl"]
+checksum = "sha256:3725d7cd7102e4d70827186389f7d5930b6878232930d0a3eb058d7e5b47e658"
+url = "https://github.com/zizmorcore/zizmor/releases/download/v1.23.1/zizmor-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/369532190"
+provenance = "github-attestations"
+
+[tools."github:woodruffw/zizmor"."platforms.linux-x64"]
+checksum = "sha256:67a8df0a14352dd81882e14876653d097b99b0f4f6b6fe798edc0320cff27aff"
+url = "https://github.com/zizmorcore/zizmor/releases/download/v1.23.1/zizmor-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/369532192"
+provenance = "github-attestations"
+
+[tools."github:woodruffw/zizmor"."platforms.linux-x64-musl"]
+checksum = "sha256:67a8df0a14352dd81882e14876653d097b99b0f4f6b6fe798edc0320cff27aff"
+url = "https://github.com/zizmorcore/zizmor/releases/download/v1.23.1/zizmor-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/369532192"
+provenance = "github-attestations"
+
+[tools."github:woodruffw/zizmor"."platforms.macos-arm64"]
+checksum = "sha256:2632561b974c69f952258c1ab4b7432d5c7f92e555704155c3ac28a2910bd717"
+url = "https://github.com/zizmorcore/zizmor/releases/download/v1.23.1/zizmor-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/369532191"
+provenance = "github-attestations"
+
+[tools."github:woodruffw/zizmor"."platforms.macos-x64"]
+checksum = "sha256:89d5ed42081dd9d0433a10b7545fac42b35f1f030885c278b9712b32c66f2597"
+url = "https://github.com/zizmorcore/zizmor/releases/download/v1.23.1/zizmor-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/369532186"
+provenance = "github-attestations"
+
+[tools."github:woodruffw/zizmor"."platforms.windows-x64"]
+checksum = "sha256:33c2293ff02834720dd7cd8b47348aafb2e95a19bdc993c0ecaca9c804ade92a"
+url = "https://github.com/zizmorcore/zizmor/releases/download/v1.23.1/zizmor-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/369532189"
 provenance = "github-attestations"
 
 [[tools.go]]
