@@ -216,7 +216,7 @@ VER_TRIVY="0.69.3"
 VER_TRIVY_PROVIDER="github:aquasecurity/trivy"
 
 VER_OSV_SCANNER="2.3.5"
-VER_OSV_SCANNER_PROVIDER="go:github.com/google/osv-scanner/v2/cmd/osv-scanner"
+VER_OSV_SCANNER_PROVIDER="github:google/osv-scanner"
 
 VER_GOVULNCHECK="1.1.4"
 VER_GOVULNCHECK_PROVIDER="go:golang.org/x/vuln/cmd/govulncheck"
@@ -230,7 +230,7 @@ VER_CARGO_AUDIT_PROVIDER="cargo:cargo-audit"
 
 # Updated 2026-04-05: Ensure latest versions are installed
 VER_ZIZMOR="1.23.1"
-VER_ZIZMOR_PROVIDER="pipx:zizmor"
+VER_ZIZMOR_PROVIDER="github:woodruffw/zizmor"
 
 # ── ☁️ DevOps & Infrastructure ────────────────────────────────────────────────
 VER_HELM="3.17.1"

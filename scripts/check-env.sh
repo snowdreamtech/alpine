@@ -682,26 +682,26 @@ main() {
 
   # 7. Group: Security & Quality Tools
   log_info "── Security & Quality Tools ──"
-  check_tool_version "Gitleaks" "gitleaks" "$(get_mise_tool_version gitleaks)" "gitleaks version" 0 0
+  check_tool_version "Gitleaks" "gitleaks" "$(get_mise_tool_version "github:gitleaks/gitleaks")" "gitleaks version" 0 0
   # Universal security scanners - Critical in CI (must be present)
-  check_tool_version "OSV-scanner" "osv-scanner" "$(get_mise_tool_version osv-scanner)" "osv-scanner --version" 1 1 "osv-scanner" "OSV_FORCE_INSTALL"
+  check_tool_version "OSV-scanner" "osv-scanner" "$(get_mise_tool_version "github:google/osv-scanner")" "osv-scanner --version" 1 1 "osv-scanner" "OSV_FORCE_INSTALL"
   # NOTE: Trivy version check removed — scanning delegated to aquasecurity/trivy-action.
-  check_tool_version "Zizmor" "zizmor" "$(get_mise_tool_version zizmor)" "zizmor --version" 1 1 "zizmor" "ZIZMOR_FORCE_INSTALL"
+  check_tool_version "Zizmor" "zizmor" "$(get_mise_tool_version "github:woodruffw/zizmor")" "zizmor --version" 1 1 "zizmor" "ZIZMOR_FORCE_INSTALL"
 
   log_info "── Lint & Quality Tools ──"
-  check_tool_version "Shfmt" "shfmt" "$(get_mise_tool_version "shfmt")" "shfmt --version" 0 0 "shfmt"
-  check_tool_version "Shellcheck" "shellcheck" "$(get_mise_tool_version "shellcheck")" "shellcheck --version" 0 0 "shellcheck"
-  check_tool_version "Actionlint" "actionlint" "$(get_mise_tool_version "actionlint")" "actionlint --version" 0 0 "actionlint"
+  check_tool_version "Shfmt" "shfmt" "$(get_mise_tool_version "github:mvdan/sh")" "shfmt --version" 0 0 "shfmt"
+  check_tool_version "Shellcheck" "shellcheck" "$(get_mise_tool_version "github:koalaman/shellcheck")" "shellcheck --version" 0 0 "shellcheck"
+  check_tool_version "Actionlint" "actionlint" "$(get_mise_tool_version "github:rhysd/actionlint")" "actionlint --version" 0 0 "actionlint"
 
   if [ -f "Dockerfile" ] || [ -f "docker-compose.yml" ]; then
-    check_tool_version "Hadolint" "hadolint" "$(get_mise_tool_version hadolint)" "hadolint --version" 0 0
+    check_tool_version "Hadolint" "hadolint" "$(get_mise_tool_version "github:hadolint/hadolint")" "hadolint --version" 0 0
   fi
   if has_lang_files "go.mod" "*.go"; then
     check_tool_version "golangci-lint" "golangci-lint" "$(get_mise_tool_version golangci-lint)" "golangci-lint --version" 0 0
     check_tool_version "Govulncheck" "govulncheck" "latest" "govulncheck ./..." 0 1 "govulncheck" "GOVULN_FORCE_INSTALL"
   fi
   if has_lang_files "Makefile" "*.make"; then
-    check_tool_version "Checkmake" "checkmake" "$(get_mise_tool_version checkmake)" "checkmake --version" 0 0
+    check_tool_version "Checkmake" "checkmake" "$(get_mise_tool_version "github:mrtazz/checkmake")" "checkmake --version" 0 0
   fi
   if has_lang_files "Cargo.toml" "*.rs"; then
     check_tool_version "Cargo-audit" "cargo-audit" "latest" "cargo-audit --version" 0 1 "cargo-audit" "CA_FORCE_INSTALL"

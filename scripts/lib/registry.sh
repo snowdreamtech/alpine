@@ -164,9 +164,9 @@ setup_registry_kube_linter() { register_mise_tool "Kube-Linter" "${VER_KUBE_LINT
 setup_registry_spectral() { register_mise_tool "Spectral" "${VER_SPECTRAL_PROVIDER:-npm:@stoplight/spectral-cli}" "${VER_SPECTRAL:-latest}"; }
 setup_registry_buf() { register_mise_tool "Buf" "${VER_BUF_PROVIDER:-github:bufbuild/buf}" "${VER_BUF:-latest}"; }
 # NOTE: setup_registry_trivy() removed — scanning delegated to aquasecurity/trivy-action.
-setup_registry_osv_scanner() { register_mise_tool "OSV-Scanner" "${VER_OSV_SCANNER_PROVIDER:-go:github.com/google/osv-scanner/v2/cmd/osv-scanner}" "${VER_OSV_SCANNER:-latest}"; }
+setup_registry_osv_scanner() { register_mise_tool "OSV-Scanner" "${VER_OSV_SCANNER_PROVIDER:-github:google/osv-scanner}" "${VER_OSV_SCANNER:-latest}"; }
 setup_registry_cargo_audit() { register_mise_tool "Cargo-Audit" "${VER_CARGO_AUDIT_PROVIDER:-cargo:cargo-audit}" "${VER_CARGO_AUDIT:-latest}"; }
-setup_registry_zizmor() { register_mise_tool "Zizmor" "${VER_ZIZMOR_PROVIDER:-pipx:zizmor}" "${VER_ZIZMOR:-latest}"; }
+setup_registry_zizmor() { register_mise_tool "Zizmor" "${VER_ZIZMOR_PROVIDER:-github:woodruffw/zizmor}" "${VER_ZIZMOR:-latest}"; }
 setup_registry_tflint() { register_mise_tool "TFLint" "${VER_TFLINT_PROVIDER:-github:terraform-linters/tflint}" "${VER_TFLINT:-latest}"; }
 setup_registry_tofu() { register_mise_tool "OpenTofu" "${VER_TOFU_PROVIDER:-github:opentofu/opentofu}" "${VER_TOFU:-latest}"; }
 setup_registry_just() { register_mise_tool "Just" "${VER_JUST_PROVIDER:-github:casey/just}" "${VER_JUST:-latest}"; }
