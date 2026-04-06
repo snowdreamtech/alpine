@@ -21,7 +21,7 @@
 | ------- | ------- | ----------------------------------------------------------------------- | --------- |
 | BATS    | 1.13.0  | `/Users/snowdream/.local/share/mise/installs/npm-bats/1.13.0/bin/bats`  | ✅ 已安装 |
 | Node.js | v25.8.2 | `/Users/snowdream/.local/share/mise/installs/node/25.8.2/bin/node`      | ✅ 已安装 |
-| Python  | 3.14.3  | `/Users/snowdream/.local/share/mise/installs/python/3.14.3/bin/python3` | ✅ 已安装 |
+| Python  | 3.14.2  | `/Users/snowdream/.local/share/mise/installs/python/3.14.2/bin/python3` | ✅ 已安装 |
 
 #### 可选工具（已安装）
 

@@ -12,7 +12,7 @@
 go = "1.26.1"
 node = "25.9.0"
 "npm:pnpm" = "10.33.0"
-python = "3.14.3"
+python = "3.13.12"
 # pipx is managed as a bootstrap tool via pip in scripts/lib/langs/base.sh to ensure cross-platform compatibility.
 # pipx = "1.11.0"
 
