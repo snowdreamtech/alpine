@@ -183,33 +183,6 @@ if [ -z "${_G_PROJECT_ROOT:-}" ]; then
   export _G_PROJECT_ROOT
 fi
 
-# ── 🛡️ Execution Guard (Recursion Prevention) ──────────────────────────────────
-# Prevents infinite process recursion if mise, python or other tools are
-# misconfigured to trigger another 'make setup' or 'sh scripts/setup.sh'.
-_RECURSION_LOCK_FILE="${_G_PROJECT_ROOT:-.}/.setup_recursion"
-_RECURSION_LEVEL=0
-if [ -f "${_RECURSION_LOCK_FILE:-}" ]; then
-  _RECURSION_LEVEL=$(cat "${_RECURSION_LOCK_FILE:-}" 2>/dev/null || echo "0")
-fi
-if [ "${_RECURSION_LEVEL:-0}" -gt 2 ]; then
-  # We allow one level of nesting (e.g., make -> setup.sh) but no more.
-  # If you see this error, check for recursive calls in your toolchain config.
-  printf "[FATAL] Infinite recursion detected in setup scripts (Level: %s). Aborting.\n" "${_RECURSION_LEVEL:-}" >&2
-  # Do NOT delete the lockfile here; we want the user to know it failed.
-  exit 1
-fi
-printf "[DEBUG] Recursion Level: %s -> %s (PID: %s, PPID: %s)\n" "${_RECURSION_LEVEL:-0}" "$((${_RECURSION_LEVEL:-0} + 1))" "$$" "$PPID" >&2
-echo $((${_RECURSION_LEVEL:-0} + 1)) >"${_RECURSION_LOCK_FILE:-}"
-
-# Export cleanup function (to be called by trap or explicitly)
-_cleanup_recursion_lock() {
-  rm -f "${_G_PROJECT_ROOT:-}/.setup_recursion" 2>/dev/null || true
-}
-
-# Automatic cleanup on script exit (works for most cases)
-# Individual scripts can override this with their own trap if needed
-trap '_cleanup_recursion_lock' EXIT
-
 # ── 📄 SSoT Version Registry ────────────────────────────────────────────────
 # Load the centralized version registry to provide a Single Source of Truth
 # for all Tier 2 and optional tools across the entire toolchain.

@@ -706,4 +706,3 @@ test-results/
 *.7z
 # docs/package.json
 .setup.lock
-.setup_recursion
