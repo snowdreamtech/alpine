@@ -166,7 +166,7 @@ setup_registry_buf() { register_mise_tool "Buf" "${VER_BUF_PROVIDER:-github:bufb
 # NOTE: setup_registry_trivy() removed — scanning delegated to aquasecurity/trivy-action.
 setup_registry_osv_scanner() { register_mise_tool "OSV-Scanner" "${VER_OSV_SCANNER_PROVIDER:-github:google/osv-scanner}" "${VER_OSV_SCANNER:-latest}"; }
 setup_registry_cargo_audit() { register_mise_tool "Cargo-Audit" "${VER_CARGO_AUDIT_PROVIDER:-cargo:cargo-audit}" "${VER_CARGO_AUDIT:-latest}"; }
-setup_registry_zizmor() { register_mise_tool "Zizmor" "${VER_ZIZMOR_PROVIDER:-github:woodruffw/zizmor}" "${VER_ZIZMOR:-latest}"; }
+setup_registry_zizmor() { register_mise_tool "Zizmor" "${VER_ZIZMOR_PROVIDER:-github:zizmorcore/zizmor}" "${VER_ZIZMOR:-latest}"; }
 setup_registry_tflint() { register_mise_tool "TFLint" "${VER_TFLINT_PROVIDER:-github:terraform-linters/tflint}" "${VER_TFLINT:-latest}"; }
 setup_registry_tofu() { register_mise_tool "OpenTofu" "${VER_TOFU_PROVIDER:-github:opentofu/opentofu}" "${VER_TOFU:-latest}"; }
 setup_registry_just() { register_mise_tool "Just" "${VER_JUST_PROVIDER:-github:casey/just}" "${VER_JUST:-latest}"; }

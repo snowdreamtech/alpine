@@ -687,7 +687,7 @@ main() {
   # (1, 1) = Critical in CI (fail if missing), skip locally with info message
   check_tool_version "OSV-scanner" "osv-scanner" "$(get_mise_tool_version "github:google/osv-scanner")" "osv-scanner --version" 1 1 "github:google/osv-scanner" "OSV_FORCE_INSTALL"
   # NOTE: Trivy version check removed — scanning delegated to aquasecurity/trivy-action.
-  check_tool_version "Zizmor" "zizmor" "$(get_mise_tool_version "github:woodruffw/zizmor")" "zizmor --version" 1 1 "github:woodruffw/zizmor" "ZIZMOR_FORCE_INSTALL"
+  check_tool_version "Zizmor" "zizmor" "$(get_mise_tool_version "github:zizmorcore/zizmor")" "zizmor --version" 1 1 "github:zizmorcore/zizmor" "ZIZMOR_FORCE_INSTALL"
 
   log_info "── Lint & Quality Tools ──"
   check_tool_version "Shfmt" "shfmt" "$(get_mise_tool_version "github:mvdan/sh")" "shfmt --version" 0 0 "github:mvdan/sh"
