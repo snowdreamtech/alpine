@@ -682,8 +682,9 @@ main() {
 
   # 7. Group: Security & Quality Tools
   log_info "── Security & Quality Tools ──"
-  check_tool_version "Gitleaks" "gitleaks" "$(get_mise_tool_version "github:gitleaks/gitleaks")" "gitleaks version" 0 0
-  # Universal security scanners - Critical in CI (must be present)
+  check_tool_version "Gitleaks" "gitleaks" "$(get_mise_tool_version "github:gitleaks/gitleaks")" "gitleaks version" 0 0 "gitleaks"
+  # Universal security scanners - Critical in CI, optional locally
+  # (1, 1) = Critical in CI (fail if missing), skip locally with info message
   check_tool_version "OSV-scanner" "osv-scanner" "$(get_mise_tool_version "github:google/osv-scanner")" "osv-scanner --version" 1 1 "osv-scanner" "OSV_FORCE_INSTALL"
   # NOTE: Trivy version check removed — scanning delegated to aquasecurity/trivy-action.
   check_tool_version "Zizmor" "zizmor" "$(get_mise_tool_version "github:woodruffw/zizmor")" "zizmor --version" 1 1 "zizmor" "ZIZMOR_FORCE_INSTALL"
