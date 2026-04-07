@@ -221,7 +221,23 @@ test_bin_resolver_module() {
   export _G_VENV_BIN="bin"
   _G_OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
   export _G_OS
-  export _G_MISE_SHIMS_BASE="${HOME}/.local/share/mise/shims"
+
+  # Set mise paths based on OS (minimal environment for testing)
+  case "$(uname -s)" in
+    Darwin)
+      if [ -d "$HOME/Library/Application Support/mise/shims" ]; then
+        export _G_MISE_SHIMS_BASE="$HOME/Library/Application Support/mise/shims"
+      else
+        export _G_MISE_SHIMS_BASE="$HOME/.local/share/mise/shims"
+      fi
+      ;;
+    MINGW*|MSYS*|CYGWIN*)
+      export _G_MISE_SHIMS_BASE="$HOME/.local/share/mise/shims"
+      ;;
+    *)
+      export _G_MISE_SHIMS_BASE="$HOME/.local/share/mise/shims"
+      ;;
+  esac
 
   # Source timeout module first (dependency)
   # shellcheck source=./lib/timeout.sh

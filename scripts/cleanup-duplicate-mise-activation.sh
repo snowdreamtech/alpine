@@ -57,8 +57,20 @@ cleanup_rc_file() {
   grep -vE '(mise|\.local/bin/mise) activate|# mise activation' "${_file:-}" >"${_file:-}.tmp" || true
 
   # Add back a single mise activation line at the end
+  # Try to detect mise binary location, fallback to standard location
   local _mise_bin
-  _mise_bin=$(command -v mise 2>/dev/null || echo "$HOME/.local/bin/mise")
+  if command -v mise >/dev/null 2>&1; then
+    _mise_bin=$(command -v mise)
+  else
+    # Fallback: try common locations
+    if [ -f "$HOME/.local/bin/mise" ]; then
+      _mise_bin="$HOME/.local/bin/mise"
+    elif [ -f "$HOME/Library/Application Support/mise/bin/mise" ]; then
+      _mise_bin="$HOME/Library/Application Support/mise/bin/mise"
+    else
+      _mise_bin="mise"  # Hope it's in PATH
+    fi
+  fi
 
   {
     cat "${_file:-}.tmp"
