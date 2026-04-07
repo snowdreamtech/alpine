@@ -415,43 +415,8 @@ url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake
 url_api = "https://api.github.com/repos/checkmake/checkmake/releases/assets/338779103"
 
 [[tools."github:mvdan/sh"]]
-version = "3.13.0"
+version = "3.13.1"
 backend = "github:mvdan/sh"
-
-[tools."github:mvdan/sh"."platforms.linux-arm64"]
-checksum = "sha256:2091a31afd47742051a77bf7cfd175533ab07e924c20ef3151cd108fa1cab5b0"
-url = "https://github.com/mvdan/sh/releases/download/v3.13.0/shfmt_v3.13.0_linux_arm64"
-url_api = "https://api.github.com/repos/mvdan/sh/releases/assets/370019372"
-
-[tools."github:mvdan/sh"."platforms.linux-arm64-musl"]
-checksum = "sha256:2091a31afd47742051a77bf7cfd175533ab07e924c20ef3151cd108fa1cab5b0"
-url = "https://github.com/mvdan/sh/releases/download/v3.13.0/shfmt_v3.13.0_linux_arm64"
-url_api = "https://api.github.com/repos/mvdan/sh/releases/assets/370019372"
-
-[tools."github:mvdan/sh"."platforms.linux-x64"]
-checksum = "sha256:70aa99784703a8d6569bbf0b1e43e1a91906a4166bf1a79de42050a6d0de7551"
-url = "https://github.com/mvdan/sh/releases/download/v3.13.0/shfmt_v3.13.0_linux_amd64"
-url_api = "https://api.github.com/repos/mvdan/sh/releases/assets/370019380"
-
-[tools."github:mvdan/sh"."platforms.linux-x64-musl"]
-checksum = "sha256:70aa99784703a8d6569bbf0b1e43e1a91906a4166bf1a79de42050a6d0de7551"
-url = "https://github.com/mvdan/sh/releases/download/v3.13.0/shfmt_v3.13.0_linux_amd64"
-url_api = "https://api.github.com/repos/mvdan/sh/releases/assets/370019380"
-
-[tools."github:mvdan/sh"."platforms.macos-arm64"]
-checksum = "sha256:650970603b5946dc6041836ddcfa7a19d99b5da885e4687f64575508e99cf718"
-url = "https://github.com/mvdan/sh/releases/download/v3.13.0/shfmt_v3.13.0_darwin_arm64"
-url_api = "https://api.github.com/repos/mvdan/sh/releases/assets/370019390"
-
-[tools."github:mvdan/sh"."platforms.macos-x64"]
-checksum = "sha256:b6890a0009abf71d36d7c536ad56e3132c547ceb77cd5d5ee62b3469ab4e9417"
-url = "https://github.com/mvdan/sh/releases/download/v3.13.0/shfmt_v3.13.0_darwin_amd64"
-url_api = "https://api.github.com/repos/mvdan/sh/releases/assets/370019393"
-
-[tools."github:mvdan/sh"."platforms.windows-x64"]
-checksum = "sha256:62241aaf6b0ca236f8625d8892784b73fa67ad40bc677a1ad1a64ae395f6a7d5"
-url = "https://github.com/mvdan/sh/releases/download/v3.13.0/shfmt_v3.13.0_windows_amd64.exe"
-url_api = "https://api.github.com/repos/mvdan/sh/releases/assets/370019338"
 
 [[tools."github:rhysd/actionlint"]]
 version = "1.7.12"
@@ -670,40 +635,40 @@ version = "4.5.1"
 backend = "pipx:pre-commit"
 
 [[tools.python]]
-version = "3.13.12"
+version = "3.14.3"
 backend = "core:python"
 
 [tools.python."platforms.linux-arm64"]
-checksum = "blake3:38f67aad894ed14d8e8b074691d107c7dbdd5843a1148ebc255bcac6672092aa"
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.13.12+20260324-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz"
+checksum = "sha256:53700338695e402a1a1fe22be4a41fbdacc70e22bb308a48eca8ed67cb7992be"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.3+20260324-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz"
 provenance = "github-attestations"
 
 [tools.python."platforms.linux-arm64-musl"]
-checksum = "sha256:8abd16da242b56902a13ba1d6e3aaa0d6d19dfc71547f04e437f707fde179915"
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.13.12+20260324-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz"
+checksum = "sha256:53700338695e402a1a1fe22be4a41fbdacc70e22bb308a48eca8ed67cb7992be"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.3+20260324-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz"
 provenance = "github-attestations"
 
 [tools.python."platforms.linux-x64"]
-checksum = "sha256:91c8920a197c3f7c562612eb4537e18e0c52c1c918bb39912cbd0b1b3c154229"
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.13.12+20260324-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
+checksum = "sha256:d7a9f970914bb4c88756fe3bdcc186d4feb90e9500e54f1db47dae4dc9687e39"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.3+20260324-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
 provenance = "github-attestations"
 
 [tools.python."platforms.linux-x64-musl"]
-checksum = "sha256:91c8920a197c3f7c562612eb4537e18e0c52c1c918bb39912cbd0b1b3c154229"
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.13.12+20260324-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
+checksum = "sha256:d7a9f970914bb4c88756fe3bdcc186d4feb90e9500e54f1db47dae4dc9687e39"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.3+20260324-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
 provenance = "github-attestations"
 
 [tools.python."platforms.macos-arm64"]
-checksum = "sha256:3de7059c87c0e7604e3e9397a547020c161f65c8d51d358e230d3a7d3a456aaa"
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.13.12+20260324-aarch64-apple-darwin-install_only_stripped.tar.gz"
+checksum = "sha256:c43aecde4a663aebff99b9b83da0efec506479f1c3f98331442f33d2c43501f9"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.3+20260324-aarch64-apple-darwin-install_only_stripped.tar.gz"
 provenance = "github-attestations"
 
 [tools.python."platforms.macos-x64"]
-checksum = "sha256:7fd6a6162ef82c9df74eb1c71dad042a05960869789915b1203d61f14d3dc629"
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.13.12+20260324-x86_64-apple-darwin-install_only_stripped.tar.gz"
+checksum = "sha256:9ab41dbc2f100a2a45d1833b9c11165f51051c558b5213eda9a9731d5948a0c0"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.3+20260324-x86_64-apple-darwin-install_only_stripped.tar.gz"
 provenance = "github-attestations"
 
 [tools.python."platforms.windows-x64"]
-checksum = "sha256:b11194bd12122df60e24b08a71a4e5aaa1d15c2cf436f7f4f57bbea4f9a80462"
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.13.12+20260324-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+checksum = "sha256:bbe19034b35b0267176a7442575ae7dc6343480fd4d35598cb7700173d431e09"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.3+20260324-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
 provenance = "github-attestations"

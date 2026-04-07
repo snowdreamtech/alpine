@@ -25,7 +25,7 @@ VER_GO="1.26.1"
 VER_NODE="25.9.0"
 VER_PNPM="10.33.0"
 VER_PNPM_PROVIDER="npm:pnpm"
-VER_PYTHON="3.14.2"
+VER_PYTHON="3.14.3"
 VER_PIPX="1.11.0"
 VER_PIPX_PROVIDER="pip"
 
@@ -45,7 +45,7 @@ VER_GRAIN="0.7.2"
 VER_GRAIN_PROVIDER="github:grain-lang/grain"
 VER_GRAIN_REF="grain-v0.7.2"
 
-VER_MOONBIT="0.8.4+4d98d95d4"
+VER_MOONBIT="0.9.0+9f1423bcb"
 VER_MOONBIT_PROVIDER="github:moonbitlang/moonbit-compiler"
 VER_MOONBIT_REF="v0.7.2+c12686398"
 
@@ -61,7 +61,7 @@ VER_BAZEL_PROVIDER="github:bazelbuild/bazel"
 VER_BALLERINA="2201.13.2"
 VER_BALLERINA_PROVIDER="github:ballerina-platform/ballerina-distribution"
 
-VER_STYLUA="2.4.0"
+VER_STYLUA="2.4.1"
 VER_STYLUA_PROVIDER="github:JohnnyMorganz/StyLua"
 
 VER_JUST="1.49.0"
@@ -124,7 +124,7 @@ VER_SHELLCHECK_PROVIDER="github:koalaman/shellcheck"
 # Use shellcheck-py for pipx fallback if needed
 VER_SHELLCHECK_PY="0.11.0.1"
 VER_SHELLCHECK_PY_PROVIDER="pipx:shellcheck-py"
-VER_SHFMT="3.13.0"
+VER_SHFMT="3.13.1"
 VER_SHFMT_PROVIDER="github:mvdan/sh"
 # Use shfmt-py for pipx fallback if needed
 VER_SHFMT_PY="3.12.0.2"
