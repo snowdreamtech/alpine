@@ -14,26 +14,6 @@ install_osv_scanner() {
   local _PROVIDER="${VER_OSV_SCANNER_PROVIDER:-}"
   local _VERSION="${VER_OSV_SCANNER:-}"
 
-  # CI-only guard by default, but allow manual/explicit on-demand installation
-  # for local developers who explicitly run 'make audit'.
-  local _OSV_BIN
-  _OSV_BIN=$(resolve_bin "osv-scanner") || true
-  if [ -n "${_OSV_BIN:-}" ]; then
-    # In CI: Strict validation - ensure binary actually works
-    if is_ci_env; then
-      if [ -x "${_OSV_BIN:-}" ] && "${_OSV_BIN:-}" --version >/dev/null 2>&1; then
-        log_success "✅ OSV-Scanner: Active (Found at ${_OSV_BIN:-})"
-        return 0
-      else
-        log_warn "⚠️  OSV-Scanner found but not functional (stale cache?). Reinstalling..."
-      fi
-    else
-      # Locally: Just check if executable exists
-      log_success "✅ OSV-Scanner: Active (Found at ${_OSV_BIN:-})"
-      return 0
-    fi
-  fi
-
   # Tier 3 Tool: Optional for local development.
   if ! is_ci_env && [ "${OSV_FORCE_INSTALL:-0}" -ne 1 ]; then
     log_summary "Security" "OSV-Scanner" "⏭️ Optional (CI-only by default)" "-" "0"
@@ -107,27 +87,6 @@ install_zizmor() {
   local _VERSION="${VER_ZIZMOR:-}"
 
   # CI-only: GH Actions security linter is rarely needed for local app code.
-  local _ZIZMOR_BIN
-  _ZIZMOR_BIN=$(resolve_bin "zizmor") || true
-  if [ -n "${_ZIZMOR_BIN:-}" ]; then
-    # In CI: Strict validation - ensure binary actually works
-    if is_ci_env; then
-      if [ -x "${_ZIZMOR_BIN:-}" ] && "${_ZIZMOR_BIN:-}" --version >/dev/null 2>&1; then
-        log_success "✅ Zizmor: Active (Found at ${_ZIZMOR_BIN:-})"
-        return 0
-      else
-        log_warn "⚠️  Zizmor found but not functional (stale cache?). Reinstalling..."
-      fi
-    else
-      # Locally: Just check if executable exists
-      if [ -x "${_ZIZMOR_BIN:-}" ]; then
-        log_success "✅ Zizmor: Active (Found at ${_ZIZMOR_BIN:-})"
-        return 0
-      fi
-      log_info "⚠️  Zizmor shim exists but binary is not executable. Reinstalling..."
-    fi
-  fi
-
   # Tier 1 Tool in CI: Critical for GitHub Actions security scanning.
   # Tier 3 Tool locally: Optional for local development.
   if ! is_ci_env && [ "${ZIZMOR_FORCE_INSTALL:-0}" -ne 1 ]; then
@@ -151,12 +110,8 @@ install_zizmor() {
   local _REQ_VER="${VER_ZIZMOR:-}"
 
   if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    # In CI, always reinstall to ensure binary is present (guards against stale cache)
-    if ! is_ci_env; then
-      log_summary "Security" "Zizmor" "✅ Exists" "${_CUR_VER:-}" "0"
-      return 0
-    fi
-    log_info "⚠️  Zizmor version matches but in CI - forcing reinstall to ensure binary is present..."
+    log_summary "Security" "Zizmor" "✅ Exists" "${_CUR_VER:-}" "0"
+    return 0
   fi
 
   _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
@@ -178,7 +133,7 @@ install_zizmor() {
     fi
   fi
   # Force reinstall in CI to ensure binary is present (guards against stale cache)
-  if ! run_mise install --force "${_PROVIDER:-}@${_VERSION:-}"; then
+  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
     _STAT_ZIZ="❌ Failed"
     log_summary "Security" "Zizmor" "${_STAT_ZIZ:-}" "-" "$(($(date +%s) - _T0_ZIZ))"
     if is_ci_env; then
@@ -207,24 +162,6 @@ install_cargo_audit() {
   fi
 
   # CI-only guard: Advisory DB download is network-heavy, skip locally.
-  local _CA_BIN
-  _CA_BIN=$(resolve_bin "cargo-audit") || true
-  if [ -n "${_CA_BIN:-}" ]; then
-    # In CI: Strict validation - ensure binary actually works
-    if is_ci_env; then
-      if [ -x "${_CA_BIN:-}" ] && "${_CA_BIN:-}" --version >/dev/null 2>&1; then
-        log_success "✅ Cargo-audit: Active (Found at ${_CA_BIN:-})"
-        return 0
-      else
-        log_warn "⚠️  Cargo-audit found but not functional (stale cache?). Reinstalling..."
-      fi
-    else
-      # Locally: Just check if executable exists
-      log_success "✅ Cargo-audit: Active (Found at ${_CA_BIN:-})"
-      return 0
-    fi
-  fi
-
   # Tier 3 Tool: Optional for local development.
   if ! is_ci_env && [ "${CA_FORCE_INSTALL:-0}" -ne 1 ]; then
     log_summary "Security" "Cargo-audit" "⏭️ Optional (CI-only by default)" "-" "0"
