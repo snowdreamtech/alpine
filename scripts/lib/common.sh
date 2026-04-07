@@ -90,12 +90,21 @@ MINGW* | MSYS* | CYGWIN*)
     # Fallback to manual path translation if cygpath is missing
     _G_APP_DATA_LOCAL=$(echo "${LOCALAPPDATA:-}" | sed 's/\\/\//g; s/:\(.*\)/\/\1/; s/^\([A-Za-z]\)\//\/\L\1\//')
   fi
-  _G_MISE_BIN_BASE="$HOME/.local/bin" # Mise installer usually puts bin here in Git Bash
-  # Support standard Windows-specific install paths if present
-  if [ ! -d "$_G_MISE_BIN_BASE" ] && [ -d "${_G_APP_DATA_LOCAL:-}/mise/bin" ]; then
+
+  # Mise on Windows can install in multiple locations - check in order of preference
+  # 1. Git Bash style: $HOME/.local/share/mise (most common in CI)
+  # 2. Windows style: %LOCALAPPDATA%\mise
+  if [ -d "$HOME/.local/share/mise/shims" ]; then
+    _G_MISE_BIN_BASE="$HOME/.local/bin"
+    _G_MISE_SHIMS_BASE="$HOME/.local/share/mise/shims"
+  elif [ -d "${_G_APP_DATA_LOCAL:-}/mise/shims" ]; then
     _G_MISE_BIN_BASE="${_G_APP_DATA_LOCAL:-}/mise/bin"
+    _G_MISE_SHIMS_BASE="${_G_APP_DATA_LOCAL:-}/mise/shims"
+  else
+    # Fallback: assume Git Bash style (will be created during setup)
+    _G_MISE_BIN_BASE="$HOME/.local/bin"
+    _G_MISE_SHIMS_BASE="$HOME/.local/share/mise/shims"
   fi
-  _G_MISE_SHIMS_BASE="${_G_APP_DATA_LOCAL:-${HOME:-}/AppData/Local}/mise/shims"
   ;;
 *)
   _G_OS="linux"
