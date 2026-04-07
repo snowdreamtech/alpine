@@ -112,11 +112,13 @@ main() {
   # This rewards developers with "forced local installs" as per Rule 03/08.
 
   local _L_OK=0
+  local _PC_VER
+  _PC_VER=$(get_version "pre-commit")
   if run_pre_commit_lint "${_FIX_LNT:-}"; then
     _L_OK=1
-    log_summary "Quality" "pre-commit" "✅ Passed" "-" "$(($(date +%s) - _T0_LNT))"
+    log_summary "Quality" "pre-commit" "✅ Passed" "${_PC_VER:--}" "$(($(date +%s) - _T0_LNT))"
   else
-    log_summary "Quality" "pre-commit" "❌ Failed" "-" "$(($(date +%s) - _T0_LNT))"
+    log_summary "Quality" "pre-commit" "❌ Failed" "${_PC_VER:--}" "$(($(date +%s) - _T0_LNT))"
   fi
 
   log_success "\n✨ Linting complete!"
