@@ -99,8 +99,13 @@ install_zizmor() {
   local _ZIZMOR_BIN
   _ZIZMOR_BIN=$(resolve_bin "zizmor") || true
   if [ -n "${_ZIZMOR_BIN:-}" ]; then
-    log_success "✅ Zizmor: Active (Found at ${_ZIZMOR_BIN:-})"
-    return 0
+    # Verify the binary is actually executable (guards against stale cache)
+    if [ -x "${_ZIZMOR_BIN:-}" ]; then
+      log_success "✅ Zizmor: Active (Found at ${_ZIZMOR_BIN:-})"
+      return 0
+    fi
+    # Binary exists but is not executable - force reinstall in CI
+    log_info "⚠️  Zizmor shim exists but binary is not executable. Reinstalling..."
   fi
 
   # Tier 1 Tool in CI: Critical for GitHub Actions security scanning.
@@ -126,8 +131,12 @@ install_zizmor() {
   local _REQ_VER="${VER_ZIZMOR:-}"
 
   if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Security" "Zizmor" "✅ Exists" "${_CUR_VER:-}" "0"
-    return 0
+    # In CI, always reinstall to ensure binary is present (guards against stale cache)
+    if ! is_ci_env; then
+      log_summary "Security" "Zizmor" "✅ Exists" "${_CUR_VER:-}" "0"
+      return 0
+    fi
+    log_info "⚠️  Zizmor version matches but in CI - forcing reinstall to ensure binary is present..."
   fi
 
   _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
@@ -148,7 +157,8 @@ install_zizmor() {
       return 0
     fi
   fi
-  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
+  # Force reinstall in CI to ensure binary is present (guards against stale cache)
+  if ! run_mise install --force "${_PROVIDER:-}@${_VERSION:-}"; then
     _STAT_ZIZ="❌ Failed"
     log_summary "Security" "Zizmor" "${_STAT_ZIZ:-}" "-" "$(($(date +%s) - _T0_ZIZ))"
     if is_ci_env; then
