@@ -34,8 +34,15 @@ install_osv_scanner() {
   local _REQ_VER="${VER_OSV_SCANNER:-}"
 
   if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Security" "OSV-Scanner" "✅ Exists" "${_CUR_VER:-}" "0"
-    return 0
+    # Version matches, but verify binary is actually available
+    local _OSV_BIN
+    _OSV_BIN=$(resolve_bin "osv-scanner") || true
+    if [ -n "${_OSV_BIN:-}" ] && [ -x "${_OSV_BIN:-}" ]; then
+      log_summary "Security" "OSV-Scanner" "✅ Exists" "${_CUR_VER:-}" "0"
+      return 0
+    else
+      log_warn "⚠️  OSV-Scanner version matches but binary not available. Reinstalling..."
+    fi
   fi
 
   _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
@@ -110,8 +117,15 @@ install_zizmor() {
   local _REQ_VER="${VER_ZIZMOR:-}"
 
   if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Security" "Zizmor" "✅ Exists" "${_CUR_VER:-}" "0"
-    return 0
+    # Version matches, but verify binary is actually available
+    local _ZIZMOR_BIN
+    _ZIZMOR_BIN=$(resolve_bin "zizmor") || true
+    if [ -n "${_ZIZMOR_BIN:-}" ] && [ -x "${_ZIZMOR_BIN:-}" ]; then
+      log_summary "Security" "Zizmor" "✅ Exists" "${_CUR_VER:-}" "0"
+      return 0
+    else
+      log_warn "⚠️  Zizmor version matches but binary not available. Reinstalling..."
+    fi
   fi
 
   _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
@@ -177,8 +191,15 @@ install_cargo_audit() {
   local _REQ_VER="${VER_CARGO_AUDIT:-}"
 
   if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Security" "Cargo-Audit" "✅ Exists" "${_CUR_VER:-}" "0"
-    return 0
+    # Version matches, but verify binary is actually available
+    local _CA_BIN
+    _CA_BIN=$(resolve_bin "cargo-audit") || true
+    if [ -n "${_CA_BIN:-}" ] && [ -x "${_CA_BIN:-}" ]; then
+      log_summary "Security" "Cargo-Audit" "✅ Exists" "${_CUR_VER:-}" "0"
+      return 0
+    else
+      log_warn "⚠️  Cargo-audit version matches but binary not available. Reinstalling..."
+    fi
   fi
 
   _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
