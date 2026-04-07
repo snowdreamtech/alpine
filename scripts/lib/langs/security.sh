@@ -19,8 +19,19 @@ install_osv_scanner() {
   local _OSV_BIN
   _OSV_BIN=$(resolve_bin "osv-scanner") || true
   if [ -n "${_OSV_BIN:-}" ]; then
-    log_success "✅ OSV-Scanner: Active (Found at ${_OSV_BIN:-})"
-    return 0
+    # In CI: Strict validation - ensure binary actually works
+    if is_ci_env; then
+      if [ -x "${_OSV_BIN:-}" ] && "${_OSV_BIN:-}" --version >/dev/null 2>&1; then
+        log_success "✅ OSV-Scanner: Active (Found at ${_OSV_BIN:-})"
+        return 0
+      else
+        log_warn "⚠️  OSV-Scanner found but not functional (stale cache?). Reinstalling..."
+      fi
+    else
+      # Locally: Just check if executable exists
+      log_success "✅ OSV-Scanner: Active (Found at ${_OSV_BIN:-})"
+      return 0
+    fi
   fi
 
   # Tier 3 Tool: Optional for local development.
@@ -199,8 +210,19 @@ install_cargo_audit() {
   local _CA_BIN
   _CA_BIN=$(resolve_bin "cargo-audit") || true
   if [ -n "${_CA_BIN:-}" ]; then
-    log_success "✅ Cargo-audit: Active (Found at ${_CA_BIN:-})"
-    return 0
+    # In CI: Strict validation - ensure binary actually works
+    if is_ci_env; then
+      if [ -x "${_CA_BIN:-}" ] && "${_CA_BIN:-}" --version >/dev/null 2>&1; then
+        log_success "✅ Cargo-audit: Active (Found at ${_CA_BIN:-})"
+        return 0
+      else
+        log_warn "⚠️  Cargo-audit found but not functional (stale cache?). Reinstalling..."
+      fi
+    else
+      # Locally: Just check if executable exists
+      log_success "✅ Cargo-audit: Active (Found at ${_CA_BIN:-})"
+      return 0
+    fi
   fi
 
   # Tier 3 Tool: Optional for local development.
