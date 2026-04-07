@@ -31,6 +31,7 @@ mise cache clear >/dev/null 2>&1 || true
 ```
 
 The cache clear operation:
+
 - Runs silently (`>/dev/null 2>&1`)
 - Never fails the script (`|| true`)
 - Ensures fresh provenance verification data is fetched
@@ -39,7 +40,7 @@ The cache clear operation:
 
 To manually verify that attestations exist for a release:
 
-1. Visit the GitHub release page (e.g., https://github.com/astral-sh/ruff/releases/tag/0.15.9)
+1. Visit the GitHub release page (e.g., <https://github.com/astral-sh/ruff/releases/tag/0.15.9>)
 2. Look for the "Verifying GitHub Artifact Attestations" section
 3. Verify using GitHub CLI:
 
@@ -50,6 +51,7 @@ gh attestation verify <file-path> --repo astral-sh/ruff
 ## Prevention
 
 The fix is now automated in the CI/CD pipeline:
+
 - The "🔄 Sync Dependabot Config" workflow runs `make sync-lock`
 - `scripts/sync-lock.sh` automatically clears the cache before locking
 - This prevents stale provenance verification errors
@@ -57,8 +59,8 @@ The fix is now automated in the CI/CD pipeline:
 ## Related Issues
 
 - Ruff 0.15.9 provenance verification error
-- GitHub Attestations: https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations
-- Mise cache documentation: https://mise.jdx.dev/cli/cache.html
+- GitHub Attestations: <https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations>
+- Mise cache documentation: <https://mise.jdx.dev/cli/cache.html>
 
 ## References
 

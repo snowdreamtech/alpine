@@ -46,6 +46,10 @@ url = "https://github.com/astral-sh/ruff/releases/download/0.15.9/ruff-x86_64-pc
 url_api = "https://api.github.com/repos/astral-sh/ruff/releases/assets/387190857"
 provenance = "github-attestations"
 
+[[tools."github:checkmake/checkmake"]]
+version = "0.3.2"
+backend = "github:checkmake/checkmake"
+
 [[tools."github:cli/cli"]]
 version = "2.89.0"
 backend = "github:cli/cli"
@@ -541,6 +545,52 @@ url = "https://github.com/zizmorcore/zizmor/releases/download/v1.23.1/zizmor-x86
 url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/369532189"
 provenance = "github-attestations"
 
+[[tools."github:zizmorcore/zizmor"]]
+version = "1.23.1"
+backend = "github:zizmorcore/zizmor"
+
+[tools."github:zizmorcore/zizmor"."platforms.linux-arm64"]
+checksum = "sha256:3725d7cd7102e4d70827186389f7d5930b6878232930d0a3eb058d7e5b47e658"
+url = "https://github.com/zizmorcore/zizmor/releases/download/v1.23.1/zizmor-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/369532190"
+provenance = "github-attestations"
+
+[tools."github:zizmorcore/zizmor"."platforms.linux-arm64-musl"]
+checksum = "sha256:3725d7cd7102e4d70827186389f7d5930b6878232930d0a3eb058d7e5b47e658"
+url = "https://github.com/zizmorcore/zizmor/releases/download/v1.23.1/zizmor-aarch64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/369532190"
+provenance = "github-attestations"
+
+[tools."github:zizmorcore/zizmor"."platforms.linux-x64"]
+checksum = "sha256:67a8df0a14352dd81882e14876653d097b99b0f4f6b6fe798edc0320cff27aff"
+url = "https://github.com/zizmorcore/zizmor/releases/download/v1.23.1/zizmor-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/369532192"
+provenance = "github-attestations"
+
+[tools."github:zizmorcore/zizmor"."platforms.linux-x64-musl"]
+checksum = "sha256:67a8df0a14352dd81882e14876653d097b99b0f4f6b6fe798edc0320cff27aff"
+url = "https://github.com/zizmorcore/zizmor/releases/download/v1.23.1/zizmor-x86_64-unknown-linux-gnu.tar.gz"
+url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/369532192"
+provenance = "github-attestations"
+
+[tools."github:zizmorcore/zizmor"."platforms.macos-arm64"]
+checksum = "sha256:2632561b974c69f952258c1ab4b7432d5c7f92e555704155c3ac28a2910bd717"
+url = "https://github.com/zizmorcore/zizmor/releases/download/v1.23.1/zizmor-aarch64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/369532191"
+provenance = "github-attestations"
+
+[tools."github:zizmorcore/zizmor"."platforms.macos-x64"]
+checksum = "sha256:89d5ed42081dd9d0433a10b7545fac42b35f1f030885c278b9712b32c66f2597"
+url = "https://github.com/zizmorcore/zizmor/releases/download/v1.23.1/zizmor-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/369532186"
+provenance = "github-attestations"
+
+[tools."github:zizmorcore/zizmor"."platforms.windows-x64"]
+checksum = "sha256:33c2293ff02834720dd7cd8b47348aafb2e95a19bdc993c0ecaca9c804ade92a"
+url = "https://github.com/zizmorcore/zizmor/releases/download/v1.23.1/zizmor-x86_64-pc-windows-msvc.zip"
+url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/369532189"
+provenance = "github-attestations"
+
 [[tools.go]]
 version = "1.26.1"
 backend = "core:go"
@@ -666,40 +716,40 @@ version = "4.5.1"
 backend = "pipx:pre-commit"
 
 [[tools.python]]
-version = "3.14.2"
+version = "3.13.12"
 backend = "core:python"
 
 [tools.python."platforms.linux-arm64"]
-checksum = "sha256:53700338695e402a1a1fe22be4a41fbdacc70e22bb308a48eca8ed67cb7992be"
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.2+20260324-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz"
+checksum = "blake3:38f67aad894ed14d8e8b074691d107c7dbdd5843a1148ebc255bcac6672092aa"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.13.12+20260324-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz"
 provenance = "github-attestations"
 
 [tools.python."platforms.linux-arm64-musl"]
-checksum = "sha256:53700338695e402a1a1fe22be4a41fbdacc70e22bb308a48eca8ed67cb7992be"
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.2+20260324-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz"
+checksum = "sha256:8abd16da242b56902a13ba1d6e3aaa0d6d19dfc71547f04e437f707fde179915"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.13.12+20260324-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz"
 provenance = "github-attestations"
 
 [tools.python."platforms.linux-x64"]
-checksum = "sha256:d7a9f970914bb4c88756fe3bdcc186d4feb90e9500e54f1db47dae4dc9687e39"
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.2+20260324-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
+checksum = "sha256:91c8920a197c3f7c562612eb4537e18e0c52c1c918bb39912cbd0b1b3c154229"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.13.12+20260324-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
 provenance = "github-attestations"
 
 [tools.python."platforms.linux-x64-musl"]
-checksum = "sha256:d7a9f970914bb4c88756fe3bdcc186d4feb90e9500e54f1db47dae4dc9687e39"
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.2+20260324-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
+checksum = "sha256:91c8920a197c3f7c562612eb4537e18e0c52c1c918bb39912cbd0b1b3c154229"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.13.12+20260324-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
 provenance = "github-attestations"
 
 [tools.python."platforms.macos-arm64"]
-checksum = "sha256:c43aecde4a663aebff99b9b83da0efec506479f1c3f98331442f33d2c43501f9"
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.2+20260324-aarch64-apple-darwin-install_only_stripped.tar.gz"
+checksum = "sha256:3de7059c87c0e7604e3e9397a547020c161f65c8d51d358e230d3a7d3a456aaa"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.13.12+20260324-aarch64-apple-darwin-install_only_stripped.tar.gz"
 provenance = "github-attestations"
 
 [tools.python."platforms.macos-x64"]
-checksum = "sha256:9ab41dbc2f100a2a45d1833b9c11165f51051c558b5213eda9a9731d5948a0c0"
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.2+20260324-x86_64-apple-darwin-install_only_stripped.tar.gz"
+checksum = "sha256:7fd6a6162ef82c9df74eb1c71dad042a05960869789915b1203d61f14d3dc629"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.13.12+20260324-x86_64-apple-darwin-install_only_stripped.tar.gz"
 provenance = "github-attestations"
 
 [tools.python."platforms.windows-x64"]
-checksum = "sha256:bbe19034b35b0267176a7442575ae7dc6343480fd4d35598cb7700173d431e09"
-url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.14.2+20260324-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
+checksum = "sha256:b11194bd12122df60e24b08a71a4e5aaa1d15c2cf436f7f4f57bbea4f9a80462"
+url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260324/cpython-3.13.12+20260324-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
 provenance = "github-attestations"

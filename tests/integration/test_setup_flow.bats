@@ -12,6 +12,10 @@
 #
 # Requirements: 5.2, 8.1
 
+# SC2030/SC2031: In bats, each @test runs in a subshell by design.
+# Exports are intentionally scoped to individual tests.
+# shellcheck disable=SC2030,SC2031
+
 setup() {
   load '../vendor/bats-support/load.bash'
   load '../vendor/bats-assert/load.bash'

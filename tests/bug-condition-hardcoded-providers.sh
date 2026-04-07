@@ -118,7 +118,7 @@ for file in "${SCRIPTS_DIR}"/*.sh; do
     if [[ -n ${file_matches} ]]; then
       count=$(echo "${file_matches}" | wc -l | tr -d ' ')
       echo "${filename}: ${count} instance(s)"
-      echo "${file_matches}" | sed 's/^/  /'
+      printf '  %s\n' "${file_matches}"
       echo ""
     fi
   fi

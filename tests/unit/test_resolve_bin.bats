@@ -15,6 +15,10 @@
 #
 # Requirements: 2.1.1, 2.1.2, 3.1, 3.2
 
+# SC2030/SC2031: In bats, each @test runs in a subshell by design.
+# Exports are intentionally scoped to individual tests.
+# shellcheck disable=SC2030,SC2031
+
 setup() {
   load '../vendor/bats-support/load.bash'
   load '../vendor/bats-assert/load.bash'
@@ -29,7 +33,8 @@ setup() {
   export _G_LIB_DIR="$SCRIPT_DIR/scripts/lib"
 
   # Set up environment
-  export _G_OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+  _G_OS="$(uname -s | tr '[:upper:]' '[:lower:]')"
+  export _G_OS
   export _G_VENV_BIN="bin"
   export _G_MISE_SHIMS_BASE="$HOME/.local/share/mise/shims"
 

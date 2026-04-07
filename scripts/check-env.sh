@@ -699,7 +699,7 @@ main() {
     check_tool_version "Govulncheck" "govulncheck" "latest" "govulncheck ./..." 0 1 "govulncheck" "GOVULN_FORCE_INSTALL"
   fi
   if has_lang_files "Makefile" "*.make"; then
-    check_tool_version "Checkmake" "checkmake" "$(get_mise_tool_version "github:mrtazz/checkmake")" "checkmake --version" 0 0 "github:mrtazz/checkmake"
+    check_tool_version "Checkmake" "checkmake" "$(get_mise_tool_version "github:checkmake/checkmake")" "checkmake --version" 0 0 "github:checkmake/checkmake"
   fi
   if has_lang_files "Cargo.toml" "*.rs"; then
     check_tool_version "Cargo-audit" "cargo-audit" "latest" "cargo-audit --version" 0 1 "cargo-audit" "CA_FORCE_INSTALL"

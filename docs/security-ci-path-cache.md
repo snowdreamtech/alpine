@@ -51,6 +51,7 @@ esac
 ```
 
 Prevents injection of:
+
 - Command substitution: `$(cmd)`, `` `cmd` ``
 - Command chaining: `;`, `|`, `&`
 - Variable expansion: `$VAR`
@@ -89,6 +90,7 @@ Each CI platform stores the cache in its workspace directory:
 | Jenkins          | `$WORKSPACE/.ci_path_cache`                      |
 
 All these directories are:
+
 - Isolated per build
 - Cleaned up after build completion
 - Not shared between different projects/builds
@@ -105,6 +107,7 @@ GitHub Actions provides a native `$GITHUB_PATH` file for PATH persistence:
 ```
 
 **Our implementation:**
+
 - Uses `$GITHUB_PATH` directly on GitHub Actions (no custom file)
 - Provides equivalent functionality for other CI platforms
 - Same security model as GitHub's native mechanism
@@ -139,6 +142,7 @@ GitHub Actions provides a native `$GITHUB_PATH` file for PATH persistence:
 3. **CI Platform Vulnerabilities** - Relies on CI platform's workspace isolation
 
 These are acceptable risks because:
+
 - CI logs typically show tool paths anyway
 - Workspace compromise implies broader security breach
 - CI platform security is the platform's responsibility
@@ -197,6 +201,7 @@ The CI PATH cache mechanism is **secure by design** for its intended purpose:
 - ✅ Provides equivalent security to native mechanisms
 
 The risk of information disclosure is **low** and **acceptable** given that:
+
 - The disclosed information (paths) is typically visible in CI logs
 - The file is temporary and workspace-isolated
 - Multiple security layers prevent misuse

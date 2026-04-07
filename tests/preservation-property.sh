@@ -55,6 +55,7 @@ test_start() {
 
 # Setup test environment
 SCRIPT_DIR="$(cd "$(dirname "$0")/../scripts" && pwd)"
+# shellcheck disable=SC2034
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 
 # ── Property 2.1: Centralized Variables Exist ────────────────────────────────
@@ -134,6 +135,7 @@ for script_name in ${SCRIPTS_TO_CHECK}; do
   fi
 
   # Verify script uses centralized pattern (contains ${VER_*_PROVIDER:-})
+  # shellcheck disable=SC2016
   if grep -q '\${VER_.*_PROVIDER:-}' "${script_path}"; then
     pass "${script_name} uses centralized pattern"
   else
@@ -153,6 +155,7 @@ done
 
 # ── Property 2.4: Fallback Pattern Preservation ──────────────────────────────
 
+# shellcheck disable=SC2016
 test_start 'Property 2.4: Fallback pattern ${VAR:-} is used correctly'
 
 # Test that the :- fallback pattern works as expected
@@ -255,6 +258,7 @@ scripts_with_pattern=0
 for script_name in ${SCRIPTS_TO_CHECK}; do
   script_path="${SCRIPT_DIR}/lib/langs/${script_name}"
 
+  # shellcheck disable=SC2016
   if [ -f "${script_path}" ] && grep -q '\${VER_.*_PROVIDER:-}' "${script_path}"; then
     scripts_with_pattern=$((scripts_with_pattern + 1))
   fi

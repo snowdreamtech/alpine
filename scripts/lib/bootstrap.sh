@@ -271,9 +271,11 @@ _mise_activate_bash() {
   # shellcheck disable=SC2016
   # Check for any existing mise activate line (with or without full path)
   if ! grep -qE '(mise|\.local/bin/mise) activate bash' "${_RC:-}"; then
-    echo '' >>"${_RC:-}"
-    echo '# mise activation (added by snowdreamtech/ai-ide-template setup)' >>"${_RC:-}"
-    echo "eval \"\$(${_MISE_BIN} activate bash)\"" >>"${_RC:-}"
+    {
+      echo ''
+      echo '# mise activation (added by snowdreamtech/ai-ide-template setup)'
+      echo "eval \"\$(${_MISE_BIN} activate bash)\""
+    } >>"${_RC:-}"
     log_debug "Added mise activation to ${_RC:-}"
   else
     log_debug "mise activation already present in ${_RC:-}"
@@ -288,9 +290,11 @@ _mise_activate_zsh() {
   # shellcheck disable=SC2016
   # Check for any existing mise activate line (with or without full path)
   if ! grep -qE '(mise|\.local/bin/mise) activate zsh' "${_RC:-}"; then
-    echo '' >>"${_RC:-}"
-    echo '# mise activation (added by snowdreamtech/ai-ide-template setup)' >>"${_RC:-}"
-    echo "eval \"\$(${_MISE_BIN} activate zsh)\"" >>"${_RC:-}"
+    {
+      echo ''
+      echo '# mise activation (added by snowdreamtech/ai-ide-template setup)'
+      echo "eval \"\$(${_MISE_BIN} activate zsh)\""
+    } >>"${_RC:-}"
     log_debug "Added mise activation to ${_RC:-}"
   else
     log_debug "mise activation already present in ${_RC:-}"
@@ -304,9 +308,11 @@ _mise_activate_fish() {
   _MISE_BIN=$(command -v mise 2>/dev/null || echo "$HOME/.local/bin/mise")
   # Check for any existing mise activate line
   if ! grep -qE '(mise|\.local/bin/mise) activate fish' "${_RC:-}"; then
-    echo '' >>"${_RC:-}"
-    echo '# mise activation (added by snowdreamtech/ai-ide-template setup)' >>"${_RC:-}"
-    echo "${_MISE_BIN} activate fish | source" >>"${_RC:-}"
+    {
+      echo ''
+      echo '# mise activation (added by snowdreamtech/ai-ide-template setup)'
+      echo "${_MISE_BIN} activate fish | source"
+    } >>"${_RC:-}"
     log_debug "Added mise activation to ${_RC:-}"
   else
     log_debug "mise activation already present in ${_RC:-}"
@@ -319,9 +325,11 @@ _mise_activate_pwsh() {
   [ -d "$(dirname "${_RC:-}")" ] || mkdir -p "$(dirname "${_RC:-}")"
   # Check for any existing mise activate line
   if ! grep -qE '(mise|\.local/bin/mise) activate pwsh' "${_RC:-}" 2>/dev/null; then
-    echo '' >>"${_RC:-}"
-    echo '# mise activation (added by snowdreamtech/ai-ide-template setup)' >>"${_RC:-}"
-    echo '(&mise activate pwsh) | Out-String | Invoke-Expression' >>"${_RC:-}"
+    {
+      echo ''
+      echo '# mise activation (added by snowdreamtech/ai-ide-template setup)'
+      echo '(&mise activate pwsh) | Out-String | Invoke-Expression'
+    } >>"${_RC:-}"
     log_debug "Added mise activation to ${_RC:-}"
   else
     log_debug "mise activation already present in ${_RC:-}"
@@ -352,9 +360,11 @@ _mise_activate_xonsh() {
   # shellcheck disable=SC2016
   # Check for any existing mise activate line
   if ! grep -qE '(mise|\.local/bin/mise) activate xonsh' "${_RC:-}" 2>/dev/null; then
-    echo '' >>"${_RC:-}"
-    echo '# mise activation (added by snowdreamtech/ai-ide-template setup)' >>"${_RC:-}"
-    echo 'execx($(mise activate xonsh))' >>"${_RC:-}"
+    {
+      echo ''
+      echo '# mise activation (added by snowdreamtech/ai-ide-template setup)'
+      echo 'execx($(mise activate xonsh))'
+    } >>"${_RC:-}"
     log_debug "Added mise activation to ${_RC:-}"
   else
     log_debug "mise activation already present in ${_RC:-}"
@@ -367,9 +377,11 @@ _mise_activate_elvish() {
   # shellcheck disable=SC2016
   # Check for any existing mise activate line
   if ! grep -qE '(mise|\.local/bin/mise) activate elvish' "${_RC:-}" 2>/dev/null; then
-    echo '' >>"${_RC:-}"
-    echo '# mise activation (added by snowdreamtech/ai-ide-template setup)' >>"${_RC:-}"
-    echo 'eval (mise activate elvish | slurp)' >>"${_RC:-}"
+    {
+      echo ''
+      echo '# mise activation (added by snowdreamtech/ai-ide-template setup)'
+      echo 'eval (mise activate elvish | slurp)'
+    } >>"${_RC:-}"
     log_debug "Added mise activation to ${_RC:-}"
   else
     log_debug "mise activation already present in ${_RC:-}"

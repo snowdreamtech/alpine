@@ -12,6 +12,11 @@
 #
 # Requirements: 5.2, 8.1
 
+# SC2030/SC2031: In bats, each @test runs in a subshell by design.
+# Exports are intentionally scoped to individual tests.
+# SC2034: Loop variable 'i' is used by brace expansion iteration.
+# shellcheck disable=SC2030,SC2031,SC2034
+
 setup() {
   load '../vendor/bats-support/load.bash'
   load '../vendor/bats-assert/load.bash'
@@ -359,7 +364,7 @@ teardown() {
 
 @test "cleanup: no leaked file descriptors" {
   # Run operations that open files
-  for i in {1..10}; do
+  for _unused in {1..10}; do
     resolve_bin "sh" >/dev/null 2>&1 || true
   done
 

@@ -57,6 +57,7 @@ echo ""
 # Pattern: run_mise install "${_PROVIDER:-}" (without @${_VERSION or @${)
 # This matches calls that are missing version specifications
 
+# shellcheck disable=SC2016
 BUGGY_CALLS=$(grep -rn 'run_mise install[[:space:]]*"\${_PROVIDER:-}"' "${SCRIPTS_DIR}"/*.sh 2>/dev/null |
   grep -v '@\${_VERSION' |
   grep -v '@\${' || true)
@@ -94,7 +95,7 @@ for tool in ${FOCUS_TOOLS}; do
   tool_matches=$(echo "${BUGGY_CALLS}" | grep -i "${tool}" || true)
   if [[ -n ${tool_matches} ]]; then
     echo -e "${BLUE}${tool}:${NC}"
-    echo "${tool_matches}" | sed 's/^/  /'
+    printf '  %s\n' "${tool_matches}"
 
     # Extract the version from versions.sh for this tool
     tool_upper=$(echo "${tool}" | tr '[:lower:]' '[:upper:]' | tr '-' '_')
@@ -116,13 +117,14 @@ echo ""
 for file in "${SCRIPTS_DIR}"/*.sh; do
   if [[ -f ${file} ]]; then
     filename=$(basename "${file}")
+    # shellcheck disable=SC2016
     file_matches=$(grep -n'run_mise install.*"\${_PROVIDER:-}"' "${file}" 2>/dev/null |
       grep -v '@\${_VERSION' |
       grep -v '@\${' || true)
     if [[ -n ${file_matches} ]]; then
       count=$(echo "${file_matches}" | wc -l | tr -d ' ')
       echo "${filename}: ${count} instance(s)"
-      echo "${file_matches}" | sed 's/^/  /'
+      printf '  %s\n' "${file_matches}"
       echo ""
     fi
   fi
@@ -135,8 +137,10 @@ echo ""
 
 # Analyze the bug pattern
 echo "Bug Pattern Analysis:"
-echo '  - Buggy pattern: run_mise install "\${_PROVIDER:-}"'
-echo '  - Expected pattern: run_mise install "\${_PROVIDER:-}@\${_VERSION:-}"'
+# shellcheck disable=SC2016
+echo '  - Buggy pattern: run_mise install "${_PROVIDER:-}"'
+# shellcheck disable=SC2016
+echo '  - Expected pattern: run_mise install "${_PROVIDER:-}@${_VERSION:-}"'
 echo ""
 
 # Check if _VERSION variables are defined
@@ -176,12 +180,15 @@ echo ""
 echo "Based on the counterexamples found, the root causes are:"
 echo ""
 echo "1. Inconsistent Version Specification Pattern:"
-echo '   - Some functions use: run_mise install "\${_PROVIDER:-}@\${_VERSION:-}" (correct)'
-echo '   - Affected functions use: run_mise install "\${_PROVIDER:-}" (buggy)'
+# shellcheck disable=SC2016
+echo '   - Some functions use: run_mise install "${_PROVIDER:-}@${_VERSION:-}" (correct)'
+# shellcheck disable=SC2016
+echo '   - Affected functions use: run_mise install "${_PROVIDER:-}" (buggy)'
 echo ""
 echo "2. Missing Version Variable Assignment:"
 echo "   - Functions define _PROVIDER but fail to define _VERSION from versions.sh"
-echo '   - Example: local _VERSION="\${VER_HADOLINT:-}" is missing'
+# shellcheck disable=SC2016
+echo '   - Example: local _VERSION="${VER_HADOLINT:-}" is missing'
 echo ""
 echo "3. Copy-Paste Error Propagation:"
 echo "   - The buggy pattern was likely copied across multiple language modules"
@@ -193,14 +200,17 @@ echo "=========================================="
 echo ""
 
 echo "After the fix is applied, ALL run_mise install calls should:"
-echo '  1. Include @\${_VERSION:-} suffix to enforce version locking'
+# shellcheck disable=SC2016
+echo '  1. Include @${_VERSION:-} suffix to enforce version locking'
 echo "  2. Install exact versions from versions.sh"
 echo "  3. Ensure reproducibility across multiple runs and environments"
 echo ""
 
 echo "Example fix for hadolint:"
-echo '  Before: run_mise install "\${_PROVIDER:-}"'
-echo '  After:  run_mise install "\${_PROVIDER:-}@\${_VERSION:-}"'
+# shellcheck disable=SC2016
+echo '  Before: run_mise install "${_PROVIDER:-}"'
+# shellcheck disable=SC2016
+echo '  After:  run_mise install "${_PROVIDER:-}@${_VERSION:-}"'
 echo ""
 
 echo "=========================================="
@@ -231,6 +241,7 @@ echo "Total affected calls: ${INSTANCE_COUNT}"
 echo ""
 echo "Next steps:"
 echo "  1. These counterexamples document the scope of the bug"
+# shellcheck disable=SC2016
 echo '  2. Implement the fix to add @${_VERSION:-} suffix to all affected calls'
 echo "  3. Re-run this test - it should PASS (0 instances) after the fix is applied"
 echo ""

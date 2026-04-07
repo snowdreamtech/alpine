@@ -18,6 +18,9 @@
 #
 # EXPECTED OUTCOME: Tests PASS (this confirms baseline behavior to preserve)
 
+# SC2329: Functions are invoked indirectly via the run_test helper.
+# shellcheck disable=SC2329
+
 set -euo pipefail
 
 # Colors for output
@@ -144,6 +147,7 @@ test_dry_run_mode() {
   # We'll check the docker.sh module as an example
   if [ -f "${PROJECT_ROOT}/scripts/lib/langs/docker.sh" ]; then
     # Check that install functions have DRY_RUN guards
+    # shellcheck disable=SC2016
     if ! grep -q 'if \[ "\${DRY_RUN:-0}" -eq 1 \]; then' "${PROJECT_ROOT}/scripts/lib/langs/docker.sh"; then
       echo "ERROR: DRY_RUN guard not found in docker.sh"
       return 1
@@ -431,6 +435,7 @@ echo "  ✓ Language file detection works correctly"
 echo ""
 echo "Next steps:"
 echo "  1. These tests document the baseline behavior to preserve"
+# shellcheck disable=SC2016
 echo '  2. Implement the fix to add @${_VERSION:-} suffix to buggy calls'
 echo "  3. Re-run these tests - they should still PASS after the fix"
 echo "  4. Run bug condition test - it should PASS (0 instances) after the fix"

@@ -13,10 +13,12 @@ Security tools are classified into two tiers based on their scope and criticalit
 **Classification**: Critical CI-only (1, 1)
 
 **Tools**:
+
 - **OSV-scanner**: Multi-language vulnerability scanner
 - **Zizmor**: GitHub Actions workflow security scanner
 
 **Behavior**:
+
 - **Local Development**: Skipped (not checked)
 - **CI Environment**: **Required** - check-env will fail if missing
 
@@ -24,6 +26,7 @@ Security tools are classified into two tiers based on their scope and criticalit
 These tools provide universal security coverage regardless of project language or technology stack. They are always applicable and should always be present in CI environments to ensure baseline security compliance.
 
 **Installation**:
+
 ```bash
 # In CI workflows
 make setup security
@@ -36,12 +39,14 @@ make setup security
 **Classification**: Optional CI-only (0, 1)
 
 **Tools**:
+
 - **Govulncheck**: Go vulnerability scanner
 - **Cargo-audit**: Rust dependency auditor
 - **npm-audit**: Node.js dependency auditor
 - **Pip-audit**: Python dependency auditor
 
 **Behavior**:
+
 - **Local Development**: Skipped (not checked)
 - **CI Environment**: **Optional** - check-env will warn if missing but not fail
 
@@ -49,6 +54,7 @@ make setup security
 These tools are language-specific and only relevant when the corresponding language files are present in the project. They are installed on-demand and should not block CI pipelines for projects that don't use those languages.
 
 **Installation**:
+
 ```bash
 # Installed automatically when language files are detected
 make setup go      # Installs govulncheck
@@ -156,11 +162,13 @@ Or include in the main setup:
 If a workflow doesn't need security scanning (e.g., documentation builds), it will fail at `make check-env` unless security tools are installed. Options:
 
 1. **Install security tools** (recommended):
+
    ```yaml
    run: make setup security && make check-env
    ```
 
 2. **Skip check-env** (not recommended):
+
    ```yaml
    run: make setup && make install
    # Skip check-env
@@ -175,12 +183,14 @@ If a workflow doesn't need security scanning (e.g., documentation builds), it wi
 If adding a new universal security scanner (applicable to all projects):
 
 1. Add to `scripts/lib/versions.sh`:
+
    ```bash
    VER_NEWTOOL="1.0.0"
    VER_NEWTOOL_PROVIDER="github:org/newtool"
    ```
 
 2. Add to `scripts/lib/langs/security.sh`:
+
    ```bash
    install_newtool() {
      # Installation logic
@@ -188,6 +198,7 @@ If adding a new universal security scanner (applicable to all projects):
    ```
 
 3. Add to `scripts/check-env.sh` as **Critical CI-only (1, 1)**:
+
    ```bash
    check_tool_version "NewTool" "newtool" \
      "$(get_mise_tool_version newtool)" \
@@ -202,6 +213,7 @@ If adding a new language-specific security tool:
 1. Add to the appropriate language module in `scripts/lib/langs/`
 
 2. Add to `scripts/check-env.sh` as **Optional CI-only (0, 1)**:
+
    ```bash
    if has_lang_files "manifest.file" "*.ext"; then
      check_tool_version "NewTool" "newtool" \
@@ -237,6 +249,7 @@ If adding a new language-specific security tool:
 If you have existing workflows that relied on the old Optional CI-only behavior for universal scanners:
 
 **Before** (all tools were Optional CI-only):
+
 ```yaml
 - name: "Check Environment"
   run: make check-env
@@ -244,6 +257,7 @@ If you have existing workflows that relied on the old Optional CI-only behavior 
 ```
 
 **After** (universal scanners are Critical CI-only):
+
 ```yaml
 - name: "Install Security Tools"
   run: make setup security

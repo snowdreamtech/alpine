@@ -54,7 +54,7 @@ cleanup_rc_file() {
   echo "  💾 Created backup: ${_file:-}.backup-$(date +%Y%m%d-%H%M%S)"
 
   # Remove all mise activation lines and related comments
-  grep -vE '(mise|\.local/bin/mise) activate|# mise activation' "${_file:-}" > "${_file:-}.tmp" || true
+  grep -vE '(mise|\.local/bin/mise) activate|# mise activation' "${_file:-}" >"${_file:-}.tmp" || true
 
   # Add back a single mise activation line at the end
   local _mise_bin
@@ -65,20 +65,20 @@ cleanup_rc_file() {
     echo ""
     echo "# mise activation (added by snowdreamtech/ai-ide-template setup)"
     case "${_shell:-}" in
-      bash)
-        echo "eval \"\$(${_mise_bin} activate bash)\""
-        ;;
-      zsh)
-        echo "eval \"\$(${_mise_bin} activate zsh)\""
-        ;;
-      fish)
-        echo "${_mise_bin} activate fish | source"
-        ;;
-      *)
-        echo "eval \"\$(${_mise_bin} activate ${_shell:-})\""
-        ;;
+    bash)
+      echo "eval \"\$(${_mise_bin} activate bash)\""
+      ;;
+    zsh)
+      echo "eval \"\$(${_mise_bin} activate zsh)\""
+      ;;
+    fish)
+      echo "${_mise_bin} activate fish | source"
+      ;;
+    *)
+      echo "eval \"\$(${_mise_bin} activate ${_shell:-})\""
+      ;;
     esac
-  } > "${_file:-}"
+  } >"${_file:-}"
 
   rm "${_file:-}.tmp"
   echo "  ✅ Cleaned up duplicates, kept one activation line"

@@ -293,8 +293,8 @@ EOF
   [[ $pid =~ ^[0-9]+$ ]]
 
   # Cleanup
-  kill $pid 2>/dev/null || true
-  wait $pid 2>/dev/null || true
+  kill "$pid" 2>/dev/null || true
+  wait "$pid" 2>/dev/null || true
 }
 
 # ── Test: Edge Cases ─────────────────────────────────────────────────────────

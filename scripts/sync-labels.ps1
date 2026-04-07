@@ -1,4 +1,4 @@
-﻿# sync-labels.ps1
+# sync-labels.ps1
 # Purpose: Synchronizes and brands repository labels using GitHub CLI (gh) on Windows.
 # Design: Ensures consistent colors and descriptions for engineering labels.
 
