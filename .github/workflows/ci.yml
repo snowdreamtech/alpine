@@ -475,7 +475,14 @@ jobs:
         run: |
           _OS=$(uname -s)
           case "$_OS" in
-            MINGW*|MSYS*|CYGWIN*) _MISE_NPM_BASE="${LOCALAPPDATA}/mise/installs" ;;
+            MINGW*|MSYS*|CYGWIN*)
+              # Convert Windows path to Unix style for Git Bash
+              if command -v cygpath >/dev/null 2>&1; then
+                _MISE_NPM_BASE="$(cygpath -u "${LOCALAPPDATA}")/mise/installs"
+              else
+                _MISE_NPM_BASE="${HOME}/.local/share/mise/installs"
+              fi
+              ;;
             *) _MISE_NPM_BASE="${HOME}/.local/share/mise/installs" ;;
           esac
           _EXTRA_NODE_PATH=""
