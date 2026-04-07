@@ -99,13 +99,22 @@ install_zizmor() {
   local _ZIZMOR_BIN
   _ZIZMOR_BIN=$(resolve_bin "zizmor") || true
   if [ -n "${_ZIZMOR_BIN:-}" ]; then
-    # Verify the binary is actually executable (guards against stale cache)
-    if [ -x "${_ZIZMOR_BIN:-}" ]; then
-      log_success "✅ Zizmor: Active (Found at ${_ZIZMOR_BIN:-})"
-      return 0
+    # In CI: Strict validation - ensure binary actually works
+    if is_ci_env; then
+      if [ -x "${_ZIZMOR_BIN:-}" ] && "${_ZIZMOR_BIN:-}" --version >/dev/null 2>&1; then
+        log_success "✅ Zizmor: Active (Found at ${_ZIZMOR_BIN:-})"
+        return 0
+      else
+        log_warn "⚠️  Zizmor found but not functional (stale cache?). Reinstalling..."
+      fi
+    else
+      # Locally: Just check if executable exists
+      if [ -x "${_ZIZMOR_BIN:-}" ]; then
+        log_success "✅ Zizmor: Active (Found at ${_ZIZMOR_BIN:-})"
+        return 0
+      fi
+      log_info "⚠️  Zizmor shim exists but binary is not executable. Reinstalling..."
     fi
-    # Binary exists but is not executable - force reinstall in CI
-    log_info "⚠️  Zizmor shim exists but binary is not executable. Reinstalling..."
   fi
 
   # Tier 1 Tool in CI: Critical for GitHub Actions security scanning.
