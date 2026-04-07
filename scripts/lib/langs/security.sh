@@ -87,6 +87,7 @@ install_osv_scanner() {
 
 # Purpose: Installs zizmor for GitHub Actions security linting.
 # Delegate: Managed by mise (.mise.toml)
+# NOTE: Zizmor is a Tier 1 tool in .mise.toml and should be installed in CI environments.
 install_zizmor() {
   local _T0_ZIZ
   _T0_ZIZ=$(date +%s)
@@ -102,7 +103,8 @@ install_zizmor() {
     return 0
   fi
 
-  # Tier 3 Tool: Optional for local development.
+  # Tier 1 Tool in CI: Critical for GitHub Actions security scanning.
+  # Tier 3 Tool locally: Optional for local development.
   if ! is_ci_env && [ "${ZIZMOR_FORCE_INSTALL:-0}" -ne 1 ]; then
     log_summary "Security" "Zizmor" "⏭️ Optional (CI-only by default)" "-" "0"
     log_info "⏭️  Zizmor: Optional for local development. Set ZIZMOR_FORCE_INSTALL=1 to force installation."
@@ -111,7 +113,10 @@ install_zizmor() {
 
   log_info "Installing zizmor..."
 
-  if ! has_lang_files ".github/workflows" "*.yaml *.yml"; then
+  # In CI, install regardless of workflow file presence (Tier 1 tool in .mise.toml)
+  # Locally, only install if workflow files exist
+  if ! is_ci_env && ! has_lang_files ".github/workflows" "*.yaml *.yml"; then
+    log_summary "Security" "Zizmor" "⏭️ Skipped (no workflows)" "-" "0"
     return 0
   fi
 
