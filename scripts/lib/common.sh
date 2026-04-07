@@ -1990,13 +1990,9 @@ fi
 # Step 2: Write mise paths to CI cache for future steps
 if is_ci_env && [ -z "${_G_CI_PATH_SYNCED:-}" ]; then
   # Proactively add mise paths to CI persistence
+  # Note: Use Unix-style paths even on Windows (GitHub Actions runs in Git Bash)
   _M_BIN_CI="${_G_MISE_BIN_BASE:-}"
   _M_SHIMS_CI="${_G_MISE_SHIMS_BASE:-}"
-
-  if [ "${_G_OS:-}" = "windows" ] && command -v cygpath >/dev/null 2>&1; then
-    _M_BIN_CI=$(cygpath -w "${_M_BIN_CI:-}")
-    _M_SHIMS_CI=$(cygpath -w "${_M_SHIMS_CI:-}")
-  fi
 
   # Always ensure these are in CI cache if they exist
   if [ -d "$_G_MISE_BIN_BASE" ]; then
