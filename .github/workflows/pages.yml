@@ -102,7 +102,7 @@ jobs:
           persist-credentials: false
 
       - name: "⚡ Cache Mise Tools"
-        uses: actions/cache@668228422ae6a00e4f7e80cd0a94068e53901d # v5.0.4
+        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
         with:
           path: |
             ~/.local/bin
