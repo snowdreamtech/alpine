@@ -680,7 +680,7 @@ run_mise() {
   fi
 
   local _M_BIN
-  _M_BIN=$(command -v mise || echo "$HOME/.local/bin/mise")
+  _M_BIN=$(command -v mise || echo "${_G_MISE_BIN_BASE:-$HOME/.local/bin}/mise")
   [ "${_G_OS:-}" = "windows" ] && [ ! -x "${_M_BIN:-}" ] && _M_BIN="${_M_BIN:-}.exe"
 
   # Performance Opt: Skip installation if version already matches SSoT

@@ -164,7 +164,7 @@ _mise_install_tier4() {
   if [ "${ENABLE_GITHUB_PROXY:-}" = "1" ] || [ "${ENABLE_GITHUB_PROXY:-}" = "true" ]; then
     _M_URL="${GITHUB_PROXY:-}${_M_URL:-}"
   fi
-  local _DEST="$HOME/.local/bin/mise"
+  local _DEST="${_G_MISE_BIN_BASE:-$HOME/.local/bin}/mise"
   if [ "${_OS:-}" = "windows" ]; then _DEST="${_DEST:-}.exe"; fi
 
   mkdir -p "$(dirname "${_DEST:-}")"
@@ -267,7 +267,7 @@ _mise_activate_bash() {
   local _RC="$HOME/.bashrc"
   [ -f "${_RC:-}" ] || return 0
   local _MISE_BIN
-  _MISE_BIN=$(command -v mise 2>/dev/null || echo "$HOME/.local/bin/mise")
+  _MISE_BIN=$(command -v mise 2>/dev/null || echo "${_G_MISE_BIN_BASE:-$HOME/.local/bin}/mise")
   # shellcheck disable=SC2016
   # Check for any existing mise activate line (with or without full path)
   if ! grep -qE '(mise|\.local/bin/mise) activate bash' "${_RC:-}"; then
@@ -286,7 +286,7 @@ _mise_activate_zsh() {
   local _RC="${ZDOTDIR-$HOME}/.zshrc"
   [ -f "${_RC:-}" ] || return 0
   local _MISE_BIN
-  _MISE_BIN=$(command -v mise 2>/dev/null || echo "$HOME/.local/bin/mise")
+  _MISE_BIN=$(command -v mise 2>/dev/null || echo "${_G_MISE_BIN_BASE:-$HOME/.local/bin}/mise")
   # shellcheck disable=SC2016
   # Check for any existing mise activate line (with or without full path)
   if ! grep -qE '(mise|\.local/bin/mise) activate zsh' "${_RC:-}"; then
@@ -305,7 +305,7 @@ _mise_activate_fish() {
   local _RC="$HOME/.config/fish/config.fish"
   mkdir -p "$(dirname "${_RC:-}")"
   local _MISE_BIN
-  _MISE_BIN=$(command -v mise 2>/dev/null || echo "$HOME/.local/bin/mise")
+  _MISE_BIN=$(command -v mise 2>/dev/null || echo "${_G_MISE_BIN_BASE:-$HOME/.local/bin}/mise")
   # Check for any existing mise activate line
   if ! grep -qE '(mise|\.local/bin/mise) activate fish' "${_RC:-}"; then
     {
