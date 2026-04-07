@@ -14,26 +14,25 @@ install_shfmt() {
   local _PROVIDER="${VER_SHFMT_PROVIDER:-}"
   local _VERSION="${VER_SHFMT:-}"
 
-  if ! has_lang_files "" "*.sh *.bash *.bats"; then
+  # In CI, always install (required by pre-commit hooks)
+  # Locally, only install if shell files exist
+  if ! is_ci_env && ! has_lang_files "" "*.sh *.bash *.bats"; then
     log_info "⏭️  Skipping Shfmt: No shell files detected (FORCE_SETUP=${FORCE_SETUP:-0})"
     log_summary "Base" "Shfmt" "⏭️ Skipped" "-" "0"
     return 0
   fi
 
-  log_debug "Shell files detected, proceeding with Shfmt installation"
+  log_debug "Shell files detected or CI environment, proceeding with Shfmt installation"
 
-  # Fast-path: Check version-aware existence (prefix match to handle pkg vs binary diffs)
+  # Fast-path: Check version-aware existence
   local _CUR_VER
   _CUR_VER=$(get_version shfmt)
   local _REQ_VER
   _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
-  if [ "${_CUR_VER:-}" != "-" ] && [ -n "${_REQ_VER:-}" ]; then
-    case "${_REQ_VER:-}" in "${_CUR_VER:-}"*)
-      log_summary "Base" "Shfmt" "✅ Exists" "${_CUR_VER:-}" "0"
-      return 0
-      ;;
-    esac
+  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_summary "Base" "Shfmt" "✅ Exists" "${_CUR_VER:-}" "0"
+    return 0
   fi
 
   _log_setup "${_TITLE:-}" "${_PROVIDER:-}"

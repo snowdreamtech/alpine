@@ -371,13 +371,15 @@ main() {
         log_summary "Security" "sbom" "⚠️ Failed" "${_T_VER:-}" "$(($(date +%s) - _T0_SBOM))"
       fi
     fi
-  elif is_ci_env; then
-    log_error "trivy not found in CI. Failing SBOM generation."
-    log_summary "Security" "sbom" "❌ Missing (Fatal)" "-" "0"
-    _OVERALL_EXIT_AUDIT=1
   else
-    log_warn "trivy not found locally. Skipping SBOM generation."
-    log_summary "Security" "sbom" "⏭️  Skipped" "-" "0"
+    # Trivy CLI not installed - this is expected in CI (uses trivy-action instead)
+    if is_ci_env; then
+      log_info "⏭️  Trivy CLI not installed (CI uses trivy-action). Skipping SBOM generation."
+      log_summary "Security" "sbom" "⏭️ Skipped (CI uses trivy-action)" "-" "0"
+    else
+      log_warn "trivy not found locally. Skipping SBOM generation."
+      log_summary "Security" "sbom" "⏭️  Skipped" "-" "0"
+    fi
   fi
 
   # 10. Binary Artifact Audit (Preventing Binary Poisoning)
