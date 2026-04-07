@@ -127,6 +127,15 @@ jobs:
         run: |
           make setup
           make install
+        env:
+          MISE_GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
+          VENV: ${{ env.VENV }}
+
+      - name: "🩺 Verify Environment Health"
+        shell: sh
+        # Run in a separate step so GITHUB_PATH entries written by make setup
+        # (mise shims) are visible in this step's PATH.
+        run: |
           make check-env
         env:
           MISE_GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
