@@ -148,26 +148,12 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          _OS=$(uname -s)
-          case "$_OS" in
-            MINGW*|MSYS*|CYGWIN*)
-              # Convert Windows path to Unix style for Git Bash
-              if command -v cygpath >/dev/null 2>&1; then
-                _MISE_NPM_BASE="$(cygpath -u "${LOCALAPPDATA}")/mise/installs"
-              else
-                _MISE_NPM_BASE="${HOME}/.local/share/mise/installs"
-              fi
-              ;;
-            *) _MISE_NPM_BASE="${HOME}/.local/share/mise/installs" ;;
-          esac
-          _EXTRA_NODE_PATH=""
-          if [ -d "$_MISE_NPM_BASE" ]; then
-            for _pkg_dir in "$_MISE_NPM_BASE"/npm-*/*/lib/node_modules; do
-              [ -d "$_pkg_dir" ] || continue
-              _EXTRA_NODE_PATH="${_EXTRA_NODE_PATH}${_EXTRA_NODE_PATH:+:}${_pkg_dir}"
-            done
-          fi
-          export NODE_PATH="${_EXTRA_NODE_PATH}${_EXTRA_NODE_PATH:+:}${NODE_PATH:-}"
+          # Source common.sh to get helper functions
+          . scripts/lib/common.sh
+
+          # Build NODE_PATH from mise npm installations
+          export NODE_PATH=$(build_mise_node_path)
+
           if [ "$EVENT_NAME" = "pull_request" ]; then
             mise exec -- commitlint --from "$BASE_SHA" --to "$HEAD_SHA" --verbose
           else

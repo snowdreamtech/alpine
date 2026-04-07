@@ -134,6 +134,60 @@ if [ "${VERBOSE:-1}" -ge 2 ]; then
   printf "[DEBUG] MISE_SHIMS_BASE: %s\n" "${_G_MISE_SHIMS_BASE:-}" >&2
 fi
 
+# ── 🪟 Windows Path Utilities ────────────────────────────────────────────────
+
+# Purpose: Get mise npm installs base path in Unix style (for NODE_PATH in CI)
+# Returns: Unix-style path to mise npm installs directory
+# Examples:
+#   NPM_BASE=$(get_mise_npm_base)
+#   export NODE_PATH="$NPM_BASE/npm-*/*/lib/node_modules"
+get_mise_npm_base() {
+  case "$(uname -s)" in
+  MINGW* | MSYS* | CYGWIN*)
+    # Windows: Convert LOCALAPPDATA to Unix style for Git Bash
+    if [ -n "${LOCALAPPDATA:-}" ]; then
+      if command -v cygpath >/dev/null 2>&1; then
+        echo "$(cygpath -u "${LOCALAPPDATA}")/mise/installs"
+      else
+        # Fallback: manual conversion if cygpath is missing
+        echo "${LOCALAPPDATA}" | sed 's/\\/\//g; s/:\(.*\)/\/\1/; s/^\([A-Za-z]\)\//\/\L\1\//' | sed 's|$|/mise/installs|'
+      fi
+    else
+      # Fallback to Git Bash style if LOCALAPPDATA is not set
+      echo "${HOME}/.local/share/mise/installs"
+    fi
+    ;;
+  *)
+    # Linux/macOS: Standard XDG path
+    echo "${HOME}/.local/share/mise/installs"
+    ;;
+  esac
+}
+
+# Purpose: Build NODE_PATH from mise npm installations
+# Returns: Colon-separated NODE_PATH string with all npm package node_modules
+# Examples:
+#   export NODE_PATH=$(build_mise_node_path)
+build_mise_node_path() {
+  local _npm_base
+  _npm_base=$(get_mise_npm_base)
+
+  local _extra_node_path=""
+  if [ -d "${_npm_base:-}" ]; then
+    for _pkg_dir in "${_npm_base}"/npm-*/*/lib/node_modules; do
+      [ -d "${_pkg_dir:-}" ] || continue
+      _extra_node_path="${_extra_node_path}${_extra_node_path:+:}${_pkg_dir}"
+    done
+  fi
+
+  # Merge with existing NODE_PATH
+  if [ -n "${_extra_node_path:-}" ]; then
+    echo "${_extra_node_path}${NODE_PATH:+:}${NODE_PATH:-}"
+  else
+    echo "${NODE_PATH:-}"
+  fi
+}
+
 # ── ⚙️ Global Configuration ──────────────────────────────────────────────────
 
 # Default verbosity
