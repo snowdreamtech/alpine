@@ -1910,43 +1910,65 @@ is_version_match() {
 
 # Purpose: Get the CI-specific PATH persistence file location
 # Returns: Path to the file where PATH additions should be written, or empty if not supported
+# Note: Returns Unix-style paths even on Windows (Git Bash compatibility)
 _get_ci_path_file() {
+  local _ci_file=""
+
   case "$(detect_ci_platform)" in
   github-actions | forgejo-actions | gitea-actions)
     # GitHub Actions and compatible platforms use GITHUB_PATH
-    echo "${GITHUB_PATH:-}"
+    # Already in correct format for the platform
+    _ci_file="${GITHUB_PATH:-}"
     ;;
   gitlab-ci)
     # GitLab CI: No direct PATH persistence mechanism
     # PATH modifications only last within the current job
     # We can use a custom file and source it in subsequent scripts
-    echo "${CI_PROJECT_DIR:-.}/.ci_path_cache"
+    _ci_file="${CI_PROJECT_DIR:-.}/.ci_path_cache"
     ;;
   drone | woodpecker)
     # Drone/Woodpecker: Similar to GitLab, use custom file
-    echo "${DRONE_WORKSPACE:-${CI_WORKSPACE:-.}}/.ci_path_cache"
+    _ci_file="${DRONE_WORKSPACE:-${CI_WORKSPACE:-.}}/.ci_path_cache"
     ;;
   circleci)
     # CircleCI: Use custom file in workspace
-    echo "${CIRCLE_WORKING_DIRECTORY:-.}/.ci_path_cache"
+    _ci_file="${CIRCLE_WORKING_DIRECTORY:-.}/.ci_path_cache"
     ;;
   azure-pipelines)
     # Azure Pipelines: Use custom file
-    echo "${BUILD_SOURCESDIRECTORY:-.}/.ci_path_cache"
+    _ci_file="${BUILD_SOURCESDIRECTORY:-.}/.ci_path_cache"
     ;;
   jenkins)
     # Jenkins: Use custom file in workspace
-    echo "${WORKSPACE:-.}/.ci_path_cache"
+    _ci_file="${WORKSPACE:-.}/.ci_path_cache"
     ;;
   travis)
     # Travis CI: Use custom file
-    echo "${TRAVIS_BUILD_DIR:-.}/.ci_path_cache"
+    _ci_file="${TRAVIS_BUILD_DIR:-.}/.ci_path_cache"
     ;;
   *)
     # Unknown or local: no persistence
     echo ""
+    return 0
     ;;
   esac
+
+  # Normalize path for Windows Git Bash if needed
+  # GITHUB_PATH is already in correct format, skip conversion
+  if [ "${_G_OS:-}" = "windows" ] && [ -n "${_ci_file:-}" ]; then
+    case "$(detect_ci_platform)" in
+    github-actions | forgejo-actions | gitea-actions)
+      # GITHUB_PATH is already correct, don't convert
+      ;;
+    *)
+      # For other CI platforms on Windows, ensure Unix-style path
+      # Convert backslashes to forward slashes if present
+      _ci_file=$(echo "${_ci_file:-}" | sed 's/\\/\//g')
+      ;;
+    esac
+  fi
+
+  echo "${_ci_file:-}"
 }
 
 # Purpose: Add a path to CI persistence file for future steps/jobs
