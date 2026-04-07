@@ -71,12 +71,25 @@ case "${_G_UNAME:-}" in
 Darwin)
   _G_OS="macos"
   _G_VENV_BIN="bin"
-  _G_MISE_BIN_BASE="$HOME/.local/bin"
-  _G_MISE_SHIMS_BASE="$HOME/.local/share/mise/shims"
+  # macOS: mise can install in multiple locations
+  # 1. Standard: ~/Library/Application Support/mise (default)
+  # 2. XDG-style: ~/.local/share/mise (if XDG_DATA_HOME is set)
+  if [ -d "$HOME/Library/Application Support/mise/shims" ]; then
+    _G_MISE_BIN_BASE="$HOME/.local/bin"
+    _G_MISE_SHIMS_BASE="$HOME/Library/Application Support/mise/shims"
+  elif [ -d "$HOME/.local/share/mise/shims" ]; then
+    _G_MISE_BIN_BASE="$HOME/.local/bin"
+    _G_MISE_SHIMS_BASE="$HOME/.local/share/mise/shims"
+  else
+    # Fallback: assume standard macOS location
+    _G_MISE_BIN_BASE="$HOME/.local/bin"
+    _G_MISE_SHIMS_BASE="$HOME/Library/Application Support/mise/shims"
+  fi
   ;;
 Linux)
   _G_OS="linux"
   _G_VENV_BIN="bin"
+  # Linux: standard XDG Base Directory Specification
   _G_MISE_BIN_BASE="$HOME/.local/bin"
   _G_MISE_SHIMS_BASE="$HOME/.local/share/mise/shims"
   ;;
@@ -93,7 +106,7 @@ MINGW* | MSYS* | CYGWIN*)
 
   # Mise on Windows can install in multiple locations - check in order of preference
   # 1. Git Bash style: $HOME/.local/share/mise (most common in CI)
-  # 2. Windows style: %LOCALAPPDATA%\mise
+  # 2. Windows style: %LOCALAPPDATA%\mise (native Windows installs)
   if [ -d "$HOME/.local/share/mise/shims" ]; then
     _G_MISE_BIN_BASE="$HOME/.local/bin"
     _G_MISE_SHIMS_BASE="$HOME/.local/share/mise/shims"
@@ -113,6 +126,13 @@ MINGW* | MSYS* | CYGWIN*)
   _G_MISE_SHIMS_BASE="$HOME/.local/share/mise/shims"
   ;;
 esac
+
+# Debug: Log detected paths (only in verbose mode)
+if [ "${VERBOSE:-1}" -ge 2 ]; then
+  printf "[DEBUG] OS: %s\n" "${_G_OS:-}" >&2
+  printf "[DEBUG] MISE_BIN_BASE: %s\n" "${_G_MISE_BIN_BASE:-}" >&2
+  printf "[DEBUG] MISE_SHIMS_BASE: %s\n" "${_G_MISE_SHIMS_BASE:-}" >&2
+fi
 
 # ── ⚙️ Global Configuration ──────────────────────────────────────────────────
 
@@ -2003,12 +2023,12 @@ if is_ci_env && [ -z "${_G_CI_PATH_SYNCED:-}" ]; then
   _M_BIN_CI="${_G_MISE_BIN_BASE:-}"
   _M_SHIMS_CI="${_G_MISE_SHIMS_BASE:-}"
 
-  # Always ensure these are in CI cache if they exist
-  if [ -d "$_G_MISE_BIN_BASE" ]; then
+  # Only persist paths that actually exist and contain files
+  if [ -d "$_G_MISE_BIN_BASE" ] && [ -n "$(ls -A "$_G_MISE_BIN_BASE" 2>/dev/null)" ]; then
     _persist_path_to_ci "${_M_BIN_CI:-}"
     log_debug "Persisted mise bin to CI: $_M_BIN_CI"
   fi
-  if [ -d "$_G_MISE_SHIMS_BASE" ]; then
+  if [ -d "$_G_MISE_SHIMS_BASE" ] && [ -n "$(ls -A "$_G_MISE_SHIMS_BASE" 2>/dev/null)" ]; then
     _persist_path_to_ci "${_M_SHIMS_CI:-}"
     log_debug "Persisted mise shims to CI: $_M_SHIMS_CI"
   fi
