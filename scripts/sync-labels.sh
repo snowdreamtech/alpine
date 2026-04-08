@@ -30,9 +30,8 @@ sync_label() {
 
   echo "🔄 Syncing label: [$_name] (#$_color)"
   # Create or Edit the label
-  # Use gh's native template output instead of jq for cross-platform compatibility
-  # Template format extracts just the name field, one per line
-  if gh label list --template '{{range .}}{{.name}}{{"\n"}}{{end}}' | grep -qx "${_name:-}"; then
+  # Check if label exists by listing all labels and filtering
+  if gh label list | awk '{print $1}' | grep -qx "${_name:-}"; then
     gh label edit "${_name:-}" --color "${_color:-}" --description "${_desc:-}"
   else
     gh label create "${_name:-}" --color "${_color:-}" --description "${_desc:-}"
