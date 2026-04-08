@@ -97,7 +97,32 @@ install_sort_package_json() {
     return 0
   fi
   local _STAT_SPJ="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_SPJ="❌ Failed"
+  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
+    _STAT_SPJ="❌ Failed"
+    log_summary "Node" "sort-package-json" "${_STAT_SPJ:-}" "-" "$(($(date +%s) - _T0_SPJ))"
+    if is_ci_env; then
+      log_error "Failed to install ${_TITLE:-} in CI."
+      return 1
+    else
+      log_warn "Failed to install ${_TITLE:-}. Continuing..."
+      return 0
+    fi
+  fi
+
+  # Atomic verification: Ensure tool is fully usable
+  if is_ci_env; then
+    log_debug "Performing atomic verification for ${_TITLE:-}..."
+    mise reshim 2>/dev/null || true
+    sleep 1
+
+    if ! verify_tool_atomic "sort-package-json" "${_PROVIDER:-}" "${_TITLE:-}"; then
+      _STAT_SPJ="❌ Not Usable"
+      log_summary "Node" "sort-package-json" "${_STAT_SPJ:-}" "-" "$(($(date +%s) - _T0_SPJ))"
+      log_error "${_TITLE:-} installed but failed atomic verification."
+      return 1
+    fi
+  fi
+
   log_summary "Node" "sort-package-json" "${_STAT_SPJ:-}" "$(get_version sort-package-json)" "$(($(date +%s) - _T0_SPJ))"
 }
 
@@ -129,7 +154,32 @@ install_eslint() {
   fi
   local _STAT_ES
   _STAT_ES="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_ES="❌ Failed"
+  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
+    _STAT_ES="❌ Failed"
+    log_summary "Node" "ESLint" "${_STAT_ES:-}" "-" "$(($(date +%s) - _T0_ES))"
+    if is_ci_env; then
+      log_error "Failed to install ${_TITLE:-} in CI."
+      return 1
+    else
+      log_warn "Failed to install ${_TITLE:-}. Continuing..."
+      return 0
+    fi
+  fi
+
+  # Atomic verification: Ensure tool is fully usable
+  if is_ci_env; then
+    log_debug "Performing atomic verification for ${_TITLE:-}..."
+    mise reshim 2>/dev/null || true
+    sleep 1
+
+    if ! verify_tool_atomic "eslint" "${_PROVIDER:-}" "${_TITLE:-}"; then
+      _STAT_ES="❌ Not Usable"
+      log_summary "Node" "ESLint" "${_STAT_ES:-}" "-" "$(($(date +%s) - _T0_ES))"
+      log_error "${_TITLE:-} installed but failed atomic verification."
+      return 1
+    fi
+  fi
+
   log_summary "Node" "ESLint" "${_STAT_ES:-}" "$(get_version eslint)" "$(($(date +%s) - _T0_ES))"
 }
 
@@ -161,7 +211,32 @@ install_stylelint() {
   fi
   local _STAT_SL
   _STAT_SL="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_SL="❌ Failed"
+  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
+    _STAT_SL="❌ Failed"
+    log_summary "Node" "Stylelint" "${_STAT_SL:-}" "-" "$(($(date +%s) - _T0_SL))"
+    if is_ci_env; then
+      log_error "Failed to install ${_TITLE:-} in CI."
+      return 1
+    else
+      log_warn "Failed to install ${_TITLE:-}. Continuing..."
+      return 0
+    fi
+  fi
+
+  # Atomic verification: Ensure tool is fully usable
+  if is_ci_env; then
+    log_debug "Performing atomic verification for ${_TITLE:-}..."
+    mise reshim 2>/dev/null || true
+    sleep 1
+
+    if ! verify_tool_atomic "stylelint" "${_PROVIDER:-}" "${_TITLE:-}"; then
+      _STAT_SL="❌ Not Usable"
+      log_summary "Node" "Stylelint" "${_STAT_SL:-}" "-" "$(($(date +%s) - _T0_SL))"
+      log_error "${_TITLE:-} installed but failed atomic verification."
+      return 1
+    fi
+  fi
+
   log_summary "Node" "Stylelint" "${_STAT_SL:-}" "$(get_version stylelint)" "$(($(date +%s) - _T0_SL))"
 }
 
@@ -197,7 +272,32 @@ install_vitepress() {
   fi
   local _STAT_VP
   _STAT_VP="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_VP="❌ Failed"
+  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
+    _STAT_VP="❌ Failed"
+    log_summary "Docs" "VitePress" "${_STAT_VP:-}" "-" "$(($(date +%s) - _T0_VP))"
+    if is_ci_env; then
+      log_error "Failed to install ${_TITLE:-} in CI."
+      return 1
+    else
+      log_warn "Failed to install ${_TITLE:-}. Continuing..."
+      return 0
+    fi
+  fi
+
+  # Atomic verification: Ensure tool is fully usable
+  if is_ci_env; then
+    log_debug "Performing atomic verification for ${_TITLE:-}..."
+    mise reshim 2>/dev/null || true
+    sleep 1
+
+    if ! verify_tool_atomic "vitepress" "${_PROVIDER:-}" "${_TITLE:-}"; then
+      _STAT_VP="❌ Not Usable"
+      log_summary "Docs" "VitePress" "${_STAT_VP:-}" "-" "$(($(date +%s) - _T0_VP))"
+      log_error "${_TITLE:-} installed but failed atomic verification."
+      return 1
+    fi
+  fi
+
   log_summary "Docs" "VitePress" "${_STAT_VP:-}" "$(get_version vitepress)" "$(($(date +%s) - _T0_VP))"
 }
 
@@ -229,7 +329,32 @@ install_prettier() {
   fi
   local _STAT_PR
   _STAT_PR="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_PR="❌ Failed"
+  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
+    _STAT_PR="❌ Failed"
+    log_summary "Base" "Prettier" "${_STAT_PR:-}" "-" "$(($(date +%s) - _T0_PR))"
+    if is_ci_env; then
+      log_error "Failed to install ${_TITLE:-} in CI."
+      return 1
+    else
+      log_warn "Failed to install ${_TITLE:-}. Continuing..."
+      return 0
+    fi
+  fi
+
+  # Atomic verification: Ensure tool is fully usable
+  if is_ci_env; then
+    log_debug "Performing atomic verification for ${_TITLE:-}..."
+    mise reshim 2>/dev/null || true
+    sleep 1
+
+    if ! verify_tool_atomic "prettier" "${_PROVIDER:-}" "${_TITLE:-}"; then
+      _STAT_PR="❌ Not Usable"
+      log_summary "Base" "Prettier" "${_STAT_PR:-}" "-" "$(($(date +%s) - _T0_PR))"
+      log_error "${_TITLE:-} installed but failed atomic verification."
+      return 1
+    fi
+  fi
+
   log_summary "Base" "Prettier" "${_STAT_PR:-}" "$(get_version prettier)" "$(($(date +%s) - _T0_PR))"
 }
 
@@ -261,7 +386,32 @@ install_commitlint() {
   fi
   local _STAT_CL
   _STAT_CL="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_CL="❌ Failed"
+  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
+    _STAT_CL="❌ Failed"
+    log_summary "Base" "Commitlint" "${_STAT_CL:-}" "-" "$(($(date +%s) - _T0_CL))"
+    if is_ci_env; then
+      log_error "Failed to install ${_TITLE:-} in CI."
+      return 1
+    else
+      log_warn "Failed to install ${_TITLE:-}. Continuing..."
+      return 0
+    fi
+  fi
+
+  # Atomic verification: Ensure tool is fully usable
+  if is_ci_env; then
+    log_debug "Performing atomic verification for ${_TITLE:-}..."
+    mise reshim 2>/dev/null || true
+    sleep 1
+
+    if ! verify_tool_atomic "commitlint" "${_PROVIDER:-}" "${_TITLE:-}"; then
+      _STAT_CL="❌ Not Usable"
+      log_summary "Base" "Commitlint" "${_STAT_CL:-}" "-" "$(($(date +%s) - _T0_CL))"
+      log_error "${_TITLE:-} installed but failed atomic verification."
+      return 1
+    fi
+  fi
+
   log_summary "Base" "Commitlint" "${_STAT_CL:-}" "$(get_version commitlint)" "$(($(date +%s) - _T0_CL))"
 }
 
@@ -293,7 +443,32 @@ install_commitizen() {
   fi
   local _STAT_CZ
   _STAT_CZ="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_CZ="❌ Failed"
+  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
+    _STAT_CZ="❌ Failed"
+    log_summary "Base" "Commitizen" "${_STAT_CZ:-}" "-" "$(($(date +%s) - _T0_CZ))"
+    if is_ci_env; then
+      log_error "Failed to install ${_TITLE:-} in CI."
+      return 1
+    else
+      log_warn "Failed to install ${_TITLE:-}. Continuing..."
+      return 0
+    fi
+  fi
+
+  # Atomic verification: Ensure tool is fully usable
+  if is_ci_env; then
+    log_debug "Performing atomic verification for ${_TITLE:-}..."
+    mise reshim 2>/dev/null || true
+    sleep 1
+
+    if ! verify_tool_atomic "commitizen" "${_PROVIDER:-}" "${_TITLE:-}"; then
+      _STAT_CZ="❌ Not Usable"
+      log_summary "Base" "Commitizen" "${_STAT_CZ:-}" "-" "$(($(date +%s) - _T0_CZ))"
+      log_error "${_TITLE:-} installed but failed atomic verification."
+      return 1
+    fi
+  fi
+
   log_summary "Base" "Commitizen" "${_STAT_CZ:-}" "$(get_version commitizen)" "$(($(date +%s) - _T0_CZ))"
 }
 
