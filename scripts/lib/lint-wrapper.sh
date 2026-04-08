@@ -73,8 +73,9 @@ main() {
     ;;
   editorconfig-checker)
     _MISE_TOOL_SPEC="github:editorconfig-checker/editorconfig-checker"
-    # Binary name varies by OS: ec (Linux/macOS), ec.exe (Windows)
-    _LINTER_BIN="editorconfig-checker"
+    # Binary name is 'ec' with platform-specific suffixes
+    # The mise tool spec uses bin = "ec-*" to match all variants
+    _LINTER_BIN="ec"
     ;;
   esac
 
