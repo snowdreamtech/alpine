@@ -2044,47 +2044,56 @@ _persist_path_to_ci() {
     ;;
   esac
 
-  # Windows PATH Conversion: GitHub Actions on Windows needs Windows-style paths
-  # Convert Unix-style paths (from Git Bash) to Windows-style for $GITHUB_PATH
-  local _path_to_write="${_path_to_add:-}"
+  # Windows PATH Handling: Write both Unix and Windows formats for maximum compatibility
+  # Strategy: Redundancy over missing paths - write both formats to ensure tools are found
   if [ "${_G_OS:-}" = "windows" ] && [ "$(detect_ci_platform)" = "github-actions" ]; then
-    # EXPERIMENT: Try Unix-style paths instead of Windows-style
-    # GitHub Actions on Windows with bash shell might expect Unix paths
-    # Keep the path as-is (Unix style) instead of converting to Windows style
-    echo "    [PATH] Using Unix-style path for bash shell: ${_path_to_add:-}" >&2
-    # Old approach (commented out for testing):
-    # if command -v cygpath >/dev/null 2>&1; then
-    #   _path_to_write=$(cygpath -w "${_path_to_add:-}" 2>/dev/null) || _path_to_write="${_path_to_add:-}"
-    #   echo "    [PATH] Converted: ${_path_to_add:-} -> ${_path_to_write:-}" >&2
-    # else
-    #   echo "    [WARN] cygpath not available, using Unix-style path" >&2
-    # fi
-  fi
-
-  # Idempotent: Don't add if already present (check both formats on Windows)
-  if [ -f "${_ci_path_file:-}" ]; then
-    if grep -qxF "${_path_to_write:-}" "${_ci_path_file:-}" 2>/dev/null; then
-      echo "    [INFO] Path already in CI cache: ${_path_to_write:-}" >&2
+    # Idempotent check: Skip if Unix-style path already present
+    if [ -f "${_ci_path_file:-}" ] && grep -qxF "${_path_to_add:-}" "${_ci_path_file:-}" 2>/dev/null; then
+      echo "    [INFO] Unix path already in CI cache: ${_path_to_add:-}" >&2
       return 0
     fi
-    # On Windows, also check if Unix-style path is already present
-    if [ "${_G_OS:-}" = "windows" ] && [ "${_path_to_write:-}" != "${_path_to_add:-}" ]; then
-      if grep -qxF "${_path_to_add:-}" "${_ci_path_file:-}" 2>/dev/null; then
-        echo "    [INFO] Unix-style path already in CI cache, skipping" >&2
-        return 0
+
+    # Security: Set restrictive permissions on first write
+    if [ ! -f "${_ci_path_file:-}" ]; then
+      touch "${_ci_path_file:-}"
+      chmod 600 "${_ci_path_file:-}" 2>/dev/null || true
+      echo "    [NEW] Created CI path cache: ${_ci_path_file:-}" >&2
+    fi
+
+    # Write Unix-style path first (Git Bash native format)
+    echo "${_path_to_add:-}" >>"${_ci_path_file:-}"
+    echo "    [OK] Wrote Unix path: ${_path_to_add:-}" >&2
+
+    # Also write Windows-style path for compatibility with other shells
+    if command -v cygpath >/dev/null 2>&1; then
+      local _windows_path
+      _windows_path=$(cygpath -w "${_path_to_add:-}" 2>/dev/null) || _windows_path=""
+      if [ -n "${_windows_path:-}" ] && [ "${_windows_path:-}" != "${_path_to_add:-}" ]; then
+        # Check if Windows path already exists
+        if ! grep -qxF "${_windows_path:-}" "${_ci_path_file:-}" 2>/dev/null; then
+          echo "${_windows_path:-}" >>"${_ci_path_file:-}"
+          echo "    [OK] Wrote Windows path: ${_windows_path:-}" >&2
+        fi
       fi
     fi
-  fi
+  else
+    # Non-Windows or non-GitHub Actions: Standard behavior
+    # Idempotent: Don't add if already present
+    if [ -f "${_ci_path_file:-}" ] && grep -qxF "${_path_to_add:-}" "${_ci_path_file:-}" 2>/dev/null; then
+      echo "    [INFO] Path already in CI cache: ${_path_to_add:-}" >&2
+      return 0
+    fi
 
-  # Security: Set restrictive permissions on first write (owner read/write only)
-  if [ ! -f "${_ci_path_file:-}" ]; then
-    touch "${_ci_path_file:-}"
-    chmod 600 "${_ci_path_file:-}" 2>/dev/null || true
-    echo "    [NEW] Created CI path cache: ${_ci_path_file:-}" >&2
-  fi
+    # Security: Set restrictive permissions on first write
+    if [ ! -f "${_ci_path_file:-}" ]; then
+      touch "${_ci_path_file:-}"
+      chmod 600 "${_ci_path_file:-}" 2>/dev/null || true
+      echo "    [NEW] Created CI path cache: ${_ci_path_file:-}" >&2
+    fi
 
-  echo "${_path_to_write:-}" >>"${_ci_path_file:-}"
-  echo "    [OK] Wrote to CI path cache: ${_path_to_write:-}" >&2
+    echo "${_path_to_add:-}" >>"${_ci_path_file:-}"
+    echo "    [OK] Wrote to CI path cache: ${_path_to_add:-}" >&2
+  fi
 }
 
 # Purpose: Read CI persistence file and sync paths to current shell
