@@ -2051,18 +2051,22 @@ _persist_path_to_ci() {
     # Use cygpath -w to convert Unix → Windows path
     if command -v cygpath >/dev/null 2>&1; then
       _path_to_write=$(cygpath -w "${_path_to_add:-}" 2>/dev/null) || _path_to_write="${_path_to_add:-}"
-      log_debug "Converted path for Windows CI: ${_path_to_add:-} → ${_path_to_write:-}"
+      log_info "    🔄 Converted path: ${_path_to_add:-} → ${_path_to_write:-}"
+    else
+      log_warn "    ⚠️  cygpath not available, using Unix-style path"
     fi
   fi
 
   # Idempotent: Don't add if already present (check both formats on Windows)
   if [ -f "${_ci_path_file:-}" ]; then
     if grep -qxF "${_path_to_write:-}" "${_ci_path_file:-}" 2>/dev/null; then
+      log_info "    ℹ️  Path already in CI cache: ${_path_to_write:-}"
       return 0
     fi
     # On Windows, also check if Unix-style path is already present
     if [ "${_G_OS:-}" = "windows" ] && [ "${_path_to_write:-}" != "${_path_to_add:-}" ]; then
       if grep -qxF "${_path_to_add:-}" "${_ci_path_file:-}" 2>/dev/null; then
+        log_info "    ℹ️  Unix-style path already in CI cache, skipping"
         return 0
       fi
     fi
@@ -2072,11 +2076,11 @@ _persist_path_to_ci() {
   if [ ! -f "${_ci_path_file:-}" ]; then
     touch "${_ci_path_file:-}"
     chmod 600 "${_ci_path_file:-}" 2>/dev/null || true
-    log_debug "Created CI path cache with restrictive permissions: ${_ci_path_file:-}"
+    log_info "    📝 Created CI path cache: ${_ci_path_file:-}"
   fi
 
   echo "${_path_to_write:-}" >>"${_ci_path_file:-}"
-  log_debug "Persisted path to CI: ${_path_to_write:-}"
+  log_info "    ✅ Wrote to CI path cache: ${_path_to_write:-}"
 }
 
 # Purpose: Read CI persistence file and sync paths to current shell

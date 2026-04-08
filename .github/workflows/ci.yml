@@ -180,6 +180,21 @@ jobs:
         run: |
           make setup
           make install
+
+          # Debug: Show what was written to GITHUB_PATH
+          echo "=== DEBUG: GITHUB_PATH contents ==="
+          if [ -f "${GITHUB_PATH:-}" ]; then
+            cat "${GITHUB_PATH}"
+          else
+            echo "GITHUB_PATH file not found: ${GITHUB_PATH:-}"
+          fi
+          echo "=== DEBUG: Current PATH ==="
+          echo "$PATH" | tr ':' '\n' | head -20
+          echo "=== DEBUG: Mise shims directory ==="
+          ls -la "$HOME/.local/share/mise/shims" 2>/dev/null || echo "Shims directory not found"
+          echo "=== DEBUG: Check for prettier ==="
+          which prettier || echo "prettier not in PATH"
+          command -v prettier || echo "prettier not found via command"
         env:
           MISE_GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           VENV: ${{ env.VENV }}
