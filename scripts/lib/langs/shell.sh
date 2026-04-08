@@ -34,12 +34,12 @@ install_shfmt() {
     # In CI, verify the tool is actually executable, not just registered in mise
     if is_ci_env; then
       log_debug "Verifying shfmt executability in CI..."
-      # Try multiple methods to verify executability
+      # Try multiple methods to verify executability with timeout protection
       if command -v shfmt >/dev/null 2>&1; then
         log_debug "shfmt found via command -v"
         log_summary "Base" "Shfmt" "✅ Exists" "${_CUR_VER:-}" "0"
         return 0
-      elif mise exec "${_PROVIDER:-}" -- shfmt --version >/dev/null 2>&1; then
+      elif run_with_timeout_robust 5 mise exec "${_PROVIDER:-}" -- shfmt --version >/dev/null 2>&1; then
         log_debug "shfmt executable via mise exec"
         log_summary "Base" "Shfmt" "✅ Exists" "${_CUR_VER:-}" "0"
         return 0
@@ -74,15 +74,17 @@ install_shfmt() {
     fi
   fi
 
-  # Post-installation verification in CI
+  # Atomic verification: Ensure tool is fully usable
   if is_ci_env; then
-    log_debug "Verifying shfmt installation..."
+    log_debug "Performing atomic verification for ${_TITLE:-}..."
     mise reshim 2>/dev/null || true
     sleep 1
 
-    if ! command -v shfmt >/dev/null 2>&1 && ! mise exec "${_PROVIDER:-}" -- shfmt --version >/dev/null 2>&1; then
-      log_error "Shfmt installed but not executable!"
-      _STAT_SHF="❌ Not Executable"
+    if ! verify_tool_atomic "shfmt" "${_PROVIDER:-}" "${_TITLE:-}"; then
+      _STAT_SHF="❌ Not Usable"
+      log_summary "Base" "Shfmt" "${_STAT_SHF:-}" "-" "$(($(date +%s) - _T0_SHF))"
+      log_error "${_TITLE:-} installed but failed atomic verification."
+      return 1
     fi
   fi
 

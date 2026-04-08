@@ -1828,6 +1828,79 @@ check_runtime() {
   fi
 }
 
+# Purpose: Atomically verifies tool installation with comprehensive checks.
+#          Ensures: installed, exists, executable, resolvable, usable.
+# Params:
+#   $1 - Tool binary name (e.g., "shfmt", "ec")
+#   $2 - Tool provider spec (e.g., "github:mvdan/sh")
+#   $3 - Tool display name (e.g., "Shfmt")
+# Returns:
+#   0 - Tool is fully verified and usable
+#   1 - Tool verification failed
+# Examples:
+#   verify_tool_atomic "shfmt" "github:mvdan/sh" "Shfmt"
+#   verify_tool_atomic "ec" "github:editorconfig-checker/editorconfig-checker" "Editorconfig-Checker"
+verify_tool_atomic() {
+  local _BIN_NAME="${1:-}"
+  local _PROVIDER="${2:-}"
+  local _DISPLAY_NAME="${3:-Tool}"
+
+  [ -z "${_BIN_NAME:-}" ] && return 1
+
+  log_debug "=== Atomic Verification: ${_DISPLAY_NAME:-} ==="
+
+  # Step 1: Check if tool is registered in mise
+  log_debug "Step 1/5: Checking mise registration..."
+  if ! mise list 2>/dev/null | grep -q "${_PROVIDER:-}"; then
+    log_error "✗ ${_DISPLAY_NAME:-} not registered in mise"
+    return 1
+  fi
+  log_debug "✓ Registered in mise"
+
+  # Step 2: Check if binary exists via command -v
+  log_debug "Step 2/5: Checking binary existence..."
+  if ! command -v "${_BIN_NAME:-}" >/dev/null 2>&1; then
+    log_warn "✗ ${_BIN_NAME:-} not found via command -v, trying mise exec..."
+
+    # Fallback: Try mise exec
+    if ! run_with_timeout_robust 5 mise exec "${_PROVIDER:-}" -- "${_BIN_NAME:-}" --version >/dev/null 2>&1; then
+      log_error "✗ ${_BIN_NAME:-} not executable via mise exec"
+      return 1
+    fi
+    log_debug "✓ Executable via mise exec (shim may need refresh)"
+  else
+    log_debug "✓ Found via command -v"
+  fi
+
+  # Step 3: Check if binary is resolvable via resolve_bin
+  log_debug "Step 3/5: Checking path resolution..."
+  local _RESOLVED_PATH
+  _RESOLVED_PATH=$(resolve_bin "${_BIN_NAME:-}") || {
+    log_error "✗ ${_BIN_NAME:-} not resolvable via resolve_bin"
+    return 1
+  }
+  log_debug "✓ Resolved to: ${_RESOLVED_PATH:-}"
+
+  # Step 4: Check if binary is executable
+  log_debug "Step 4/5: Checking executability..."
+  if [ ! -x "${_RESOLVED_PATH:-}" ]; then
+    log_error "✗ ${_RESOLVED_PATH:-} is not executable"
+    return 1
+  fi
+  log_debug "✓ Executable"
+
+  # Step 5: Check if binary can run (smoke test)
+  log_debug "Step 5/5: Running smoke test..."
+  if ! run_with_timeout_robust 5 "${_RESOLVED_PATH:-}" --version >/dev/null 2>&1; then
+    log_error "✗ ${_BIN_NAME:-} failed smoke test (--version)"
+    return 1
+  fi
+  log_debug "✓ Smoke test passed"
+
+  log_debug "=== ✓ ${_DISPLAY_NAME:-} fully verified ==="
+  return 0
+}
+
 # Purpose: Installs the Node.js runtime and project dependencies.
 # language-specific modules will be loaded dynamically below
 

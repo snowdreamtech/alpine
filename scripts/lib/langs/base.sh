@@ -195,7 +195,7 @@ install_editorconfig_checker() {
         log_debug "ec found via command -v"
         log_summary "Base" "Editorconfig-Checker" "✅ Exists" "${_CUR_VER:-}" "0"
         return 0
-      elif mise exec "${_PROVIDER:-}" -- ec --version >/dev/null 2>&1; then
+      elif run_with_timeout_robust 5 mise exec "${_PROVIDER:-}" -- ec --version >/dev/null 2>&1; then
         log_debug "ec executable via mise exec"
         log_summary "Base" "Editorconfig-Checker" "✅ Exists" "${_CUR_VER:-}" "0"
         return 0
@@ -220,17 +220,28 @@ install_editorconfig_checker() {
   local _STAT_EC="✅ mise"
   if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
     _STAT_EC="❌ Failed"
-  else
-    # Post-installation verification in CI
+    log_summary "Base" "Editorconfig-Checker" "${_STAT_EC:-}" "-" "$(($(date +%s) - _T0_EC))"
     if is_ci_env; then
-      log_debug "Verifying editorconfig-checker installation..."
-      mise reshim 2>/dev/null || true
-      sleep 1
+      log_error "Failed to install ${_TITLE:-} in CI."
+      return 1
+    else
+      log_warn "Failed to install ${_TITLE:-}. Continuing..."
+      return 0
+    fi
+  fi
 
-      if ! command -v ec >/dev/null 2>&1 && ! mise exec "${_PROVIDER:-}" -- ec --version >/dev/null 2>&1; then
-        log_error "Editorconfig-Checker installed but not executable!"
-        _STAT_EC="❌ Not Executable"
-      fi
+  # Atomic verification: Ensure tool is fully usable
+  # Note: editorconfig-checker binary is named 'ec'
+  if is_ci_env; then
+    log_debug "Performing atomic verification for ${_TITLE:-}..."
+    mise reshim 2>/dev/null || true
+    sleep 1
+
+    if ! verify_tool_atomic "ec" "${_PROVIDER:-}" "${_TITLE:-}"; then
+      _STAT_EC="❌ Not Usable"
+      log_summary "Base" "Editorconfig-Checker" "${_STAT_EC:-}" "-" "$(($(date +%s) - _T0_EC))"
+      log_error "${_TITLE:-} installed but failed atomic verification."
+      return 1
     fi
   fi
 
