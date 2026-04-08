@@ -231,18 +231,43 @@ install_editorconfig_checker() {
   fi
 
   # Atomic verification: Ensure tool is fully usable
-  # Note: editorconfig-checker binary is named 'ec'
+  # Note: editorconfig-checker binary is platform-specific (ec-linux-amd64, ec-darwin-amd64, etc.)
   if is_ci_env; then
     log_debug "Performing atomic verification for ${_TITLE:-}..."
     mise reshim 2>/dev/null || true
     sleep 1
 
-    if ! verify_tool_atomic "ec" "${_PROVIDER:-}" "${_TITLE:-}"; then
-      _STAT_EC="❌ Not Usable"
+    # Special handling for editorconfig-checker: binary name is platform-specific
+    # Use mise which to get the actual binary path (handles shims and platform-specific names)
+    local _EC_BIN
+    _EC_BIN=$(MISE_OFFLINE=1 run_with_timeout_robust 3 mise which editorconfig-checker 2>/dev/null) || _EC_BIN=""
+
+    if [ -z "${_EC_BIN:-}" ]; then
+      # Fallback: Try to find ec-* pattern in mise installs directory
+      local _EC_INSTALL_DIR
+      _EC_INSTALL_DIR=$(mise where "${_PROVIDER:-}" 2>/dev/null) || _EC_INSTALL_DIR=""
+      if [ -n "${_EC_INSTALL_DIR:-}" ] && [ -d "${_EC_INSTALL_DIR:-}/bin" ]; then
+        _EC_BIN=$(find "${_EC_INSTALL_DIR:-}/bin" -name "ec-*" -type f 2>/dev/null | head -n 1)
+      fi
+    fi
+
+    if [ -z "${_EC_BIN:-}" ] || [ ! -x "${_EC_BIN:-}" ]; then
+      _STAT_EC="❌ Not Executable"
       log_summary "Base" "Editorconfig-Checker" "${_STAT_EC:-}" "-" "$(($(date +%s) - _T0_EC))"
-      log_error "${_TITLE:-} installed but failed atomic verification."
+      log_error "${_TITLE:-} installed but binary not found or not executable."
+      log_debug "Attempted paths: mise which editorconfig-checker, ${_EC_INSTALL_DIR:-}/bin/ec-*"
       return 1
     fi
+
+    # Run smoke test
+    if ! run_with_timeout_robust 5 "${_EC_BIN:-}" --version >/dev/null 2>&1; then
+      _STAT_EC="❌ Not Usable"
+      log_summary "Base" "Editorconfig-Checker" "${_STAT_EC:-}" "-" "$(($(date +%s) - _T0_EC))"
+      log_error "${_TITLE:-} installed but failed smoke test."
+      return 1
+    fi
+
+    log_debug "✓ Editorconfig-Checker fully verified at: ${_EC_BIN:-}"
   fi
 
   log_summary "Base" "Editorconfig-Checker" "${_STAT_EC:-}" "$(get_version editorconfig-checker)" "$(($(date +%s) - _T0_EC))"
