@@ -148,8 +148,17 @@ jobs:
           else
             echo "GITHUB_PATH file not found"
           fi
-          echo "=== DEBUG: Current PATH (first 10) ==="
-          echo "$PATH" | tr ':' '\n' | head -10
+          echo "=== DEBUG: Current PATH (first 20) ==="
+          echo "$PATH" | tr ':' '\n' | head -20
+          echo "=== DEBUG: Mise Installation ==="
+          ls -la "$HOME/.local/share/mise/shims" 2>/dev/null || echo "$HOME/.local/share/mise/shims not found"
+          if command -v cygpath >/dev/null 2>&1 && [ -n "${LOCALAPPDATA:-}" ]; then
+            _local_app=$(cygpath -u "${LOCALAPPDATA}")
+            ls -la "${_local_app}/mise/shims" 2>/dev/null || echo "${_local_app}/mise/shims not found"
+          fi
+          echo "=== DEBUG: Tool Check (prettier) ==="
+          which prettier || echo "prettier not in PATH"
+          command -v prettier || echo "prettier not found"
         env:
           MISE_GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           VENV: ${{ env.VENV }}
