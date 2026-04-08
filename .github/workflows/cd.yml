@@ -125,25 +125,31 @@ jobs:
       - name: "🚀 Initialize Development Environment"
         shell: sh
         run: |
-          # Debug: Show environment (Windows only)
-          if [ "$(uname -s | grep -i 'MINGW\|MSYS\|CYGWIN')" ]; then
-            echo "=== DEBUG: Windows Environment ==="
-            echo "GITHUB_PATH: ${GITHUB_PATH:-}"
-            echo "HOME: $HOME"
-            echo "LOCALAPPDATA: ${LOCALAPPDATA:-}"
+          # Debug: Show environment before setup
+          echo "=== DEBUG: Environment Detection ==="
+          echo "GITHUB_PATH: ${GITHUB_PATH:-}"
+          echo "GITHUB_ACTIONS: ${GITHUB_ACTIONS:-}"
+          echo "OS (uname): $(uname -s)"
+          echo "HOME: $HOME"
+          echo "LOCALAPPDATA: ${LOCALAPPDATA:-}"
+          echo "cygpath: $(command -v cygpath >/dev/null 2>&1 && echo yes || echo no)"
+          if command -v cygpath >/dev/null 2>&1 && [ -n "${LOCALAPPDATA:-}" ]; then
+            echo "LOCALAPPDATA (Unix): $(cygpath -u "${LOCALAPPDATA}")"
           fi
 
           make setup
           make install
 
-          # Debug: Show PATH after setup (Windows only)
-          if [ "$(uname -s | grep -i 'MINGW\|MSYS\|CYGWIN')" ]; then
-            echo "=== DEBUG: After Setup ==="
-            echo "GITHUB_PATH contents:"
-            cat "${GITHUB_PATH}" 2>/dev/null || echo "GITHUB_PATH file not found"
-            echo "PATH (first 10):"
-            echo "$PATH" | tr ':' '\n' | head -10
+          # Debug: Show what was written to GITHUB_PATH
+          echo "=== DEBUG: GITHUB_PATH Contents ==="
+          if [ -f "${GITHUB_PATH:-}" ]; then
+            cat "${GITHUB_PATH}"
+            echo "--- Lines: $(wc -l < "${GITHUB_PATH}") ---"
+          else
+            echo "GITHUB_PATH file not found"
           fi
+          echo "=== DEBUG: Current PATH (first 10) ==="
+          echo "$PATH" | tr ':' '\n' | head -10
         env:
           MISE_GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           VENV: ${{ env.VENV }}
@@ -165,14 +171,12 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
-          # Debug: Check commitlint availability (Windows only)
-          if [ "$(uname -s | grep -i 'MINGW\|MSYS\|CYGWIN')" ]; then
-            echo "=== DEBUG: Commitlint Check ==="
-            which commitlint || echo "commitlint not in PATH"
-            command -v commitlint || echo "commitlint not found"
-            echo "PATH (first 10):"
-            echo "$PATH" | tr ':' '\n' | head -10
-          fi
+          # Debug: Check commitlint availability
+          echo "=== DEBUG: Tool Check (commitlint) ==="
+          which commitlint || echo "commitlint not in PATH"
+          command -v commitlint || echo "commitlint not found"
+          echo "PATH (first 10):"
+          echo "$PATH" | tr ':' '\n' | head -10
 
           # Source common.sh to get helper functions
           . scripts/lib/common.sh
