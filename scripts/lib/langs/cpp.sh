@@ -44,6 +44,15 @@ install_clang_format() {
   fi
   local _STAT_CF="✅ mise"
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_CF="❌ Failed"
+
+  # Atomic verification: ensure tool is fully functional
+  if ! verify_tool_atomic "clang-format" "--version"; then
+    _STAT_CF="❌ Not Executable"
+    log_summary "CPP" "clang-format" "${_STAT_CF:-}" "-" "$(($(date +%s) - _T0_CF))"
+    [ "${CI:-}" = "true" ] && return 1
+    return 0
+  fi
+
   log_summary "CPP" "clang-format" "${_STAT_CF:-}" "$(get_version clang-format)" "$(($(date +%s) - _T0_CF))"
 }
 

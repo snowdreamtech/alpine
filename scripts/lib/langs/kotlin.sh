@@ -41,6 +41,15 @@ install_ktlint() {
   local _STAT_KT="✅ mise"
   setup_registry_ktlint
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_KT="❌ Failed"
+
+  # Atomic verification: ensure tool is fully functional
+  if ! verify_tool_atomic "ktlint" "--version"; then
+    _STAT_KT="❌ Not Executable"
+    log_summary "Kotlin" "ktlint" "${_STAT_KT:-}" "-" "$(($(date +%s) - _T0_KT))"
+    [ "${CI:-}" = "true" ] && return 1
+    return 0
+  fi
+
   log_summary "Kotlin" "ktlint" "${_STAT_KT:-}" "$(get_version ktlint --version)" "$(($(date +%s) - _T0_KT))"
 }
 

@@ -34,6 +34,15 @@ install_stylua() {
   local _STAT_LUA="✅ mise"
   setup_registry_stylua
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_LUA="❌ Failed"
+
+  # Atomic verification: ensure tool is fully functional
+  if ! verify_tool_atomic "stylua" "--version"; then
+    _STAT_LUA="❌ Not Executable"
+    log_summary "Lua" "StyLua" "${_STAT_LUA:-}" "-" "$(($(date +%s) - _T0_LUA))"
+    [ "${CI:-}" = "true" ] && return 1
+    return 0
+  fi
+
   log_summary "Lua" "StyLua" "${_STAT_LUA:-}" "$(get_version stylua --version)" "$(($(date +%s) - _T0_LUA))"
 }
 

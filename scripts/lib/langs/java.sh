@@ -45,6 +45,15 @@ install_java_lint() {
   local _STAT_JAVA="✅ mise"
   setup_registry_google_java_format
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_JAVA="❌ Failed"
+
+  # Atomic verification: ensure tool is fully functional
+  if ! verify_tool_atomic "google-java-format" "--version"; then
+    _STAT_JAVA="❌ Not Executable"
+    log_summary "Java" "Java Lint" "${_STAT_JAVA:-}" "-" "$(($(date +%s) - _T0_JAVA))"
+    [ "${CI:-}" = "true" ] && return 1
+    return 0
+  fi
+
   log_summary "Java" "Java Lint" "${_STAT_JAVA:-}" "$(get_version google-java-format)" "$(($(date +%s) - _T0_JAVA))"
 }
 
