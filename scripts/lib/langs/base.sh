@@ -187,8 +187,19 @@ install_editorconfig_checker() {
   _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
 
   if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Base" "Editorconfig-Checker" "✅ Exists" "${_CUR_VER:-}" "0"
-    return 0
+    # In CI, verify the tool is actually executable, not just registered in mise
+    if is_ci_env; then
+      # Note: editorconfig-checker binary is actually named 'ec'
+      if ! command -v ec >/dev/null 2>&1 && ! mise exec "${_PROVIDER:-}" -- ec --version >/dev/null 2>&1; then
+        log_warn "Editorconfig-Checker is registered in mise but not executable. Reinstalling..."
+      else
+        log_summary "Base" "Editorconfig-Checker" "✅ Exists" "${_CUR_VER:-}" "0"
+        return 0
+      fi
+    else
+      log_summary "Base" "Editorconfig-Checker" "✅ Exists" "${_CUR_VER:-}" "0"
+      return 0
+    fi
   fi
 
   _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
