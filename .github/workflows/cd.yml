@@ -215,15 +215,25 @@ jobs:
         shell: sh
         run: |
           # Ensure mise shims are on PATH for all commands
+          # Add both possible mise shims locations
           if [ -d "$HOME/.local/share/mise/shims" ]; then
             export PATH="$HOME/.local/share/mise/shims:$PATH"
+            echo "Added to PATH: $HOME/.local/share/mise/shims"
           fi
           if command -v cygpath >/dev/null 2>&1 && [ -n "${LOCALAPPDATA:-}" ]; then
             _local_app=$(cygpath -u "${LOCALAPPDATA}")
             if [ -d "${_local_app}/mise/shims" ]; then
               export PATH="${_local_app}/mise/shims:$PATH"
+              echo "Added to PATH: ${_local_app}/mise/shims"
             fi
           fi
+
+          # Debug: Verify PATH and tool availability
+          echo "=== DEBUG: PATH after mise shims addition ==="
+          echo "$PATH" | tr ':' '\n' | head -10
+          echo "=== DEBUG: Tool availability check ==="
+          command -v prettier || echo "prettier not found"
+          command -v pnpm || echo "pnpm not found"
 
           make lint
           make test
