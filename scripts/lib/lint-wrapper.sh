@@ -73,7 +73,8 @@ main() {
     ;;
   editorconfig-checker)
     _MISE_TOOL_SPEC="github:editorconfig-checker/editorconfig-checker"
-    _LINTER_BIN="ec-windows-amd64"
+    # Binary name varies by OS: ec (Linux/macOS), ec.exe (Windows)
+    _LINTER_BIN="editorconfig-checker"
     ;;
   esac
 

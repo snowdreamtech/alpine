@@ -26,7 +26,7 @@ python = "3.14.3"
 # ── 💎 Core Quality & Commit Tooling ──────────────────────────────────────────
 # Tools invoked by pre-commit hooks or universally needed.
 "github:checkmake/checkmake" = { version = "0.3.2", bin = "checkmake" }
-"github:editorconfig-checker/editorconfig-checker" = "3.6.1"
+"github:editorconfig-checker/editorconfig-checker" = { version = "3.6.1", bin = "ec-*" }
 "github:google/addlicense" = "1.2.0"
 
 # Git / commit workflow
@@ -56,7 +56,7 @@ python = "3.14.3"
 "github:rhysd/actionlint" = "1.7.12"
 "pipx:pre-commit" = "4.5.1"
 "github:koalaman/shellcheck" = "0.11.0"
-"github:mvdan/sh" = "3.13.1"
+"github:mvdan/sh" = { version = "3.13.1", bin = "shfmt" }
 
 # Testing (required by make test)
 "npm:bats" = "1.13.0"
