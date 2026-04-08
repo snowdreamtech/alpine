@@ -18,6 +18,11 @@ jobs:
   dco:
     name: "🛡️ Verify Signed-off-by"
     runs-on: ubuntu-latest
+    # Skip DCO check for bot commits (release-please, dependabot, etc.)
+    if: |
+      github.actor != 'dependabot[bot]' &&
+      github.actor != 'github-actions[bot]' &&
+      github.actor != 'release-please[bot]'
     concurrency:
       group: dco-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: true
