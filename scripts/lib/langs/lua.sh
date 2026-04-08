@@ -36,7 +36,7 @@ install_stylua() {
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_LUA="❌ Failed"
 
   # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "stylua" "--version"; then
+  if ! verify_tool_atomic "stylua" "${_PROVIDER:-}" "StyLua" "--version"; then
     _STAT_LUA="❌ Not Executable"
     log_summary "Lua" "StyLua" "${_STAT_LUA:-}" "-" "$(($(date +%s) - _T0_LUA))"
     [ "${CI:-}" = "true" ] && return 1

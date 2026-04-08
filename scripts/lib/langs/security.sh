@@ -213,7 +213,7 @@ install_cargo_audit() {
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_CA="❌ Failed"
 
   # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "cargo-audit" "--version"; then
+  if ! verify_tool_atomic "cargo-audit" "${_PROVIDER:-}" "Cargo-Audit" "--version"; then
     _STAT_CA="❌ Not Executable"
     log_summary "Security" "Cargo-Audit" "${_STAT_CA:-}" "-" "$(($(date +%s) - _T0_CA))"
     [ "${CI:-}" = "true" ] && return 1

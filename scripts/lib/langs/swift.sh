@@ -80,7 +80,7 @@ install_swiftformat() {
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_SF="❌ Failed"
 
   # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "swiftformat" "--version"; then
+  if ! verify_tool_atomic "swiftformat" "${_PROVIDER:-}" "SwiftFormat" "--version"; then
     _STAT_SF="❌ Not Executable"
     log_summary "Swift" "SwiftFormat" "${_STAT_SF:-}" "-" "$(($(date +%s) - _T0_SF))"
     [ "${CI:-}" = "true" ] && return 1

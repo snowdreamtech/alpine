@@ -40,7 +40,7 @@ install_bats() {
   refresh_mise_cache
 
   # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "bats" "--version"; then
+  if ! verify_tool_atomic "bats" "${_PROVIDER:-}" "Bats" "--version"; then
     _STAT_BATS="❌ Not Executable"
     log_summary "Testing" "Bats" "${_STAT_BATS:-}" "-" "$(($(date +%s) - _T0_BATS))"
     [ "${CI:-}" = "true" ] && return 1

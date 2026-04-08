@@ -43,7 +43,7 @@ install_scala_lint() {
   run_mise install "${_PROVIDER:-}@${_REQ_VER:-}" || _STAT_SCALA="❌ Failed"
 
   # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "scalafmt" "--version"; then
+  if ! verify_tool_atomic "scalafmt" "${_PROVIDER:-}" "Scala Lint" "--version"; then
     _STAT_SCALA="❌ Not Executable"
     log_summary "Scala" "Scala Lint" "${_STAT_SCALA:-}" "-" "$(($(date +%s) - _T0_SCALA))"
     [ "${CI:-}" = "true" ] && return 1

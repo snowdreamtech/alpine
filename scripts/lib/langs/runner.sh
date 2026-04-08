@@ -39,7 +39,7 @@ install_just() {
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_JUST="❌ Failed"
 
   # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "just" "--version"; then
+  if ! verify_tool_atomic "just" "${_PROVIDER:-}" "Just" "--version"; then
     _STAT_JUST="❌ Not Executable"
     log_summary "Base" "Just" "${_STAT_JUST:-}" "-" "$(($(date +%s) - _T0_JUST))"
     [ "${CI:-}" = "true" ] && return 1
@@ -83,7 +83,7 @@ install_task() {
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_TASK="❌ Failed"
 
   # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "task" "--version"; then
+  if ! verify_tool_atomic "task" "${_PROVIDER:-}" "Task" "--version"; then
     _STAT_TASK="❌ Not Executable"
     log_summary "Base" "Task" "${_STAT_TASK:-}" "-" "$(($(date +%s) - _T0_TASK))"
     [ "${CI:-}" = "true" ] && return 1

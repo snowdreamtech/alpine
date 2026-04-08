@@ -39,7 +39,7 @@ install_sqlfluff() {
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_SQL="❌ Failed"
 
   # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "sqlfluff" "--version"; then
+  if ! verify_tool_atomic "sqlfluff" "${_PROVIDER:-}" "Sqlfluff" "--version"; then
     _STAT_SQL="❌ Not Executable"
     log_summary "Data" "Sqlfluff" "${_STAT_SQL:-}" "-" "$(($(date +%s) - _T0_SQL))"
     [ "${CI:-}" = "true" ] && return 1

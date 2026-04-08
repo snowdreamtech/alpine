@@ -1837,13 +1837,29 @@ check_runtime() {
 # Returns:
 #   0 - Tool is fully verified and usable
 #   1 - Tool verification failed
+# Purpose: Atomic verification for mise-installed tools with robust binary resolution.
+# This function ensures a tool is fully functional through 5 verification steps,
+# using mise which as the primary resolution method for cross-platform compatibility.
+#
+# Parameters:
+#   $1 - Binary name (e.g., "shfmt", "editorconfig-checker")
+#   $2 - Mise provider (e.g., "github:mvdan/sh")
+#   $3 - Display name (e.g., "Shfmt") [optional]
+#   $4 - Version flag (e.g., "--version") [optional, defaults to "--version"]
+#
+# Returns:
+#   0 - Tool is fully verified and usable
+#   1 - Tool verification failed
+#
 # Examples:
 #   verify_tool_atomic "shfmt" "github:mvdan/sh" "Shfmt"
-#   verify_tool_atomic "ec" "github:editorconfig-checker/editorconfig-checker" "Editorconfig-Checker"
+#   verify_tool_atomic "editorconfig-checker" "github:editorconfig-checker/editorconfig-checker" "Editorconfig-Checker"
+#   verify_tool_atomic "ruff" "github:astral-sh/ruff" "Ruff" "--version"
 verify_tool_atomic() {
   local _BIN_NAME="${1:-}"
   local _PROVIDER="${2:-}"
   local _DISPLAY_NAME="${3:-Tool}"
+  local _VERSION_FLAG="${4:---version}"
 
   [ -z "${_BIN_NAME:-}" ] && return 1
 
@@ -1857,29 +1873,49 @@ verify_tool_atomic() {
   fi
   log_debug "✓ Registered in mise"
 
-  # Step 2: Check if binary exists via command -v
-  log_debug "Step 2/5: Checking binary existence..."
-  if ! command -v "${_BIN_NAME:-}" >/dev/null 2>&1; then
-    log_warn "✗ ${_BIN_NAME:-} not found via command -v, trying mise exec..."
+  # Step 2: Resolve binary path using mise which (primary method)
+  # This handles platform-specific binaries, shims, and cross-platform compatibility
+  log_debug "Step 2/5: Resolving binary path via mise which..."
+  local _RESOLVED_PATH
+  _RESOLVED_PATH=$(MISE_OFFLINE=1 run_with_timeout_robust 3 mise which "${_BIN_NAME:-}" 2>/dev/null) || _RESOLVED_PATH=""
 
-    # Fallback: Try mise exec
-    if ! run_with_timeout_robust 5 mise exec "${_PROVIDER:-}" -- "${_BIN_NAME:-}" --version >/dev/null 2>&1; then
-      log_error "✗ ${_BIN_NAME:-} not executable via mise exec"
+  if [ -z "${_RESOLVED_PATH:-}" ]; then
+    log_debug "✗ mise which failed, trying fallback methods..."
+
+    # Fallback 1: Try command -v (for tools already in PATH)
+    _RESOLVED_PATH=$(command -v "${_BIN_NAME:-}" 2>/dev/null) || _RESOLVED_PATH=""
+
+    if [ -z "${_RESOLVED_PATH:-}" ]; then
+      # Fallback 2: Search in mise install directory
+      local _INSTALL_DIR
+      _INSTALL_DIR=$(mise where "${_PROVIDER:-}" 2>/dev/null) || _INSTALL_DIR=""
+      if [ -n "${_INSTALL_DIR:-}" ] && [ -d "${_INSTALL_DIR:-}/bin" ]; then
+        # Try exact match first
+        if [ -f "${_INSTALL_DIR:-}/bin/${_BIN_NAME:-}" ]; then
+          _RESOLVED_PATH="${_INSTALL_DIR:-}/bin/${_BIN_NAME:-}"
+        else
+          # Try pattern match (e.g., ec-* for editorconfig-checker)
+          _RESOLVED_PATH=$(find "${_INSTALL_DIR:-}/bin" -name "${_BIN_NAME:-}*" -type f 2>/dev/null | head -n 1)
+        fi
+      fi
+    fi
+
+    if [ -z "${_RESOLVED_PATH:-}" ]; then
+      log_error "✗ ${_BIN_NAME:-} not found via any resolution method"
       return 1
     fi
-    log_debug "✓ Executable via mise exec (shim may need refresh)"
+    log_debug "✓ Resolved via fallback: ${_RESOLVED_PATH:-}"
   else
-    log_debug "✓ Found via command -v"
+    log_debug "✓ Resolved via mise which: ${_RESOLVED_PATH:-}"
   fi
 
-  # Step 3: Check if binary is resolvable via resolve_bin
-  log_debug "Step 3/5: Checking path resolution..."
-  local _RESOLVED_PATH
-  _RESOLVED_PATH=$(resolve_bin "${_BIN_NAME:-}") || {
-    log_error "✗ ${_BIN_NAME:-} not resolvable via resolve_bin"
+  # Step 3: Check if binary exists
+  log_debug "Step 3/5: Checking binary existence..."
+  if [ ! -f "${_RESOLVED_PATH:-}" ]; then
+    log_error "✗ Binary does not exist at: ${_RESOLVED_PATH:-}"
     return 1
-  }
-  log_debug "✓ Resolved to: ${_RESOLVED_PATH:-}"
+  fi
+  log_debug "✓ Binary exists"
 
   # Step 4: Check if binary is executable
   log_debug "Step 4/5: Checking executability..."
@@ -1889,10 +1925,10 @@ verify_tool_atomic() {
   fi
   log_debug "✓ Executable"
 
-  # Step 5: Check if binary can run (smoke test)
+  # Step 5: Run smoke test
   log_debug "Step 5/5: Running smoke test..."
-  if ! run_with_timeout_robust 5 "${_RESOLVED_PATH:-}" --version >/dev/null 2>&1; then
-    log_error "✗ ${_BIN_NAME:-} failed smoke test (--version)"
+  if ! run_with_timeout_robust 5 "${_RESOLVED_PATH:-}" "${_VERSION_FLAG:-}" >/dev/null 2>&1; then
+    log_error "✗ ${_BIN_NAME:-} failed smoke test (${_VERSION_FLAG:-})"
     return 1
   fi
   log_debug "✓ Smoke test passed"

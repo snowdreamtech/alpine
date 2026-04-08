@@ -48,7 +48,7 @@ install_go_lint() {
   MISE_HTTP_TIMEOUT=600s VERBOSE=2 ENABLE_GITHUB_PROXY=1 run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_GO="❌ Failed"
 
   # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "golangci-lint" "--version"; then
+  if ! verify_tool_atomic "golangci-lint" "golangci-lint" "Go Lint" "--version"; then
     _STAT_GO="❌ Not Executable"
     log_summary "Go" "Go Lint" "${_STAT_GO:-}" "-" "$(($(date +%s) - _T0_GO))"
     [ "${CI:-}" = "true" ] && return 1
@@ -81,7 +81,7 @@ install_govulncheck() {
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_GOVC="❌ Failed"
 
   # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "govulncheck" "--version"; then
+  if ! verify_tool_atomic "govulncheck" "${_PROVIDER:-}" "Govulncheck" "--version"; then
     _STAT_GOVC="❌ Not Executable"
     log_summary "Go" "Govulncheck" "${_STAT_GOVC:-}" "-" "$(($(date +%s) - _T0_GOVC))"
     [ "${CI:-}" = "true" ] && return 1

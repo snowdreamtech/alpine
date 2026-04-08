@@ -289,8 +289,8 @@ install_tool() {
   local _STAT="✅ mise"
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT="❌ Failed"
 
-  # CRITICAL: Atomic verification
-  if ! verify_tool_atomic "tool" "--version"; then
+  # CRITICAL: Atomic verification using mise which for robust binary resolution
+  if ! verify_tool_atomic "tool" "${_PROVIDER:-}" "Tool Name" "--version"; then
     _STAT="❌ Not Executable"
     log_summary "Category" "Tool" "${_STAT:-}" "-" "$(($(date +%s) - _T0))"
     [ "${CI:-}" = "true" ] && return 1  # Fail-fast in CI
@@ -301,7 +301,47 @@ install_tool() {
 }
 ```
 
-### 7.3 Key Principles
+### 7.3 Binary Resolution Strategy
+
+The `verify_tool_atomic` function uses a **layered resolution strategy** to handle cross-platform binaries and edge cases:
+
+#### Resolution Layers (in order of priority):
+
+1. **mise which** (Primary Method)
+   ```bash
+   MISE_OFFLINE=1 run_with_timeout_robust 3 mise which "tool-name"
+   ```
+   - Handles platform-specific binaries (e.g., `ec-linux-amd64`, `ec-darwin-amd64`)
+   - Works with mise shims and direct installations
+   - Timeout-protected to prevent hangs
+   - Offline mode to avoid network delays
+
+2. **command -v** (Fallback 1)
+   ```bash
+   command -v "tool-name"
+   ```
+   - For tools already in PATH
+   - Fast and reliable for standard installations
+
+3. **mise where + find** (Fallback 2)
+   ```bash
+   INSTALL_DIR=$(mise where "provider")
+   find "$INSTALL_DIR/bin" -name "tool-name*" -type f | head -n 1
+   ```
+   - Searches mise installation directory
+   - Handles pattern matching (e.g., `ec-*` for editorconfig-checker)
+   - Works when shims are not yet activated
+   - BSD find compatible (no `-executable` flag)
+
+#### Why This Approach?
+
+- **Cross-Platform**: Handles Linux, macOS, Windows binary naming differences
+- **Robust**: Multiple fallbacks prevent false negatives
+- **Fast**: Primary method (mise which) is optimized and cached
+- **Reliable**: Works in fresh CI environments before PATH is fully configured
+- **Compatible**: BSD find support for macOS runners
+
+### 7.4 Key Principles
 
 - **Fail-Fast in CI**: When verification fails in CI (`CI=true`), the function **MUST** return error code 1 immediately to prevent wasted CI time.
 - **Warn-Continue Locally**: In local development, verification failures should log a warning but return 0 to allow developers to continue working.
@@ -311,7 +351,7 @@ install_tool() {
   - Alternative naming: Check for tool-specific patterns (e.g., `ec-*` for editorconfig-checker)
 - **Atomic Commits**: Each batch of tool fixes **MUST** be committed atomically with clear, descriptive commit messages following Conventional Commits.
 
-### 7.4 Error Handling Requirements
+### 7.5 Error Handling Requirements
 
 - **Clear Error Messages**: Every verification failure **MUST** log which step failed and why:
   ```
@@ -337,7 +377,7 @@ install_tool() {
   - `❌ Not Executable` - Installed but failed atomic verification
   - `⚖️ Previewed` - Dry-run mode
 
-### 7.5 Maintenance Guidelines
+### 7.6 Maintenance Guidelines
 
 When adding new tools:
 
@@ -347,7 +387,7 @@ When adding new tools:
 4. **Verify error scenarios**: Temporarily break mise to ensure error handling works correctly
 5. **Commit atomically**: Group related tool fixes together with descriptive commit messages
 
-### 7.6 Common Pitfalls to Avoid
+### 7.7 Common Pitfalls to Avoid
 
 - ❌ **Don't** assume a tool is usable just because `mise install` succeeded
 - ❌ **Don't** skip timeout protection on tool execution calls

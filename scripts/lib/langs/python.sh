@@ -64,7 +64,7 @@ install_ruff() {
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_RUF="❌ Failed"
 
   # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "ruff" "--version"; then
+  if ! verify_tool_atomic "ruff" "${_PROVIDER:-}" "Ruff" "--version"; then
     _STAT_RUF="❌ Not Executable"
     log_summary "Python" "Ruff" "${_STAT_RUF:-}" "-" "$(($(date +%s) - _T0_RUF))"
     [ "${CI:-}" = "true" ] && return 1
@@ -101,7 +101,7 @@ install_pip_audit() {
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_PA="❌ Failed"
 
   # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "pip-audit" "--version"; then
+  if ! verify_tool_atomic "pip-audit" "${_PROVIDER:-}" "pip-audit" "--version"; then
     _STAT_PA="❌ Not Executable"
     log_summary "Python" "pip-audit" "${_STAT_PA:-}" "-" "$(($(date +%s) - _T0_PA))"
     [ "${CI:-}" = "true" ] && return 1

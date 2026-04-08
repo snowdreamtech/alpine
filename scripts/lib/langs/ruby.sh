@@ -70,7 +70,7 @@ install_ruby_lint() {
     run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_RUBY="❌ Failed"
 
     # Atomic verification: ensure tool is fully functional
-    if ! verify_tool_atomic "rubocop" "--version"; then
+    if ! verify_tool_atomic "rubocop" "${_PROVIDER:-}" "Rubocop" "--version"; then
       _STAT_RUBY="❌ Not Executable"
       log_summary "Ruby" "Rubocop" "${_STAT_RUBY:-}" "-" "$(($(date +%s) - _T0_RUBY))"
       [ "${CI:-}" = "true" ] && return 1

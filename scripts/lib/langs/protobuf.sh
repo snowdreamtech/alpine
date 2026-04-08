@@ -39,7 +39,7 @@ install_buf() {
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_BUF="❌ Failed"
 
   # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "buf" "--version"; then
+  if ! verify_tool_atomic "buf" "${_PROVIDER:-}" "Buf" "--version"; then
     _STAT_BUF="❌ Not Executable"
     log_summary "Protobuf" "Buf" "${_STAT_BUF:-}" "-" "$(($(date +%s) - _T0_BUF))"
     [ "${CI:-}" = "true" ] && return 1
