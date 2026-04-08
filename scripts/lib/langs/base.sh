@@ -189,14 +189,20 @@ install_editorconfig_checker() {
   if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
     # In CI, verify the tool is actually executable, not just registered in mise
     if is_ci_env; then
+      log_debug "Verifying editorconfig-checker executability in CI..."
       # Note: editorconfig-checker binary is actually named 'ec'
-      if ! command -v ec >/dev/null 2>&1 && ! mise exec "${_PROVIDER:-}" -- ec --version >/dev/null 2>&1; then
+      if command -v ec >/dev/null 2>&1; then
+        log_debug "ec found via command -v"
+        log_summary "Base" "Editorconfig-Checker" "✅ Exists" "${_CUR_VER:-}" "0"
+        return 0
+      elif mise exec "${_PROVIDER:-}" -- ec --version >/dev/null 2>&1; then
+        log_debug "ec executable via mise exec"
+        log_summary "Base" "Editorconfig-Checker" "✅ Exists" "${_CUR_VER:-}" "0"
+        return 0
+      else
         log_warn "Editorconfig-Checker is registered in mise but not executable. Force reinstalling..."
         # Force reinstall by removing from mise first
         mise uninstall "${_PROVIDER:-}" 2>/dev/null || true
-      else
-        log_summary "Base" "Editorconfig-Checker" "✅ Exists" "${_CUR_VER:-}" "0"
-        return 0
       fi
     else
       log_summary "Base" "Editorconfig-Checker" "✅ Exists" "${_CUR_VER:-}" "0"
@@ -210,8 +216,24 @@ install_editorconfig_checker() {
     log_summary "Base" "Editorconfig-Checker" '⚖️ Previewed' "-" '0'
     return 0
   fi
+
   local _STAT_EC="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_EC="❌ Failed"
+  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
+    _STAT_EC="❌ Failed"
+  else
+    # Post-installation verification in CI
+    if is_ci_env; then
+      log_debug "Verifying editorconfig-checker installation..."
+      mise reshim 2>/dev/null || true
+      sleep 1
+
+      if ! command -v ec >/dev/null 2>&1 && ! mise exec "${_PROVIDER:-}" -- ec --version >/dev/null 2>&1; then
+        log_error "Editorconfig-Checker installed but not executable!"
+        _STAT_EC="❌ Not Executable"
+      fi
+    fi
+  fi
+
   log_summary "Base" "Editorconfig-Checker" "${_STAT_EC:-}" "$(get_version editorconfig-checker)" "$(($(date +%s) - _T0_EC))"
 }
 

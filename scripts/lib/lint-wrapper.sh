@@ -96,51 +96,80 @@ main() {
     # CI Fallback: Try mise exec directly if tool not resolved
     # This handles cases where mise shims exist but resolve_bin fails
     if is_ci_env; then
-      log_info "Attempting to run ${_LINTER_WRAP:-} via mise exec..."
+      log_info "=== CI Tool Resolution Fallback for ${_LINTER_WRAP:-} ==="
+      log_info "Tool spec: ${_MISE_TOOL_SPEC:-${_LINTER_BIN:-}}"
+      log_info "Binary name: ${_LINTER_BIN:-}"
 
       # Use tool spec if available, otherwise use binary name
       local _EXEC_TARGET="${_MISE_TOOL_SPEC:-${_LINTER_BIN:-}}"
 
-      # Try to execute the tool first
+      # Step 1: Try to execute the tool first
+      log_debug "Step 1: Attempting mise exec..."
       if mise exec "${_EXEC_TARGET:-}" -- "${_LINTER_BIN:-}" --version >/dev/null 2>&1; then
-        log_info "── Executing ${_LINTER_WRAP:-} via mise exec ──"
+        log_info "✓ Tool found via mise exec, executing..."
         # shellcheck disable=SC2093
         exec mise exec "${_EXEC_TARGET:-}" -- "${_LINTER_BIN:-}" "$@"
       fi
+      log_warn "✗ mise exec failed"
 
-      # Tool execution failed - try to install/reinstall
-      log_warn "Tool ${_LINTER_WRAP:-} execution failed. Attempting to (re)install..."
-
-      # Force reinstall by uninstalling first
-      mise uninstall "${_EXEC_TARGET:-}" 2>/dev/null || true
-
-      if mise install "${_EXEC_TARGET:-}"; then
-        log_info "Successfully installed ${_EXEC_TARGET:-}"
-
-        # CRITICAL: Refresh mise's internal state after installation
-        mise reshim 2>/dev/null || true
-        sleep 1
-
-        # Try again after installation
-        if mise exec "${_EXEC_TARGET:-}" -- "${_LINTER_BIN:-}" --version >/dev/null 2>&1; then
-          log_info "── Executing ${_LINTER_WRAP:-} via mise exec ──"
-          # shellcheck disable=SC2093
-          exec mise exec "${_EXEC_TARGET:-}" -- "${_LINTER_BIN:-}" "$@"
-        else
-          # Last resort: try direct execution from install path
-          log_warn "mise exec failed, trying direct execution..."
-          local _INSTALL_PATH
-          _INSTALL_PATH=$(mise where "${_EXEC_TARGET:-}" 2>/dev/null || true)
-          if [ -n "${_INSTALL_PATH:-}" ] && [ -x "${_INSTALL_PATH:-}/bin/${_LINTER_BIN:-}" ]; then
-            log_info "── Executing ${_LINTER_WRAP:-} directly ──"
-            exec "${_INSTALL_PATH:-}/bin/${_LINTER_BIN:-}" "$@"
-          fi
-        fi
+      # Step 2: Check if tool is installed in mise
+      log_debug "Step 2: Checking mise installation status..."
+      if mise list 2>/dev/null | grep -q "${_EXEC_TARGET:-}"; then
+        log_info "Tool is registered in mise, attempting uninstall..."
+        mise uninstall "${_EXEC_TARGET:-}" 2>/dev/null || true
+      else
+        log_info "Tool not found in mise registry"
       fi
 
-      log_error "❌ ${_LINTER_WRAP:-} not found in CI. Failing."
-      log_info "💡 CI environments must have all required tools installed."
-      log_info "💡 Tool spec: ${_EXEC_TARGET:-}, Binary: ${_LINTER_BIN:-}"
+      # Step 3: Install the tool
+      log_info "Step 3: Installing tool..."
+      if mise install "${_EXEC_TARGET:-}"; then
+        log_info "✓ Installation successful"
+
+        # Step 4: Refresh mise state
+        log_debug "Step 4: Refreshing mise state..."
+        mise reshim 2>/dev/null || log_warn "reshim failed"
+        sleep 1
+
+        # Step 5: Try mise exec again
+        log_debug "Step 5: Retrying mise exec..."
+        if mise exec "${_EXEC_TARGET:-}" -- "${_LINTER_BIN:-}" --version >/dev/null 2>&1; then
+          log_info "✓ Tool now executable via mise exec"
+          # shellcheck disable=SC2093
+          exec mise exec "${_EXEC_TARGET:-}" -- "${_LINTER_BIN:-}" "$@"
+        fi
+        log_warn "✗ mise exec still failed after installation"
+
+        # Step 6: Try direct execution from install path
+        log_debug "Step 6: Attempting direct execution..."
+        local _INSTALL_PATH
+        _INSTALL_PATH=$(mise where "${_EXEC_TARGET:-}" 2>/dev/null || true)
+        if [ -n "${_INSTALL_PATH:-}" ]; then
+          log_info "Install path: ${_INSTALL_PATH:-}"
+
+          # Try multiple possible binary locations
+          for _BIN_DIR in "bin" "."; do
+            local _FULL_PATH="${_INSTALL_PATH:-}/${_BIN_DIR}/${_LINTER_BIN:-}"
+            if [ -x "${_FULL_PATH:-}" ]; then
+              log_info "✓ Found executable at ${_FULL_PATH:-}"
+              exec "${_FULL_PATH:-}" "$@"
+            fi
+          done
+          log_warn "✗ Binary not found in install path"
+        else
+          log_warn "✗ Could not determine install path"
+        fi
+      else
+        log_error "✗ Installation failed"
+      fi
+
+      # All attempts failed
+      log_error "❌ ${_LINTER_WRAP:-} not found in CI after all attempts"
+      log_info "💡 Debugging information:"
+      log_info "   - Tool spec: ${_EXEC_TARGET:-}"
+      log_info "   - Binary: ${_LINTER_BIN:-}"
+      log_info "   - mise list output:"
+      mise list 2>&1 | grep -E "(${_EXEC_TARGET:-}|${_LINTER_BIN:-})" || echo "     (no matches)"
       exit 1
     fi
     log_warn "⚠️  ${_LINTER_WRAP:-} not found locally. Skipping linting for this module."

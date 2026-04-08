@@ -33,13 +33,20 @@ install_shfmt() {
   if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
     # In CI, verify the tool is actually executable, not just registered in mise
     if is_ci_env; then
-      if ! command -v shfmt >/dev/null 2>&1 && ! mise exec "${_PROVIDER:-}" -- shfmt --version >/dev/null 2>&1; then
+      log_debug "Verifying shfmt executability in CI..."
+      # Try multiple methods to verify executability
+      if command -v shfmt >/dev/null 2>&1; then
+        log_debug "shfmt found via command -v"
+        log_summary "Base" "Shfmt" "✅ Exists" "${_CUR_VER:-}" "0"
+        return 0
+      elif mise exec "${_PROVIDER:-}" -- shfmt --version >/dev/null 2>&1; then
+        log_debug "shfmt executable via mise exec"
+        log_summary "Base" "Shfmt" "✅ Exists" "${_CUR_VER:-}" "0"
+        return 0
+      else
         log_warn "Shfmt is registered in mise but not executable. Force reinstalling..."
         # Force reinstall by removing from mise first
         mise uninstall "${_PROVIDER:-}" 2>/dev/null || true
-      else
-        log_summary "Base" "Shfmt" "✅ Exists" "${_CUR_VER:-}" "0"
-        return 0
       fi
     else
       log_summary "Base" "Shfmt" "✅ Exists" "${_CUR_VER:-}" "0"
@@ -66,6 +73,19 @@ install_shfmt() {
       return 0
     fi
   fi
+
+  # Post-installation verification in CI
+  if is_ci_env; then
+    log_debug "Verifying shfmt installation..."
+    mise reshim 2>/dev/null || true
+    sleep 1
+
+    if ! command -v shfmt >/dev/null 2>&1 && ! mise exec "${_PROVIDER:-}" -- shfmt --version >/dev/null 2>&1; then
+      log_error "Shfmt installed but not executable!"
+      _STAT_SHF="❌ Not Executable"
+    fi
+  fi
+
   log_summary "Base" "Shfmt" "${_STAT_SHF:-}" "$(get_version shfmt)" "$(($(date +%s) - _T0_SHF))"
 }
 
