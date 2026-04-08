@@ -2048,14 +2048,17 @@ _persist_path_to_ci() {
   # Convert Unix-style paths (from Git Bash) to Windows-style for $GITHUB_PATH
   local _path_to_write="${_path_to_add:-}"
   if [ "${_G_OS:-}" = "windows" ] && [ "$(detect_ci_platform)" = "github-actions" ]; then
-    # Use cygpath -w to convert Unix → Windows path
-    if command -v cygpath >/dev/null 2>&1; then
-      _path_to_write=$(cygpath -w "${_path_to_add:-}" 2>/dev/null) || _path_to_write="${_path_to_add:-}"
-      # Use echo instead of log_info to avoid printf issues with Windows paths
-      echo "    [PATH] Converted: ${_path_to_add:-} -> ${_path_to_write:-}" >&2
-    else
-      echo "    [WARN] cygpath not available, using Unix-style path" >&2
-    fi
+    # EXPERIMENT: Try Unix-style paths instead of Windows-style
+    # GitHub Actions on Windows with bash shell might expect Unix paths
+    # Keep the path as-is (Unix style) instead of converting to Windows style
+    echo "    [PATH] Using Unix-style path for bash shell: ${_path_to_add:-}" >&2
+    # Old approach (commented out for testing):
+    # if command -v cygpath >/dev/null 2>&1; then
+    #   _path_to_write=$(cygpath -w "${_path_to_add:-}" 2>/dev/null) || _path_to_write="${_path_to_add:-}"
+    #   echo "    [PATH] Converted: ${_path_to_add:-} -> ${_path_to_write:-}" >&2
+    # else
+    #   echo "    [WARN] cygpath not available, using Unix-style path" >&2
+    # fi
   fi
 
   # Idempotent: Don't add if already present (check both formats on Windows)
