@@ -54,7 +54,7 @@ install_hadolint() {
     mise reshim 2>/dev/null || true
     sleep 1
 
-    if ! verify_tool_atomic "hadolint" "${_PROVIDER:-}" "${_TITLE:-}"; then
+    if ! verify_tool_atomic "hadolint" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
       _STAT_HADO="❌ Not Usable"
       log_summary "Docker" "Hadolint" "${_STAT_HADO:-}" "-" "$(($(date +%s) - _T0_HADO))"
       log_error "${_TITLE:-} installed but failed atomic verification."
@@ -114,7 +114,7 @@ install_dockerfile_utils() {
     mise reshim 2>/dev/null || true
     sleep 1
 
-    if ! verify_tool_atomic "dockerfile-utils" "${_PROVIDER:-}" "${_TITLE:-}"; then
+    if ! verify_tool_atomic "dockerfile-utils" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
       _STAT_DU="❌ Not Usable"
       log_summary "Docker" "dockerfile-utils" "${_STAT_DU:-}" "-" "$(($(date +%s) - _T0_DU))"
       log_error "${_TITLE:-} installed but failed atomic verification."

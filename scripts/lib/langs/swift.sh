@@ -120,7 +120,7 @@ install_swiftlint() {
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_SL="❌ Failed"
 
   # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "swiftlint" "version"; then
+  if ! verify_tool_atomic "swiftlint" "${_PROVIDER:-}" "SwiftLint" "version"; then
     _STAT_SL="❌ Not Executable"
     log_summary "Swift" "SwiftLint" "${_STAT_SL:-}" "-" "$(($(date +%s) - _T0_SL))"
     [ "${CI:-}" = "true" ] && return 1

@@ -115,7 +115,7 @@ install_sort_package_json() {
     mise reshim 2>/dev/null || true
     sleep 1
 
-    if ! verify_tool_atomic "sort-package-json" "${_PROVIDER:-}" "${_TITLE:-}"; then
+    if ! verify_tool_atomic "sort-package-json" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
       _STAT_SPJ="❌ Not Usable"
       log_summary "Node" "sort-package-json" "${_STAT_SPJ:-}" "-" "$(($(date +%s) - _T0_SPJ))"
       log_error "${_TITLE:-} installed but failed atomic verification."
@@ -172,7 +172,7 @@ install_eslint() {
     mise reshim 2>/dev/null || true
     sleep 1
 
-    if ! verify_tool_atomic "eslint" "${_PROVIDER:-}" "${_TITLE:-}"; then
+    if ! verify_tool_atomic "eslint" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
       _STAT_ES="❌ Not Usable"
       log_summary "Node" "ESLint" "${_STAT_ES:-}" "-" "$(($(date +%s) - _T0_ES))"
       log_error "${_TITLE:-} installed but failed atomic verification."
@@ -229,7 +229,7 @@ install_stylelint() {
     mise reshim 2>/dev/null || true
     sleep 1
 
-    if ! verify_tool_atomic "stylelint" "${_PROVIDER:-}" "${_TITLE:-}"; then
+    if ! verify_tool_atomic "stylelint" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
       _STAT_SL="❌ Not Usable"
       log_summary "Node" "Stylelint" "${_STAT_SL:-}" "-" "$(($(date +%s) - _T0_SL))"
       log_error "${_TITLE:-} installed but failed atomic verification."
@@ -290,7 +290,7 @@ install_vitepress() {
     mise reshim 2>/dev/null || true
     sleep 1
 
-    if ! verify_tool_atomic "vitepress" "${_PROVIDER:-}" "${_TITLE:-}"; then
+    if ! verify_tool_atomic "vitepress" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
       _STAT_VP="❌ Not Usable"
       log_summary "Docs" "VitePress" "${_STAT_VP:-}" "-" "$(($(date +%s) - _T0_VP))"
       log_error "${_TITLE:-} installed but failed atomic verification."
@@ -347,7 +347,7 @@ install_prettier() {
     mise reshim 2>/dev/null || true
     sleep 1
 
-    if ! verify_tool_atomic "prettier" "${_PROVIDER:-}" "${_TITLE:-}"; then
+    if ! verify_tool_atomic "prettier" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
       _STAT_PR="❌ Not Usable"
       log_summary "Base" "Prettier" "${_STAT_PR:-}" "-" "$(($(date +%s) - _T0_PR))"
       log_error "${_TITLE:-} installed but failed atomic verification."
@@ -404,7 +404,7 @@ install_commitlint() {
     mise reshim 2>/dev/null || true
     sleep 1
 
-    if ! verify_tool_atomic "commitlint" "${_PROVIDER:-}" "${_TITLE:-}"; then
+    if ! verify_tool_atomic "commitlint" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
       _STAT_CL="❌ Not Usable"
       log_summary "Base" "Commitlint" "${_STAT_CL:-}" "-" "$(($(date +%s) - _T0_CL))"
       log_error "${_TITLE:-} installed but failed atomic verification."
@@ -461,7 +461,7 @@ install_commitizen() {
     mise reshim 2>/dev/null || true
     sleep 1
 
-    if ! verify_tool_atomic "commitizen" "${_PROVIDER:-}" "${_TITLE:-}"; then
+    if ! verify_tool_atomic "commitizen" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
       _STAT_CZ="❌ Not Usable"
       log_summary "Base" "Commitizen" "${_STAT_CZ:-}" "-" "$(($(date +%s) - _T0_CZ))"
       log_error "${_TITLE:-} installed but failed atomic verification."

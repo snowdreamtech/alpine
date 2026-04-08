@@ -54,7 +54,7 @@ install_yamllint() {
     mise reshim 2>/dev/null || true
     sleep 1
 
-    if ! verify_tool_atomic "yamllint" "${_PROVIDER:-}" "${_TITLE:-}"; then
+    if ! verify_tool_atomic "yamllint" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
       _STAT_YAML="❌ Not Usable"
       log_summary "Config" "Yamllint" "${_STAT_YAML:-}" "-" "$(($(date +%s) - _T0_YAML))"
       log_error "${_TITLE:-} installed but failed atomic verification."
@@ -114,7 +114,7 @@ install_dotenv_linter() {
     mise reshim 2>/dev/null || true
     sleep 1
 
-    if ! verify_tool_atomic "dotenv-linter" "${_PROVIDER:-}" "${_TITLE:-}"; then
+    if ! verify_tool_atomic "dotenv-linter" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
       _STAT_ENV="❌ Not Usable"
       log_summary "Config" "Dotenv-Linter" "${_STAT_ENV:-}" "-" "$(($(date +%s) - _T0_ENV))"
       log_error "${_TITLE:-} installed but failed atomic verification."

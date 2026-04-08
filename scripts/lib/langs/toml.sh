@@ -53,7 +53,7 @@ install_taplo() {
     mise reshim 2>/dev/null || true
     sleep 1
 
-    if ! verify_tool_atomic "taplo" "${_PROVIDER:-}" "${_TITLE:-}"; then
+    if ! verify_tool_atomic "taplo" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
       _STAT_TAP="❌ Not Usable"
       log_summary "Base" "Taplo" "${_STAT_TAP:-}" "-" "$(($(date +%s) - _T0_TAP))"
       log_error "${_TITLE:-} installed but failed atomic verification."

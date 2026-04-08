@@ -54,7 +54,7 @@ install_markdownlint() {
     mise reshim 2>/dev/null || true
     sleep 1
 
-    if ! verify_tool_atomic "markdownlint-cli2" "${_PROVIDER:-}" "${_TITLE:-}"; then
+    if ! verify_tool_atomic "markdownlint-cli2" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
       _STAT_MD="❌ Not Usable"
       log_summary "Docs" "Markdownlint" "${_STAT_MD:-}" "-" "$(($(date +%s) - _T0_MD))"
       log_error "${_TITLE:-} installed but failed atomic verification."

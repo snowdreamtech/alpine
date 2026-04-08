@@ -80,7 +80,7 @@ install_shfmt() {
     mise reshim 2>/dev/null || true
     sleep 1
 
-    if ! verify_tool_atomic "shfmt" "${_PROVIDER:-}" "${_TITLE:-}"; then
+    if ! verify_tool_atomic "shfmt" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
       _STAT_SHF="❌ Not Usable"
       log_summary "Base" "Shfmt" "${_STAT_SHF:-}" "-" "$(($(date +%s) - _T0_SHF))"
       log_error "${_TITLE:-} installed but failed atomic verification."

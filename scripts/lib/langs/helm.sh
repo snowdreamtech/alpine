@@ -40,7 +40,7 @@ install_kube_linter() {
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_KL="❌ Failed"
 
   # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "kube-linter" "version"; then
+  if ! verify_tool_atomic "kube-linter" "${_PROVIDER:-}" "Kube-Linter" "version"; then
     _STAT_KL="❌ Not Executable"
     log_summary "IaC" "Kube-Linter" "${_STAT_KL:-}" "-" "$(($(date +%s) - _T0_KL))"
     [ "${CI:-}" = "true" ] && return 1
