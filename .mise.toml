@@ -109,6 +109,10 @@ RUBY_BUILD_MIRROR_URL = "{% if env.CI is defined %}https://cache.ruby-lang.org/p
 # Go acceleration
 GOPROXY = "{% if env.CI is defined %}https://proxy.golang.org,direct{% else %}https://mirrors.aliyun.com/goproxy/,direct{% endif %}"
 MISE_GO_DOWNLOAD_MIRROR = "{% if env.CI is defined %}https://dl.google.com/go/{% else %}https://mirrors.aliyun.com/golang/{% endif %}"
+# Skip SHA256 verification for Go downloads from mirrors that don't provide checksum files
+# Aliyun mirror doesn't provide .sha256 files, causing mise installation failures
+# In CI, we use official mirror which provides checksums for security
+MISE_GO_SKIP_CHECKSUM = "{% if env.CI is defined %}0{% else %}1{% endif %}"
 
 # Rust & Cargo acceleration
 RUSTUP_DIST_SERVER = "{% if env.CI is defined %}https://static.rust-lang.org{% else %}https://mirrors.aliyun.com/rustup{% endif %}"
