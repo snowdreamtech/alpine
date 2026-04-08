@@ -167,7 +167,29 @@ main() {
 
   # 5. Dependency Audits (Node.js)
   if [ -f "${PACKAGE_JSON:-}" ]; then
-    if resolve_bin "${NPM:-npm}" >/dev/null 2>&1; then
+    local _NPM_BIN
+    _NPM_BIN=$(resolve_bin "${NPM:-npm}") || true
+
+    # CI Fallback: Try mise exec if resolve_bin fails (Windows hollow shims issue)
+    if [ -z "${_NPM_BIN:-}" ] && is_ci_env; then
+      log_info "Attempting to run ${NPM:-npm} via mise exec..."
+      # Determine mise tool spec for the package manager
+      local _NPM_SPEC=""
+      case "${NPM:-npm}" in
+        pnpm) _NPM_SPEC="npm:pnpm" ;;
+        yarn) _NPM_SPEC="npm:yarn" ;;
+        bun) _NPM_SPEC="bun" ;;
+        *) _NPM_SPEC="node" ;;
+      esac
+
+      # Test if mise exec works
+      if mise exec "${_NPM_SPEC:-}" -- "${NPM:-npm}" --version >/dev/null 2>&1; then
+        _NPM_BIN="mise_exec_wrapper"
+        log_info "Successfully validated ${NPM:-npm} via mise exec"
+      fi
+    fi
+
+    if [ -n "${_NPM_BIN:-}" ]; then
       local _T0_JS
       _T0_JS=$(date +%s)
       log_info "\n── Auditing Node.js dependencies (${NPM:-npm} audit) ──"
@@ -179,8 +201,30 @@ main() {
         # npmmirror.com) do not implement the audit endpoint and return 404.
         local _AUDIT_REGISTRY="https://registry.npmjs.org"
 
-        # shellcheck disable=SC2086
-        if run_quiet "${NPM:-npm}" audit --registry="${_AUDIT_REGISTRY:-}"; then
+        # Determine mise tool spec for the package manager
+        local _NPM_SPEC=""
+        case "${NPM:-npm}" in
+          pnpm) _NPM_SPEC="npm:pnpm" ;;
+          yarn) _NPM_SPEC="npm:yarn" ;;
+          bun) _NPM_SPEC="bun" ;;
+          *) _NPM_SPEC="node" ;;
+        esac
+
+        # Execute audit command (use mise exec if resolve_bin failed)
+        local _AUDIT_OK=0
+        if [ "${_NPM_BIN:-}" = "mise_exec_wrapper" ]; then
+          # Use mise exec for hollow shims on Windows
+          if run_quiet mise exec "${_NPM_SPEC:-}" -- "${NPM:-npm}" audit --registry="${_AUDIT_REGISTRY:-}"; then
+            _AUDIT_OK=1
+          fi
+        else
+          # Use resolved binary path
+          if run_quiet "${_NPM_BIN:-}" audit --registry="${_AUDIT_REGISTRY:-}"; then
+            _AUDIT_OK=1
+          fi
+        fi
+
+        if [ "${_AUDIT_OK:-}" -eq 1 ]; then
           log_summary "Node.js" "${NPM:-npm}-audit" "✅ Secure" "$(get_version "${NPM:-npm}")" "$(($(date +%s) - _T0_JS))"
         else
           log_summary "Node.js" "${NPM:-npm}-audit" "⚠️ Vulnerabilities" "$(get_version "${NPM:-npm}")" "$(($(date +%s) - _T0_JS))"
