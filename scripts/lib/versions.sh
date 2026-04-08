@@ -97,7 +97,7 @@ VER_GH_CLI="2.89.0"
 VER_GH_CLI_PROVIDER="github:cli/cli"
 
 # ── 💎 Tier 1: Core Quality & Commit Tooling (Mirror of .mise.toml) ──────────
-VER_CHECKMAKE="0.3.2"
+VER_CHECKMAKE="v0.3.2"
 VER_CHECKMAKE_PROVIDER="github:checkmake/checkmake"
 VER_EDITORCONFIG_CHECKER="3.6.1"
 VER_EDITORCONFIG_CHECKER_PROVIDER="github:editorconfig-checker/editorconfig-checker"
