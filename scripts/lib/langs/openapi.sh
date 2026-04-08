@@ -38,6 +38,15 @@ install_spectral() {
   local _STAT_SPEC="✅ mise"
   setup_registry_spectral
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_SPEC="❌ Failed"
+
+  # Atomic verification: ensure tool is fully functional
+  if ! verify_tool_atomic "spectral" "--version"; then
+    _STAT_SPEC="❌ Not Executable"
+    log_summary "API" "Spectral" "${_STAT_SPEC:-}" "-" "$(($(date +%s) - _T0_SPEC))"
+    [ "${CI:-}" = "true" ] && return 1
+    return 0
+  fi
+
   log_summary "API" "Spectral" "${_STAT_SPEC:-}" "$(get_version spectral)" "$(($(date +%s) - _T0_SPEC))"
 }
 

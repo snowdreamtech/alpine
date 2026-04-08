@@ -42,6 +42,14 @@ install_haskell_lint() {
   local _STAT_HASKELL="✅ Installed"
   run_mise install "${_PROVIDER:-}@${_REQ_VER:-}" || _STAT_HASKELL="❌ Failed"
 
+  # Atomic verification: ensure tool is fully functional
+  if ! verify_tool_atomic "ormolu" "--version"; then
+    _STAT_HASKELL="❌ Not Executable"
+    log_summary "Haskell" "Haskell Lint" "${_STAT_HASKELL:-}" "-" "$(($(date +%s) - _T0_HASKELL))"
+    [ "${CI:-}" = "true" ] && return 1
+    return 0
+  fi
+
   log_summary "Haskell" "Haskell Lint" "${_STAT_HASKELL:-}" "$(get_version ormolu)" "$(($(date +%s) - _T0_HASKELL))"
 }
 

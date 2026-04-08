@@ -49,6 +49,15 @@ install_tflint() {
   local _STAT_TF="✅ mise"
   setup_registry_tflint
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_TF="❌ Failed"
+
+  # Atomic verification: ensure tool is fully functional
+  if ! verify_tool_atomic "tflint" "--version"; then
+    _STAT_TF="❌ Not Executable"
+    log_summary "IaC" "TFLint" "${_STAT_TF:-}" "-" "$(($(date +%s) - _T0_TF))"
+    [ "${CI:-}" = "true" ] && return 1
+    return 0
+  fi
+
   log_summary "IaC" "TFLint" "${_STAT_TF:-}" "$(get_version tflint)" "$(($(date +%s) - _T0_TF))"
 }
 

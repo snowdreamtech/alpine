@@ -37,6 +37,15 @@ install_buf() {
   local _STAT_BUF="✅ mise"
   setup_registry_buf
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_BUF="❌ Failed"
+
+  # Atomic verification: ensure tool is fully functional
+  if ! verify_tool_atomic "buf" "--version"; then
+    _STAT_BUF="❌ Not Executable"
+    log_summary "Protobuf" "Buf" "${_STAT_BUF:-}" "-" "$(($(date +%s) - _T0_BUF))"
+    [ "${CI:-}" = "true" ] && return 1
+    return 0
+  fi
+
   log_summary "Protobuf" "Buf" "${_STAT_BUF:-}" "$(get_version buf --version)" "$(($(date +%s) - _T0_BUF))"
 }
 

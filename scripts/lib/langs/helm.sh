@@ -30,8 +30,23 @@ install_kube_linter() {
   fi
 
   _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "IaC" "Kube-Linter" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
+
   local _STAT_KL="✅ mise"
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_KL="❌ Failed"
+
+  # Atomic verification: ensure tool is fully functional
+  if ! verify_tool_atomic "kube-linter" "version"; then
+    _STAT_KL="❌ Not Executable"
+    log_summary "IaC" "Kube-Linter" "${_STAT_KL:-}" "-" "$(($(date +%s) - _T0_KL))"
+    [ "${CI:-}" = "true" ] && return 1
+    return 0
+  fi
+
   log_summary "IaC" "Kube-Linter" "${_STAT_KL:-}" "$(get_version kube-linter version)" "$(($(date +%s) - _T0_KL))"
 }
 

@@ -25,6 +25,15 @@ install_rego() {
   fi
   local _STAT_REGO="✅ mise"
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_REGO="❌ Failed"
+
+  # Atomic verification: ensure tool is fully functional
+  if ! verify_tool_atomic "opa" "version"; then
+    _STAT_REGO="❌ Not Executable"
+    log_summary "Security" "Rego" "${_STAT_REGO:-}" "-" "$(($(date +%s) - _T0_REGO))"
+    [ "${CI:-}" = "true" ] && return 1
+    return 0
+  fi
+
   log_summary "Security" "Rego" "${_STAT_REGO:-}" "$(get_version opa version | grep Version | awk '{print $NF}')" "$(($(date +%s) - _T0_REGO))"
 }
 

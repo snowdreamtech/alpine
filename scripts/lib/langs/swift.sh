@@ -78,6 +78,15 @@ install_swiftformat() {
   local _STAT_SF="✅ mise"
   setup_registry_swiftformat
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_SF="❌ Failed"
+
+  # Atomic verification: ensure tool is fully functional
+  if ! verify_tool_atomic "swiftformat" "--version"; then
+    _STAT_SF="❌ Not Executable"
+    log_summary "Swift" "SwiftFormat" "${_STAT_SF:-}" "-" "$(($(date +%s) - _T0_SF))"
+    [ "${CI:-}" = "true" ] && return 1
+    return 0
+  fi
+
   log_summary "Swift" "SwiftFormat" "${_STAT_SF:-}" "$(get_version swiftformat)" "$(($(date +%s) - _T0_SF))"
 }
 
@@ -109,6 +118,15 @@ install_swiftlint() {
   local _STAT_SL="✅ mise"
   setup_registry_swiftlint
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_SL="❌ Failed"
+
+  # Atomic verification: ensure tool is fully functional
+  if ! verify_tool_atomic "swiftlint" "version"; then
+    _STAT_SL="❌ Not Executable"
+    log_summary "Swift" "SwiftLint" "${_STAT_SL:-}" "-" "$(($(date +%s) - _T0_SL))"
+    [ "${CI:-}" = "true" ] && return 1
+    return 0
+  fi
+
   log_summary "Swift" "SwiftLint" "${_STAT_SL:-}" "$(get_version swiftlint)" "$(($(date +%s) - _T0_SL))"
 }
 

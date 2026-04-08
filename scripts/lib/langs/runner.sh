@@ -37,6 +37,15 @@ install_just() {
   local _STAT_JUST="✅ mise"
   setup_registry_just
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_JUST="❌ Failed"
+
+  # Atomic verification: ensure tool is fully functional
+  if ! verify_tool_atomic "just" "--version"; then
+    _STAT_JUST="❌ Not Executable"
+    log_summary "Base" "Just" "${_STAT_JUST:-}" "-" "$(($(date +%s) - _T0_JUST))"
+    [ "${CI:-}" = "true" ] && return 1
+    return 0
+  fi
+
   log_summary "Base" "Just" "${_STAT_JUST:-}" "$(get_version just --version)" "$(($(date +%s) - _T0_JUST))"
 }
 
@@ -72,6 +81,15 @@ install_task() {
   local _STAT_TASK="✅ mise"
   setup_registry_task
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_TASK="❌ Failed"
+
+  # Atomic verification: ensure tool is fully functional
+  if ! verify_tool_atomic "task" "--version"; then
+    _STAT_TASK="❌ Not Executable"
+    log_summary "Base" "Task" "${_STAT_TASK:-}" "-" "$(($(date +%s) - _T0_TASK))"
+    [ "${CI:-}" = "true" ] && return 1
+    return 0
+  fi
+
   log_summary "Base" "Task" "${_STAT_TASK:-}" "$(get_version task --version)" "$(($(date +%s) - _T0_TASK))"
 }
 

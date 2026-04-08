@@ -38,6 +38,15 @@ install_bats() {
   local _STAT_BATS="✅ mise"
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_BATS="❌ Failed"
   refresh_mise_cache
+
+  # Atomic verification: ensure tool is fully functional
+  if ! verify_tool_atomic "bats" "--version"; then
+    _STAT_BATS="❌ Not Executable"
+    log_summary "Testing" "Bats" "${_STAT_BATS:-}" "-" "$(($(date +%s) - _T0_BATS))"
+    [ "${CI:-}" = "true" ] && return 1
+    return 0
+  fi
+
   log_summary "Testing" "Bats" "${_STAT_BATS:-}" "$(get_version bats --version)" "$(($(date +%s) - _T0_BATS))"
 }
 

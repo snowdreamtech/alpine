@@ -68,6 +68,14 @@ install_ruby_lint() {
   if resolve_bin "mise" >/dev/null 2>&1; then
     setup_registry_rubocop
     run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_RUBY="❌ Failed"
+
+    # Atomic verification: ensure tool is fully functional
+    if ! verify_tool_atomic "rubocop" "--version"; then
+      _STAT_RUBY="❌ Not Executable"
+      log_summary "Ruby" "Rubocop" "${_STAT_RUBY:-}" "-" "$(($(date +%s) - _T0_RUBY))"
+      [ "${CI:-}" = "true" ] && return 1
+      return 0
+    fi
   else
     gem install rubocop --no-document || _STAT_RUBY="❌ Failed"
   fi
