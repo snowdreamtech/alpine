@@ -2076,6 +2076,16 @@ _persist_path_to_ci() {
         fi
       fi
     fi
+
+    # CRITICAL: Also update current shell's PATH immediately
+    # GitHub Actions only applies GITHUB_PATH changes to NEXT step, not current step
+    case ":${PATH:-}:" in
+    *":${_path_to_add:-}:"*) ;;
+    *)
+      export PATH="${_path_to_add:-}:${PATH:-}"
+      echo "    [OK] Added to current shell PATH: ${_path_to_add:-}" >&2
+      ;;
+    esac
   else
     # Non-Windows or non-GitHub Actions: Standard behavior
     # Idempotent: Don't add if already present
@@ -2093,6 +2103,16 @@ _persist_path_to_ci() {
 
     echo "${_path_to_add:-}" >>"${_ci_path_file:-}"
     echo "    [OK] Wrote to CI path cache: ${_path_to_add:-}" >&2
+
+    # CRITICAL: Also update current shell's PATH immediately
+    # GitHub Actions only applies GITHUB_PATH changes to NEXT step, not current step
+    case ":${PATH:-}:" in
+    *":${_path_to_add:-}:"*) ;;
+    *)
+      export PATH="${_path_to_add:-}:${PATH:-}"
+      echo "    [OK] Added to current shell PATH: ${_path_to_add:-}" >&2
+      ;;
+    esac
   fi
 }
 
