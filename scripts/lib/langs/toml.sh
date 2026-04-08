@@ -35,7 +35,32 @@ install_taplo() {
     return 0
   fi
   local _STAT_TAP="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_TAP="❌ Failed"
+  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
+    _STAT_TAP="❌ Failed"
+    log_summary "Base" "Taplo" "${_STAT_TAP:-}" "-" "$(($(date +%s) - _T0_TAP))"
+    if is_ci_env; then
+      log_error "Failed to install ${_TITLE:-} in CI."
+      return 1
+    else
+      log_warn "Failed to install ${_TITLE:-}. Continuing..."
+      return 0
+    fi
+  fi
+
+  # Atomic verification: Ensure tool is fully usable
+  if is_ci_env; then
+    log_debug "Performing atomic verification for ${_TITLE:-}..."
+    mise reshim 2>/dev/null || true
+    sleep 1
+
+    if ! verify_tool_atomic "taplo" "${_PROVIDER:-}" "${_TITLE:-}"; then
+      _STAT_TAP="❌ Not Usable"
+      log_summary "Base" "Taplo" "${_STAT_TAP:-}" "-" "$(($(date +%s) - _T0_TAP))"
+      log_error "${_TITLE:-} installed but failed atomic verification."
+      return 1
+    fi
+  fi
+
   log_summary "Base" "Taplo" "${_STAT_TAP:-}" "$(get_version taplo)" "$(($(date +%s) - _T0_TAP))"
 }
 

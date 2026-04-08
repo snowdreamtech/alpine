@@ -36,7 +36,32 @@ install_markdownlint() {
     return 0
   fi
   local _STAT_MD="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_MD="❌ Failed"
+  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
+    _STAT_MD="❌ Failed"
+    log_summary "Docs" "Markdownlint" "${_STAT_MD:-}" "-" "$(($(date +%s) - _T0_MD))"
+    if is_ci_env; then
+      log_error "Failed to install ${_TITLE:-} in CI."
+      return 1
+    else
+      log_warn "Failed to install ${_TITLE:-}. Continuing..."
+      return 0
+    fi
+  fi
+
+  # Atomic verification: Ensure tool is fully usable
+  if is_ci_env; then
+    log_debug "Performing atomic verification for ${_TITLE:-}..."
+    mise reshim 2>/dev/null || true
+    sleep 1
+
+    if ! verify_tool_atomic "markdownlint-cli2" "${_PROVIDER:-}" "${_TITLE:-}"; then
+      _STAT_MD="❌ Not Usable"
+      log_summary "Docs" "Markdownlint" "${_STAT_MD:-}" "-" "$(($(date +%s) - _T0_MD))"
+      log_error "${_TITLE:-} installed but failed atomic verification."
+      return 1
+    fi
+  fi
+
   log_summary "Docs" "Markdownlint" "${_STAT_MD:-}" "$(get_version markdownlint)" "$(($(date +%s) - _T0_MD))"
 }
 
