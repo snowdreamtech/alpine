@@ -178,6 +178,13 @@ jobs:
       - name: "🚀 Initialize Development Environment"
         shell: sh
         run: |
+          # Debug: Show environment before setup
+          echo "=== DEBUG: Environment Detection ==="
+          echo "GITHUB_PATH variable: ${GITHUB_PATH:-}"
+          echo "GITHUB_ACTIONS: ${GITHUB_ACTIONS:-}"
+          echo "OS detection (uname): $(uname -s)"
+          echo "cygpath available: $(command -v cygpath >/dev/null 2>&1 && echo yes || echo no)"
+
           make setup
           make install
 
@@ -185,6 +192,7 @@ jobs:
           echo "=== DEBUG: GITHUB_PATH contents ==="
           if [ -f "${GITHUB_PATH:-}" ]; then
             cat "${GITHUB_PATH}"
+            echo "--- File size: $(wc -l < "${GITHUB_PATH}") lines ---"
           else
             echo "GITHUB_PATH file not found: ${GITHUB_PATH:-}"
           fi
