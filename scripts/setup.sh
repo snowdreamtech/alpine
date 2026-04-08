@@ -417,15 +417,17 @@ EOF
       log_info "[CI-PATH] Persisting mise paths to CI..."
       if [ -d "${_G_MISE_BIN_BASE:-}" ] && [ -n "$(ls -A "${_G_MISE_BIN_BASE:-}" 2>/dev/null)" ]; then
         _persist_path_to_ci "${_G_MISE_BIN_BASE:-}"
-        log_info "  [OK] Persisted mise bin: ${_G_MISE_BIN_BASE:-}"
+        # Use echo to avoid printf issues with Windows paths
+        echo "  [OK] Persisted mise bin: ${_G_MISE_BIN_BASE:-}" >&2
       else
-        log_warn "  [WARN] Mise bin directory not found or empty: ${_G_MISE_BIN_BASE:-}"
+        echo "  [WARN] Mise bin directory not found or empty: ${_G_MISE_BIN_BASE:-}" >&2
       fi
       if [ -d "${_G_MISE_SHIMS_BASE:-}" ] && [ -n "$(ls -A "${_G_MISE_SHIMS_BASE:-}" 2>/dev/null)" ]; then
         _persist_path_to_ci "${_G_MISE_SHIMS_BASE:-}"
-        log_info "  [OK] Persisted mise shims: ${_G_MISE_SHIMS_BASE:-}"
+        # Use echo to avoid printf issues with Windows paths
+        echo "  [OK] Persisted mise shims: ${_G_MISE_SHIMS_BASE:-}" >&2
       else
-        log_warn "  [WARN] Mise shims directory not found or empty: ${_G_MISE_SHIMS_BASE:-}"
+        echo "  [WARN] Mise shims directory not found or empty: ${_G_MISE_SHIMS_BASE:-}" >&2
       fi
     fi
 
