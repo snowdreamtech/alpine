@@ -46,6 +46,15 @@ install_go_lint() {
   # Ref: Rule 01 (Network/Retry)
   log_info "Downloading golangci-lint (this may take a few minutes on slow networks)..."
   MISE_HTTP_TIMEOUT=600s VERBOSE=2 ENABLE_GITHUB_PROXY=1 run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_GO="❌ Failed"
+
+  # Atomic verification: ensure tool is fully functional
+  if ! verify_tool_atomic "golangci-lint" "--version"; then
+    _STAT_GO="❌ Not Executable"
+    log_summary "Go" "Go Lint" "${_STAT_GO:-}" "-" "$(($(date +%s) - _T0_GO))"
+    [ "${CI:-}" = "true" ] && return 1
+    return 0
+  fi
+
   log_summary "Go" "Go Lint" "${_STAT_GO:-}" "$(get_version golangci-lint)" "$(($(date +%s) - _T0_GO))"
 }
 
@@ -70,6 +79,15 @@ install_govulncheck() {
   fi
   local _STAT_GOVC="✅ mise"
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_GOVC="❌ Failed"
+
+  # Atomic verification: ensure tool is fully functional
+  if ! verify_tool_atomic "govulncheck" "--version"; then
+    _STAT_GOVC="❌ Not Executable"
+    log_summary "Go" "Govulncheck" "${_STAT_GOVC:-}" "-" "$(($(date +%s) - _T0_GOVC))"
+    [ "${CI:-}" = "true" ] && return 1
+    return 0
+  fi
+
   log_summary "Go" "Govulncheck" "${_STAT_GOVC:-}" "$(get_version govulncheck)" "$(($(date +%s) - _T0_GOVC))"
 }
 

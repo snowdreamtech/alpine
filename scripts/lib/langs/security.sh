@@ -211,6 +211,15 @@ install_cargo_audit() {
   local _STAT_CA="✅ mise"
   setup_registry_cargo_audit
   run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_CA="❌ Failed"
+
+  # Atomic verification: ensure tool is fully functional
+  if ! verify_tool_atomic "cargo-audit" "--version"; then
+    _STAT_CA="❌ Not Executable"
+    log_summary "Security" "Cargo-Audit" "${_STAT_CA:-}" "-" "$(($(date +%s) - _T0_CA))"
+    [ "${CI:-}" = "true" ] && return 1
+    return 0
+  fi
+
   log_summary "Security" "Cargo-Audit" "${_STAT_CA:-}" "$(get_version cargo-audit)" "$(($(date +%s) - _T0_CA))"
 }
 
