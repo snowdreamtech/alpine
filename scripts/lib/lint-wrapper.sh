@@ -77,7 +77,16 @@ main() {
       exec mise exec "${_ZM_SPEC:-}" -- zizmor "$@"
     fi
 
+    # CI Fallback: Try mise exec directly if tool not resolved
+    # This handles cases where mise shims exist but resolve_bin fails
     if is_ci_env; then
+      log_info "Attempting to run ${_LINTER_WRAP:-} via mise exec..."
+      if mise exec -- "${_LINTER_BIN:-}" --version >/dev/null 2>&1; then
+        log_info "── Executing ${_LINTER_WRAP:-} via mise exec ──"
+        # shellcheck disable=SC2093
+        exec mise exec -- "${_LINTER_BIN:-}" "$@"
+      fi
+
       log_error "❌ ${_LINTER_WRAP:-} not found in CI. Failing."
       log_info "💡 CI environments must have all required tools installed."
       exit 1
