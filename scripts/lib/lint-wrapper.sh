@@ -54,12 +54,26 @@ main() {
 
   # 1. Resolve Binary Path
   local _LINTER_BIN="${_LINTER_WRAP:-}"
+  local _MISE_TOOL_SPEC=""
   case "${_LINTER_WRAP:-}" in
   psscriptanalyzer) _LINTER_BIN="pwsh" ;;
   osv_scanner) _LINTER_BIN="osv-scanner" ;;
   node-audit)
     # node-audit is a logical tool, we resolve the package manager instead
     _LINTER_BIN="${NPM:-pnpm}"
+    ;;
+  # Map tool names to mise tool specs for tools with different binary names
+  shfmt)
+    _MISE_TOOL_SPEC="github:mvdan/sh"
+    _LINTER_BIN="shfmt"
+    ;;
+  taplo)
+    _MISE_TOOL_SPEC="npm:@taplo/cli"
+    _LINTER_BIN="taplo"
+    ;;
+  editorconfig-checker)
+    _MISE_TOOL_SPEC="github:editorconfig-checker/editorconfig-checker"
+    _LINTER_BIN="ec-windows-amd64"
     ;;
   esac
 
@@ -81,10 +95,14 @@ main() {
     # This handles cases where mise shims exist but resolve_bin fails
     if is_ci_env; then
       log_info "Attempting to run ${_LINTER_WRAP:-} via mise exec..."
-      if mise exec -- "${_LINTER_BIN:-}" --version >/dev/null 2>&1; then
+
+      # Use tool spec if available, otherwise use binary name
+      local _EXEC_TARGET="${_MISE_TOOL_SPEC:-${_LINTER_BIN:-}}"
+
+      if mise exec "${_EXEC_TARGET:-}" -- "${_LINTER_BIN:-}" --version >/dev/null 2>&1; then
         log_info "── Executing ${_LINTER_WRAP:-} via mise exec ──"
         # shellcheck disable=SC2093
-        exec mise exec -- "${_LINTER_BIN:-}" "$@"
+        exec mise exec "${_EXEC_TARGET:-}" -- "${_LINTER_BIN:-}" "$@"
       fi
 
       log_error "❌ ${_LINTER_WRAP:-} not found in CI. Failing."
