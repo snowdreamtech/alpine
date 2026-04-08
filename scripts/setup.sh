@@ -414,18 +414,18 @@ EOF
     # CI PATH Persistence: Ensure mise paths are persisted after setup completes
     # This is critical for Windows CI where tools are installed during setup
     if is_ci_env && [ "${DRY_RUN:-0}" -eq 0 ]; then
-      log_info "📍 Persisting mise paths to CI..."
+      log_info "[CI-PATH] Persisting mise paths to CI..."
       if [ -d "${_G_MISE_BIN_BASE:-}" ] && [ -n "$(ls -A "${_G_MISE_BIN_BASE:-}" 2>/dev/null)" ]; then
         _persist_path_to_ci "${_G_MISE_BIN_BASE:-}"
-        log_info "  ✅ Persisted mise bin: ${_G_MISE_BIN_BASE:-}"
+        log_info "  [OK] Persisted mise bin: ${_G_MISE_BIN_BASE:-}"
       else
-        log_warn "  ⚠️  Mise bin directory not found or empty: ${_G_MISE_BIN_BASE:-}"
+        log_warn "  [WARN] Mise bin directory not found or empty: ${_G_MISE_BIN_BASE:-}"
       fi
       if [ -d "${_G_MISE_SHIMS_BASE:-}" ] && [ -n "$(ls -A "${_G_MISE_SHIMS_BASE:-}" 2>/dev/null)" ]; then
         _persist_path_to_ci "${_G_MISE_SHIMS_BASE:-}"
-        log_info "  ✅ Persisted mise shims: ${_G_MISE_SHIMS_BASE:-}"
+        log_info "  [OK] Persisted mise shims: ${_G_MISE_SHIMS_BASE:-}"
       else
-        log_warn "  ⚠️  Mise shims directory not found or empty: ${_G_MISE_SHIMS_BASE:-}"
+        log_warn "  [WARN] Mise shims directory not found or empty: ${_G_MISE_SHIMS_BASE:-}"
       fi
     fi
 
