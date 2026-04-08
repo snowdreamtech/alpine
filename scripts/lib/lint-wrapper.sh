@@ -116,11 +116,25 @@ main() {
 
       if mise install "${_EXEC_TARGET:-}"; then
         log_info "Successfully installed ${_EXEC_TARGET:-}"
+
+        # CRITICAL: Refresh mise's internal state after installation
+        mise reshim 2>/dev/null || true
+        sleep 1
+
         # Try again after installation
         if mise exec "${_EXEC_TARGET:-}" -- "${_LINTER_BIN:-}" --version >/dev/null 2>&1; then
           log_info "── Executing ${_LINTER_WRAP:-} via mise exec ──"
           # shellcheck disable=SC2093
           exec mise exec "${_EXEC_TARGET:-}" -- "${_LINTER_BIN:-}" "$@"
+        else
+          # Last resort: try direct execution from install path
+          log_warn "mise exec failed, trying direct execution..."
+          local _INSTALL_PATH
+          _INSTALL_PATH=$(mise where "${_EXEC_TARGET:-}" 2>/dev/null || true)
+          if [ -n "${_INSTALL_PATH:-}" ] && [ -x "${_INSTALL_PATH:-}/bin/${_LINTER_BIN:-}" ]; then
+            log_info "── Executing ${_LINTER_WRAP:-} directly ──"
+            exec "${_INSTALL_PATH:-}/bin/${_LINTER_BIN:-}" "$@"
+          fi
         fi
       fi
 
