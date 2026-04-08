@@ -9,7 +9,7 @@
 [tools]
 
 # ── 🏗️ Core Runtimes ──────────────────────────────────────────────────────────
-go = "1.26.1"
+go = "1.26.2"
 node = "25.9.0"
 "npm:pnpm" = "10.33.0"
 python = "3.14.3"
@@ -50,7 +50,7 @@ python = "3.14.3"
 
 # Python tools (pre-commit hooks)
 "github:astral-sh/ruff" = "0.15.9"
-"pipx:clang-format" = "22.1.2"
+"pipx:clang-format" = "22.1.3"
 
 # Shell & scripting linters (pre-commit hooks)
 "github:rhysd/actionlint" = "1.7.12"

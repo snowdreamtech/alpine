@@ -21,7 +21,7 @@ set -eu
 
 # ── 🏗️ Tier 1: Core Runtimes (Mirror of .mise.toml) ──────────────────────────
 # shellcheck disable=SC2034
-VER_GO="1.26.1"
+VER_GO="1.26.2"
 VER_NODE="25.9.0"
 VER_PNPM="10.33.0"
 VER_PNPM_PROVIDER="npm:pnpm"
@@ -200,7 +200,7 @@ VER_DOCKERFILE_UTILS_PROVIDER="npm:dockerfile-utils"
 VER_RUFF="0.15.9"
 VER_RUFF_PROVIDER="github:astral-sh/ruff"
 
-VER_CLANG_FORMAT="22.1.2"
+VER_CLANG_FORMAT="22.1.3"
 VER_CLANG_FORMAT_PROVIDER="pipx:clang-format"
 
 VER_SQLFLUFF="4.1.0"
