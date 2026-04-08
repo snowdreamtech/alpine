@@ -121,14 +121,30 @@ main() {
     log_summary "Quality" "pre-commit" "❌ Failed" "${_PC_VER:--}" "$(($(date +%s) - _T0_LNT))"
   fi
 
-  log_success "\n✨ Linting complete!"
+  if [ "${_L_OK:-}" -eq 1 ]; then
+    log_success "\n✨ Linting complete!"
+  else
+    log_error "\n❌ Linting failed! Please fix the errors above."
+  fi
   finalize_summary_table
 
   # 5. Standardized Next Actions
   if [ "${DRY_RUN:-0}" -eq 0 ] && [ "${_IS_TOP_LEVEL:-}" = "true" ]; then
-    printf "\n%bNext Actions:%b\n" "${YELLOW:-}" "${NC:-}"
-    printf "  - Run %bmake test%b to execute functional test suites.\n" "${GREEN:-}" "${NC:-}"
-    printf "  - Run %bmake verify%b to ensure full project stability.\n" "${GREEN:-}" "${NC:-}"
+    if [ "${_L_OK:-}" -eq 1 ]; then
+      printf "\n%bNext Actions:%b\n" "${YELLOW:-}" "${NC:-}"
+      printf "  - Run %bmake test%b to execute functional test suites.\n" "${GREEN:-}" "${NC:-}"
+      printf "  - Run %bmake verify%b to ensure full project stability.\n" "${GREEN:-}" "${NC:-}"
+    else
+      printf "\n%bRecommended Actions:%b\n" "${YELLOW:-}" "${NC:-}"
+      printf "  - Review the errors above and fix them.\n"
+      printf "  - Run %bmake lint --fix%b to auto-fix some issues.\n" "${GREEN:-}" "${NC:-}"
+      printf "  - Run %bmake setup%b if tools are missing.\n" "${GREEN:-}" "${NC:-}"
+    fi
+  fi
+
+  # Exit with failure if linting failed
+  if [ "${_L_OK:-}" -eq 0 ]; then
+    exit 1
   fi
 }
 
