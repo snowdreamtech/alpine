@@ -191,7 +191,9 @@ install_editorconfig_checker() {
     if is_ci_env; then
       # Note: editorconfig-checker binary is actually named 'ec'
       if ! command -v ec >/dev/null 2>&1 && ! mise exec "${_PROVIDER:-}" -- ec --version >/dev/null 2>&1; then
-        log_warn "Editorconfig-Checker is registered in mise but not executable. Reinstalling..."
+        log_warn "Editorconfig-Checker is registered in mise but not executable. Force reinstalling..."
+        # Force reinstall by removing from mise first
+        mise uninstall "${_PROVIDER:-}" 2>/dev/null || true
       else
         log_summary "Base" "Editorconfig-Checker" "✅ Exists" "${_CUR_VER:-}" "0"
         return 0

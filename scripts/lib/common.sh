@@ -739,6 +739,8 @@ run_mise() {
 
   # Performance Opt: Skip installation if version already matches SSoT
   # BUT still ensure PATH synchronization for CI environments
+  # CRITICAL: In CI, we MUST verify tool executability, not just version match
+  # because mise may have hollow shims (especially on Windows)
   local _SKIP_INSTALL=0
   if [ "${_CMD:-}" = "install" ] && [ -n "${1:-}" ]; then
     local _T_CHECK="${1:-}"
@@ -752,7 +754,11 @@ run_mise() {
     if [ "${_C_VER:-}" != "-" ] && [ -n "${_R_VER:-}" ]; then
       # Use prefix matching: e.g. 3.12.0.2 (required) matches 3.12.0 (current)
       case "${_R_VER:-}" in "${_C_VER:-}"*)
-        _SKIP_INSTALL=1
+        # In CI, don't skip - the caller (install_* functions) has already verified executability
+        # If we reach here in CI, it means the tool needs reinstallation
+        if ! is_ci_env; then
+          _SKIP_INSTALL=1
+        fi
         ;;
       esac
     fi
