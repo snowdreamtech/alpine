@@ -36,7 +36,32 @@ install_hadolint() {
     return 0
   fi
   local _STAT_HADO="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_HADO="❌ Failed"
+  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
+    _STAT_HADO="❌ Failed"
+    log_summary "Docker" "Hadolint" "${_STAT_HADO:-}" "-" "$(($(date +%s) - _T0_HADO))"
+    if is_ci_env; then
+      log_error "Failed to install ${_TITLE:-} in CI."
+      return 1
+    else
+      log_warn "Failed to install ${_TITLE:-}. Continuing..."
+      return 0
+    fi
+  fi
+
+  # Atomic verification: Ensure tool is fully usable
+  if is_ci_env; then
+    log_debug "Performing atomic verification for ${_TITLE:-}..."
+    mise reshim 2>/dev/null || true
+    sleep 1
+
+    if ! verify_tool_atomic "hadolint" "${_PROVIDER:-}" "${_TITLE:-}"; then
+      _STAT_HADO="❌ Not Usable"
+      log_summary "Docker" "Hadolint" "${_STAT_HADO:-}" "-" "$(($(date +%s) - _T0_HADO))"
+      log_error "${_TITLE:-} installed but failed atomic verification."
+      return 1
+    fi
+  fi
+
   log_summary "Docker" "Hadolint" "${_STAT_HADO:-}" "$(get_version hadolint)" "$(($(date +%s) - _T0_HADO))"
 }
 
@@ -71,7 +96,32 @@ install_dockerfile_utils() {
     return 0
   fi
   local _STAT_DU="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_DU="❌ Failed"
+  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
+    _STAT_DU="❌ Failed"
+    log_summary "Docker" "dockerfile-utils" "${_STAT_DU:-}" "-" "$(($(date +%s) - _T0_DU))"
+    if is_ci_env; then
+      log_error "Failed to install ${_TITLE:-} in CI."
+      return 1
+    else
+      log_warn "Failed to install ${_TITLE:-}. Continuing..."
+      return 0
+    fi
+  fi
+
+  # Atomic verification: Ensure tool is fully usable
+  if is_ci_env; then
+    log_debug "Performing atomic verification for ${_TITLE:-}..."
+    mise reshim 2>/dev/null || true
+    sleep 1
+
+    if ! verify_tool_atomic "dockerfile-utils" "${_PROVIDER:-}" "${_TITLE:-}"; then
+      _STAT_DU="❌ Not Usable"
+      log_summary "Docker" "dockerfile-utils" "${_STAT_DU:-}" "-" "$(($(date +%s) - _T0_DU))"
+      log_error "${_TITLE:-} installed but failed atomic verification."
+      return 1
+    fi
+  fi
+
   log_summary "Docker" "dockerfile-utils" "${_STAT_DU:-}" "$(get_version dockerfile-utils)" "$(($(date +%s) - _T0_DU))"
 }
 
