@@ -212,7 +212,153 @@ All core integration and stability branches MUST follow a unified release standa
 - **Release Please**: Every push to a Core Branch MUST trigger `release-please` orchestration to automate versioning, changelog generation, and Gitleaks/Security auditing.
 - **Delivery Parity**: Whether on `main` or `dev`, the delivery pipeline (CD) must ensure 100% parity in verification depth (Lint -> Test -> Audit).
 
-## 7. CI Security & Supply Chain
+## 7. Tool Installation & Atomic Verification
+
+To ensure CI reliability and prevent silent failures where tools are "installed" but not actually usable, all tool installation functions **MUST** implement atomic verification.
+
+### 7.1 The Five-Step Atomic Verification Pattern
+
+Every tool installation in CI **MUST** verify the tool is fully functional through these five atomic checks:
+
+```bash
+verify_tool_atomic() {
+  local _TOOL_NAME="${1:-}"
+  local _VERSION_FLAG="${2:---version}"
+
+  # Step 1: Check mise registration
+  if ! mise list | grep -q "${_TOOL_NAME}"; then
+    log_error "Step 1/5 Failed: ${_TOOL_NAME} not registered in mise"
+    return 1
+  fi
+
+  # Step 2: Check binary existence (command -v)
+  if ! command -v "${_TOOL_NAME}" >/dev/null 2>&1; then
+    log_error "Step 2/5 Failed: ${_TOOL_NAME} not found via command -v"
+    return 1
+  fi
+
+  # Step 3: Check path resolution (resolve_bin)
+  local _RESOLVED_PATH
+  if ! _RESOLVED_PATH=$(resolve_bin "${_TOOL_NAME}"); then
+    log_error "Step 3/5 Failed: Cannot resolve path for ${_TOOL_NAME}"
+    return 1
+  fi
+
+  # Step 4: Check executability (test -x)
+  if [ ! -x "${_RESOLVED_PATH}" ]; then
+    log_error "Step 4/5 Failed: ${_TOOL_NAME} at ${_RESOLVED_PATH} is not executable"
+    return 1
+  fi
+
+  # Step 5: Run smoke test (--version with timeout)
+  if ! run_with_timeout_robust 5 "${_TOOL_NAME}" "${_VERSION_FLAG}" >/dev/null 2>&1; then
+    log_error "Step 5/5 Failed: ${_TOOL_NAME} smoke test failed"
+    return 1
+  fi
+
+  return 0
+}
+```
+
+### 7.2 Installation Function Pattern
+
+All tool installation functions **MUST** follow this pattern:
+
+```bash
+install_tool() {
+  local _T0=$(date +%s)
+  local _TITLE="Tool Name"
+  local _PROVIDER="${VER_TOOL_PROVIDER:-}"
+  local _VERSION="${VER_TOOL:-}"
+
+  # Fast-path: Check if already installed
+  local _CUR_VER=$(get_version tool)
+  if is_version_match "${_CUR_VER:-}" "${_VERSION:-}"; then
+    log_summary "Category" "Tool" "✅ Exists" "${_CUR_VER:-}" "0"
+    return 0
+  fi
+
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Category" "Tool" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
+
+  # Install via mise
+  local _STAT="✅ mise"
+  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT="❌ Failed"
+
+  # CRITICAL: Atomic verification
+  if ! verify_tool_atomic "tool" "--version"; then
+    _STAT="❌ Not Executable"
+    log_summary "Category" "Tool" "${_STAT:-}" "-" "$(($(date +%s) - _T0))"
+    [ "${CI:-}" = "true" ] && return 1  # Fail-fast in CI
+    return 0  # Warn-continue in local dev
+  fi
+
+  log_summary "Category" "Tool" "${_STAT:-}" "$(get_version tool)" "$(($(date +%s) - _T0))"
+}
+```
+
+### 7.3 Key Principles
+
+- **Fail-Fast in CI**: When verification fails in CI (`CI=true`), the function **MUST** return error code 1 immediately to prevent wasted CI time.
+- **Warn-Continue Locally**: In local development, verification failures should log a warning but return 0 to allow developers to continue working.
+- **Timeout Protection**: All tool execution calls **MUST** use `run_with_timeout_robust` (default: 5 seconds) to prevent indefinite hangs.
+- **Cross-Platform Binary Detection**: Binary detection **MUST** handle platform-specific patterns:
+  - Windows: Check for `.exe` extensions
+  - Alternative naming: Check for tool-specific patterns (e.g., `ec-*` for editorconfig-checker)
+- **Atomic Commits**: Each batch of tool fixes **MUST** be committed atomically with clear, descriptive commit messages following Conventional Commits.
+
+### 7.4 Error Handling Requirements
+
+- **Clear Error Messages**: Every verification failure **MUST** log which step failed and why:
+  ```
+  [ERROR] Step 3/5 Failed: Cannot resolve path for shfmt
+  [ERROR] shfmt installed but failed atomic verification
+  ```
+
+- **Detailed Debug Output**: In CI, enable debug logging to show verification progress:
+  ```
+  [DEBUG] === Atomic Verification: Shfmt ===
+  [DEBUG] Step 1/5: Checking mise registration... ✓
+  [DEBUG] Step 2/5: Checking binary existence... ✓
+  [DEBUG] Step 3/5: Checking path resolution... ✓
+  [DEBUG] Step 4/5: Checking executability... ✓
+  [DEBUG] Step 5/5: Running smoke test... ✓
+  [DEBUG] === ✓ Shfmt fully verified ===
+  ```
+
+- **Status Reporting**: Use consistent status indicators in log summaries:
+  - `✅ Exists` - Tool already installed and verified
+  - `✅ mise` - Tool successfully installed via mise
+  - `❌ Failed` - Installation failed
+  - `❌ Not Executable` - Installed but failed atomic verification
+  - `⚖️ Previewed` - Dry-run mode
+
+### 7.5 Maintenance Guidelines
+
+When adding new tools:
+
+1. **Use the atomic verification pattern** shown in §7.2
+2. **Test locally first**: Run `make setup` to verify no regressions
+3. **Test in CI**: Push to a test branch and verify CI passes on all platforms (Linux, macOS, Windows)
+4. **Verify error scenarios**: Temporarily break mise to ensure error handling works correctly
+5. **Commit atomically**: Group related tool fixes together with descriptive commit messages
+
+### 7.6 Common Pitfalls to Avoid
+
+- ❌ **Don't** assume a tool is usable just because `mise install` succeeded
+- ❌ **Don't** skip timeout protection on tool execution calls
+- ❌ **Don't** use different error handling patterns for different tools
+- ❌ **Don't** commit verification failures without fixing the root cause
+- ✅ **Do** verify tools are fully functional before marking installation as successful
+- ✅ **Do** use consistent error codes (return 1 in CI, return 0 locally)
+- ✅ **Do** provide clear, actionable error messages
+- ✅ **Do** test on all target platforms before merging
+
+## 8. CI Security & Supply Chain
 
 - **Immutable Action Pinning (SHA-1) - GOLD STANDARD**: All GitHub Actions references **MUST** use the 40-character commit SHA (e.g., `uses: actions/checkout@1d96...`). This is the only way to guarantee that the code being executed is the exact version that was audited.
   - Tags (even exact versions like `v6.0.2`) are mutable and can be hijacked.
