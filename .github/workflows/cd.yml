@@ -151,8 +151,9 @@ jobs:
           # Source common.sh to get helper functions
           . scripts/lib/common.sh
 
-          # Build NODE_PATH from mise npm installations
-          export NODE_PATH=$(build_mise_node_path)
+          # Build NODE_PATH from mise npm installations (avoid SC2155)
+          _node_path=$(build_mise_node_path)
+          export NODE_PATH="${_node_path}"
 
           if [ "$EVENT_NAME" = "pull_request" ]; then
             mise exec -- commitlint --from "$BASE_SHA" --to "$HEAD_SHA" --verbose

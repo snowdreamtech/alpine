@@ -411,6 +411,19 @@ EOF
     finalize_summary_table
     log_info "\n✨ Setup step complete!"
 
+    # CI PATH Persistence: Ensure mise paths are persisted after setup completes
+    # This is critical for Windows CI where tools are installed during setup
+    if is_ci_env && [ "${DRY_RUN:-0}" -eq 0 ]; then
+      if [ -d "${_G_MISE_BIN_BASE:-}" ] && [ -n "$(ls -A "${_G_MISE_BIN_BASE:-}" 2>/dev/null)" ]; then
+        _persist_path_to_ci "${_G_MISE_BIN_BASE:-}"
+        log_debug "Post-setup: Persisted mise bin to CI: ${_G_MISE_BIN_BASE:-}"
+      fi
+      if [ -d "${_G_MISE_SHIMS_BASE:-}" ] && [ -n "$(ls -A "${_G_MISE_SHIMS_BASE:-}" 2>/dev/null)" ]; then
+        _persist_path_to_ci "${_G_MISE_SHIMS_BASE:-}"
+        log_debug "Post-setup: Persisted mise shims to CI: ${_G_MISE_SHIMS_BASE:-}"
+      fi
+    fi
+
     if [ "${DRY_RUN:-0}" -eq 0 ]; then
       if ! command -v mise >/dev/null 2>&1; then
         log_warn "Warning: mise binary not found on PATH. You may need to restart your shell."
