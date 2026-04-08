@@ -101,23 +101,27 @@ main() {
       # Use tool spec if available, otherwise use binary name
       local _EXEC_TARGET="${_MISE_TOOL_SPEC:-${_LINTER_BIN:-}}"
 
-      # Debug: Check if tool is installed
-      log_debug "Checking if ${_EXEC_TARGET:-} is installed..."
-      if mise list | grep -q "${_EXEC_TARGET:-}"; then
-        log_debug "Tool ${_EXEC_TARGET:-} is installed"
-      else
-        log_warn "Tool ${_EXEC_TARGET:-} is NOT installed. Attempting to install..."
-        if mise install "${_EXEC_TARGET:-}"; then
-          log_info "Successfully installed ${_EXEC_TARGET:-}"
-        else
-          log_error "Failed to install ${_EXEC_TARGET:-}"
-        fi
-      fi
-
+      # Try to execute the tool first
       if mise exec "${_EXEC_TARGET:-}" -- "${_LINTER_BIN:-}" --version >/dev/null 2>&1; then
         log_info "── Executing ${_LINTER_WRAP:-} via mise exec ──"
         # shellcheck disable=SC2093
         exec mise exec "${_EXEC_TARGET:-}" -- "${_LINTER_BIN:-}" "$@"
+      fi
+
+      # Tool execution failed - try to install/reinstall
+      log_warn "Tool ${_LINTER_WRAP:-} execution failed. Attempting to (re)install..."
+
+      # Force reinstall by uninstalling first
+      mise uninstall "${_EXEC_TARGET:-}" 2>/dev/null || true
+
+      if mise install "${_EXEC_TARGET:-}"; then
+        log_info "Successfully installed ${_EXEC_TARGET:-}"
+        # Try again after installation
+        if mise exec "${_EXEC_TARGET:-}" -- "${_LINTER_BIN:-}" --version >/dev/null 2>&1; then
+          log_info "── Executing ${_LINTER_WRAP:-} via mise exec ──"
+          # shellcheck disable=SC2093
+          exec mise exec "${_EXEC_TARGET:-}" -- "${_LINTER_BIN:-}" "$@"
+        fi
       fi
 
       log_error "❌ ${_LINTER_WRAP:-} not found in CI. Failing."
