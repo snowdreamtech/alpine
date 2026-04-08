@@ -2044,9 +2044,28 @@ _persist_path_to_ci() {
     ;;
   esac
 
-  # Idempotent: Don't add if already present
-  if [ -f "${_ci_path_file:-}" ] && grep -qxF "${_path_to_add:-}" "${_ci_path_file:-}" 2>/dev/null; then
-    return 0
+  # Windows PATH Conversion: GitHub Actions on Windows needs Windows-style paths
+  # Convert Unix-style paths (from Git Bash) to Windows-style for $GITHUB_PATH
+  local _path_to_write="${_path_to_add:-}"
+  if [ "${_G_OS:-}" = "windows" ] && [ "$(detect_ci_platform)" = "github-actions" ]; then
+    # Use cygpath -w to convert Unix → Windows path
+    if command -v cygpath >/dev/null 2>&1; then
+      _path_to_write=$(cygpath -w "${_path_to_add:-}" 2>/dev/null) || _path_to_write="${_path_to_add:-}"
+      log_debug "Converted path for Windows CI: ${_path_to_add:-} → ${_path_to_write:-}"
+    fi
+  fi
+
+  # Idempotent: Don't add if already present (check both formats on Windows)
+  if [ -f "${_ci_path_file:-}" ]; then
+    if grep -qxF "${_path_to_write:-}" "${_ci_path_file:-}" 2>/dev/null; then
+      return 0
+    fi
+    # On Windows, also check if Unix-style path is already present
+    if [ "${_G_OS:-}" = "windows" ] && [ "${_path_to_write:-}" != "${_path_to_add:-}" ]; then
+      if grep -qxF "${_path_to_add:-}" "${_ci_path_file:-}" 2>/dev/null; then
+        return 0
+      fi
+    fi
   fi
 
   # Security: Set restrictive permissions on first write (owner read/write only)
@@ -2056,8 +2075,8 @@ _persist_path_to_ci() {
     log_debug "Created CI path cache with restrictive permissions: ${_ci_path_file:-}"
   fi
 
-  echo "${_path_to_add:-}" >>"${_ci_path_file:-}"
-  log_debug "Persisted path to CI: ${_path_to_add:-}"
+  echo "${_path_to_write:-}" >>"${_ci_path_file:-}"
+  log_debug "Persisted path to CI: ${_path_to_write:-}"
 }
 
 # Purpose: Read CI persistence file and sync paths to current shell
