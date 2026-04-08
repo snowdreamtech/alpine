@@ -183,7 +183,12 @@ jobs:
           echo "GITHUB_PATH variable: ${GITHUB_PATH:-}"
           echo "GITHUB_ACTIONS: ${GITHUB_ACTIONS:-}"
           echo "OS detection (uname): $(uname -s)"
+          echo "HOME: $HOME"
+          echo "LOCALAPPDATA: ${LOCALAPPDATA:-}"
           echo "cygpath available: $(command -v cygpath >/dev/null 2>&1 && echo yes || echo no)"
+          if command -v cygpath >/dev/null 2>&1 && [ -n "${LOCALAPPDATA:-}" ]; then
+            echo "LOCALAPPDATA (Unix): $(cygpath -u "${LOCALAPPDATA}")"
+          fi
 
           make setup
           make install
@@ -196,10 +201,14 @@ jobs:
           else
             echo "GITHUB_PATH file not found: ${GITHUB_PATH:-}"
           fi
-          echo "=== DEBUG: Current PATH ==="
+          echo "=== DEBUG: Current PATH (first 20 entries) ==="
           echo "$PATH" | tr ':' '\n' | head -20
-          echo "=== DEBUG: Mise shims directory ==="
-          ls -la "$HOME/.local/share/mise/shims" 2>/dev/null || echo "Shims directory not found"
+          echo "=== DEBUG: Check mise installation ==="
+          ls -la "$HOME/.local/share/mise/shims" 2>/dev/null || echo "$HOME/.local/share/mise/shims not found"
+          if command -v cygpath >/dev/null 2>&1 && [ -n "${LOCALAPPDATA:-}" ]; then
+            _local_app=$(cygpath -u "${LOCALAPPDATA}")
+            ls -la "${_local_app}/mise/shims" 2>/dev/null || echo "${_local_app}/mise/shims not found"
+          fi
           echo "=== DEBUG: Check for prettier ==="
           which prettier || echo "prettier not in PATH"
           command -v prettier || echo "prettier not found via command"
