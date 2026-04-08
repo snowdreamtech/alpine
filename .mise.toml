@@ -25,7 +25,7 @@ python = "3.14.3"
 
 # ── 💎 Core Quality & Commit Tooling ──────────────────────────────────────────
 # Tools invoked by pre-commit hooks or universally needed.
-"github:checkmake/checkmake" = { version = "0.3.2", bin = "checkmake" }
+"github:checkmake/checkmake" = { version = "v0.3.2", bin = "checkmake" }
 "github:editorconfig-checker/editorconfig-checker" = { version = "3.6.1", bin = "ec-*" }
 "github:google/addlicense" = "1.2.0"
 
@@ -82,8 +82,8 @@ http_timeout = "30s"
 # Environment variables for performance acceleration
 # ------------------------------------------------------------
 [env]
-# GitHub Proxy Acceleration - DISABLED to prevent hanging
-ENABLE_GITHUB_PROXY = "0"
+# GitHub Proxy Acceleration - Enable locally for faster downloads, disable in CI
+ENABLE_GITHUB_PROXY = "{% if env.CI is defined %}0{% else %}1{% endif %}"
 GITHUB_PROXY = "https://gh-proxy.sn0wdr1am.com/"
 
 # Feature Governance (0 = Disabled, 1 = Enabled)
