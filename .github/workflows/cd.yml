@@ -125,8 +125,25 @@ jobs:
       - name: "🚀 Initialize Development Environment"
         shell: sh
         run: |
+          # Debug: Show environment (Windows only)
+          if [ "$(uname -s | grep -i 'MINGW\|MSYS\|CYGWIN')" ]; then
+            echo "=== DEBUG: Windows Environment ==="
+            echo "GITHUB_PATH: ${GITHUB_PATH:-}"
+            echo "HOME: $HOME"
+            echo "LOCALAPPDATA: ${LOCALAPPDATA:-}"
+          fi
+
           make setup
           make install
+
+          # Debug: Show PATH after setup (Windows only)
+          if [ "$(uname -s | grep -i 'MINGW\|MSYS\|CYGWIN')" ]; then
+            echo "=== DEBUG: After Setup ==="
+            echo "GITHUB_PATH contents:"
+            cat "${GITHUB_PATH}" 2>/dev/null || echo "GITHUB_PATH file not found"
+            echo "PATH (first 10):"
+            echo "$PATH" | tr ':' '\n' | head -10
+          fi
         env:
           MISE_GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           VENV: ${{ env.VENV }}
@@ -148,6 +165,15 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           HEAD_SHA: ${{ github.event.pull_request.head.sha }}
         run: |
+          # Debug: Check commitlint availability (Windows only)
+          if [ "$(uname -s | grep -i 'MINGW\|MSYS\|CYGWIN')" ]; then
+            echo "=== DEBUG: Commitlint Check ==="
+            which commitlint || echo "commitlint not in PATH"
+            command -v commitlint || echo "commitlint not found"
+            echo "PATH (first 10):"
+            echo "$PATH" | tr ':' '\n' | head -10
+          fi
+
           # Source common.sh to get helper functions
           . scripts/lib/common.sh
 
