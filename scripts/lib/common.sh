@@ -2051,22 +2051,23 @@ _persist_path_to_ci() {
     # Use cygpath -w to convert Unix → Windows path
     if command -v cygpath >/dev/null 2>&1; then
       _path_to_write=$(cygpath -w "${_path_to_add:-}" 2>/dev/null) || _path_to_write="${_path_to_add:-}"
-      log_info "    [PATH] Converted: ${_path_to_add:-} -> ${_path_to_write:-}"
+      # Use echo instead of log_info to avoid printf issues with Windows paths
+      echo "    [PATH] Converted: ${_path_to_add:-} -> ${_path_to_write:-}" >&2
     else
-      log_warn "    [WARN] cygpath not available, using Unix-style path"
+      echo "    [WARN] cygpath not available, using Unix-style path" >&2
     fi
   fi
 
   # Idempotent: Don't add if already present (check both formats on Windows)
   if [ -f "${_ci_path_file:-}" ]; then
     if grep -qxF "${_path_to_write:-}" "${_ci_path_file:-}" 2>/dev/null; then
-      log_info "    [INFO] Path already in CI cache: ${_path_to_write:-}"
+      echo "    [INFO] Path already in CI cache: ${_path_to_write:-}" >&2
       return 0
     fi
     # On Windows, also check if Unix-style path is already present
     if [ "${_G_OS:-}" = "windows" ] && [ "${_path_to_write:-}" != "${_path_to_add:-}" ]; then
       if grep -qxF "${_path_to_add:-}" "${_ci_path_file:-}" 2>/dev/null; then
-        log_info "    [INFO] Unix-style path already in CI cache, skipping"
+        echo "    [INFO] Unix-style path already in CI cache, skipping" >&2
         return 0
       fi
     fi
@@ -2076,11 +2077,11 @@ _persist_path_to_ci() {
   if [ ! -f "${_ci_path_file:-}" ]; then
     touch "${_ci_path_file:-}"
     chmod 600 "${_ci_path_file:-}" 2>/dev/null || true
-    log_info "    [NEW] Created CI path cache: ${_ci_path_file:-}"
+    echo "    [NEW] Created CI path cache: ${_ci_path_file:-}" >&2
   fi
 
   echo "${_path_to_write:-}" >>"${_ci_path_file:-}"
-  log_info "    [OK] Wrote to CI path cache: ${_path_to_write:-}"
+  echo "    [OK] Wrote to CI path cache: ${_path_to_write:-}" >&2
 }
 
 # Purpose: Read CI persistence file and sync paths to current shell
