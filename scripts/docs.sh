@@ -95,13 +95,9 @@ main() {
       run_mise exec -- pnpm --dir "${DOCS_DIR:-}" install
     fi
 
-    # 5. Resolve VitePress (check in docs/node_modules/.bin first)
+    # 5. Resolve VitePress (check docs/node_modules/.bin via extra search paths)
     local _VITEPRESS_BIN
-    if [ -x "${DOCS_DIR:-}/node_modules/.bin/vitepress" ]; then
-      _VITEPRESS_BIN="${DOCS_DIR:-}/node_modules/.bin/vitepress"
-    else
-      _VITEPRESS_BIN=$(resolve_bin "vitepress") || true
-    fi
+    _VITEPRESS_BIN=$(resolve_bin "vitepress" "${DOCS_DIR:-}/node_modules/.bin") || true
 
     if [ -z "${_VITEPRESS_BIN:-}" ]; then
       log_error "Error: vitepress not found. Please run 'make setup' first."
@@ -116,11 +112,7 @@ main() {
       log_success "DRY-RUN: Would start VitePress dev server on $DOCS_DIR"
     else
       local _VITEPRESS_BIN
-      if [ -x "${DOCS_DIR:-}/node_modules/.bin/vitepress" ]; then
-        _VITEPRESS_BIN="${DOCS_DIR:-}/node_modules/.bin/vitepress"
-      else
-        _VITEPRESS_BIN=$(resolve_bin "vitepress") || true
-      fi
+      _VITEPRESS_BIN=$(resolve_bin "vitepress" "${DOCS_DIR:-}/node_modules/.bin") || true
       log_info "Starting development server..."
       "${_VITEPRESS_BIN:-}" dev "${DOCS_DIR:-}"
     fi
@@ -131,11 +123,7 @@ main() {
     else
       # VitePress binary was already resolved and dependencies installed in the checks section
       local _VITEPRESS_BIN
-      if [ -x "${DOCS_DIR:-}/node_modules/.bin/vitepress" ]; then
-        _VITEPRESS_BIN="${DOCS_DIR:-}/node_modules/.bin/vitepress"
-      else
-        _VITEPRESS_BIN=$(resolve_bin "vitepress") || true
-      fi
+      _VITEPRESS_BIN=$(resolve_bin "vitepress" "${DOCS_DIR:-}/node_modules/.bin") || true
       log_info "Building documentation site..."
       "${_VITEPRESS_BIN:-}" build "${DOCS_DIR:-}"
       log_success "\n✨ Build complete! Artifacts are in $DOCS_DIR/.vitepress/dist"
@@ -146,11 +134,7 @@ main() {
       log_success "DRY-RUN: Would preview VitePress site in $DOCS_DIR"
     else
       local _VITEPRESS_BIN
-      if [ -x "${DOCS_DIR:-}/node_modules/.bin/vitepress" ]; then
-        _VITEPRESS_BIN="${DOCS_DIR:-}/node_modules/.bin/vitepress"
-      else
-        _VITEPRESS_BIN=$(resolve_bin "vitepress") || true
-      fi
+      _VITEPRESS_BIN=$(resolve_bin "vitepress" "${DOCS_DIR:-}/node_modules/.bin") || true
       log_info "Previewing production build..."
       "${_VITEPRESS_BIN:-}" preview "${DOCS_DIR:-}"
     fi

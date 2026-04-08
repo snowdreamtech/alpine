@@ -1606,20 +1606,56 @@ if tool_key and isinstance(data[tool_key], list):
 # Feature Flag:
 #   USE_NEW_RESOLVE_BIN=1 - Use new layered implementation with timeout protection
 #   USE_NEW_RESOLVE_BIN=0 - Use legacy implementation (default for gradual rollout)
+# Params:
+#   $1 - Binary name to resolve
+#   $2 - Optional: Additional search paths (colon-separated, e.g., "docs/node_modules/.bin:other/path")
+# Examples:
+#   resolve_bin "vitepress"
+#   resolve_bin "vitepress" "docs/node_modules/.bin"
+#   resolve_bin "eslint" "packages/app/node_modules/.bin:packages/lib/node_modules/.bin"
 resolve_bin() {
   local _BIN="${1:-}"
+  local _EXTRA_PATHS="${2:-}"
   [ -z "${_BIN:-}" ] && return 1
 
   # Feature flag: Use new implementation if enabled
   if [ "${USE_NEW_RESOLVE_BIN:-0}" = "1" ]; then
     # Delegate to new layered implementation with timeout protection
     if command -v resolve_bin_cached >/dev/null 2>&1; then
-      resolve_bin_cached "${_BIN:-}"
+      resolve_bin_cached "${_BIN:-}" "${_EXTRA_PATHS:-}"
       return $?
     else
       # Fallback to legacy if new implementation not available
       log_debug "resolve_bin_cached not found, falling back to legacy implementation"
     fi
+  fi
+
+  # ── 0. Extra Search Paths (highest priority) ──
+  if [ -n "${_EXTRA_PATHS:-}" ]; then
+    local _OLD_IFS="$IFS"
+    IFS=":"
+    # shellcheck disable=SC2086
+    for _extra_path in ${_EXTRA_PATHS:-}; do
+      if [ -x "${_extra_path:-}/${_BIN:-}" ]; then
+        IFS="$_OLD_IFS"
+        echo "${_extra_path:-}/${_BIN:-}"
+        return 0
+      fi
+      # Windows: check .exe and .cmd extensions
+      if [ "${_G_OS:-}" = "windows" ]; then
+        if [ -x "${_extra_path:-}/${_BIN:-}.exe" ]; then
+          IFS="$_OLD_IFS"
+          echo "${_extra_path:-}/${_BIN:-}.exe"
+          return 0
+        fi
+        if [ -f "${_extra_path:-}/${_BIN:-}.cmd" ]; then
+          IFS="$_OLD_IFS"
+          echo "${_extra_path:-}/${_BIN:-}.cmd"
+          return 0
+        fi
+      fi
+    done
+    IFS="$_OLD_IFS"
   fi
 
   # ── 1. Python Venv ──
