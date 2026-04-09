@@ -14,7 +14,7 @@ This document summarizes the refactoring effort to migrate all tool installation
 - ✅ Integrated mise shim detection and handling
 - ✅ Added comprehensive debugging and error reporting
 
-### Phase 2: Tool Migration (18/56 tools completed - 32%)
+### Phase 2: Tool Migration (23/56 tools completed - 41%)
 
 #### Completed Files
 
@@ -57,6 +57,17 @@ This document summarizes the refactoring effort to migrate all tool installation
     - ✅ yamllint
     - ✅ dotenv-linter
 
+11. **scripts/lib/langs/go.sh** (2 tools)
+    - ✅ golangci-lint
+    - ✅ govulncheck
+
+12. **scripts/lib/langs/python.sh** (2 tools)
+    - ✅ ruff
+    - ✅ pip-audit
+
+13. **scripts/lib/langs/kotlin.sh** (1 tool)
+    - ✅ ktlint
+
 ### Phase 3: Documentation (Completed)
 
 - ✅ Added §7.8 to `.agent/rules/06-ci-testing.md`
@@ -66,17 +77,9 @@ This document summarizes the refactoring effort to migrate all tool installation
 
 ## Remaining Work
 
-### Tools Pending Migration (~38 tools)
+### Tools Pending Migration (~33 tools)
 
 #### High Priority (Frequently Used)
-
-- **scripts/lib/langs/go.sh** (2 tools)
-  - ⏳ install_go_lint
-  - ⏳ install_govulncheck
-
-- **scripts/lib/langs/python.sh** (2 tools)
-  - ⏳ install_ruff
-  - ⏳ install_pip_audit
 
 - **scripts/lib/langs/node.sh** (4 tools)
   - ⏳ install_sort_package_json
@@ -91,9 +94,6 @@ This document summarizes the refactoring effort to migrate all tool installation
   - ⏳ install_ruby_lint
 
 #### Medium Priority
-
-- **scripts/lib/langs/kotlin.sh** (1 tool)
-  - ⏳ install_ktlint
 
 - **scripts/lib/langs/markdown.sh** (1 tool)
   - ⏳ install_markdownlint
@@ -157,12 +157,16 @@ This document summarizes the refactoring effort to migrate all tool installation
 ### 4. Code Reduction
 
 - Average reduction: ~40-50 lines per tool
-- Total lines saved so far: ~800 lines
+- Total lines saved so far: ~1,150 lines (23 tools × 50 lines avg)
 - Improved maintainability and consistency
 
 ## Commit History
 
 ```
+bc525dc refactor(ci): migrate ktlint to install_tool_safe
+91b43ea refactor(ci): migrate ruff and pip-audit to install_tool_safe
+30e6e61 refactor(ci): migrate golangci-lint and govulncheck to install_tool_safe
+275a598 docs(ci): add refactoring summary document
 ca9d719 docs(ci): add install_tool_safe pattern documentation to 06-ci-testing.md
 c8c841b refactor(ci): migrate yamllint and dotenv-linter to install_tool_safe
 e2c80af refactor(ci): migrate osv-scanner, zizmor, cargo-audit to install_tool_safe
@@ -177,10 +181,19 @@ a6f3942 refactor(ci): migrate hadolint and dockerfile-utils to install_tool_safe
 
 ## Next Steps
 
-1. **Continue Migration**: Refactor remaining 38 tools following the same pattern
+1. **Continue Migration**: Refactor remaining 33 tools following the same pattern
 2. **CI Validation**: Ensure all platforms (Linux, macOS, Windows) pass
 3. **Performance Testing**: Verify no regression in setup time
 4. **Documentation**: Update tool-specific documentation as needed
+
+## Progress Summary
+
+- **Total Tools**: 56
+- **Completed**: 23 (41%)
+- **Remaining**: 33 (59%)
+- **Code Reduction**: ~1,150 lines
+- **Commits**: 14 atomic commits
+- **Files Modified**: 13 files
 
 ## Benefits Realized
 
