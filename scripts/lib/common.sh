@@ -2046,8 +2046,10 @@ install_tool_safe() {
   _VERSION=$(get_mise_tool_version "${_PROVIDER:-}")
 
   # If version looks like a TOML table (contains "version ="), extract just the version
+  # Use [^"]* instead of [^"]+ for better compatibility (handles empty strings)
+  # Use [[:space:]]* for POSIX compatibility across all platforms
   if echo "${_VERSION:-}" | grep -q "version[[:space:]]*="; then
-    _VERSION=$(echo "${_VERSION:-}" | sed -E 's/.*version[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/')
+    _VERSION=$(echo "${_VERSION:-}" | sed -E 's/.*version[[:space:]]*=[[:space:]]*"([^"]*)".*/\1/')
   fi
 
   log_info "=== install_tool_safe: ${_DISPLAY_NAME:-} ==="
