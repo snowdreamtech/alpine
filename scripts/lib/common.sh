@@ -1852,9 +1852,26 @@ verify_binary_exists() {
   [ -z "${_BIN:-}" ] && return 1
 
   # Method 1: Check if in PATH
-  if command -v "${_BIN:-}" >/dev/null 2>&1; then
-    # Method 2: Try to execute it
-    if "${_BIN:-}" "${_VER_FLAG:-}" >/dev/null 2>&1; then
+  if ! command -v "${_BIN:-}" >/dev/null 2>&1; then
+    return 1
+  fi
+
+  # Method 2: Try to execute it with timeout protection
+  # CRITICAL: For mise shims, direct execution may fail with "not currently active"
+  # We need to handle this gracefully by checking if it's a shim
+  local _BIN_PATH
+  _BIN_PATH=$(command -v "${_BIN:-}" 2>/dev/null)
+
+  # If it's a mise shim, it will be in the shims directory
+  if echo "${_BIN_PATH:-}" | grep -q "/mise/shims/"; then
+    # For mise shims, we can't reliably test execution without mise exec
+    # Just verify the shim file exists and is executable
+    if [ -f "${_BIN_PATH:-}" ] && [ -x "${_BIN_PATH:-}" ]; then
+      return 0
+    fi
+  else
+    # For non-shim binaries, try to execute with timeout
+    if run_with_timeout_robust 3 "${_BIN:-}" "${_VER_FLAG:-}" >/dev/null 2>&1; then
       return 0
     fi
   fi
