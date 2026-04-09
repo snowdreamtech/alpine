@@ -8,46 +8,8 @@ set -eu
 # Purpose: Installs spectral for OpenAPI/AsyncAPI linting.
 # Delegate: Managed by mise (.mise.toml)
 install_spectral() {
-  local _T0_SPEC
-  _T0_SPEC=$(date +%s)
-  local _TITLE="Spectral"
-  local _PROVIDER="${VER_SPECTRAL_PROVIDER:-}"
-  local _VERSION="${VER_SPECTRAL:-}"
-
-  if ! has_lang_files "" "openapi.yaml openapi.json asyncapi.yaml asyncapi.json"; then
-    return 0
-  fi
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version spectral)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
-
-  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary"API" "Spectral" "✅ Exists" "${_CUR_VER:-}" "0"
-    return 0
-  fi
-
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "API" "Spectral" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_SPEC="✅ mise"
   setup_registry_spectral
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_SPEC="❌ Failed"
-
-  # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "spectral" "${_PROVIDER:-}" "Spectral" "--version"; then
-    _STAT_SPEC="❌ Not Executable"
-    log_summary "API" "Spectral" "${_STAT_SPEC:-}" "-" "$(($(date +%s) - _T0_SPEC))"
-    [ "${CI:-}" = "true" ] && return 1
-    return 0
-  fi
-
-  log_summary "API" "Spectral" "${_STAT_SPEC:-}" "$(get_version spectral)" "$(($(date +%s) - _T0_SPEC))"
+  install_tool_safe "spectral" "${VER_SPECTRAL_PROVIDER:-}" "Spectral" "--version" 0 "openapi.yaml openapi.json asyncapi.yaml asyncapi.json" ""
 }
 
 # Purpose: Sets up OpenAPI environment.
