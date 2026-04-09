@@ -398,6 +398,116 @@ When adding new tools:
 ### 7.7 Common Pitfalls to Avoid
 
 - ❌ **Don't** assume a tool is usable just because `mise install` succeeded
+- ❌ **Don't** skip atomic verification in CI environments
+- ❌ **Don't** use hardcoded paths - always use `resolve_bin` or `mise which`
+- ❌ **Don't** forget timeout protection on tool execution
+- ❌ **Don't** ignore platform-specific binary naming (`.exe`, `ec-*`, etc.)
+
+### 7.8 The `install_tool_safe()` Pattern (Recommended)
+
+**Status**: ✅ Production-Ready (Refactoring in Progress)
+
+To simplify tool installation and ensure consistency, use the `install_tool_safe()` function which encapsulates all best practices from §7.1-7.6:
+
+#### Function Signature
+
+```bash
+install_tool_safe() {
+  local _BIN_NAME="${1:-}"        # Binary name (e.g., "shfmt")
+  local _PROVIDER="${2:-}"        # Provider (e.g., "github:mvdan/sh")
+  local _DISPLAY_NAME="${3:-}"    # Display name (e.g., "Shfmt")
+  local _VERSION_FLAG="${4:---version}"  # Version flag (default: "--version")
+  local _SKIP_FILE_CHECK="${5:-0}"       # Skip file detection (0=check, 1=skip)
+  local _FILE_PATTERNS="${6:-}"          # File patterns (e.g., "*.sh *.bash")
+  local _FILE_DIR="${7:-}"               # File directory (optional)
+}
+```
+
+#### Usage Examples
+
+**Basic usage** (with file detection):
+
+```bash
+install_shfmt() {
+  install_tool_safe "shfmt" "${VER_SHFMT_PROVIDER:-}" "Shfmt" "--version" 0 "*.sh *.bash" ""
+}
+```
+
+**CI-only tool** (skip file detection):
+
+```bash
+install_gitleaks() {
+  install_tool_safe "gitleaks" "${VER_GITLEAKS_PROVIDER:-}" "Gitleaks" "version" 1
+}
+```
+
+**Tool with custom version flag**:
+
+```bash
+install_goreleaser() {
+  install_tool_safe "goreleaser" "${VER_GORELEASER_PROVIDER:-}" "GoReleaser" "--version" 1
+}
+```
+
+**Tool with registry setup**:
+
+```bash
+install_spectral() {
+  setup_registry_spectral  # Pre-install registry configuration
+  install_tool_safe "spectral" "${VER_SPECTRAL_PROVIDER:-}" "Spectral" "--version" 0 "openapi.yaml openapi.json" ""
+}
+```
+
+#### What `install_tool_safe()` Does
+
+1. **Binary-First Detection**: Checks if binary exists and is executable BEFORE checking version
+2. **Version Verification**: Only checks version if binary exists (prevents false positives from stale cache)
+3. **Smart Installation**: Determines if installation is needed based on binary existence + version match
+4. **Cache Refresh**: In CI, refreshes mise cache to avoid stale data from GitHub Actions cache
+5. **Platform-Specific Binary Resolution**: Handles `ec-linux-amd64`, `ec-darwin-arm64`, `.exe` extensions
+6. **Post-Install Verification**: Runs full atomic verification after installation
+7. **Mise Shim Detection**: Detects shims in `/mise/shims/` and uses `mise exec` for smoke tests
+8. **Comprehensive Error Reporting**: Provides detailed debugging information on failure
+
+#### Migration Status
+
+**Completed** (18 tools):
+
+- ✅ shfmt, shellcheck, actionlint (shell.sh)
+- ✅ gitleaks, checkmake, editorconfig-checker, goreleaser (base.sh)
+- ✅ hadolint, dockerfile-utils (docker.sh)
+- ✅ tflint (terraform.sh)
+- ✅ spectral (openapi.sh)
+- ✅ clang-format (cpp.sh)
+- ✅ stylua (lua.sh)
+- ✅ bats (testing.sh)
+- ✅ osv-scanner, zizmor, cargo-audit (security.sh)
+- ✅ yamllint, dotenv-linter (yaml.sh)
+
+**In Progress** (~30+ tools remaining):
+
+- go.sh, python.sh, kotlin.sh, markdown.sh, rego.sh, swift.sh, protobuf.sh, haskell.sh, sql.sh, node.sh, helm.sh, scala.sh, toml.sh, dotnet.sh, runner.sh, java.sh, ruby.sh, and others
+
+#### Benefits
+
+- **Consistency**: All tools follow the same installation pattern
+- **Reliability**: Binary-first detection prevents false positives
+- **Maintainability**: Single function to update for improvements
+- **Debugging**: Comprehensive logging for troubleshooting
+- **Cross-Platform**: Handles platform-specific binary naming automatically
+- **CI-Optimized**: Aggressive cache refresh and verification in CI environments
+
+#### When to Use
+
+- ✅ **Use `install_tool_safe()`** for all new tool installations
+- ✅ **Migrate existing tools** to `install_tool_safe()` during refactoring
+- ✅ **Prefer this pattern** over custom installation logic
+
+#### When NOT to Use
+
+- ❌ Tools with complex pre-install setup (use custom function + call `install_tool_safe()`)
+- ❌ Runtime installations (use `install_runtime_*` pattern)
+- ❌ Tools requiring special environment variables during installation (set them before calling)
 - ❌ **Don't** skip timeout protection on tool execution calls
 - ❌ **Don't** use different error handling patterns for different tools
 - ❌ **Don't** commit verification failures without fixing the root cause
