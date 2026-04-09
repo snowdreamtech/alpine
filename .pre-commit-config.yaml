@@ -758,7 +758,7 @@ repos:
         entry: sh scripts/lib/lint-wrapper.sh osv_scanner --config .osv-scanner.toml --call-analysis=all --format table --lockfile
         files: '(pnpm-lock\.yaml|go\.mod|Cargo\.lock|package-lock\.json|yarn\.lock|bun\.lockb)$'
         description: "Audit project dependencies for known vulnerabilities using Google OSV-Scanner."
-        stages: [manual, push]  # Skip in local pre-commit, run in CI or manually
+        stages: [manual, push] # Skip in local pre-commit, run in CI or manually
 
       - id: trivy
         name: trivy security scan
