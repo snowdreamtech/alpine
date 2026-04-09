@@ -2088,10 +2088,31 @@ install_tool_safe() {
     refresh_mise_cache
   fi
 
+  # CRITICAL: Resolve actual binary name from mise installation
+  # For tools with platform-specific binaries (e.g., ec-linux-amd64), we need to find the real name
+  local _ACTUAL_BIN="${_BIN_NAME:-}"
+  local _INSTALL_DIR
+  _INSTALL_DIR=$(mise where "${_PROVIDER:-}" 2>/dev/null) || _INSTALL_DIR=""
+
+  if [ -n "${_INSTALL_DIR:-}" ] && [ -d "${_INSTALL_DIR:-}/bin" ]; then
+    # Try exact match first
+    if [ -f "${_INSTALL_DIR:-}/bin/${_BIN_NAME:-}" ]; then
+      _ACTUAL_BIN="${_BIN_NAME:-}"
+    else
+      # Try pattern match (e.g., ec-* for editorconfig-checker)
+      local _FOUND_BIN
+      _FOUND_BIN=$(find "${_INSTALL_DIR:-}/bin" -name "${_BIN_NAME:-}*" -type f 2>/dev/null | head -n 1)
+      if [ -n "${_FOUND_BIN:-}" ]; then
+        _ACTUAL_BIN=$(basename "${_FOUND_BIN:-}")
+        log_info "Resolved actual binary name: ${_ACTUAL_BIN:-} (from ${_BIN_NAME:-})"
+      fi
+    fi
+  fi
+
   # Step 1: Check if binary exists and works (FIRST, before version check)
-  log_info "Step 1: Checking if ${_BIN_NAME:-} binary exists and is executable"
+  log_info "Step 1: Checking if ${_ACTUAL_BIN:-} binary exists and is executable"
   local _BINARY_EXISTS=0
-  if verify_binary_exists "${_BIN_NAME:-}" "${_VERSION_FLAG:-}"; then
+  if verify_binary_exists "${_ACTUAL_BIN:-}" "${_VERSION_FLAG:-}"; then
     log_info "Step 1: ✓ Binary exists and is executable"
     _BINARY_EXISTS=1
   else
@@ -2105,7 +2126,7 @@ install_tool_safe() {
   log_info "Step 2: Required version: ${_REQ_VER:-<none>}"
 
   if [ "${_BINARY_EXISTS:-0}" -eq 1 ]; then
-    _CUR_VER=$(get_version "${_BIN_NAME:-}")
+    _CUR_VER=$(get_version "${_ACTUAL_BIN:-}")
     log_info "Step 2: Current version (binary exists): ${_CUR_VER:-<none>}"
   else
     log_info "Step 2: Skipping version check (binary doesn't exist)"
@@ -2170,15 +2191,37 @@ install_tool_safe() {
   # Wait for filesystem sync (especially important in CI with network filesystems)
   sleep 2
 
+  # CRITICAL: Re-resolve actual binary name after installation
+  _INSTALL_DIR=$(mise where "${_PROVIDER:-}" 2>/dev/null) || _INSTALL_DIR=""
+
+  if [ -n "${_INSTALL_DIR:-}" ] && [ -d "${_INSTALL_DIR:-}/bin" ]; then
+    if [ -f "${_INSTALL_DIR:-}/bin/${_BIN_NAME:-}" ]; then
+      _ACTUAL_BIN="${_BIN_NAME:-}"
+    else
+      local _FOUND_BIN
+      _FOUND_BIN=$(find "${_INSTALL_DIR:-}/bin" -name "${_BIN_NAME:-}*" -type f 2>/dev/null | head -n 1)
+      if [ -n "${_FOUND_BIN:-}" ]; then
+        _ACTUAL_BIN=$(basename "${_FOUND_BIN:-}")
+        log_info "Post-install: Resolved actual binary name: ${_ACTUAL_BIN:-}"
+      fi
+    fi
+  fi
+
   # Step 6a: Verify binary now exists
   log_info "Step 6a: Verifying binary existence"
-  if ! verify_binary_exists "${_BIN_NAME:-}" "${_VERSION_FLAG:-}"; then
+  if ! verify_binary_exists "${_ACTUAL_BIN:-}" "${_VERSION_FLAG:-}"; then
     log_error "Step 6a: Binary still not found after installation!"
     log_error "Debugging info:"
+    log_error "  - Logical name: ${_BIN_NAME:-}"
+    log_error "  - Actual name: ${_ACTUAL_BIN:-}"
+    log_error "  - Install dir: ${_INSTALL_DIR:-}"
     log_error "  - PATH: ${PATH:-}"
-    log_error "  - command -v ${_BIN_NAME:-}: $(command -v "${_BIN_NAME:-}" 2>&1 || echo 'NOT FOUND')"
-    log_error "  - mise which ${_BIN_NAME:-}: $(mise which "${_BIN_NAME:-}" 2>&1 || echo 'NOT FOUND')"
+    log_error "  - command -v ${_ACTUAL_BIN:-}: $(command -v "${_ACTUAL_BIN:-}" 2>&1 || echo 'NOT FOUND')"
+    log_error "  - mise which ${_ACTUAL_BIN:-}: $(mise which "${_ACTUAL_BIN:-}" 2>&1 || echo 'NOT FOUND')"
     log_error "  - mise where ${_PROVIDER:-}: $(mise where "${_PROVIDER:-}" 2>&1 || echo 'NOT FOUND')"
+    if [ -n "${_INSTALL_DIR:-}" ] && [ -d "${_INSTALL_DIR:-}/bin" ]; then
+      log_error "  - Binaries in install dir: $(ls -la "${_INSTALL_DIR:-}/bin" 2>&1 || echo 'FAILED')"
+    fi
     log_summary "Base" "${_DISPLAY_NAME:-}" "❌ Not Found" "-" "$(($(date +%s) - _T0))"
     return 1
   fi
@@ -2187,7 +2230,7 @@ install_tool_safe() {
   # Step 6b: Atomic verification (comprehensive check in CI)
   if is_ci_env; then
     log_info "Step 6b: Running atomic verification"
-    if ! verify_tool_atomic "${_BIN_NAME:-}" "${_PROVIDER:-}" "${_DISPLAY_NAME:-}" "${_VERSION_FLAG:-}"; then
+    if ! verify_tool_atomic "${_ACTUAL_BIN:-}" "${_PROVIDER:-}" "${_DISPLAY_NAME:-}" "${_VERSION_FLAG:-}"; then
       log_error "Step 6b: Atomic verification FAILED"
       log_summary "Base" "${_DISPLAY_NAME:-}" "❌ Not Usable" "-" "$(($(date +%s) - _T0))"
       return 1
@@ -2195,7 +2238,7 @@ install_tool_safe() {
     log_info "Step 6b: ✓ Atomic verification succeeded"
   fi
 
-  log_summary "Base" "${_DISPLAY_NAME:-}" "${_STAT:-}" "$(get_version "${_BIN_NAME:-}")" "$(($(date +%s) - _T0))"
+  log_summary "Base" "${_DISPLAY_NAME:-}" "${_STAT:-}" "$(get_version "${_ACTUAL_BIN:-}")" "$(($(date +%s) - _T0))"
   log_info "=== install_tool_safe: ${_DISPLAY_NAME:-} completed successfully ==="
   return 0
 }
