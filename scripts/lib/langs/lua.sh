@@ -19,31 +19,8 @@ install_runtime_lua() {
 # Purpose: Installs stylua.
 # Delegate: Managed by mise (.mise.toml)
 install_stylua() {
-  local _T0_LUA
-  _T0_LUA=$(date +%s)
-  local _TITLE="StyLua"
-  local _PROVIDER="${VER_STYLUA_PROVIDER:-}"
-  local _VERSION="${VER_STYLUA:-}"
-
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Lua" "StyLua" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_LUA="✅ mise"
   setup_registry_stylua
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_LUA="❌ Failed"
-
-  # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "stylua" "${_PROVIDER:-}" "StyLua" "--version"; then
-    _STAT_LUA="❌ Not Executable"
-    log_summary "Lua" "StyLua" "${_STAT_LUA:-}" "-" "$(($(date +%s) - _T0_LUA))"
-    [ "${CI:-}" = "true" ] && return 1
-    return 0
-  fi
-
-  log_summary "Lua" "StyLua" "${_STAT_LUA:-}" "$(get_version stylua --version)" "$(($(date +%s) - _T0_LUA))"
+  install_tool_safe "stylua" "${VER_STYLUA_PROVIDER:-}" "StyLua" "--version" 0 "*.lua" ""
 }
 
 # Purpose: Sets up Lua runtime and mandatory linting tools.
