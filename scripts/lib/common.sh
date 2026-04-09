@@ -2116,17 +2116,25 @@ install_tool_safe() {
   local _INSTALL_DIR
   _INSTALL_DIR=$(mise where "${_PROVIDER:-}" 2>/dev/null) || _INSTALL_DIR=""
 
-  if [ -n "${_INSTALL_DIR:-}" ] && [ -d "${_INSTALL_DIR:-}/bin" ]; then
-    # Try exact match first
-    if [ -f "${_INSTALL_DIR:-}/bin/${_BIN_NAME:-}" ]; then
+  if [ -n "${_INSTALL_DIR:-}" ]; then
+    # Try exact match first in bin/ directory
+    if [ -d "${_INSTALL_DIR:-}/bin" ] && [ -f "${_INSTALL_DIR:-}/bin/${_BIN_NAME:-}" ]; then
       _ACTUAL_BIN="${_BIN_NAME:-}"
-    else
-      # Try pattern match (e.g., ec-* for editorconfig-checker)
+    # Try pattern match in bin/ directory (e.g., ec-* for editorconfig-checker)
+    elif [ -d "${_INSTALL_DIR:-}/bin" ]; then
       local _FOUND_BIN
-      _FOUND_BIN=$(find "${_INSTALL_DIR:-}/bin" -name "${_BIN_NAME:-}*" -type f 2>/dev/null | head -n 1)
+      _FOUND_BIN=$(find "${_INSTALL_DIR:-}/bin" -maxdepth 1 -name "${_BIN_NAME:-}*" -type f -executable 2>/dev/null | head -n 1)
       if [ -n "${_FOUND_BIN:-}" ]; then
         _ACTUAL_BIN=$(basename "${_FOUND_BIN:-}")
         log_info "Resolved actual binary name: ${_ACTUAL_BIN:-} (from ${_BIN_NAME:-})"
+      fi
+    # Try pattern match in root directory (some tools install directly to root, e.g., shfmt_v3.13.1)
+    else
+      local _FOUND_BIN
+      _FOUND_BIN=$(find "${_INSTALL_DIR:-}" -maxdepth 1 -name "${_BIN_NAME:-}*" -type f -executable 2>/dev/null | head -n 1)
+      if [ -n "${_FOUND_BIN:-}" ]; then
+        _ACTUAL_BIN=$(basename "${_FOUND_BIN:-}")
+        log_info "Resolved actual binary name: ${_ACTUAL_BIN:-} (from ${_BIN_NAME:-}, in root dir)"
       fi
     fi
   fi
@@ -2216,15 +2224,25 @@ install_tool_safe() {
   # CRITICAL: Re-resolve actual binary name after installation
   _INSTALL_DIR=$(mise where "${_PROVIDER:-}" 2>/dev/null) || _INSTALL_DIR=""
 
-  if [ -n "${_INSTALL_DIR:-}" ] && [ -d "${_INSTALL_DIR:-}/bin" ]; then
-    if [ -f "${_INSTALL_DIR:-}/bin/${_BIN_NAME:-}" ]; then
+  if [ -n "${_INSTALL_DIR:-}" ]; then
+    # Try exact match first in bin/ directory
+    if [ -d "${_INSTALL_DIR:-}/bin" ] && [ -f "${_INSTALL_DIR:-}/bin/${_BIN_NAME:-}" ]; then
       _ACTUAL_BIN="${_BIN_NAME:-}"
-    else
+    # Try pattern match in bin/ directory
+    elif [ -d "${_INSTALL_DIR:-}/bin" ]; then
       local _FOUND_BIN
-      _FOUND_BIN=$(find "${_INSTALL_DIR:-}/bin" -name "${_BIN_NAME:-}*" -type f 2>/dev/null | head -n 1)
+      _FOUND_BIN=$(find "${_INSTALL_DIR:-}/bin" -maxdepth 1 -name "${_BIN_NAME:-}*" -type f -executable 2>/dev/null | head -n 1)
       if [ -n "${_FOUND_BIN:-}" ]; then
         _ACTUAL_BIN=$(basename "${_FOUND_BIN:-}")
         log_info "Post-install: Resolved actual binary name: ${_ACTUAL_BIN:-}"
+      fi
+    # Try pattern match in root directory
+    else
+      local _FOUND_BIN
+      _FOUND_BIN=$(find "${_INSTALL_DIR:-}" -maxdepth 1 -name "${_BIN_NAME:-}*" -type f -executable 2>/dev/null | head -n 1)
+      if [ -n "${_FOUND_BIN:-}" ]; then
+        _ACTUAL_BIN=$(basename "${_FOUND_BIN:-}")
+        log_info "Post-install: Resolved actual binary name: ${_ACTUAL_BIN:-} (in root dir)"
       fi
     fi
   fi
