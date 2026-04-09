@@ -16,79 +16,28 @@ install_runtime_go() {
 
 # Purpose: Installs golangci-lint for Go projects (version pinned in versions.sh).
 install_go_lint() {
-  local _T0_GO
-  _T0_GO=$(date +%s)
-  local _TITLE="Go Lint"
-  local _PROVIDER="golangci-lint"
-  local _VERSION="${VER_GOLANGCI_LINT:-}"
-
-  # Fast-path: Check version-aware existence — avoid re-downloading the large
-  # GitHub-released binary (~50MB) on every local setup run.
-  local _CUR_VER
-  _CUR_VER=$(get_version golangci-lint)
-  local _REQ_VER="${VER_GOLANGCI_LINT:-}"
-
-  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Go" "Go Lint" "✅ Exists" "${_CUR_VER:-}" "0"
+  if ! has_lang_files "go.mod" "*.go"; then
     return 0
   fi
-
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Go" "Go Lint" "⚖️ Previewed" "-" "0"
-    return 0
-  fi
-  local _STAT_GO="✅ mise"
 
   # Support verbose logging for Tier 2 tools to track large binary downloads (~50MB)
-  # or complex compilations that might hang without feedback.
-  # We also enforce a local MISE_HTTP_TIMEOUT override here to ensure reliability.
-  # Ref: Rule 01 (Network/Retry)
   log_info "Downloading golangci-lint (this may take a few minutes on slow networks)..."
-  MISE_HTTP_TIMEOUT=600s VERBOSE=2 ENABLE_GITHUB_PROXY=1 run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_GO="❌ Failed"
-
-  # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "golangci-lint" "golangci-lint" "Go Lint" "--version"; then
-    _STAT_GO="❌ Not Executable"
-    log_summary "Go" "Go Lint" "${_STAT_GO:-}" "-" "$(($(date +%s) - _T0_GO))"
-    [ "${CI:-}" = "true" ] && return 1
-    return 0
-  fi
-
-  log_summary "Go" "Go Lint" "${_STAT_GO:-}" "$(get_version golangci-lint)" "$(($(date +%s) - _T0_GO))"
+  MISE_HTTP_TIMEOUT=600s VERBOSE=2 ENABLE_GITHUB_PROXY=1 install_tool_safe "golangci-lint" "golangci-lint" "Go Lint" "--version" 1
 }
 
 # Purpose: Installs govulncheck for Go project vulnerability scanning.
 # NOTE: CI-only tool — vulnerability scanner. Skipped on local environments.
 install_govulncheck() {
-  local _T0_GOVC
-  _T0_GOVC=$(date +%s)
-  local _TITLE="Govulncheck"
-  local _PROVIDER="${VER_GOVULNCHECK_PROVIDER:-}"
-  local _VERSION="${VER_GOVULNCHECK:-}"
   # CI-only: Go vulnerability checks are typically heavier and reserved for CI workflows.
   if ! is_ci_env && [ "${GOVULN_FORCE_INSTALL:-0}" -ne 1 ]; then
     return 0
   fi
 
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Go" "Govulncheck" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_GOVC="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_GOVC="❌ Failed"
-
-  # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "govulncheck" "${_PROVIDER:-}" "Govulncheck" "--version"; then
-    _STAT_GOVC="❌ Not Executable"
-    log_summary "Go" "Govulncheck" "${_STAT_GOVC:-}" "-" "$(($(date +%s) - _T0_GOVC))"
-    [ "${CI:-}" = "true" ] && return 1
+  if ! has_lang_files "go.mod" "*.go"; then
     return 0
   fi
 
-  log_summary "Go" "Govulncheck" "${_STAT_GOVC:-}" "$(get_version govulncheck)" "$(($(date +%s) - _T0_GOVC))"
+  install_tool_safe "govulncheck" "${VER_GOVULNCHECK_PROVIDER:-}" "Govulncheck" "--version" 1
 }
 
 # Purpose: Sets up Go runtime for project.
