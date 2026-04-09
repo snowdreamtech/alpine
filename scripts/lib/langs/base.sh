@@ -129,9 +129,38 @@ install_editorconfig_checker() {
   if [ ! -f ".editorconfig" ]; then
     return 0
   fi
-  # Note: editorconfig-checker binary is platform-specific (ec-linux-amd64, ec-darwin-amd64, etc.)
-  # The actual binary name is 'ec' or 'ec-*', but we check for 'editorconfig-checker' command
-  install_tool_safe "editorconfig-checker" "${VER_EDITORCONFIG_CHECKER_PROVIDER:-}" "Editorconfig-Checker" "--version" 1
+
+  # SPECIAL CASE: editorconfig-checker has platform-specific binary names
+  # (ec-linux-amd64, ec-darwin-amd64, ec-windows-amd64.exe, etc.)
+  # We need to detect the actual binary name based on the platform
+  local _EC_BIN="ec"
+  case "$(uname -s)" in
+  Linux)
+    case "$(uname -m)" in
+    x86_64) _EC_BIN="ec-linux-amd64" ;;
+    aarch64 | arm64) _EC_BIN="ec-linux-arm64" ;;
+    *) _EC_BIN="ec-linux-amd64" ;;
+    esac
+    ;;
+  Darwin)
+    case "$(uname -m)" in
+    x86_64) _EC_BIN="ec-darwin-amd64" ;;
+    arm64) _EC_BIN="ec-darwin-arm64" ;;
+    *) _EC_BIN="ec-darwin-amd64" ;;
+    esac
+    ;;
+  MINGW* | MSYS* | CYGWIN*)
+    case "$(uname -m)" in
+    x86_64) _EC_BIN="ec-windows-amd64.exe" ;;
+    *) _EC_BIN="ec-windows-amd64.exe" ;;
+    esac
+    ;;
+  *)
+    _EC_BIN="ec-linux-amd64"
+    ;;
+  esac
+
+  install_tool_safe "${_EC_BIN}" "${VER_EDITORCONFIG_CHECKER_PROVIDER:-}" "Editorconfig-Checker" "--version" 1
 }
 
 # Purpose: Installs GoReleaser as a universal release automation tool.
