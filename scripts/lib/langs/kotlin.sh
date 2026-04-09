@@ -16,41 +16,12 @@ install_runtime_kotlin() {
 
 # Purpose: Installs ktlint (version pinned in scripts/lib/versions.sh).
 install_ktlint() {
-  local _T0_KT
-  _T0_KT=$(date +%s)
-  local _TITLE="ktlint"
-  local _PROVIDER="${VER_KTLINT_PROVIDER:-}"
-  local _VERSION="${VER_KTLINT:-}"
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version ktlint --version)
-  local _REQ_VER="${VER_KTLINT:-}"
-
-  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Kotlin" "ktlint" "✅ Exists" "${_CUR_VER:-}" "0"
+  if ! has_lang_files "build.gradle.kts build.gradle settings.gradle.kts" "*.kt *.kts"; then
     return 0
   fi
 
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Kotlin" "ktlint" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_KT="✅ mise"
   setup_registry_ktlint
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_KT="❌ Failed"
-
-  # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "ktlint" "${_PROVIDER:-}" "ktlint" "--version"; then
-    _STAT_KT="❌ Not Executable"
-    log_summary "Kotlin" "ktlint" "${_STAT_KT:-}" "-" "$(($(date +%s) - _T0_KT))"
-    [ "${CI:-}" = "true" ] && return 1
-    return 0
-  fi
-
-  log_summary "Kotlin" "ktlint" "${_STAT_KT:-}" "$(get_version ktlint --version)" "$(($(date +%s) - _T0_KT))"
+  install_tool_safe "ktlint" "${VER_KTLINT_PROVIDER:-}" "ktlint" "--version" 0 "*.kt *.kts" ""
 }
 
 # Purpose: Sets up Kotlin runtime and mandatory linting tools.
