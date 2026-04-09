@@ -176,10 +176,10 @@ main() {
       # Determine mise tool spec for the package manager
       local _NPM_SPEC=""
       case "${NPM:-npm}" in
-        pnpm) _NPM_SPEC="npm:pnpm" ;;
-        yarn) _NPM_SPEC="npm:yarn" ;;
-        bun) _NPM_SPEC="bun" ;;
-        *) _NPM_SPEC="node" ;;
+      pnpm) _NPM_SPEC="npm:pnpm" ;;
+      yarn) _NPM_SPEC="npm:yarn" ;;
+      bun) _NPM_SPEC="bun" ;;
+      *) _NPM_SPEC="node" ;;
       esac
 
       # Test if mise exec works
@@ -204,10 +204,10 @@ main() {
         # Determine mise tool spec for the package manager
         local _NPM_SPEC=""
         case "${NPM:-npm}" in
-          pnpm) _NPM_SPEC="npm:pnpm" ;;
-          yarn) _NPM_SPEC="npm:yarn" ;;
-          bun) _NPM_SPEC="bun" ;;
-          *) _NPM_SPEC="node" ;;
+        pnpm) _NPM_SPEC="npm:pnpm" ;;
+        yarn) _NPM_SPEC="npm:yarn" ;;
+        bun) _NPM_SPEC="bun" ;;
+        *) _NPM_SPEC="node" ;;
         esac
 
         # Execute audit command (use mise exec if resolve_bin failed)

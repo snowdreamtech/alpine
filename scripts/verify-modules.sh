@@ -224,19 +224,19 @@ test_bin_resolver_module() {
 
   # Set mise paths based on OS (minimal environment for testing)
   case "$(uname -s)" in
-    Darwin)
-      if [ -d "$HOME/Library/Application Support/mise/shims" ]; then
-        export _G_MISE_SHIMS_BASE="$HOME/Library/Application Support/mise/shims"
-      else
-        export _G_MISE_SHIMS_BASE="$HOME/.local/share/mise/shims"
-      fi
-      ;;
-    MINGW*|MSYS*|CYGWIN*)
+  Darwin)
+    if [ -d "$HOME/Library/Application Support/mise/shims" ]; then
+      export _G_MISE_SHIMS_BASE="$HOME/Library/Application Support/mise/shims"
+    else
       export _G_MISE_SHIMS_BASE="$HOME/.local/share/mise/shims"
-      ;;
-    *)
-      export _G_MISE_SHIMS_BASE="$HOME/.local/share/mise/shims"
-      ;;
+    fi
+    ;;
+  MINGW* | MSYS* | CYGWIN*)
+    export _G_MISE_SHIMS_BASE="$HOME/.local/share/mise/shims"
+    ;;
+  *)
+    export _G_MISE_SHIMS_BASE="$HOME/.local/share/mise/shims"
+    ;;
   esac
 
   # Source timeout module first (dependency)

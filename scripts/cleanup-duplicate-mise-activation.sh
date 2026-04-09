@@ -68,7 +68,7 @@ cleanup_rc_file() {
     elif [ -f "$HOME/Library/Application Support/mise/bin/mise" ]; then
       _mise_bin="$HOME/Library/Application Support/mise/bin/mise"
     else
-      _mise_bin="mise"  # Hope it's in PATH
+      _mise_bin="mise" # Hope it's in PATH
     fi
   fi
 

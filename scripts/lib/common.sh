@@ -1368,9 +1368,11 @@ parse_common_args() {
       log_warn "Running in DRY-RUN mode. No changes will be applied."
       ;;
     -q | --quiet) # shellcheck disable=SC2034
-      VERBOSE=0 ;;
+      VERBOSE=0
+      ;;
     -v | --verbose) # shellcheck disable=SC2034
-      export VERBOSE=2 ;;
+      export VERBOSE=2
+      ;;
     -h | --help)
       # shellcheck disable=SC2317
       if command -v show_help >/dev/null 2>&1; then
