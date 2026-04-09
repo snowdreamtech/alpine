@@ -2244,6 +2244,9 @@ install_tool_safe() {
     if [ -n "${_INSTALL_DIR:-}" ] && [ -d "${_INSTALL_DIR:-}/bin" ]; then
       log_error "  - Binaries in install dir: $(ls -la "${_INSTALL_DIR:-}/bin" 2>&1 || echo 'FAILED')"
     fi
+    if [ -n "${_INSTALL_DIR:-}" ] && [ -d "${_INSTALL_DIR:-}" ]; then
+      log_error "  - Install dir contents: $(ls -la "${_INSTALL_DIR:-}" 2>&1 || echo 'FAILED')"
+    fi
     log_summary "Base" "${_DISPLAY_NAME:-}" "❌ Not Found" "-" "$(($(date +%s) - _T0))"
     return 1
   fi
