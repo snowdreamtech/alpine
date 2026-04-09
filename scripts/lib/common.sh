@@ -2039,8 +2039,16 @@ install_tool_safe() {
   _T0=$(date +%s)
 
   # Get version from provider
+  # CRITICAL: For tools with table syntax in .mise.toml like:
+  #   "github:foo/bar" = { version = "1.0.0", bin = "foo" }
+  # We need to extract just the version number, not the whole table
   local _VERSION
   _VERSION=$(get_mise_tool_version "${_PROVIDER:-}")
+
+  # If version looks like a TOML table (contains "version ="), extract just the version
+  if echo "${_VERSION:-}" | grep -q "version[[:space:]]*="; then
+    _VERSION=$(echo "${_VERSION:-}" | sed -E 's/.*version[[:space:]]*=[[:space:]]*"([^"]+)".*/\1/')
+  fi
 
   log_info "=== install_tool_safe: ${_DISPLAY_NAME:-} ==="
   log_info "Binary: ${_BIN_NAME:-}, Provider: ${_PROVIDER:-}, Version: ${_VERSION:-}"
