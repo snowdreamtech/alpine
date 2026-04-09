@@ -8,46 +8,7 @@ set -eu
 # Purpose: Installs bats (Bash Automated Testing System).
 # Delegate: Managed by mise (.mise.toml)
 install_bats() {
-  local _T0_BATS
-  _T0_BATS=$(date +%s)
-  local _TITLE="Bats"
-  local _PROVIDER="${VER_BATS_PROVIDER:-npm:bats}"
-  local _VERSION="${VER_BATS:-}"
-
-  if ! has_lang_files "" "*.bats"; then
-    return 0
-  fi
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version bats --version)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
-
-  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Testing" "Bats" "✅ Exists" "${_CUR_VER:-}" "0"
-    return 0
-  fi
-
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Testing" "Bats" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_BATS="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_BATS="❌ Failed"
-  refresh_mise_cache
-
-  # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "bats" "${_PROVIDER:-}" "Bats" "--version"; then
-    _STAT_BATS="❌ Not Executable"
-    log_summary "Testing" "Bats" "${_STAT_BATS:-}" "-" "$(($(date +%s) - _T0_BATS))"
-    [ "${CI:-}" = "true" ] && return 1
-    return 0
-  fi
-
-  log_summary "Testing" "Bats" "${_STAT_BATS:-}" "$(get_version bats --version)" "$(($(date +%s) - _T0_BATS))"
+  install_tool_safe "bats" "${VER_BATS_PROVIDER:-npm:bats}" "Bats" "--version" 0 "*.bats" ""
 }
 
 # Purpose: Installs bats-libs (helper libraries for bats).
