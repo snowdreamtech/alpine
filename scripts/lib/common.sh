@@ -1830,6 +1830,38 @@ check_runtime() {
   fi
 }
 
+# Purpose: Verify tool binary exists and is executable (lightweight check).
+# This is a fast pre-check before version detection to avoid false positives
+# from mise metadata that may be stale or incorrect.
+#
+# Parameters:
+#   $1 - Binary name (e.g., "shfmt")
+#   $2 - Version flag (e.g., "--version") [optional, defaults to "--version"]
+#
+# Returns:
+#   0 - Binary exists and is executable
+#   1 - Binary missing or not executable
+#
+# Examples:
+#   verify_binary_exists "shfmt" "--version"
+#   verify_binary_exists "ruff"
+verify_binary_exists() {
+  local _BIN="${1:-}"
+  local _VER_FLAG="${2:---version}"
+
+  [ -z "${_BIN:-}" ] && return 1
+
+  # Method 1: Check if in PATH
+  if command -v "${_BIN:-}" >/dev/null 2>&1; then
+    # Method 2: Try to execute it
+    if "${_BIN:-}" "${_VER_FLAG:-}" >/dev/null 2>&1; then
+      return 0
+    fi
+  fi
+
+  return 1
+}
+
 # Purpose: Atomically verifies tool installation with comprehensive checks.
 #          Ensures: installed, exists, executable, resolvable, usable.
 # Params:
