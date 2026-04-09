@@ -305,29 +305,35 @@ install_tool() {
 
 The `verify_tool_atomic` function uses a **layered resolution strategy** to handle cross-platform binaries and edge cases:
 
-#### Resolution Layers (in order of priority):
+#### Resolution Layers (in order of priority)
 
 1. **mise which** (Primary Method)
+
    ```bash
    MISE_OFFLINE=1 run_with_timeout_robust 3 mise which "tool-name"
    ```
+
    - Handles platform-specific binaries (e.g., `ec-linux-amd64`, `ec-darwin-amd64`)
    - Works with mise shims and direct installations
    - Timeout-protected to prevent hangs
    - Offline mode to avoid network delays
 
 2. **command -v** (Fallback 1)
+
    ```bash
    command -v "tool-name"
    ```
+
    - For tools already in PATH
    - Fast and reliable for standard installations
 
 3. **mise where + find** (Fallback 2)
+
    ```bash
    INSTALL_DIR=$(mise where "provider")
    find "$INSTALL_DIR/bin" -name "tool-name*" -type f | head -n 1
    ```
+
    - Searches mise installation directory
    - Handles pattern matching (e.g., `ec-*` for editorconfig-checker)
    - Works when shims are not yet activated
@@ -354,12 +360,14 @@ The `verify_tool_atomic` function uses a **layered resolution strategy** to hand
 ### 7.5 Error Handling Requirements
 
 - **Clear Error Messages**: Every verification failure **MUST** log which step failed and why:
+
   ```
   [ERROR] Step 3/5 Failed: Cannot resolve path for shfmt
   [ERROR] shfmt installed but failed atomic verification
   ```
 
 - **Detailed Debug Output**: In CI, enable debug logging to show verification progress:
+
   ```
   [DEBUG] === Atomic Verification: Shfmt ===
   [DEBUG] Step 1/5: Checking mise registration... ✓
