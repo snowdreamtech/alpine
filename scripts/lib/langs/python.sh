@@ -38,50 +38,16 @@ install_runtime_python() {
 # Purpose: Installs Ruff.
 # Delegate: Managed by mise (.mise.toml)
 install_ruff() {
-  local _T0_RUF
-  _T0_RUF=$(date +%s)
-  local _TITLE="Ruff"
-  local _PROVIDER="${VER_RUFF_PROVIDER:-}"
-  local _VERSION="${VER_RUFF:-}"
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version "ruff" "")
-  _REQ_VER=$(get_mise_tool_version "ruff")
-
-  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Python" "Ruff" "✅ Exists" "${_CUR_VER:-}" "0"
+  if ! has_lang_files "requirements.txt pyproject.toml" "*.py"; then
     return 0
   fi
 
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Python" "Ruff" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_RUF="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_RUF="❌ Failed"
-
-  # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "ruff" "${_PROVIDER:-}" "Ruff" "--version"; then
-    _STAT_RUF="❌ Not Executable"
-    log_summary "Python" "Ruff" "${_STAT_RUF:-}" "-" "$(($(date +%s) - _T0_RUF))"
-    [ "${CI:-}" = "true" ] && return 1
-    return 0
-  fi
-
-  log_summary "Python" "Ruff" "${_STAT_RUF:-}" "$(get_version ruff)" "$(($(date +%s) - _T0_RUF))"
+  install_tool_safe "ruff" "${VER_RUFF_PROVIDER:-}" "Ruff" "--version" 0 "*.py" ""
 }
 
 # Purpose: Installs pip-audit for Python dependency vulnerability scanning.
 # NOTE: CI-only tool — security audit. Skipped on local environments.
 install_pip_audit() {
-  local _T0_PA
-  _T0_PA=$(date +%s)
-  local _TITLE="pip-audit"
-  local _PROVIDER="${VER_PIP_AUDIT_PROVIDER:-}"
-  local _VERSION="${VER_PIP_AUDIT:-}"
   # CI-only: Optional security tool, local dev skips to avoid pip-audit installation overhead.
   if ! is_ci_env && [ "${PA_FORCE_INSTALL:-0}" -ne 1 ]; then
     return 0
@@ -91,24 +57,7 @@ install_pip_audit() {
     return 0
   fi
 
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Python" "pip-audit" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_PA="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_PA="❌ Failed"
-
-  # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "pip-audit" "${_PROVIDER:-}" "pip-audit" "--version"; then
-    _STAT_PA="❌ Not Executable"
-    log_summary "Python" "pip-audit" "${_STAT_PA:-}" "-" "$(($(date +%s) - _T0_PA))"
-    [ "${CI:-}" = "true" ] && return 1
-    return 0
-  fi
-
-  log_summary "Python" "pip-audit" "${_STAT_PA:-}" "$(get_version pip-audit --version)" "$(($(date +%s) - _T0_PA))"
+  install_tool_safe "pip-audit" "${VER_PIP_AUDIT_PROVIDER:-}" "pip-audit" "--version" 1
 }
 
 # Purpose: Sets up Python runtime for project.
