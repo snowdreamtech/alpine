@@ -2222,41 +2222,45 @@ install_tool_safe() {
   sleep 2
 
   # CRITICAL: Re-resolve actual binary name after installation
+  log_info "Step 6: Re-resolving binary name after installation"
   _INSTALL_DIR=$(mise where "${_PROVIDER:-}" 2>/dev/null) || _INSTALL_DIR=""
+  log_info "Step 6: Install dir = ${_INSTALL_DIR:-<empty>}"
 
   if [ -n "${_INSTALL_DIR:-}" ]; then
-    log_info "Post-install: Resolving binary name in ${_INSTALL_DIR:-}"
+    log_info "Step 6: Resolving binary name in ${_INSTALL_DIR:-}"
     local _FOUND_BIN=""
 
     # Strategy 1: Try exact match in bin/ directory
     if [ -d "${_INSTALL_DIR:-}/bin" ] && [ -f "${_INSTALL_DIR:-}/bin/${_BIN_NAME:-}" ]; then
       _ACTUAL_BIN="${_BIN_NAME:-}"
-      log_info "Post-install: Found exact match in bin/"
+      log_info "Step 6: Found exact match in bin/"
     else
       # Strategy 2: Try pattern match in bin/ directory
       if [ -d "${_INSTALL_DIR:-}/bin" ]; then
-        log_info "Post-install: Searching for ${_BIN_NAME:-}* in bin/"
+        log_info "Step 6: Searching for ${_BIN_NAME:-}* in bin/"
         _FOUND_BIN=$(find "${_INSTALL_DIR:-}/bin" -maxdepth 1 -name "${_BIN_NAME:-}*" -type f 2>/dev/null | head -n 1)
-        log_info "Post-install: find result: ${_FOUND_BIN:-<empty>}"
+        log_info "Step 6: find result: ${_FOUND_BIN:-<empty>}"
         if [ -n "${_FOUND_BIN:-}" ] && [ -x "${_FOUND_BIN:-}" ]; then
           _ACTUAL_BIN=$(basename "${_FOUND_BIN:-}")
-          log_info "Post-install: Resolved actual binary name: ${_ACTUAL_BIN:-} (pattern match in bin/)"
+          log_info "Step 6: Resolved actual binary name: ${_ACTUAL_BIN:-} (pattern match in bin/)"
         fi
       fi
 
       # Strategy 3: If still not found, try root directory
       if [ -z "${_FOUND_BIN:-}" ]; then
-        log_info "Post-install: Searching for ${_BIN_NAME:-}* in root dir"
+        log_info "Step 6: Searching for ${_BIN_NAME:-}* in root dir"
         _FOUND_BIN=$(find "${_INSTALL_DIR:-}" -maxdepth 1 -name "${_BIN_NAME:-}*" -type f 2>/dev/null | head -n 1)
-        log_info "Post-install: find result: ${_FOUND_BIN:-<empty>}"
+        log_info "Step 6: find result: ${_FOUND_BIN:-<empty>}"
         if [ -n "${_FOUND_BIN:-}" ] && [ -x "${_FOUND_BIN:-}" ]; then
           _ACTUAL_BIN=$(basename "${_FOUND_BIN:-}")
-          log_info "Post-install: Resolved actual binary name: ${_ACTUAL_BIN:-} (in root dir)"
+          log_info "Step 6: Resolved actual binary name: ${_ACTUAL_BIN:-} (in root dir)"
         fi
       fi
     fi
 
-    log_info "Post-install: Final _ACTUAL_BIN = ${_ACTUAL_BIN:-}"
+    log_info "Step 6: Final _ACTUAL_BIN = ${_ACTUAL_BIN:-}"
+  else
+    log_warn "Step 6: Install dir not found, cannot resolve binary name"
   fi
 
   # Step 6a: Verify binary now exists
