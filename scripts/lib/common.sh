@@ -2225,24 +2225,29 @@ install_tool_safe() {
   _INSTALL_DIR=$(mise where "${_PROVIDER:-}" 2>/dev/null) || _INSTALL_DIR=""
 
   if [ -n "${_INSTALL_DIR:-}" ]; then
-    # Try exact match first in bin/ directory
+    local _FOUND_BIN=""
+
+    # Strategy 1: Try exact match in bin/ directory
     if [ -d "${_INSTALL_DIR:-}/bin" ] && [ -f "${_INSTALL_DIR:-}/bin/${_BIN_NAME:-}" ]; then
       _ACTUAL_BIN="${_BIN_NAME:-}"
-    # Try pattern match in bin/ directory
-    elif [ -d "${_INSTALL_DIR:-}/bin" ]; then
-      local _FOUND_BIN
-      _FOUND_BIN=$(find "${_INSTALL_DIR:-}/bin" -maxdepth 1 -name "${_BIN_NAME:-}*" -type f -executable 2>/dev/null | head -n 1)
-      if [ -n "${_FOUND_BIN:-}" ]; then
-        _ACTUAL_BIN=$(basename "${_FOUND_BIN:-}")
-        log_info "Post-install: Resolved actual binary name: ${_ACTUAL_BIN:-}"
-      fi
-    # Try pattern match in root directory
+      log_info "Post-install: Found exact match in bin/"
     else
-      local _FOUND_BIN
-      _FOUND_BIN=$(find "${_INSTALL_DIR:-}" -maxdepth 1 -name "${_BIN_NAME:-}*" -type f -executable 2>/dev/null | head -n 1)
-      if [ -n "${_FOUND_BIN:-}" ]; then
-        _ACTUAL_BIN=$(basename "${_FOUND_BIN:-}")
-        log_info "Post-install: Resolved actual binary name: ${_ACTUAL_BIN:-} (in root dir)"
+      # Strategy 2: Try pattern match in bin/ directory
+      if [ -d "${_INSTALL_DIR:-}/bin" ]; then
+        _FOUND_BIN=$(find "${_INSTALL_DIR:-}/bin" -maxdepth 1 -name "${_BIN_NAME:-}*" -type f -executable 2>/dev/null | head -n 1)
+        if [ -n "${_FOUND_BIN:-}" ]; then
+          _ACTUAL_BIN=$(basename "${_FOUND_BIN:-}")
+          log_info "Post-install: Resolved actual binary name: ${_ACTUAL_BIN:-} (pattern match in bin/)"
+        fi
+      fi
+
+      # Strategy 3: If still not found, try root directory
+      if [ -z "${_FOUND_BIN:-}" ]; then
+        _FOUND_BIN=$(find "${_INSTALL_DIR:-}" -maxdepth 1 -name "${_BIN_NAME:-}*" -type f -executable 2>/dev/null | head -n 1)
+        if [ -n "${_FOUND_BIN:-}" ]; then
+          _ACTUAL_BIN=$(basename "${_FOUND_BIN:-}")
+          log_info "Post-install: Resolved actual binary name: ${_ACTUAL_BIN:-} (in root dir)"
+        fi
       fi
     fi
   fi
