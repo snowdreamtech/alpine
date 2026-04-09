@@ -1998,6 +1998,181 @@ verify_tool_atomic() {
   return 0
 }
 
+# Purpose: Safe tool installation with binary-first verification.
+# This function implements the correct detection logic:
+#   1. Check if binary exists and is executable (FIRST)
+#   2. Check version ONLY if binary exists
+#   3. Install if needed
+#   4. Verify installation with aggressive cache refresh
+#
+# This prevents false positives from stale mise cache (GitHub Actions cache).
+#
+# Parameters:
+#   $1 - Binary name (e.g., "shfmt")
+#   $2 - Provider (e.g., "github:mvdan/sh")
+#   $3 - Display name (e.g., "Shfmt")
+#   $4 - Version flag (e.g., "--version") [optional, defaults to "--version"]
+#   $5 - Skip file check (0=check files, 1=skip) [optional, defaults to 0]
+#   $6 - File patterns (e.g., "*.sh *.bash") [optional, only used if skip_file_check=0]
+#   $7 - File directory (e.g., ".github/workflows") [optional, defaults to ""]
+#
+# Returns:
+#   0 - Tool installed and verified successfully
+#   1 - Installation or verification failed
+#
+# Examples:
+#   install_tool_safe "shfmt" "github:mvdan/sh" "Shfmt" "--version" 0 "*.sh *.bash"
+#   install_tool_safe "hadolint" "github:hadolint/hadolint" "Hadolint" "--version" 0 "Dockerfile*"
+#   install_tool_safe "gitleaks" "github:gitleaks/gitleaks" "Gitleaks" "version" 1
+install_tool_safe() {
+  local _BIN_NAME="${1:-}"
+  local _PROVIDER="${2:-}"
+  local _DISPLAY_NAME="${3:-Tool}"
+  local _VERSION_FLAG="${4:---version}"
+  local _SKIP_FILE_CHECK="${5:-0}"
+  local _FILE_PATTERNS="${6:-}"
+  local _FILE_DIR="${7:-}"
+
+  [ -z "${_BIN_NAME:-}" ] || [ -z "${_PROVIDER:-}" ] && return 1
+
+  local _T0
+  _T0=$(date +%s)
+
+  # Get version from provider
+  local _VERSION
+  _VERSION=$(get_mise_tool_version "${_PROVIDER:-}")
+
+  log_info "=== install_tool_safe: ${_DISPLAY_NAME:-} ==="
+  log_info "Binary: ${_BIN_NAME:-}, Provider: ${_PROVIDER:-}, Version: ${_VERSION:-}"
+  log_info "CI: $(is_ci_env && echo YES || echo NO)"
+
+  # File detection (skip in CI or if skip_file_check=1)
+  if [ "${_SKIP_FILE_CHECK:-0}" -eq 0 ] && ! is_ci_env; then
+    if ! has_lang_files "${_FILE_DIR:-}" "${_FILE_PATTERNS:-}"; then
+      log_info "⏭️  Skipping ${_DISPLAY_NAME:-}: No matching files detected"
+      log_summary "Base" "${_DISPLAY_NAME:-}" "⏭️ Skipped" "-" "0"
+      return 0
+    fi
+  fi
+
+  # CRITICAL: In CI, refresh mise cache to avoid stale data from GitHub Actions cache
+  if is_ci_env; then
+    log_info "CI detected: Refreshing mise cache to avoid stale data"
+    refresh_mise_cache
+  fi
+
+  # Step 1: Check if binary exists and works (FIRST, before version check)
+  log_info "Step 1: Checking if ${_BIN_NAME:-} binary exists and is executable"
+  local _BINARY_EXISTS=0
+  if verify_binary_exists "${_BIN_NAME:-}" "${_VERSION_FLAG:-}"; then
+    log_info "Step 1: ✓ Binary exists and is executable"
+    _BINARY_EXISTS=1
+  else
+    log_info "Step 1: ✗ Binary not found or not executable"
+    _BINARY_EXISTS=0
+  fi
+
+  # Step 2: Check version ONLY if binary exists
+  local _CUR_VER="-"
+  local _REQ_VER="${_VERSION:-}"
+  log_info "Step 2: Required version: ${_REQ_VER:-<none>}"
+
+  if [ "${_BINARY_EXISTS:-0}" -eq 1 ]; then
+    _CUR_VER=$(get_version "${_BIN_NAME:-}")
+    log_info "Step 2: Current version (binary exists): ${_CUR_VER:-<none>}"
+  else
+    log_info "Step 2: Skipping version check (binary doesn't exist)"
+  fi
+
+  # Step 3: Determine if installation is needed
+  log_info "Step 3: Determining if installation is needed"
+  local _NEEDS_INSTALL=0
+
+  if [ "${_BINARY_EXISTS:-0}" -eq 0 ]; then
+    log_info "Step 3: Binary doesn't exist → INSTALL NEEDED"
+    _NEEDS_INSTALL=1
+  elif [ "${_CUR_VER:-}" = "-" ] || [ -z "${_CUR_VER:-}" ]; then
+    log_info "Step 3: No version detected (despite binary existing) → INSTALL NEEDED"
+    _NEEDS_INSTALL=1
+  elif ! is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
+    log_info "Step 3: Version mismatch (${_CUR_VER:-} != ${_REQ_VER:-}) → INSTALL NEEDED"
+    _NEEDS_INSTALL=1
+  else
+    log_info "Step 3: Binary exists + version matches → NO INSTALL NEEDED"
+    log_summary "Base" "${_DISPLAY_NAME:-}" "✅ Exists" "${_CUR_VER:-}" "0"
+    return 0
+  fi
+
+  # Step 4: Clean up if binary exists but needs reinstall
+  if [ "${_BINARY_EXISTS:-0}" -eq 1 ] && [ "${_NEEDS_INSTALL:-0}" -eq 1 ]; then
+    log_warn "Step 4: Binary exists but needs reinstall - cleaning up"
+    mise uninstall "${_PROVIDER:-}" 2>/dev/null || true
+    refresh_mise_cache
+  fi
+
+  # Step 5: Install
+  log_info "Step 5: Installing ${_PROVIDER:-}@${_VERSION:-}"
+  _log_setup "${_DISPLAY_NAME:-}" "${_PROVIDER:-}"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "${_DISPLAY_NAME:-}" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
+
+  local _STAT="✅ mise"
+  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
+    _STAT="❌ Failed"
+    log_error "Step 5: mise install FAILED"
+    log_summary "Base" "${_DISPLAY_NAME:-}" "${_STAT:-}" "-" "$(($(date +%s) - _T0))"
+    if is_ci_env; then
+      return 1
+    else
+      return 0
+    fi
+  fi
+
+  log_info "Step 5: mise install succeeded"
+
+  # Step 6: Post-install verification with aggressive cache refresh
+  log_info "Step 6: Post-install verification"
+  mise reshim 2>/dev/null || true
+
+  # CRITICAL: Refresh mise cache after installation to ensure get_version sees new binary
+  refresh_mise_cache
+
+  # Wait for filesystem sync (especially important in CI with network filesystems)
+  sleep 2
+
+  # Step 6a: Verify binary now exists
+  log_info "Step 6a: Verifying binary existence"
+  if ! verify_binary_exists "${_BIN_NAME:-}" "${_VERSION_FLAG:-}"; then
+    log_error "Step 6a: Binary still not found after installation!"
+    log_error "Debugging info:"
+    log_error "  - PATH: ${PATH:-}"
+    log_error "  - command -v ${_BIN_NAME:-}: $(command -v "${_BIN_NAME:-}" 2>&1 || echo 'NOT FOUND')"
+    log_error "  - mise which ${_BIN_NAME:-}: $(mise which "${_BIN_NAME:-}" 2>&1 || echo 'NOT FOUND')"
+    log_error "  - mise where ${_PROVIDER:-}: $(mise where "${_PROVIDER:-}" 2>&1 || echo 'NOT FOUND')"
+    log_summary "Base" "${_DISPLAY_NAME:-}" "❌ Not Found" "-" "$(($(date +%s) - _T0))"
+    return 1
+  fi
+  log_info "Step 6a: ✓ Binary exists after installation"
+
+  # Step 6b: Atomic verification (comprehensive check in CI)
+  if is_ci_env; then
+    log_info "Step 6b: Running atomic verification"
+    if ! verify_tool_atomic "${_BIN_NAME:-}" "${_PROVIDER:-}" "${_DISPLAY_NAME:-}" "${_VERSION_FLAG:-}"; then
+      log_error "Step 6b: Atomic verification FAILED"
+      log_summary "Base" "${_DISPLAY_NAME:-}" "❌ Not Usable" "-" "$(($(date +%s) - _T0))"
+      return 1
+    fi
+    log_info "Step 6b: ✓ Atomic verification succeeded"
+  fi
+
+  log_summary "Base" "${_DISPLAY_NAME:-}" "${_STAT:-}" "$(get_version "${_BIN_NAME:-}")" "$(($(date +%s) - _T0))"
+  log_info "=== install_tool_safe: ${_DISPLAY_NAME:-} completed successfully ==="
+  return 0
+}
+
 # Purpose: Installs the Node.js runtime and project dependencies.
 # language-specific modules will be loaded dynamically below
 

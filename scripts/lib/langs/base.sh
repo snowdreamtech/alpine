@@ -72,65 +72,20 @@ install_pipx() {
 # Purpose: Installs Gitleaks for secrets scanning.
 # Delegate: Managed by mise (.mise.toml)
 install_gitleaks() {
-  local _T0_GITL
-  _T0_GITL=$(date +%s)
-  local _TITLE="Gitleaks"
-  local _PROVIDER="${VER_GITLEAKS_PROVIDER:-}"
-  local _VERSION="${VER_GITLEAKS:-}"
-
-  # In CI environments, install gitleaks unconditionally for security scanning.
-  # In local dev, skip if not a git repository to avoid unnecessary installation.
+  # In CI, always install. Locally, skip if not a git repository
+  local _SKIP_CHECK=1
   if [ ! -d ".git" ] && ! is_ci_env; then
     log_info "⏭️  Gitleaks: Skipped (not a git repository)"
     log_summary "Base" "Gitleaks" "⏭️ Skipped" "-" "0"
     return 0
   fi
-
-  # Fast-path: Check version-aware existence (Optimized via _G_MISE_LS_JSON)
-  local _CUR_VER
-  _CUR_VER=$(get_version gitleaks)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
-
-  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Base" "Gitleaks" "✅ Exists" "${_CUR_VER:-}" "0"
-    return 0
-  fi
-
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-  local _STAT_GITL="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_GITL="❌ Failed"
-  log_summary "Base" "Gitleaks" "${_STAT_GITL:-}" "$(get_version gitleaks)" "$(($(date +%s) - _T0_GITL))"
+  install_tool_safe "gitleaks" "${VER_GITLEAKS_PROVIDER:-}" "Gitleaks" "version" 1
 }
 
 # Purpose: Installs checkmake for Makefile linting.
 # Delegate: Managed by mise (.mise.toml)
 install_checkmake() {
-  local _T0_CM
-  _T0_CM=$(date +%s)
-  local _TITLE="Checkmake"
-  local _PROVIDER="${VER_CHECKMAKE_PROVIDER:-}"
-  local _VERSION="${VER_CHECKMAKE:-}"
-
-  if ! has_lang_files "Makefile" "*.make"; then
-    return 0
-  fi
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version checkmake)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
-
-  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Base" "Checkmake" "✅ Exists" "${_CUR_VER:-}" "0"
-    return 0
-  fi
-
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-  local _STAT_CM="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_CM="❌ Failed"
-  log_summary "Base" "Checkmake" "${_STAT_CM:-}" "$(get_version checkmake)" "$(($(date +%s) - _T0_CM))"
+  install_tool_safe "checkmake" "${VER_CHECKMAKE_PROVIDER:-}" "Checkmake" "--version" 0 "Makefile *.make" ""
 }
 
 # Purpose: Installs pre-commit runtime via pipx.
@@ -170,107 +125,13 @@ setup_hooks() {
 # Purpose: Installs editorconfig-checker.
 # Delegate: Managed by mise (.mise.toml)
 install_editorconfig_checker() {
-  local _T0_EC
-  _T0_EC=$(date +%s)
-  local _TITLE="Editorconfig-Checker"
-  local _PROVIDER="${VER_EDITORCONFIG_CHECKER_PROVIDER:-}"
-  local _VERSION="${VER_EDITORCONFIG_CHECKER:-}"
-
+  # Skip if no .editorconfig file
   if [ ! -f ".editorconfig" ]; then
     return 0
   fi
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version editorconfig-checker)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
-
-  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    # In CI, verify the tool is actually executable, not just registered in mise
-    if is_ci_env; then
-      log_debug "Verifying editorconfig-checker executability in CI..."
-      # Note: editorconfig-checker binary is actually named 'ec'
-      if command -v ec >/dev/null 2>&1; then
-        log_debug "ec found via command -v"
-        log_summary "Base" "Editorconfig-Checker" "✅ Exists" "${_CUR_VER:-}" "0"
-        return 0
-      elif run_with_timeout_robust 5 mise exec "${_PROVIDER:-}" -- ec --version >/dev/null 2>&1; then
-        log_debug "ec executable via mise exec"
-        log_summary "Base" "Editorconfig-Checker" "✅ Exists" "${_CUR_VER:-}" "0"
-        return 0
-      else
-        log_warn "Editorconfig-Checker is registered in mise but not executable. Force reinstalling..."
-        # Force reinstall by removing from mise first
-        mise uninstall "${_PROVIDER:-}" 2>/dev/null || true
-      fi
-    else
-      log_summary "Base" "Editorconfig-Checker" "✅ Exists" "${_CUR_VER:-}" "0"
-      return 0
-    fi
-  fi
-
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "Editorconfig-Checker" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-
-  local _STAT_EC="✅ mise"
-  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
-    _STAT_EC="❌ Failed"
-    log_summary "Base" "Editorconfig-Checker" "${_STAT_EC:-}" "-" "$(($(date +%s) - _T0_EC))"
-    if is_ci_env; then
-      log_error "Failed to install ${_TITLE:-} in CI."
-      return 1
-    else
-      log_warn "Failed to install ${_TITLE:-}. Continuing..."
-      return 0
-    fi
-  fi
-
-  # Atomic verification: Ensure tool is fully usable
   # Note: editorconfig-checker binary is platform-specific (ec-linux-amd64, ec-darwin-amd64, etc.)
-  if is_ci_env; then
-    log_debug "Performing atomic verification for ${_TITLE:-}..."
-    mise reshim 2>/dev/null || true
-    sleep 1
-
-    # Special handling for editorconfig-checker: binary name is platform-specific
-    # Use mise which to get the actual binary path (handles shims and platform-specific names)
-    local _EC_BIN
-    _EC_BIN=$(MISE_OFFLINE=1 run_with_timeout_robust 3 mise which editorconfig-checker 2>/dev/null) || _EC_BIN=""
-
-    if [ -z "${_EC_BIN:-}" ]; then
-      # Fallback: Try to find ec-* pattern in mise installs directory
-      local _EC_INSTALL_DIR
-      _EC_INSTALL_DIR=$(mise where "${_PROVIDER:-}" 2>/dev/null) || _EC_INSTALL_DIR=""
-      if [ -n "${_EC_INSTALL_DIR:-}" ] && [ -d "${_EC_INSTALL_DIR:-}/bin" ]; then
-        _EC_BIN=$(find "${_EC_INSTALL_DIR:-}/bin" -name "ec-*" -type f 2>/dev/null | head -n 1)
-      fi
-    fi
-
-    if [ -z "${_EC_BIN:-}" ] || [ ! -x "${_EC_BIN:-}" ]; then
-      _STAT_EC="❌ Not Executable"
-      log_summary "Base" "Editorconfig-Checker" "${_STAT_EC:-}" "-" "$(($(date +%s) - _T0_EC))"
-      log_error "${_TITLE:-} installed but binary not found or not executable."
-      log_debug "Attempted paths: mise which editorconfig-checker, ${_EC_INSTALL_DIR:-}/bin/ec-*"
-      return 1
-    fi
-
-    # Run smoke test
-    if ! run_with_timeout_robust 5 "${_EC_BIN:-}" --version >/dev/null 2>&1; then
-      _STAT_EC="❌ Not Usable"
-      log_summary "Base" "Editorconfig-Checker" "${_STAT_EC:-}" "-" "$(($(date +%s) - _T0_EC))"
-      log_error "${_TITLE:-} installed but failed smoke test."
-      return 1
-    fi
-
-    log_debug "✓ Editorconfig-Checker fully verified at: ${_EC_BIN:-}"
-  fi
-
-  log_summary "Base" "Editorconfig-Checker" "${_STAT_EC:-}" "$(get_version editorconfig-checker)" "$(($(date +%s) - _T0_EC))"
+  # The actual binary name is 'ec' or 'ec-*', but we check for 'editorconfig-checker' command
+  install_tool_safe "editorconfig-checker" "${VER_EDITORCONFIG_CHECKER_PROVIDER:-}" "Editorconfig-Checker" "--version" 1
 }
 
 # Purpose: Installs GoReleaser as a universal release automation tool.
@@ -281,33 +142,7 @@ install_goreleaser() {
   if ! is_ci_env && [ "${GORELEASER_FORCE_INSTALL:-0}" -ne 1 ]; then
     return 0
   fi
-
-  local _T0_GR
-  _T0_GR=$(date +%s)
-  local _TITLE="GoReleaser"
-  local _PROVIDER="${VER_GORELEASER_PROVIDER:-}"
-  local _VERSION="${VER_GORELEASER:-}"
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version goreleaser "")
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
-
-  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Base" "GoReleaser" "✅ Exists" "${_CUR_VER:-}" "0"
-    return 0
-  fi
-
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "GoReleaser" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_GR="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_GR="❌ Failed"
-  log_summary "Base" "GoReleaser" "${_STAT_GR:-}" "$(get_version goreleaser)" "$(($(date +%s) - _T0_GR))"
+  install_tool_safe "goreleaser" "${VER_GORELEASER_PROVIDER:-}" "GoReleaser" "--version" 1
 }
 
 # Purpose: Sets up Base environment.
