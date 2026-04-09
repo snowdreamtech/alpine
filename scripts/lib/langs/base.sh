@@ -143,7 +143,8 @@ install_goreleaser() {
   if ! is_ci_env && [ "${GORELEASER_FORCE_INSTALL:-0}" -ne 1 ]; then
     return 0
   fi
-  install_tool_safe "goreleaser" "${VER_GORELEASER_PROVIDER:-}" "GoReleaser" "--version" 1
+  # Note: goreleaser uses 'version' subcommand, not '--version'
+  install_tool_safe "goreleaser" "${VER_GORELEASER_PROVIDER:-}" "GoReleaser" "version" 1
 }
 
 # Purpose: Sets up Base environment.
