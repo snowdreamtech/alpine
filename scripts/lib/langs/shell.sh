@@ -27,6 +27,12 @@ install_shfmt() {
 
   log_info "Proceeding with Shfmt (CI or shell files detected)"
 
+  # CRITICAL: In CI, refresh mise cache to avoid stale data from GitHub Actions cache
+  if is_ci_env; then
+    log_info "CI detected: Refreshing mise cache to avoid stale data"
+    refresh_mise_cache
+  fi
+
   # Step 1: Check if binary exists and works (FIRST, before version check)
   log_info "Step 1: Checking if shfmt binary exists and is executable"
   local _BINARY_EXISTS=0
@@ -100,18 +106,29 @@ install_shfmt() {
 
   log_info "Step 5: mise install succeeded"
 
-  # Step 6: Post-install verification
+  # Step 6: Post-install verification with aggressive cache refresh
   log_info "Step 6: Post-install verification"
   mise reshim 2>/dev/null || true
-  sleep 1
+
+  # CRITICAL: Refresh mise cache after installation to ensure get_version sees new binary
+  refresh_mise_cache
+
+  # Wait for filesystem sync (especially important in CI with network filesystems)
+  sleep 2
 
   # Step 6a: Verify binary now exists
+  log_info "Step 6a: Verifying binary existence"
   if ! verify_binary_exists "shfmt" "--version"; then
     log_error "Step 6a: Binary still not found after installation!"
+    log_error "Debugging info:"
+    log_error "  - PATH: ${PATH:-}"
+    log_error "  - command -v shfmt: $(command -v shfmt 2>&1 || echo 'NOT FOUND')"
+    log_error "  - mise which shfmt: $(mise which shfmt 2>&1 || echo 'NOT FOUND')"
+    log_error "  - mise where ${_PROVIDER:-}: $(mise where "${_PROVIDER:-}" 2>&1 || echo 'NOT FOUND')"
     log_summary "Base" "Shfmt" "❌ Not Found" "-" "$(($(date +%s) - _T0_SHF))"
     return 1
   fi
-  log_info "Step 6a: Binary exists after installation"
+  log_info "Step 6a: ✓ Binary exists after installation"
 
   # Step 6b: Atomic verification (comprehensive check)
   if is_ci_env; then
@@ -121,12 +138,100 @@ install_shfmt() {
       log_summary "Base" "Shfmt" "❌ Not Usable" "-" "$(($(date +%s) - _T0_SHF))"
       return 1
     fi
-    log_info "Step 6b: Atomic verification succeeded"
+    log_info "Step 6b: ✓ Atomic verification succeeded"
   fi
 
   log_summary "Base" "Shfmt" "${_STAT_SHF:-}" "$(get_version shfmt)" "$(($(date +%s) - _T0_SHF))"
   log_info "=== install_shfmt: Completed successfully ==="
 }
+
+# Purpose: Installs Shellcheck.
+# Delegate: Managed by mise (.mise.toml)
+install_shellcheck() {
+  local _T0_SHC
+  _T0_SHC=$(date +%s)
+  local _TITLE="Shellcheck"
+  local _PROVIDER="${VER_SHELLCHECK_PROVIDER:-}"
+  local _VERSION="${VER_SHELLCHECK:-}"
+
+  if ! has_lang_files "" "*.sh *.bash *.bats"; then
+    log_info "⏭️  Skipping Shellcheck: No shell files detected (FORCE_SETUP=${FORCE_SETUP:-0})"
+    log_summary "Base" "Shellcheck" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  log_debug "Shell files detected, proceeding with Shellcheck installation"
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version shellcheck)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
+
+  if [ "${_CUR_VER:-}" != "-" ]; then
+    if [ "${_REQ_VER:-}" = "latest" ]; then
+      log_summary "Base" "Shellcheck" "✅ Exists" "${_CUR_VER:-}" "0"
+      return 0
+    fi
+    case "${_REQ_VER:-}" in "${_CUR_VER:-}"*)
+      log_summary "Base" "Shellcheck" "✅ Exists" "${_CUR_VER:-}" "0"
+      return 0
+      ;;
+    esac
+  fi
+
+  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
+
+  if [ "${DRY_RUN:-0}" -eq 1 ]; then
+    log_summary "Base" "Shellcheck" '⚖️ Previewed' "-" '0'
+    return 0
+  fi
+
+  local _STAT_SHC="✅ mise"
+  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
+    _STAT_SHC="❌ Failed"
+    log_summary "Base" "Shellcheck" "${_STAT_SHC:-}" "-" "$(($(date +%s) - _T0_SHC))"
+    if is_ci_env; then
+      log_error "Failed to install ${_TITLE:-} in CI."
+      return 1
+    else
+      log_warn "Failed to install ${_TITLE:-}. Continuing..."
+      return 0
+    fi
+  fi
+  log_summary "Base" "Shellcheck" "${_STAT_SHC:-}" "$(get_version shellcheck)" "$(($(date +%s) - _T0_SHC))"
+}
+
+# Purpose: Installs Actionlint.
+# Delegate: Managed by mise (.mise.toml)
+install_actionlint() {
+  local _T0_ACT
+  _T0_ACT=$(date +%s)
+  local _TITLE="Actionlint"
+  local _PROVIDER="${VER_ACTIONLINT_PROVIDER:-}"
+  local _VERSION="${VER_ACTIONLINT:-}"
+  if ! has_lang_files ".github/workflows" "*.yml *.yaml"; then
+    log_info "⏭️  Skipping Actionlint: No GitHub workflow files detected (FORCE_SETUP=${FORCE_SETUP:-0})"
+    log_summary "Base" "Actionlint" "⏭️ Skipped" "-" "0"
+    return 0
+  fi
+
+  log_debug "GitHub workflow files detected, proceeding with Actionlint installation"
+
+  # Fast-path: Check version-aware existence
+  local _CUR_VER
+  _CUR_VER=$(get_version actionlint)
+  local _REQ_VER
+  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
+
+  if [ "${_CUR_VER:-}" != "-" ] && [ -n "${_REQ_VER:-}" ]; then
+    case "${_REQ_VER:-}" in "${_CUR_VER:-}"*)
+      log_summary "Base" "Actionlint" "✅ Exists" "${_CUR_VER:-}" "0"
+      return 0
+      ;;
+    esac
+  fi
+
   _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
 
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
