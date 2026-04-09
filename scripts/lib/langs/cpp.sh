@@ -27,33 +27,7 @@ install_runtime_cpp() {
 # Purpose: Installs clang-format.
 # Delegate: Managed by mise (.mise.toml)
 install_clang_format() {
-  local _T0_CF
-  _T0_CF=$(date +%s)
-  local _TITLE="clang-format"
-  local _PROVIDER="${VER_CLANG_FORMAT_PROVIDER:-}"
-  local _VERSION="${VER_CLANG_FORMAT:-}"
-  if ! has_lang_files "" "*.c *.cpp *.h *.hpp *.cc *.m *.mm"; then
-    return 0
-  fi
-
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "CPP" "clang-format" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_CF="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_CF="❌ Failed"
-
-  # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "clang-format" "${_PROVIDER:-}" "clang-format" "--version"; then
-    _STAT_CF="❌ Not Executable"
-    log_summary "CPP" "clang-format" "${_STAT_CF:-}" "-" "$(($(date +%s) - _T0_CF))"
-    [ "${CI:-}" = "true" ] && return 1
-    return 0
-  fi
-
-  log_summary "CPP" "clang-format" "${_STAT_CF:-}" "$(get_version clang-format)" "$(($(date +%s) - _T0_CF))"
+  install_tool_safe "clang-format" "${VER_CLANG_FORMAT_PROVIDER:-}" "clang-format" "--version" 0 "*.c *.cpp *.h *.hpp *.cc *.m *.mm" ""
 }
 
 # Purpose: Sets up C/C++ environment for project.
