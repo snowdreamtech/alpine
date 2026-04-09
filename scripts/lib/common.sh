@@ -1891,6 +1891,8 @@ verify_tool_atomic() {
       # Fallback 2: Search in mise install directory
       local _INSTALL_DIR
       _INSTALL_DIR=$(mise where "${_PROVIDER:-}" 2>/dev/null) || _INSTALL_DIR=""
+      log_debug "mise where ${_PROVIDER:-} returned: ${_INSTALL_DIR:-<empty>}"
+
       if [ -n "${_INSTALL_DIR:-}" ] && [ -d "${_INSTALL_DIR:-}/bin" ]; then
         # Try exact match first
         if [ -f "${_INSTALL_DIR:-}/bin/${_BIN_NAME:-}" ]; then
@@ -1899,11 +1901,36 @@ verify_tool_atomic() {
           # Try pattern match (e.g., ec-* for editorconfig-checker)
           _RESOLVED_PATH=$(find "${_INSTALL_DIR:-}/bin" -name "${_BIN_NAME:-}*" -type f 2>/dev/null | head -n 1)
         fi
+      else
+        # Fallback 3: Try to find in mise installs directory by searching for provider pattern
+        log_debug "Searching in mise installs directory..."
+        local _MISE_INSTALLS="${HOME}/.local/share/mise/installs"
+        if [ -d "${_MISE_INSTALLS:-}" ]; then
+          # For GitHub providers, the directory name pattern is: github-owner-repo/version
+          # e.g., github-mvdan-sh/3.13.1
+          local _PROVIDER_DIR
+          _PROVIDER_DIR=$(echo "${_PROVIDER:-}" | sed 's|github:||; s|/|-|g')
+          log_debug "Looking for provider directory pattern: ${_PROVIDER_DIR:-}"
+
+          # Find the most recent version directory
+          local _TOOL_DIR
+          _TOOL_DIR=$(find "${_MISE_INSTALLS:-}" -maxdepth 2 -type d -name "${_PROVIDER_DIR:-}*" 2>/dev/null | sort -V | tail -n 1)
+
+          if [ -n "${_TOOL_DIR:-}" ] && [ -d "${_TOOL_DIR:-}/bin" ]; then
+            log_debug "Found tool directory: ${_TOOL_DIR:-}"
+            if [ -f "${_TOOL_DIR:-}/bin/${_BIN_NAME:-}" ]; then
+              _RESOLVED_PATH="${_TOOL_DIR:-}/bin/${_BIN_NAME:-}"
+            else
+              _RESOLVED_PATH=$(find "${_TOOL_DIR:-}/bin" -name "${_BIN_NAME:-}*" -type f 2>/dev/null | head -n 1)
+            fi
+          fi
+        fi
       fi
     fi
 
     if [ -z "${_RESOLVED_PATH:-}" ]; then
       log_error "✗ ${_BIN_NAME:-} not found via any resolution method"
+      log_error "   Tried: mise which, command -v, mise where, directory search"
       return 1
     fi
     log_debug "✓ Resolved via fallback: ${_RESOLVED_PATH:-}"
