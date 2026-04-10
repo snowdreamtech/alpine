@@ -65,11 +65,11 @@ load_baseline() {
   local baseline_file="$BASELINE_DIR/baseline-${platform}.json"
 
   if [ ! -f "$baseline_file" ]; then
-    echo "0"
     return 1
   fi
 
   # Extract total time (simplified - actual implementation would parse JSON)
+  # For now, return 0 as placeholder
   echo "0"
 }
 
@@ -87,9 +87,19 @@ compare_platforms() {
   local macos_time
   local windows_time
 
-  linux_time=$(load_baseline "linux" || echo "0")
-  macos_time=$(load_baseline "macos" || echo "0")
-  windows_time=$(load_baseline "windows" || echo "0")
+  linux_time=$(load_baseline "linux" 2>/dev/null || echo "0")
+  macos_time=$(load_baseline "macos" 2>/dev/null || echo "0")
+  windows_time=$(load_baseline "windows" 2>/dev/null || echo "0")
+
+  # Clean up any whitespace/newlines
+  linux_time=$(echo "$linux_time" | tr -d '\n\r ' | head -c 10)
+  macos_time=$(echo "$macos_time" | tr -d '\n\r ' | head -c 10)
+  windows_time=$(echo "$windows_time" | tr -d '\n\r ' | head -c 10)
+
+  # Ensure we have valid numbers
+  linux_time=${linux_time:-0}
+  macos_time=${macos_time:-0}
+  windows_time=${windows_time:-0}
 
   # Calculate differences (simplified)
   local max_diff=0
@@ -101,9 +111,9 @@ compare_platforms() {
     printf '  "baseline_dir": "%s",\n' "$BASELINE_DIR"
     printf '  "threshold_percent": %s,\n' "$THRESHOLD"
     printf '  "platforms": {\n'
-    printf '    "linux": {"time": %s, "available": %s},\n' "$linux_time" "$([ -f "$BASELINE_DIR/baseline-linux.json" ] && echo "true" || echo "false")"
-    printf '    "macos": {"time": %s, "available": %s},\n' "$macos_time" "$([ -f "$BASELINE_DIR/baseline-macos.json" ] && echo "true" || echo "false")"
-    printf '    "windows": {"time": %s, "available": %s}\n' "$windows_time" "$([ -f "$BASELINE_DIR/baseline-windows.json" ] && echo "true" || echo "false")"
+    printf '    "linux": {"time": %s, "available": %s},\n' "${linux_time:-0}" "$([ -f "$BASELINE_DIR/baseline-linux.json" ] && echo "true" || echo "false")"
+    printf '    "macos": {"time": %s, "available": %s},\n' "${macos_time:-0}" "$([ -f "$BASELINE_DIR/baseline-macos.json" ] && echo "true" || echo "false")"
+    printf '    "windows": {"time": %s, "available": %s}\n' "${windows_time:-0}" "$([ -f "$BASELINE_DIR/baseline-windows.json" ] && echo "true" || echo "false")"
     printf '  },\n'
     printf '  "max_difference_percent": %s,\n' "$max_diff"
     printf '  "passed": true\n'

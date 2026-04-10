@@ -120,6 +120,8 @@ validate_docs() {
     local blocks
     # shellcheck disable=SC2016
     blocks=$(grep -c '```sh\|```bash' "$doc_file" 2>/dev/null || echo "0")
+    # Remove any whitespace/newlines
+    blocks=$(echo "$blocks" | tr -d '\n\r ')
     total_blocks=$((total_blocks + blocks))
   done
 
