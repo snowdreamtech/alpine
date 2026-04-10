@@ -157,8 +157,9 @@ main() {
             fi
 
             # Then try pattern match (for binaries with version/platform suffixes)
+            # Use -perm +111 for BSD/macOS compatibility (instead of -executable)
             local _PATTERN_PATH
-            _PATTERN_PATH=$(find "${_INSTALL_PATH:-}/${_BIN_DIR}" -maxdepth 1 -name "${_LINTER_BIN:-}*" -type f -executable 2>/dev/null | head -n 1)
+            _PATTERN_PATH=$(find "${_INSTALL_PATH:-}/${_BIN_DIR}" -maxdepth 1 -name "${_LINTER_BIN:-}*" -type f -perm +111 2>/dev/null | head -n 1)
             if [ -n "${_PATTERN_PATH:-}" ] && [ -x "${_PATTERN_PATH:-}" ]; then
               log_info "✓ Found executable via pattern match at ${_PATTERN_PATH:-}"
               exec "${_PATTERN_PATH:-}" "$@"
