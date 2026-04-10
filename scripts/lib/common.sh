@@ -2000,12 +2000,15 @@ verify_tool_atomic() {
 
   # Step 4: Check if binary is executable (skip on Windows)
   log_debug "Step 4/5: Checking executability..."
+  log_debug "OS detection: _G_OS=${_G_OS:-<unset>}, _G_UNAME=${_G_UNAME:-<unset>}"
 
   # Windows doesn't use Unix executable permissions
   # .exe, .cmd, .bat files are executable by extension
-  if [ "${_G_OS:-}" != "windows" ] && [ ! -x "${_RESOLVED_PATH:-}" ]; then
-    log_error "✗ ${_RESOLVED_PATH:-} is not executable"
-    return 1
+  if [ "${_G_OS:-}" != "windows" ]; then
+    if [ ! -x "${_RESOLVED_PATH:-}" ]; then
+      log_error "✗ ${_RESOLVED_PATH:-} is not executable"
+      return 1
+    fi
   fi
 
   # On Windows, check if it's a known executable extension
