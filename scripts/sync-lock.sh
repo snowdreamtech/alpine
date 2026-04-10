@@ -39,6 +39,13 @@ run_sync_lock() {
 
   # 3. Multi-Platform Locking
   # Platforms: Ubuntu/Debian (glibc), Alpine (musl), macOS (x64/arm64), Windows (x64).
+  # In CI, temporarily disable paranoid mode to allow missing provenance attestations
+  # for new releases that haven't been attested yet by upstream projects.
+  if [ "${CI:-}" = "true" ]; then
+    log_warn "CI: Temporarily disabling paranoid mode for lockfile sync (MISE_PARANOID=0)"
+    export MISE_PARANOID=0
+  fi
+
   # shellcheck disable=SC2086
   MISE_CONFIG="${_TMP_MANIFEST:-}" mise lock --platform linux-x64,linux-arm64,linux-x64-musl,linux-arm64-musl,macos-x64,macos-arm64,windows-x64 ${_TOOLS:-} "$@"
 
