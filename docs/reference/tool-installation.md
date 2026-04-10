@@ -185,7 +185,7 @@ Each verification step is atomic and reports its status:
 
 ### Common Failure Scenarios
 
-**Scenario 1: Binary Not Found After Installation**
+#### Scenario 1: Binary Not Found After Installation
 
 ```
 ❌ Binary not found after installation: tool-name
@@ -203,7 +203,7 @@ Each verification step is atomic and reports its status:
 2. Verify PATH includes mise shims: `echo $PATH`
 3. Try manual installation: `mise install tool-name`
 
-**Scenario 2: Binary Not Functional**
+#### Scenario 2: Binary Not Functional
 
 ```
 ❌ Binary not functional after installation: tool-name
@@ -221,7 +221,7 @@ Each verification step is atomic and reports its status:
 2. Check tool documentation for dependencies
 3. Verify platform compatibility
 
-**Scenario 3: Platform-Specific Binary Not Found**
+#### Scenario 3: Platform-Specific Binary Not Found
 
 ```
 ❌ Could not resolve platform-specific binary: ec-*

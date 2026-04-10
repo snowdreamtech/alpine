@@ -58,7 +58,7 @@ Measures setup time for all tools and outputs structured performance data.
 Options:
   --output-format <json|text>  Output format (default: text)
   --categories <all|security|linters|formatters|runtimes>
-                               Tool categories to test (default: all)
+                                Tool categories to test (default: all)
   --include-binary-resolution  Include binary resolution benchmarks
   --verbose                    Enable detailed timing logs
   --dry-run                    Preview without actual installation

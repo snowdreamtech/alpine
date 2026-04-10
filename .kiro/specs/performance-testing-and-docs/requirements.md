@@ -24,7 +24,7 @@ The refactoring introduced binary-first detection, platform-specific binary name
 
 **User Story:** As a developer, I want to establish a performance baseline for setup times, so that I can detect regressions after the refactoring.
 
-#### Acceptance Criteria
+#### Acceptance Criteria 1
 
 1. THE Performance_Test_Suite SHALL measure total setup time for all 56 tools
 2. THE Performance_Test_Suite SHALL measure individual installation time for each tool category (security, linters, formatters, runtimes)
@@ -36,7 +36,7 @@ The refactoring introduced binary-first detection, platform-specific binary name
 
 **User Story:** As a developer, I want to detect performance regressions, so that I can ensure the refactoring hasn't slowed down setup times.
 
-#### Acceptance Criteria
+#### Acceptance Criteria 2
 
 1. WHEN setup time exceeds baseline by more than 20 percent, THE Performance_Test_Suite SHALL report a performance regression
 2. WHEN setup time exceeds baseline by more than 50 percent, THE Performance_Test_Suite SHALL fail the test
@@ -48,7 +48,7 @@ The refactoring introduced binary-first detection, platform-specific binary name
 
 **User Story:** As a developer, I want to verify that binary-first detection doesn't add significant overhead, so that tool verification remains fast.
 
-#### Acceptance Criteria
+#### Acceptance Criteria 3
 
 1. WHEN verifying a tool binary, THE Binary_Resolution SHALL complete within 5 seconds
 2. THE Performance_Test_Suite SHALL measure binary resolution time separately from installation time
@@ -60,7 +60,7 @@ The refactoring introduced binary-first detection, platform-specific binary name
 
 **User Story:** As a developer, I want to measure cache effectiveness, so that I can optimize repeated setup operations.
 
-#### Acceptance Criteria
+#### Acceptance Criteria 4
 
 1. THE Performance_Test_Suite SHALL measure setup time with cold cache (first run)
 2. THE Performance_Test_Suite SHALL measure setup time with warm cache (second run)
@@ -72,7 +72,7 @@ The refactoring introduced binary-first detection, platform-specific binary name
 
 **User Story:** As a developer, I want accurate documentation, so that I can understand the new tool installation patterns.
 
-#### Acceptance Criteria
+#### Acceptance Criteria 5
 
 1. THE Tool_Documentation SHALL reference `install_tool_safe()` for all 45 migrated tools
 2. THE Tool_Documentation SHALL document the binary-first detection strategy
@@ -84,7 +84,7 @@ The refactoring introduced binary-first detection, platform-specific binary name
 
 **User Story:** As a developer, I want complete documentation coverage, so that all refactored components are documented.
 
-#### Acceptance Criteria
+#### Acceptance Criteria 6
 
 1. THE Documentation_Checker SHALL verify that each refactored file in `scripts/lib/langs/*.sh` has corresponding documentation
 2. WHEN a tool uses `install_tool_safe()`, THE Documentation_Checker SHALL verify that the tool is documented in `docs/`
@@ -96,7 +96,7 @@ The refactoring introduced binary-first detection, platform-specific binary name
 
 **User Story:** As a developer, I want Alpine Linux compatibility documented, so that I can use the tools in musl-based containers.
 
-#### Acceptance Criteria
+#### Acceptance Criteria 7
 
 1. THE Tool_Documentation SHALL verify that `docs/alpine-compatibility.md` accurately reflects the refactored implementation
 2. THE Tool_Documentation SHALL document any Alpine-specific binary resolution patterns
@@ -108,7 +108,7 @@ The refactoring introduced binary-first detection, platform-specific binary name
 
 **User Story:** As a developer, I want automated performance tests, so that regressions are detected in CI.
 
-#### Acceptance Criteria
+#### Acceptance Criteria 8
 
 1. THE Performance_Test_Suite SHALL integrate with the existing CI pipeline
 2. THE Performance_Test_Suite SHALL run on every pull request that modifies `scripts/lib/` files
@@ -120,7 +120,7 @@ The refactoring introduced binary-first detection, platform-specific binary name
 
 **User Story:** As a developer, I want tool-specific performance profiles, so that I can identify bottlenecks.
 
-#### Acceptance Criteria
+#### Acceptance Criteria 9
 
 1. THE Performance_Test_Suite SHALL measure time spent in each phase of `install_tool_safe()` (detection, installation, verification)
 2. THE Performance_Test_Suite SHALL identify tools that spend excessive time in binary resolution
@@ -132,7 +132,7 @@ The refactoring introduced binary-first detection, platform-specific binary name
 
 **User Story:** As a developer, I want automated documentation updates, so that documentation stays synchronized with code changes.
 
-#### Acceptance Criteria
+#### Acceptance Criteria 10
 
 1. THE Documentation_Generator SHALL extract function signatures from `scripts/lib/common.sh`
 2. THE Documentation_Generator SHALL generate API documentation for `install_tool_safe()` and related functions
@@ -144,7 +144,7 @@ The refactoring introduced binary-first detection, platform-specific binary name
 
 **User Story:** As a developer, I want performance regression prevention, so that future changes don't degrade setup times.
 
-#### Acceptance Criteria
+#### Acceptance Criteria 11
 
 1. THE CI_Pipeline SHALL fail builds when setup time exceeds the acceptable threshold
 2. THE Performance_Test_Suite SHALL establish performance budgets for each tool category
@@ -156,7 +156,7 @@ The refactoring introduced binary-first detection, platform-specific binary name
 
 **User Story:** As a developer, I want cross-platform performance validation, so that all platforms perform acceptably.
 
-#### Acceptance Criteria
+#### Acceptance Criteria 12
 
 1. THE Performance_Test_Suite SHALL measure setup time on Linux, macOS, and Windows
 2. THE Performance_Test_Suite SHALL identify platform-specific performance differences

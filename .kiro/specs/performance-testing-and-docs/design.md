@@ -526,21 +526,21 @@ interface PerformanceBudget {
 
 ### Performance Test Failures
 
-**Scenario 1: Tool Installation Timeout**
+#### Scenario 1: Tool Installation Timeout
 
 - **Detection**: Tool installation exceeds 5-minute timeout
 - **Handling**: Mark tool as "TIMEOUT", continue with remaining tools
 - **Logging**: Record timeout in performance data with partial timing
 - **CI Behavior**: Fail workflow if critical tool times out
 
-**Scenario 2: Binary Resolution Failure**
+#### Scenario 2: Binary Resolution Failure
 
 - **Detection**: `verify_binary_exists()` returns non-zero after installation
 - **Handling**: Mark tool as "NOT_EXECUTABLE", log detailed debug info
 - **Logging**: Include resolution attempts (mise which, command -v, find)
 - **CI Behavior**: Fail workflow (indicates broken installation)
 
-**Scenario 3: Performance Regression**
+#### Scenario 3: Performance Regression
 
 - **Detection**: Current time exceeds baseline by > threshold
 - **Handling**: Generate detailed regression report
@@ -551,21 +551,21 @@ interface PerformanceBudget {
 
 ### Documentation Validation Failures
 
-**Scenario 1: Missing Documentation**
+#### Scenario 1: Missing Documentation
 
 - **Detection**: Tool using `install_tool_safe()` not found in docs
 - **Handling**: List all missing tools in audit report
 - **Logging**: Generate coverage report with percentage
 - **CI Behavior**: Fail if coverage < 80%
 
-**Scenario 2: Invalid Code Examples**
+#### Scenario 2: Invalid Code Examples
 
 - **Detection**: Shell code block fails shellcheck validation
 - **Handling**: Report file, line number, and shellcheck error
 - **Logging**: Include suggested fix from shellcheck
 - **CI Behavior**: Fail workflow (broken documentation)
 
-**Scenario 3: Broken Links**
+#### Scenario 3: Broken Links
 
 - **Detection**: Internal link returns 404 or file not found
 - **Handling**: List all broken links with source location
@@ -574,14 +574,14 @@ interface PerformanceBudget {
 
 ### Cross-Platform Failures
 
-**Scenario 1: Platform-Specific Performance Difference**
+#### Scenario 1: Platform-Specific Performance Difference
 
 - **Detection**: One platform differs by > 30% from others
 - **Handling**: Generate cross-platform comparison report
 - **Logging**: Highlight platform-specific bottlenecks
 - **CI Behavior**: Warning only (expected variation)
 
-**Scenario 2: Platform-Specific Binary Resolution Failure**
+#### Scenario 2: Platform-Specific Binary Resolution Failure
 
 - **Detection**: Binary resolution works on Linux but fails on Windows
 - **Handling**: Log platform-specific binary names attempted

@@ -524,7 +524,7 @@ fi
 - Set appropriate timeouts based on tool size
 - Consider using `MISE_OFFLINE=1` when network is unavailable
 
-### Logging
+### Logging Best Practices
 
 - Use `VERBOSE=0` for minimal output in CI
 - Use `DEBUG=1` only when troubleshooting

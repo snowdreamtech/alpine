@@ -4,7 +4,9 @@
 
 This document tracks the implementation status of the Performance Testing and Documentation feature spec. The spec aims to establish performance baselines, create automated regression detection, and update documentation for the recent refactoring that migrated 45 tools to the `install_tool_safe()` pattern.
 
-**Overall Progress: 18.5% Complete (5/27 tasks)**
+### Overall Progress
+
+18.5% Complete (5/27 tasks)
 
 ## Completed Tasks ✅
 
