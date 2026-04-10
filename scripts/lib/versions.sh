@@ -188,8 +188,8 @@ VER_MARKDOWNLINT_PROVIDER="npm:markdownlint-cli2"
 VER_SORT_PACKAGE_JSON="3.6.1"
 VER_SORT_PACKAGE_JSON_PROVIDER="npm:sort-package-json"
 
-VER_TAPLO="0.7.0"
-VER_TAPLO_PROVIDER="npm:@taplo/cli"
+VER_TAPLO="0.10.0"
+VER_TAPLO_PROVIDER="github:tamasfe/taplo"
 
 VER_HADOLINT="2.14.0"
 VER_HADOLINT_PROVIDER="github:hadolint/hadolint"
