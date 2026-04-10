@@ -20,34 +20,7 @@ install_runtime_helm() {
 # Purpose: Installs kube-linter.
 # Delegate: Managed by mise (.mise.toml)
 install_kube_linter() {
-  local _T0_KL
-  _T0_KL=$(date +%s)
-  local _TITLE="Kube-Linter"
-  local _PROVIDER="${VER_KUBE_LINTER_PROVIDER:-}"
-  local _VERSION="${VER_KUBE_LINTER:-}"
-  if ! has_lang_files "" "CHARTS *.yaml *.yml"; then
-    return 0
-  fi
-
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "IaC" "Kube-Linter" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-
-  local _STAT_KL="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_KL="❌ Failed"
-
-  # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "kube-linter" "${_PROVIDER:-}" "Kube-Linter" "version"; then
-    _STAT_KL="❌ Not Executable"
-    log_summary "IaC" "Kube-Linter" "${_STAT_KL:-}" "-" "$(($(date +%s) - _T0_KL))"
-    [ "${CI:-}" = "true" ] && return 1
-    return 0
-  fi
-
-  log_summary "IaC" "Kube-Linter" "${_STAT_KL:-}" "$(get_version kube-linter version)" "$(($(date +%s) - _T0_KL))"
+  install_tool_safe "kube-linter" "${VER_KUBE_LINTER_PROVIDER:-}" "Kube-Linter" "version" 0 "CHARTS *.yaml *.yml" ""
 }
 
 # Purpose: Sets up Helm environment for project.
