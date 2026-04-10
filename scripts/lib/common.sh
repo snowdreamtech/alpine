@@ -1945,15 +1945,30 @@ verify_tool_atomic() {
       _INSTALL_DIR=$(mise where "${_PROVIDER:-}" 2>/dev/null) || _INSTALL_DIR=""
       log_debug "mise where ${_PROVIDER:-} returned: ${_INSTALL_DIR:-<empty>}"
 
-      if [ -n "${_INSTALL_DIR:-}" ] && [ -d "${_INSTALL_DIR:-}/bin" ]; then
-        # Try exact match first
-        if [ -f "${_INSTALL_DIR:-}/bin/${_BIN_NAME:-}" ]; then
-          _RESOLVED_PATH="${_INSTALL_DIR:-}/bin/${_BIN_NAME:-}"
-        else
-          # Try pattern match (e.g., ec-* for editorconfig-checker)
-          _RESOLVED_PATH=$(find "${_INSTALL_DIR:-}/bin" -name "${_BIN_NAME:-}*" -type f 2>/dev/null | head -n 1)
+      if [ -n "${_INSTALL_DIR:-}" ]; then
+        # Try bin/ directory first
+        if [ -d "${_INSTALL_DIR:-}/bin" ]; then
+          # Try exact match first
+          if [ -f "${_INSTALL_DIR:-}/bin/${_BIN_NAME:-}" ]; then
+            _RESOLVED_PATH="${_INSTALL_DIR:-}/bin/${_BIN_NAME:-}"
+          else
+            # Try pattern match (e.g., ec-* for editorconfig-checker)
+            _RESOLVED_PATH=$(find "${_INSTALL_DIR:-}/bin" -name "${_BIN_NAME:-}*" -type f 2>/dev/null | head -n 1)
+          fi
         fi
-      else
+
+        # If not found in bin/, try root directory
+        if [ -z "${_RESOLVED_PATH:-}" ]; then
+          if [ -f "${_INSTALL_DIR:-}/${_BIN_NAME:-}" ]; then
+            _RESOLVED_PATH="${_INSTALL_DIR:-}/${_BIN_NAME:-}"
+          else
+            # Try pattern match in root directory
+            _RESOLVED_PATH=$(find "${_INSTALL_DIR:-}" -maxdepth 1 -name "${_BIN_NAME:-}*" -type f 2>/dev/null | head -n 1)
+          fi
+        fi
+      fi
+
+      if [ -z "${_RESOLVED_PATH:-}" ]; then
         # Fallback 3: Try to find in mise installs directory by searching for provider pattern
         log_debug "Searching in mise installs directory..."
         local _MISE_INSTALLS="${HOME}/.local/share/mise/installs"
