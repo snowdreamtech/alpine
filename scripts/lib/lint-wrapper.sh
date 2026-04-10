@@ -68,7 +68,7 @@ main() {
     _LINTER_BIN="shfmt"
     ;;
   taplo)
-    _MISE_TOOL_SPEC="npm:@taplo/cli"
+    _MISE_TOOL_SPEC="github:tamasfe/taplo"
     _LINTER_BIN="taplo"
     ;;
   editorconfig-checker)

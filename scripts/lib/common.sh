@@ -2187,7 +2187,7 @@ install_tool_safe() {
     mise uninstall "${_PROVIDER:-}" 2>/dev/null || true
 
     # CRITICAL: Aggressive cache refresh after uninstall
-    # This is essential for version downgrades (e.g., taplo 0.9.0 -> 0.7.0)
+    # This is essential for version changes (e.g., taplo 0.7.0 -> 0.10.0)
     refresh_mise_cache
     mise reshim 2>/dev/null || true
 
