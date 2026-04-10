@@ -53,81 +53,23 @@ setup_swift() {
 # Purpose: Installs swiftformat for Swift linting.
 # Delegate: Managed by mise (.mise.toml)
 install_swiftformat() {
-  local _T0_SF
-  _T0_SF=$(date +%s)
-  local _TITLE="SwiftFormat"
-  local _PROVIDER="${VER_SWIFTFORMAT_PROVIDER:-}"
-  local _VERSION="${VER_SWIFTFORMAT:-}"
-
   if ! has_lang_files "Package.swift" "*.swift"; then
     return 0
   fi
 
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version swiftformat)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
-
-  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Swift" "SwiftFormat" "✅ Exists" "${_CUR_VER:-}" "0"
-    return 0
-  fi
-
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-  local _STAT_SF="✅ mise"
   setup_registry_swiftformat
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_SF="❌ Failed"
-
-  # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "swiftformat" "${_PROVIDER:-}" "SwiftFormat" "--version"; then
-    _STAT_SF="❌ Not Executable"
-    log_summary "Swift" "SwiftFormat" "${_STAT_SF:-}" "-" "$(($(date +%s) - _T0_SF))"
-    [ "${CI:-}" = "true" ] && return 1
-    return 0
-  fi
-
-  log_summary "Swift" "SwiftFormat" "${_STAT_SF:-}" "$(get_version swiftformat)" "$(($(date +%s) - _T0_SF))"
+  install_tool_safe "swiftformat" "${VER_SWIFTFORMAT_PROVIDER:-}" "SwiftFormat" "--version" 0 "*.swift" ""
 }
 
 # Purpose: Installs swiftlint for Swift linting.
 # Delegate: Managed by mise (.mise.toml)
 install_swiftlint() {
-  local _T0_SL
-  _T0_SL=$(date +%s)
-  local _TITLE="SwiftLint"
-  local _PROVIDER="${VER_SWIFTLINT_PROVIDER:-}"
-  local _VERSION="${VER_SWIFTLINT:-}"
-
   if ! has_lang_files "Package.swift" "*.swift"; then
     return 0
   fi
 
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version swiftlint)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
-
-  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Swift" "SwiftLint" "✅ Exists" "${_CUR_VER:-}" "0"
-    return 0
-  fi
-
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-  local _STAT_SL="✅ mise"
   setup_registry_swiftlint
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_SL="❌ Failed"
-
-  # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "swiftlint" "${_PROVIDER:-}" "SwiftLint" "version"; then
-    _STAT_SL="❌ Not Executable"
-    log_summary "Swift" "SwiftLint" "${_STAT_SL:-}" "-" "$(($(date +%s) - _T0_SL))"
-    [ "${CI:-}" = "true" ] && return 1
-    return 0
-  fi
-
-  log_summary "Swift" "SwiftLint" "${_STAT_SL:-}" "$(get_version swiftlint)" "$(($(date +%s) - _T0_SL))"
+  install_tool_safe "swiftlint" "${VER_SWIFTLINT_PROVIDER:-}" "SwiftLint" "version" 0 "*.swift" ""
 }
 
 # Purpose: Checks if Swift runtime is available.
