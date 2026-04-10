@@ -8,45 +8,7 @@ set -eu
 # Purpose: Installs sqlfluff for SQL linting.
 # Delegate: Managed by mise (.mise.toml)
 install_sqlfluff() {
-  local _T0_SQL
-  _T0_SQL=$(date +%s)
-  local _TITLE="Sqlfluff"
-  local _PROVIDER="${VER_SQLFLUFF_PROVIDER:-}"
-  local _VERSION="${VER_SQLFLUFF:-}"
-
-  if ! has_lang_files "" "*.sql"; then
-    return 0
-  fi
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version sqlfluff)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
-
-  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Data" "Sqlfluff" "✅ Exists" "${_CUR_VER:-}" "0"
-    return 0
-  fi
-
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Data" "Sqlfluff" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_SQL="✅ mise"
-  run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_SQL="❌ Failed"
-
-  # Atomic verification: ensure tool is fully functional
-  if ! verify_tool_atomic "sqlfluff" "${_PROVIDER:-}" "Sqlfluff" "--version"; then
-    _STAT_SQL="❌ Not Executable"
-    log_summary "Data" "Sqlfluff" "${_STAT_SQL:-}" "-" "$(($(date +%s) - _T0_SQL))"
-    [ "${CI:-}" = "true" ] && return 1
-    return 0
-  fi
-
-  log_summary "Data" "Sqlfluff" "${_STAT_SQL:-}" "$(get_version sqlfluff)" "$(($(date +%s) - _T0_SQL))"
+  install_tool_safe "sqlfluff" "${VER_SQLFLUFF_PROVIDER:-}" "Sqlfluff" "--version" 0 "*.sql" ""
 }
 
 # Purpose: Sets up SQL environment.
