@@ -9,7 +9,7 @@ on:
       - ".mise.toml"
       - "scripts/lib/versions.sh"
       - ".github/workflows/performance.yml"
-  workflow_dispatch:
+  workflow_dispatch: {}
 
 jobs:
   performance-test:
