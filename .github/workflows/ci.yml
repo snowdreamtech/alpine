@@ -95,7 +95,7 @@ jobs:
     permissions:
       contents: read
       security-events: write
-    timeout-minutes: 15
+    timeout-minutes: 20
     env:
       VENV: ".venv"
       PYTHONUTF8: 1
