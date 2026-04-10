@@ -73,403 +73,59 @@ install_runtime_node() {
 # Purpose: Installs sort-package-json.
 # Delegate: Managed by mise (.mise.toml)
 install_sort_package_json() {
-  local _T0_SPJ
-  _T0_SPJ=$(date +%s)
-  local _TITLE="sort-package-json"
-  local _PROVIDER="${VER_SORT_PACKAGE_JSON_PROVIDER:-}"
-  local _VERSION="${VER_SORT_PACKAGE_JSON:-}"
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version sort-package-json)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
-
-  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Node" "sort-package-json" "✅ Exists" "${_CUR_VER:-}" "0"
+  if ! has_lang_files "package.json" ""; then
     return 0
   fi
 
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Node" "sort-package-json" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_SPJ="✅ mise"
-  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
-    _STAT_SPJ="❌ Failed"
-    log_summary "Node" "sort-package-json" "${_STAT_SPJ:-}" "-" "$(($(date +%s) - _T0_SPJ))"
-    if is_ci_env; then
-      log_error "Failed to install ${_TITLE:-} in CI."
-      return 1
-    else
-      log_warn "Failed to install ${_TITLE:-}. Continuing..."
-      return 0
-    fi
-  fi
-
-  # Atomic verification: Ensure tool is fully usable
-  if is_ci_env; then
-    log_debug "Performing atomic verification for ${_TITLE:-}..."
-    mise reshim 2>/dev/null || true
-    sleep 1
-
-    if ! verify_tool_atomic "sort-package-json" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
-      _STAT_SPJ="❌ Not Usable"
-      log_summary "Node" "sort-package-json" "${_STAT_SPJ:-}" "-" "$(($(date +%s) - _T0_SPJ))"
-      log_error "${_TITLE:-} installed but failed atomic verification."
-      return 1
-    fi
-  fi
-
-  log_summary "Node" "sort-package-json" "${_STAT_SPJ:-}" "$(get_version sort-package-json)" "$(($(date +%s) - _T0_SPJ))"
+  install_tool_safe "sort-package-json" "${VER_SORT_PACKAGE_JSON_PROVIDER:-}" "sort-package-json" "--version" 0 "" "package.json"
 }
 
 # Purpose: Installs eslint.
 # Delegate: Managed by mise (.mise.toml)
 install_eslint() {
-  local _T0_ES
-  _T0_ES=$(date +%s)
-  local _TITLE="ESLint"
-  local _PROVIDER="${VER_ESLINT_PROVIDER:-}"
-  local _VERSION="${VER_ESLINT:-}"
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version "eslint" "")
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "npm:eslint")
-
-  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Node" "ESLint" "✅ Exists" "${_CUR_VER:-}" "0"
+  if ! has_lang_files "package.json" "*.js *.ts *.jsx *.tsx *.vue *.svelte *.astro"; then
     return 0
   fi
 
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Node" "ESLint" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_ES
-  _STAT_ES="✅ mise"
-  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
-    _STAT_ES="❌ Failed"
-    log_summary "Node" "ESLint" "${_STAT_ES:-}" "-" "$(($(date +%s) - _T0_ES))"
-    if is_ci_env; then
-      log_error "Failed to install ${_TITLE:-} in CI."
-      return 1
-    else
-      log_warn "Failed to install ${_TITLE:-}. Continuing..."
-      return 0
-    fi
-  fi
-
-  # Atomic verification: Ensure tool is fully usable
-  if is_ci_env; then
-    log_debug "Performing atomic verification for ${_TITLE:-}..."
-    mise reshim 2>/dev/null || true
-    sleep 1
-
-    if ! verify_tool_atomic "eslint" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
-      _STAT_ES="❌ Not Usable"
-      log_summary "Node" "ESLint" "${_STAT_ES:-}" "-" "$(($(date +%s) - _T0_ES))"
-      log_error "${_TITLE:-} installed but failed atomic verification."
-      return 1
-    fi
-  fi
-
-  log_summary "Node" "ESLint" "${_STAT_ES:-}" "$(get_version eslint)" "$(($(date +%s) - _T0_ES))"
+  install_tool_safe "eslint" "${VER_ESLINT_PROVIDER:-}" "ESLint" "--version" 0 "*.js *.ts *.jsx *.tsx" ""
 }
 
 # Purpose: Installs stylelint.
 # Delegate: Managed by mise (.mise.toml)
 install_stylelint() {
-  local _T0_SL
-  _T0_SL=$(date +%s)
-  local _TITLE="Stylelint"
-  local _PROVIDER="${VER_STYLELINT_PROVIDER:-}"
-  local _VERSION="${VER_STYLELINT:-}"
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version stylelint)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
-
-  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Node" "Stylelint" "✅ Exists" "${_CUR_VER:-}" "0"
+  if ! has_lang_files "package.json" "*.css *.scss *.sass *.less"; then
     return 0
   fi
 
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Node" "Stylelint" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_SL
-  _STAT_SL="✅ mise"
-  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
-    _STAT_SL="❌ Failed"
-    log_summary "Node" "Stylelint" "${_STAT_SL:-}" "-" "$(($(date +%s) - _T0_SL))"
-    if is_ci_env; then
-      log_error "Failed to install ${_TITLE:-} in CI."
-      return 1
-    else
-      log_warn "Failed to install ${_TITLE:-}. Continuing..."
-      return 0
-    fi
-  fi
-
-  # Atomic verification: Ensure tool is fully usable
-  if is_ci_env; then
-    log_debug "Performing atomic verification for ${_TITLE:-}..."
-    mise reshim 2>/dev/null || true
-    sleep 1
-
-    if ! verify_tool_atomic "stylelint" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
-      _STAT_SL="❌ Not Usable"
-      log_summary "Node" "Stylelint" "${_STAT_SL:-}" "-" "$(($(date +%s) - _T0_SL))"
-      log_error "${_TITLE:-} installed but failed atomic verification."
-      return 1
-    fi
-  fi
-
-  log_summary "Node" "Stylelint" "${_STAT_SL:-}" "$(get_version stylelint)" "$(($(date +%s) - _T0_SL))"
+  install_tool_safe "stylelint" "${VER_STYLELINT_PROVIDER:-}" "Stylelint" "--version" 0 "*.css *.scss *.sass *.less" ""
 }
 
 # Purpose: Installs vitepress.
 # Delegate: Managed by mise (.mise.toml)
 install_vitepress() {
-  local _T0_VP
-  _T0_VP=$(date +%s)
-  local _TITLE="VitePress"
-  local _PROVIDER="${VER_VITEPRESS_PROVIDER:-}"
-  local _VERSION="${VER_VITEPRESS:-}"
-
   if [ ! -d docs ] && ! grep -q '"vitepress"' "${PACKAGE_JSON:-}" 2>/dev/null; then
     return 0
   fi
 
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version vitepress "" "vitepress")
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
-
-  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Docs" "VitePress" "✅ Exists" "${_CUR_VER:-}" "0"
-    return 0
-  fi
-
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Docs" "VitePress" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_VP
-  _STAT_VP="✅ mise"
-  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
-    _STAT_VP="❌ Failed"
-    log_summary "Docs" "VitePress" "${_STAT_VP:-}" "-" "$(($(date +%s) - _T0_VP))"
-    if is_ci_env; then
-      log_error "Failed to install ${_TITLE:-} in CI."
-      return 1
-    else
-      log_warn "Failed to install ${_TITLE:-}. Continuing..."
-      return 0
-    fi
-  fi
-
-  # Atomic verification: Ensure tool is fully usable
-  if is_ci_env; then
-    log_debug "Performing atomic verification for ${_TITLE:-}..."
-    mise reshim 2>/dev/null || true
-    sleep 1
-
-    if ! verify_tool_atomic "vitepress" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
-      _STAT_VP="❌ Not Usable"
-      log_summary "Docs" "VitePress" "${_STAT_VP:-}" "-" "$(($(date +%s) - _T0_VP))"
-      log_error "${_TITLE:-} installed but failed atomic verification."
-      return 1
-    fi
-  fi
-
-  log_summary "Docs" "VitePress" "${_STAT_VP:-}" "$(get_version vitepress)" "$(($(date +%s) - _T0_VP))"
+  install_tool_safe "vitepress" "${VER_VITEPRESS_PROVIDER:-}" "VitePress" "--version" 1
 }
 
 # Purpose: Installs prettier.
 # Delegate: Managed by mise (.mise.toml)
 install_prettier() {
-  local _T0_PR
-  _T0_PR=$(date +%s)
-  local _TITLE="Prettier"
-  local _PROVIDER="${VER_PRETTIER_PROVIDER:-}"
-  local _VERSION="${VER_PRETTIER:-}"
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version prettier)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
-
-  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Base" "Prettier" "✅ Exists" "${_CUR_VER:-}" "0"
-    return 0
-  fi
-
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "Prettier" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_PR
-  _STAT_PR="✅ mise"
-  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
-    _STAT_PR="❌ Failed"
-    log_summary "Base" "Prettier" "${_STAT_PR:-}" "-" "$(($(date +%s) - _T0_PR))"
-    if is_ci_env; then
-      log_error "Failed to install ${_TITLE:-} in CI."
-      return 1
-    else
-      log_warn "Failed to install ${_TITLE:-}. Continuing..."
-      return 0
-    fi
-  fi
-
-  # Atomic verification: Ensure tool is fully usable
-  if is_ci_env; then
-    log_debug "Performing atomic verification for ${_TITLE:-}..."
-    mise reshim 2>/dev/null || true
-    sleep 1
-
-    if ! verify_tool_atomic "prettier" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
-      _STAT_PR="❌ Not Usable"
-      log_summary "Base" "Prettier" "${_STAT_PR:-}" "-" "$(($(date +%s) - _T0_PR))"
-      log_error "${_TITLE:-} installed but failed atomic verification."
-      return 1
-    fi
-  fi
-
-  log_summary "Base" "Prettier" "${_STAT_PR:-}" "$(get_version prettier)" "$(($(date +%s) - _T0_PR))"
+  install_tool_safe "prettier" "${VER_PRETTIER_PROVIDER:-}" "Prettier" "--version" 1
 }
 
 # Purpose: Installs commitlint.
 # Delegate: Managed by mise (.mise.toml)
 install_commitlint() {
-  local _T0_CL
-  _T0_CL=$(date +%s)
-  local _TITLE="Commitlint"
-  local _PROVIDER="${VER_COMMITLINT_PROVIDER:-}"
-  local _VERSION="${VER_COMMITLINT:-}"
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version commitlint "" "@commitlint/cli")
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
-
-  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Base" "Commitlint" "✅ Exists" "${_CUR_VER:-}" "0"
-    return 0
-  fi
-
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "Commitlint" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_CL
-  _STAT_CL="✅ mise"
-  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
-    _STAT_CL="❌ Failed"
-    log_summary "Base" "Commitlint" "${_STAT_CL:-}" "-" "$(($(date +%s) - _T0_CL))"
-    if is_ci_env; then
-      log_error "Failed to install ${_TITLE:-} in CI."
-      return 1
-    else
-      log_warn "Failed to install ${_TITLE:-}. Continuing..."
-      return 0
-    fi
-  fi
-
-  # Atomic verification: Ensure tool is fully usable
-  if is_ci_env; then
-    log_debug "Performing atomic verification for ${_TITLE:-}..."
-    mise reshim 2>/dev/null || true
-    sleep 1
-
-    if ! verify_tool_atomic "commitlint" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
-      _STAT_CL="❌ Not Usable"
-      log_summary "Base" "Commitlint" "${_STAT_CL:-}" "-" "$(($(date +%s) - _T0_CL))"
-      log_error "${_TITLE:-} installed but failed atomic verification."
-      return 1
-    fi
-  fi
-
-  log_summary "Base" "Commitlint" "${_STAT_CL:-}" "$(get_version commitlint)" "$(($(date +%s) - _T0_CL))"
+  install_tool_safe "commitlint" "${VER_COMMITLINT_PROVIDER:-}" "Commitlint" "--version" 1
 }
 
 # Purpose: Installs commitizen.
 # Delegate: Managed by mise (.mise.toml)
 install_commitizen() {
-  local _T0_CZ
-  _T0_CZ=$(date +%s)
-  local _TITLE="Commitizen"
-  local _PROVIDER="${VER_COMMITIZEN_PROVIDER:-}"
-  local _VERSION="${VER_COMMITIZEN:-}"
-
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version commitizen "" "commitizen")
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
-
-  if is_version_match "${_CUR_VER:-}" "${_REQ_VER:-}"; then
-    log_summary "Base" "Commitizen" "✅ Exists" "${_CUR_VER:-}" "0"
-    return 0
-  fi
-
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Base" "Commitizen" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-  local _STAT_CZ
-  _STAT_CZ="✅ mise"
-  if ! run_mise install "${_PROVIDER:-}@${_VERSION:-}"; then
-    _STAT_CZ="❌ Failed"
-    log_summary "Base" "Commitizen" "${_STAT_CZ:-}" "-" "$(($(date +%s) - _T0_CZ))"
-    if is_ci_env; then
-      log_error "Failed to install ${_TITLE:-} in CI."
-      return 1
-    else
-      log_warn "Failed to install ${_TITLE:-}. Continuing..."
-      return 0
-    fi
-  fi
-
-  # Atomic verification: Ensure tool is fully usable
-  if is_ci_env; then
-    log_debug "Performing atomic verification for ${_TITLE:-}..."
-    mise reshim 2>/dev/null || true
-    sleep 1
-
-    if ! verify_tool_atomic "commitizen" "${_PROVIDER:-}" "${_TITLE:-}" "--version"; then
-      _STAT_CZ="❌ Not Usable"
-      log_summary "Base" "Commitizen" "${_STAT_CZ:-}" "-" "$(($(date +%s) - _T0_CZ))"
-      log_error "${_TITLE:-} installed but failed atomic verification."
-      return 1
-    fi
-  fi
-
-  log_summary "Base" "Commitizen" "${_STAT_CZ:-}" "$(get_version commitizen)" "$(($(date +%s) - _T0_CZ))"
+  install_tool_safe "commitizen" "${VER_COMMITIZEN_PROVIDER:-}" "Commitizen" "--version" 1
 }
 
 # Purpose: Sets up Node.js runtime for project.
