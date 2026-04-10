@@ -2185,7 +2185,14 @@ install_tool_safe() {
   if [ "${_BINARY_EXISTS:-0}" -eq 1 ] && [ "${_NEEDS_INSTALL:-0}" -eq 1 ]; then
     log_warn "Step 4: Binary exists but needs reinstall - cleaning up"
     mise uninstall "${_PROVIDER:-}" 2>/dev/null || true
+
+    # CRITICAL: Aggressive cache refresh after uninstall
+    # This is essential for version downgrades (e.g., taplo 0.9.0 -> 0.7.0)
     refresh_mise_cache
+    mise reshim 2>/dev/null || true
+
+    # Wait for filesystem sync
+    sleep 1
   fi
 
   # Step 5: Install
