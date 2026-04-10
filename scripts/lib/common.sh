@@ -1865,9 +1865,12 @@ verify_binary_exists() {
   # If it's a mise shim, it will be in the shims directory
   if echo "${_BIN_PATH:-}" | grep -q "/mise/shims/"; then
     # For mise shims, we can't reliably test execution without mise exec
-    # Just verify the shim file exists and is executable
-    if [ -f "${_BIN_PATH:-}" ] && [ -x "${_BIN_PATH:-}" ]; then
-      return 0
+    # Just verify the shim file exists
+    # On Windows, skip executable check (files are executable by extension)
+    if [ -f "${_BIN_PATH:-}" ]; then
+      if [ "${_G_OS:-}" = "windows" ] || [ -x "${_BIN_PATH:-}" ]; then
+        return 0
+      fi
     fi
   else
     # For non-shim binaries, try to execute with timeout
@@ -1995,13 +1998,31 @@ verify_tool_atomic() {
   fi
   log_debug "✓ Binary exists"
 
-  # Step 4: Check if binary is executable
+  # Step 4: Check if binary is executable (skip on Windows)
   log_debug "Step 4/5: Checking executability..."
-  if [ ! -x "${_RESOLVED_PATH:-}" ]; then
+
+  # Windows doesn't use Unix executable permissions
+  # .exe, .cmd, .bat files are executable by extension
+  if [ "${_G_OS:-}" != "windows" ] && [ ! -x "${_RESOLVED_PATH:-}" ]; then
     log_error "✗ ${_RESOLVED_PATH:-} is not executable"
     return 1
   fi
-  log_debug "✓ Executable"
+
+  # On Windows, check if it's a known executable extension
+  if [ "${_G_OS:-}" = "windows" ]; then
+    case "${_RESOLVED_PATH:-}" in
+    *.exe | *.cmd | *.bat | *.ps1)
+      log_debug "✓ Windows executable (by extension)"
+      ;;
+    *)
+      # On Windows, files without extension might still be executable
+      # Let the smoke test determine if it works
+      log_debug "⚠ Unknown extension on Windows, will verify via smoke test"
+      ;;
+    esac
+  else
+    log_debug "✓ Executable"
+  fi
 
   # Step 5: Run smoke test
   log_debug "Step 5/5: Running smoke test..."
