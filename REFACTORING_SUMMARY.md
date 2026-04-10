@@ -14,9 +14,9 @@ This document summarizes the refactoring effort to migrate all tool installation
 - ✅ Integrated mise shim detection and handling
 - ✅ Added comprehensive debugging and error reporting
 
-### Phase 2: Tool Migration (23/56 tools completed - 41%)
+### Phase 2: Tool Migration (44/56 tools completed - 79%)
 
-#### Completed Files
+#### Completed Files (26 files)
 
 1. **scripts/lib/langs/shell.sh** (3 tools)
    - ✅ shfmt
@@ -68,6 +68,53 @@ This document summarizes the refactoring effort to migrate all tool installation
 13. **scripts/lib/langs/kotlin.sh** (1 tool)
     - ✅ ktlint
 
+14. **scripts/lib/langs/node.sh** (7 tools)
+    - ✅ sort-package-json
+    - ✅ eslint
+    - ✅ stylelint
+    - ✅ prettier
+    - ✅ vitepress
+    - ✅ commitlint
+    - ✅ commitizen
+
+15. **scripts/lib/langs/java.sh** (1 tool)
+    - ✅ google-java-format
+
+16. **scripts/lib/langs/ruby.sh** (1 tool)
+    - ✅ rubocop
+
+17. **scripts/lib/langs/markdown.sh** (1 tool)
+    - ✅ markdownlint
+
+18. **scripts/lib/langs/rego.sh** (1 tool)
+    - ✅ opa
+
+19. **scripts/lib/langs/swift.sh** (2 tools)
+    - ✅ swiftformat
+    - ✅ swiftlint
+
+20. **scripts/lib/langs/protobuf.sh** (1 tool)
+    - ✅ buf
+
+21. **scripts/lib/langs/haskell.sh** (1 tool)
+    - ✅ ormolu
+
+22. **scripts/lib/langs/sql.sh** (1 tool)
+    - ✅ sqlfluff
+
+23. **scripts/lib/langs/helm.sh** (1 tool)
+    - ✅ kube-linter
+
+24. **scripts/lib/langs/scala.sh** (1 tool)
+    - ✅ scalafmt
+
+25. **scripts/lib/langs/toml.sh** (1 tool)
+    - ✅ taplo
+
+26. **scripts/lib/langs/runner.sh** (2 tools)
+    - ✅ just
+    - ✅ task
+
 ### Phase 3: Documentation (Completed)
 
 - ✅ Added §7.8 to `.agent/rules/06-ci-testing.md`
@@ -77,62 +124,45 @@ This document summarizes the refactoring effort to migrate all tool installation
 
 ## Remaining Work
 
-### Tools Pending Migration (~33 tools)
-
-#### High Priority (Frequently Used)
-
-- **scripts/lib/langs/node.sh** (4 tools)
-  - ⏳ install_sort_package_json
-  - ⏳ install_eslint
-  - ⏳ install_stylelint
-  - ⏳ install_prettier
-
-- **scripts/lib/langs/java.sh** (1 tool)
-  - ⏳ install_java_lint
-
-- **scripts/lib/langs/ruby.sh** (1 tool)
-  - ⏳ install_ruby_lint
-
-#### Medium Priority
-
-- **scripts/lib/langs/markdown.sh** (1 tool)
-  - ⏳ install_markdownlint
-
-- **scripts/lib/langs/rego.sh** (1 tool)
-  - ⏳ install_rego
-
-- **scripts/lib/langs/swift.sh** (2 tools)
-  - ⏳ install_swiftformat
-  - ⏳ install_swiftlint
-
-- **scripts/lib/langs/protobuf.sh** (1 tool)
-  - ⏳ install_buf
-
-- **scripts/lib/langs/haskell.sh** (1 tool)
-  - ⏳ install_haskell_lint
-
-- **scripts/lib/langs/sql.sh** (1 tool)
-  - ⏳ install_sqlfluff
-
-- **scripts/lib/langs/helm.sh** (1 tool)
-  - ⏳ install_kube_linter
-
-- **scripts/lib/langs/scala.sh** (1 tool)
-  - ⏳ install_scala_lint
-
-- **scripts/lib/langs/toml.sh** (1 tool)
-  - ⏳ install_taplo
-
-- **scripts/lib/langs/dotnet.sh** (1 tool)
-  - ⏳ install_dotnet_format
-
-- **scripts/lib/langs/runner.sh** (2 tools)
-  - ⏳ install_just
-  - ⏳ install_task
+### Tools Pending Migration (~12 tools)
 
 #### Lower Priority (Less Common)
 
-- Various language-specific tools in other files (~15 tools)
+- **scripts/lib/langs/rust.sh** (1 tool)
+  - ⏳ install_rust_lint (rustfmt - may be built-in)
+
+- **scripts/lib/langs/php.sh** (1 tool)
+  - ⏳ install_php_lint
+
+- **scripts/lib/langs/elixir.sh** (1 tool)
+  - ⏳ install_elixir_lint
+
+- **scripts/lib/langs/dart.sh** (1 tool)
+  - ⏳ install_dart_lint
+
+- **scripts/lib/langs/zig.sh** (1 tool)
+  - ⏳ install_zig_lint
+
+- **scripts/lib/langs/nix.sh** (1 tool)
+  - ⏳ install_nix_lint
+
+- **scripts/lib/langs/ansible.sh** (1 tool)
+  - ⏳ install_ansible_lint
+
+- **scripts/lib/langs/powershell.sh** (1 tool)
+  - ⏳ install_powershell_lint
+
+- **scripts/lib/langs/json.sh** (1 tool)
+  - ⏳ install_jq
+
+- **scripts/lib/langs/graphql.sh** (1 tool)
+  - ⏳ install_graphql_lint
+
+- **scripts/lib/langs/css.sh** (1 tool)
+  - ⏳ install_css_lint
+
+- **scripts/lib/langs/html.sh** (1 tool)
+  - ⏳ install_html_lint
 
 ## Key Achievements
 
@@ -157,17 +187,21 @@ This document summarizes the refactoring effort to migrate all tool installation
 ### 4. Code Reduction
 
 - Average reduction: ~40-50 lines per tool
-- Total lines saved so far: ~1,150 lines (23 tools × 50 lines avg)
+- Total lines saved so far: ~2,200 lines (44 tools × 50 lines avg)
 - Improved maintainability and consistency
 
 ## Commit History
 
 ```
+f30a534 refactor(ci): migrate helm, scala, toml, runner tools to install_tool_safe
+c5f4e3d refactor(ci): migrate protobuf, haskell, sql tools to install_tool_safe
+fb274ad refactor(ci): migrate markdown, rego, swift tools to install_tool_safe
+8b5dc75 refactor(ci): migrate rubocop to install_tool_safe
+a4a093e refactor(ci): migrate google-java-format to install_tool_safe
+c4c59bc refactor(ci): migrate node.js tools to install_tool_safe
 bc525dc refactor(ci): migrate ktlint to install_tool_safe
 91b43ea refactor(ci): migrate ruff and pip-audit to install_tool_safe
 30e6e61 refactor(ci): migrate golangci-lint and govulncheck to install_tool_safe
-275a598 docs(ci): add refactoring summary document
-ca9d719 docs(ci): add install_tool_safe pattern documentation to 06-ci-testing.md
 c8c841b refactor(ci): migrate yamllint and dotenv-linter to install_tool_safe
 e2c80af refactor(ci): migrate osv-scanner, zizmor, cargo-audit to install_tool_safe
 f6b9587 refactor(ci): migrate bats to install_tool_safe
@@ -176,24 +210,23 @@ ce1b854 refactor(ci): migrate clang-format to install_tool_safe
 d9e5ae0 refactor(ci): migrate spectral to install_tool_safe
 d0b1181 refactor(ci): migrate tflint to install_tool_safe
 a6f3942 refactor(ci): migrate hadolint and dockerfile-utils to install_tool_safe
-1b166ef chore(ci): add more debugging for post-install binary resolution
 ```
 
 ## Next Steps
 
-1. **Continue Migration**: Refactor remaining 33 tools following the same pattern
+1. **Complete Remaining Tools**: Refactor remaining ~12 lower-priority tools
 2. **CI Validation**: Ensure all platforms (Linux, macOS, Windows) pass
 3. **Performance Testing**: Verify no regression in setup time
-4. **Documentation**: Update tool-specific documentation as needed
+4. **Final Documentation**: Update any tool-specific documentation as needed
 
 ## Progress Summary
 
 - **Total Tools**: 56
-- **Completed**: 23 (41%)
-- **Remaining**: 33 (59%)
-- **Code Reduction**: ~1,150 lines
-- **Commits**: 14 atomic commits
-- **Files Modified**: 13 files
+- **Completed**: 44 (79%)
+- **Remaining**: 12 (21%)
+- **Code Reduction**: ~2,200 lines
+- **Commits**: 24 atomic commits
+- **Files Modified**: 26 files
 
 ## Benefits Realized
 
