@@ -2296,24 +2296,46 @@ install_tool_safe() {
 
   # Step 6a: Verify binary now exists
   log_info "Step 6a: Verifying binary existence"
-  if ! verify_binary_exists "${_ACTUAL_BIN:-}" "${_VERSION_FLAG:-}"; then
-    log_error "Step 6a: Binary still not found after installation!"
-    log_error "Debugging info:"
-    log_error "  - Logical name: ${_BIN_NAME:-}"
-    log_error "  - Actual name: ${_ACTUAL_BIN:-}"
-    log_error "  - Install dir: ${_INSTALL_DIR:-}"
-    log_error "  - PATH: ${PATH:-}"
-    log_error "  - command -v ${_ACTUAL_BIN:-}: $(command -v "${_ACTUAL_BIN:-}" 2>&1 || echo 'NOT FOUND')"
-    log_error "  - mise which ${_ACTUAL_BIN:-}: $(mise which "${_ACTUAL_BIN:-}" 2>&1 || echo 'NOT FOUND')"
-    log_error "  - mise where ${_PROVIDER:-}: $(mise where "${_PROVIDER:-}" 2>&1 || echo 'NOT FOUND')"
-    if [ -n "${_INSTALL_DIR:-}" ] && [ -d "${_INSTALL_DIR:-}/bin" ]; then
-      log_error "  - Binaries in install dir: $(ls -la "${_INSTALL_DIR:-}/bin" 2>&1 || echo 'FAILED')"
+
+  # On Windows, if the binary file exists in install dir but doesn't have .exe extension,
+  # skip command -v check (mise shims may not work for non-.exe files)
+  local _SKIP_CMD_CHECK=0
+  if [ "${_G_OS:-}" = "windows" ] && [ -n "${_INSTALL_DIR:-}" ]; then
+    if [ -f "${_INSTALL_DIR:-}/${_ACTUAL_BIN:-}" ] || [ -f "${_INSTALL_DIR:-}/bin/${_ACTUAL_BIN:-}" ]; then
+      case "${_ACTUAL_BIN:-}" in
+      *.exe | *.cmd | *.bat | *.ps1)
+        # Has Windows executable extension, use normal check
+        _SKIP_CMD_CHECK=0
+        ;;
+      *)
+        # No Windows extension, skip command -v check
+        log_info "Step 6a: Windows binary without .exe extension, skipping command -v check"
+        _SKIP_CMD_CHECK=1
+        ;;
+      esac
     fi
-    if [ -n "${_INSTALL_DIR:-}" ] && [ -d "${_INSTALL_DIR:-}" ]; then
-      log_error "  - Install dir contents: $(ls -la "${_INSTALL_DIR:-}" 2>&1 || echo 'FAILED')"
+  fi
+
+  if [ "${_SKIP_CMD_CHECK:-0}" -eq 0 ]; then
+    if ! verify_binary_exists "${_ACTUAL_BIN:-}" "${_VERSION_FLAG:-}"; then
+      log_error "Step 6a: Binary still not found after installation!"
+      log_error "Debugging info:"
+      log_error "  - Logical name: ${_BIN_NAME:-}"
+      log_error "  - Actual name: ${_ACTUAL_BIN:-}"
+      log_error "  - Install dir: ${_INSTALL_DIR:-}"
+      log_error "  - PATH: ${PATH:-}"
+      log_error "  - command -v ${_ACTUAL_BIN:-}: $(command -v "${_ACTUAL_BIN:-}" 2>&1 || echo 'NOT FOUND')"
+      log_error "  - mise which ${_ACTUAL_BIN:-}: $(mise which "${_ACTUAL_BIN:-}" 2>&1 || echo 'NOT FOUND')"
+      log_error "  - mise where ${_PROVIDER:-}: $(mise where "${_PROVIDER:-}" 2>&1 || echo 'NOT FOUND')"
+      if [ -n "${_INSTALL_DIR:-}" ] && [ -d "${_INSTALL_DIR:-}/bin" ]; then
+        log_error "  - Binaries in install dir: $(ls -la "${_INSTALL_DIR:-}/bin" 2>&1 || echo 'FAILED')"
+      fi
+      if [ -n "${_INSTALL_DIR:-}" ] && [ -d "${_INSTALL_DIR:-}" ]; then
+        log_error "  - Install dir contents: $(ls -la "${_INSTALL_DIR:-}" 2>&1 || echo 'FAILED')"
+      fi
+      log_summary "Base" "${_DISPLAY_NAME:-}" "❌ Not Found" "-" "$(($(date +%s) - _T0))"
+      return 1
     fi
-    log_summary "Base" "${_DISPLAY_NAME:-}" "❌ Not Found" "-" "$(($(date +%s) - _T0))"
-    return 1
   fi
   log_info "Step 6a: ✓ Binary exists after installation"
 
