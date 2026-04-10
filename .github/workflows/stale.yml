@@ -35,7 +35,7 @@ jobs:
     permissions:
       issues: write # Required to label and close stagnant issues
       pull-requests: write # Required to label and close stagnant PRs
-    timeout-minutes: 10 # Maintenance tasks are usually fast API operations
+    timeout-minutes: 20 # Maintenance tasks are usually fast API operations
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
         uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1

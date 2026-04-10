@@ -28,7 +28,7 @@ jobs:
       cancel-in-progress: true
     permissions:
       contents: read
-    timeout-minutes: 5
+    timeout-minutes: 15
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"
         uses: step-security/harden-runner@fe104658747b27e96e4f7e80cd0a94068e53901d # v2.16.1
