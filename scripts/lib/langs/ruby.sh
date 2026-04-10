@@ -28,59 +28,12 @@ install_runtime_ruby() {
 # Examples:
 #   install_ruby_lint
 install_ruby_lint() {
-  local _T0_RUBY
-  _T0_RUBY=$(date +%s)
-  local _TITLE="Rubocop"
-  local _PROVIDER="${VER_RUBOCOP_PROVIDER:-}"
-  local _VERSION="${VER_RUBOCOP:-}"
-
   if ! has_lang_files "Gemfile" "*.rb"; then
     return 0
   fi
 
-  # Fast-path: Check version-aware existence
-  local _CUR_VER
-  _CUR_VER=$(get_version rubocop)
-  local _REQ_VER
-  _REQ_VER=$(get_mise_tool_version "${_PROVIDER:-}")
-
-  # Detect gem installation
-  if [ "${_CUR_VER:-}" = "-" ]; then
-    if resolve_bin "gem" >/dev/null 2>&1 && gem list -i "^rubocop$" >/dev/null 2>&1; then
-      _CUR_VER=$(rubocop --version 2>/dev/null || echo "exists")
-    fi
-  fi
-
-  if [ "${_CUR_VER:-}" != "-" ] && { [ "${_CUR_VER:-}" = "${_REQ_VER:-}" ] || [ "${_REQ_VER:-}" = "" ]; }; then
-    log_summary "Ruby" "Rubocop" "✅ Exists" "${_CUR_VER:-}" "0"
-    return 0
-  fi
-
-  _log_setup "${_TITLE:-}" "${_PROVIDER:-}"
-
-  if [ "${DRY_RUN:-0}" -eq 1 ]; then
-    log_summary "Ruby" "Rubocop" '⚖️ Previewed' "-" '0'
-    return 0
-  fi
-
-  local _STAT_RUBY="✅ Installed"
-  # Support mise gem provider if possible, else fallback to direct gem
-  if resolve_bin "mise" >/dev/null 2>&1; then
-    setup_registry_rubocop
-    run_mise install "${_PROVIDER:-}@${_VERSION:-}" || _STAT_RUBY="❌ Failed"
-
-    # Atomic verification: ensure tool is fully functional
-    if ! verify_tool_atomic "rubocop" "${_PROVIDER:-}" "Rubocop" "--version"; then
-      _STAT_RUBY="❌ Not Executable"
-      log_summary "Ruby" "Rubocop" "${_STAT_RUBY:-}" "-" "$(($(date +%s) - _T0_RUBY))"
-      [ "${CI:-}" = "true" ] && return 1
-      return 0
-    fi
-  else
-    gem install rubocop --no-document || _STAT_RUBY="❌ Failed"
-  fi
-
-  log_summary "Ruby" "Rubocop" "${_STAT_RUBY:-}" "$(get_version rubocop)" "$(($(date +%s) - _T0_RUBY))"
+  setup_registry_rubocop
+  install_tool_safe "rubocop" "${VER_RUBOCOP_PROVIDER:-}" "Rubocop" "--version" 0 "*.rb" ""
 }
 
 # Purpose: Sets up Ruby runtime and mandatory linting tools.
