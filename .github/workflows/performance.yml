@@ -1,7 +1,7 @@
 ---
 name: Performance Testing
 
-on:
+"on":
   pull_request:
     paths:
       - "scripts/lib/**/*.sh"
