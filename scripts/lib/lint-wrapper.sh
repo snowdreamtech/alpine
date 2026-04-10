@@ -165,8 +165,9 @@ main() {
             if [ "${_G_OS:-}" = "windows" ]; then
               _PATTERN_PATH=$(find "${_INSTALL_PATH:-}/${_BIN_DIR}" -maxdepth 1 -name "${_LINTER_BIN:-}*" -type f 2>/dev/null | head -n 1)
             else
-              # Use -perm +111 for BSD/macOS compatibility (instead of -executable)
-              _PATTERN_PATH=$(find "${_INSTALL_PATH:-}/${_BIN_DIR}" -maxdepth 1 -name "${_LINTER_BIN:-}*" -type f -perm +111 2>/dev/null | head -n 1)
+              # Use -perm /111 (any execute bit) for better compatibility
+              # Note: /111 means "any of these bits", +111 means "all of these bits"
+              _PATTERN_PATH=$(find "${_INSTALL_PATH:-}/${_BIN_DIR}" -maxdepth 1 -name "${_LINTER_BIN:-}*" -type f -perm /111 2>/dev/null | head -n 1)
             fi
 
             if [ -n "${_PATTERN_PATH:-}" ] && [ -f "${_PATTERN_PATH:-}" ]; then
