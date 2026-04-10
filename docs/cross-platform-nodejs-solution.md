@@ -91,8 +91,20 @@ $ mise install node@25.9.0
 ```dockerfile
 FROM alpine:3.19
 
-# 安装基础依赖
-RUN apk add --no-cache bash curl git ca-certificates
+# ⚠️ 重要：安装完整的基础依赖
+# bash - mise 和 Python 构建脚本需要
+# curl - 下载 mise 和工具
+# git - 版本控制
+# ca-certificates - HTTPS 下载
+# gpg - 验证下载签名（可选但推荐）
+# python3 - Node.js 构建脚本需要（即使下载预编译包也需要）
+RUN apk add --no-cache \
+    bash \
+    curl \
+    git \
+    ca-certificates \
+    gpg \
+    python3
 
 # 安装 mise
 RUN curl https://mise.run | sh
@@ -168,23 +180,74 @@ mise exec -- npm --version
 mise exec -- node -e "console.log(process.platform, process.arch)"
 ```
 
-## 特殊情况处理
+## Alpine Linux 依赖说明
 
-### 情况 1: 预编译包不可用
+### 最小运行时依赖（使用预编译包）
 
-如果某个版本没有预编译包（极少见），mise 会自动：
-
-1. 尝试从源码编译
-2. 需要安装编译依赖（gcc, make, python3 等）
+即使使用预编译包，Alpine 也需要这些基础依赖：
 
 ```dockerfile
-# Alpine - 添加编译依赖（仅在需要编译时）
+# 最小依赖 - 足以运行预编译的 Node.js
 RUN apk add --no-cache \
-    bash curl git ca-certificates \
-    build-base python3 linux-headers
+    bash \           # mise 和构建脚本需要
+    curl \           # 下载工具
+    git \            # 版本控制
+    ca-certificates \# HTTPS 下载
+    gpg \            # 签名验证（推荐）
+    python3          # Node.js 的 configure 脚本需要
 ```
 
-### 情况 2: 使用官方 Node.js Docker 镜像
+### 为什么需要 python3？
+
+即使下载预编译包，Node.js 的安装过程也会运行 `./configure` 脚本来检测系统环境，这个脚本需要 Python。
+
+### 完整编译依赖（源码编译时）
+
+如果预编译包不可用，需要完整的编译环境：
+
+```dockerfile
+# 完整编译依赖
+RUN apk add --no-cache \
+    bash curl git ca-certificates gpg \
+    python3 \
+    build-base \     # gcc, g++, make
+    linux-headers \  # 内核头文件
+    binutils-gold    # 链接器
+```
+
+## 特殊情况处理
+
+### 情况 1: 缺少依赖导致安装失败
+
+如果看到以下错误：
+
+```bash
+# 错误 1: python not found
+./configure: exec: line 8: python: not found
+# 解决：apk add python3
+
+# 错误 2: bash not found
+env: 'bash': No such file or directory
+# 解决：apk add bash
+
+# 错误 3: gpg not found
+mise WARN gpg not found, skipping verification
+# 解决：apk add gpg（可选，但推荐）
+```
+
+### 情况 2: 预编译包不可用
+
+如果某个版本没有预编译包（极少见），mise 会自动尝试从源码编译：
+
+```dockerfile
+# Alpine - 添加完整编译依赖
+RUN apk add --no-cache \
+    bash curl git ca-certificates gpg \
+    python3 \
+    build-base linux-headers binutils-gold
+```
+
+### 情况 3: 使用官方 Node.js Docker 镜像
 
 如果你主要使用 Node.js，可以直接使用官方镜像：
 
