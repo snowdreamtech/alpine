@@ -149,10 +149,19 @@ main() {
 
           # Try multiple possible binary locations
           for _BIN_DIR in "bin" "."; do
+            # First try exact match
             local _FULL_PATH="${_INSTALL_PATH:-}/${_BIN_DIR}/${_LINTER_BIN:-}"
             if [ -x "${_FULL_PATH:-}" ]; then
               log_info "✓ Found executable at ${_FULL_PATH:-}"
               exec "${_FULL_PATH:-}" "$@"
+            fi
+
+            # Then try pattern match (for binaries with version/platform suffixes)
+            local _PATTERN_PATH
+            _PATTERN_PATH=$(find "${_INSTALL_PATH:-}/${_BIN_DIR}" -maxdepth 1 -name "${_LINTER_BIN:-}*" -type f -executable 2>/dev/null | head -n 1)
+            if [ -n "${_PATTERN_PATH:-}" ] && [ -x "${_PATTERN_PATH:-}" ]; then
+              log_info "✓ Found executable via pattern match at ${_PATTERN_PATH:-}"
+              exec "${_PATTERN_PATH:-}" "$@"
             fi
           done
           log_warn "✗ Binary not found in install path"
