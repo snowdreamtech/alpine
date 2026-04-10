@@ -1066,7 +1066,7 @@ repos:
         args:
           - -NoProfile
           - -Command
-          - "& { if (!(Get-Command Invoke-ScriptAnalyzer -ErrorAction SilentlyContinue)) { exit 0 }; $r = $args | ForEach-Object { Invoke-ScriptAnalyzer -Path $_ -Severity Error,Warning }; if ($r) { $r | Format-Table -AutoSize; exit 1 } }"
+          - "& { if (!(Get-Command Invoke-ScriptAnalyzer -ErrorAction SilentlyContinue)) { exit 0 }; $r = $args | ForEach-Object { Invoke-ScriptAnalyzer -Path $_ -Settings PSScriptAnalyzerSettings.psd1 -Severity Error,Warning }; if ($r) { $r | Format-Table -AutoSize; exit 1 } }"
         types: [powershell]
         description: "PowerShell static analysis tool (macOS/Windows)."
 
