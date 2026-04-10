@@ -941,7 +941,7 @@ run_mise() {
 #   log_info "Starting build process..."
 log_info() {
   local _msg_info="${1:-}"
-  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "${BLUE:-}" "${_msg_info:-}" "${NC:-}"; fi
+  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%s%s\n" "${BLUE:-}" "${_msg_info:-}" "${NC:-}"; fi
 }
 
 # Purpose: Log a success message in green.
@@ -951,7 +951,7 @@ log_info() {
 #   log_success "Build completed successfully."
 log_success() {
   local _msg_suc="${1:-}"
-  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "${GREEN:-}" "${_msg_suc:-}" "${NC:-}"; fi
+  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%s%s\n" "${GREEN:-}" "${_msg_suc:-}" "${NC:-}"; fi
 }
 
 # Purpose: Log a warning message in yellow.
@@ -961,7 +961,7 @@ log_success() {
 #   log_warn "Dependency 'jq' not found. Some features may be limited."
 log_warn() {
   local _msg_warn="${1:-}"
-  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%b%s\n" "${YELLOW:-}" "${_msg_warn:-}" "${NC:-}"; fi
+  if [ "${VERBOSE:-1}" -ge 1 ]; then printf "%s%s%s\n" "${YELLOW:-}" "${_msg_warn:-}" "${NC:-}"; fi
 }
 
 # Purpose: Log an error message in red to stderr.
@@ -971,7 +971,7 @@ log_warn() {
 #   log_error "Critical error: Database connection failed."
 log_error() {
   local _msg_err="${1:-}"
-  printf "%s%b%s\n" "${RED:-}" "${_msg_err:-}" "${NC:-}" >&2
+  printf "%s%s%s\n" "${RED:-}" "${_msg_err:-}" "${NC:-}" >&2
 }
 
 # Purpose: Verifies that a required toolchain manager (e.g., cargo, npm, go) is available.
