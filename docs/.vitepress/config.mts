@@ -104,6 +104,8 @@ export default defineConfig({
             { text: "Makefile Commands", link: "/reference/makefile" },
             { text: "Supported AI IDEs", link: "/reference/ai-ides" },
             { text: "Linting Tools", link: "/reference/linters" },
+            { text: "Tool Installation", link: "/reference/tool-installation" },
+            { text: "API Reference", link: "/reference/api-common" },
           ],
         },
       ],

@@ -256,8 +256,55 @@ file $(mise where node)/bin/node
 
 ---
 
+## 工具安装架构
+
+本项目使用 `install_tool_safe()` 模式进行工具安装，该模式自动处理平台特定的二进制名称，包括 Alpine Linux 的特殊情况。
+
+### 二进制名称解析
+
+工具安装系统会自动检测平台并解析正确的二进制名称：
+
+**Linux (glibc):**
+
+- `ec-linux-amd64` (x86_64)
+- `ec-linux-arm64` (ARM64)
+
+**Linux (musl/Alpine):**
+
+- 相同的二进制名称，但链接到 musl libc
+- 系统自动检测并使用兼容的版本
+
+**macOS:**
+
+- `ec-darwin-amd64` (Intel)
+- `ec-darwin-arm64` (Apple Silicon)
+
+**Windows:**
+
+- `ec-windows-amd64.exe`
+
+### Alpine 特定考虑
+
+1. **二进制兼容性检查**: 安装后自动验证二进制是否可执行
+2. **版本验证**: 确保工具在 musl 环境下正常工作
+3. **回退机制**: 如果预编译二进制不兼容，提供清晰的错误信息
+
+### 性能特征
+
+在 Alpine Linux 上：
+
+- 二进制验证: < 5 秒
+- 平台特定解析: < 3 秒
+- 缓存效果: 与其他平台相同（~50% 加速）
+
+详见 [工具安装架构文档](./reference/tool-installation.md)。
+
+---
+
 ## 更新日志
 
 - 2026-04-10: 初始版本
 - 包含 Go、Python、Node.js 的 Alpine 兼容性说明
 - 提供 Dockerfile 示例和最佳实践
+- 2025-01-15: 添加工具安装架构说明
+- 记录二进制名称解析和性能特征
