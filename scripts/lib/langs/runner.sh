@@ -21,6 +21,15 @@ install_task() {
 
 # Purpose: Sets up Runners environment.
 setup_runners() {
+  # Skip if no runner config files exist (unless forced)
+  if [ "${FORCE_SETUP:-0}" -eq 0 ]; then
+    if ! has_lang_files "" "justfile Justfile Taskfile.yml Taskfile.yaml"; then
+      log_info "⏭️  Skipping runners: No justfile or Taskfile detected"
+      log_summary "Runners" "just/task" "⏭️ Skipped" "-" "0"
+      return 0
+    fi
+  fi
+
   install_just
   install_task
 }

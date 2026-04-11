@@ -14,5 +14,14 @@ install_buf() {
 
 # Purpose: Sets up Protobuf environment.
 setup_protobuf() {
+  # Skip if no Protobuf files exist (unless forced)
+  if [ "${FORCE_SETUP:-0}" -eq 0 ]; then
+    if ! has_lang_files "buf.yaml buf.gen.yaml" "*.proto"; then
+      log_info "⏭️  Skipping Protobuf: No .proto files or buf config detected"
+      log_summary "Protobuf" "buf" "⏭️ Skipped" "-" "0"
+      return 0
+    fi
+  fi
+
   install_buf
 }

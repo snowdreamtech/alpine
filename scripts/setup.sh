@@ -209,7 +209,8 @@ EOF
   if [ -z "$(echo "${_RAW_ARGS:-}" | tr -d ' ')" ] || [ "${_IS_ALL_MODULES:-}" = "true" ]; then
     # Grouped list for "On-demand" (default) or "All" (explicit)
     local _BASE_LIST="python node go base shell toml yaml markdown rust java kotlin php ruby dart swift lua cpp terraform solidity perl julia r groovy dotnet zig elixir haskell scala ada assemblyscript ballerina bun clojure crystal deno dlang duckdb elm erlang fortran fpc gleam grain haxe jsonnet kcl lean lisp luau mojo moonbit move nim ocaml odin pkl prolog pulumi racket raku rescript starlark tcl tofu typst vala vcpkg vlang wat"
-    local _DOMAIN_LIST="docker sql openapi protobuf security runners testing docs ai helm k8s terraform terragrunt tofu pulumi"
+    # Domain-specific tools: Removed sql, openapi, protobuf, runners (rarely used, install on-demand only)
+    local _DOMAIN_LIST="docker security testing docs ai helm k8s terraform terragrunt tofu pulumi"
     _MODULES_LIST="${_BASE_LIST:-} ${_DOMAIN_LIST:-}"
   else
     _MODULES_LIST="${_RAW_ARGS:-}"
