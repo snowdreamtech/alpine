@@ -96,6 +96,23 @@ main() {
     # CI Fallback: Try mise exec directly if tool not resolved
     # This handles cases where mise shims exist but resolve_bin fails
     if is_ci_env; then
+      # Special handling for node-audit: it's a logical tool, not a real binary
+      if [ "${_LINTER_WRAP:-}" = "node-audit" ]; then
+        log_info "=== CI Fallback for node-audit ==="
+        local _PKG_MGR="${NPM:-pnpm}"
+        log_info "Using package manager: ${_PKG_MGR:-}"
+
+        # Try to execute audit directly
+        if command -v "${_PKG_MGR:-}" >/dev/null 2>&1; then
+          log_info "✓ Package manager found, executing audit..."
+          "${_PKG_MGR:-}" audit --registry="${NPM_AUDIT_REGISTRY:-https://registry.npmjs.org}" "$@"
+          exit $?
+        else
+          log_error "Package manager '${_PKG_MGR:-}' not found"
+          exit 1
+        fi
+      fi
+
       log_info "=== CI Tool Resolution Fallback for ${_LINTER_WRAP:-} ==="
       log_info "Tool spec: ${_MISE_TOOL_SPEC:-${_LINTER_BIN:-}}"
       log_info "Binary name: ${_LINTER_BIN:-}"
