@@ -533,7 +533,7 @@ fi
 ## Related Documentation
 
 - [Tool Installation Architecture](./tool-installation.md)
-- [Performance Testing](../../benchmarks/README)
+- [Performance Testing](../../benchmarks/README.md)
 - [Troubleshooting](../troubleshooting-mise-provenance.md)
 
 ## References
