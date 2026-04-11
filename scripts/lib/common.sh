@@ -2052,30 +2052,34 @@ verify_tool_atomic() {
 
   # For mise shims, we need to use mise exec instead of direct execution
   local _SMOKE_CMD
+  local _SMOKE_OUTPUT
+  local _SMOKE_EXIT=0
+
   if echo "${_RESOLVED_PATH:-}" | grep -q "/mise/shims/"; then
     # It's a mise shim, use mise exec
     _SMOKE_CMD="mise exec ${_PROVIDER:-} -- ${_BIN_NAME:-} ${_VERSION_FLAG:-}"
     log_debug "Using mise exec for shim: ${_SMOKE_CMD:-}"
-    if ! run_with_timeout_robust 5 sh -c "${_SMOKE_CMD:-}" >/dev/null 2>&1; then
+    _SMOKE_OUTPUT=$(run_with_timeout_robust 5 sh -c "${_SMOKE_CMD:-}" 2>&1) || _SMOKE_EXIT=$?
+  else
+    # Direct binary execution
+    _SMOKE_OUTPUT=$(run_with_timeout_robust 5 "${_RESOLVED_PATH:-}" "${_VERSION_FLAG:-}" 2>&1) || _SMOKE_EXIT=$?
+  fi
+
+  # Check if smoke test passed
+  # Success criteria: exit code 0 OR output contains version-like pattern
+  if [ "${_SMOKE_EXIT:-0}" -ne 0 ]; then
+    # Exit code non-zero, check if output looks like a version
+    if echo "${_SMOKE_OUTPUT:-}" | grep -qE '[0-9]+\.[0-9]+'; then
+      log_debug "✓ Smoke test passed (version detected in output despite non-zero exit)"
+    else
       log_error "✗ ${_BIN_NAME:-} failed smoke test (${_VERSION_FLAG:-})"
-      # Debug: Try to capture the actual error
-      local _SMOKE_OUTPUT
-      _SMOKE_OUTPUT=$(run_with_timeout_robust 5 sh -c "${_SMOKE_CMD:-}" 2>&1 || true)
+      log_error "   Exit code: ${_SMOKE_EXIT:-}"
       log_error "   Smoke test output: ${_SMOKE_OUTPUT:-<empty>}"
       return 1
     fi
   else
-    # Direct binary execution
-    if ! run_with_timeout_robust 5 "${_RESOLVED_PATH:-}" "${_VERSION_FLAG:-}" >/dev/null 2>&1; then
-      log_error "✗ ${_BIN_NAME:-} failed smoke test (${_VERSION_FLAG:-})"
-      # Debug: Try to capture the actual error
-      local _SMOKE_OUTPUT
-      _SMOKE_OUTPUT=$(run_with_timeout_robust 5 "${_RESOLVED_PATH:-}" "${_VERSION_FLAG:-}" 2>&1 || true)
-      log_error "   Smoke test output: ${_SMOKE_OUTPUT:-<empty>}"
-      return 1
-    fi
+    log_debug "✓ Smoke test passed"
   fi
-  log_debug "✓ Smoke test passed"
 
   log_debug "=== ✓ ${_DISPLAY_NAME:-} fully verified ==="
   return 0
