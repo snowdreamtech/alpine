@@ -43,6 +43,8 @@ run_sync_lock() {
   # Many legitimate projects don't provide attestations, making this check too strict.
   # We rely on mise's built-in checksum verification for security instead.
   export MISE_PARANOID=0
+  export MISE_LOCKFILE_PARANOID=0
+  export MISE_YES=1
 
   # shellcheck disable=SC2086
   MISE_CONFIG="${_TMP_MANIFEST:-}" mise lock --platform linux-x64,linux-arm64,linux-x64-musl,linux-arm64-musl,macos-x64,macos-arm64,windows-x64 ${_TOOLS:-} "$@"
