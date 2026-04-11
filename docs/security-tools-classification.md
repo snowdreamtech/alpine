@@ -293,6 +293,6 @@ CI=true make check-env
 
 ## References
 
-- [check-env.sh](../scripts/check-env.sh) - Implementation
-- [security.sh](../scripts/lib/langs/security.sh) - Security tool installation
-- [versions.sh](../scripts/lib/versions.sh) - Tool version definitions
+- Implementation details in `scripts/check-env.sh`
+- Security tool installation in `scripts/lib/langs/security.sh`
+- Tool version definitions in `scripts/lib/versions.sh`
