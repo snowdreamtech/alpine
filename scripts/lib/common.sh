@@ -2336,6 +2336,22 @@ install_tool_safe() {
     fi
   fi
 
+  # CRITICAL: For mise bins (tools installed via mise but not through backends),
+  # mise which may fail even though the binary exists. Check install dir directly.
+  if [ -n "${_INSTALL_DIR:-}" ]; then
+    local _BIN_FILE=""
+    if [ -f "${_INSTALL_DIR:-}/bin/${_ACTUAL_BIN:-}" ]; then
+      _BIN_FILE="${_INSTALL_DIR:-}/bin/${_ACTUAL_BIN:-}"
+    elif [ -f "${_INSTALL_DIR:-}/${_ACTUAL_BIN:-}" ]; then
+      _BIN_FILE="${_INSTALL_DIR:-}/${_ACTUAL_BIN:-}"
+    fi
+
+    if [ -n "${_BIN_FILE:-}" ] && [ -x "${_BIN_FILE:-}" ]; then
+      log_info "Step 6a: ✓ Binary exists in install dir and is executable"
+      _SKIP_CMD_CHECK=1
+    fi
+  fi
+
   if [ "${_SKIP_CMD_CHECK:-0}" -eq 0 ]; then
     if ! verify_binary_exists "${_ACTUAL_BIN:-}" "${_VERSION_FLAG:-}"; then
       log_error "Step 6a: Binary still not found after installation!"
