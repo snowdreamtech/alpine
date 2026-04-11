@@ -113,12 +113,12 @@ NODEJS_ORG_MIRROR = "{% if env.CI is defined %}https://nodejs.org/dist/{% else %
 # 3. Does NOT provide source tarballs (node-vX.Y.Z.tar.gz)
 # 4. Binary naming includes "-musl" suffix
 #
-# For Alpine/musl: Use unofficial-builds with flavor=musl and compile=never
+# For Alpine/musl: Use unofficial-builds with flavor=musl and compile=false
 # For others: Use official mirror (CI) or npmmirror (local)
 MISE_NODE_MIRROR_URL = "{% if env.ALPINE_VERSION is defined %}https://unofficial-builds.nodejs.org/download/release/{% elif env.CI is defined %}https://nodejs.org/dist/{% else %}https://npmmirror.com/mirrors/node/{% endif %}"
 MISE_NODE_FLAVOR = "{% if env.ALPINE_VERSION is defined %}musl{% endif %}"
-# Force precompiled binaries for musl (never compile from source)
-MISE_NODE_COMPILE = "{% if env.ALPINE_VERSION is defined %}never{% endif %}"
+# Disable source compilation for musl (node.compile is boolean: true/false)
+MISE_NODE_COMPILE = "{% if env.ALPINE_VERSION is defined %}false{% endif %}"
 
 # Python & pip acceleration
 PIP_INDEX_URL = "{% if env.CI is defined %}https://pypi.org/simple{% else %}https://mirrors.aliyun.com/pypi/simple{% endif %}"

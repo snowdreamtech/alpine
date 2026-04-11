@@ -23,8 +23,9 @@ install_runtime_node() {
     # Set node flavor to musl in mise settings (persists across commands)
     mise settings set node.flavor musl 2>/dev/null || log_warn "Failed to set node.flavor setting"
 
-    # Also set compile mode to never (force precompiled binaries)
-    mise settings set node.compile never 2>/dev/null || log_warn "Failed to set node.compile setting"
+    # Disable source compilation (node.compile is a boolean, not "never")
+    # Setting to false forces mise to use precompiled binaries only
+    mise settings set node.compile false 2>/dev/null || log_warn "Failed to set node.compile setting"
 
     # Verify settings
     log_debug "Node flavor: $(mise settings get node.flavor 2>/dev/null || echo 'not set')"
