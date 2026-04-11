@@ -308,6 +308,7 @@ jobs:
           release-type: simple
           config-file: .release-please-config.json
           signoff: "github-actions[bot] <github-actions[bot]@users.noreply.github.com>"
+          target-branch: ${{ github.ref_name }}
 
       - name: "🏗️ Checkout Release PR Branch"
         if: ${{ steps.release.outputs.pr }}
