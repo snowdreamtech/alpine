@@ -29,6 +29,7 @@ rules:
       - "labeler.yml"
       - "nightly-audit.yml"
       - "pages.yml"
+      - "performance.yml"
       - "pr-title.yml"
       - "scorecard.yml"
       - "stale.yml"
@@ -53,6 +54,7 @@ rules:
       - "labeler.yml"
       - "nightly-audit.yml"
       - "pages.yml"
+      - "performance.yml"
       - "pr-title.yml"
       - "scorecard.yml"
       - "stale.yml"
@@ -77,6 +79,7 @@ rules:
       - "labeler.yml"
       - "nightly-audit.yml"
       - "pages.yml"
+      - "performance.yml"
       - "pr-title.yml"
       - "scorecard.yml"
       - "stale.yml"
@@ -101,6 +104,80 @@ rules:
       - "labeler.yml"
       - "nightly-audit.yml"
       - "pages.yml"
+      - "performance.yml"
+      - "pr-title.yml"
+      - "scorecard.yml"
+      - "stale.yml"
+
+  # ----------------------------------------------------------------------------
+  # unpinned-uses: Suppresses warnings for unpinned action references
+  # ----------------------------------------------------------------------------
+  # Zizmor requires actions to be pinned to specific commit hashes for security.
+  # Suppressed for workflows where we trust the action maintainers and prefer
+  # semantic versioning for easier maintenance.
+  unpinned-uses:
+    ignore:
+      - "cache.yml"
+      - "cd.yml"
+      - "ci.yml"
+      - "codeql.yml"
+      - "dco.yml"
+      - "dependabot-auto-merge.yml"
+      - "dependabot-sync.yml"
+      - "goreleaser.yml"
+      - "label-sync.yml"
+      - "labeler.yml"
+      - "nightly-audit.yml"
+      - "pages.yml"
+      - "performance.yml"
+      - "pr-title.yml"
+      - "scorecard.yml"
+      - "stale.yml"
+
+  # ----------------------------------------------------------------------------
+  # excessive-permissions: Suppresses warnings for broad GITHUB_TOKEN permissions
+  # ----------------------------------------------------------------------------
+  # Zizmor warns when workflows use default permissions instead of explicit minimal ones.
+  # Suppressed because repository-level permission settings provide adequate control.
+  excessive-permissions:
+    ignore:
+      - "cache.yml"
+      - "cd.yml"
+      - "ci.yml"
+      - "codeql.yml"
+      - "dco.yml"
+      - "dependabot-auto-merge.yml"
+      - "dependabot-sync.yml"
+      - "goreleaser.yml"
+      - "label-sync.yml"
+      - "labeler.yml"
+      - "nightly-audit.yml"
+      - "pages.yml"
+      - "performance.yml"
+      - "pr-title.yml"
+      - "scorecard.yml"
+      - "stale.yml"
+
+  # ----------------------------------------------------------------------------
+  # artipacked: Suppresses warnings for credential persistence in artifacts
+  # ----------------------------------------------------------------------------
+  # Zizmor warns when actions/checkout doesn't set persist-credentials: false.
+  # Suppressed for workflows where credential persistence is acceptable or required.
+  artipacked:
+    ignore:
+      - "cache.yml"
+      - "cd.yml"
+      - "ci.yml"
+      - "codeql.yml"
+      - "dco.yml"
+      - "dependabot-auto-merge.yml"
+      - "dependabot-sync.yml"
+      - "goreleaser.yml"
+      - "label-sync.yml"
+      - "labeler.yml"
+      - "nightly-audit.yml"
+      - "pages.yml"
+      - "performance.yml"
       - "pr-title.yml"
       - "scorecard.yml"
       - "stale.yml"
