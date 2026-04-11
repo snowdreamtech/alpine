@@ -1851,12 +1851,17 @@ verify_binary_exists() {
 
   [ -z "${_BIN:-}" ] && return 1
 
-  # Method 1: Check if in PATH
+  # Method 1: Check if mise can find it (most reliable in CI)
+  if mise which "${_BIN:-}" >/dev/null 2>&1; then
+    return 0
+  fi
+
+  # Method 2: Check if in PATH
   if ! command -v "${_BIN:-}" >/dev/null 2>&1; then
     return 1
   fi
 
-  # Method 2: Try to execute it with timeout protection
+  # Method 3: Try to execute it with timeout protection
   # CRITICAL: For mise shims, direct execution may fail with "not currently active"
   # We need to handle this gracefully by checking if it's a shim
   local _BIN_PATH
