@@ -258,7 +258,21 @@ main() {
     # logical case: call package manager audit command
     # NOTE: Some registries (like npmmirror.com) do not support the audit endpoint.
     # We use the official registry for the audit scan to ensure reliability.
-    exec "${_RESOLVED_BIN_WRAP:-}" audit --registry="${NPM_AUDIT_REGISTRY:-https://registry.npmjs.org}" "$@"
+
+    # On Windows, we need to handle .cmd/.exe wrappers carefully
+    # Use the package manager command directly instead of relying on resolved path
+    local _PKG_MGR="${NPM:-pnpm}"
+
+    # Verify the package manager is available
+    if ! command -v "${_PKG_MGR:-}" >/dev/null 2>&1; then
+      log_error "Package manager '${_PKG_MGR:-}' not found in PATH"
+      exit 1
+    fi
+
+    # Execute audit with explicit command invocation (not exec)
+    # This ensures proper argument passing on Windows
+    "${_PKG_MGR:-}" audit --registry="${NPM_AUDIT_REGISTRY:-https://registry.npmjs.org}" "$@"
+    exit $?
   fi
 
   exec "${_RESOLVED_BIN_WRAP:-}" "$@"
