@@ -95,7 +95,7 @@ jobs:
       - name: "📂 Checkout Repository Code"
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
         with:
-          token: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           persist-credentials: true
           ref: ${{ github.ref }}
 
@@ -117,7 +117,7 @@ jobs:
           make setup
           make install
         env:
-          MISE_GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
+          MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "🩺 Verify Environment Health"
         shell: sh
@@ -126,7 +126,7 @@ jobs:
         run: |
           make check-env
         env:
-          MISE_GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
+          MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "🧪 Run Generator Smoke Test"
         shell: sh
