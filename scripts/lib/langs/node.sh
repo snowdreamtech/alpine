@@ -20,6 +20,18 @@ install_runtime_node() {
   if [ -f /etc/alpine-release ] || [ "${ALPINE_VERSION:-}" != "" ]; then
     log_info "Alpine/musl environment detected. Configuring mise for musl binaries..."
 
+    # Check if bash is installed (required by npm)
+    if ! command -v bash >/dev/null 2>&1; then
+      log_warn "bash is not installed. npm requires bash to function properly."
+      log_info "Installing bash via apk..."
+      if command -v apk >/dev/null 2>&1; then
+        apk add --no-cache bash >/dev/null 2>&1 || log_error "Failed to install bash. Please run: apk add bash"
+      else
+        log_error "apk not found. Please install bash manually before installing Node.js"
+        return 1
+      fi
+    fi
+
     # Set node flavor to musl in mise settings (persists across commands)
     mise settings set node.flavor musl 2>/dev/null || log_warn "Failed to set node.flavor setting"
 

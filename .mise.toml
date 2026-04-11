@@ -112,6 +112,8 @@ NODEJS_ORG_MIRROR = "{% if env.CI is defined %}https://nodejs.org/dist/{% else %
 # 2. Only provides precompiled musl binaries (node-vX.Y.Z-linux-ARCH-musl.tar.gz)
 # 3. Does NOT provide source tarballs (node-vX.Y.Z.tar.gz)
 # 4. Binary naming includes "-musl" suffix
+# 5. IMPORTANT: npm requires bash, which is not installed by default in Alpine
+#    You must install bash first: apk add bash
 #
 # For Alpine/musl: Use unofficial-builds with flavor=musl and compile=false
 # For others: Use official mirror (CI) or npmmirror (local)
