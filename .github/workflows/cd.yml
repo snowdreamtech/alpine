@@ -287,7 +287,7 @@ jobs:
   release-please:
     name: "🚀 Release Orchestration"
     needs: [verify]
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && github.ref_name == 'main'
     runs-on: ubuntu-latest
     environment: internal
     concurrency:
