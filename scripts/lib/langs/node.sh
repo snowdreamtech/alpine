@@ -13,6 +13,24 @@ install_runtime_node() {
     return 0
   fi
 
+  # Alpine/musl detection and configuration
+  # CRITICAL: unofficial-builds.nodejs.org does NOT provide source tarballs
+  # It only provides precompiled musl binaries with "-musl" suffix in filename
+  # We must configure mise to use the correct flavor BEFORE installation
+  if [ -f /etc/alpine-release ] || [ "${ALPINE_VERSION:-}" != "" ]; then
+    log_info "Alpine/musl environment detected. Configuring mise for musl binaries..."
+
+    # Set node flavor to musl in mise settings (persists across commands)
+    mise settings set node.flavor musl 2>/dev/null || log_warn "Failed to set node.flavor setting"
+
+    # Also set compile mode to never (force precompiled binaries)
+    mise settings set node.compile never 2>/dev/null || log_warn "Failed to set node.compile setting"
+
+    # Verify settings
+    log_debug "Node flavor: $(mise settings get node.flavor 2>/dev/null || echo 'not set')"
+    log_debug "Node compile: $(mise settings get node.compile 2>/dev/null || echo 'not set')"
+  fi
+
   # Fix: Windows Node 20 has an old bundled corepack that doesn't recognise
   # the new npm signing key (SHA256:DhQ8...). Setting COREPACK_INTEGRITY_KEYS=0
   # disables signature verification globally for this process and its children.
