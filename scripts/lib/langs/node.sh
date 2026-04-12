@@ -20,6 +20,12 @@ install_runtime_node() {
   if [ -f /etc/alpine-release ] || [ "${ALPINE_VERSION:-}" != "" ]; then
     log_info "Alpine/musl environment detected. Configuring mise for musl binaries..."
 
+    # Export ALPINE_VERSION for mise.toml template evaluation
+    # This ensures MISE_NODE_MIRROR_URL points to unofficial-builds
+    if [ -z "${ALPINE_VERSION:-}" ]; then
+      export ALPINE_VERSION="detected"
+    fi
+
     # Check if bash is installed (required by npm)
     if ! command -v bash >/dev/null 2>&1; then
       log_warn "bash is not installed. npm requires bash to function properly."
