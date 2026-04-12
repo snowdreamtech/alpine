@@ -26,6 +26,16 @@ install_runtime_node() {
       export ALPINE_VERSION="detected"
     fi
 
+    # Explicitly set mise environment variables for Node.js
+    # These override the .mise.toml template values
+    export MISE_NODE_MIRROR_URL="https://unofficial-builds.nodejs.org/download/release/"
+    export MISE_NODE_FLAVOR="musl"
+    export MISE_NODE_COMPILE="false"
+
+    log_debug "MISE_NODE_MIRROR_URL: ${MISE_NODE_MIRROR_URL:-}"
+    log_debug "MISE_NODE_FLAVOR: ${MISE_NODE_FLAVOR:-}"
+    log_debug "MISE_NODE_COMPILE: ${MISE_NODE_COMPILE:-}"
+
     # Check if bash is installed (required by npm)
     if ! command -v bash >/dev/null 2>&1; then
       log_warn "bash is not installed. npm requires bash to function properly."
