@@ -6,6 +6,17 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.0.3](https://github.com/snowdreamtech/template/compare/v0.0.2...v0.0.3) (2026-04-12)
+
+
+### Bug Fixes
+
+* **ci:** exclude unreleased version compare links from lychee checks ([6165757](https://github.com/snowdreamtech/template/commit/6165757ebf73b2d1b7abf5c738d66f6402a06f14))
+* **ci:** make link checker non-blocking to avoid false failures ([99c2ec9](https://github.com/snowdreamtech/template/commit/99c2ec99befd980c996953bd53471ded5f6d404a))
+* **ci:** pass GITHUB_TOKEN to lychee for link checking ([dfb9fd1](https://github.com/snowdreamtech/template/commit/dfb9fd185e4f1bbe4987b4e991db85a4a03639e8))
+* **ci:** use valid log level for lychee verbose option ([171e721](https://github.com/snowdreamtech/template/commit/171e7218eb1e6cf00645c27f7d9d8187e5c9bf47))
+* **docs:** update TPGi CCA link to GitHub releases page ([b061ca1](https://github.com/snowdreamtech/template/commit/b061ca1150e4dd23b47fd88b3f9992d0f97c1df8))
+
 ## [0.0.2](https://github.com/snowdreamtech/template/compare/v0.0.1...v0.0.2) (2026-04-12)
 
 
