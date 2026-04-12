@@ -56,7 +56,7 @@
   | Large text (≥ 18pt or ≥ 14pt bold) | **3:1** | ✓ required | 4.5:1 target |
   | UI components (borders, focus rings, icons) | **3:1** | ✓ required | — |
 
-- Use contrast checkers to verify: [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/), [Colour Contrast Analyser](https://www.tpgi.com/color-contrast-checker/) (desktop app, picks screen colors).
+- Use contrast checkers to verify: [WebAIM Contrast Checker](https://webaim.org/resources/contrastchecker/), [TPGi Colour Contrast Analyser](https://github.com/ThePacielloGroup/CCAe/releases) (desktop app, picks screen colors).
 - **Dark mode** MUST maintain the same contrast ratios as light mode. Verify both themes in CI and during manual review.
 
 ### Color Independence
