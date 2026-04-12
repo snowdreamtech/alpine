@@ -45,5 +45,5 @@ timeout = 20
 # User agent
 user_agent = "lychee/link-checker"
 
-# Verbose output
-verbose = true
+# Verbose output (log level)
+verbose = "info"
