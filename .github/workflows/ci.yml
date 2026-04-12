@@ -541,7 +541,7 @@ jobs:
         uses: lycheeverse/lychee-action@8646ba30535128ac92d33dfc9133794bfdd9b411 # v2.8.0
         if: ${{ always() }}
         with:
-          args: --root-dir "${{ github.workspace }}" --verbose --no-progress --cache --exclude-path ".git" --exclude-path "node_modules" --exclude-path ".venv" --exclude-path "venv" --exclude-path "env" --exclude-path "vendor" --exclude-path "dist" --exclude-path "build" --exclude-path "out" --exclude-path "target" --exclude-path ".next" --exclude-path ".nuxt" --exclude-path ".output" --exclude-path "__pycache__" --exclude-path ".specify" '**/*.md'
+          args: --config lychee.toml '**/*.md'
           fail: true
         env:
           # Pass GitHub token to avoid rate limiting and access private repos
