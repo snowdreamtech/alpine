@@ -13,6 +13,34 @@ install_runtime_python() {
     return 0
   fi
 
+  # Alpine/musl detection and build dependencies installation
+  # Python needs to be compiled from source on Alpine (no prebuilt musl binaries)
+  if [ -f /etc/alpine-release ] || [ "${ALPINE_VERSION:-}" != "" ]; then
+    log_info "Alpine/musl environment detected. Installing Python build dependencies..."
+
+    # Check if apk is available
+    if command -v apk >/dev/null 2>&1; then
+      # Install essential build dependencies for Python compilation
+      # These are required for building Python from source on Alpine
+      apk add --no-cache \
+        build-base \
+        libffi-dev \
+        openssl-dev \
+        bzip2-dev \
+        zlib-dev \
+        xz-dev \
+        readline-dev \
+        sqlite-dev \
+        tk-dev \
+        ncurses-dev \
+        gdbm-dev \
+        libnsl-dev \
+        libtirpc-dev \
+        linux-headers ||
+        log_warn "Failed to install some Python build dependencies. Compilation may fail."
+    fi
+  fi
+
   # 1. Runtime initialization
   local _VERSION="${VER_PYTHON:-}"
   run_mise install "python@${_VERSION:-}"
