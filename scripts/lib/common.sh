@@ -2560,6 +2560,11 @@ is_version_match() {
   [ "${_CUR_V_M:- -}" = "-" ] && return 1
   [ -z "${_REQ_V_M:-}" ] && return 1
   [ "${_REQ_V_M:-}" = "latest" ] && return 0
+
+  # Normalize versions: strip leading 'v' or 'V' prefix (Robustness Principle - input tolerance)
+  _CUR_V_M=$(echo "${_CUR_V_M:-}" | sed 's/^[vV]//')
+  _REQ_V_M=$(echo "${_REQ_V_M:-}" | sed 's/^[vV]//')
+
   # Use prefix match to handle diffs like 3.12.0.2 (pkg) vs 3.12.0 (binary)
   case "${_REQ_V_M:-}" in "${_CUR_V_M:-}"*) return 0 ;; esac
   return 1
