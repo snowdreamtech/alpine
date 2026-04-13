@@ -72,7 +72,7 @@ jobs:
         shell: bash
 
       - name: Upload performance artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: performance-data-${{ matrix.platform }}
           path: |
