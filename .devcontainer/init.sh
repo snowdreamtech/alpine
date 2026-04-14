@@ -248,7 +248,7 @@ fi
 log_step "🔐 Setting up GPG program path..."
 if command -v gpg >/dev/null 2>&1; then
   GPG_PATH="$(command -v gpg)"
-  git config --local gpg.program "$GPG_PATH"
+  git config --global gpg.program "$GPG_PATH"
   GPG_VERSION=$(gpg --version 2>/dev/null | head -1 || echo "unknown")
   log_success "GPG program: $GPG_PATH ($GPG_VERSION)"
 
@@ -280,14 +280,14 @@ else
   fi
 
   if [ -n "$GIT_USER_NAME" ]; then
-    git config --local user.name "$GIT_USER_NAME"
+    git config --global user.name "$GIT_USER_NAME"
     log_detail "Git user: $GIT_USER_NAME"
   else
     log_warning "Git user name not configured"
   fi
 
   if [ -n "$GIT_USER_EMAIL" ]; then
-    git config --local user.email "$GIT_USER_EMAIL"
+    git config --global user.email "$GIT_USER_EMAIL"
     log_detail "Git email: $GIT_USER_EMAIL"
   else
     log_warning "Git email not configured"
@@ -305,24 +305,24 @@ log_step "🔑 Configuring git signing..."
 if ! command -v git >/dev/null 2>&1; then
   log_error "Git not found - skipping signing configuration"
 elif SIGNING_KEY=$(git config --global user.signingkey 2>/dev/null); then
-  git config --local user.signingkey "$SIGNING_KEY"
+  git config --global user.signingkey "$SIGNING_KEY"
 
   # Check if GPG can sign with this key only if GPG is available
   if command -v gpg >/dev/null 2>&1; then
     if gpg --list-secret-keys "$SIGNING_KEY" >/dev/null 2>&1; then
-      git config --local commit.gpgsign true
+      git config --global commit.gpgsign true
       log_success "Git signing enabled with key: $SIGNING_KEY"
     else
       log_warning "Signing key not accessible in GPG: $SIGNING_KEY"
-      git config --local commit.gpgsign false || true
+      git config --global commit.gpgsign false || true
     fi
   else
     log_warning "GPG not available - cannot verify signing key"
-    git config --local commit.gpgsign false || true
+    git config --global commit.gpgsign false || true
   fi
 else
   log_warning "No global signing key found"
-  git config --local commit.gpgsign false || true
+  git config --global commit.gpgsign false || true
 fi
 
 # Step 11: Install project dependencies (optional)
@@ -375,8 +375,8 @@ log_detail "  - Git user: ${GIT_USER_NAME:-<not configured>}"
 log_detail "  - Warnings: $WARNINGS | Errors: $ERRORS"
 log_detail ""
 log_detail "📖 Useful commands:"
-log_detail '  - View git config: git config --local --list'
-log_detail "  - Test GPG signing: git config --local commit.gpgsign true"
+log_detail '  - View git config: git config --global --list'
+log_detail "  - Test GPG signing: git config --global commit.gpgsign true"
 log_detail "  - Show this script: cat .devcontainer/init.sh"
 log_detail "  - Run with logging: LOG_FILE=init.log sh .devcontainer/init.sh"
 log_detail "  - Run in debug mode: DEBUG=1 VERBOSE=1 sh .devcontainer/init.sh"
