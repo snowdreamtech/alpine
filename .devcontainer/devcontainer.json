@@ -4,11 +4,9 @@
   "remoteUser": "root",
   "forwardPorts": [],
   "mounts": [
-    "source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached",
     "source=${localEnv:HOME},target=/host-home,type=bind,consistency=cached,readonly",
     "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
   ],
-  "initializeCommand": "mkdir -p ${localEnv:HOME}/.ssh",
   "containerEnv": {
     "ENABLE_GITHUB_PROXY": "0",
     "MISE_QUIET": "0",
