@@ -5,6 +5,10 @@
 
 set -eu
 
+# Disable mise config trust errors in this script
+export MISE_IGNORE_MISE_TOML=1
+export MISE_WARN_UNTRUSTED=0
+
 # Colors for output
 GREEN='\033[0;32m'
 BLUE='\033[0;34m'
@@ -14,7 +18,7 @@ NC='\033[0m'
 
 # Verbosity control
 VERBOSE="${VERBOSE:-0}"
-DEBUG="${DEBUG:-0}"
+DEBUG="${DEBUG:-0}" # Use 0 or 1, not 'false'
 LOG_FILE="${LOG_FILE:-}"
 SKIP_DEPS="${SKIP_DEPS:-0}"
 
@@ -52,6 +56,13 @@ log_detail() {
 
 echo "${BLUE}=== Initializing Devcontainer ===${NC}"
 log_detail "Start time: $(date)"
+
+# Step 0: Trust mise configuration early (before any operations)
+if command -v mise >/dev/null 2>&1; then
+  if mise trust -a 2>/dev/null; then
+    log_detail "mise configuration pre-trusted"
+  fi
+fi
 
 # Step 0: Copy host configurations (if available)
 log_step "📋 Copying host configurations..."
@@ -225,7 +236,7 @@ if command -v gpg >/dev/null 2>&1; then
   log_success "GPG program: $GPG_PATH ($GPG_VERSION)"
 
   # Verify GPG functionality
-  if [ "$DEBUG" -eq 1 ]; then
+  if [ "${DEBUG:-0}" -eq 1 ]; then
     if gpg --list-secret-keys >/dev/null 2>&1; then
       log_detail "GPG can access private keys"
     else
@@ -307,10 +318,18 @@ elif [ ! -f "Makefile" ]; then
   log_warning "Makefile not found - cannot install dependencies"
 else
   log_detail "Running: make setup install"
-  if make setup install 2>&1 | tee -a "$LOG_FILE"; then
-    log_success "Dependencies installed successfully"
+  if [ -n "$LOG_FILE" ]; then
+    if make setup install 2>&1 | tee -a "$LOG_FILE"; then
+      log_success "Dependencies installed successfully"
+    else
+      log_error "Dependency installation failed - continuing anyway"
+    fi
   else
-    log_error "Dependency installation failed - continuing anyway"
+    if make setup install 2>&1; then
+      log_success "Dependencies installed successfully"
+    else
+      log_error "Dependency installation failed - continuing anyway"
+    fi
   fi
 fi
 
