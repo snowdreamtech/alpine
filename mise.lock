@@ -648,6 +648,10 @@ backend = "pipx:clang-format"
 version = "4.5.1"
 backend = "pipx:pre-commit"
 
+[[tools."pipx:yamllint"]]
+version = "1.38.0"
+backend = "pipx:yamllint"
+
 [[tools.python]]
 version = "3.14.3"
 backend = "core:python"
