@@ -90,20 +90,15 @@ else
   log_success "Home directory accessible"
 fi
 
-# Step 3: Trust and bootstrap mise
+# Step 3: Trust mise configuration
 log_step "📦 Setting up mise..."
 if ! command -v mise >/dev/null 2>&1; then
   log_error "mise not found in PATH - skipping"
 else
   if mise trust -a 2>/dev/null; then
-    log_detail "mise configuration trusted"
+    log_success "mise configuration trusted"
   else
     log_warning "Failed to trust mise configuration"
-  fi
-  if mise bootstrap 2>/dev/null; then
-    log_success "mise tools bootstrapped"
-  else
-    log_warning "Failed to bootstrap some mise tools"
   fi
 fi
 
