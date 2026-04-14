@@ -8,6 +8,7 @@ services:
     user: root
     cap_add:
       - SYS_ADMIN
+    command: sleep infinity
     environment:
       ENABLE_GITHUB_PROXY: "0"
       MISE_QUIET: "0"
