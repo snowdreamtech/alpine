@@ -125,7 +125,7 @@ if command -v docker >/dev/null 2>&1; then
     log_warning "Docker command found but socket not available at /var/run/docker.sock"
   fi
 else
-  log_detail "Docker not installed (optional)"
+  log_detail "Docker client not installed in container (optional)"
 fi
 
 # Step 1: Detect environment
@@ -238,39 +238,45 @@ fi
 
 # Step 7: Configure git user information
 log_step "👤 Configuring git user information..."
-GIT_USER_NAME="${GIT_USER_NAME:-}"
-GIT_USER_EMAIL="${GIT_USER_EMAIL:-}"
-
-if [ -z "$GIT_USER_NAME" ]; then
-  GIT_USER_NAME=$(git config --global user.name 2>/dev/null || echo "")
-fi
-if [ -z "$GIT_USER_EMAIL" ]; then
-  GIT_USER_EMAIL=$(git config --global user.email 2>/dev/null || echo "")
-fi
-
-if [ -n "$GIT_USER_NAME" ]; then
-  git config --local user.name "$GIT_USER_NAME"
-  log_detail "Git user: $GIT_USER_NAME"
+if ! command -v git >/dev/null 2>&1; then
+  log_error "Git not found in PATH - skipping git configuration"
 else
-  log_warning "Git user name not configured"
-fi
+  GIT_USER_NAME="${GIT_USER_NAME:-}"
+  GIT_USER_EMAIL="${GIT_USER_EMAIL:-}"
 
-if [ -n "$GIT_USER_EMAIL" ]; then
-  git config --local user.email "$GIT_USER_EMAIL"
-  log_detail "Git email: $GIT_USER_EMAIL"
-else
-  log_warning "Git email not configured"
-fi
+  if [ -z "$GIT_USER_NAME" ]; then
+    GIT_USER_NAME=$(git config --global user.name 2>/dev/null || echo "")
+  fi
+  if [ -z "$GIT_USER_EMAIL" ]; then
+    GIT_USER_EMAIL=$(git config --global user.email 2>/dev/null || echo "")
+  fi
 
-if [ -n "$GIT_USER_NAME" ] && [ -n "$GIT_USER_EMAIL" ]; then
-  log_success "Git user information configured"
-else
-  log_warning "Git user info incomplete - configure with: git config --global user.name/email"
+  if [ -n "$GIT_USER_NAME" ]; then
+    git config --local user.name "$GIT_USER_NAME"
+    log_detail "Git user: $GIT_USER_NAME"
+  else
+    log_warning "Git user name not configured"
+  fi
+
+  if [ -n "$GIT_USER_EMAIL" ]; then
+    git config --local user.email "$GIT_USER_EMAIL"
+    log_detail "Git email: $GIT_USER_EMAIL"
+  else
+    log_warning "Git email not configured"
+  fi
+
+  if [ -n "$GIT_USER_NAME" ] && [ -n "$GIT_USER_EMAIL" ]; then
+    log_success "Git user information configured"
+  else
+    log_warning "Git user info incomplete - configure with: git config --global user.name/email"
+  fi
 fi
 
 # Step 8: Configure git signing key
 log_step "🔑 Configuring git signing..."
-if SIGNING_KEY=$(git config --global user.signingkey 2>/dev/null); then
+if ! command -v git >/dev/null 2>&1; then
+  log_error "Git not found - skipping signing configuration"
+elif SIGNING_KEY=$(git config --global user.signingkey 2>/dev/null); then
   git config --local user.signingkey "$SIGNING_KEY"
 
   # Check if GPG can sign with this key only if GPG is available
@@ -295,16 +301,16 @@ fi
 log_step "📥 Installing project dependencies..."
 if [ "$SKIP_DEPS" -eq 1 ]; then
   log_detail "Skipping dependency installation (SKIP_DEPS=1)"
+elif ! command -v make >/dev/null 2>&1; then
+  log_warning "make command not found - cannot install dependencies"
+elif [ ! -f "Makefile" ]; then
+  log_warning "Makefile not found - cannot install dependencies"
 else
-  if [ ! -f "Makefile" ]; then
-    log_warning "Makefile not found - cannot install dependencies"
+  log_detail "Running: make setup install"
+  if make setup install 2>&1 | tee -a "$LOG_FILE"; then
+    log_success "Dependencies installed successfully"
   else
-    log_detail "Running: make setup install"
-    if make setup install 2>&1 | tee -a "$LOG_FILE"; then
-      log_success "Dependencies installed successfully"
-    else
-      log_error "Dependency installation failed - continuing anyway"
-    fi
+    log_error "Dependency installation failed - continuing anyway"
   fi
 fi
 
