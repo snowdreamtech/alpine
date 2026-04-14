@@ -6,6 +6,30 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.2.0](https://github.com/snowdreamtech/template/compare/v0.1.0...v0.2.0) (2026-04-14)
+
+
+### Features
+
+* **devcontainer:** add Docker availability check in init script ([7ca1fe4](https://github.com/snowdreamtech/template/commit/7ca1fe4c37ada1893e94e9ac28ec578952c1d99e))
+* **mise:** add yamllint to core tools in mise.toml ([406bbb3](https://github.com/snowdreamtech/template/commit/406bbb32f3a9f47bdfee72e2422b273a6cab252b))
+
+
+### Bug Fixes
+
+* **devcontainer:** add command availability checks before usage ([a0a4ce0](https://github.com/snowdreamtech/template/commit/a0a4ce0d1bed246c722270f920e79f2046a1bfe7))
+* **devcontainer:** add command to keep container running ([5484045](https://github.com/snowdreamtech/template/commit/54840456dfb76e040655d49cf28b45e9b64ead1d))
+* **devcontainer:** add workspace volume mount and fix configuration ([9ff708b](https://github.com/snowdreamtech/template/commit/9ff708be2aa74af62eae40012f163229bb688296))
+* **devcontainer:** add YAML document start marker for yamllint ([44ccf81](https://github.com/snowdreamtech/template/commit/44ccf8108ad6ea15b92069f15bbc1ce852723ec0))
+* **devcontainer:** correct updateContentCommand to use make install ([774bba2](https://github.com/snowdreamtech/template/commit/774bba245b5025973492b2cd8fb10826eae7af12))
+* **devcontainer:** handle missing host directories gracefully ([9b79301](https://github.com/snowdreamtech/template/commit/9b7930189a20c8c44983a739d80ec05d8b5987f5))
+* **devcontainer:** use global git config instead of local ([934bb1c](https://github.com/snowdreamtech/template/commit/934bb1c3bec475b571daab4168cdd233d10b6816))
+* **mise:** update yamllint version to match versions.sh ([d9bcf61](https://github.com/snowdreamtech/template/commit/d9bcf61f7092f248186d41ceb66fcd98d3015a34))
+* resolve devcontainer startup with docker-compose configuration ([fa788e4](https://github.com/snowdreamtech/template/commit/fa788e4f3c94e767f465eea9f17acb4ab8f4a01e))
+* **setup:** ensure yaml and toml modules are always installed locally ([7ca7026](https://github.com/snowdreamtech/template/commit/7ca7026761c0a58a939935db83e37922a872a243))
+* **tools:** complete taplo provider migration to npm ([cdeaf76](https://github.com/snowdreamtech/template/commit/cdeaf762d62dfde4a14d90136cf298fe4c8e125d))
+* **tools:** switch taplo from GitHub source to npm precompiled binary ([18de234](https://github.com/snowdreamtech/template/commit/18de2342744562645b849d24edbd94e6524259d1))
+
 ## [0.1.0](https://github.com/snowdreamtech/template/compare/v0.0.4...v0.1.0) (2026-04-14)
 
 
