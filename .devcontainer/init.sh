@@ -53,7 +53,35 @@ log_detail() {
 echo "${BLUE}=== Initializing Devcontainer ===${NC}"
 log_detail "Start time: $(date)"
 
-# Step 0: Check prerequisite tools
+# Step 0: Copy host configurations (if available)
+log_step "📋 Copying host configurations..."
+HOST_HOME="${HOST_HOME:-/host-home}"
+
+# Copy .gitconfig if available from host
+if [ -f "$HOST_HOME/.gitconfig" ]; then
+  if cp "$HOST_HOME/.gitconfig" "$HOME/.gitconfig" 2>/dev/null; then
+    log_detail "Copied .gitconfig from host"
+  else
+    log_warning "Failed to copy .gitconfig"
+  fi
+fi
+
+# Copy .gitconfig.local if available from host
+if [ -f "$HOST_HOME/.gitconfig.local" ]; then
+  cp "$HOST_HOME/.gitconfig.local" "$HOME/.gitconfig.local" 2>/dev/null && log_detail "Copied .gitconfig.local from host"
+fi
+
+# Copy .gnupg if available from host (preserve permissions)
+if [ -d "$HOST_HOME/.gnupg" ]; then
+  if cp -r "$HOST_HOME/.gnupg" "$HOME/.gnupg" 2>/dev/null; then
+    chmod 700 "$HOME/.gnupg"
+    log_detail "Copied .gnupg from host"
+  else
+    log_warning "Failed to copy .gnupg"
+  fi
+fi
+
+# Step 1: Check prerequisite tools
 log_step "🔧 Checking prerequisite tools..."
 MISSING_TOOLS=""
 for tool in git gpg ssh; do
