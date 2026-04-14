@@ -18,4 +18,5 @@ services:
     volumes:
       - ${HOME}:/host-home:ro,cached
       - /var/run/docker.sock:/var/run/docker.sock:rw
+      - ../:/workspaces/template:cached
     working_dir: /workspaces/template

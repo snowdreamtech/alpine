@@ -3,7 +3,6 @@
   "dockerComposeFile": "docker-compose.yml",
   "service": "devcontainer",
   "remoteUser": "root",
-  "workspaceMount": "source=${localWorkspaceFolder},target=/workspaces/template,type=bind,consistency=cached",
   "workspaceFolder": "/workspaces/template",
   "forwardPorts": [],
   "containerEnv": {
