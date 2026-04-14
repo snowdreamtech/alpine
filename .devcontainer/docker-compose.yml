@@ -1,0 +1,20 @@
+version: "3.8"
+
+services:
+  devcontainer:
+    image: ghcr.io/snowdreamtech/devcontainers:debian
+    container_name: devcontainer
+    hostname: devcontainer
+    user: root
+    cap_add:
+      - SYS_ADMIN
+    environment:
+      ENABLE_GITHUB_PROXY: "0"
+      MISE_QUIET: "0"
+      MISE_IGNORE_MISE_TOML: "1"
+      MISE_WARN_UNTRUSTED: "0"
+      HOST_HOME: /host-home
+    volumes:
+      - ${HOME}:/host-home:ro,cached
+      - /var/run/docker.sock:/var/run/docker.sock:rw
+    working_dir: /workspaces/template
