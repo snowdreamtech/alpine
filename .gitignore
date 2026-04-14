@@ -706,3 +706,4 @@ test-results/
 *.7z
 # docs/package.json
 .setup.lock
+.pnpm-store

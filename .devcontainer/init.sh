@@ -22,6 +22,11 @@ DEBUG="${DEBUG:-0}" # Use 0 or 1, not 'false'
 LOG_FILE="${LOG_FILE:-}"
 SKIP_DEPS="${SKIP_DEPS:-0}"
 
+# Convert string booleans to 0/1 for arithmetic comparisons
+case "$DEBUG" in true | yes | 1) DEBUG=1 ;; false | no | 0 | "") DEBUG=0 ;; esac
+case "$VERBOSE" in true | yes | 1) VERBOSE=1 ;; false | no | 0 | "") VERBOSE=0 ;; esac
+case "$SKIP_DEPS" in true | yes | 1) SKIP_DEPS=1 ;; false | no | 0 | "") SKIP_DEPS=0 ;; esac
+
 # Counters for summary
 WARNINGS=0
 ERRORS=0
@@ -29,29 +34,29 @@ START_TIME=$(date +%s)
 
 log_info() {
   echo "${BLUE}ℹ $*${NC}"
-  [ -n "$LOG_FILE" ] && echo "INFO: $*" >>"$LOG_FILE"
+  [ -n "$LOG_FILE" ] && echo "INFO: $*" >>"$LOG_FILE" || true
 }
 log_success() {
   echo "${GREEN}✓ $*${NC}"
-  [ -n "$LOG_FILE" ] && echo "SUCCESS: $*" >>"$LOG_FILE"
+  [ -n "$LOG_FILE" ] && echo "SUCCESS: $*" >>"$LOG_FILE" || true
 }
 log_step() {
   echo "${GREEN}$*${NC}"
-  [ -n "$LOG_FILE" ] && echo "STEP: $*" >>"$LOG_FILE"
+  [ -n "$LOG_FILE" ] && echo "STEP: $*" >>"$LOG_FILE" || true
 }
 log_warning() {
   echo "${YELLOW}⚠ $*${NC}"
   WARNINGS=$((WARNINGS + 1))
-  [ -n "$LOG_FILE" ] && echo "WARN: $*" >>"$LOG_FILE"
+  [ -n "$LOG_FILE" ] && echo "WARN: $*" >>"$LOG_FILE" || true
 }
 log_error() {
   echo "${RED}✗ $*${NC}"
   ERRORS=$((ERRORS + 1))
-  [ -n "$LOG_FILE" ] && echo "ERROR: $*" >>"$LOG_FILE"
+  [ -n "$LOG_FILE" ] && echo "ERROR: $*" >>"$LOG_FILE" || true
 }
 log_detail() {
   [ "$VERBOSE" -eq 1 ] && echo "${YELLOW}  $*${NC}" || true
-  [ -n "$LOG_FILE" ] && echo "DETAIL: $*" >>"$LOG_FILE"
+  [ -n "$LOG_FILE" ] && echo "DETAIL: $*" >>"$LOG_FILE" || true
 }
 
 echo "${BLUE}=== Initializing Devcontainer ===${NC}"
@@ -59,12 +64,24 @@ log_detail "Start time: $(date)"
 
 # Step 0: Trust mise configuration early (before any operations)
 if command -v mise >/dev/null 2>&1; then
-  if mise trust -a 2>/dev/null; then
-    log_detail "mise configuration pre-trusted"
-  fi
+  # Try to trust mise configurations - retry up to 3 times
+  MISE_TRUST_ATTEMPTS=0
+  MISE_TRUST_MAX=3
+  while [ $MISE_TRUST_ATTEMPTS -lt $MISE_TRUST_MAX ]; do
+    MISE_TRUST_ATTEMPTS=$((MISE_TRUST_ATTEMPTS + 1))
+    if mise trust -a 2>/dev/null; then
+      log_detail "mise configuration pre-trusted (attempt $MISE_TRUST_ATTEMPTS)"
+      break
+    elif [ $MISE_TRUST_ATTEMPTS -lt $MISE_TRUST_MAX ]; then
+      log_detail "mise trust attempt $MISE_TRUST_ATTEMPTS/$MISE_TRUST_MAX failed, retrying..."
+      sleep 1
+    else
+      log_detail "mise trust failed after $MISE_TRUST_MAX attempts (continuing anyway)"
+    fi
+  done || true
 fi
 
-# Step 0: Copy host configurations (if available)
+# Step 1: Copy host configurations (if available)
 log_step "📋 Copying host configurations..."
 HOST_HOME="${HOST_HOME:-/host-home}"
 
@@ -111,7 +128,7 @@ if [ -d "$HOST_HOME/.gnupg" ]; then
   fi
 fi
 
-# Step 1: Check prerequisite tools
+# Step 2: Check prerequisite tools
 log_step "🔧 Checking prerequisite tools..."
 MISSING_TOOLS=""
 for tool in git gpg ssh; do
@@ -139,7 +156,7 @@ else
   log_detail "Docker client not installed in container (optional)"
 fi
 
-# Step 1: Detect environment
+# Step 3: Detect environment
 log_step "🔍 Detecting container environment..."
 if [ -f /.dockerenv ]; then
   log_detail "Running in Docker container"
@@ -152,7 +169,7 @@ CONTAINER_USER="${CONTAINER_USER:-$(whoami)}"
 log_detail "Container user: $CONTAINER_USER"
 log_detail "Home directory: $HOME"
 
-# Step 2: Verify home directory permissions
+# Step 4: Verify home directory permissions
 log_step "🏠 Verifying home directory..."
 if [ ! -d "$HOME" ]; then
   log_error "Home directory not found: $HOME"
@@ -164,7 +181,7 @@ else
   log_success "Home directory accessible"
 fi
 
-# Step 3: Trust mise configuration
+# Step 5: Setup mise
 log_step "📦 Setting up mise..."
 if ! command -v mise >/dev/null 2>&1; then
   log_error "mise not found in PATH - skipping"
@@ -176,7 +193,7 @@ else
   fi
 fi
 
-# Step 4: Verify SSH configuration
+# Step 6: Verify SSH configuration
 log_step "🔑 Verifying SSH configuration..."
 SSH_KEYS_FOUND=0
 if [ -d "$HOME/.ssh" ]; then
@@ -189,7 +206,7 @@ else
   log_warning "SSH directory not found at $HOME/.ssh"
 fi
 
-# Step 5: Configure GPG permissions
+# Step 7: Configure GPG permissions
 log_step "🔐 Configuring GPG permissions..."
 GPG_KEYS_FOUND=0
 if [ -d "$HOME/.gnupg" ]; then
@@ -227,7 +244,7 @@ else
   log_warning "GPG directory not found at $HOME/.gnupg"
 fi
 
-# Step 6: Configure GPG program path
+# Step 8: Configure GPG program path
 log_step "🔐 Setting up GPG program path..."
 if command -v gpg >/dev/null 2>&1; then
   GPG_PATH="$(command -v gpg)"
@@ -247,7 +264,7 @@ else
   log_warning "GPG not found in PATH - signing operations may fail"
 fi
 
-# Step 7: Configure git user information
+# Step 9: Configure git user information
 log_step "👤 Configuring git user information..."
 if ! command -v git >/dev/null 2>&1; then
   log_error "Git not found in PATH - skipping git configuration"
@@ -283,7 +300,7 @@ else
   fi
 fi
 
-# Step 8: Configure git signing key
+# Step 10: Configure git signing key
 log_step "🔑 Configuring git signing..."
 if ! command -v git >/dev/null 2>&1; then
   log_error "Git not found - skipping signing configuration"
@@ -308,7 +325,7 @@ else
   git config --local commit.gpgsign false || true
 fi
 
-# Step 9: Install project dependencies (optional)
+# Step 11: Install project dependencies (optional)
 log_step "📥 Installing project dependencies..."
 if [ "$SKIP_DEPS" -eq 1 ]; then
   log_detail "Skipping dependency installation (SKIP_DEPS=1)"

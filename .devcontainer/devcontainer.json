@@ -10,8 +10,10 @@
   "containerEnv": {
     "ENABLE_GITHUB_PROXY": "0",
     "MISE_QUIET": "0",
+    "MISE_IGNORE_MISE_TOML": "1",
+    "MISE_WARN_UNTRUSTED": "0",
     "HOST_HOME": "/host-home"
   },
-  "postCreateCommand": "sh ${containerWorkspaceFolder}/.devcontainer/init.sh 2>&1 | tee /tmp/devcontainer-init.log",
+  "postCreateCommand": "VERBOSE=1 sh ${containerWorkspaceFolder}/.devcontainer/init.sh 2>&1 | tee /tmp/devcontainer-init.log",
   "postStartCommand": "echo '✅ Devcontainer is ready!'"
 }
