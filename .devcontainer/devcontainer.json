@@ -1,73 +1,37 @@
 {
   "name": "Snowdream Tech Universal Workspace",
-  "image": "mcr.microsoft.com/devcontainers/base:ubuntu",
-  "features": {
-    "ghcr.io/devcontainers/features/node:1": {
-      "version": "lts"
-    },
-    "ghcr.io/devcontainers/features/python:1": {
-      "version": "os-provided"
-    },
-    "ghcr.io/devcontainers/features/go:1": {
-      "version": "latest"
-    },
-    "ghcr.io/devcontainers/features/powershell:1": {
-      "version": "latest"
-    }
+  "image": "ghcr.io/snowdreamtech/devcontainers:debian",
+  "remoteUser": "root",
+  "workspaceFolder": "/workspaces/template",
+  "forwardPorts": [],
+  "mounts": [
+    "source=${localEnv:HOME}/.gitconfig,target=/root/.gitconfig,type=bind,consistency=cached",
+    "source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached",
+    "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind"
+  ],
+  "containerEnv": {
+    "ENABLE_GITHUB_PROXY": "0",
+    "MISE_QUIET": "0"
   },
   "customizations": {
     "vscode": {
-      "settings": {
-        "editor.formatOnSave": true,
-        "editor.codeActionsOnSave": {
-          "source.fixAll.eslint": "explicit"
-        },
-        "[python]": {
-          "editor.defaultFormatter": "charliermarsh.ruff"
-        },
-        "[go]": {
-          "editor.defaultFormatter": "golang.go"
-        }
-      },
       "extensions": [
-        "ms-ceintl.vscode-language-pack-zh-hans",
-        "file-icons.file-icons",
-        "vscode-icons-team.vscode-icons",
-        "github.github-vscode-theme",
-        "pkief.material-icon-theme",
-        "mhutchie.git-graph",
-        "wdhongtw.gpg-indicator",
-        "ms-azuretools.vscode-docker",
-        "github.vscode-github-actions",
+        "GitHub.copilot",
+        "GitHub.copilot-chat",
+        "eamodio.gitlens",
+        "gitpod.workspace-full",
+        "ms-vscode.makefile-tools",
         "esbenp.prettier-vscode",
-        "ms-python.python",
-        "charliermarsh.ruff",
-        "golang.go",
-        "Vue.volar",
-        "dsznajder.es7-react-js-snippets",
         "dbaeumer.vscode-eslint",
-        "ecmel.vscode-html-css",
-        "ritwickdey.LiveServer",
-        "redhat.ansible",
-        "wayou.vscode-todo-highlight",
-        "aaron-bond.better-comments",
-        "redhat.vscode-xml",
-        "ms-vscode.cpptools",
-        "vscjava.vscode-java-pack",
-        "usernamehw.errorlens",
-        "EditorConfig.EditorConfig",
+        "charliermarsh.ruff",
+        "ms-python.python",
+        "golang.go",
+        "rust-lang.rust-analyzer",
         "redhat.vscode-yaml",
-        "be5invis.toml",
-        "iceyer.toml-formatter",
-        "davidanson.vscode-markdownlint",
-        "shd101wyy.markdown-preview-enhanced",
-        "timonwong.shellcheck",
-        "foxundermoon.shell-format",
-        "ultram4rine.vscode-choosealicense",
-        "minherz.copyright-inserter"
+        "redhat.vscode-xml"
       ]
     }
   },
-  "postCreateCommand": "sudo chown -R vscode /tmp && make setup && make install",
-  "remoteUser": "vscode"
+  "postCreateCommand": "mise trust -a && mise bootstrap",
+  "postStartCommand": "echo '✅ Devcontainer is ready!'"
 }
