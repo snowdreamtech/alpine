@@ -2,7 +2,6 @@
   "name": "Snowdream Tech Universal Workspace",
   "image": "ghcr.io/snowdreamtech/devcontainers:debian",
   "remoteUser": "root",
-  "workspaceFolder": "/workspaces/template",
   "forwardPorts": [],
   "mounts": [
     "source=${localEnv:HOME}/.gitconfig,target=/root/.gitconfig,type=bind,consistency=cached",
@@ -16,6 +15,6 @@
     "MISE_QUIET": "0",
     "GNUPGHOME": "/root/.gnupg"
   },
-  "postCreateCommand": "sh /workspaces/template/.devcontainer/init.sh",
+  "postCreateCommand": "sh ${containerWorkspaceFolder}/.devcontainer/init.sh",
   "postStartCommand": "echo '✅ Devcontainer is ready!'"
 }
