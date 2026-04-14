@@ -15,6 +15,6 @@
     "MISE_QUIET": "0",
     "GNUPGHOME": "/root/.gnupg"
   },
-  "postCreateCommand": "mise trust -a && mise bootstrap && chmod 700 ~/.gnupg 2>/dev/null; git config --local user.signingkey \"$(git config --global user.signingkey)\" 2>/dev/null || true && git config --local commit.gpgsign true",
+  "postCreateCommand": "sh /workspaces/template/.devcontainer/init.sh",
   "postStartCommand": "echo '✅ Devcontainer is ready!'"
 }
