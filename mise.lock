@@ -499,9 +499,9 @@ url = "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_
 url_api = "https://api.github.com/repos/rhysd/actionlint/releases/assets/384924919"
 provenance = "github-attestations"
 
-[[tools."github:tamasfe/taplo"]]
-version = "0.10.0"
-backend = "github:tamasfe/taplo"
+[[tools."npm:@taplo/cli"]]
+version = "0.7.0"
+backend = "npm:@taplo/cli"
 
 [[tools."github:zizmorcore/zizmor"]]
 version = "1.23.1"
