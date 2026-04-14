@@ -90,9 +90,13 @@ main() {
     # 4. Install documentation dependencies if package.json exists
     if [ -f "$DOCS_DIR/package.json" ]; then
       log_info "Installing documentation dependencies..."
-      # use 'mise exec' to ensure pnpm is resolved via mise shims
-      # even when the mise shell integration is not activated.
-      run_mise exec -- pnpm --dir "${DOCS_DIR:-}" install
+      # Use pnpm directly with frozen lockfile for faster installation
+      # Skip if dependencies are already up to date
+      if [ ! -d "$DOCS_DIR/node_modules" ] || [ "$DOCS_DIR/package.json" -nt "$DOCS_DIR/node_modules" ]; then
+        pnpm --dir "${DOCS_DIR:-}" install --frozen-lockfile --prefer-offline
+      else
+        log_info "Dependencies are up to date, skipping install"
+      fi
     fi
 
     # 5. Resolve VitePress (check docs/node_modules/.bin via extra search paths)

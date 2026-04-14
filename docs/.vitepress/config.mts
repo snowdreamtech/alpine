@@ -8,6 +8,9 @@ export default defineConfig({
 
   base: "/template/",
 
+  // Ignore dead links for files outside docs directory
+  ignoreDeadLinks: [/\/benchmarks\//, /\/\.kiro\//],
+
   head: [["link", { rel: "icon", href: "/template/favicon.ico" }]],
 
   themeConfig: {

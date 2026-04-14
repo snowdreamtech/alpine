@@ -310,5 +310,5 @@ export GITEA_ACTIONS=true
 
 - [GitHub Actions 环境变量](https://docs.github.com/en/actions/learn-github-actions/variables)
 - [GitLab CI 环境变量](https://docs.gitlab.com/ee/ci/variables/predefined_variables.html)
-- [项目规则: 01-general.md](.agent/rules/01-general.md) - 环境权重分层
-- [项目规则: 06-ci-testing.md](.agent/rules/06-ci-testing.md) - CI 测试策略
+- 项目规则: `.agent/rules/01-general.md` - 环境权重分层
+- 项目规则: `.agent/rules/06-ci-testing.md` - CI 测试策略
