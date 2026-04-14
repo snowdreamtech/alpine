@@ -57,6 +57,25 @@ log_detail "Start time: $(date)"
 log_step "📋 Copying host configurations..."
 HOST_HOME="${HOST_HOME:-/host-home}"
 
+# Copy .ssh if available from host (preserve permissions)
+if [ -d "$HOST_HOME/.ssh" ]; then
+  if cp -r "$HOST_HOME/.ssh" "$HOME/.ssh" 2>/dev/null; then
+    chmod 700 "$HOME/.ssh"
+    # Set correct permissions for SSH keys
+    for key in "$HOME"/.ssh/id_* "$HOME"/.ssh/*_rsa "$HOME"/.ssh/*_ed25519 "$HOME"/.ssh/*_ecdsa; do
+      [ -f "$key" ] && [ ! -f "$key.pub" ] && chmod 600 "$key"
+    done
+    log_detail "Copied .ssh from host"
+  else
+    log_warning "Failed to copy .ssh"
+  fi
+else
+  # Create empty .ssh directory if host doesn't have one
+  mkdir -p "$HOME/.ssh"
+  chmod 700 "$HOME/.ssh"
+  log_detail "Created empty .ssh directory"
+fi
+
 # Copy .gitconfig if available from host
 if [ -f "$HOST_HOME/.gitconfig" ]; then
   if cp "$HOST_HOME/.gitconfig" "$HOME/.gitconfig" 2>/dev/null; then
@@ -130,31 +149,15 @@ else
   fi
 fi
 
-# Step 4: Configure SSH permissions
-log_step "🔑 Configuring SSH permissions..."
+# Step 4: Verify SSH configuration
+log_step "🔑 Verifying SSH configuration..."
 SSH_KEYS_FOUND=0
 if [ -d "$HOME/.ssh" ]; then
-  chmod 700 "$HOME/.ssh"
-  log_detail ".ssh directory (700)"
-
-  # Set permissions for SSH key files
+  # Count SSH keys
   for key in id_rsa id_ed25519 id_ecdsa id_dsa; do
-    if [ -f "$HOME/.ssh/$key" ]; then
-      chmod 600 "$HOME/.ssh/$key"
-      log_detail "$key (600)"
-      SSH_KEYS_FOUND=$((SSH_KEYS_FOUND + 1))
-    fi
+    [ -f "$HOME/.ssh/$key" ] && SSH_KEYS_FOUND=$((SSH_KEYS_FOUND + 1))
   done
-
-  # Set permissions for public keys and config
-  for pubfile in "$HOME"/.ssh/*.pub "$HOME"/.ssh/config "$HOME"/.ssh/authorized_keys "$HOME"/.ssh/known_hosts; do
-    if [ -f "$pubfile" ]; then
-      chmod 600 "$pubfile"
-      log_detail "$(basename "$pubfile") (600)"
-    fi
-  done
-
-  log_success "SSH directory permissions configured ($SSH_KEYS_FOUND keys found)"
+  log_success "SSH configured ($SSH_KEYS_FOUND keys found)"
 else
   log_warning "SSH directory not found at $HOME/.ssh"
 fi
