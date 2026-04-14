@@ -112,6 +112,22 @@ for tool in git gpg ssh; do
   fi
 done
 
+# Check Docker availability (optional but recommended)
+if command -v docker >/dev/null 2>&1; then
+  if [ -S /var/run/docker.sock ]; then
+    if docker ps >/dev/null 2>&1; then
+      DOCKER_VERSION=$(docker version --format '{{.Server.Version}}' 2>/dev/null || echo "unknown")
+      log_detail "Docker available (server: $DOCKER_VERSION)"
+    else
+      log_warning "Docker socket exists but not accessible (permission issue?)"
+    fi
+  else
+    log_warning "Docker command found but socket not available at /var/run/docker.sock"
+  fi
+else
+  log_detail "Docker not installed (optional)"
+fi
+
 # Step 1: Detect environment
 log_step "🔍 Detecting container environment..."
 if [ -f /.dockerenv ]; then
