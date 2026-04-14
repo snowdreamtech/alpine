@@ -13,25 +13,6 @@
     "ENABLE_GITHUB_PROXY": "0",
     "MISE_QUIET": "0"
   },
-  "customizations": {
-    "vscode": {
-      "extensions": [
-        "GitHub.copilot",
-        "GitHub.copilot-chat",
-        "eamodio.gitlens",
-        "gitpod.workspace-full",
-        "ms-vscode.makefile-tools",
-        "esbenp.prettier-vscode",
-        "dbaeumer.vscode-eslint",
-        "charliermarsh.ruff",
-        "ms-python.python",
-        "golang.go",
-        "rust-lang.rust-analyzer",
-        "redhat.vscode-yaml",
-        "redhat.vscode-xml"
-      ]
-    }
-  },
   "postCreateCommand": "mise trust -a && mise bootstrap",
   "postStartCommand": "echo '✅ Devcontainer is ready!'"
 }
