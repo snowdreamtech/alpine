@@ -187,6 +187,26 @@ When operating in an agentic mode equipped with system tools, AI MUST prioritize
 
 1. **The Hierarchy of Execution (Native API > Shell > Browser)**:
    - **Tier 1 (Native APIs)**: ALWAYS use native, purpose-built file manipulation APIs (e.g., `replace_file_content`, `view_file` equivalents exposed by the host IDE) as the absolute first choice.
+     - **File Modification Best Practice**: Prefer `strReplace` over `fsWrite` for existing files:
+
+       ```typescript
+       // ❌ WRONG: Rewriting entire file (risks overwriting others' changes)
+       fsWrite('.devcontainer/devcontainer.json', completeFileContent)
+       // Risks: May overwrite concurrent changes, lose previous fixes, introduce regressions
+
+       // ✅ CORRECT: Precise surgical replacement
+       strReplace({
+         path: '.devcontainer/devcontainer.json',
+         oldStr: '"workspaceFolder": "/workspaces/template",',
+         newStr: ''  // Remove this line
+       })
+       // Benefits: Minimal change scope, preserves other modifications, easier to review
+       ```
+
+     - **When to use `fsWrite`**: Only for creating new files or when the entire file structure needs to change
+     - **When to use `strReplace`**: For all modifications to existing files (99% of cases)
+     - **Why this matters**: `fsWrite` can accidentally overwrite fixes made in other branches or by other developers, leading to regression of previously resolved issues
+
    - **Tier 2 (Shell/CLI)**: If native APIs are insufficient, fall back to CLI tools (`grep`, `curl`, `jq`).
    - **Tier 3 (Browser)**: The Browser tool is the absolute last resort. Use it ONLY for rendering visual documentation, passing CAPTCHAs, or interacting with heavy client-side SPAs where CLI scraping fails.
 2. **Strict Prohibition on Dangerous Shell Text Processing**: NEVER use `cat <<EOF > file`, `sed -i`, or `echo > file` in a shell command to modify source code. These workflows are highly prone to escaping errors and context corruption.
