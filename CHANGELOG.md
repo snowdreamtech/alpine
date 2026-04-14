@@ -6,6 +6,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.1.0](https://github.com/snowdreamtech/template/compare/v0.0.4...v0.1.0) (2026-04-14)
+
+
+### Features
+
+* **devcontainer:** add comprehensive SSH and GPG permission configuration ([843180b](https://github.com/snowdreamtech/template/commit/843180b5722d20b1704e482d40b1c4a80f890fdc))
+* **devcontainer:** add support for local git config file ([2fb5e43](https://github.com/snowdreamtech/template/commit/2fb5e435b5038617746aff9837dec98865cd4d5c))
+* **devcontainer:** enable GPG signing support ([4d88e12](https://github.com/snowdreamtech/template/commit/4d88e125ddc84966237d382d897c03b1cf73da06))
+
+
+### Bug Fixes
+
+* **ci:** pin GitHub Actions to commit SHA in performance workflow ([13623d9](https://github.com/snowdreamtech/template/commit/13623d9cf5ae7a6677a8645a8d568bb39a2752a2))
+* **devcontainer:** make git config cross-platform compatible ([600052a](https://github.com/snowdreamtech/template/commit/600052ae9d9067de738a875009df7e8371099625))
+* **devcontainer:** use dynamic workspace folder variable ([73421d6](https://github.com/snowdreamtech/template/commit/73421d6f6724ae63613d30566103b55191d43c87))
+* **devcontainer:** use find instead of ls for directory permissions ([ffeaee8](https://github.com/snowdreamtech/template/commit/ffeaee833e3a9f4ad7a88d45b906ad12ca52b62d))
+* **setup:** normalize version strings in is_version_match to handle v prefix ([e5efefd](https://github.com/snowdreamtech/template/commit/e5efefdf81ca728f3b75703007cd475c6a2fa0f1))
+
 ## [0.0.4](https://github.com/snowdreamtech/template/compare/v0.0.3...v0.0.4) (2026-04-12)
 
 
