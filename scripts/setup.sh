@@ -208,7 +208,10 @@ EOF
   local _MODULES_LIST
   if [ -z "$(echo "${_RAW_ARGS:-}" | tr -d ' ')" ] || [ "${_IS_ALL_MODULES:-}" = "true" ]; then
     # Grouped list for "On-demand" (default) or "All" (explicit)
-    local _BASE_LIST="python node go base shell toml yaml markdown rust java kotlin php ruby dart swift lua cpp terraform solidity perl julia r groovy dotnet zig elixir haskell scala ada assemblyscript ballerina bun clojure crystal deno dlang duckdb elm erlang fortran fpc gleam grain haxe jsonnet kcl lean lisp luau mojo moonbit move nim ocaml odin pkl prolog pulumi racket raku rescript starlark tcl tofu typst vala vcpkg vlang wat"
+    # NOTE: yaml and toml are ESSENTIAL modules required for local pre-commit hooks
+    # (yamllint, taplo). They are listed after markdown in BASE_LIST to ensure
+    # they are always installed by default, never skipped in local development.
+    local _BASE_LIST="python node go base shell markdown yaml toml rust java kotlin php ruby dart swift lua cpp terraform solidity perl julia r groovy dotnet zig elixir haskell scala ada assemblyscript ballerina bun clojure crystal deno dlang duckdb elm erlang fortran fpc gleam grain haxe jsonnet kcl lean lisp luau mojo moonbit move nim ocaml odin pkl prolog pulumi racket raku rescript starlark tcl tofu typst vala vcpkg vlang wat"
     # Domain-specific tools: Removed sql, openapi, protobuf, runners (rarely used, install on-demand only)
     local _DOMAIN_LIST="docker security testing docs ai helm k8s terraform terragrunt tofu pulumi"
     _MODULES_LIST="${_BASE_LIST:-} ${_DOMAIN_LIST:-}"
@@ -221,8 +224,10 @@ EOF
   if ! is_ci_env && [ "${_IS_ALL_MODULES:-}" != "true" ] && [ "${SETUP_FORCE_ALL:-0}" -ne 1 ] && [ -z "$(echo "${_RAW_ARGS:-}" | tr -d ' ')" ]; then
     # Skip heavyweight and rarely-needed modules in local dev to prevent
     # long network downloads (especially GitHub-released binaries).
+    # NOTE: yaml and toml are NOT included here because they are essential
+    # for pre-commit hooks (yamllint, taplo) and must run locally for quality checks.
     # These can still be installed on-demand via: sh scripts/setup.sh <module>
-    local _HEAVY_MODULES="markdown yaml toml security docs testing ai helm k8s terragrunt grain moonbit move luau rescript starlark tcl wat pkl kcl ada assemblyscript ballerina fpc lean lisp racket prolog fortran typst"
+    local _HEAVY_MODULES="markdown security docs testing ai helm k8s terragrunt grain moonbit move luau rescript starlark tcl wat pkl kcl ada assemblyscript ballerina fpc lean lisp racket prolog fortran typst"
     local _SMART_LIST=""
     for _m in ${_MODULES_LIST:-}; do
       case " ${_HEAVY_MODULES:-} " in *" ${_m} "*)
