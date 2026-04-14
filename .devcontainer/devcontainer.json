@@ -13,6 +13,6 @@
     "ENABLE_GITHUB_PROXY": "0",
     "MISE_QUIET": "0"
   },
-  "postCreateCommand": "mise trust -a && mise bootstrap",
+  "postCreateCommand": "mise trust -a && mise bootstrap && git config --local commit.gpgsign false && git config --local gpg.program gpg",
   "postStartCommand": "echo '✅ Devcontainer is ready!'"
 }
