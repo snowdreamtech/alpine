@@ -99,7 +99,8 @@ main() {
       # Special handling for node-audit: it's a logical tool, not a real binary
       if [ "${_LINTER_WRAP:-}" = "node-audit" ]; then
         log_info "=== CI Fallback for node-audit ==="
-        local _PKG_MGR="${NPM:-pnpm}"
+        local _PKG_MGR="${NPM:-npm}"
+        # local _PKG_MGR="${NPM:-pnpm}"
         log_info "Using package manager: ${_PKG_MGR:-}"
 
         # Try to execute audit directly
@@ -280,7 +281,8 @@ main() {
 
     # On Windows, we need to handle .cmd/.exe wrappers carefully
     # Use the package manager command directly instead of relying on resolved path
-    local _PKG_MGR="${NPM:-pnpm}"
+    local _PKG_MGR="${NPM:-npm}"
+    # local _PKG_MGR="${NPM:-pnpm}"
 
     # Verify the package manager is available
     if ! command -v "${_PKG_MGR:-}" >/dev/null 2>&1; then
