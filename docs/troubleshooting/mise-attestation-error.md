@@ -248,6 +248,7 @@ mise lock
 
 ## 相关链接
 
+- [Mise 配置最佳实践](../reference/mise-configuration.md) - mise 配置标准和安全要求
 - [GitHub Artifact Attestations 文档](https://docs.github.com/en/actions/security-for-github-actions/using-artifact-attestations/using-artifact-attestations-to-establish-provenance-for-builds)
 - [Aqua Registry](https://github.com/aquaproj/aqua-registry)
 - [Mise 文档](https://mise.jdx.dev/)

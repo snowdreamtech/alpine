@@ -70,12 +70,17 @@ python = "3.14.3"
 # ------------------------------------------------------------
 [settings]
 experimental = true
+
+# ASDF Compatibility: File Format Only
+# Allows mise to read .tool-versions files (asdf format)
+# NOTE: This is UNRELATED to Aqua Registry - it's just file format compatibility
 asdf_compat = true
 
 # 🛡️ Supply Chain Security: Disable Aqua Registry Backend
 # CRITICAL: Force mise to download binaries ONLY from GitHub Releases,
 # not from Aqua Registry which may repackage binaries and lose provenance.
 # See: docs/troubleshooting/mise-attestation-error.md
+# See: docs/reference/mise-configuration.md
 aqua.baked_registry = false
 aqua.github_attestations = false
 aqua.slsa = false

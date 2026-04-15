@@ -108,8 +108,13 @@ export default defineConfig({
             { text: "Supported AI IDEs", link: "/reference/ai-ides" },
             { text: "Linting Tools", link: "/reference/linters" },
             { text: "Tool Installation", link: "/reference/tool-installation" },
+            { text: "Mise Configuration", link: "/reference/mise-configuration" },
             { text: "API Reference", link: "/reference/api-common" },
           ],
+        },
+        {
+          text: "Troubleshooting",
+          items: [{ text: "Mise Attestation Error", link: "/troubleshooting/mise-attestation-error" }],
         },
       ],
       "/rules/languages/": [
