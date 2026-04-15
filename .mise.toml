@@ -78,6 +78,14 @@ http_timeout = "300s" # 5 minutes for slow GitHub downloads
 # GitHub proxy disabled - causing mise ls to hang
 # url_replacements = { "https://github.com" = "https://gh-proxy.sn0wdr1am.com/https://github.com" }
 
+# GitHub Artifact Attestations Verification
+# IMPORTANT: mise uses Aqua Registry as backend for github: tools, which requires
+# attestation verification. If you encounter errors like:
+#   "github:astral-sh/ruff@X.Y.Z has no provenance verification on <platform>"
+# This is likely a mise bug, not a real supply chain attack. See:
+#   docs/troubleshooting/mise-attestation-error.md
+# Workaround: Set MISE_SKIP_CHECKSUM=1 or wait for mise to fix the issue
+
 # Node.js flavor configuration for Alpine/musl environments
 # CRITICAL: This must be set in [settings] section, not just as env var
 # When node.flavor is set, mise will download precompiled binaries instead of source
