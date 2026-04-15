@@ -105,7 +105,7 @@ main() {
         # Try to execute audit directly
         if command -v "${_PKG_MGR:-}" >/dev/null 2>&1; then
           log_info "✓ Package manager found, executing audit..."
-          "${_PKG_MGR:-}" audit --registry="${NPM_AUDIT_REGISTRY:-https://registry.npmjs.org}" "$@"
+          "${_PKG_MGR:-}" audit "$@"
           exit $?
         else
           log_error "Package manager '${_PKG_MGR:-}' not found"
@@ -273,8 +273,9 @@ main() {
   # shellcheck disable=SC2086
   if [ "${_LINTER_WRAP:-}" = "node-audit" ]; then
     # logical case: call package manager audit command
-    # NOTE: Some registries (like npmmirror.com) do not support the audit endpoint.
-    # We use the official registry for the audit scan to ensure reliability.
+    # NOTE: npm has retired the old audit endpoints (/-/npm/v1/security/audits/*).
+    # Modern package managers (pnpm, npm 7+, yarn 2+) now use the bulk advisory endpoint.
+    # We skip the --registry flag to let the package manager use its configured registry.
 
     # On Windows, we need to handle .cmd/.exe wrappers carefully
     # Use the package manager command directly instead of relying on resolved path
@@ -288,7 +289,8 @@ main() {
 
     # Execute audit with explicit command invocation (not exec)
     # This ensures proper argument passing on Windows
-    "${_PKG_MGR:-}" audit --registry="${NPM_AUDIT_REGISTRY:-https://registry.npmjs.org}" "$@"
+    # Remove --registry flag as it causes issues with the new bulk advisory endpoint
+    "${_PKG_MGR:-}" audit "$@"
     exit $?
   fi
 
