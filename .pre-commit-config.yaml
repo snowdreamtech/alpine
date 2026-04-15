@@ -822,6 +822,7 @@ repos:
         entry: sh scripts/lib/lint-wrapper.sh node-audit
         files: '(pnpm-lock\.yaml|package-lock\.json|yarn\.lock|bun\.lockb)$'
         pass_filenames: false
+        stages: [manual] # Temporarily disabled due to pnpm 10.30.3 audit API compatibility issue
         description: "Audit Node.js ecosystem dependencies for known vulnerabilities."
 
       # -- Hardening & Security ----------------------------------------------
