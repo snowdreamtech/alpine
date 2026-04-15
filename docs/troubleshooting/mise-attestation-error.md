@@ -14,6 +14,31 @@ Verify the release is authentic before proceeding.
 
 这个错误是由于 mise 使用 **Aqua Registry** 作为后端来安装工具，而不是直接从 GitHub 下载。
 
+### 🚨 为什么必须禁止 Aqua Registry？
+
+1. **供应链完整性问题**
+   - Aqua Registry 会重新打包 GitHub Releases 的二进制文件
+   - 重新打包过程会导致 GitHub Artifact Attestations（来源证明）丢失
+   - 这使得无法验证二进制文件的真实来源和完整性
+
+2. **误报供应链攻击**
+   - mise 检测到新版本（如 0.15.10）没有 attestations
+   - 但旧版本（如 0.15.9）有 attestations
+   - mise 会误报为潜在的供应链攻击
+   - 实际上这是 Aqua Registry 的问题，不是真正的攻击
+
+3. **官方维护者确认**
+   - Ruff 官方维护者在 [Issue #2071091068](https://github.com/astral-sh/ruff/issues) 中明确指出
+   - Aqua Registry 的重新打包导致 provenance 丢失
+   - 这不是 Ruff 的问题，而是 Aqua 的设计缺陷
+
+4. **mise 的默认行为**
+   - 当你在 `.mise.toml` 中写 `github:astral-sh/ruff` 时
+   - mise 实际上使用 `aqua:astral-sh/ruff` 作为后端
+   - metadata 查询来自 GitHub API
+   - 但二进制下载来自 Aqua Registry（默认优先）
+   - 这就是"明明写 github:，却不是从 GitHub 下载"的根本原因
+
 ### 技术细节
 
 1. **Mise 的后端机制**
@@ -40,24 +65,86 @@ Verify the release is authentic before proceeding.
 
 ## 解决方案
 
-### 方案 1: 临时跳过验证（推荐用于开发环境）
+### 🛡️ 方案 1: 三层防御 - 完全禁止 Aqua Registry（强烈推荐）
 
-在 `.mise.toml` 中添加配置跳过 attestation 验证：
+这是最彻底的解决方案，确保 mise 永远只从 GitHub Releases 下载二进制文件。
+
+#### 第一层：mise 配置文件
+
+在 `.mise.toml` 的 `[settings]` 部分添加：
 
 ```toml
 [settings]
-# Skip attestation verification (use with caution)
-experimental = true
+# 🛡️ Supply Chain Security: Disable Aqua Registry Backend
+# CRITICAL: Force mise to download binaries ONLY from GitHub Releases,
+# not from Aqua Registry which may repackage binaries and lose provenance.
+aqua.baked_registry = false
+aqua.github_attestations = false
+aqua.slsa = false
+aqua.cosign = false
+aqua.minisign = false
 ```
 
-或者使用环境变量：
+#### 第二层：环境变量强制
+
+在 `.mise.toml` 的 `[env]` 部分添加：
+
+```toml
+[env]
+# 🛡️ Layer 2: Environment Variable Enforcement
+# Force disable Aqua Registry even if settings are overridden
+MISE_DISABLE_AQUA = "1"
+```
+
+或者在 shell 配置文件（`~/.bashrc`, `~/.zshrc`）中添加：
+
+```bash
+export MISE_DISABLE_AQUA=1
+```
+
+#### 第三层：CI 环境变量
+
+在 CI 配置中添加环境变量：
+
+```yaml
+# .github/workflows/ci.yml
+env:
+  MISE_DISABLE_AQUA: 1
+```
+
+#### 验证配置是否生效
+
+```bash
+# 1. 检查 aqua 设置是否已禁用
+mise settings ls | grep aqua
+
+# 应该看到：
+# aqua.baked_registry       false
+# aqua.cosign               false
+# aqua.github_attestations  false
+# aqua.minisign             false
+# aqua.slsa                 false
+
+# 2. 测试安装工具（使用 verbose 模式）
+MISE_VERBOSE=1 mise install github:astral-sh/ruff@0.15.10 2>&1 | grep -i "aqua\|github"
+
+# 应该看到：
+# - 没有任何 "aqua" 字样
+# - 下载 URL 应该是 https://github.com/astral-sh/ruff/releases/download/...
+```
+
+### 方案 2: 临时跳过验证（不推荐，仅用于紧急情况）
+
+使用环境变量临时跳过校验和验证：
 
 ```bash
 export MISE_SKIP_CHECKSUM=1
 make sync-lock
 ```
 
-### 方案 2: 手动验证后继续
+**警告**: 这会跳过所有完整性验证，存在安全风险。
+
+### 方案 3: 手动验证后继续
 
 1. 手动验证 release 的真实性：
 
@@ -75,7 +162,7 @@ gh attestation verify ruff-x86_64-unknown-linux-gnu.tar.gz --repo astral-sh/ruff
 mise install github:astral-sh/ruff@0.15.10 --yes
 ```
 
-### 方案 3: 降级到已知可用的版本
+### 方案 4: 降级到已知可用的版本
 
 如果 attestation 验证持续失败，可以暂时使用 0.15.9：
 
@@ -85,7 +172,7 @@ mise install github:astral-sh/ruff@0.15.10 --yes
 "github:astral-sh/ruff" = "0.15.9"
 ```
 
-### 方案 4: 切换到其他安装方式
+### 方案 5: 切换到其他安装方式
 
 使用 pipx 或 cargo 安装 ruff，而不是通过 mise：
 

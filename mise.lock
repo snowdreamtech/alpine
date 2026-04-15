@@ -295,30 +295,41 @@ backend = "github:google/osv-scanner"
 checksum = "sha256:fa46ad2b3954db5d5335303d45de921613393285d9a93c140b63b40e35e9ce50"
 url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_linux_arm64"
 url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248755"
-provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.linux-arm64".provenance.slsa]
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/multiple.intoto.jsonl"
 
 [tools."github:google/osv-scanner"."platforms.linux-arm64-musl"]
 checksum = "sha256:fa46ad2b3954db5d5335303d45de921613393285d9a93c140b63b40e35e9ce50"
 url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_linux_arm64"
 url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248755"
-provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.linux-arm64-musl".provenance.slsa]
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/multiple.intoto.jsonl"
 
 [tools."github:google/osv-scanner"."platforms.linux-x64"]
 checksum = "sha256:bb30c580afe5e757d3e959f4afd08a4795ea505ef84c46962b9a738aa573b41b"
 url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_linux_amd64"
 url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248788"
 
+[tools."github:google/osv-scanner"."platforms.linux-x64".provenance.slsa]
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/multiple.intoto.jsonl"
+
 [tools."github:google/osv-scanner"."platforms.linux-x64-musl"]
 checksum = "sha256:bb30c580afe5e757d3e959f4afd08a4795ea505ef84c46962b9a738aa573b41b"
 url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_linux_amd64"
 url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248788"
-provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.linux-x64-musl".provenance.slsa]
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/multiple.intoto.jsonl"
 
 [tools."github:google/osv-scanner"."platforms.macos-arm64"]
 checksum = "sha256:b740efe0b08fb817865e818a498997d5f042f14b8eeafb6393176ce84dd09cf6"
 url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_darwin_arm64"
 url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248752"
-provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.macos-arm64".provenance.slsa]
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/multiple.intoto.jsonl"
 
 [tools."github:google/osv-scanner"."platforms.macos-x64"]
 checksum = "sha256:3b1c72d59dcbad99fa4eb2c72bf2e82017f83e0268340e4b00af76a1fea32c85"
@@ -330,7 +341,9 @@ provenance = "slsa"
 checksum = "sha256:b165d33c08bda663119a459f5187e096d2525f888503495f5f34925741e981a2"
 url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_windows_amd64.exe"
 url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248754"
-provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.windows-x64".provenance.slsa]
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/multiple.intoto.jsonl"
 
 [[tools."github:hadolint/hadolint"]]
 version = "2.14.0"
@@ -410,48 +423,44 @@ checksum = "sha256:8a4e35ab0b331c85d73567b12f2a444df187f483e5079ceffa6bda1faa2e7
 url = "https://github.com/koalaman/shellcheck/releases/download/v0.11.0/shellcheck-v0.11.0.zip"
 url_api = "https://api.github.com/repos/koalaman/shellcheck/releases/assets/279056944"
 
-[[tools."github:mrtazz/checkmake"]]
-version = "0.3.2"
-backend = "github:mrtazz/checkmake"
-
-[tools."github:mrtazz/checkmake"."platforms.linux-arm64"]
-checksum = "sha256:409167c4abb99407bd232c3bbd351b8a39df57997feafde5a08bddffb0f2dcb4"
-url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake-v0.3.2.linux.arm64"
-url_api = "https://api.github.com/repos/checkmake/checkmake/releases/assets/338779065"
-
-[tools."github:mrtazz/checkmake"."platforms.linux-arm64-musl"]
-checksum = "sha256:409167c4abb99407bd232c3bbd351b8a39df57997feafde5a08bddffb0f2dcb4"
-url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake-v0.3.2.linux.arm64"
-url_api = "https://api.github.com/repos/checkmake/checkmake/releases/assets/338779065"
-
-[tools."github:mrtazz/checkmake"."platforms.linux-x64"]
-checksum = "sha256:e2effb876913f3ee2caef0ba35f6202c5e8a3cd55a077d8d2b9ce2034257b6af"
-url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake-v0.3.2.linux.amd64"
-url_api = "https://api.github.com/repos/checkmake/checkmake/releases/assets/338779060"
-
-[tools."github:mrtazz/checkmake"."platforms.linux-x64-musl"]
-checksum = "sha256:e2effb876913f3ee2caef0ba35f6202c5e8a3cd55a077d8d2b9ce2034257b6af"
-url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake-v0.3.2.linux.amd64"
-url_api = "https://api.github.com/repos/checkmake/checkmake/releases/assets/338779060"
-
-[tools."github:mrtazz/checkmake"."platforms.macos-arm64"]
-checksum = "sha256:d5dab7169d1cb246b380ed5e7fc1e6aded301d453db258f858e774422d25961f"
-url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake-v0.3.2.darwin.arm64"
-url_api = "https://api.github.com/repos/checkmake/checkmake/releases/assets/338779063"
-
-[tools."github:mrtazz/checkmake"."platforms.macos-x64"]
-checksum = "sha256:82942043a4766b9fb3ffe6c77584df7d6c832bfa00571f234d257799f492fdd7"
-url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake-v0.3.2.darwin.amd64"
-url_api = "https://api.github.com/repos/checkmake/checkmake/releases/assets/338779062"
-
-[tools."github:mrtazz/checkmake"."platforms.windows-x64"]
-checksum = "sha256:6adf4bde2dbfe8001ecf2918abfe02f7a57191568f1d185537eccd9c59625dca"
-url = "https://github.com/checkmake/checkmake/releases/download/v0.3.2/checkmake-v0.3.2.windows.amd64.exe"
-url_api = "https://api.github.com/repos/checkmake/checkmake/releases/assets/338779103"
-
 [[tools."github:mvdan/sh"]]
 version = "3.13.1"
 backend = "github:mvdan/sh"
+
+[tools."github:mvdan/sh"."platforms.linux-arm64"]
+checksum = "sha256:32d92acaa5cd8abb29fc49dac123dc412442d5713967819d8af2c29f1b3857c7"
+url = "https://github.com/mvdan/sh/releases/download/v3.13.1/shfmt_v3.13.1_linux_arm64"
+url_api = "https://api.github.com/repos/mvdan/sh/releases/assets/390322859"
+
+[tools."github:mvdan/sh"."platforms.linux-arm64-musl"]
+checksum = "sha256:32d92acaa5cd8abb29fc49dac123dc412442d5713967819d8af2c29f1b3857c7"
+url = "https://github.com/mvdan/sh/releases/download/v3.13.1/shfmt_v3.13.1_linux_arm64"
+url_api = "https://api.github.com/repos/mvdan/sh/releases/assets/390322859"
+
+[tools."github:mvdan/sh"."platforms.linux-x64"]
+checksum = "sha256:fb096c5d1ac6beabbdbaa2874d025badb03ee07929f0c9ff67563ce8c75398b1"
+url = "https://github.com/mvdan/sh/releases/download/v3.13.1/shfmt_v3.13.1_linux_amd64"
+url_api = "https://api.github.com/repos/mvdan/sh/releases/assets/390322866"
+
+[tools."github:mvdan/sh"."platforms.linux-x64-musl"]
+checksum = "sha256:fb096c5d1ac6beabbdbaa2874d025badb03ee07929f0c9ff67563ce8c75398b1"
+url = "https://github.com/mvdan/sh/releases/download/v3.13.1/shfmt_v3.13.1_linux_amd64"
+url_api = "https://api.github.com/repos/mvdan/sh/releases/assets/390322866"
+
+[tools."github:mvdan/sh"."platforms.macos-arm64"]
+checksum = "sha256:9680526be4a66ea1ffe988ed08af58e1400fe1e4f4aef5bd88b20bb9b3da33f8"
+url = "https://github.com/mvdan/sh/releases/download/v3.13.1/shfmt_v3.13.1_darwin_arm64"
+url_api = "https://api.github.com/repos/mvdan/sh/releases/assets/390322881"
+
+[tools."github:mvdan/sh"."platforms.macos-x64"]
+checksum = "sha256:6feedafc72915794163114f512348e2437d080d0047ef8b8fa2ec63b575f12af"
+url = "https://github.com/mvdan/sh/releases/download/v3.13.1/shfmt_v3.13.1_darwin_amd64"
+url_api = "https://api.github.com/repos/mvdan/sh/releases/assets/390322886"
+
+[tools."github:mvdan/sh"."platforms.windows-x64"]
+checksum = "sha256:60cd368533d0ad73fa86d93d5bbf95ef40587245ce684ed138c1b31557b5fe97"
+url = "https://github.com/mvdan/sh/releases/download/v3.13.1/shfmt_v3.13.1_windows_amd64.exe"
+url_api = "https://api.github.com/repos/mvdan/sh/releases/assets/390322844"
 
 [[tools."github:rhysd/actionlint"]]
 version = "1.7.12"
@@ -498,10 +507,6 @@ checksum = "sha256:6e7241b51e6817ea6a047693d8e6fed13b31819c9a0dd6c5a726e1592d22f
 url = "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_windows_amd64.zip"
 url_api = "https://api.github.com/repos/rhysd/actionlint/releases/assets/384924919"
 provenance = "github-attestations"
-
-[[tools."npm:@taplo/cli"]]
-version = "0.7.0"
-backend = "npm:@taplo/cli"
 
 [[tools."github:zizmorcore/zizmor"]]
 version = "1.23.1"
@@ -555,31 +560,31 @@ backend = "core:go"
 
 [tools.go."platforms.linux-arm64"]
 checksum = "sha256:c958a1fe1b361391db163a485e21f5f228142d6f8b584f6bef89b26f66dc5b23"
-url = "https://dl.google.com/go/go1.26.2.linux-arm64.tar.gz"
+url = "https://mirrors.aliyun.com/golang//go1.26.2.linux-arm64.tar.gz"
 
 [tools.go."platforms.linux-arm64-musl"]
 checksum = "sha256:c958a1fe1b361391db163a485e21f5f228142d6f8b584f6bef89b26f66dc5b23"
-url = "https://dl.google.com/go/go1.26.2.linux-arm64.tar.gz"
+url = "https://mirrors.aliyun.com/golang//go1.26.2.linux-arm64.tar.gz"
 
 [tools.go."platforms.linux-x64"]
 checksum = "sha256:990e6b4bbba816dc3ee129eaeaf4b42f17c2800b88a2166c265ac1a200262282"
-url = "https://dl.google.com/go/go1.26.2.linux-amd64.tar.gz"
+url = "https://mirrors.aliyun.com/golang//go1.26.2.linux-amd64.tar.gz"
 
 [tools.go."platforms.linux-x64-musl"]
 checksum = "sha256:990e6b4bbba816dc3ee129eaeaf4b42f17c2800b88a2166c265ac1a200262282"
-url = "https://dl.google.com/go/go1.26.2.linux-amd64.tar.gz"
+url = "https://mirrors.aliyun.com/golang//go1.26.2.linux-amd64.tar.gz"
 
 [tools.go."platforms.macos-arm64"]
 checksum = "sha256:32af1522bf3e3ff3975864780a429cc0b41d190ec7bf90faa661d6d64566e7af"
-url = "https://dl.google.com/go/go1.26.2.darwin-arm64.tar.gz"
+url = "https://mirrors.aliyun.com/golang//go1.26.2.darwin-arm64.tar.gz"
 
 [tools.go."platforms.macos-x64"]
 checksum = "sha256:bc3f1500d9968c36d705442d90ba91addf9271665033748b82532682e90a7966"
-url = "https://dl.google.com/go/go1.26.2.darwin-amd64.tar.gz"
+url = "https://mirrors.aliyun.com/golang//go1.26.2.darwin-amd64.tar.gz"
 
 [tools.go."platforms.windows-x64"]
 checksum = "sha256:98eb3570bade15cb826b0909338df6cc6d2cf590bc39c471142002db3832b708"
-url = "https://dl.google.com/go/go1.26.2.windows-amd64.zip"
+url = "https://mirrors.aliyun.com/golang//go1.26.2.windows-amd64.zip"
 
 [[tools.node]]
 version = "25.9.0"
@@ -587,6 +592,34 @@ backend = "core:node"
 
 [tools.node.options]
 flavor = ""
+
+[tools.node."platforms.linux-arm64"]
+checksum = "sha256:8fb4283301b8c720fc9f18bffff0f659e72cc14d0cf207a3bb411808aaa73a57"
+url = "https://npmmirror.com/mirrors/node/v25.9.0/node-v25.9.0-linux-arm64.tar.gz"
+
+[tools.node."platforms.linux-arm64-musl"]
+checksum = "sha256:8fb4283301b8c720fc9f18bffff0f659e72cc14d0cf207a3bb411808aaa73a57"
+url = "https://npmmirror.com/mirrors/node/v25.9.0/node-v25.9.0-linux-arm64.tar.gz"
+
+[tools.node."platforms.linux-x64"]
+checksum = "sha256:134e55b2408448a219760fe04dc44d6851f9de8a79549021ffd870e9082d9e7b"
+url = "https://npmmirror.com/mirrors/node/v25.9.0/node-v25.9.0-linux-x64.tar.gz"
+
+[tools.node."platforms.linux-x64-musl"]
+checksum = "sha256:134e55b2408448a219760fe04dc44d6851f9de8a79549021ffd870e9082d9e7b"
+url = "https://npmmirror.com/mirrors/node/v25.9.0/node-v25.9.0-linux-x64.tar.gz"
+
+[tools.node."platforms.macos-arm64"]
+checksum = "sha256:e479f3c469d3d9303a44f00a8ea37a3788395d171bb8059c48a4bbbd2e371b59"
+url = "https://npmmirror.com/mirrors/node/v25.9.0/node-v25.9.0-darwin-arm64.tar.gz"
+
+[tools.node."platforms.macos-x64"]
+checksum = "sha256:7d737b53ce191142bfa1c17cfa5b070d96e84eebf76b8dd06d84981cbdc3f7e3"
+url = "https://npmmirror.com/mirrors/node/v25.9.0/node-v25.9.0-darwin-x64.tar.gz"
+
+[tools.node."platforms.windows-x64"]
+checksum = "sha256:929552b8305effac843ba7b4270c437aefb702fc3fbd73fcd1bffd35d4ac284e"
+url = "https://npmmirror.com/mirrors/node/v25.9.0/node-v25.9.0-win-x64.zip"
 
 [[tools."npm:@commitlint/cli"]]
 version = "20.5.0"

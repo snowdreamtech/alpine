@@ -71,6 +71,16 @@ python = "3.14.3"
 [settings]
 experimental = true
 asdf_compat = true
+
+# 🛡️ Supply Chain Security: Disable Aqua Registry Backend
+# CRITICAL: Force mise to download binaries ONLY from GitHub Releases,
+# not from Aqua Registry which may repackage binaries and lose provenance.
+# See: docs/troubleshooting/mise-attestation-error.md
+aqua.baked_registry = false
+aqua.github_attestations = false
+aqua.slsa = false
+aqua.cosign = false
+aqua.minisign = false
 # Settings and URL replacements for network reliability.
 # Note: url_replacements do not support Jinja2/Tera templates directly in settings;
 # simple key-value replacement of the URL prefix is performed.
@@ -100,6 +110,9 @@ http_timeout = "300s" # 5 minutes for slow GitHub downloads
 # Environment variables for performance acceleration
 # ------------------------------------------------------------
 [env]
+# 🛡️ Layer 2: Environment Variable Enforcement
+# Force disable Aqua Registry even if settings are overridden
+MISE_DISABLE_AQUA = "1"
 # GitHub Proxy Acceleration - Enable locally for faster downloads, disable in CI
 ENABLE_GITHUB_PROXY = "{% if env.CI is defined %}0{% else %}1{% endif %}"
 GITHUB_PROXY = "https://gh-proxy.sn0wdr1am.com/"
