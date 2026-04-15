@@ -6,6 +6,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.3.0](https://github.com/snowdreamtech/template/compare/v0.2.0...v0.3.0) (2026-04-15)
+
+
+### ⚠ BREAKING CHANGES
+
+* **security:** mise now downloads binaries ONLY from GitHub Releases
+
+### Features
+
+* **dev:** add POSIX-compatible CI simulation script ([a587a39](https://github.com/snowdreamtech/template/commit/a587a390faa640adce2d448b773222cbb373c41d))
+* **security:** implement three-layer defense against Aqua Registry ([ef13665](https://github.com/snowdreamtech/template/commit/ef136651dc6d7d358cf4de2748a0a10a841730bf))
+
+
+### Bug Fixes
+
+* **ci:** update node-audit to use new npm bulk advisory endpoint ([526ca79](https://github.com/snowdreamtech/template/commit/526ca79e307d38240e54505bda3b06d75f1e8b9a))
+* **docs:** ensure make docs build works correctly ([6a0df9c](https://github.com/snowdreamtech/template/commit/6a0df9ce6acf22d2d8606dda0444c48d369967bd))
+
 ## [0.2.0](https://github.com/snowdreamtech/template/compare/v0.1.0...v0.2.0) (2026-04-14)
 
 
