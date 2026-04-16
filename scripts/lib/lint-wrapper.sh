@@ -63,6 +63,10 @@ main() {
     _LINTER_BIN="${NPM:-pnpm}"
     ;;
   # Map tool names to mise tool specs for tools with different binary names
+  checkmake)
+    _MISE_TOOL_SPEC="github:checkmake/checkmake"
+    _LINTER_BIN="checkmake"
+    ;;
   shfmt)
     _MISE_TOOL_SPEC="github:mvdan/sh"
     _LINTER_BIN="shfmt"
