@@ -3,7 +3,7 @@
 [English](README.md) | [简体中文](README_zh-CN.md)
 
 > [!NOTE]
-> This directory contains the implementation of the project's automation infrastructure. It follows a **Single Source of Truth (SSoT)** pattern where the core logic resides in POSIX shell scripts (`.sh`), with wrappers provided for Windows compatibility (`.ps1`, `.bat`).
+> This directory contains the implementation of the project's automation infrastructure using POSIX shell scripts (`.sh`) that work across all platforms including Windows (via Git Bash or WSL).
 
 ## 1. Design & Architecture
 
@@ -23,21 +23,20 @@ This component provides a suite of cross-platform scripts to manage the developm
     [ Makefile ] (Convenience Entry)
         |
         v
-    [ scripts/*.sh ] (Core POSIX Logic, SSoT)
-    /    |      \
-  /     |       \
-  /      |        \
-[lib/common.sh] [lib/langs/*.sh] [Windows Wrappers]
-(Utils/SSoT)    (Lang Modules)    (.ps1, .bat)
+    [ scripts/*.sh ] (POSIX Shell Scripts)
+    /      \
+  /         \
+[lib/common.sh] [lib/langs/*.sh]
+(Utils/SSoT)    (Lang Modules)
 ```
 
 ### Design Principles
 
-- **SSoT**: Logic is never duplicated between `.sh` and `.ps1`.
-- **Auditable**: Every decision is traceable via detailed logging and exit codes.
-- **Idempotent**: Scripts can be run multiple times safely without side effects.
-- **Fail-Fast**: Immediate exit on error with clear diagnostics.
-- **Lean**: Zero-dependency for core logic where possible (uses `sh`, `sed`, `awk`).
+- **Cross-Platform**: POSIX-compliant shell scripts work on Linux, macOS, and Windows (Git Bash/WSL)
+- **Auditable**: Every decision is traceable via detailed logging and exit codes
+- **Idempotent**: Scripts can be run multiple times safely without side effects
+- **Fail-Fast**: Immediate exit on error with clear diagnostics
+- **Lean**: Zero-dependency for core logic where possible (uses `sh`, `sed`, `awk`)
 
 ### Responsibilities
 
@@ -50,9 +49,12 @@ This component provides a suite of cross-platform scripts to manage the developm
 
 ### Prerequisites
 
-- **POSIX Shell** (Standard on Linux/macOS; Git Bash or WSL on Windows)
-- **PowerShell 5.1+** (For Windows wrappers)
-- **Make** (Optional, provides convenient entry points)
+- **Linux/macOS**: Built-in POSIX shell
+- **Windows**: Git Bash (included with [Git for Windows](https://git-scm.com/download/win)) or WSL
+- **Make**: Optional, provides convenient entry points
+
+> [!TIP]
+> Windows users: See [Windows Shell Migration Guide](../docs/migration/windows-shell-migration.md) for setup instructions.
 
 ### Quick Start
 
@@ -98,10 +100,9 @@ sh scripts/verify.sh
 
 ### Directory Structure
 
-- `scripts/`: Primary automation entry points.
-- `scripts/lib/`: Internal core library (`common.sh`).
-- `scripts/lib/langs/`: Modular language-specific logic (Sourced by `common.sh`).
-- `scripts/*.ps1` & `scripts/*.bat`: Windows entry wrappers.
+- `scripts/`: Primary automation entry points (POSIX shell scripts)
+- `scripts/lib/`: Internal core library (`common.sh`)
+- `scripts/lib/langs/`: Modular language-specific logic (sourced by `common.sh`)
 
 ## 3. Operations Guide
 
@@ -119,13 +120,13 @@ sh scripts/verify.sh
 
 ### Troubleshooting
 
-- **Problem**: Permission Denied.
-  - **Solution**: Run `chmod +x scripts/*.sh`.
-- **Problem**: Windows Script Execution Failure.
-  - **Solution**: Run `Set-ExecutionPolicy -Scope CurrentUser RemoteSigned`.
-- **Problem**: 404/Network failure during download.
-  - **Diagnosis**: Check if `GITHUB_PROXY` is reachable.
-  - **Solution**: Configure `GITHUB_PROXY` in `scripts/lib/common.sh` or env.
+- **Problem**: Permission Denied
+  - **Solution**: Run `chmod +x scripts/*.sh`
+- **Problem**: Command not found on Windows
+  - **Solution**: Install Git Bash or WSL. See [migration guide](../docs/migration/windows-shell-migration.md)
+- **Problem**: 404/Network failure during download
+  - **Diagnosis**: Check if `GITHUB_PROXY` is reachable
+  - **Solution**: Configure `GITHUB_PROXY` in `scripts/lib/common.sh` or env
 
 ### Maintenance Procedures
 
@@ -142,12 +143,11 @@ sh scripts/verify.sh
 
 ### Best Practices
 
-| Aspect           | Requirement                 | Implementation            |
-| :--------------- | :-------------------------- | :------------------------ |
-| File Permissions | Scripts must be executable  | `chmod 755 scripts/*.sh`  |
-| Secret Integrity | No hardcoded keys           | Source from `.env` only   |
-| Proxy Handling   | Secure download gateway     | `GITHUB_PROXY` via TLS    |
-| Windows Security | Signed or restricted policy | `-ExecutionPolicy Bypass` |
+| Aspect           | Requirement                | Implementation           |
+| :--------------- | :------------------------- | :----------------------- |
+| File Permissions | Scripts must be executable | `chmod 755 scripts/*.sh` |
+| Secret Integrity | No hardcoded keys          | Source from `.env` only  |
+| Proxy Handling   | Secure download gateway    | `GITHUB_PROXY` via TLS   |
 
 ## 5. Development Guide
 
@@ -159,19 +159,19 @@ sh scripts/verify.sh
 
 ### Contribution Requirements
 
-1. All new scripts MUST include a `main()` function and call `parse_common_args`.
-2. All new scripts MUST pass `shellcheck --shell=sh`.
-3. All new scripts MUST provide `.ps1` and `.bat` wrappers for delegation.
-4. Keep English/Chinese README versions in sync.
+1. All new scripts MUST include a `main()` function and call `parse_common_args`
+2. All new scripts MUST pass `shellcheck --shell=sh`
+3. All new scripts MUST be POSIX-compliant for cross-platform compatibility
+4. Keep English/Chinese README versions in sync
 
 ### Local Development Setup
 
-1. Install ShellCheck: `brew install shellcheck`.
-2. Install PSScriptAnalyzer (on Windows): `Install-Module -Name PSScriptAnalyzer`.
-3. Run `make lint` to verify compliance.
+1. Install ShellCheck: `brew install shellcheck` (macOS) or see [shellcheck.net](https://www.shellcheck.net/)
+2. Run `make lint` to verify compliance
 
 ### References
 
 - [POSIX Standard](https://pubs.opengroup.org/onlinepubs/9699919799/utilities/V3_chap02.html)
 - [ShellCheck Wiki](https://github.com/koalaman/shellcheck/wiki)
-- [PowerShell Guidelines](https://docs.microsoft.com/en-us/powershell/scripting/developer/cmdlet/approved-verbs-for-windows-powershell-commands)
+- [Git for Windows](https://git-scm.com/download/win)
+- [Windows Shell Migration Guide](../docs/migration/windows-shell-migration.md)
