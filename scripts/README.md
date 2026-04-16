@@ -11,9 +11,9 @@
 
 This component provides a suite of cross-platform scripts to manage the development lifecycle, including environment setup, dependency installation, linting, testing, and deployment.
 
-- **Portable**: Written in POSIX-compliant shell to ensure consistency across Linux, macOS, and CI environments.
+- **Portable**: Written in POSIX-compliant shell to ensure consistency across Linux, macOS, Windows (Git Bash/WSL), and CI environments.
 - **Robust**: Includes safety guards, atomic operations, and standardized error handling.
-- **Windows Optimized**: Full delegation from CMD and PowerShell to the core logic.
+- **Cross-Platform**: Single source of truth with POSIX shell scripts, no platform-specific wrappers needed.
 
 ### Architecture
 
