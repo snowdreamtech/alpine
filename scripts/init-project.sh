@@ -161,8 +161,6 @@ main() {
       ! -path "./node_modules/*" \
       ! -path "./.venv/*" \
       ! -path "./scripts/init-project.sh" \
-      ! -path "./scripts/init-project.ps1" \
-      ! -path "./scripts/init-project.bat" \
       -exec perl -pi -e "s~${_OLD_ORG_REF:-}|${_OLD_USER_REF:-}~${_GITHUB_ORG_HYD:-}~g" {} +
 
     # Replace description if provided

@@ -5,7 +5,7 @@
 # scripts/test.sh - Multi-Stack Test Runner
 #
 # Purpose:
-#   Orchestrates test suites (bats, pytest, pester, vitest) for holistic verification.
+#   Orchestrates test suites (bats, pytest, vitest) for holistic verification.
 #   Ensures functional correctness across all supported project components.
 #
 # Usage:
@@ -19,7 +19,7 @@
 # Features:
 #   - POSIX compliant, encapsulated main() pattern.
 #   - Automated test-discovery for all project components.
-#   - Cross-platform support (Shell, Python, Node.js, PowerShell).
+#   - Cross-platform support (Shell, Python, Node.js).
 
 set -eu
 
@@ -34,7 +34,7 @@ show_help() {
   cat <<EOF
 Usage: $0 [OPTIONS] [SUITE_TYPE]
 
-Unified project test runner for Shell, Python, Node.js, Go, Rust, and more.
+Unified project test runner for Shell, Python, and Node.js.
 
 Options:
   --dry-run        Preview test suites that will be executed.
@@ -45,7 +45,6 @@ Options:
 Suites (default: all):
   shell            Run bats tests in tests/
   python           Run pytest (requires .venv)
-  powershell       Run Pester tests (requires pwsh)
   node             Run vitest (requires node_modules)
   all              Run all detected test suites
 
@@ -177,25 +176,6 @@ run_python_tests() {
   fi
 }
 
-# Purpose: Executes PowerShell-specific test suites using the Pester framework.
-# Scans the tests/ directory for .Tests.ps1 files.
-# Examples:
-#   run_powershell_tests
-run_powershell_tests() {
-  if [ -d "tests" ] && find tests -name "*.Tests.ps1" | grep -q .; then
-    log_info "── Running PowerShell Tests (Pester) ──"
-    if [ "${DRY_RUN:-0}" -eq 1 ]; then
-      log_success "DRY-RUN: Would run Pester tests in tests/"
-    elif resolve_bin "pwsh" >/dev/null 2>&1; then
-      pwsh -NoProfile -Command "Invoke-Pester tests/"
-    else
-      log_warn "Warning: pwsh not found. Skipping powershell tests."
-    fi
-  else
-    log_debug "No .Tests.ps1 files found in tests/. Skipping powershell tests."
-  fi
-}
-
 # Purpose: Main entry point for the multi-stack test orchestration engine.
 # Params:
 #   $@ - Command line arguments and optional suite selection
@@ -210,7 +190,7 @@ main() {
   local _arg_tst
   for _arg_tst in "$@"; do
     case "${_arg_tst:-}" in
-    shell | python | powershell | all) _SUITE_TST="${_arg_tst:-}" ;;
+    shell | python | all) _SUITE_TST="${_arg_tst:-}" ;;
     -q | --quiet | -v | --verbose | --dry-run | -h | --help) ;;
     esac
   done
@@ -237,13 +217,6 @@ main() {
       log_summary "Test" "Python (pytest)" "❌ Failed" "-" "$(($(date +%s) - _T0_TST))"
     fi
     ;;
-  powershell)
-    if run_powershell_tests; then
-      log_summary "Test" "PowerShell (Pester)" "✅ Passed" "-" "$(($(date +%s) - _T0_TST))"
-    else
-      log_summary "Test" "PowerShell (Pester)" "❌ Failed" "-" "$(($(date +%s) - _T0_TST))"
-    fi
-    ;;
   all)
     local _T_S _T_P _T_PS
     _T_S=$(date +%s)
@@ -258,13 +231,6 @@ main() {
       log_summary "Test" "Python (pytest)" "✅ Passed" "-" "$(($(date +%s) - _T_P))"
     else
       log_summary "Test" "Python (pytest)" "❌ Failed" "-" "$(($(date +%s) - _T_P))"
-    fi
-    printf "\n"
-    _T_PS=$(date +%s)
-    if run_powershell_tests; then
-      log_summary "Test" "PowerShell (Pester)" "✅ Passed" "-" "$(($(date +%s) - _T_PS))"
-    else
-      log_summary "Test" "PowerShell (Pester)" "❌ Failed" "-" "$(($(date +%s) - _T_PS))"
     fi
     ;;
   esac
