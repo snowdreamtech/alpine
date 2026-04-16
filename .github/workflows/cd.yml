@@ -16,7 +16,8 @@ name: "🚀 Continuous Delivery"
       - "dev"
   workflow_dispatch:
 
-permissions: {}
+permissions:
+  contents: read
 
 env:
   MISE_LOCKED: 1
