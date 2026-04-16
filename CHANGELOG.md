@@ -6,6 +6,39 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.5.0](https://github.com/snowdreamtech/template/compare/v0.4.0...v0.5.0) (2026-04-16)
+
+
+### Features
+
+* **ci:** improve release-please configuration and remove fixed version ([e1fcd64](https://github.com/snowdreamtech/template/commit/e1fcd648d91c306f6f385eca7600b3d6d2fefc5e))
+
+
+### Bug Fixes
+
+* **ci:** detect docker-compose files in dependabot generator ([530ca75](https://github.com/snowdreamtech/template/commit/530ca7534583ea16bb876c0e8bfbf209d958a42a))
+* **ci:** explicitly specify checkmake mise tool spec to avoid aqua registry lookup ([acefebb](https://github.com/snowdreamtech/template/commit/acefebb98efc3563a9011f2ea05e7cc7274f5aef))
+* **ci:** remove unsupported signoff parameter and add release-as 0.5.0 ([d01b2df](https://github.com/snowdreamtech/template/commit/d01b2dffa875d815316b5d41922b58ce9d574879))
+* **mise:** workaround for GitHub attestation verification failures ([2911054](https://github.com/snowdreamtech/template/commit/29110547a86ebe51593eac637c0b4dc4c14977bc))
+
+
+### Documentation
+
+* **security:** add comprehensive asdf supply chain risk analysis ([515eea1](https://github.com/snowdreamtech/template/commit/515eea10cedc50f05f0cecd3f421129e1ce59cd4))
+* **security:** add mise supply chain security analysis and mitigation ([c0c72f8](https://github.com/snowdreamtech/template/commit/c0c72f889b691ca3ed847e3b11dd3576c1586653))
+
+
+### Miscellaneous Chores
+
+* **deps:** bump mise to v2026.4.14 ([2bf29e3](https://github.com/snowdreamtech/template/commit/2bf29e3e3f8385913f9367de8a1170a151b5bd82))
+* **release:** v0.4.0 - Fix Dependabot docker-compose detection ([e91f7d8](https://github.com/snowdreamtech/template/commit/e91f7d882f3c7b23260f4da02f0e5e53d6399968))
+
+
+### Continuous Integration
+
+* **dependabot:** add path monitoring for mise toolchain config ([ebc7227](https://github.com/snowdreamtech/template/commit/ebc72273a85cb32f3e66b84305c726e47ce55b63))
+* **deps:** remove MISE_SKIP_CHECKSUM workaround ([0a80645](https://github.com/snowdreamtech/template/commit/0a8064500cc0ecef8851af4aea31023f5809512e))
+
 ## [0.4.0](https://github.com/snowdreamtech/template/compare/v0.4.0...v0.4.0) (2026-04-16)
 
 
