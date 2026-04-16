@@ -335,7 +335,9 @@ url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/multiple.i
 checksum = "sha256:3b1c72d59dcbad99fa4eb2c72bf2e82017f83e0268340e4b00af76a1fea32c85"
 url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/osv-scanner_darwin_amd64"
 url_api = "https://api.github.com/repos/google/osv-scanner/releases/assets/380248790"
-provenance = "slsa"
+
+[tools."github:google/osv-scanner"."platforms.macos-x64".provenance.slsa]
+url = "https://github.com/google/osv-scanner/releases/download/v2.3.5/multiple.intoto.jsonl"
 
 [tools."github:google/osv-scanner"."platforms.windows-x64"]
 checksum = "sha256:b165d33c08bda663119a459f5187e096d2525f888503495f5f34925741e981a2"
@@ -546,6 +548,7 @@ provenance = "github-attestations"
 checksum = "sha256:721ba70d7fca753aeef1a4ee959a9bc20c55784d4faa6c56e66129a2611fd52f"
 url = "https://github.com/zizmorcore/zizmor/releases/download/v1.24.1/zizmor-x86_64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/395578621"
+provenance = "github-attestations"
 
 [tools."github:zizmorcore/zizmor"."platforms.windows-x64"]
 checksum = "sha256:b777ec2cb1098139ba74b32e30d11ed149c69ab692d23788c466d4a31704bd4b"
