@@ -12,7 +12,7 @@
 go = "1.26.2"
 node = "25.9.0"
 "npm:pnpm" = "10.33.0"
-python = "3.14.3"
+python = "3.14.4"
 # pipx is managed as a bootstrap tool via pip in scripts/lib/langs/base.sh to ensure cross-platform compatibility.
 # pipx = "1.11.0"
 
@@ -20,7 +20,7 @@ python = "3.14.3"
 # ── 🔐 Security & Engineering (always needed) ──────────────────────────────────
 "github:gitleaks/gitleaks" = "8.30.1"
 "github:google/osv-scanner" = "2.3.5"
-"github:zizmorcore/zizmor" = "1.23.1"
+"github:zizmorcore/zizmor" = "1.24.1"
 "github:cli/cli" = "2.89.0"
 
 # ── 💎 Core Quality & Commit Tooling ──────────────────────────────────────────
@@ -36,9 +36,9 @@ python = "3.14.3"
 "npm:cz-conventional-changelog" = "3.3.0"
 
 # Formatting & linting (invoked by pre-commit hooks)
-"npm:prettier" = "3.8.1"
+"npm:prettier" = "3.8.3"
 "npm:eslint" = "10.2.0"
-"npm:stylelint" = "17.6.0"
+"npm:stylelint" = "17.8.0"
 "npm:markdownlint-cli2" = "0.22.0"
 "npm:sort-package-json" = "3.6.1"
 "npm:@taplo/cli" = "0.7.0"
@@ -50,7 +50,7 @@ python = "3.14.3"
 "pipx:yamllint" = "1.38.0"
 
 # Python tools (pre-commit hooks)
-"github:astral-sh/ruff" = "0.15.9"
+"github:astral-sh/ruff" = "0.15.10"
 "pipx:clang-format" = "22.1.3"
 
 # Shell & scripting linters (pre-commit hooks)
@@ -97,9 +97,14 @@ http_timeout = "300s" # 5 minutes for slow GitHub downloads
 # IMPORTANT: mise uses Aqua Registry as backend for github: tools, which requires
 # attestation verification. If you encounter errors like:
 #   "github:astral-sh/ruff@X.Y.Z has no provenance verification on <platform>"
-# This is likely a mise bug, not a real supply chain attack. See:
-#   docs/troubleshooting/mise-attestation-error.md
-# Workaround: Set MISE_SKIP_CHECKSUM=1 or wait for mise to fix the issue
+# This is likely a mise bug or the upstream project temporarily missing attestations.
+# See: docs/troubleshooting/mise-attestation-error.md
+#
+# Workarounds:
+# 1. Temporary: Set MISE_SKIP_CHECKSUM=1 (not recommended for production)
+# 2. Pin to last known good version with attestations
+# 3. Wait for upstream to add attestations or mise to fix the issue
+# 4. Disable attestation checks (already done via aqua.github_attestations = false)
 
 # Node.js flavor configuration for Alpine/musl environments
 # CRITICAL: This must be set in [settings] section, not just as env var

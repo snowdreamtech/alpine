@@ -25,18 +25,18 @@ VER_GO="1.26.2"
 VER_NODE="25.9.0"
 VER_PNPM="10.33.0"
 VER_PNPM_PROVIDER="npm:pnpm"
-VER_PYTHON="3.14.3"
+VER_PYTHON="3.14.4"
 VER_PIPX="1.11.0"
 VER_PIPX_PROVIDER="pip"
 
 # ── 🏗️ Tier 2: Language Runtimes (On-demand) ─────────────────────────────────
 VER_KOTLIN="2.3.20"
 VER_RUST="1.94.1"
-VER_BUN="1.3.11"
-VER_DENO="2.7.11"
-VER_ZIG="0.15.2"
+VER_BUN="1.3.12"
+VER_DENO="2.7.12"
+VER_ZIG="0.16.0"
 VER_JAVA="26.0.0"
-VER_DOTNET="10.0.201"
+VER_DOTNET="10.0.202"
 VER_RUBY="4.0.2"
 VER_YARN="1.22.22"
 
@@ -55,7 +55,7 @@ VER_KCL_PROVIDER="github:kcl-lang/kcl"
 VER_PKL="0.31.1"
 VER_PKL_PROVIDER="github:apple/pkl"
 
-VER_BAZEL="9.0.1"
+VER_BAZEL="9.0.2"
 VER_BAZEL_PROVIDER="github:bazelbuild/bazel"
 
 VER_BALLERINA="2201.13.2"
@@ -67,7 +67,7 @@ VER_STYLUA_PROVIDER="github:JohnnyMorganz/StyLua"
 VER_JUST="1.49.0"
 VER_JUST_PROVIDER="github:casey/just"
 
-VER_TASK="3.49.1"
+VER_TASK="3.50.0"
 VER_TASK_PROVIDER="github:go-task/task"
 
 VER_TYPST="0.13.0"
@@ -75,7 +75,7 @@ VER_DUCKDB="1.5.0"
 # NOTE: Lychee version removed — link checking delegated to lycheeverse/lychee-action in CI.
 
 # Additional language runtimes requiring GitHub providers
-VER_LEAN="4.29.0"
+VER_LEAN="4.29.1"
 VER_LEAN_PROVIDER="github:leanprover/lean4"
 
 VER_NIM="2.4.0"
@@ -97,7 +97,7 @@ VER_GH_CLI="2.89.0"
 VER_GH_CLI_PROVIDER="github:cli/cli"
 
 # ── 💎 Tier 1: Core Quality & Commit Tooling (Mirror of .mise.toml) ──────────
-VER_CHECKMAKE="v0.3.2"
+VER_CHECKMAKE="0.3.2"
 VER_CHECKMAKE_PROVIDER="github:checkmake/checkmake"
 VER_EDITORCONFIG_CHECKER="3.6.1"
 VER_EDITORCONFIG_CHECKER_PROVIDER="github:editorconfig-checker/editorconfig-checker"
@@ -115,7 +115,7 @@ VER_CZ_CONVENTIONAL_CHANGELOG="3.3.0"
 VER_CZ_CONVENTIONAL_CHANGELOG_PROVIDER="npm:cz-conventional-changelog"
 
 # Universal formatting
-VER_PRETTIER="3.8.1"
+VER_PRETTIER="3.8.3"
 VER_PRETTIER_PROVIDER="npm:prettier"
 
 # Shell & scripting
@@ -153,22 +153,22 @@ VER_SWIFTLINT_PROVIDER="github:realm/SwiftLint"
 
 VER_RUBOCOP_PROVIDER="gem:rubocop"
 
-VER_STYLELINT="17.6.0"
+VER_STYLELINT="17.8.0"
 VER_STYLELINT_PROVIDER="npm:stylelint"
 
 VER_STYLELINT_CONFIG="40.0.0"
 VER_STYLELINT_CONFIG_PROVIDER="npm:stylelint-config-standard"
 
-VER_ASSEMBLYSCRIPT="0.28.13"
+VER_ASSEMBLYSCRIPT="0.28.14"
 VER_ASSEMBLYSCRIPT_PROVIDER="npm:assemblyscript"
 
-VER_OPA="1.15.1"
+VER_OPA="1.15.2"
 VER_OPA_PROVIDER="github:open-policy-agent/opa"
 
-VER_BUF="1.67.0"
+VER_BUF="1.68.1"
 VER_BUF_PROVIDER="github:bufbuild/buf"
 
-VER_CUE="0.16.0"
+VER_CUE="0.16.1"
 VER_CUE_PROVIDER="github:cue-lang/cue"
 
 VER_JSONNET="0.22.0"
@@ -197,7 +197,7 @@ VER_HADOLINT_PROVIDER="github:hadolint/hadolint"
 VER_DOCKERFILE_UTILS="0.16.3"
 VER_DOCKERFILE_UTILS_PROVIDER="npm:dockerfile-utils"
 
-VER_RUFF="0.15.9"
+VER_RUFF="0.15.10"
 VER_RUFF_PROVIDER="github:astral-sh/ruff"
 
 VER_CLANG_FORMAT="22.1.3"
@@ -218,7 +218,7 @@ VER_TRIVY_PROVIDER="github:aquasecurity/trivy"
 VER_OSV_SCANNER="2.3.5"
 VER_OSV_SCANNER_PROVIDER="github:google/osv-scanner"
 
-VER_GOVULNCHECK="1.1.4"
+VER_GOVULNCHECK="1.2.0"
 VER_GOVULNCHECK_PROVIDER="go:golang.org/x/vuln/cmd/govulncheck"
 
 # Updated 2026-04-05: Ensure latest versions are installed
@@ -229,16 +229,16 @@ VER_CARGO_AUDIT="0.22.1"
 VER_CARGO_AUDIT_PROVIDER="cargo:cargo-audit"
 
 # Updated 2026-04-05: Ensure latest versions are installed
-VER_ZIZMOR="1.23.1"
+VER_ZIZMOR="1.24.1"
 VER_ZIZMOR_PROVIDER="github:zizmorcore/zizmor"
 
 # ── ☁️ DevOps & Infrastructure ────────────────────────────────────────────────
 VER_HELM="3.17.1"
 VER_TERRAFORM="1.11.0"
 VER_TERRAGRUNT="1.0.0-rc3"
-VER_TOFU="1.11.5"
+VER_TOFU="1.11.6"
 VER_TOFU_PROVIDER="github:opentofu/opentofu"
-VER_PULUMI="3.229.0"
+VER_PULUMI="3.230.0"
 VER_PULUMI_PROVIDER="github:pulumi/pulumi"
 VER_KUBE_LINTER="0.8.3"
 VER_KUBE_LINTER_PROVIDER="github:stackrox/kube-linter"
@@ -246,10 +246,10 @@ VER_TFLINT="0.61.0"
 VER_TFLINT_PROVIDER="github:terraform-linters/tflint"
 VER_ANSIBLE_LINT="26.4.0"
 VER_ANSIBLE_LINT_PROVIDER="pipx:ansible-lint"
-VER_SPECTRAL="6.15.0"
+VER_SPECTRAL="6.15.1"
 VER_SPECTRAL_PROVIDER="npm:@stoplight/spectral-cli"
 
-VER_GORELEASER="2.15.2"
+VER_GORELEASER="2.15.3"
 VER_GORELEASER_PROVIDER="github:goreleaser/goreleaser"
 
 # ── 📖 Documentation ──────────────────────────────────────────────────────────

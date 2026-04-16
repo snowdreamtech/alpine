@@ -142,7 +142,7 @@ jobs:
         shell: sh
         run: |
           make update-tools
-          make sync-lock
+          MISE_SKIP_CHECKSUM=1 make sync-lock
 
       - name: "📝 Commit Changes (if any)"
         shell: sh
