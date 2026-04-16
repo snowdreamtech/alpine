@@ -542,6 +542,11 @@ url = "https://github.com/zizmorcore/zizmor/releases/download/v1.24.1/zizmor-aar
 url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/395578622"
 provenance = "github-attestations"
 
+[tools."github:zizmorcore/zizmor"."platforms.macos-x64"]
+checksum = "sha256:721ba70d7fca753aeef1a4ee959a9bc20c55784d4faa6c56e66129a2611fd52f"
+url = "https://github.com/zizmorcore/zizmor/releases/download/v1.24.1/zizmor-x86_64-apple-darwin.tar.gz"
+url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/395578621"
+
 [tools."github:zizmorcore/zizmor"."platforms.windows-x64"]
 checksum = "sha256:b777ec2cb1098139ba74b32e30d11ed149c69ab692d23788c466d4a31704bd4b"
 url = "https://github.com/zizmorcore/zizmor/releases/download/v1.24.1/zizmor-x86_64-pc-windows-msvc.zip"
