@@ -63,6 +63,10 @@ main() {
     _LINTER_BIN="${NPM:-pnpm}"
     ;;
   # Map tool names to mise tool specs for tools with different binary names
+  # SECURITY: Explicitly specify full tool specs to avoid mise's default registry
+  # which may redirect to different backends (e.g., aqua:mrtazz/checkmake instead
+  # of github:checkmake/checkmake). This prevents supply chain attacks via
+  # implicit registry redirections.
   checkmake)
     _MISE_TOOL_SPEC="github:checkmake/checkmake"
     _LINTER_BIN="checkmake"
