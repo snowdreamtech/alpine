@@ -285,7 +285,7 @@ scan_ecosystems() {
   fi
 
   # ── 8. Docker ───────────────────────────────────────────────────────────
-  _docker_dirs=$(find_dirs_for_patterns "Dockerfile" "**/Dockerfile" "Dockerfile.*" "**/Dockerfile.*")
+  _docker_dirs=$(find_dirs_for_patterns "Dockerfile" "**/Dockerfile" "Dockerfile.*" "**/Dockerfile.*" "docker-compose.yml" "docker-compose.yaml" "**/docker-compose.yml" "**/docker-compose.yaml")
   if [ -n "${_docker_dirs:-}" ]; then
     echo "${_docker_dirs:-}" | while IFS= read -r _d; do
       if [ -n "${_d:-}" ]; then _emit_unique "docker" "${_d:-}"; fi
