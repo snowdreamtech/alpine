@@ -38,6 +38,7 @@ provenance = "github-attestations"
 checksum = "sha256:7210e06196de876771cc0bad0f1d57678e709d039f184b491fdaa600d6a95a5e"
 url = "https://github.com/astral-sh/ruff/releases/download/0.15.10/ruff-x86_64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/astral-sh/ruff/releases/assets/392436420"
+provenance = "github-attestations"
 
 [tools."github:astral-sh/ruff"."platforms.windows-x64"]
 checksum = "sha256:6f8f9a445102107ee3c0a05c8f386bacb32238199ecbc0983b9b06c5ea3d7c5e"
