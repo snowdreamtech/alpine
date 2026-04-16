@@ -6,6 +6,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0](https://github.com/snowdreamtech/template/compare/v0.4.0...v0.4.0) (2026-04-16)
+
+
+### Bug Fixes
+
+* **mise:** workaround for GitHub attestation verification failures ([2911054](https://github.com/snowdreamtech/template/commit/29110547a86ebe51593eac637c0b4dc4c14977bc))
+
+
+### Documentation
+
+* **security:** add comprehensive asdf supply chain risk analysis ([515eea1](https://github.com/snowdreamtech/template/commit/515eea10cedc50f05f0cecd3f421129e1ce59cd4))
+
 ## [0.4.0](https://github.com/snowdreamtech/template/compare/v0.3.0...v0.4.0) (2026-04-15)
 
 
