@@ -3,7 +3,7 @@
 [English](README.md) | [简体中文](README_zh-CN.md)
 
 > [!NOTE]
-> 此目录包含了项目自动化基础设施的实现。它遵循 **Single Source of Truth (SSoT)** 模式，核心逻辑位于 POSIX shell 脚本 (`.sh`) 中，并为 Windows 兼容性提供了包装器 (`.ps1`, `.bat`)。
+> 此目录包含了项目自动化基础设施的实现，使用 POSIX shell 脚本 (`.sh`)，可在所有平台上运行，包括 Windows（通过 Git Bash 或 WSL）。
 
 ## 1. 设计与架构
 
@@ -27,8 +27,8 @@
     /    |      \
   /     |       \
   /      |        \
-[lib/common.sh] [lib/langs/*.sh] [Windows 包装器]
-(工具库/SSoT)   (语言模块)            (.bat, .ps1)
+[lib/common.sh] [lib/langs/*.sh] [POSIX Shell 脚本]
+(工具库/SSoT)   (语言模块)            ()
 ```
 
 ### 设计原则
@@ -50,9 +50,12 @@
 
 ### 前置条件
 
-- **POSIX Shell** (Linux/macOS 标准配置；Windows 建议使用 Git Bash 或 WSL)
-- **PowerShell 5.1+** (用于 Windows 包装器)
-- **Make** (可选，提供便捷的入口点)
+- **Linux/macOS**: 内置 POSIX shell
+- **Windows**: Git Bash（随 [Git for Windows](https://git-scm.com/download/win) 安装）或 WSL
+- **Make**: 可选，提供便捷的入口点
+
+> [!TIP]
+> Windows 用户：请参阅 [Windows Shell 迁移指南](../docs/migration/windows-shell-migration.md) 了解设置说明。
 
 ### 快速开始
 
@@ -98,10 +101,9 @@ sh scripts/verify.sh
 
 ### 目录结构
 
-- `scripts/`: 主自动化入口。
-- `scripts/lib/`: 内部核心库 (`common.sh`)。
-- `scripts/lib/langs/`: 模块化语言逻辑 (由 `common.sh` 自动加载)。
-- `scripts/*.ps1` & `scripts/*.bat`: Windows 平台包装器。
+- `scripts/`: 主自动化入口（POSIX shell 脚本）
+- `scripts/lib/`: 内部核心库 (`common.sh`)
+- `scripts/lib/langs/`: 模块化语言逻辑（由 `common.sh` 自动加载）
 
 ## 3. 运维指南
 
@@ -161,7 +163,7 @@ sh scripts/verify.sh
 
 1. 所有新脚本必须包含 `main()` 函数并调用 `parse_common_args`。
 2. 所有新脚本必须通过 `shellcheck --shell=sh` 检查。
-3. 所有新脚本必须提供 `.ps1` 和 `.bat` 包装器。
+3.
 4. 保持英文与中文 README 版本的同步更新。
 
 ### 本地开发环境准备
