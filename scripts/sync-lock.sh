@@ -64,8 +64,12 @@ run_sync_lock() {
   # checksum verification for security.
   if [ -f "mise.lock" ]; then
     log_debug "Removing provenance fields from mise.lock to prevent attestation errors..."
-    # Use perl for cross-platform compatibility
-    perl -i -pe 's/^provenance = .*\n//' mise.lock
+
+    # Use sed for POSIX compatibility (works on Linux, macOS, Windows Git Bash)
+    # Create a temporary file to avoid in-place editing issues across platforms
+    _TMP_LOCK="mise.lock.tmp"
+    sed '/^provenance = /d' mise.lock >"${_TMP_LOCK:-}"
+    mv "${_TMP_LOCK:-}" mise.lock
   fi
 
   # 5. Cleanup
