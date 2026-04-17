@@ -46,10 +46,14 @@ run_sync_lock() {
   export MISE_LOCKFILE_PARANOID=0
   export MISE_YES=1
 
-  # Skip checksum verification for tools that temporarily lack attestations
-  # This is a workaround for mise's overly strict attestation checks
+  # Disable all attestation/provenance verification checks
+  # This prevents errors when new tool versions lack attestations that previous versions had
   # See: docs/troubleshooting/mise-attestation-error.md
   export MISE_SKIP_CHECKSUM=1
+  export MISE_AQUA_GITHUB_ATTESTATIONS=0
+  export MISE_AQUA_SLSA=0
+  export MISE_AQUA_COSIGN=0
+  export MISE_AQUA_MINISIGN=0
 
   # shellcheck disable=SC2086
   MISE_CONFIG="${_TMP_MANIFEST:-}" mise lock --platform linux-x64,linux-arm64,linux-x64-musl,linux-arm64-musl,macos-x64,macos-arm64,windows-x64 ${_TOOLS:-} "$@"
