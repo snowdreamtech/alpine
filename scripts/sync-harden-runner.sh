@@ -28,26 +28,24 @@ main() {
 
   log_info "📋 Synchronizing Harden Runner endpoints from centralized config..."
 
-  # Check if yq is available
-  if ! command -v yq >/dev/null 2>&1; then
-    log_error "Error: yq is required but not installed."
-    log_info "Install with: brew install yq (macOS) or mise install yq"
+  # Ensure PyYAML is installed
+  if ! python3 -c "import yaml" >/dev/null 2>&1; then
+    log_info "Installing PyYAML..."
+    python3 -m pip install --quiet PyYAML || {
+      log_error "Failed to install PyYAML"
+      exit 1
+    }
+  fi
+
+  local _SCRIPT="scripts/sync-harden-runner.py"
+
+  if [ ! -f "${_SCRIPT:-}" ]; then
+    log_error "Error: Python script ${_SCRIPT:-} not found"
     exit 1
   fi
 
-  local _CONFIG=".github/harden-runner-endpoints.yml"
-
-  if [ ! -f "${_CONFIG:-}" ]; then
-    log_error "Error: Configuration file ${_CONFIG:-} not found"
-    exit 1
-  fi
-
-  log_info "✓ Configuration file found: ${_CONFIG:-}"
-  log_info ""
-  log_info "This script requires manual implementation due to complexity."
-  log_info "Please use the Python script instead: python3 scripts/sync-harden-runner.py"
-
-  exit 0
+  log_info "✓ Running Python synchronization script..."
+  python3 "${_SCRIPT:-}" "$@"
 }
 
 main "$@"
