@@ -72,7 +72,7 @@ GIT_BRANCH      := $(shell git branch --show-current 2>/dev/null || echo "not a 
 # =============================================================================
 # Targets
 # =============================================================================
-.PHONY: all help init setup install lint format test build clean commit verify release env update audit health bench docs archive-changelog check-env sync-docs precommit license-add license-check gen-dependabot sync-labels sync-lock update-tools
+.PHONY: all help init setup install lint format test build clean commit verify release env update audit health bench docs archive-changelog check-env sync-docs precommit license-add license-check gen-dependabot sync-labels sync-harden-runner sync-lock update-tools
 
 # Default target: display help
 all: help
@@ -241,6 +241,13 @@ ifeq ($(OS_NAME),Windows)
 	@mise x -- scripts/sync-labels.bat $(SCRIPT_ARGS) $(ARGS)
 else
 	@mise x -- sh scripts/sync-labels.sh $(SCRIPT_ARGS) $(ARGS)
+endif
+
+sync-harden-runner: ## Synchronize Harden Runner endpoints to all workflow files
+ifeq ($(OS_NAME),Windows)
+	@scripts/sync-harden-runner.bat $(SCRIPT_ARGS) $(ARGS)
+else
+	@sh scripts/sync-harden-runner.sh $(SCRIPT_ARGS) $(ARGS)
 endif
 
 sync-lock: ## Synchronize and verify the mise.lock file across all platforms
