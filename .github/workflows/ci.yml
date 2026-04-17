@@ -38,10 +38,8 @@ jobs:
           egress-policy: block
           allowed-endpoints: >
             api.github.com:443
+            *.githubusercontent.com:443
             github.com:443
-            objects.githubusercontent.com:443
-            raw.githubusercontent.com:443
-            release-assets.githubusercontent.com:443
             mise.run:443
             install.mise.jdx.dev:443
             *.mise.jdx.dev:443
@@ -108,10 +106,8 @@ jobs:
           egress-policy: block
           allowed-endpoints: >
             api.github.com:443
+            *.githubusercontent.com:443
             github.com:443
-            objects.githubusercontent.com:443
-            raw.githubusercontent.com:443
-            release-assets.githubusercontent.com:443
             mise.run:443
             install.mise.jdx.dev:443
             *.mise.jdx.dev:443
@@ -262,10 +258,8 @@ jobs:
           egress-policy: block
           allowed-endpoints: >
             api.github.com:443
+            *.githubusercontent.com:443
             github.com:443
-            objects.githubusercontent.com:443
-            raw.githubusercontent.com:443
-            release-assets.githubusercontent.com:443
             mise.run:443
             install.mise.jdx.dev:443
             *.mise.jdx.dev:443
@@ -409,10 +403,8 @@ jobs:
           egress-policy: block
           allowed-endpoints: >
             api.github.com:443
+            *.githubusercontent.com:443
             github.com:443
-            objects.githubusercontent.com:443
-            raw.githubusercontent.com:443
-            release-assets.githubusercontent.com:443
             mise.run:443
             install.mise.jdx.dev:443
             *.mise.jdx.dev:443
