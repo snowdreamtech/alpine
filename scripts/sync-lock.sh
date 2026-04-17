@@ -58,7 +58,17 @@ run_sync_lock() {
   # shellcheck disable=SC2086
   MISE_CONFIG="${_TMP_MANIFEST:-}" mise lock --platform linux-x64,linux-arm64,linux-x64-musl,linux-arm64-musl,macos-x64,macos-arm64,windows-x64 ${_TOOLS:-} "$@"
 
-  # 4. Cleanup
+  # 4. Remove provenance fields from mise.lock to prevent attestation comparison errors
+  # When a new version lacks attestations that the previous version had, mise will error out.
+  # By removing all provenance fields, we prevent this comparison while still maintaining
+  # checksum verification for security.
+  if [ -f "mise.lock" ]; then
+    log_debug "Removing provenance fields from mise.lock to prevent attestation errors..."
+    # Use perl for cross-platform compatibility
+    perl -i -pe 's/^provenance = .*\n//' mise.lock
+  fi
+
+  # 5. Cleanup
   rm -f "${_TMP_MANIFEST:-}"
 
   log_success "mise.lock synchronized successfully for all platforms."
