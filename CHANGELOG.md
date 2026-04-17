@@ -6,6 +6,19 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.6.1](https://github.com/snowdreamtech/template/compare/v0.6.0...v0.6.1) (2026-04-17)
+
+
+### Bug Fixes
+
+* **mise:** disable attestation checks in sync-lock to prevent false positives ([3f09708](https://github.com/snowdreamtech/template/commit/3f09708fefcf850b11f0ed2f7c29525f2c6c2b0d))
+* **mise:** remove provenance fields from lockfile to prevent attestation errors ([f7790b5](https://github.com/snowdreamtech/template/commit/f7790b5803b47822c1191f28c155763a3ce43844))
+
+
+### Miscellaneous Chores
+
+* release 0.6.1 ([f6fc042](https://github.com/snowdreamtech/template/commit/f6fc042cad7d1c4991a20657655bc4b6b339d0d9))
+
 ## [0.6.0](https://github.com/snowdreamtech/template/compare/v0.5.0...v0.6.0) (2026-04-16)
 
 
