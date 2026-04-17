@@ -48,6 +48,7 @@ python = "3.14.4"
 "github:hadolint/hadolint" = "2.14.0"
 "github:dotenv-linter/dotenv-linter" = "4.0.0"
 "pipx:yamllint" = "1.38.0"
+"pipx:pyyaml" = "6.0.2"
 
 # Python tools (pre-commit hooks)
 "github:astral-sh/ruff" = "0.15.10"
