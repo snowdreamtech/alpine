@@ -95,6 +95,7 @@ jobs:
             osv-vulnerabilities.storage.googleapis.com:443
             api.osv.dev:443
             trivy-repo.aquasecurity.github.io:443
+            get.trivy.dev:443
             *.aquasecurity.github.io:443
             pkg-containers.githubusercontent.com:443
             *.dkr.ecr.*.amazonaws.com:443

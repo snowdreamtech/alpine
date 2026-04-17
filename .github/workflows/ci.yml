@@ -442,6 +442,7 @@ jobs:
             osv-vulnerabilities.storage.googleapis.com:443
             api.osv.dev:443
             trivy-repo.aquasecurity.github.io:443
+            get.trivy.dev:443
             *.aquasecurity.github.io:443
             production.cloudflare.docker.com:443
             gcr.io:443
@@ -451,6 +452,9 @@ jobs:
             *.quay.io:443
             *.dkr.ecr.*.amazonaws.com:443
             *.azurecr.io:443
+            tuf-repo-cdn.sigstore.dev:443
+            fulcio.sigstore.dev:443
+            rekor.sigstore.dev:443
 
       - name: "📂 Checkout Repository Code"
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
