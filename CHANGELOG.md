@@ -673,7 +673,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 * **ci:** comprehensive tool installation and execution fix ([bac4a9c](https://github.com/snowdreamtech/template/commit/bac4a9ce77e15170d3a8f3e1db970b00917e7abc))
 * **ci:** correct action SHA and version tag mismatches in cd.yml ([f4d90ec](https://github.com/snowdreamtech/template/commit/f4d90ec5d3570189d0f8c5562f4eea59f70a899f))
 * **ci:** disable paranoid mode in CI for lockfile sync ([1b282ce](https://github.com/snowdreamtech/template/commit/1b282ce6fa3d1ecca5c18de89a4962ec7e50226b))
-* **ci:** elevate MISE_GITHUB_TOKEN for rate-limit resilience ([7c2123f](https://github.com/snowdreamtech/template/commit/7c2123fe8f1dbced5332f7a16cdbb84c973b6c29))
+* **ci:** elevate GITHUB_TOKEN for rate-limit resilience ([7c2123f](https://github.com/snowdreamtech/template/commit/7c2123fe8f1dbced5332f7a16cdbb84c973b6c29))
 * **ci:** enable release-please for dev branch and fix DCO signoff ([ab8f065](https://github.com/snowdreamtech/template/commit/ab8f065dce45cc794d78aa075fc8c066eeec2bf5))
 * **ci:** ensure CI_STEP_SUMMARY is always defined and sourced in gen-dependabot ([e19a7ec](https://github.com/snowdreamtech/template/commit/e19a7ec5fa7c2c61f9cdccb0dae4ddc56afcbfc4))
 * **ci:** ensure PATH persistence after setup completes on Windows ([460dc8d](https://github.com/snowdreamtech/template/commit/460dc8d84067a89081762401269565a815ceab00))
