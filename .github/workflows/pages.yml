@@ -66,10 +66,6 @@ jobs:
             *.ubuntu.com:443
             *.debian.org:80
             *.debian.org:443
-            deb.debian.org:80
-            deb.debian.org:443
-            security.debian.org:80
-            security.debian.org:443
             *.rockylinux.org:443
             *.centos.org:443
             *.redhat.com:443
@@ -161,10 +157,6 @@ jobs:
             *.ubuntu.com:443
             *.debian.org:80
             *.debian.org:443
-            deb.debian.org:80
-            deb.debian.org:443
-            security.debian.org:80
-            security.debian.org:443
             *.rockylinux.org:443
             *.centos.org:443
             *.redhat.com:443
