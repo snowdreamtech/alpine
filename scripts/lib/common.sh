@@ -207,11 +207,9 @@ export MISE_CHECK_FOR_UPDATES=0
 export MISE_GIT_ALWAYS_USE_GIX=0
 export MISE_GIX=0
 export MISE_USE_GIX=0
-# In CI, ensure GitHub tokens are correctly normalized for both mise and GitHub CLI (gh).
+# In CI, ensure GitHub tokens are correctly normalized for GitHub CLI (gh).
 # This MUST happen at bootstrap, before any direct tool invocation.
 if [ -n "${GITHUB_TOKEN:-}" ]; then
-  # mise-specific token variable
-  [ -z "${MISE_GITHUB_TOKEN:-}" ] && export MISE_GITHUB_TOKEN="${GITHUB_TOKEN:-}"
   # GitHub CLI (gh) preferred variable
   [ -z "${GH_TOKEN:-}" ] && export GH_TOKEN="${GITHUB_TOKEN:-}"
 fi
@@ -688,13 +686,6 @@ run_mise() {
   if ! is_ci_env && [ "${GITHUB_TOKEN_FORCE_KEEP:-0}" -ne 1 ]; then
     unset GITHUB_TOKEN
   else
-    # Ensure MISE_GITHUB_TOKEN is set for mise's internal GitHub API calls.
-    # Workflows set this at env level, but ensure it survives subshell/export boundaries.
-    if [ -n "${GITHUB_TOKEN:-}" ] && [ -z "${MISE_GITHUB_TOKEN:-}" ]; then
-      export MISE_GITHUB_TOKEN="${GITHUB_TOKEN:-}"
-      log_debug "Forwarded GITHUB_TOKEN -> MISE_GITHUB_TOKEN for mise."
-    fi
-
     # Ensure GITHUB_API_TOKEN is set for mise's internal GitHub API calls.
     # Workflows set this at env level, but ensure it survives subshell/export boundaries.
     if [ -n "${GITHUB_TOKEN:-}" ] && [ -z "${GITHUB_API_TOKEN:-}" ]; then
