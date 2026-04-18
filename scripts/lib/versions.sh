@@ -93,7 +93,7 @@ VER_APTOS_PROVIDER="github:aptos-labs/aptos-core"
 # ── 🔐 Tier 1: Security & Engineering (Mirror of .mise.toml) ─────────────────
 VER_GITLEAKS="8.30.1"
 VER_GITLEAKS_PROVIDER="github:gitleaks/gitleaks"
-VER_GH_CLI="2.89.0"
+VER_GH_CLI="2.90.0"
 VER_GH_CLI_PROVIDER="github:cli/cli"
 
 # ── 💎 Tier 1: Core Quality & Commit Tooling (Mirror of .mise.toml) ──────────
@@ -165,7 +165,7 @@ VER_ASSEMBLYSCRIPT_PROVIDER="npm:assemblyscript"
 VER_OPA="1.15.2"
 VER_OPA_PROVIDER="github:open-policy-agent/opa"
 
-VER_BUF="1.68.1"
+VER_BUF="1.68.2"
 VER_BUF_PROVIDER="github:bufbuild/buf"
 
 VER_CUE="0.16.1"
@@ -197,7 +197,7 @@ VER_HADOLINT_PROVIDER="github:hadolint/hadolint"
 VER_DOCKERFILE_UTILS="0.16.3"
 VER_DOCKERFILE_UTILS_PROVIDER="npm:dockerfile-utils"
 
-VER_RUFF="0.15.10"
+VER_RUFF="0.15.11"
 VER_RUFF_PROVIDER="github:astral-sh/ruff"
 
 VER_CLANG_FORMAT="22.1.3"
@@ -212,7 +212,7 @@ VER_DOTENV_LINTER_PROVIDER="github:dotenv-linter/dotenv-linter"
 # NOTE: VER_CHECKMAKE moved to Tier 1 section above.
 
 # ── 🛡️ Security Scanning (CI-only by default) ─────────────────────────────────
-VER_TRIVY="0.69.3"
+VER_TRIVY="0.70.0"
 VER_TRIVY_PROVIDER="github:aquasecurity/trivy"
 
 VER_OSV_SCANNER="2.3.5"
@@ -238,7 +238,7 @@ VER_TERRAFORM="1.11.0"
 VER_TERRAGRUNT="1.0.0-rc3"
 VER_TOFU="1.11.6"
 VER_TOFU_PROVIDER="github:opentofu/opentofu"
-VER_PULUMI="3.230.0"
+VER_PULUMI="3.231.0"
 VER_PULUMI_PROVIDER="github:pulumi/pulumi"
 VER_KUBE_LINTER="0.8.3"
 VER_KUBE_LINTER_PROVIDER="github:stackrox/kube-linter"
