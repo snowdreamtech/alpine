@@ -44,12 +44,12 @@ name: "🐳 Docker Multi-Platform Build"
         required: false
         type: choice
         options:
-          - ""
+          - "all"
           - "3.20"
           - "3.21"
           - "3.22"
           - "3.23"
-        default: ""
+        default: "all"
       push_images:
         description: "Push images to registries"
         required: false
@@ -96,7 +96,7 @@ jobs:
         run: |
           # For workflow_dispatch, check if this matrix version should run
           if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
-            if [ -n "${{ inputs.alpine_version }}" ] && [ "${{ inputs.alpine_version }}" != "${{ matrix.version }}" ]; then
+            if [ "${{ inputs.alpine_version }}" != "all" ] && [ "${{ inputs.alpine_version }}" != "${{ matrix.version }}" ]; then
               echo "skip=true" >> "$GITHUB_OUTPUT"
               echo "→ Skipping Alpine ${{ matrix.version }} (user selected: ${{ inputs.alpine_version }})"
               exit 0
@@ -221,8 +221,8 @@ jobs:
           echo "  GHCR: ${{ steps.login-ghcr.outcome }}"
 
           if [ "${{ steps.login-dockerhub.outcome }}" != "success" ] && \
-             [ "${{ steps.login-quay.outcome }}" != "success" ] && \
-             [ "${{ steps.login-ghcr.outcome }}" != "success" ]; then
+            [ "${{ steps.login-quay.outcome }}" != "success" ] && \
+            [ "${{ steps.login-ghcr.outcome }}" != "success" ]; then
             echo "::error::All registry logins failed. Cannot proceed."
             exit 1
           fi
@@ -677,7 +677,7 @@ jobs:
           fi
 
           if [ "${{ steps.login-dockerhub.outcome }}" != "success" ] && \
-             [ "${{ steps.login-quay.outcome }}" != "success" ] && \
-             [ "${{ steps.login-ghcr.outcome }}" != "success" ]; then
+            [ "${{ steps.login-quay.outcome }}" != "success" ] && \
+            [ "${{ steps.login-ghcr.outcome }}" != "success" ]; then
             echo "::error title=Registry Login Failed::All registry authentications failed"
           fi
