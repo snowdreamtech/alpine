@@ -47,6 +47,41 @@ url_api = "https://api.github.com/repos/checkmake/checkmake/releases/assets/3387
 version = "2.90.0"
 backend = "github:cli/cli"
 
+[tools."github:cli/cli"."platforms.linux-arm64"]
+checksum = "sha256:1139e1ad912fcddb5ef4b957530184c2c30d9937ff65ff4e641fbf6ca5f28c7c"
+url = "https://github.com/cli/cli/releases/download/v2.90.0/gh_2.90.0_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/397970492"
+
+[tools."github:cli/cli"."platforms.linux-arm64-musl"]
+checksum = "sha256:1139e1ad912fcddb5ef4b957530184c2c30d9937ff65ff4e641fbf6ca5f28c7c"
+url = "https://github.com/cli/cli/releases/download/v2.90.0/gh_2.90.0_linux_arm64.tar.gz"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/397970492"
+
+[tools."github:cli/cli"."platforms.linux-x64"]
+checksum = "sha256:b2aef7b23ec6899bf27f37a32c57a7935d0a178568ac33dc9bb03842f724195a"
+url = "https://github.com/cli/cli/releases/download/v2.90.0/gh_2.90.0_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/397970489"
+
+[tools."github:cli/cli"."platforms.linux-x64-musl"]
+checksum = "sha256:b2aef7b23ec6899bf27f37a32c57a7935d0a178568ac33dc9bb03842f724195a"
+url = "https://github.com/cli/cli/releases/download/v2.90.0/gh_2.90.0_linux_amd64.tar.gz"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/397970489"
+
+[tools."github:cli/cli"."platforms.macos-arm64"]
+checksum = "sha256:82a6acdc3f445dc316b70e1bc15b9b7c4b4e26fd30b04de461a7829ad6c6e97f"
+url = "https://github.com/cli/cli/releases/download/v2.90.0/gh_2.90.0_macOS_arm64.zip"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/397970501"
+
+[tools."github:cli/cli"."platforms.macos-x64"]
+checksum = "sha256:e44d23dd5f0f8534d7a9989177f2c60ac8ffbcdfc6a0a6e5d1f23c4a3b83a9e0"
+url = "https://github.com/cli/cli/releases/download/v2.90.0/gh_2.90.0_macOS_amd64.zip"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/397970500"
+
+[tools."github:cli/cli"."platforms.windows-x64"]
+checksum = "sha256:73fcae688eb64ae67828536c9be90db1e5be3f11691a6fa1c1e5418fd24ee10b"
+url = "https://github.com/cli/cli/releases/download/v2.90.0/gh_2.90.0_windows_amd64.zip"
+url_api = "https://api.github.com/repos/cli/cli/releases/assets/397970515"
+
 [[tools."github:dotenv-linter/dotenv-linter"]]
 version = "4.0.0"
 backend = "github:dotenv-linter/dotenv-linter"
