@@ -31,7 +31,7 @@ VER_PIPX_PROVIDER="pip"
 
 # ── 🏗️ Tier 2: Language Runtimes (On-demand) ─────────────────────────────────
 VER_KOTLIN="2.3.20"
-VER_RUST="1.94.1"
+VER_RUST="1.95.0"
 VER_BUN="1.3.12"
 VER_DENO="2.7.12"
 VER_ZIG="0.16.0"
@@ -179,7 +179,7 @@ VER_GOLANGCI_LINT="1.64.5"
 VER_VITEPRESS="1.6.4"
 VER_VITEPRESS_PROVIDER="npm:vitepress"
 
-VER_ESLINT="10.2.0"
+VER_ESLINT="10.2.1"
 VER_ESLINT_PROVIDER="npm:eslint"
 
 VER_MARKDOWNLINT="0.22.0"

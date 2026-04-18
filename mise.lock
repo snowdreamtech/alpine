@@ -8,43 +8,36 @@ backend = "github:astral-sh/ruff"
 checksum = "sha256:b775a5a09484549ac3fd377b5ce34955cf633165169671d1c4a215c113ce15df"
 url = "https://github.com/astral-sh/ruff/releases/download/0.15.10/ruff-aarch64-unknown-linux-gnu.tar.gz"
 url_api = "https://api.github.com/repos/astral-sh/ruff/releases/assets/392436366"
-provenance = "github-attestations"
 
 [tools."github:astral-sh/ruff"."platforms.linux-arm64-musl"]
 checksum = "sha256:84754f0e58f58fb123ea49b8d22b8ce2cc96e4046b7c1b1ed99f6af7fe76f8ef"
 url = "https://github.com/astral-sh/ruff/releases/download/0.15.10/ruff-aarch64-unknown-linux-musl.tar.gz"
 url_api = "https://api.github.com/repos/astral-sh/ruff/releases/assets/392436377"
-provenance = "github-attestations"
 
 [tools."github:astral-sh/ruff"."platforms.linux-x64"]
 checksum = "sha256:e3e9e5c791542f00d95edc74a506e1ac24efc0af9574de01ab338187bf1ff9f6"
 url = "https://github.com/astral-sh/ruff/releases/download/0.15.10/ruff-x86_64-unknown-linux-gnu.tar.gz"
 url_api = "https://api.github.com/repos/astral-sh/ruff/releases/assets/392436426"
-provenance = "github-attestations"
 
 [tools."github:astral-sh/ruff"."platforms.linux-x64-musl"]
 checksum = "sha256:8b0a16bae81e371c9b6176a27fdb9db1deaa04c4cfe87e8604a898cc31686500"
 url = "https://github.com/astral-sh/ruff/releases/download/0.15.10/ruff-x86_64-unknown-linux-musl.tar.gz"
 url_api = "https://api.github.com/repos/astral-sh/ruff/releases/assets/392436430"
-provenance = "github-attestations"
 
 [tools."github:astral-sh/ruff"."platforms.macos-arm64"]
 checksum = "sha256:77c1df502dcfaaec52c6ce203b504b8554c88ab66ac01313410fa68ad9aafd5b"
 url = "https://github.com/astral-sh/ruff/releases/download/0.15.10/ruff-aarch64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/astral-sh/ruff/releases/assets/392436358"
-provenance = "github-attestations"
 
 [tools."github:astral-sh/ruff"."platforms.macos-x64"]
 checksum = "sha256:7210e06196de876771cc0bad0f1d57678e709d039f184b491fdaa600d6a95a5e"
 url = "https://github.com/astral-sh/ruff/releases/download/0.15.10/ruff-x86_64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/astral-sh/ruff/releases/assets/392436420"
-provenance = "github-attestations"
 
 [tools."github:astral-sh/ruff"."platforms.windows-x64"]
 checksum = "sha256:6f8f9a445102107ee3c0a05c8f386bacb32238199ecbc0983b9b06c5ea3d7c5e"
 url = "https://github.com/astral-sh/ruff/releases/download/0.15.10/ruff-x86_64-pc-windows-msvc.zip"
 url_api = "https://api.github.com/repos/astral-sh/ruff/releases/assets/392436425"
-provenance = "github-attestations"
 
 [[tools."github:checkmake/checkmake"]]
 version = "v0.3.2"
@@ -93,43 +86,36 @@ backend = "github:cli/cli"
 checksum = "sha256:9e64a623dfc242990aa5d9b3f507111149c4282f66b68eaad1dc79eeb13b9ce5"
 url = "https://github.com/cli/cli/releases/download/v2.89.0/gh_2.89.0_linux_arm64.tar.gz"
 url_api = "https://api.github.com/repos/cli/cli/releases/assets/382152834"
-provenance = "github-attestations"
 
 [tools."github:cli/cli"."platforms.linux-arm64-musl"]
 checksum = "sha256:9e64a623dfc242990aa5d9b3f507111149c4282f66b68eaad1dc79eeb13b9ce5"
 url = "https://github.com/cli/cli/releases/download/v2.89.0/gh_2.89.0_linux_arm64.tar.gz"
 url_api = "https://api.github.com/repos/cli/cli/releases/assets/382152834"
-provenance = "github-attestations"
 
 [tools."github:cli/cli"."platforms.linux-x64"]
 checksum = "sha256:d0422caade520530e76c1c558da47daebaa8e1203d6b7ff10ad7d6faba3490d8"
 url = "https://github.com/cli/cli/releases/download/v2.89.0/gh_2.89.0_linux_amd64.tar.gz"
 url_api = "https://api.github.com/repos/cli/cli/releases/assets/382152824"
-provenance = "github-attestations"
 
 [tools."github:cli/cli"."platforms.linux-x64-musl"]
 checksum = "sha256:d0422caade520530e76c1c558da47daebaa8e1203d6b7ff10ad7d6faba3490d8"
 url = "https://github.com/cli/cli/releases/download/v2.89.0/gh_2.89.0_linux_amd64.tar.gz"
 url_api = "https://api.github.com/repos/cli/cli/releases/assets/382152824"
-provenance = "github-attestations"
 
 [tools."github:cli/cli"."platforms.macos-arm64"]
 checksum = "sha256:2423d02ec0a2094898c378703a1b28a5846c08700f87461363857cb8cb3fda94"
 url = "https://github.com/cli/cli/releases/download/v2.89.0/gh_2.89.0_macOS_arm64.zip"
 url_api = "https://api.github.com/repos/cli/cli/releases/assets/382152851"
-provenance = "github-attestations"
 
 [tools."github:cli/cli"."platforms.macos-x64"]
 checksum = "sha256:862e21cac6a71f81e7cd6e5127e3cd344f8537441ad2db94cd208319dd17b6e9"
 url = "https://github.com/cli/cli/releases/download/v2.89.0/gh_2.89.0_macOS_amd64.zip"
 url_api = "https://api.github.com/repos/cli/cli/releases/assets/382152850"
-provenance = "github-attestations"
 
 [tools."github:cli/cli"."platforms.windows-x64"]
 checksum = "sha256:f3326f6406c98c99701b257d77e2b040eedf83d0176c2c2e9809aa339ceb467e"
 url = "https://github.com/cli/cli/releases/download/v2.89.0/gh_2.89.0_windows_amd64.zip"
 url_api = "https://api.github.com/repos/cli/cli/releases/assets/382152866"
-provenance = "github-attestations"
 
 [[tools."github:dotenv-linter/dotenv-linter"]]
 version = "4.0.0"
@@ -472,43 +458,36 @@ backend = "github:rhysd/actionlint"
 checksum = "sha256:325e971b6ba9bfa504672e29be93c24981eeb1c07576d730e9f7c8805afff0c6"
 url = "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_arm64.tar.gz"
 url_api = "https://api.github.com/repos/rhysd/actionlint/releases/assets/384924897"
-provenance = "github-attestations"
 
 [tools."github:rhysd/actionlint"."platforms.linux-arm64-musl"]
 checksum = "sha256:325e971b6ba9bfa504672e29be93c24981eeb1c07576d730e9f7c8805afff0c6"
 url = "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_arm64.tar.gz"
 url_api = "https://api.github.com/repos/rhysd/actionlint/releases/assets/384924897"
-provenance = "github-attestations"
 
 [tools."github:rhysd/actionlint"."platforms.linux-x64"]
 checksum = "sha256:8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8"
 url = "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz"
 url_api = "https://api.github.com/repos/rhysd/actionlint/releases/assets/384924896"
-provenance = "github-attestations"
 
 [tools."github:rhysd/actionlint"."platforms.linux-x64-musl"]
 checksum = "sha256:8aca8db96f1b94770f1b0d72b6dddcb1ebb8123cb3712530b08cc387b349a3d8"
 url = "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_linux_amd64.tar.gz"
 url_api = "https://api.github.com/repos/rhysd/actionlint/releases/assets/384924896"
-provenance = "github-attestations"
 
 [tools."github:rhysd/actionlint"."platforms.macos-arm64"]
 checksum = "sha256:aba9ced2dee8d27fecca3dc7feb1a7f9a52caefa1eb46f3271ea66b6e0e6953f"
 url = "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_darwin_arm64.tar.gz"
 url_api = "https://api.github.com/repos/rhysd/actionlint/releases/assets/384924893"
-provenance = "github-attestations"
 
 [tools."github:rhysd/actionlint"."platforms.macos-x64"]
 checksum = "sha256:5b44c3bc2255115c9b69e30efc0fecdf498fdb63c5d58e17084fd5f16324c644"
 url = "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_darwin_amd64.tar.gz"
 url_api = "https://api.github.com/repos/rhysd/actionlint/releases/assets/384924880"
-provenance = "github-attestations"
 
 [tools."github:rhysd/actionlint"."platforms.windows-x64"]
 checksum = "sha256:6e7241b51e6817ea6a047693d8e6fed13b31819c9a0dd6c5a726e1592d22f6e9"
 url = "https://github.com/rhysd/actionlint/releases/download/v1.7.12/actionlint_1.7.12_windows_amd64.zip"
 url_api = "https://api.github.com/repos/rhysd/actionlint/releases/assets/384924919"
-provenance = "github-attestations"
 
 [[tools."github:zizmorcore/zizmor"]]
 version = "1.24.1"
@@ -518,43 +497,36 @@ backend = "github:zizmorcore/zizmor"
 checksum = "sha256:d66e37ef8a375fb07939c630ebf9709a6e0f20242bdc3faf672a7ed97e0b768d"
 url = "https://github.com/zizmorcore/zizmor/releases/download/v1.24.1/zizmor-aarch64-unknown-linux-gnu.tar.gz"
 url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/395578623"
-provenance = "github-attestations"
 
 [tools."github:zizmorcore/zizmor"."platforms.linux-arm64-musl"]
 checksum = "sha256:d66e37ef8a375fb07939c630ebf9709a6e0f20242bdc3faf672a7ed97e0b768d"
 url = "https://github.com/zizmorcore/zizmor/releases/download/v1.24.1/zizmor-aarch64-unknown-linux-gnu.tar.gz"
 url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/395578623"
-provenance = "github-attestations"
 
 [tools."github:zizmorcore/zizmor"."platforms.linux-x64"]
 checksum = "sha256:a8000f3c683319a523d3b20df0e75457ba591f049cfcbfa98966631b56733c03"
 url = "https://github.com/zizmorcore/zizmor/releases/download/v1.24.1/zizmor-x86_64-unknown-linux-gnu.tar.gz"
 url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/395578625"
-provenance = "github-attestations"
 
 [tools."github:zizmorcore/zizmor"."platforms.linux-x64-musl"]
 checksum = "sha256:a8000f3c683319a523d3b20df0e75457ba591f049cfcbfa98966631b56733c03"
 url = "https://github.com/zizmorcore/zizmor/releases/download/v1.24.1/zizmor-x86_64-unknown-linux-gnu.tar.gz"
 url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/395578625"
-provenance = "github-attestations"
 
 [tools."github:zizmorcore/zizmor"."platforms.macos-arm64"]
 checksum = "sha256:fc4ea59e18bc028dddb5f710b16dbc361b01ff1e7a20c03b8e5778366ca9f4e1"
 url = "https://github.com/zizmorcore/zizmor/releases/download/v1.24.1/zizmor-aarch64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/395578622"
-provenance = "github-attestations"
 
 [tools."github:zizmorcore/zizmor"."platforms.macos-x64"]
 checksum = "sha256:721ba70d7fca753aeef1a4ee959a9bc20c55784d4faa6c56e66129a2611fd52f"
 url = "https://github.com/zizmorcore/zizmor/releases/download/v1.24.1/zizmor-x86_64-apple-darwin.tar.gz"
 url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/395578621"
-provenance = "github-attestations"
 
 [tools."github:zizmorcore/zizmor"."platforms.windows-x64"]
 checksum = "sha256:b777ec2cb1098139ba74b32e30d11ed149c69ab692d23788c466d4a31704bd4b"
 url = "https://github.com/zizmorcore/zizmor/releases/download/v1.24.1/zizmor-x86_64-pc-windows-msvc.zip"
 url_api = "https://api.github.com/repos/zizmorcore/zizmor/releases/assets/395578624"
-provenance = "github-attestations"
 
 [[tools.go]]
 version = "1.26.2"
@@ -570,7 +542,7 @@ url = "https://dl.google.com/go/go1.26.2.linux-arm64.tar.gz"
 
 [tools.go."platforms.linux-x64"]
 checksum = "sha256:990e6b4bbba816dc3ee129eaeaf4b42f17c2800b88a2166c265ac1a200262282"
-url = "https://mirrors.aliyun.com/golang//go1.26.2.linux-amd64.tar.gz"
+url = "https://dl.google.com/go/go1.26.2.linux-amd64.tar.gz"
 
 [tools.go."platforms.linux-x64-musl"]
 checksum = "sha256:990e6b4bbba816dc3ee129eaeaf4b42f17c2800b88a2166c265ac1a200262282"
@@ -684,7 +656,7 @@ version = "0.16.3"
 backend = "npm:dockerfile-utils"
 
 [[tools."npm:eslint"]]
-version = "10.2.0"
+version = "10.2.1"
 backend = "npm:eslint"
 
 [[tools."npm:markdownlint-cli2"]]
@@ -726,34 +698,27 @@ backend = "core:python"
 [tools.python."platforms.linux-arm64"]
 checksum = "sha256:b8b597fdb2f8dccdc502c11947b60a4b65eb6bce79cfa60c7ccf9b6e8352c60a"
 url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260414/cpython-3.14.4+20260414-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz"
-provenance = "github-attestations"
 
 [tools.python."platforms.linux-arm64-musl"]
 checksum = "sha256:b8b597fdb2f8dccdc502c11947b60a4b65eb6bce79cfa60c7ccf9b6e8352c60a"
 url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260414/cpython-3.14.4+20260414-aarch64-unknown-linux-gnu-install_only_stripped.tar.gz"
-provenance = "github-attestations"
 
 [tools.python."platforms.linux-x64"]
 checksum = "sha256:fe9a9c32d13870af632cbac3dfc7528ae53597e94472aa4c7d6a42e8166136cd"
 url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260414/cpython-3.14.4+20260414-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
-provenance = "github-attestations"
 
 [tools.python."platforms.linux-x64-musl"]
 checksum = "sha256:fe9a9c32d13870af632cbac3dfc7528ae53597e94472aa4c7d6a42e8166136cd"
 url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260414/cpython-3.14.4+20260414-x86_64-unknown-linux-gnu-install_only_stripped.tar.gz"
-provenance = "github-attestations"
 
 [tools.python."platforms.macos-arm64"]
 checksum = "sha256:6f304f4ec30854611f23316578302235fb517cd970519ecdd11a8c4db87fd843"
 url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260414/cpython-3.14.4+20260414-aarch64-apple-darwin-install_only_stripped.tar.gz"
-provenance = "github-attestations"
 
 [tools.python."platforms.macos-x64"]
 checksum = "sha256:d51250a32fa5d9f0799c7bcb71720c27b10a3afd4a7de288120f96085d508a5a"
 url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260414/cpython-3.14.4+20260414-x86_64-apple-darwin-install_only_stripped.tar.gz"
-provenance = "github-attestations"
 
 [tools.python."platforms.windows-x64"]
 checksum = "sha256:a976991dcd085c1bb5d9a8084823a6bc8b7f9b079d8c432574a6ddd68c3a6fe1"
 url = "https://github.com/astral-sh/python-build-standalone/releases/download/20260414/cpython-3.14.4+20260414-x86_64-pc-windows-msvc-install_only_stripped.tar.gz"
-provenance = "github-attestations"
