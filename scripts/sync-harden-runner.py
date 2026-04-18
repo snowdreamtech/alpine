@@ -29,33 +29,54 @@ def update_workflow_endpoints(filepath: Path, endpoints: List[str]) -> bool:
     original = content
     lines = content.split("\n")
     result = []
-    indent = ""
 
     i = 0
     while i < len(lines):
         line = lines[i]
 
         # Detect allowed-endpoints section
-        if "allowed-endpoints:" in line:
+        if "allowed-endpoints:" in line and ">" in line:
+            # Multi-line format: allowed-endpoints: >
             result.append(line)
+            i += 1
 
             # Detect indentation from next line
-            if i + 1 < len(lines):
-                next_line = lines[i + 1]
-                if next_line.strip():
-                    indent = next_line[: len(next_line) - len(next_line.lstrip())]
+            if i < len(lines) and lines[i].strip():
+                base_indent = len(lines[i]) - len(lines[i].lstrip())
+            else:
+                base_indent = 12  # Default indentation
 
             # Add new endpoints
+            indent = " " * base_indent
             for endpoint in endpoints:
                 result.append(f"{indent}{endpoint}")
 
-            # Skip old endpoints
-            i += 1
+            # Skip old endpoints (only lines with same or greater indentation that are endpoints)
             while i < len(lines):
-                if lines[i] and not lines[i].startswith(" "):
-                    # Reached next section
+                current_line = lines[i]
+                if not current_line.strip():
+                    # Empty line - keep it and continue
+                    result.append(current_line)
+                    i += 1
+                    continue
+
+                current_indent = len(current_line) - len(current_line.lstrip())
+
+                # If indentation is less than base, we've reached the next section
+                if current_indent < base_indent:
                     break
-                i += 1
+
+                # If indentation equals base and line looks like an endpoint, skip it
+                if current_indent == base_indent and (
+                    ":" in current_line
+                    and not current_line.strip().startswith("-")
+                    and not current_line.strip().endswith(":")
+                ):
+                    i += 1
+                    continue
+
+                # Otherwise, we've reached the next section
+                break
 
             continue
 
