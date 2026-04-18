@@ -2540,7 +2540,7 @@ init_summary_table() {
 finalize_summary_table() {
   if [ "${_IS_TOP_LEVEL:-}" = "true" ] && [ -f "${CI_STEP_SUMMARY:-}" ]; then
     # In CI, the platform handles the file. In local dev, we print it to the console.
-    if [ "${CI:-}" != "true" ] && [ "${GITHUB_ACTIONS:-}" != "true" ] && [ "${VERBOSE:-0}" -ge 1 ]; then
+    if [ "${CI:-}" != "true" ] && [ "${GITHUB_ACTIONS:-}" != "true" ] && [ "${VERBOSE:-1}" -ge 1 ]; then
       cat "${CI_STEP_SUMMARY:-}"
     fi
   fi
