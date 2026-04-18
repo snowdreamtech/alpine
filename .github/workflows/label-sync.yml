@@ -35,32 +35,6 @@ jobs:
             mise.run:443
             install.mise.jdx.dev:443
             *.mise.jdx.dev:443
-            packages.microsoft.com:443
-            *.ubuntu.com:80
-            *.ubuntu.com:443
-            *.debian.org:80
-            *.debian.org:443
-            deb.debian.org:80
-            deb.debian.org:443
-            security.debian.org:80
-            security.debian.org:443
-            *.rockylinux.org:443
-            *.centos.org:443
-            *.redhat.com:443
-            dl-cdn.alpinelinux.org:443
-            registry.npmjs.org:443
-            registry.yarnpkg.com:443
-            pypi.org:443
-            files.pythonhosted.org:443
-            proxy.golang.org:443
-            sum.golang.org:443
-            index.crates.io:443
-            static.rust-lang.org:443
-            packagist.org:443
-            repo.maven.apache.org:443
-            rubygems.org:443
-            registry.terraform.io:443
-            formulae.brew.sh:443
 
       - name: "📂 Checkout Repository Code"
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd # v6.0.2
