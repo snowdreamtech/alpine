@@ -110,5 +110,6 @@
       "section": "♻️ Miscellaneous Chores",
       "hidden": false
     }
-  ]
+  ],
+  "separate-pull-requests": true
 }
