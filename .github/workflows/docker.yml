@@ -343,9 +343,7 @@ jobs:
           echo "→ Inspecting manifest for: ${first_tag}"
 
           # Inspect the manifest
-          manifest=$(docker buildx imagetools inspect "${first_tag}" 2>&1)
-
-          if [ $? -eq 0 ]; then
+          if manifest=$(docker buildx imagetools inspect "${first_tag}" 2>&1); then
             echo "${manifest}"
 
             # Count platforms
@@ -500,15 +498,19 @@ jobs:
             critical=$(jq '[.runs[].results[] | select(.level=="error")] | length' trivy-image-${{ matrix.version }}.sarif)
             high=$(jq '[.runs[].results[] | select(.level=="warning")] | length' trivy-image-${{ matrix.version }}.sarif)
             medium=$(jq '[.runs[].results[] | select(.level=="note")] | length' trivy-image-${{ matrix.version }}.sarif)
-            echo "critical=${critical}" >> "$GITHUB_OUTPUT"
-            echo "high=${high}" >> "$GITHUB_OUTPUT"
-            echo "medium=${medium}" >> "$GITHUB_OUTPUT"
+            {
+              echo "critical=${critical}"
+              echo "high=${high}"
+              echo "medium=${medium}"
+            } >> "$GITHUB_OUTPUT"
             echo "✓ Parsed Trivy results: Critical=${critical}, High=${high}, Medium=${medium}"
           else
             echo "⚠️ SARIF file not found, skipping parse"
-            echo "critical=0" >> "$GITHUB_OUTPUT"
-            echo "high=0" >> "$GITHUB_OUTPUT"
-            echo "medium=0" >> "$GITHUB_OUTPUT"
+            {
+              echo "critical=0"
+              echo "high=0"
+              echo "medium=0"
+            } >> "$GITHUB_OUTPUT"
           fi
 
       - name: "📤 Upload Image Security Scan (SARIF)"
