@@ -37,19 +37,12 @@ jobs:
         with:
           egress-policy: block
           allowed-endpoints: >
-            *.mise.jdx.dev:443
-            *.ubuntu.com:80
-            *.ubuntu.com:443
-            *.debian.org:80
-            *.debian.org:443
-            *.rockylinux.org:443
-            *.centos.org:443
-            *.redhat.com:443
             api.github.com:443
             *.githubusercontent.com:443
             github.com:443
             mise.run:443
             install.mise.jdx.dev:443
+            *.mise.jdx.dev:443
             packages.microsoft.com:443
             *.ubuntu.com:80
             *.ubuntu.com:443
@@ -124,25 +117,12 @@ jobs:
         with:
           egress-policy: block
           allowed-endpoints: >
-            *.mise.jdx.dev:443
-            *.ubuntu.com:80
-            *.ubuntu.com:443
-            *.debian.org:80
-            *.debian.org:443
-            *.rockylinux.org:443
-            *.centos.org:443
-            *.redhat.com:443
-            *.nodesource.com:443
-            *.gcr.io:443
-            *.pkg.dev:443
-            *.quay.io:443
-            *.dkr.ecr.*.amazonaws.com:443
-            *.azurecr.io:443
             api.github.com:443
             *.githubusercontent.com:443
             github.com:443
             mise.run:443
             install.mise.jdx.dev:443
+            *.mise.jdx.dev:443
             packages.microsoft.com:443
             *.ubuntu.com:80
             *.ubuntu.com:443
@@ -286,24 +266,12 @@ jobs:
         with:
           egress-policy: block
           allowed-endpoints: >
-            *.mise.jdx.dev:443
-            *.ubuntu.com:80
-            *.ubuntu.com:443
-            *.debian.org:80
-            *.debian.org:443
-            *.rockylinux.org:443
-            *.centos.org:443
-            *.redhat.com:443
-            *.gcr.io:443
-            *.pkg.dev:443
-            *.quay.io:443
-            *.dkr.ecr.*.amazonaws.com:443
-            *.azurecr.io:443
             api.github.com:443
             *.githubusercontent.com:443
             github.com:443
             mise.run:443
             install.mise.jdx.dev:443
+            *.mise.jdx.dev:443
             packages.microsoft.com:443
             *.ubuntu.com:80
             *.ubuntu.com:443
@@ -441,25 +409,12 @@ jobs:
         with:
           egress-policy: block
           allowed-endpoints: >
-            *.mise.jdx.dev:443
-            *.ubuntu.com:80
-            *.ubuntu.com:443
-            *.debian.org:80
-            *.debian.org:443
-            *.rockylinux.org:443
-            *.centos.org:443
-            *.redhat.com:443
-            *.aquasecurity.github.io:443
-            *.gcr.io:443
-            *.pkg.dev:443
-            *.quay.io:443
-            *.dkr.ecr.*.amazonaws.com:443
-            *.azurecr.io:443
             api.github.com:443
             *.githubusercontent.com:443
             github.com:443
             mise.run:443
             install.mise.jdx.dev:443
+            *.mise.jdx.dev:443
             packages.microsoft.com:443
             *.ubuntu.com:80
             *.ubuntu.com:443
