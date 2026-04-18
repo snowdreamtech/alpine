@@ -219,7 +219,7 @@ jobs:
           which prettier || echo "prettier not in PATH"
           command -v prettier || echo "prettier not found"
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           VENV: ${{ env.VENV }}
 
       - name: "🩺 Verify Environment Health"
@@ -229,7 +229,7 @@ jobs:
         run: |
           make check-env
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           VENV: ${{ env.VENV }}
 
       - name: "🔍 Inspect Code Quality (Lint)"
@@ -365,7 +365,7 @@ jobs:
           make setup
           make install
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           VENV: ${{ env.VENV }}
 
       - name: "🩺 Verify Environment Health"
@@ -375,7 +375,7 @@ jobs:
         run: |
           make check-env
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           VENV: ${{ env.VENV }}
 
       - name: "🧪 Execute Multi-Stack Test Suite"
@@ -480,7 +480,7 @@ jobs:
           make setup
           make install
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           VENV: ${{ env.VENV }}
 
       - name: "🩺 Verify Environment Health"
@@ -490,7 +490,7 @@ jobs:
         run: |
           make check-env
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           VENV: ${{ env.VENV }}
 
       - name: "📝 Validate Commit Convention (Commitlint)"
@@ -520,7 +520,7 @@ jobs:
           # Extra SARIF export for GitHub Security Tab (Offline to prevent API rate limits)
           mise exec -- zizmor . --format sarif --offline --config .zizmor.yml > zizmor-results.sarif
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           VENV: ${{ env.VENV }}
           TRIVY_CACHE_DIR: .trivycache
 
@@ -541,7 +541,7 @@ jobs:
           fail: true
         env:
           # Pass GitHub token to avoid rate limiting and access private repos
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
 
       - name: "🕵️ Detect Vulnerabilities (Trivy FS)"
         uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0

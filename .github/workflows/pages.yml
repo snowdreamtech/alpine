@@ -109,7 +109,7 @@ jobs:
       - name: "🚀 Initialize Development Environment"
         shell: sh # POSIX compliant
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
         run: |
           make setup
           make install

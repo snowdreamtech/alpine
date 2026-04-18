@@ -92,7 +92,7 @@ jobs:
           make setup
           make install
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
 
       - name: "🩺 Verify Environment Health"
         shell: sh
@@ -101,7 +101,7 @@ jobs:
         run: |
           make check-env
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
 
       - name: "🧪 Run Generator Smoke Test"
         shell: sh
@@ -122,7 +122,7 @@ jobs:
       - name: "📝 Commit Changes (if any)"
         shell: sh
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           GITHUB_REF: ${{ github.ref }}
         run: |
           if git diff --quiet .github/dependabot.yml mise.lock scripts/lib/versions.sh .mise.toml 2>/dev/null; then
