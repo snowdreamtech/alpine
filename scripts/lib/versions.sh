@@ -58,7 +58,7 @@ VER_PKL_PROVIDER="github:apple/pkl"
 VER_BAZEL="9.0.2"
 VER_BAZEL_PROVIDER="github:bazelbuild/bazel"
 
-VER_BALLERINA="2201.13.2"
+VER_BALLERINA="2201.13.3"
 VER_BALLERINA_PROVIDER="github:ballerina-platform/ballerina-distribution"
 
 VER_STYLUA="2.4.1"
