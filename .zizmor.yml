@@ -35,6 +35,30 @@ rules:
       - "stale.yml"
 
   # ----------------------------------------------------------------------------
+  # template-injection: Suppresses warnings for template expansion in run blocks
+  # ----------------------------------------------------------------------------
+  # Zizmor warns when GitHub context variables are used in run blocks as they
+  # could potentially be exploited for code injection. Suppressed for workflows
+  # where template expansion is used safely (e.g., in echo statements or comparisons).
+  template-injection:
+    ignore:
+      - "cache.yml"
+      - "cd.yml"
+      - "ci.yml"
+      - "codeql.yml"
+      - "dco.yml"
+      - "dependabot-auto-merge.yml"
+      - "dependabot-sync.yml"
+      - "goreleaser.yml"
+      - "label-sync.yml"
+      - "labeler.yml"
+      - "nightly-audit.yml"
+      - "pages.yml"
+      - "performance.yml"
+      - "pr-title.yml"
+      - "scorecard.yml"
+      - "stale.yml"
+
   # untrusted-input: Suppresses warnings for using dynamically evaluated data
   # ----------------------------------------------------------------------------
   # Checks for potentially malicious values like GitHub context variables
