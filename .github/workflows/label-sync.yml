@@ -60,7 +60,7 @@ jobs:
           make setup
           make install
         env:
-          MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "🩺 Verify Environment Health"
         shell: sh
@@ -69,7 +69,7 @@ jobs:
         run: |
           make check-env
         env:
-          MISE_GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: "🏷️ Sync Labels via gh CLI"
         shell: sh
