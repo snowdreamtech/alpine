@@ -6,6 +6,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.8.2](https://github.com/snowdreamtech/template/compare/v0.8.1...v0.8.2) (2026-04-19)
+
+
+### Bug Fixes
+
+* **ci:** add GITHUB_TOKEN to all make commands for API rate limit prevention ([2060bca](https://github.com/snowdreamtech/template/commit/2060bca9cef56a23645775c519e8054fdf1b0261))
+* **ci:** skip DCO check for snowdream user in release-please PRs ([dde607b](https://github.com/snowdreamtech/template/commit/dde607bc3c474bf8967811bb9902c672f998717b))
+* **ci:** use GITHUB_TOKEN for release-please to prevent tag creation issues ([73266aa](https://github.com/snowdreamtech/template/commit/73266aa2d12b86d1cce4ba785d48141dbe817a44))
+
+
+### Reverts
+
+* **ci:** restore WORKFLOW_SECRET fallback for release-please ([4a1956b](https://github.com/snowdreamtech/template/commit/4a1956b4c14b7961932fd9c1851d5849e149107d))
+
 ## [0.8.1](https://github.com/snowdreamtech/template/compare/v0.8.0...v0.8.1) (2026-04-19)
 
 
