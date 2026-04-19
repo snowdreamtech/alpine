@@ -6,6 +6,18 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.0](https://github.com/snowdreamtech/template/compare/v0.8.2...v0.9.0) (2026-04-19)
+
+
+### Features
+
+* **lint:** add two-pass auto-fix mechanism to make lint ([9fba0f1](https://github.com/snowdreamtech/template/commit/9fba0f1436429e3e3d161358ab1dbc8d299b7fe8))
+
+
+### Bug Fixes
+
+* **lint:** restore color output in Pass 1 auto-fix stage ([fe3d523](https://github.com/snowdreamtech/template/commit/fe3d52320f604686e0f5dededbd07da463a0f176))
+
 ## [0.8.2](https://github.com/snowdreamtech/template/compare/v0.8.1...v0.8.2) (2026-04-19)
 
 
