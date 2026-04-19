@@ -220,7 +220,6 @@ jobs:
           command -v prettier || echo "prettier not found"
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
-          VENV: ${{ env.VENV }}
 
       - name: "🩺 Verify Environment Health"
         shell: sh
@@ -230,7 +229,6 @@ jobs:
           make check-env
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
-          VENV: ${{ env.VENV }}
 
       - name: "🔍 Inspect Code Quality (Lint)"
         shell: sh
@@ -238,7 +236,6 @@ jobs:
           make lint
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
-          VENV: ${{ env.VENV }}
 
   # 2. Automated Testing Stage (Test)
   test:
@@ -367,7 +364,6 @@ jobs:
           make install
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
-          VENV: ${{ env.VENV }}
 
       - name: "🩺 Verify Environment Health"
         shell: sh
@@ -377,7 +373,6 @@ jobs:
           make check-env
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
-          VENV: ${{ env.VENV }}
 
       - name: "🧪 Execute Multi-Stack Test Suite"
         shell: sh
@@ -385,7 +380,6 @@ jobs:
           make test
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
-          VENV: ${{ env.VENV }}
 
   # 3. Security & Standards Audit Stage (Audit)
   audit:
@@ -483,7 +477,6 @@ jobs:
           make install
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
-          VENV: ${{ env.VENV }}
 
       - name: "🩺 Verify Environment Health"
         shell: sh
@@ -493,7 +486,6 @@ jobs:
           make check-env
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
-          VENV: ${{ env.VENV }}
 
       - name: "📝 Validate Commit Convention (Commitlint)"
         shell: sh
@@ -523,7 +515,6 @@ jobs:
           mise exec -- zizmor . --format sarif --offline --config .zizmor.yml > zizmor-results.sarif
         env:
           GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
-          VENV: ${{ env.VENV }}
           TRIVY_CACHE_DIR: .trivycache
 
       - name: "⚡ Cache Documentation Links (Lychee)"
