@@ -119,6 +119,8 @@ jobs:
         run: |
           # executes the documentation manager to install dependencies and build site.
           make docs ARGS="build"
+        env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
 
       - name: "📦 Stage Assets for Web Deployment"
         uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v4.1.1

@@ -112,12 +112,16 @@ jobs:
         shell: sh
         run: |
           make gen-dependabot
+        env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
 
       - name: "🔧 Update Mise Toolchain & Lockfile"
         shell: sh
         run: |
           make update-tools
           make sync-lock
+        env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
 
       - name: "📝 Commit Changes (if any)"
         shell: sh

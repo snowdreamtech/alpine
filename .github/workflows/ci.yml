@@ -237,6 +237,7 @@ jobs:
         run: |
           make lint
         env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           VENV: ${{ env.VENV }}
 
   # 2. Automated Testing Stage (Test)
@@ -383,6 +384,7 @@ jobs:
         run: |
           make test
         env:
+          GITHUB_TOKEN: ${{ secrets.WORKFLOW_SECRET || secrets.GITHUB_TOKEN }}
           VENV: ${{ env.VENV }}
 
   # 3. Security & Standards Audit Stage (Audit)
