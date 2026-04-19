@@ -113,37 +113,35 @@ main() {
   local _PC_VER
   _PC_VER=$(get_version "pre-commit")
 
-  # First attempt: Run lint
-  log_info "── Pass 1: Initial lint check ──"
-  if run_pre_commit_lint "${_FIX_LNT:-}"; then
+  # First attempt: Run lint with auto-fix enabled
+  log_info "── Pass 1: Lint check with auto-fix ──"
+  if run_pre_commit_lint "--fix" 2>/dev/null || true; then
+    log_info "Auto-fix completed (if any issues were found)."
+  else
+    log_info "Auto-fix completed (if any issues were found)."
+  fi
+
+  # Check if lint passes after auto-fix
+  local _T1_CHECK
+  _T1_CHECK=$(date +%s)
+  if run_pre_commit_lint ""; then
     _L_OK=1
     log_summary "Quality" "pre-commit (Pass 1)" "✅ Passed" "${_PC_VER:--}" "$(($(date +%s) - _T0_LNT))"
   else
     log_summary "Quality" "pre-commit (Pass 1)" "⚠️  Failed" "${_PC_VER:--}" "$(($(date +%s) - _T0_LNT))"
 
-    # Auto-fix mechanism: If first pass failed, try to fix and run again
-    log_warn "\n⚠️  First pass failed. Attempting auto-fix..."
-
-    # Run pre-commit with auto-fix (suppress error code)
-    local _T1_FIX
-    _T1_FIX=$(date +%s)
-    if run_pre_commit_lint "--fix" 2>/dev/null || true; then
-      log_info "Auto-fix completed."
-    else
-      log_info "Auto-fix completed (some issues may remain)."
-    fi
-
     # Second attempt: Run lint again after auto-fix
-    log_info "\n── Pass 2: Re-checking after auto-fix ──"
+    log_warn "\n⚠️  First pass failed. Running second check..."
+    log_info "── Pass 2: Final verification ──"
     local _T2_LNT
     _T2_LNT=$(date +%s)
     if run_pre_commit_lint ""; then
       _L_OK=1
       log_summary "Quality" "pre-commit (Pass 2)" "✅ Passed" "${_PC_VER:--}" "$(($(date +%s) - _T2_LNT))"
-      log_success "\n✨ Linting passed after auto-fix!"
+      log_success "\n✨ Linting passed on second check!"
     else
       log_summary "Quality" "pre-commit (Pass 2)" "❌ Failed" "${_PC_VER:--}" "$(($(date +%s) - _T2_LNT))"
-      log_error "\n❌ Linting failed even after auto-fix!"
+      log_error "\n❌ Linting failed! Manual fixes required."
     fi
   fi
 
