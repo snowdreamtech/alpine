@@ -18,12 +18,15 @@ jobs:
   dco:
     name: "🛡️ Verify Signed-off-by"
     runs-on: ubuntu-latest
-    # Skip DCO check for bot-created PRs (release-please, dependabot, etc.)
-    # Check PR author, not branch name, to prevent bypass attempts
+    # Skip DCO check for bot-created PRs and repository maintainer
+    # When release-please uses GITHUB_TOKEN, it creates PRs as user 'snowdream' (not the org 'snowdreamtech')
+    # Security: github.event.pull_request.user.login cannot be forged by external contributors
+    # Note: github.repository_owner = 'snowdreamtech' (org), but PR user = 'snowdream' (user)
     if: |
       github.event.pull_request.user.login != 'dependabot[bot]' &&
       github.event.pull_request.user.login != 'github-actions[bot]' &&
-      github.event.pull_request.user.login != 'release-please[bot]'
+      github.event.pull_request.user.login != 'release-please[bot]' &&
+      github.event.pull_request.user.login != 'snowdream'
     concurrency:
       group: dco-${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
       cancel-in-progress: true
