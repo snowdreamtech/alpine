@@ -115,11 +115,7 @@ main() {
 
   # First attempt: Run lint with auto-fix enabled
   log_info "── Pass 1: Lint check with auto-fix ──"
-  if run_pre_commit_lint "--fix" 2>/dev/null || true; then
-    log_info "Auto-fix completed (if any issues were found)."
-  else
-    log_info "Auto-fix completed (if any issues were found)."
-  fi
+  run_pre_commit_lint "--fix" || true
 
   # Check if lint passes after auto-fix
   local _T1_CHECK
