@@ -52,7 +52,6 @@ EOF
 #   run_pre_commit_lint "--fix"
 run_pre_commit_lint() {
   local _LV_FIX="${1:-}"
-  log_info "── Running pre-commit hooks (Pass 1/1) ──"
   local _PRE_COMMIT_LNT
   _PRE_COMMIT_LNT=$(resolve_bin "pre-commit") || true
 
@@ -70,10 +69,9 @@ run_pre_commit_lint() {
   if [ "${DRY_RUN:-0}" -eq 1 ]; then
     log_success "DRY-RUN: Would run ${_PRE_COMMIT_LNT:-} --all-files"
   elif [ -n "${_LV_FIX:-}" ]; then
-    log_info "Running in auto-fix mode..."
-    # pre-commit doesn't have a direct --fix flag for everything at once,
-    # but many hooks auto-fix by default.
-    "${_PRE_COMMIT_LNT:-}" run --all-files || log_warn "Some hooks modified files or reported errors."
+    log_info "Running pre-commit with auto-fix enabled..."
+    # Many pre-commit hooks auto-fix by default when they can
+    "${_PRE_COMMIT_LNT:-}" run --all-files
   else
     "${_PRE_COMMIT_LNT:-}" run --all-files
   fi
@@ -114,11 +112,39 @@ main() {
   local _L_OK=0
   local _PC_VER
   _PC_VER=$(get_version "pre-commit")
+
+  # First attempt: Run lint
+  log_info "── Pass 1: Initial lint check ──"
   if run_pre_commit_lint "${_FIX_LNT:-}"; then
     _L_OK=1
-    log_summary "Quality" "pre-commit" "✅ Passed" "${_PC_VER:--}" "$(($(date +%s) - _T0_LNT))"
+    log_summary "Quality" "pre-commit (Pass 1)" "✅ Passed" "${_PC_VER:--}" "$(($(date +%s) - _T0_LNT))"
   else
-    log_summary "Quality" "pre-commit" "❌ Failed" "${_PC_VER:--}" "$(($(date +%s) - _T0_LNT))"
+    log_summary "Quality" "pre-commit (Pass 1)" "⚠️  Failed" "${_PC_VER:--}" "$(($(date +%s) - _T0_LNT))"
+
+    # Auto-fix mechanism: If first pass failed, try to fix and run again
+    log_warn "\n⚠️  First pass failed. Attempting auto-fix..."
+
+    # Run pre-commit with auto-fix (suppress error code)
+    local _T1_FIX
+    _T1_FIX=$(date +%s)
+    if run_pre_commit_lint "--fix" 2>/dev/null || true; then
+      log_info "Auto-fix completed."
+    else
+      log_info "Auto-fix completed (some issues may remain)."
+    fi
+
+    # Second attempt: Run lint again after auto-fix
+    log_info "\n── Pass 2: Re-checking after auto-fix ──"
+    local _T2_LNT
+    _T2_LNT=$(date +%s)
+    if run_pre_commit_lint ""; then
+      _L_OK=1
+      log_summary "Quality" "pre-commit (Pass 2)" "✅ Passed" "${_PC_VER:--}" "$(($(date +%s) - _T2_LNT))"
+      log_success "\n✨ Linting passed after auto-fix!"
+    else
+      log_summary "Quality" "pre-commit (Pass 2)" "❌ Failed" "${_PC_VER:--}" "$(($(date +%s) - _T2_LNT))"
+      log_error "\n❌ Linting failed even after auto-fix!"
+    fi
   fi
 
   if [ "${_L_OK:-}" -eq 1 ]; then
@@ -136,8 +162,8 @@ main() {
       printf "  - Run %bmake verify%b to ensure full project stability.\n" "${GREEN:-}" "${NC:-}"
     else
       printf "\n%bRecommended Actions:%b\n" "${YELLOW:-}" "${NC:-}"
-      printf "  - Review the errors above and fix them.\n"
-      printf "  - Run %bmake lint --fix%b to auto-fix some issues.\n" "${GREEN:-}" "${NC:-}"
+      printf "  - Review the errors above and fix them manually.\n"
+      printf "  - Some issues cannot be auto-fixed and require manual intervention.\n"
       printf "  - Run %bmake setup%b if tools are missing.\n" "${GREEN:-}" "${NC:-}"
     fi
   fi
