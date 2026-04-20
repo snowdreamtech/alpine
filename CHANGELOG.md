@@ -6,6 +6,13 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.1](https://github.com/snowdreamtech/template/compare/v0.9.0...v0.9.1) (2026-04-20)
+
+
+### Bug Fixes
+
+* **lint:** ignore CHANGELOG.md in all directories for markdownlint ([ebe338c](https://github.com/snowdreamtech/template/commit/ebe338c66126b82624c63e45b5c8a7c6bf77fcc1))
+
 ## [0.9.0](https://github.com/snowdreamtech/template/compare/v0.8.2...v0.9.0) (2026-04-19)
 
 
