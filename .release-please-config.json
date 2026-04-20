@@ -5,25 +5,25 @@
       "release-type": "simple",
       "component": "3.20",
       "include-component-in-tag": true,
-      "changelog-path": "docker/3.20/CHANGELOG.md"
+      "changelog-path": "CHANGELOG.md"
     },
     "docker/3.21": {
       "release-type": "simple",
       "component": "3.21",
       "include-component-in-tag": true,
-      "changelog-path": "docker/3.21/CHANGELOG.md"
+      "changelog-path": "CHANGELOG.md"
     },
     "docker/3.22": {
       "release-type": "simple",
       "component": "3.22",
       "include-component-in-tag": true,
-      "changelog-path": "docker/3.22/CHANGELOG.md"
+      "changelog-path": "CHANGELOG.md"
     },
     "docker/3.23": {
       "release-type": "simple",
       "component": "3.23",
       "include-component-in-tag": true,
-      "changelog-path": "docker/3.23/CHANGELOG.md"
+      "changelog-path": "CHANGELOG.md"
     }
   },
   "include-v-in-tag": true,
