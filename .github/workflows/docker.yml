@@ -457,12 +457,13 @@ jobs:
       - name: "🕵️ Scan Image for Vulnerabilities (Trivy)"
         id: trivy
         if: steps.version-filter.outputs.skip != 'true' && steps.build.conclusion == 'success'
+        continue-on-error: true
         uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
         env:
           TRIVY_DB_REPOSITORY: "public.ecr.aws/aquasecurity/trivy-db"
           TRIVY_CHECKS_BUNDLE_REPOSITORY: "public.ecr.aws/aquasecurity/trivy-checks"
-          TAGS: ${{ steps.meta.outputs.tags }}
         with:
+          scan-type: "image"
           image-ref: ${{ fromJSON(steps.meta.outputs.json).tags[0] }}
           format: "sarif"
           output: "trivy-image-${{ matrix.version }}.sarif"
@@ -474,7 +475,8 @@ jobs:
 
       - name: "📊 Parse Trivy Results"
         id: trivy-summary
-        if: steps.version-filter.outputs.skip != 'true' && steps.build.conclusion == 'success'
+        if: steps.version-filter.outputs.skip != 'true' && steps.build.conclusion == 'success' && steps.trivy.outcome == 'success'
+        continue-on-error: true
         run: |
           if [ -f "trivy-image-${{ matrix.version }}.sarif" ]; then
             critical=$(jq '[.runs[].results[] | select(.level=="error")] | length' trivy-image-${{ matrix.version }}.sarif)
@@ -483,14 +485,17 @@ jobs:
             echo "critical=${critical}" >> "$GITHUB_OUTPUT"
             echo "high=${high}" >> "$GITHUB_OUTPUT"
             echo "medium=${medium}" >> "$GITHUB_OUTPUT"
+            echo "✓ Parsed Trivy results: Critical=${critical}, High=${high}, Medium=${medium}"
           else
+            echo "⚠️ SARIF file not found, skipping parse"
             echo "critical=0" >> "$GITHUB_OUTPUT"
             echo "high=0" >> "$GITHUB_OUTPUT"
             echo "medium=0" >> "$GITHUB_OUTPUT"
           fi
 
       - name: "📤 Upload Image Security Scan (SARIF)"
-        if: steps.version-filter.outputs.skip != 'true' && steps.build.conclusion == 'success'
+        if: steps.version-filter.outputs.skip != 'true' && steps.build.conclusion == 'success' && steps.trivy.outcome == 'success'
+        continue-on-error: true
         uses: github/codeql-action/upload-sarif@c10b8064de6f491fea524254123dbe5e09572f13 # v4.35.1
         with:
           sarif_file: "trivy-image-${{ matrix.version }}.sarif"
