@@ -170,7 +170,7 @@ jobs:
           persist-credentials: false
 
       - name: "⚡ Cache Mise Tools"
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: |
             ~/.local/bin
@@ -319,7 +319,7 @@ jobs:
           persist-credentials: false
 
       - name: "⚡ Cache Mise Tools"
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: |
             ~/.local/bin
@@ -331,7 +331,7 @@ jobs:
             ${{ runner.os }}-mise-
 
       - name: "📦 Cache Language Dependencies (Advanced)"
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: |
             ~/go/pkg/mod
@@ -463,7 +463,7 @@ jobs:
           fetch-depth: 0
 
       - name: "⚡ Cache Mise Tools"
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: |
             ~/.local/share/mise
@@ -525,7 +525,7 @@ jobs:
           TRIVY_CACHE_DIR: .trivycache
 
       - name: "⚡ Cache Documentation Links (Lychee)"
-        uses: actions/cache@668228422ae6a00e4ad889ee87cd7109ec5666a7 # v5.0.4
+        uses: actions/cache@27d5ce7f107fe9357f9df03efb73ab90386fccae # v5.0.5
         with:
           path: .lycheecache
           key: ${{ runner.os }}-lychee-${{ hashFiles('**/*.md') }}
