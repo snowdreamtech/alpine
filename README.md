@@ -1,226 +1,166 @@
-# Snowdream Tech AI IDE Template
+# Alpine
 
-[![CI Pipeline](https://img.shields.io/github/actions/workflow/status/snowdreamtech/template/ci.yml?branch=main&label=CI%20Pipeline)](https://github.com/snowdreamtech/template/actions/workflows/ci.yml)
-[![CD Pipeline](https://img.shields.io/github/actions/workflow/status/snowdreamtech/template/cd.yml?branch=main&label=CD%20Pipeline)](https://github.com/snowdreamtech/template/actions/workflows/cd.yml)
-[![GitHub Pages](https://img.shields.io/github/actions/workflow/status/snowdreamtech/template/pages.yml?branch=main&label=Docs&logo=github)](https://github.com/snowdreamtech/template/actions/workflows/pages.yml)
-[![CodeQL](https://img.shields.io/github/actions/workflow/status/snowdreamtech/template/codeql.yml?branch=main&label=CodeQL&logo=github)](https://github.com/snowdreamtech/template/actions/workflows/codeql.yml)
-[![Multi-OS Verified](https://img.shields.io/badge/Verified-Linux%20%7C%20macOS%20%7C%20Windows-blue)](https://github.com/snowdreamtech/template/actions/workflows/ci.yml)
-[![Security Audit](https://img.shields.io/badge/Security-Zizmor%20%7C%20Trivy%20%7C%20Gitleaks-brightgreen)](https://github.com/snowdreamtech/template/actions/workflows/ci.yml)
-[![SBOM Available](https://img.shields.io/badge/SBOM-Available-success)](https://github.com/snowdreamtech/template/releases/latest)
-[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/license/MIT)
-[![Release](https://img.shields.io/github/v/release/snowdreamtech/template?logo=github&sort=semver)](https://github.com/snowdreamtech/template/releases/latest)
-[![Dependabot Enabled](https://img.shields.io/badge/Dependabot-Enabled-brightgreen?logo=dependabot)](https://github.com/snowdreamtech/template/blob/main/.github/dependabot.yml)
-[![pre-commit](https://img.shields.io/badge/pre--commit-enabled-brightgreen?logo=pre-commit)](https://github.com/pre-commit/pre-commit)
-[![GitHub Stars](https://img.shields.io/github/stars/snowdreamtech/template?style=social)](https://github.com/snowdreamtech/template)
-[![GitHub Issues](https://img.shields.io/github/issues/snowdreamtech/template)](https://github.com/snowdreamtech/template/issues)
-[![Code Size](https://img.shields.io/github/languages/code-size/snowdreamtech/template)](https://github.com/snowdreamtech/template)
+[![GitHub Actions Lint](https://github.com/snowdreamtech/alpine/actions/workflows/lint.yml/badge.svg)](https://github.com/snowdreamtech/alpine/actions/workflows/lint.yml)
+[![GitHub Actions Verify](https://github.com/snowdreamtech/alpine/actions/workflows/verify.yml/badge.svg)](https://github.com/snowdreamtech/alpine/actions/workflows/verify.yml)
+[![GitHub Release](https://img.shields.io/github/v/release/snowdreamtech/alpine?include_prereleases&sort=semver)](https://github.com/snowdreamtech/alpine/releases/latest)
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
+[![CodeSize](https://img.shields.io/github/languages/code-size/snowdreamtech/alpine)](https://github.com/snowdreamtech/alpine)
+[![Dependabot Enabled](https://img.shields.io/badge/Dependabot-Enabled-brightgreen?logo=dependabot)](https://github.com/snowdreamtech/alpine/blob/main/.github/dependabot.yml)
+![Docker Image Version](https://img.shields.io/docker/v/snowdreamtech/alpine)
+![Docker Image Size](https://img.shields.io/docker/image-size/snowdreamtech/alpine/latest)
+![Docker Pulls](https://img.shields.io/docker/pulls/snowdreamtech/alpine)
+![Docker Stars](https://img.shields.io/docker/stars/snowdreamtech/alpine)
 
 [English](README.md) | [简体中文](README_zh-CN.md)
 
-An enterprise-grade, foundational template designed for multi-AI IDE collaboration. This repository serves as a **Single Source of Truth** for AI agent rules, workflows, and project configurations, supporting over 50 different AI-assisted IDEs with massive multi-language support.
+Docker Image packaging for Alpine. (amd64, arm32v6, arm32v7, arm64v8, i386, ppc64le, riscv64, s390x)
 
-## 🌟 Features
+## Usage
 
-- **Multi-IDE Compatibility**: Out-of-the-box support for Cursor, Windsurf, GitHub Copilot, Cline, Roo Code, Trae, Gemini, Claude Code, and 50+ other AI editors.
-- **Unified Rule System**: Centralized rule definitions in `.agent/rules/`. Changes propagate automatically to all supported IDEs via a secure symlink/redirect pattern.
-- **80+ Language & Framework Rules**: Pre-configured high-quality rules from Rust, Go, TypeScript, Python to Ansible, Kubernetes, and API design.
-- **Smart Workflows (SpecKit)**: Standardized `.agent/workflows/` commands (`speckit.plan`, `speckit.analyze`, `snowdreamtech.init`) that behave consistently across all supported environments.
-- **Triple Guarantee Quality**: 100% code purity enforced through Pre-commit and GitHub Actions integrated quality gates.
-- **Cross-Platform Ready**: Runs seamlessly on macOS (Homebrew/MacPorts), Linux, and Windows.
+To help you get started creating a container from this image you can either use docker-compose or the docker cli.
 
-## 🏗️ Section 1 — Design & Architecture
+### Docker Cli
 
-### Overview
-
-The Snowdream Tech Template is a foundational scaffold engineered to solve the "N-IDE Fragmentation" problem. It standardizes the development environment, AI agent rules, and automation pipelines across varied platforms and languages.
-
-**Key Capabilities:**
-
-- Provides a **Unified Rule Engine** that governs AI behavior consistently across 50+ IDEs.
-- Enforces **Cross-Platform Portability** through dynamically adapting POSIX shell automation.
-- Implements a **Triple Guarantee Quality Gate** (IDE, CLI, CI) to prevent regressions.
-- Supports **Massive Multi-Language Stacks** with modular onboarding logic.
-
-### Architecture
-
-```mermaid
-graph TD
-    A["Developers & Agents"] -->|Operates via| IDE["Cursor / Windsurf / Copilot / 50+ Others"]
-    IDE -->|Reads Rules via Redirects| R1[".vscode/"]
-    IDE -->|Reads Rules via Redirects| R2[".github/"]
-    IDE -->|Reads Rules via Redirects| R3[".cline/ .trae/ etc."]
-
-    R1 -.->|SSoT Pointer| CoreRules[".agent/rules/"]
-    R2 -.->|SSoT Pointer| CoreRules
-    R3 -.->|SSoT Pointer| CoreRules
-
-    CoreRules -->|Governs| Src["Source Code"]
-    CoreRules -->|Governs| Scripts["CI/CD & Shell Scripts"]
-```
-
-### Design Principles
-
-- **Single Source of Truth (SSoT)**: All AI rules, commands, and Git hooks live in one place. No duplicated IDE configurations.
-- **Cross-Platform Portability**: Heavy automation logic is written in POSIX Shell, with thin wrappers for Windows PowerShell/Batch.
-- **Triple Guarantee Quality**: Linting and formatting form an impenetrable wall, enforced at the IDE layer, pre-commit layer, and CI/CD GitHub Actions layer.
-
-### Responsibilities
-
-- **.agent/rules/**: Owns the definitive behavioral logic for AI agents across all supported languages.
-- **scripts/**: Owns the cross-platform automation and lifecycle logic.
-- **.agent/workflows/**: Owns the interactive AI commands (SpecKit).
-
----
-
-## 📖 Section 2 — Usage Guide
-
-### Prerequisites
-
-- **Runtime**: Node.js (>= 20.x), Python (>= 3.10.x).
-- **Git**: Global git installation required.
-
-### Quick Start
-
-1. **Prerequisites**: [mise](https://mise.jdx.dev/) is highly recommended for global tool management (automatically installed during setup).
-2. **Initialize**: `make setup` (bootstraps mise and core tools).
-3. **Install**: `make install` (installs project dependencies).
-4. **Verify**: `make verify` (ensures everything is green).
-
-### Configuration Reference
-
-| Parameter      | Purpose                                                           | Location                |
-| :------------- | :---------------------------------------------------------------- | :---------------------- |
-| `PROJECT_NAME` | Project identity                                                  | `init-project.sh`       |
-| `GITHUB_PROXY` | Network optimization (See [Proxy Usage](#-proxy-usage-scenarios)) | `scripts/lib/common.sh` |
-| `VERSION`      | Semantic versioning                                               | `package.json`          |
-
-### File Structure
-
-```text
-project-root/
-├── .agent/              # 🤖 Canonical AI configuration (The Brain)
-│   ├── rules/           # 📏 Unified AI behavioral rules (80+ sets, SSoT)
-│   └── workflows/       # 🛠️ Unified commands & AI workflows (SpecKit)
-├── .agents/             # 🧩 Shared command sources (Auto-managed symlinks)
-├── .github/             # 🐙 GitHub integration & Copilot settings
-├── .vscode/             # 💻 Optimized VS Code configurations
-└── src/                 # 📦 Your actual application source code
-```
-
----
-
-## 🛠️ Section 3 — Operations Guide
-
-### Pre-deployment Checklist
-
-1. Run `make verify` to ensure all quality gates are green.
-2. Run `make audit` to verify security compliance.
-3. Ensure `CHANGELOG.md` is updated.
-
-### Performance Considerations
-
-- **Linting Speed**: Pre-commit hooks target < 5s by scanning staged files only.
-- **CI Throughput**: GitHub Actions use matrix builds for parallel testing across OS types.
-
-### Troubleshooting
-
-- **Problem**: `make install` fails on Windows.
-  - **Diagnosis**: Check if `ExecutionPolicy` allows script execution.
-  - **Solution**: Run `Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass`.
-- **Problem**: Gitleaks detects false positives.
-  - **Diagnosis**: Check `.gitleaks.toml` allowlist.
-  - **Solution**: Add fingerprint to `.gitleaksignore`.
-- **Problem**: Pre-commit hooks fail on macOS after `make install` with Python errors.
-  - **Diagnosis**: Check if the venv exists: `ls .venv/bin/python`.
-  - **Solution**: Rebuild the venv: `rm -rf .venv && make install`.
-
----
-
-## 🔒 Section 4 — Security Considerations
-
-### Security Model
-
-- **Secret Management**: All secrets must be injected via environment variables or handled by HashiCorp Vault. Never commit `.env` files.
-- **Audit Logging**: All critical operations (commits, releases, state changes) are traced via Git and CI logs.
-- **Supply Chain**: All CI actions are pinned to exact versions/SHAs.
-
-### Best Practices
-
-| Aspect      | Requirement                  | Implementation                    |
-| :---------- | :--------------------------- | :-------------------------------- |
-| Secrets     | No plaintext secrets in repo | `gitleaks` enforced at commit     |
-| Integrity   | Verify downloads             | SHA-256 validation in `common.sh` |
-| Permissions | Non-root execution           | Dockerfile best practices         |
-
----
-
-## 🧑‍💻 Section 5 — Development Guide
-
-### Code Organization
-
-```text
-project-root/
-├── .agent/               # AI configuration (Single Source of Truth)
-│   ├── rules/            # 88 behavioral rule files for AI agents
-│   └── workflows/        # SpecKit slash-command definitions
-├── .github/              # GitHub ecosystem (Actions, templates, Dependabot)
-│   └── workflows/        # CI/CD pipelines (lint, verify, release, security)
-├── .devcontainer/        # DevContainer configuration for reproducible environments
-├── docs/                 # Project documentation
-│   ├── adr/              # Architecture Decision Records
-│   ├── runbooks/         # Operations and recovery runbooks
-│   └── glossary.md       # Bilingual term glossary
-├── scripts/              # POSIX shell automation (setup, install, verify)
-│   └── lib/              # Shared shell library functions
-└── Makefile              # Task orchestration (setup, install, lint, verify, audit)
-```
-
-**Naming Conventions**: Rule files use `NN-kebab-case.md` (core rules) or `technology.md`
-(language stacks). Workflow files use `namespace.verb.md`. Shell scripts use `kebab-case.sh`.
-
-### Extension Points
-
-1. **Adding Rules**: Create a new `.md` file in `.agent/rules/` and link it in `00-index.md`.
-2. **Adding Commands**: Add `.md` files to `.agent/workflows/`.
-3. **Adding IDE Support**: Create a redirect folder (e.g., `.myide/`) following the symlink pattern in Rule 03.
-
-### Local Development Setup
+#### CLI - Simple
 
 ```bash
-git clone <repo>
-cd <repo>
-git config core.ignorecase false  # MANDATORY for Mac/Windows
-make setup
-make install
+docker run -d \
+  --name=alpine \
+  -e TZ=Asia/Shanghai \
+  --restart unless-stopped \
+  snowdreamtech/alpine:latest
 ```
 
-### References
+#### CLI - Advance
 
-- [Full Documentation](docs/index.md)
-- [Project Glossary](docs/glossary.md)
-- [Conventional Commits](https://www.conventionalcommits.org/)
+```bash
+docker run -d \
+  --name=alpine \
+  -e TZ=Asia/Shanghai \
+  -v /path/to/data:/path/to/data \
+  --restart unless-stopped \
+  snowdreamtech/alpine:latest
+```
 
-### 🚀 Proxy Usage Scenarios
+### Docker Compose
 
-The `GITHUB_PROXY` (default: `https://gh-proxy.sn0wdr1am.com/`) is optimized for specific network acceleration scenarios. Misusing it for unsupported protocols (like Git) will result in errors.
+#### Compose - Simple
 
-| Scenario              | Supported? | Example / Note                                         |
-| :-------------------- | :--------- | :----------------------------------------------------- |
-| **Release Files**     | ✅ Yes     | `.../releases/download/v1.0/tool.zip`                  |
-| **Source Archives**   | ✅ Yes     | `.../archive/master.zip` or `.tar.gz`                  |
-| **Direct File Links** | ✅ Yes     | `.../blob/master/filename`                             |
-| **Git Clone**         | ❌ **No**  | Do **not** use for `git clone` or `insteadOf` configs. |
-| **Project Folders**   | ❌ **No**  | Browsing/cloning via proxy is not supported.           |
+```yaml
+version: "3"
 
-> [!IMPORTANT]
-> To prevent breaking toolchains (like `mise` or `asdf`), this template explicitly disables Git redirection via this proxy. Use it only for direct HTTP downloads in scripts.
+services:
+  alpine:
+    image: snowdreamtech/alpine:latest
+    container_name: alpine
+    environment:
+      - TZ=Asia/Shanghai
+    restart: unless-stopped
+```
 
-## 📄 License
+#### Compose - Advance
 
-This project is licensed under the **MIT License**.
-Copyright (c) 2026-present [SnowdreamTech Inc.](https://github.com/snowdreamtech)
-See the [LICENSE](./LICENSE) file for the full license text.
+```yaml
+version: "3"
 
-## Star History
+services:
+  alpine:
+    image: snowdreamtech/alpine:latest
+    container_name: alpine
+    environment:
+      - TZ=Asia/Shanghai
+    volumes:
+      - /path/to/data:/path/to/data
+    restart: unless-stopped
+```
 
-[![Star History Chart](https://api.star-history.com/image?repos=snowdreamtech/template&type=date&legend=top-left)](https://www.star-history.com/?repos=snowdreamtech%2Ftemplate&type=date&legend=top-left)
+## Environment Variables
+
+This image provides several environment variables to customize its behavior.
+
+| Variable               | Default   | Description                                                          |
+| :--------------------- | :-------- | :------------------------------------------------------------------- |
+| `PUID`                 | `0`       | User ID for the running process.                                     |
+| `PGID`                 | `0`       | Group ID for the running process.                                    |
+| `USER`                 | `root`    | Username for the running process.                                    |
+| `PASSWORDLESS_SUDO`    | `false`   | Set to `true` to grant the mapped user passwordless `sudo`/`doas`.   |
+| `WORKDIR`              | `/root`   | Working directory.                                                   |
+| `UMASK`                | `022`     | Umask for file creation.                                             |
+| `DEBUG`                | `false`   | Enable debug logging for the entrypoint.                             |
+| `KEEPALIVE`            | `0`       | Set to `1` to keep the container running indefinitely.               |
+| `TZ`                   | `UTC`     | Timezone setting.                                                    |
+| `CAP_NET_BIND_SERVICE` | `0`       | Set to `1` to grant permission to bind to privileged ports (< 1024). |
+| `LANG`                 | `C.UTF-8` | System locale and language setting.                                  |
+
+## Features
+
+### User Mapping & Permissions
+
+You can map the internal user to your host user's ID and Group ID using `PUID` and `PGID`. This is extremely useful for avoiding permission issues when using volumes.
+
+```bash
+docker run -d \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  snowdreamtech/alpine:latest
+```
+
+By default, the mapped user does **not** have `sudo` or `doas` access. To enable passwordless privilege escalation (e.g., for development or debugging), set `PASSWORDLESS_SUDO=true`:
+
+```bash
+docker run -d \
+  -e PUID=1000 \
+  -e PGID=1000 \
+  -e PASSWORDLESS_SUDO=true \
+  snowdreamtech/alpine:latest
+```
+
+> **Security note**: Do not set `PASSWORDLESS_SUDO=true` in production environments, as it allows the container process to escalate to root without a password.
+
+### Entrypoint Extension (`entrypoint.d`)
+
+This image supports an extension mechanism for custom initialization scripts. Any executable script placed in `/usr/local/bin/entrypoint.d/` (or the project's `entrypoint.d/` folder before build) will be executed in alphabetical order during container startup.
+
+### Included Packages
+
+The image comes pre-installed with a curated set of essential tools:
+
+- **Shell**: `bash`, `zsh`
+- **Editors**: `vim`, `nano`
+- **Network**: `curl`, `wget`, `rsync`, `git`
+- **Utils**: `sudo`, `ca-certificates`, `tzdata`
+
+## Development
+
+```bash
+docker buildx create --use --name build --node build --driver-opt network=host
+docker buildx build -t snowdreamtech/alpine --platform=linux/386,linux/amd64,linux/arm/v6,linux/arm/v7,linux/arm64,linux/ppc64le,linux/riscv64,linux/s390x . --push
+```
+
+### Project Tooling
+
+This project uses the Snowdream Tech Alpine Base Image for advanced automation.
+
+| Suite        | Goal                       | Commands                                |
+| :----------- | :------------------------- | :-------------------------------------- |
+| **Core**     | Onboarding & Project Setup | `init`, `setup`, `install`, `check-env` |
+| **Quality**  | Reliability & Standards    | `test`, `lint`, `format`, `verify`      |
+| **Security** | Auditing & Compliance      | `audit`, `env`                          |
+| **Ops**      | Building & Releasing       | `build`, `release`, `archive-changelog` |
+| **Maint**    | Tooling & Cleanup          | `update`, `cleanup`                     |
+| **DX**       | Developer Productivity     | `docs`, `commit`, `bench`               |
+
+For more details on the AI-first development workflow, refer to the [CONVENTIONS.md](CONVENTIONS.md).
+
+## Reference
+
+1. [使用 buildx 构建多平台 Docker 镜像](https://icloudnative.io/posts/multiarch-docker-with-buildx/)
+1. [如何使用 docker buildx 构建跨平台 Go 镜像](https://waynerv.com/posts/building-multi-architecture-images-with-docker-buildx/#buildx-%E7%9A%84%E8%B7%A8%E5%B9%B3%E5%8F%B0%E6%9E%84%E5%BB%BA%E7%AD%96%E7%95%A5)
+1. [Building Multi-Arch Images for Arm and x86 with Docker Desktop](https://www.docker.com/blog/multi-arch-images/)
+1. [How to Rapidly Build Multi-Architecture Images with Buildx](https://www.docker.com/blog/how-to-rapidly-build-multi-architecture-images-with-buildx/)
+1. [Faster Multi-Platform Builds: Dockerfile Cross-Compilation Guide](https://www.docker.com/blog/faster-multi-platform-builds-dockerfile-cross-compilation-guide/)
+1. [docker/buildx](https://github.com/docker/buildx)
+
+---
+
+Copyright (c) 2024-present [SnowdreamTech Inc.](https://github.com/snowdreamtech)

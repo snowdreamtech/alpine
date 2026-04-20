@@ -1,6 +1,6 @@
 {
   "name": "template",
-  "version": "0.1.0",
+  "version": "3.23.3",
   "private": true,
   "description": "Standardized project template with multi-language support",
   "type": "module",
