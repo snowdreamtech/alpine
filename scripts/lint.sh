@@ -113,20 +113,15 @@ main() {
   local _PC_VER
   _PC_VER=$(get_version "pre-commit")
 
-  # First attempt: Run lint with auto-fix enabled
+  # Pass 1: Run lint with auto-fix enabled
   log_info "── Pass 1: Lint check with auto-fix ──"
-  run_pre_commit_lint "--fix" || true
-
-  # Check if lint passes after auto-fix
-  local _T1_CHECK
-  _T1_CHECK=$(date +%s)
-  if run_pre_commit_lint ""; then
+  if run_pre_commit_lint "--fix"; then
     _L_OK=1
-    log_summary "Quality" "pre-commit (Pass 1)" "✅ Passed" "${_PC_VER:--}" "$(($(date +%s) - _T0_LNT))"
+    log_summary "Quality" "pre-commit" "✅ Passed" "${_PC_VER:--}" "$(($(date +%s) - _T0_LNT))"
   else
     log_summary "Quality" "pre-commit (Pass 1)" "⚠️  Failed" "${_PC_VER:--}" "$(($(date +%s) - _T0_LNT))"
 
-    # Second attempt: Run lint again after auto-fix
+    # Pass 2: Run lint again to verify
     log_warn "\n⚠️  First pass failed. Running second check..."
     log_info "── Pass 2: Final verification ──"
     local _T2_LNT
