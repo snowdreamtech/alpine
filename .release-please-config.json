@@ -111,5 +111,5 @@
       "hidden": false
     }
   ],
-  "separate-pull-requests": true
+  "separate-pull-requests": false
 }
