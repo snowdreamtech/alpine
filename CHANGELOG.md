@@ -6,6 +6,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.9.2](https://github.com/snowdreamtech/template/compare/v0.9.1...v0.9.2) (2026-04-20)
+
+
+### Bug Fixes
+
+* **lint:** ensure pre-commit runs exactly 2 times, not 3 ([4085676](https://github.com/snowdreamtech/template/commit/40856766a964a95216a171fd5760bde2b91240c5))
+* **release:** set separate-pull-requests to false for unified PR ([07054f5](https://github.com/snowdreamtech/template/commit/07054f5d69e832f976b46e1648d39779042cfb15))
+
 ## [0.9.1](https://github.com/snowdreamtech/template/compare/v0.9.0...v0.9.1) (2026-04-20)
 
 
