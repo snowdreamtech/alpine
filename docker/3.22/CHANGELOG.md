@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.22.4](https://github.com/snowdreamtech/alpine/compare/3.22-v3.22.3...3.22-v3.22.4) (2026-04-21)
+
+
+### 🐛 Bug Fixes
+
+* **docker:** update Alpine base images to latest security releases ([47d0a83](https://github.com/snowdreamtech/alpine/commit/47d0a83d1f2ea57c52e7c727de069d76b26dccb2))
+
 ## [3.22.3](https://github.com/snowdreamtech/alpine/compare/3.22-v3.22.2...3.22-v3.22.3) (2026-04-21)
 
 
