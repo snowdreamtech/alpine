@@ -1,7 +1,5 @@
 # Alpine
 
-[![GitHub Actions Lint](https://github.com/snowdreamtech/alpine/actions/workflows/lint.yml/badge.svg)](https://github.com/snowdreamtech/alpine/actions/workflows/lint.yml)
-[![GitHub Actions Verify](https://github.com/snowdreamtech/alpine/actions/workflows/verify.yml/badge.svg)](https://github.com/snowdreamtech/alpine/actions/workflows/verify.yml)
 [![GitHub Release](https://img.shields.io/github/v/release/snowdreamtech/alpine?include_prereleases&sort=semver)](https://github.com/snowdreamtech/alpine/releases/latest)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](https://opensource.org/licenses/MIT)
 [![CodeSize](https://img.shields.io/github/languages/code-size/snowdreamtech/alpine)](https://github.com/snowdreamtech/alpine)
