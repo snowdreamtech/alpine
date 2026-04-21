@@ -37,7 +37,7 @@ VER_DENO="2.7.12"
 VER_ZIG="0.16.0"
 VER_JAVA="26.0.0"
 VER_DOTNET="10.0.202"
-VER_RUBY="4.0.2"
+VER_RUBY="4.0.3"
 VER_YARN="1.22.22"
 
 # ── 🧪 Exotic / Domain-Specific Runtimes ─────────────────────────────────────
@@ -249,7 +249,7 @@ VER_ANSIBLE_LINT_PROVIDER="pipx:ansible-lint"
 VER_SPECTRAL="6.15.1"
 VER_SPECTRAL_PROVIDER="npm:@stoplight/spectral-cli"
 
-VER_GORELEASER="2.15.3"
+VER_GORELEASER="2.15.4"
 VER_GORELEASER_PROVIDER="github:goreleaser/goreleaser"
 
 # ── 📖 Documentation ──────────────────────────────────────────────────────────
