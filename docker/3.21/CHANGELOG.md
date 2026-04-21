@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.21.6](https://github.com/snowdreamtech/alpine/compare/3.21-v3.21.5...3.21-v3.21.6) (2026-04-21)
+
+
+### 🐛 Bug Fixes
+
+* **docs:** clean up duplicate CHANGELOG entries ([b436b36](https://github.com/snowdreamtech/alpine/commit/b436b36c87a3bc53e1a4207c9eb4cea7d76ddc75))
+
 ## [3.21.5](https://github.com/snowdreamtech/alpine/compare/3.21-v3.21.5...3.21-v3.21.5) (2026-04-20)
 
 
