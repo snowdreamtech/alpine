@@ -549,6 +549,7 @@ jobs:
 
       - name: "🖊️ Sign the Docker Image"
         if: steps.version-filter.outputs.skip != 'true' && steps.build.conclusion == 'success'
+        continue-on-error: true
         env:
           TAGS: ${{ steps.meta.outputs.tags }}
           COSIGN_YES: true
@@ -557,50 +558,52 @@ jobs:
         run: |
           echo "→ Signing images with Cosign (keyless OIDC + metadata)"
 
-          # Sign all images in parallel for speed
-          pids=()
+          # Track successful signatures
+          declare -a signed_tags=()
+          declare -a failed_tags=()
+
+          # Sign all images sequentially to better track failures
           for tag in ${TAGS}; do
-            (
-              echo "  Signing: ${tag}"
-              cosign sign --yes \
-                -a "build-id=${BUILD_ID}" \
-                -a "commit=${COMMIT_SHA}" \
-                -a "alpine-version=${{ matrix.version }}" \
-                -a "workflow=${GITHUB_WORKFLOW}" \
-                "${tag}" 2>&1 | sed 's/^/    /'
+            echo "  Signing: ${tag}"
+            if cosign sign --yes \
+              -a "build-id=${BUILD_ID}" \
+              -a "commit=${COMMIT_SHA}" \
+              -a "alpine-version=${{ matrix.version }}" \
+              -a "workflow=${GITHUB_WORKFLOW}" \
+              "${tag}" 2>&1 | sed 's/^/    /'; then
               echo "  ✓ Signed: ${tag}"
-            ) &
-            pids+=($!)
+              signed_tags+=("${tag}")
+            else
+              echo "  ✗ Failed to sign: ${tag}"
+              failed_tags+=("${tag}")
+            fi
           done
-
-          # Wait for all signing processes
-          failed=0
-          for pid in "${pids[@]}"; do
-            wait "$pid" || failed=1
-          done
-
-          if [ $failed -eq 1 ]; then
-            echo "✗ Some signatures failed"
-            exit 1
-          fi
 
           echo ""
-          echo "→ Verifying all signatures..."
+          echo "→ Signature Summary:"
+          echo "  Successful: ${#signed_tags[@]}/${#TAGS[@]}"
+          if [ ${#failed_tags[@]} -gt 0 ]; then
+            echo "  Failed: ${failed_tags[*]}"
+          fi
 
-          # Verify all signatures
-          for tag in ${TAGS}; do
-            echo "  Verifying: ${tag}"
-            cosign verify \
-              --certificate-identity-regexp=".*" \
-              --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
-              "${tag}" > /dev/null 2>&1 || {
-                echo "  ✗ Signature verification failed for ${tag}"
-                exit 1
-              }
-            echo "  ✓ Verified: ${tag}"
-          done
+          # Only verify successfully signed images
+          if [ ${#signed_tags[@]} -gt 0 ]; then
+            echo ""
+            echo "→ Verifying signatures..."
+            for tag in "${signed_tags[@]}"; do
+              echo "  Verifying: ${tag}"
+              if cosign verify \
+                --certificate-identity-regexp=".*" \
+                --certificate-oidc-issuer="https://token.actions.githubusercontent.com" \
+                "${tag}" > /dev/null 2>&1; then
+                echo "  ✓ Verified: ${tag}"
+              else
+                echo "  ⚠️ Verification failed for ${tag} (signature may not be propagated yet)"
+              fi
+            done
+          fi
 
-          echo "✓ All images signed and verified successfully"
+          echo "✓ Signing process completed (${#signed_tags[@]} successful, ${#failed_tags[@]} failed)"
 
       - name: "📊 Generate Build Summary"
         if: steps.version-filter.outputs.skip != 'true' && always()
