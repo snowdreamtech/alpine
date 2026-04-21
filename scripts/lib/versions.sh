@@ -55,7 +55,7 @@ VER_KCL_PROVIDER="github:kcl-lang/kcl"
 VER_PKL="0.31.1"
 VER_PKL_PROVIDER="github:apple/pkl"
 
-VER_BAZEL="9.0.2"
+VER_BAZEL="9.1.0"
 VER_BAZEL_PROVIDER="github:bazelbuild/bazel"
 
 VER_BALLERINA="2201.13.3"
