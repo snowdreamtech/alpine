@@ -165,7 +165,7 @@ VER_ASSEMBLYSCRIPT_PROVIDER="npm:assemblyscript"
 VER_OPA="1.15.2"
 VER_OPA_PROVIDER="github:open-policy-agent/opa"
 
-VER_BUF="1.68.2"
+VER_BUF="1.68.3"
 VER_BUF_PROVIDER="github:bufbuild/buf"
 
 VER_CUE="0.16.1"
