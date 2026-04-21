@@ -60,6 +60,14 @@ jobs:
         with:
           egress-policy: block
           allowed-endpoints: >
+            *.mise.jdx.dev:443
+            *.ubuntu.com:80
+            *.ubuntu.com:443
+            *.debian.org:80
+            *.debian.org:443
+            *.rockylinux.org:443
+            *.centos.org:443
+            *.redhat.com:443
             api.github.com:443
             *.githubusercontent.com:443
             github.com:443
