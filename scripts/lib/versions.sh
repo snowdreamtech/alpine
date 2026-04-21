@@ -32,7 +32,7 @@ VER_PIPX_PROVIDER="pip"
 # ── 🏗️ Tier 2: Language Runtimes (On-demand) ─────────────────────────────────
 VER_KOTLIN="2.3.20"
 VER_RUST="1.95.0"
-VER_BUN="1.3.12"
+VER_BUN="1.3.13"
 VER_DENO="2.7.12"
 VER_ZIG="0.16.0"
 VER_JAVA="26.0.0"
