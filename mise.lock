@@ -645,11 +645,11 @@ version = "17.8.0"
 backend = "npm:stylelint"
 
 [[tools."pipx:clang-format"]]
-version = "22.1.3"
+version = "22.1.4"
 backend = "pipx:clang-format"
 
 [[tools."pipx:pre-commit"]]
-version = "4.5.1"
+version = "4.6.0"
 backend = "pipx:pre-commit"
 
 [[tools."pipx:yamllint"]]
