@@ -1,8 +1,8 @@
 {
-  "name": "template",
-  "version": "3.23.3",
+  "name": "alpine",
+  "version": "0.1.0",
   "private": true,
-  "description": "Standardized project template with multi-language support",
+  "description": "Docker Images for Alpine with multi-architecture support",
   "type": "module",
   "devDependencies": {
     "@commitlint/cli": "20.5.0",
