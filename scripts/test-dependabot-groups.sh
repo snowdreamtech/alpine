@@ -47,11 +47,11 @@ echo "0" >"${_temp_overlap}"
 
 # Extract each ecosystem block and check for overlaps
 awk '/package-ecosystem:/ {eco=$0; block=""}
-     /package-ecosystem:|^  - package-ecosystem:/ && block {
-       print block; block=""; eco=$0
-     }
-     {block=block"\n"$0}
-     END {if(block) print block}' "${DEPENDABOT_FILE}" |
+  /package-ecosystem:|^  - package-ecosystem:/ && block {
+    print block; block=""; eco=$0
+  }
+  {block=block"\n"$0}
+  END {if(block) print block}' "${DEPENDABOT_FILE}" |
   while IFS= read -r line; do
     case "${line}" in
     *"package-ecosystem:"*)
