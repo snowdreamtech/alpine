@@ -46,7 +46,8 @@ parse_rate_limit() {
   fi
 
   # Extract the "core" section first
-  _core_section=$(echo "${_json}" | sed -n '/"core":/,/"search":/p' | head -n -1)
+  # Use sed to remove the last line (more portable than head -n -1)
+  _core_section=$(echo "${_json}" | sed -n '/"core":/,/"search":/p' | sed '$d')
 
   if [ -z "${_core_section}" ]; then
     # Fallback: try to extract core section differently
