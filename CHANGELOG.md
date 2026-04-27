@@ -6,6 +6,14 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.12.0](https://github.com/snowdreamtech/template/compare/v0.11.0...v0.12.0) (2026-04-27)
+
+
+### Features
+
+* **security:** add CDN and download mirror endpoints to harden runner ([3ff8a5d](https://github.com/snowdreamtech/template/commit/3ff8a5d3d073a57bb4681c619e94aa797983ef23))
+* **security:** add DockerHub endpoints to harden runner ([48b6416](https://github.com/snowdreamtech/template/commit/48b6416ced65a68194a50d4ffb406c7e7257a37f))
+
 ## [0.11.0](https://github.com/snowdreamtech/template/compare/v0.10.0...v0.11.0) (2026-04-24)
 
 
