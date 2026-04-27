@@ -9,6 +9,8 @@ minimal:
   - api.github.com:443
   - "*.githubusercontent.com:443"
   - github.com:443
+  - objects.githubusercontent.com:443
+  - codeload.github.com:443
   - mise.run:443
   - install.mise.jdx.dev:443
   - "*.mise.jdx.dev:443"
@@ -46,6 +48,15 @@ standard:
   - registry.terraform.io:443
   - formulae.brew.sh:443
   - repo.yarnpkg.com:443
+  # CDN & Download mirrors
+  - objects.githubusercontent.com:443
+  - codeload.github.com:443
+  - nodejs.org:443
+  - deno.land:443
+  - cdn.deno.land:443
+  - downloads.gradle.org:443
+  - services.gradle.org:443
+  - downloads.gradle-dn.com:443
 
 # Profile: full
 # For CI/CD workflows with containers and security scanning
@@ -80,6 +91,15 @@ full:
   - registry.terraform.io:443
   - formulae.brew.sh:443
   - repo.yarnpkg.com:443
+  # CDN & Download mirrors
+  - objects.githubusercontent.com:443
+  - codeload.github.com:443
+  - nodejs.org:443
+  - deno.land:443
+  - cdn.deno.land:443
+  - downloads.gradle.org:443
+  - services.gradle.org:443
+  - downloads.gradle-dn.com:443
   # Container registries
   - mise.jdx.dev:443
   - ghcr.io:443
