@@ -33,7 +33,7 @@ jobs:
       contents: read
       # Required for checking branch protection rules.
       actions: read
-    timeout-minutes: 20
+    timeout-minutes: 40
 
     steps:
       - name: "🔒 Harden Runner (Security Egress Audit)"

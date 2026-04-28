@@ -39,7 +39,7 @@ jobs:
       contents: read
       statuses: write
       security-events: write
-    timeout-minutes: 25
+    timeout-minutes: 50
     env:
       PYTHONUTF8: 1
     steps:
@@ -292,7 +292,7 @@ jobs:
       pull-requests: write
       statuses: write
       security-events: write
-    timeout-minutes: 25
+    timeout-minutes: 50
     steps:
       - name: "📝 Orchestrate Release Lifecycle (Release Please)"
         id: release
