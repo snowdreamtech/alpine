@@ -425,11 +425,12 @@ scan_ecosystems() {
   fi
 
   # ── 18. Dev Containers ──────────────────────────────────────────────────
-  _dc_dirs=$(find_dirs_for_patterns "devcontainer.json" ".devcontainer.json" "**/devcontainer.json" "**/.devcontainer.json")
-  if [ -n "${_dc_dirs:-}" ]; then
-    echo "${_dc_dirs:-}" | while IFS= read -r _d; do
-      if [ -n "${_d:-}" ]; then _emit_unique "devcontainers" "${_d:-}"; fi
-    done
+  # Note: Dependabot's devcontainers ecosystem requires directory to point to the
+  # parent directory containing .devcontainer/, not .devcontainer/ itself.
+  # It looks for: .devcontainer.json OR .devcontainer/devcontainer.json OR .devcontainer/<name>/devcontainer.json
+  if has_tracked_file ".devcontainer.json" ".devcontainer/devcontainer.json" ".devcontainer/*/devcontainer.json"; then
+    # For root-level .devcontainer, always use "/"
+    _emit_unique "devcontainers" "/"
   fi
 
   # ── 19. Bazel ────────────────────────────────────────────────────────────

@@ -36,7 +36,9 @@ git config user.name "Test User"
 # Create dummy files
 touch "package.json"
 touch "docs/package.json"
-touch ".devcontainer/docker-compose.yml" # Should be ignored (devcontainers handles it)
+# Create devcontainer.json to trigger devcontainers ecosystem
+echo '{"name": "test"}' >".devcontainer/devcontainer.json"
+touch ".devcontainer/docker-compose.yml" # Should be ignored by docker ecosystem
 touch "docker/Dockerfile"                # Should be detected by docker ecosystem
 touch ".pre-commit-config.yaml"
 touch ".github/workflows/ci.yml"
@@ -91,6 +93,8 @@ assert_contains 'directory: "/docs"'
 # Docker ecosystem should detect docker/Dockerfile but not .devcontainer
 assert_contains 'package-ecosystem: "docker"'
 assert_contains 'directory: "/docker"'
+# Devcontainers ecosystem should be detected with directory pointing to root
+assert_contains 'package-ecosystem: "devcontainers"'
 assert_contains 'package-ecosystem: "pre-commit"'
 # New unified grouping strategy
 assert_contains "all-dependencies"
@@ -107,7 +111,7 @@ assert_contains 'default-days: 7'
 
 echo "🔍 Verifying exclusions..."
 # Verify .devcontainer is NOT detected by docker ecosystem
-# (it should only be handled by devcontainers ecosystem if devcontainer.json exists)
+# (it should only be handled by devcontainers ecosystem)
 assert_not_contains 'directory: "/.devcontainer"'
 
 echo "✨ Smoke test PASSED successfully!"

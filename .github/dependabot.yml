@@ -117,7 +117,7 @@ updates:
       - "javascript"
 
   - package-ecosystem: "devcontainers"
-    directory: "/.devcontainer"
+    directory: "/"
     # 1. Target Branch: dev (Ensures updates are validated in development)
     target-branch: "dev"
     # 2. Concurrency: Prevent PR-bombing
