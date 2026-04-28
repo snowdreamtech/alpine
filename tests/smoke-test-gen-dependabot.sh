@@ -25,6 +25,7 @@ trap cleanup EXIT
 mkdir -p "$TEMP_DIR/root"
 mkdir -p "$TEMP_DIR/root/docs"
 mkdir -p "$TEMP_DIR/root/.devcontainer"
+mkdir -p "$TEMP_DIR/root/docker"
 mkdir -p "$TEMP_DIR/root/.github/workflows"
 
 cd "$TEMP_DIR/root"
@@ -35,7 +36,8 @@ git config user.name "Test User"
 # Create dummy files
 touch "package.json"
 touch "docs/package.json"
-touch ".devcontainer/Dockerfile"
+touch ".devcontainer/docker-compose.yml" # Should be ignored (devcontainers handles it)
+touch "docker/Dockerfile"                # Should be detected by docker ecosystem
 touch ".pre-commit-config.yaml"
 touch ".github/workflows/ci.yml"
 
@@ -71,11 +73,24 @@ assert_contains() {
   fi
 }
 
+assert_not_contains() {
+  _pattern="$1"
+  if grep -q "$_pattern" "$OUTPUT_FILE"; then
+    echo "❌ Should NOT contain: $_pattern"
+    on_failure
+    exit 1
+  else
+    echo "✅ Correctly excluded: $_pattern"
+  fi
+}
+
 echo "🔍 Verifying generated content..."
 assert_contains 'package-ecosystem: "npm"'
 assert_contains 'directory: "/"'
 assert_contains 'directory: "/docs"'
+# Docker ecosystem should detect docker/Dockerfile but not .devcontainer
 assert_contains 'package-ecosystem: "docker"'
+assert_contains 'directory: "/docker"'
 assert_contains 'package-ecosystem: "pre-commit"'
 # New unified grouping strategy
 assert_contains "all-dependencies"
@@ -89,5 +104,10 @@ assert_contains 'open-pull-requests-limit: 5'
 assert_contains 'update-types:'
 assert_contains 'cooldown:'
 assert_contains 'default-days: 7'
+
+echo "🔍 Verifying exclusions..."
+# Verify .devcontainer is NOT detected by docker ecosystem
+# (it should only be handled by devcontainers ecosystem if devcontainer.json exists)
+assert_not_contains 'directory: "/.devcontainer"'
 
 echo "✨ Smoke test PASSED successfully!"
