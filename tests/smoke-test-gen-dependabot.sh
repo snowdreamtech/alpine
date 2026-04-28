@@ -77,13 +77,16 @@ assert_contains 'directory: "/"'
 assert_contains 'directory: "/docs"'
 assert_contains 'package-ecosystem: "docker"'
 assert_contains 'package-ecosystem: "pre-commit"'
-assert_contains "📦-npm-root-patch-minor"
-assert_contains "🧹-root-lint-dependencies"
-assert_contains "🔧-actions-updates"
+# New unified grouping strategy
+assert_contains "all-dependencies"
+assert_contains 'patterns: \["\*"\]'
+# Verify all update types are included
+assert_contains '"patch"'
+assert_contains '"minor"'
+assert_contains '"major"'
 assert_contains 'rebase-strategy: "auto"'
 assert_contains 'open-pull-requests-limit: 5'
 assert_contains 'update-types:'
-assert_contains 'exclude-patterns:'
 assert_contains 'cooldown:'
 assert_contains 'default-days: 7'
 
