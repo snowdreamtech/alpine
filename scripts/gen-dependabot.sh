@@ -335,8 +335,13 @@ scan_ecosystems() {
   fi
 
   # ── 8. Docker ───────────────────────────────────────────────────────────
-  _docker_dirs=$(find_dirs_for_patterns "Dockerfile" "**/Dockerfile" "Dockerfile.*" "**/Dockerfile.*" "docker-compose.yml" "docker-compose.yaml" "**/docker-compose.yml" "**/docker-compose.yaml" | grep -v -E '(node_modules/|vendor/|\.terraform/)' || true)
-  if [ -n "${_docker_dirs:-}" ]; then
+  # Exclude .devcontainer directory as it's handled by devcontainers ecosystem
+  _docker_files=$(git ls-files "Dockerfile" "**/Dockerfile" "Dockerfile.*" "**/Dockerfile.*" "docker-compose.yml" "docker-compose.yaml" "**/docker-compose.yml" "**/docker-compose.yaml" 2>/dev/null | grep -v -E '(node_modules/|vendor/|\.terraform/|\.devcontainer/)' || true)
+  if [ -n "${_docker_files:-}" ]; then
+    _docker_dirs=$(echo "${_docker_files:-}" | while IFS= read -r _file; do
+      _dir=$(dirname "${_file:-}")
+      [ "${_dir:-}" = "." ] && echo "/" || echo "/$_dir"
+    done | sort -u)
     echo "${_docker_dirs:-}" | while IFS= read -r _d; do
       if [ -n "${_d:-}" ]; then _emit_unique "docker" "${_d:-}"; fi
     done
