@@ -27,18 +27,18 @@ updates:
     # 1. Target Branch: dev (Ensures updates are validated in development)
     target-branch: "dev"
     # 2. Concurrency: Prevent PR-bombing
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     # 3. Management: Auto-rebase to resolve conflicts
     rebase-strategy: "auto"
-    # 4. Grouping: Consolidate updates to reduce PR noise
+    # 4. Grouping: Consolidate ALL updates into a single PR
     groups:
-      📦-all-patch-minor:
+      all-dependencies:
+        patterns: ["*"]
         update-types:
           - "patch"
           - "minor"
-      🔧-actions-updates:
-        patterns: ["*"]
-    # 6. Scheduling: Weekly updates on Monday
+          - "major"
+    # 6. Scheduling: weekly updates on monday
     schedule:
       interval: "weekly"
       day: "monday"
@@ -59,22 +59,18 @@ updates:
     # 1. Target Branch: dev (Ensures updates are validated in development)
     target-branch: "dev"
     # 2. Concurrency: Prevent PR-bombing
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     # 3. Management: Auto-rebase to resolve conflicts
     rebase-strategy: "auto"
-    # 4. Grouping: Consolidate updates to reduce PR noise
+    # 4. Grouping: Consolidate ALL updates into a single PR
     groups:
-      📦-all-patch-minor:
+      all-dependencies:
+        patterns: ["*"]
         update-types:
           - "patch"
           - "minor"
-      🧹-lint-dependencies:
-        patterns: ["eslint*", "prettier*", "stylelint*"]
-      🧪-testing-frameworks:
-        patterns: ["vitest*", "jest*", "playwright*", "cypress*"]
-      ⚡-vite-suite:
-        patterns: ["vite*", "@vitejs/*"]
-    # 6. Scheduling: Weekly updates on Monday
+          - "major"
+    # 6. Scheduling: weekly updates on monday
     schedule:
       interval: "weekly"
       day: "monday"
@@ -94,22 +90,18 @@ updates:
     # 1. Target Branch: dev (Ensures updates are validated in development)
     target-branch: "dev"
     # 2. Concurrency: Prevent PR-bombing
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     # 3. Management: Auto-rebase to resolve conflicts
     rebase-strategy: "auto"
-    # 4. Grouping: Consolidate updates to reduce PR noise
+    # 4. Grouping: Consolidate ALL updates into a single PR
     groups:
-      📦-all-patch-minor:
+      all-dependencies:
+        patterns: ["*"]
         update-types:
           - "patch"
           - "minor"
-      🧹-lint-dependencies:
-        patterns: ["eslint*", "prettier*", "stylelint*"]
-      🧪-testing-frameworks:
-        patterns: ["vitest*", "jest*", "playwright*", "cypress*"]
-      ⚡-vite-suite:
-        patterns: ["vite*", "@vitejs/*"]
-    # 6. Scheduling: Weekly updates on Monday
+          - "major"
+    # 6. Scheduling: weekly updates on monday
     schedule:
       interval: "weekly"
       day: "monday"
@@ -124,183 +116,23 @@ updates:
       - "dependencies"
       - "javascript"
 
-  - package-ecosystem: "docker"
-    directory: "/.devcontainer"
-    # 1. Target Branch: dev (Ensures updates are validated in development)
-    target-branch: "dev"
-    # 2. Concurrency: Prevent PR-bombing
-    open-pull-requests-limit: 10
-    # 3. Management: Auto-rebase to resolve conflicts
-    rebase-strategy: "auto"
-    # 4. Grouping: Consolidate updates to reduce PR noise
-    groups:
-      📦-all-patch-minor:
-        update-types:
-          - "patch"
-          - "minor"
-      🐳-base-images:
-        patterns: ["alpine*", "ubuntu*", "debian*", "rocky*", "rockylinux*", "rhel*", "node*", "python*", "golang*"]
-    # 6. Scheduling: Weekly updates on Monday
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    # 6.1 Cooldown: Wait for software to be stable before updating (Zizmor compliance)
-    cooldown:
-      default-days: 7
-    # 7. Commit Format: Semantic commit prefixes
-    commit-message:
-      prefix: "build(deps):"
-    # 8. Classification: Semantic labels for triage
-    labels:
-      - "dependencies"
-      - "docker"
-      - "infrastructure"
-
-  - package-ecosystem: "docker"
-    directory: "/docker/3.20"
-    # 1. Target Branch: dev (Ensures updates are validated in development)
-    target-branch: "dev"
-    # 2. Concurrency: Prevent PR-bombing
-    open-pull-requests-limit: 10
-    # 3. Management: Auto-rebase to resolve conflicts
-    rebase-strategy: "auto"
-    # 4. Grouping: Consolidate updates to reduce PR noise
-    groups:
-      📦-all-patch-minor:
-        update-types:
-          - "patch"
-          - "minor"
-      🐳-base-images:
-        patterns: ["alpine*", "ubuntu*", "debian*", "rocky*", "rockylinux*", "rhel*", "node*", "python*", "golang*"]
-    # 6. Scheduling: Weekly updates on Monday
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    # 6.1 Cooldown: Wait for software to be stable before updating (Zizmor compliance)
-    cooldown:
-      default-days: 7
-    # 7. Commit Format: Semantic commit prefixes
-    commit-message:
-      prefix: "build(deps):"
-    # 8. Classification: Semantic labels for triage
-    labels:
-      - "dependencies"
-      - "docker"
-      - "infrastructure"
-
-  - package-ecosystem: "docker"
-    directory: "/docker/3.21"
-    # 1. Target Branch: dev (Ensures updates are validated in development)
-    target-branch: "dev"
-    # 2. Concurrency: Prevent PR-bombing
-    open-pull-requests-limit: 10
-    # 3. Management: Auto-rebase to resolve conflicts
-    rebase-strategy: "auto"
-    # 4. Grouping: Consolidate updates to reduce PR noise
-    groups:
-      📦-all-patch-minor:
-        update-types:
-          - "patch"
-          - "minor"
-      🐳-base-images:
-        patterns: ["alpine*", "ubuntu*", "debian*", "rocky*", "rockylinux*", "rhel*", "node*", "python*", "golang*"]
-    # 6. Scheduling: Weekly updates on Monday
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    # 6.1 Cooldown: Wait for software to be stable before updating (Zizmor compliance)
-    cooldown:
-      default-days: 7
-    # 7. Commit Format: Semantic commit prefixes
-    commit-message:
-      prefix: "build(deps):"
-    # 8. Classification: Semantic labels for triage
-    labels:
-      - "dependencies"
-      - "docker"
-      - "infrastructure"
-
-  - package-ecosystem: "docker"
-    directory: "/docker/3.22"
-    # 1. Target Branch: dev (Ensures updates are validated in development)
-    target-branch: "dev"
-    # 2. Concurrency: Prevent PR-bombing
-    open-pull-requests-limit: 10
-    # 3. Management: Auto-rebase to resolve conflicts
-    rebase-strategy: "auto"
-    # 4. Grouping: Consolidate updates to reduce PR noise
-    groups:
-      📦-all-patch-minor:
-        update-types:
-          - "patch"
-          - "minor"
-      🐳-base-images:
-        patterns: ["alpine*", "ubuntu*", "debian*", "rocky*", "rockylinux*", "rhel*", "node*", "python*", "golang*"]
-    # 6. Scheduling: Weekly updates on Monday
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    # 6.1 Cooldown: Wait for software to be stable before updating (Zizmor compliance)
-    cooldown:
-      default-days: 7
-    # 7. Commit Format: Semantic commit prefixes
-    commit-message:
-      prefix: "build(deps):"
-    # 8. Classification: Semantic labels for triage
-    labels:
-      - "dependencies"
-      - "docker"
-      - "infrastructure"
-
-  - package-ecosystem: "docker"
-    directory: "/docker/3.23"
-    # 1. Target Branch: dev (Ensures updates are validated in development)
-    target-branch: "dev"
-    # 2. Concurrency: Prevent PR-bombing
-    open-pull-requests-limit: 10
-    # 3. Management: Auto-rebase to resolve conflicts
-    rebase-strategy: "auto"
-    # 4. Grouping: Consolidate updates to reduce PR noise
-    groups:
-      📦-all-patch-minor:
-        update-types:
-          - "patch"
-          - "minor"
-      🐳-base-images:
-        patterns: ["alpine*", "ubuntu*", "debian*", "rocky*", "rockylinux*", "rhel*", "node*", "python*", "golang*"]
-    # 6. Scheduling: Weekly updates on Monday
-    schedule:
-      interval: "weekly"
-      day: "monday"
-    # 6.1 Cooldown: Wait for software to be stable before updating (Zizmor compliance)
-    cooldown:
-      default-days: 7
-    # 7. Commit Format: Semantic commit prefixes
-    commit-message:
-      prefix: "build(deps):"
-    # 8. Classification: Semantic labels for triage
-    labels:
-      - "dependencies"
-      - "docker"
-      - "infrastructure"
-
   - package-ecosystem: "devcontainers"
-    directory: "/.devcontainer"
+    directory: "/"
     # 1. Target Branch: dev (Ensures updates are validated in development)
     target-branch: "dev"
     # 2. Concurrency: Prevent PR-bombing
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     # 3. Management: Auto-rebase to resolve conflicts
     rebase-strategy: "auto"
-    # 4. Grouping: Consolidate updates to reduce PR noise
+    # 4. Grouping: Consolidate ALL updates into a single PR
     groups:
-      📦-all-patch-minor:
+      all-dependencies:
+        patterns: ["*"]
         update-types:
           - "patch"
           - "minor"
-      🐳-base-images:
-        patterns: ["alpine*", "ubuntu*", "debian*", "rocky*", "rockylinux*", "rhel*", "node*", "python*", "golang*"]
-    # 6. Scheduling: Weekly updates on Monday
+          - "major"
+    # 6. Scheduling: weekly updates on monday
     schedule:
       interval: "weekly"
       day: "monday"
@@ -321,18 +153,18 @@ updates:
     # 1. Target Branch: dev (Ensures updates are validated in development)
     target-branch: "dev"
     # 2. Concurrency: Prevent PR-bombing
-    open-pull-requests-limit: 10
+    open-pull-requests-limit: 5
     # 3. Management: Auto-rebase to resolve conflicts
     rebase-strategy: "auto"
-    # 4. Grouping: Consolidate updates to reduce PR noise
+    # 4. Grouping: Consolidate ALL updates into a single PR
     groups:
-      📦-all-patch-minor:
+      all-dependencies:
+        patterns: ["*"]
         update-types:
           - "patch"
           - "minor"
-      🧹-pre-commit-hooks:
-        patterns: ["*"]
-    # 6. Scheduling: Weekly updates on Monday
+          - "major"
+    # 6. Scheduling: weekly updates on monday
     schedule:
       interval: "weekly"
       day: "monday"

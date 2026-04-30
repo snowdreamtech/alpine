@@ -23,14 +23,14 @@ set -eu
 # shellcheck disable=SC2034
 VER_GO="1.26.2"
 VER_NODE="25.9.0"
-VER_PNPM="10.33.2"
+VER_PNPM="11.0.0"
 VER_PNPM_PROVIDER="npm:pnpm"
 VER_PYTHON="3.14.4"
 VER_PIPX="1.11.0"
 VER_PIPX_PROVIDER="pip"
 
 # ── 🏗️ Tier 2: Language Runtimes (On-demand) ─────────────────────────────────
-VER_KOTLIN="2.3.21"
+VER_KOTLIN="2.4.0-Beta2"
 VER_RUST="1.95.0"
 VER_BUN="1.3.13"
 VER_DENO="2.7.13"
@@ -93,7 +93,7 @@ VER_APTOS_PROVIDER="github:aptos-labs/aptos-core"
 # ── 🔐 Tier 1: Security & Engineering (Mirror of .mise.toml) ─────────────────
 VER_GITLEAKS="8.30.1"
 VER_GITLEAKS_PROVIDER="github:gitleaks/gitleaks"
-VER_GH_CLI="2.91.0"
+VER_GH_CLI="2.92.0"
 VER_GH_CLI_PROVIDER="github:cli/cli"
 
 # ── 💎 Tier 1: Core Quality & Commit Tooling (Mirror of .mise.toml) ──────────
@@ -153,7 +153,7 @@ VER_SWIFTLINT_PROVIDER="github:realm/SwiftLint"
 
 VER_RUBOCOP_PROVIDER="gem:rubocop"
 
-VER_STYLELINT="17.9.0"
+VER_STYLELINT="17.9.1"
 VER_STYLELINT_PROVIDER="npm:stylelint"
 
 VER_STYLELINT_CONFIG="40.0.0"
