@@ -593,11 +593,11 @@ checksum = "sha256:929552b8305effac843ba7b4270c437aefb702fc3fbd73fcd1bffd35d4ac2
 url = "https://nodejs.org/dist/v25.9.0/node-v25.9.0-win-x64.zip"
 
 [[tools."npm:@commitlint/cli"]]
-version = "20.5.2"
+version = "20.5.3"
 backend = "npm:@commitlint/cli"
 
 [[tools."npm:@commitlint/config-conventional"]]
-version = "20.5.0"
+version = "20.5.3"
 backend = "npm:@commitlint/config-conventional"
 
 [[tools."npm:@taplo/cli"]]
@@ -629,7 +629,7 @@ version = "0.22.1"
 backend = "npm:markdownlint-cli2"
 
 [[tools."npm:pnpm"]]
-version = "11.0.0"
+version = "11.0.2"
 backend = "npm:pnpm"
 
 [[tools."npm:prettier"]]
