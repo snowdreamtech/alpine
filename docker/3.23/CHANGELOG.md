@@ -1,5 +1,15 @@
 # Changelog
 
+## [3.23.5](https://github.com/snowdreamtech/alpine/compare/3.23-v3.23.4...3.23-v3.23.5) (2026-05-01)
+
+
+### ♻️ Miscellaneous Chores
+
+* **config:** merge upstream zizmor configuration updates ([96af4a1](https://github.com/snowdreamtech/alpine/commit/96af4a12447ea4fa6c9b9fcb9c7b3a34a8e65b00))
+* **deps:** merge upstream dependency synchronization updates ([29fb40c](https://github.com/snowdreamtech/alpine/commit/29fb40cc182fb18e64547da95e167d5f821ba1dd))
+* **docker:** remove version bump trigger comments from Dockerfiles ([be7408a](https://github.com/snowdreamtech/alpine/commit/be7408ab29c725a95b7495cf769d4ff187fb3520))
+* **main:** release 0.14.0 ([043d2a4](https://github.com/snowdreamtech/alpine/commit/043d2a4202505e42c645e899c6731f5fb8f52c8e))
+
 ## [3.23.4](https://github.com/snowdreamtech/alpine/compare/3.23-v3.23.3...3.23-v3.23.4) (2026-04-21)
 
 
