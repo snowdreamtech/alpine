@@ -193,11 +193,11 @@ jobs:
 
       - name: "🏗️ Configure QEMU Emulation"
         if: steps.version-filter.outputs.skip != 'true'
-        uses: docker/setup-qemu-action@29109295f81e9208d7d86ff1c6c12d2833863392 # v3.7.0
+        uses: docker/setup-qemu-action@ce360397dd3f832beb865e1373c09c0e9f86d70a # v3.7.0
 
       - name: "🛠️ Configure Docker Buildx"
         if: steps.version-filter.outputs.skip != 'true'
-        uses: docker/setup-buildx-action@b5ca514318bd6ebac0fb2aedd5d36ec1b5c232a2 # v3.12.0
+        uses: docker/setup-buildx-action@4d04d5d9486b7bd6fa91e7baf45bbb4f8b9deedd # v3.12.0
         with:
           buildkitd-config: .github/buildkitd.toml
 
@@ -205,7 +205,7 @@ jobs:
         if: steps.version-filter.outputs.skip != 'true'
         id: login-dockerhub
         continue-on-error: true
-        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.7.0
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v3.7.0
         with:
           username: ${{ secrets.DOCKER_HUB_USERNAME }}
           password: ${{ secrets.DOCKER_HUB_TOKEN }}
@@ -214,7 +214,7 @@ jobs:
         if: steps.version-filter.outputs.skip != 'true'
         id: login-quay
         continue-on-error: true
-        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.7.0
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v3.7.0
         with:
           registry: quay.io
           username: ${{ secrets.QUAY_USERNAME }}
@@ -224,7 +224,7 @@ jobs:
         if: steps.version-filter.outputs.skip != 'true'
         id: login-ghcr
         continue-on-error: true
-        uses: docker/login-action@74a5d142397b4f367a81961eba4e8cd7edddf772 # v3.7.0
+        uses: docker/login-action@4907a6ddec9925e35a0a9e82d7399ccc52663121 # v3.7.0
         with:
           registry: ghcr.io
           username: ${{ github.repository_owner }}
@@ -248,7 +248,7 @@ jobs:
       - name: "🏷️ Generate Docker Metadata"
         if: steps.version-filter.outputs.skip != 'true'
         id: meta
-        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5.10.0
+        uses: docker/metadata-action@030e881283bb7a6894de51c315a6bfe6a94e05cf # v6.0.0
         with:
           images: |
             name=snowdreamtech/alpine,enable=true
@@ -288,7 +288,7 @@ jobs:
           steps.version-filter.outputs.skip != 'true' &&
           ((github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/')) ||
           (startsWith(github.ref, format('refs/tags/{0}-', matrix.version))))
-        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6.19.2
+        uses: docker/build-push-action@bcafcacb16a39f128d818304e6c9c0c18556b85f # v7.1.0
         with:
           context: docker/${{ matrix.version }}
           build-args: |
@@ -474,7 +474,7 @@ jobs:
         id: trivy
         if: steps.version-filter.outputs.skip != 'true' && steps.build.conclusion == 'success'
         continue-on-error: true
-        uses: aquasecurity/trivy-action@57a97c7e7821a5776cebc9bb87c984fa69cba8f1 # v0.35.0
+        uses: aquasecurity/trivy-action@ed142fd0673e97e23eac54620cfb913e5ce36c25 # v0.36.0
         env:
           TRIVY_DB_REPOSITORY: "public.ecr.aws/aquasecurity/trivy-db"
           TRIVY_CHECKS_BUNDLE_REPOSITORY: "public.ecr.aws/aquasecurity/trivy-checks"
