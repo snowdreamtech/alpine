@@ -52,6 +52,19 @@
           "glob": false
         }
       ]
+    },
+    "docker/3.24": {
+      "release-type": "simple",
+      "component": "3.24",
+      "include-component-in-tag": true,
+      "changelog-path": "CHANGELOG.md",
+      "extra-files": [
+        {
+          "type": "generic",
+          "path": "Dockerfile",
+          "glob": false
+        }
+      ]
     }
   },
   "include-v-in-tag": true,
