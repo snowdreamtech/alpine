@@ -193,6 +193,7 @@ jobs:
           key: ${{ runner.os }}-trivy-${{ github.run_id }}
           restore-keys: |
             ${{ runner.os }}-trivy-
+          lookup-only: true
 
       - name: "🏗️ Configure QEMU Emulation"
         if: steps.version-filter.outputs.skip != 'true'
@@ -237,16 +238,20 @@ jobs:
         if: steps.version-filter.outputs.skip != 'true'
         run: |
           echo "→ Registry login status:"
-          echo "  DockerHub: ${{ steps.login-dockerhub.outcome }}"
-          echo "  Quay.io: ${{ steps.login-quay.outcome }}"
-          echo "  GHCR: ${{ steps.login-ghcr.outcome }}"
+          echo "  DockerHub: ${STEPS_LOGIN_DOCKERHUB_OUTCOME}"
+          echo "  Quay.io: ${STEPS_LOGIN_QUAY_OUTCOME}"
+          echo "  GHCR: ${STEPS_LOGIN_GHCR_OUTCOME}"
 
-          if [ "${{ steps.login-dockerhub.outcome }}" != "success" ] && \
-            [ "${{ steps.login-quay.outcome }}" != "success" ] && \
-            [ "${{ steps.login-ghcr.outcome }}" != "success" ]; then
+          if [ "${STEPS_LOGIN_DOCKERHUB_OUTCOME}" != "success" ] && \
+            [ "${STEPS_LOGIN_QUAY_OUTCOME}" != "success" ] && \
+            [ "${STEPS_LOGIN_GHCR_OUTCOME}" != "success" ]; then
             echo "::error::All registry logins failed. Cannot proceed."
             exit 1
           fi
+        env:
+          STEPS_LOGIN_DOCKERHUB_OUTCOME: ${{ steps.login-dockerhub.outcome }}
+          STEPS_LOGIN_QUAY_OUTCOME: ${{ steps.login-quay.outcome }}
+          STEPS_LOGIN_GHCR_OUTCOME: ${{ steps.login-ghcr.outcome }}
 
       - name: "🏷️ Generate Docker Metadata"
         if: steps.version-filter.outputs.skip != 'true'
@@ -316,7 +321,7 @@ jobs:
         if: steps.version-filter.outputs.skip != 'true' && always()
         run: |
           # Calculate build duration
-          start_time=${{ steps.start-time.outputs.timestamp }}
+          start_time=${STEPS_START_TIME_OUTPUTS_TIMESTAMP}
           end_time=$(date -u +%s)
           duration=$((end_time - start_time))
 
@@ -333,15 +338,18 @@ jobs:
           fi
 
           echo "→ Build completed in ${duration} seconds ($((duration / 60)) minutes)"
+        env:
+          STEPS_START_TIME_OUTPUTS_TIMESTAMP: ${{ steps.start-time.outputs.timestamp }}
 
       - name: "🔍 Verify Docker Manifest (Multi-Platform)"
         id: manifest-check
         if: steps.version-filter.outputs.skip != 'true' && steps.build.conclusion == 'success' && steps.build.outputs.digest != ''
         env:
           IMAGE_DIGEST: ${{ steps.build.outputs.digest }}
+          STEPS_META_OUTPUTS_TAGS: ${{ steps.meta.outputs.tags }}
         run: |
           # Get the first tag for inspection
-          first_tag=$(echo "${{ steps.meta.outputs.tags }}" | head -n 1)
+          first_tag=$(echo "${STEPS_META_OUTPUTS_TAGS}" | head -n 1)
 
           echo "→ Inspecting manifest for: ${first_tag}"
 
@@ -369,6 +377,9 @@ jobs:
         if: steps.version-filter.outputs.skip != 'true' && steps.build.conclusion == 'success'
         env:
           TAGS: ${{ steps.meta.outputs.tags }}
+          STEPS_LOGIN_DOCKERHUB_OUTCOME: ${{ steps.login-dockerhub.outcome }}
+          STEPS_LOGIN_GHCR_OUTCOME: ${{ steps.login-ghcr.outcome }}
+          STEPS_LOGIN_QUAY_OUTCOME: ${{ steps.login-quay.outcome }}
         run: |
           echo "→ Verifying multi-registry image availability..."
 
@@ -424,7 +435,7 @@ jobs:
 
           # Test images from each registry
           # DockerHub (no prefix)
-          if [ "${{ steps.login-dockerhub.outcome }}" = "success" ]; then
+          if [ "${STEPS_LOGIN_DOCKERHUB_OUTCOME}" = "success" ]; then
             dockerhub_tag=$(echo "${TAGS}" | grep -v '/' | head -n 1)
             if [ -n "${dockerhub_tag}" ]; then
               echo "  Testing DockerHub: ${dockerhub_tag}"
@@ -440,7 +451,7 @@ jobs:
           fi
 
           # GHCR
-          if [ "${{ steps.login-ghcr.outcome }}" = "success" ]; then
+          if [ "${STEPS_LOGIN_GHCR_OUTCOME}" = "success" ]; then
             ghcr_tag=$(echo "${TAGS}" | grep '^ghcr.io/' | head -n 1)
             if [ -n "${ghcr_tag}" ]; then
               echo "  Testing GHCR: ${ghcr_tag}"
@@ -456,7 +467,7 @@ jobs:
           fi
 
           # Quay.io
-          if [ "${{ steps.login-quay.outcome }}" = "success" ]; then
+          if [ "${STEPS_LOGIN_QUAY_OUTCOME}" = "success" ]; then
             quay_tag=$(echo "${TAGS}" | grep '^quay.io/' | head -n 1)
             if [ -n "${quay_tag}" ]; then
               echo "  Testing Quay.io: ${quay_tag}"
@@ -535,8 +546,8 @@ jobs:
         id: vuln-check
         if: steps.version-filter.outputs.skip != 'true' && steps.build.conclusion == 'success'
         run: |
-          critical=${{ steps.trivy-summary.outputs.critical }}
-          high=${{ steps.trivy-summary.outputs.high }}
+          critical=${STEPS_TRIVY_SUMMARY_OUTPUTS_CRITICAL}
+          high=${STEPS_TRIVY_SUMMARY_OUTPUTS_HIGH}
 
           if [ "${critical}" -gt 0 ]; then
             echo "::warning title=Critical Vulnerabilities Detected::Found ${critical} critical vulnerabilities in Alpine ${{ matrix.version }} image"
@@ -545,10 +556,13 @@ jobs:
           if [ "${high}" -gt 5 ]; then
             echo "::warning title=High Vulnerabilities Detected::Found ${high} high-severity vulnerabilities in Alpine ${{ matrix.version }} image"
           fi
+        env:
+          STEPS_TRIVY_SUMMARY_OUTPUTS_CRITICAL: ${{ steps.trivy-summary.outputs.critical }}
+          STEPS_TRIVY_SUMMARY_OUTPUTS_HIGH: ${{ steps.trivy-summary.outputs.high }}
 
       - name: "🔏 Install Cosign Tool"
         if: steps.version-filter.outputs.skip != 'true' && steps.build.conclusion == 'success'
-        uses: sigstore/cosign-installer@d7d6bc7722e3daa8354c50bcb52f4837da5e9b6a # v3.8.1
+        uses: sigstore/cosign-installer@v4.1.2 # v3.8.1
 
       - name: "🖊️ Sign the Docker Image"
         if: steps.version-filter.outputs.skip != 'true' && steps.build.conclusion == 'success'
@@ -615,31 +629,31 @@ jobs:
             echo "## 🐳 Docker Build Summary"
             echo ""
             echo "**Alpine Version:** ${{ matrix.version }}"
-            echo "**Build Status:** ${{ steps.build.conclusion }}"
+            echo "**Build Status:** ${STEPS_BUILD_CONCLUSION}"
             echo "**Trigger:** ${{ github.event_name }}"
-            echo "**Ref:** \`${{ github.ref }}\`"
+            echo "**Ref:** \`${GITHUB_REF}\`"
             echo "**Workflow Run:** [#${{ github.run_number }}](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }})"
             echo ""
 
-            if [ "${{ steps.build.conclusion }}" = "success" ]; then
+            if [ "${STEPS_BUILD_CONCLUSION}" = "success" ]; then
               echo "### ⏱️ Build Performance"
               echo ""
-              echo "- **Duration:** ${{ steps.cache-stats.outputs.duration_seconds }}s (${{ steps.cache-stats.outputs.duration_minutes }} min)"
-              echo "- **Cache Efficiency:** ${{ steps.cache-stats.outputs.cache_efficiency }}"
-              echo "- **Started:** ${{ steps.start-time.outputs.datetime }}"
+              echo "- **Duration:** ${STEPS_CACHE_STATS_OUTPUTS_DURATION_SECONDS}s (${STEPS_CACHE_STATS_OUTPUTS_DURATION_MINUTES} min)"
+              echo "- **Cache Efficiency:** ${STEPS_CACHE_STATS_OUTPUTS_CACHE_EFFICIENCY}"
+              echo "- **Started:** ${STEPS_START_TIME_OUTPUTS_DATETIME}"
               echo ""
               echo "### 📦 Published Images"
               echo ""
               echo '```'
-              echo "${{ steps.meta.outputs.tags }}"
+              echo "${STEPS_META_OUTPUTS_TAGS}"
               echo '```'
               echo ""
 
-              if [ -n "${{ steps.manifest-check.outputs.platform_count }}" ]; then
+              if [ -n "${STEPS_MANIFEST_CHECK_OUTPUTS_PLATFORM_COUNT}" ]; then
                 echo "### 🔍 Manifest Verification"
                 echo ""
-                echo "- **Platforms Verified:** ${{ steps.manifest-check.outputs.platform_count }}/8"
-                echo "- **Status:** ${{ steps.manifest-check.outputs.status }}"
+                echo "- **Platforms Verified:** ${STEPS_MANIFEST_CHECK_OUTPUTS_PLATFORM_COUNT}/8"
+                echo "- **Status:** ${STEPS_MANIFEST_CHECK_OUTPUTS_STATUS}"
                 echo ""
               fi
 
@@ -652,7 +666,7 @@ jobs:
               echo "### 🏗️ Build Configuration"
               echo ""
               echo "- **Platforms:** 8 architectures (386, amd64, arm/v6, arm/v7, arm64, ppc64le, riscv64, s390x)"
-              echo "- **Registries:** DockerHub (${{ steps.login-dockerhub.outcome }}), GHCR (${{ steps.login-ghcr.outcome }}), Quay.io (${{ steps.login-quay.outcome }})"
+              echo "- **Registries:** DockerHub (${STEPS_LOGIN_DOCKERHUB_OUTCOME}), GHCR (${STEPS_LOGIN_GHCR_OUTCOME}), Quay.io (${STEPS_LOGIN_QUAY_OUTCOME})"
               echo "- **Cache Sources:** Current branch + main + dev"
               echo ""
               echo "### 🔐 Security & Compliance"
@@ -661,15 +675,15 @@ jobs:
               echo "- ✅ Provenance Attestation (SLSA)"
               echo "- ✅ Trivy Vulnerability Scan (optimized, ignore-unfixed)"
 
-              if [ -n "${{ steps.trivy-summary.outputs.critical }}" ]; then
-                echo "  - 🔴 Critical: ${{ steps.trivy-summary.outputs.critical }}"
-                echo "  - 🟠 High: ${{ steps.trivy-summary.outputs.high }}"
-                echo "  - 🟡 Medium: ${{ steps.trivy-summary.outputs.medium }}"
+              if [ -n "${STEPS_TRIVY_SUMMARY_OUTPUTS_CRITICAL}" ]; then
+                echo "  - 🔴 Critical: ${STEPS_TRIVY_SUMMARY_OUTPUTS_CRITICAL}"
+                echo "  - 🟠 High: ${STEPS_TRIVY_SUMMARY_OUTPUTS_HIGH}"
+                echo "  - 🟡 Medium: ${STEPS_TRIVY_SUMMARY_OUTPUTS_MEDIUM}"
               fi
 
               echo "- ✅ Cosign Signature (keyless OIDC + metadata)"
               echo "- ✅ Multi-registry Smoke Tests"
-            elif [ "${{ steps.build.conclusion }}" = "skipped" ]; then
+            elif [ "${STEPS_BUILD_CONCLUSION}" = "skipped" ]; then
               echo "### ⏭️ Build Skipped"
               echo ""
               echo "This version was not built because the tag filter did not match."
@@ -687,6 +701,21 @@ jobs:
               echo "- Registry authentication issues"
             fi
           } >> "$GITHUB_STEP_SUMMARY"
+        env:
+          STEPS_BUILD_CONCLUSION: ${{ steps.build.conclusion }}
+          STEPS_CACHE_STATS_OUTPUTS_DURATION_SECONDS: ${{ steps.cache-stats.outputs.duration_seconds }}
+          STEPS_CACHE_STATS_OUTPUTS_DURATION_MINUTES: ${{ steps.cache-stats.outputs.duration_minutes }}
+          STEPS_CACHE_STATS_OUTPUTS_CACHE_EFFICIENCY: ${{ steps.cache-stats.outputs.cache_efficiency }}
+          STEPS_START_TIME_OUTPUTS_DATETIME: ${{ steps.start-time.outputs.datetime }}
+          STEPS_META_OUTPUTS_TAGS: ${{ steps.meta.outputs.tags }}
+          STEPS_MANIFEST_CHECK_OUTPUTS_PLATFORM_COUNT: ${{ steps.manifest-check.outputs.platform_count }}
+          STEPS_MANIFEST_CHECK_OUTPUTS_STATUS: ${{ steps.manifest-check.outputs.status }}
+          STEPS_LOGIN_DOCKERHUB_OUTCOME: ${{ steps.login-dockerhub.outcome }}
+          STEPS_LOGIN_GHCR_OUTCOME: ${{ steps.login-ghcr.outcome }}
+          STEPS_LOGIN_QUAY_OUTCOME: ${{ steps.login-quay.outcome }}
+          STEPS_TRIVY_SUMMARY_OUTPUTS_CRITICAL: ${{ steps.trivy-summary.outputs.critical }}
+          STEPS_TRIVY_SUMMARY_OUTPUTS_HIGH: ${{ steps.trivy-summary.outputs.high }}
+          STEPS_TRIVY_SUMMARY_OUTPUTS_MEDIUM: ${{ steps.trivy-summary.outputs.medium }}
 
       - name: "⚠️ Annotate Build Failure"
         if: steps.version-filter.outputs.skip != 'true' && failure()
@@ -694,16 +723,22 @@ jobs:
           echo "::error title=Docker Build Failed (Alpine ${{ matrix.version }})::The multi-platform Docker build failed. Check the workflow logs for details."
 
           # Detailed failure annotations
-          if [ "${{ steps.build.conclusion }}" = "failure" ]; then
+          if [ "${STEPS_BUILD_CONCLUSION}" = "failure" ]; then
             echo "::error title=Build Step Failed::Docker build process failed for Alpine ${{ matrix.version }}"
           fi
 
-          if [ "${{ steps.trivy.conclusion }}" = "failure" ]; then
+          if [ "${STEPS_TRIVY_CONCLUSION}" = "failure" ]; then
             echo "::error title=Security Scan Failed::Trivy vulnerability scan failed for Alpine ${{ matrix.version }}"
           fi
 
-          if [ "${{ steps.login-dockerhub.outcome }}" != "success" ] && \
-            [ "${{ steps.login-quay.outcome }}" != "success" ] && \
-            [ "${{ steps.login-ghcr.outcome }}" != "success" ]; then
+          if [ "${STEPS_LOGIN_DOCKERHUB_OUTCOME}" != "success" ] && \
+            [ "${STEPS_LOGIN_QUAY_OUTCOME}" != "success" ] && \
+            [ "${STEPS_LOGIN_GHCR_OUTCOME}" != "success" ]; then
             echo "::error title=Registry Login Failed::All registry authentications failed"
           fi
+        env:
+          STEPS_BUILD_CONCLUSION: ${{ steps.build.conclusion }}
+          STEPS_TRIVY_CONCLUSION: ${{ steps.trivy.conclusion }}
+          STEPS_LOGIN_DOCKERHUB_OUTCOME: ${{ steps.login-dockerhub.outcome }}
+          STEPS_LOGIN_QUAY_OUTCOME: ${{ steps.login-quay.outcome }}
+          STEPS_LOGIN_GHCR_OUTCOME: ${{ steps.login-ghcr.outcome }}
