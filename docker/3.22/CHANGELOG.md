@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.23.0](https://github.com/snowdreamtech/alpine/compare/3.22-v3.22.4...3.22-v3.23.0) (2026-07-03)
+
+
+### 🚀 Features
+
+* **docker:** enable Alpine edge and testing repositories ([807e8a3](https://github.com/snowdreamtech/alpine/commit/807e8a3af6344b9cf2f19a89105c7bd1bcdc1e79))
+
 ## [3.22.4](https://github.com/snowdreamtech/alpine/compare/3.22-v3.22.3...3.22-v3.22.4) (2026-04-21)
 
 
