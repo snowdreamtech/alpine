@@ -19,13 +19,6 @@
 
 * **docker:** enable Alpine edge and testing repositories ([807e8a3](https://github.com/snowdreamtech/alpine/commit/807e8a3af6344b9cf2f19a89105c7bd1bcdc1e79))
 
-## [3.20.10](https://github.com/snowdreamtech/alpine/compare/3.20-v3.20.9...3.20-v3.20.10) (2026-04-21)
-
-
-### 🐛 Bug Fixes
-
-* **docker:** update Alpine base images to latest security releases ([47d0a83](https://github.com/snowdreamtech/alpine/commit/47d0a83d1f2ea57c52e7c727de069d76b26dccb2))
-
 ## [3.20.9](https://github.com/snowdreamtech/alpine/compare/3.20-v3.20.8...3.20-v3.20.9) (2026-04-21)
 
 
