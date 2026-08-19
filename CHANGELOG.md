@@ -6,6 +6,20 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.15.11](https://github.com/snowdreamtech/template/compare/v0.15.10...v0.15.11) (2026-08-19)
+
+
+### 🐛 Bug Fixes
+
+* update nanoid to 3.3.18 in package-lock.json ([7411de0](https://github.com/snowdreamtech/template/commit/7411de016dbe4a384dc51712354aac7852f4e00b))
+
+
+### ♻️ Miscellaneous Chores
+
+* **deps:** bump the all-dependencies group in /docs with 3 updates ([8c8ffd9](https://github.com/snowdreamtech/template/commit/8c8ffd91c27ffc4a74cf44ea5c3eadec988ffa04))
+* **deps:** bump vite in /docs in the all-dependencies group ([91cdab1](https://github.com/snowdreamtech/template/commit/91cdab13e0b1cbf7e533b1173f02661b0c4dade4))
+* **release:** set bump-patch-for-minor-pre-major to false ([1e47e29](https://github.com/snowdreamtech/template/commit/1e47e29bf8d338de6bf5cee8c1373507568c5c4c))
+
 ## [0.15.10](https://github.com/snowdreamtech/template/compare/v0.15.9...v0.15.10) (2026-08-08)
 
 
