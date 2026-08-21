@@ -7,13 +7,6 @@
 
 * **docker:** remove redundant edge and testing repositories ([cdab5aa](https://github.com/snowdreamtech/alpine/commit/cdab5aa70703d012cfbf39a5fc2397f5295ac4b2))
 
-## [3.24.1](https://github.com/snowdreamtech/alpine/compare/3.24-v3.24.1...3.24-v3.24.1) (2026-08-08)
-
-
-### ♻️ Miscellaneous Chores
-
-* **merge:** merge upstream/dev into dev ([71e3e4a](https://github.com/snowdreamtech/alpine/commit/71e3e4a80f3d2ffb50ac651f9e23ffe8533a3283))
-
 ## [3.25.0](https://github.com/snowdreamtech/alpine/compare/3.24-v3.24.1...3.24-v3.25.0) (2026-07-03)
 
 

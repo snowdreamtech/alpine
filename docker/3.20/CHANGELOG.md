@@ -7,18 +7,6 @@
 
 * **docker:** remove redundant edge and testing repositories ([cdab5aa](https://github.com/snowdreamtech/alpine/commit/cdab5aa70703d012cfbf39a5fc2397f5295ac4b2))
 
-## [3.20.10](https://github.com/snowdreamtech/alpine/compare/3.20-v3.20.10...3.20-v3.20.10) (2026-07-06)
-
-
-### 🚀 Features
-
-* **docker:** enable Alpine edge and testing repositories ([807e8a3](https://github.com/snowdreamtech/alpine/commit/807e8a3af6344b9cf2f19a89105c7bd1bcdc1e79))
-
-
-### ♻️ Miscellaneous Chores
-
-* release main ([52aa071](https://github.com/snowdreamtech/alpine/commit/52aa071876c56cd8f1dcb7fda23ebbeb170cb62c))
-
 ## [3.21.0](https://github.com/snowdreamtech/alpine/compare/3.20-v3.20.10...3.20-v3.21.0) (2026-07-03)
 
 
