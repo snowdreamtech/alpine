@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.22.5](https://github.com/snowdreamtech/alpine/compare/3.22-v3.22.5...3.22-v3.22.5) (2026-08-21)
+
+
+### 🐛 Bug Fixes
+
+* **docker:** remove redundant edge and testing repositories ([cdab5aa](https://github.com/snowdreamtech/alpine/commit/cdab5aa70703d012cfbf39a5fc2397f5295ac4b2))
+
 ## [3.22.5](https://github.com/snowdreamtech/alpine/compare/3.22-v3.22.4...3.22-v3.22.5) (2026-07-06)
 
 
