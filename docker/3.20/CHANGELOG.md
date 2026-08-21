@@ -5,6 +5,13 @@
 
 ### 🐛 Bug Fixes
 
+* **docs:** clean up misaligned version entries in CHANGELOGs ([9552725](https://github.com/snowdreamtech/alpine/commit/95527256f77a5a746f65125061fec2227949458a))
+
+## [3.20.10](https://github.com/snowdreamtech/alpine/compare/3.20-v3.20.10...3.20-v3.20.10) (2026-08-21)
+
+
+### 🐛 Bug Fixes
+
 * **docker:** remove redundant edge and testing repositories ([cdab5aa](https://github.com/snowdreamtech/alpine/commit/cdab5aa70703d012cfbf39a5fc2397f5295ac4b2))
 
 ## [3.20.9](https://github.com/snowdreamtech/alpine/compare/3.20-v3.20.8...3.20-v3.20.9) (2026-04-21)
