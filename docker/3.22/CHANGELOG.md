@@ -7,13 +7,6 @@
 
 * **docs:** clean up misaligned version entries in CHANGELOGs ([9552725](https://github.com/snowdreamtech/alpine/commit/95527256f77a5a746f65125061fec2227949458a))
 
-## [3.22.5](https://github.com/snowdreamtech/alpine/compare/3.22-v3.22.5...3.22-v3.22.5) (2026-08-21)
-
-
-### 🐛 Bug Fixes
-
-* **docker:** remove redundant edge and testing repositories ([cdab5aa](https://github.com/snowdreamtech/alpine/commit/cdab5aa70703d012cfbf39a5fc2397f5295ac4b2))
-
 ## [3.22.4](https://github.com/snowdreamtech/alpine/compare/3.22-v3.22.3...3.22-v3.22.4) (2026-04-21)
 
 
