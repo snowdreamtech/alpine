@@ -52,10 +52,7 @@ ENV KEEPALIVE=${KEEPALIVE} \
 
 # Infrastructure & Tooling Setup
 # Includes standard repositories and essential system packages.
-RUN echo "@edge https://dl-cdn.alpinelinux.org/alpine/edge/main" >> /etc/apk/repositories \
-    && echo "@edgecommunity https://dl-cdn.alpinelinux.org/alpine/edge/community" >> /etc/apk/repositories \
-    && echo "@testing https://dl-cdn.alpinelinux.org/alpine/edge/testing" >> /etc/apk/repositories \
-    && apk update \
+RUN apk update \
     && apk add --no-cache \
     bash \
     zsh \
