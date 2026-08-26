@@ -168,12 +168,6 @@ ghcr.io/snowdreamtech/alpine:1
 ghcr.io/snowdreamtech/alpine:3.23-latest
 ghcr.io/snowdreamtech/alpine:latest
 
-# Same tags for Quay.io
-quay.io/snowdreamtech/alpine:1.2.3
-quay.io/snowdreamtech/alpine:1.2
-quay.io/snowdreamtech/alpine:1
-quay.io/snowdreamtech/alpine:3.23-latest
-quay.io/snowdreamtech/alpine:latest
 ```
 
 ## 🧪 Manual Testing Commands
