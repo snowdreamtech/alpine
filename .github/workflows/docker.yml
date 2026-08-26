@@ -176,16 +176,14 @@ jobs:
         if: steps.version-filter.outputs.skip != 'true'
         run: |
           echo "→ Registry login status:"
-          echo "  DockerHub: ${STEPS_LOGIN_DOCKERHUB_OUTCOME}"
-          echo "  GHCR: ${STEPS_LOGIN_GHCR_OUTCOME}"
+          echo "  DockerHub: ${{ steps.login-dockerhub.outcome }}"
+          echo "  GHCR: ${{ steps.login-ghcr.outcome }}"
 
-          if [ "${STEPS_LOGIN_DOCKERHUB_OUTCOME}" != "success" ] && \
-            [ "${STEPS_LOGIN_GHCR_OUTCOME}" != "success" ]; then
+          if [ "${{ steps.login-dockerhub.outcome }}" != "success" ] && \
+            [ "${{ steps.login-ghcr.outcome }}" != "success" ]; then
             echo "::error::All registry logins failed. Cannot proceed."
             exit 1
           fi
-        env:
-          STEPS_LOGIN_DOCKERHUB_OUTCOME: ${{ steps.login-dockerhub.outcome }}          STEPS_LOGIN_GHCR_OUTCOME: ${{ steps.login-ghcr.outcome }}
 
       - name: "🏷️ Generate Docker Metadata"
         if: steps.version-filter.outputs.skip != 'true'
@@ -310,8 +308,7 @@ jobs:
         if: steps.version-filter.outputs.skip != 'true' && steps.build.conclusion == 'success'
         env:
           TAGS: ${{ steps.meta.outputs.tags }}
-          STEPS_LOGIN_DOCKERHUB_OUTCOME: ${{ steps.login-dockerhub.outcome }}
-          STEPS_LOGIN_GHCR_OUTCOME: ${{ steps.login-ghcr.outcome }}        run: |
+        run: |
           echo "→ Verifying multi-registry image availability..."
 
           # Retry function
@@ -366,7 +363,7 @@ jobs:
 
           # Test images from each registry
           # DockerHub (no prefix)
-          if [ "${STEPS_LOGIN_DOCKERHUB_OUTCOME}" = "success" ]; then
+          if [ "${{ steps.login-dockerhub.outcome }}" = "success" ]; then
             dockerhub_tag=$(echo "${TAGS}" | grep -v '/' | head -n 1)
             if [ -n "${dockerhub_tag}" ]; then
               echo "  Testing DockerHub: ${dockerhub_tag}"
@@ -382,7 +379,7 @@ jobs:
           fi
 
           # GHCR
-          if [ "${STEPS_LOGIN_GHCR_OUTCOME}" = "success" ]; then
+          if [ "${{ steps.login-ghcr.outcome }}" = "success" ]; then
             ghcr_tag=$(echo "${TAGS}" | grep '^ghcr.io/' | head -n 1)
             if [ -n "${ghcr_tag}" ]; then
               echo "  Testing GHCR: ${ghcr_tag}"
@@ -393,12 +390,6 @@ jobs:
                 fi
               else
                 echo "  ✗ GHCR image pull failed after retries"
-              fi
-            fi
-          fi
-
-                fi
-              else
               fi
             fi
           fi
@@ -587,7 +578,7 @@ jobs:
               echo "### 🏗️ Build Configuration"
               echo ""
               echo "- **Platforms:** 8 architectures (386, amd64, arm/v6, arm/v7, arm64, ppc64le, riscv64, s390x)"
-              echo "- **Registries:** DockerHub (${STEPS_LOGIN_DOCKERHUB_OUTCOME}), GHCR (${STEPS_LOGIN_GHCR_OUTCOME})"
+              echo "- **Registries:** DockerHub (${{ steps.login-dockerhub.outcome }}), GHCR (${{ steps.login-ghcr.outcome }})"
               echo "- **Cache Sources:** Current branch + main + dev"
               echo ""
               echo "### 🔐 Security & Compliance"
@@ -631,8 +622,7 @@ jobs:
           STEPS_META_OUTPUTS_TAGS: ${{ steps.meta.outputs.tags }}
           STEPS_MANIFEST_CHECK_OUTPUTS_PLATFORM_COUNT: ${{ steps.manifest-check.outputs.platform_count }}
           STEPS_MANIFEST_CHECK_OUTPUTS_STATUS: ${{ steps.manifest-check.outputs.status }}
-          STEPS_LOGIN_DOCKERHUB_OUTCOME: ${{ steps.login-dockerhub.outcome }}
-          STEPS_LOGIN_GHCR_OUTCOME: ${{ steps.login-ghcr.outcome }}          STEPS_TRIVY_SUMMARY_OUTPUTS_CRITICAL: ${{ steps.trivy-summary.outputs.critical }}
+          STEPS_TRIVY_SUMMARY_OUTPUTS_CRITICAL: ${{ steps.trivy-summary.outputs.critical }}
           STEPS_TRIVY_SUMMARY_OUTPUTS_HIGH: ${{ steps.trivy-summary.outputs.high }}
           STEPS_TRIVY_SUMMARY_OUTPUTS_MEDIUM: ${{ steps.trivy-summary.outputs.medium }}
 
@@ -650,11 +640,10 @@ jobs:
             echo "::error title=Security Scan Failed::Trivy vulnerability scan failed for Alpine ${{ matrix.version }}"
           fi
 
-          if [ "${STEPS_LOGIN_DOCKERHUB_OUTCOME}" != "success" ] && \
-            [ "${STEPS_LOGIN_GHCR_OUTCOME}" != "success" ]; then
+          if [ "${{ steps.login-dockerhub.outcome }}" != "success" ] && \
+            [ "${{ steps.login-ghcr.outcome }}" != "success" ]; then
             echo "::error title=Registry Login Failed::All registry authentications failed"
           fi
         env:
           STEPS_BUILD_CONCLUSION: ${{ steps.build.conclusion }}
           STEPS_TRIVY_CONCLUSION: ${{ steps.trivy.conclusion }}
-          STEPS_LOGIN_DOCKERHUB_OUTCOME: ${{ steps.login-dockerhub.outcome }}          STEPS_LOGIN_GHCR_OUTCOME: ${{ steps.login-ghcr.outcome }}
