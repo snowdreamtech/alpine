@@ -8,13 +8,6 @@
 * **entrypoint:** unify default non-root username to appuser and restore flat script structure ([394e75f](https://github.com/snowdreamtech/alpine/commit/394e75f7f22e82bd56a219d08197833e76404663))
 * **entrypoint:** wrap user setup in function and default username for non-root PUID ([ae10d16](https://github.com/snowdreamtech/alpine/commit/ae10d16a5dd2c3e5c55967d75323d83c95f5fe09))
 
-## [3.20.10](https://github.com/snowdreamtech/alpine/compare/3.20-v3.20.10...3.20-v3.20.10) (2026-08-21)
-
-
-### 🐛 Bug Fixes
-
-* **docs:** clean up misaligned version entries in CHANGELOGs ([9552725](https://github.com/snowdreamtech/alpine/commit/95527256f77a5a746f65125061fec2227949458a))
-
 ## [3.20.9](https://github.com/snowdreamtech/alpine/compare/3.20-v3.20.8...3.20-v3.20.9) (2026-04-21)
 
 
