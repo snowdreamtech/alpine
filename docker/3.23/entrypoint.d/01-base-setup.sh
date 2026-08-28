@@ -6,11 +6,10 @@
 
 set -e
 
-setup_base_environment() {
-  # Default USER to snowdream if PUID/PGID are specified and USER is root or unset
-  if [ "${PUID:-0}" -ne 0 ] && [ "${USER:-root}" = "root" ]; then
-    USER="snowdream"
-  fi
+# Default USER to appuser if PUID/PGID are specified and USER is root or unset
+if [ "${PUID:-0}" -ne 0 ] && [ "${USER:-root}" = "root" ]; then
+  USER="appuser"
+fi
 
 # Create a user with PUID and PGID if specified and doesn't exist
 if [ "$(id -u)" = "0" ]; then
@@ -20,7 +19,7 @@ if [ "$(id -u)" = "0" ]; then
     fi
 
     # 1. Handle group creation/mapping
-    local _EFFECTIVE_GROUP="${USER}"
+    _EFFECTIVE_GROUP="${USER}"
     if ! getent group "${PGID}" >/dev/null 2>&1; then
       if [ "$DEBUG" = "true" ]; then
         echo "→ [EXTENSION] Creating group: ${USER} (GID: ${PGID})"
@@ -40,7 +39,6 @@ if [ "$(id -u)" = "0" ]; then
       fi
       adduser -h /home/"${USER}" -u "${PUID}" -G "${_EFFECTIVE_GROUP}" -s /bin/sh -D "${USER}"
     else
-      local _EXISTING_USER
       _EXISTING_USER=$(getent passwd "${PUID}" | cut -d: -f1)
       if [ "$DEBUG" = "true" ]; then
         echo "→ [EXTENSION] UID ${PUID} already exists as user: ${_EXISTING_USER}. Using it."
@@ -92,6 +90,3 @@ if [ "$DEBUG" = "true" ]; then
   echo "→ [EXTENSION] Applying system umask: ${UMASK}"
 fi
 umask "${UMASK}"
-}
-
-setup_base_environment "$@"
