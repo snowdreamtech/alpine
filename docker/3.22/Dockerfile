@@ -7,11 +7,11 @@
 #   - Native support for PUID/PGID user mapping.
 #   - Pre-installed with essential dev/ops tooling (Git, Curl, Sudo, etc.).
 
-FROM alpine:3.22.6
+FROM alpine:3.22.7
 
 # Build-time Configuration
 # x-release-please-start-version
-ARG VERSION="3.22.6"
+ARG VERSION="3.22.7"
 # x-release-please-end
 ARG BUILDTIME \
     REVISION \
