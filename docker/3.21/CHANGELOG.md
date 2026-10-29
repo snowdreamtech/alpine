@@ -1,5 +1,12 @@
 # Changelog
 
+## [3.21.8](https://github.com/snowdreamtech/alpine/compare/3.21-v3.21.7...3.21-v3.21.8) (2026-10-29)
+
+
+### 🚀 Features
+
+* upgrade alpine versions to 3.21.8, 3.22.6, 3.23.6, 3.24.2 ([e25a021](https://github.com/snowdreamtech/alpine/commit/e25a021c663cbb461120b3c59ada6cf1727ecc1a))
+
 ## [3.21.7](https://github.com/snowdreamtech/alpine/compare/3.21-v3.21.7...3.21-v3.21.7) (2026-10-29)
 
 
