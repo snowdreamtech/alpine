@@ -7,13 +7,6 @@
 
 * upgrade alpine versions to 3.21.8, 3.22.6, 3.23.6, 3.24.2 ([e25a021](https://github.com/snowdreamtech/alpine/commit/e25a021c663cbb461120b3c59ada6cf1727ecc1a))
 
-## [3.20.10](https://github.com/snowdreamtech/alpine/compare/3.20-v3.20.10...3.20-v3.20.10) (2026-10-29)
-
-
-### 🚀 Features
-
-* align with base dev template and retain alpine docker configs ([6c09a29](https://github.com/snowdreamtech/alpine/commit/6c09a29f6e6b59de55bfb7e814963cf2cc7db465))
-
 ## [3.20.9](https://github.com/snowdreamtech/alpine/compare/3.20-v3.20.8...3.20-v3.20.9) (2026-04-21)
 
 ### 🐛 Bug Fixes
