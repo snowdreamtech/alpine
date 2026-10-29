@@ -89,12 +89,12 @@ jobs:
       packages: write
       id-token: write
       security-events: write
-    timeout-minutes: 60
+    timeout-minutes: 360
     env:
       TRIVY_CACHE_DIR: .trivycache
       BUILD_START_TIME: ${{ github.event.repository.updated_at }}
     steps:
-      - name: "🎯 Check Version Filter (workflow_dispatch)"
+      - name: "🎯 Check Version Filter"
         id: version-filter
         run: |
           # For workflow_dispatch, check if this matrix version should run
@@ -105,6 +105,51 @@ jobs:
               exit 0
             fi
           fi
+
+          # For tag pushes, check if tag matches this version or is a unified tag
+          if [ "${{ github.event_name }}" = "push" ]; then
+            case "${{ github.ref }}" in
+              refs/tags/*)
+                tag_name="${{ github.ref }}"
+                tag_name="${tag_name#refs/tags/}"
+                case "${tag_name}" in
+                  ${{ matrix.version }}-*|alpine-${{ matrix.version }}*|${{ matrix.version }}*)
+                    # Version-specific tag, matches this version
+                    ;;
+                  3.20-*|3.21-*|3.22-*|3.23-*|3.24-*)
+                    # Tag for another specific alpine version, skip this version
+                    echo "skip=true" >> "$GITHUB_OUTPUT"
+                    echo "→ Skipping Alpine ${{ matrix.version }} (tag ${tag_name} is for another version)"
+                    exit 0
+                    ;;
+                  *)
+                    # Other tags (e.g. unified tags v1.0.0, alpine-latest): build only if latest or allow all
+                    if [ "${{ matrix.is_latest }}" != "true" ]; then
+                      echo "skip=true" >> "$GITHUB_OUTPUT"
+                      echo "→ Skipping Alpine ${{ matrix.version }} (tag ${tag_name} does not match and not latest)"
+                      exit 0
+                    fi
+                    ;;
+                esac
+                ;;
+            esac
+          fi
+
+          # For release events, check if release tag matches this version
+          if [ "${{ github.event_name }}" = "release" ]; then
+            tag_name="${{ github.event.release.tag_name }}"
+            case "${tag_name}" in
+              ${{ matrix.version }}-*|alpine-${{ matrix.version }}*|${{ matrix.version }}*)
+                # Release tag matches version, continue
+                ;;
+              *)
+                echo "skip=true" >> "$GITHUB_OUTPUT"
+                echo "→ Skipping Alpine ${{ matrix.version }} (release tag ${tag_name} does not match)"
+                exit 0
+                ;;
+            esac
+          fi
+
           echo "skip=false" >> "$GITHUB_OUTPUT"
           echo "→ Building Alpine ${{ matrix.version }}"
 
@@ -223,10 +268,7 @@ jobs:
 
       - name: "🚀 Orchestrate Build & Delivery Suite"
         id: build
-        if: |
-          steps.version-filter.outputs.skip != 'true' &&
-          ((github.event_name != 'push' || !startsWith(github.ref, 'refs/tags/')) ||
-          (startsWith(github.ref, format('refs/tags/{0}-', matrix.version))))
+        if: steps.version-filter.outputs.skip != 'true'
         uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
         with:
           context: docker/${{ matrix.version }}
@@ -474,7 +516,7 @@ jobs:
 
       - name: "🔏 Install Cosign Tool"
         if: steps.version-filter.outputs.skip != 'true' && steps.build.conclusion == 'success'
-        uses: sigstore/cosign-installer@v4.1.2 # v3.8.1
+        uses: sigstore/cosign-installer@6f9f17788090df1f26f669e9d70d6ae9567deba6 # v4.1.2
 
       - name: "🖊️ Sign the Docker Image"
         if: steps.version-filter.outputs.skip != 'true' && steps.build.conclusion == 'success'
