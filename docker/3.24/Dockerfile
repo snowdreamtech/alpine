@@ -10,8 +10,10 @@
 FROM alpine:3.24.2
 
 # Build-time Configuration
+# x-release-please-start-version
+ARG VERSION="3.24.2"
+# x-release-please-end
 ARG BUILDTIME \
-    VERSION \
     REVISION \
     KEEPALIVE=0 \
     CAP_NET_BIND_SERVICE=0 \
@@ -110,4 +112,3 @@ USER root
 WORKDIR /root
 ENTRYPOINT ["docker-entrypoint.sh"]
 CMD ["/bin/sh"]
-# Force Release-Please to bump patch

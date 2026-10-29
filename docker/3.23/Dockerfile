@@ -10,8 +10,10 @@
 FROM alpine:3.23.6
 
 # Build-time Configuration
+# x-release-please-start-version
+ARG VERSION="3.23.6"
+# x-release-please-end
 ARG BUILDTIME \
-    VERSION \
     REVISION \
     KEEPALIVE=0 \
     CAP_NET_BIND_SERVICE=0 \
