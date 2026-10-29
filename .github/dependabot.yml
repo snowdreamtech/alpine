@@ -33,7 +33,7 @@ updates:
       - "infrastructure"
 
   - package-ecosystem: "docker"
-    directory: "/docker/alpine"
+    directory: "/docker/3.20"
     target-branch: "dev"
     open-pull-requests-limit: 5
     rebase-strategy: "auto"
@@ -62,7 +62,7 @@ updates:
           - "version-update:semver-major"
 
   - package-ecosystem: "docker"
-    directory: "/docker/debian"
+    directory: "/docker/3.21"
     target-branch: "dev"
     open-pull-requests-limit: 5
     rebase-strategy: "auto"
@@ -91,7 +91,65 @@ updates:
           - "version-update:semver-major"
 
   - package-ecosystem: "docker"
-    directory: "/docker/rocky"
+    directory: "/docker/3.22"
+    target-branch: "dev"
+    open-pull-requests-limit: 5
+    rebase-strategy: "auto"
+    groups:
+      all-dependencies:
+        patterns: ["*"]
+        update-types:
+          - "patch"
+          - "minor"
+          - "major"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "build(deps):"
+    labels:
+      - "dependencies"
+      - "docker"
+      - "infrastructure"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-minor"
+          - "version-update:semver-major"
+
+  - package-ecosystem: "docker"
+    directory: "/docker/3.23"
+    target-branch: "dev"
+    open-pull-requests-limit: 5
+    rebase-strategy: "auto"
+    groups:
+      all-dependencies:
+        patterns: ["*"]
+        update-types:
+          - "patch"
+          - "minor"
+          - "major"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+    cooldown:
+      default-days: 7
+    commit-message:
+      prefix: "build(deps):"
+    labels:
+      - "dependencies"
+      - "docker"
+      - "infrastructure"
+    ignore:
+      - dependency-name: "*"
+        update-types:
+          - "version-update:semver-minor"
+          - "version-update:semver-major"
+
+  - package-ecosystem: "docker"
+    directory: "/docker/3.24"
     target-branch: "dev"
     open-pull-requests-limit: 5
     rebase-strategy: "auto"
