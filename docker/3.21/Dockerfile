@@ -7,7 +7,7 @@
 #   - Native support for PUID/PGID user mapping.
 #   - Pre-installed with essential dev/ops tooling (Git, Curl, Sudo, etc.).
 
-FROM alpine:3.21.9
+FROM alpine:3.21.10
 
 # Build-time Configuration
 # x-release-please-start-version
